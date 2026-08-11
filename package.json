@@ -1,0 +1,112 @@
+{
+  "name": "ignoshashi",
+  "version": "1.0.0",
+  "description": "Ignoshashi - Server-Side Meme Coin Terminal (pump.fun+) with Star Wars Pixel Art UI",
+  "main": "main.js",
+  "author": "Ignoshashi",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "server": "node server.js",
+    "electron": "electron .",
+    "desktop": "electron .",
+    "app": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux",
+    "pm2:start": "pm2 start server.js --name ignoshashi --watch",
+    "pm2:stop": "pm2 stop ignoshashi",
+    "pm2:restart": "pm2 restart ignoshashi",
+    "pm2:logs": "pm2 logs ignoshashi"
+  },
+  "build": {
+    "appId": "com.ignoshashi.terminal",
+    "productName": "Ignoshashi",
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "node_modules/better-sqlite3/**",
+      "node_modules/usb/**",
+      "node_modules/bindings/**",
+      "node_modules/node-gyp-build/**",
+      "node_modules/bufferutil/**",
+      "node_modules/utf-8-validate/**",
+      "node_modules/blake-hash/**",
+      "node_modules/tiny-secp256k1/**"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "server.js",
+      "package.json",
+      "contracts/**/*",
+      "public/**/*",
+      ".env",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "public",
+        "to": "public"
+      },
+      {
+        "from": "contracts",
+        "to": "contracts"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.finance",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "Unknown.png"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "Unknown.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "category": "Finance",
+      "icon": "Unknown.png"
+    }
+  },
+  "dependencies": {
+    "@metamask/sdk": "^0.34.0",
+    "@solana/wallet-adapter-base": "^0.9.27",
+    "@solana/wallet-adapter-react": "^0.15.39",
+    "@solana/wallet-adapter-wallets": "^0.19.38",
+    "@solana/web3.js": "^1.98.4",
+    "@walletconnect/modal": "^2.7.0",
+    "@walletconnect/web3wallet": "^1.16.1",
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.2",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "stripe": "^14.25.0",
+    "uuid": "^9.0.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.2.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}

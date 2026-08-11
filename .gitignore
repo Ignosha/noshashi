@@ -1,0 +1,15 @@
+node_modules/
+dist/
+release/
+*.log
+ignoshashi.db
+ignoshashi.db-journal
+ignoshashi.db-shm
+ignoshashi.db-wal
+backups/
+.env
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

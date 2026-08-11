@@ -1,0 +1,16 @@
+node_modules/
+npm-debug.log
+ignoshashi.db
+ignoshashi.db-journal
+backups/
+.env
+.git/
+.gitignore
+*.md
+!PRODUCTION.md
+.idea/
+.vscode/
+*.swp
+.DS_Store
+tests/
+coverage/

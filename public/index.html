@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self' https://*.rpc.quiknode.pro https://*.solana-rpc.com https://*.infura.io https://*.alchemyapi.io https://*.ankr.com https://*.chainstacklabs.com https://*.getblock.io https://*.moralis.io https://*.tenderly.co https://*.publicnode.com https://*.drpc.org https://*.1rpc.io https://*.quiknode.pro https://*.blastapi.io https://*.alchemy.com https://*.infura.io https://*.rpcpool.com https://*.ankr.com https://*.chainstacklabs.com https://*.getblock.io https://*.moralis.io https://*.tenderly.co https://*.publicnode.com https://*.drpc.org https://*.1rpc.io https://*.quiknode.pro https://*.blastapi.io; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';" />
+  <title>IGNOSHASHI - Meme Coin Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Star Wars style preloader -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-logo pixel-anim">IGNOSHASHI</div>
+    <div class="preloader-sub pixel">MAY THE MEMES BE WITH YOU</div>
+    <div class="preloader-bar"><div class="preloader-fill" id="preloaderFill"></div></div>
+    <div class="preloader-tip pixel tiny" id="preloaderTip">INITIALIZING TERMINAL...</div>
+  </div>
+
+  <!-- Pixel starfield background -->
+  <canvas id="starfield"></canvas>
+  <div class="scanlines"></div>
+  <div class="noise"></div>
+  <div class="grid-bg"></div>
+  <div class="vignette"></div>
+  <div class="black-hole"></div>
+  <div class="nebula"></div>
+  <canvas id="particleCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.4"></canvas>
+
+  <!-- Loading screen -->
+  <div id="loadingScreen" style="position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s">
+    <div class="pixel lg glow-cyan" style="font-size:28px;margin-bottom:20px">IGNOSHASHI</div>
+    <div class="pixel small dim" style="margin-bottom:30px">MEME COIN TERMINAL</div>
+    <div style="width:200px;height:4px;background:var(--panel-line);position:relative;overflow:hidden">
+      <div id="loadingBar" style="position:absolute;left:0;top:0;bottom:0;background:var(--cyan);width:0%;transition:width 0.3s"></div>
+    </div>
+    <div class="pixel tiny dim" style="margin-top:10px" id="loadingText">INITIALIZING SYSTEMS_</div>
+  </div>
+
+  <!-- Onboarding tour -->
+  <div id="onboarding" class="onboarding hidden">
+    <div class="onboarding-card pixel-anim">
+      <div class="onboarding-step" id="onbStep1">
+        <div class="pixel lg glow-cyan" style="margin-bottom:12px">🚀 WELCOME TO IGNOSHASHI</div>
+        <div class="pixel small" style="margin-bottom:16px">The most powerful meme coin terminal in the galaxy. Let's take a quick tour.</div>
+      <div class="pixel tiny dim" style="margin-bottom:16px">Press <b>NEXT</b> or hit <b>ENTER</b></div>
+      <button class="pixel-btn" id="onbNext1">NEXT →</button>
+      </div>
+      <div class="onboarding-step hidden" id="onbStep2">
+        <div class="pixel lg glow-yellow" style="margin-bottom:12px">🏠 HOME</div>
+        <div class="pixel small" style="margin-bottom:16px">Your command center. View top tokens, Token of the Day, and market stats.</div>
+        <button class="pixel-btn" id="onbNext2">NEXT →</button>
+      </div>
+      <div class="onboarding-step hidden" id="onbStep3">
+        <div class="pixel lg glow-green" style="margin-bottom:12px">📈 TRADE</div>
+        <div class="pixel small" style="margin-bottom:16px">Buy and sell tokens with live charts, whale tracking, and price alerts.</div>
+        <button class="pixel-btn" id="onbNext3">NEXT →</button>
+      </div>
+      <div class="onboarding-step hidden" id="onbStep4">
+        <div class="pixel lg glow-purple" style="margin-bottom:12px">🛠️ TOOLS</div>
+        <div class="pixel small" style="margin-bottom:16px">Advanced features: staking, airdrops, bridges, DCA, limit orders, and more.</div>
+        <button class="pixel-btn" id="onbNext4">NEXT →</button>
+      </div>
+      <div class="onboarding-step hidden" id="onbStep5">
+        <div class="pixel lg glow-cyan" style="margin-bottom:12px">⌨️ SHORTCUTS</div>
+        <div class="pixel small" style="margin-bottom:16px">Press <b>T</b> Trade · <b>P</b> Portfolio · <b>W</b> Watchlist · <b>N</b> News · <b>L</b> Launchpad · <b>C</b> Create · <b>/</b> Search</div>
+        <button class="pixel-btn" id="onbFinish">🚀 LAUNCH</button>
+      </div>
+      <div class="onboarding-dots" id="onbDots"></div>
+    </div>
+  </div>
+
+  <!-- Search results dropdown -->
+  <div id="searchDropdown" class="search-dropdown hidden" style="position:fixed;top:68px;right:20px;z-index:30;width:320px;max-height:400px;overflow-y:auto"></div>
+
+  <!-- Command palette -->
+  <div id="commandPalette" class="command-palette hidden" style="position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--cyan);padding:16px;width:90%;max-width:500px;box-shadow:0 0 30px rgba(50,242,255,0.3)">
+      <div class="pixel small" style="margin-bottom:8px;color:var(--cyan)">⌘ COMMAND PALETTE</div>
+      <input id="commandInput" class="pixel-input" placeholder="Type a command or page..." style="margin-bottom:8px" />
+      <div id="commandResults" style="max-height:300px;overflow-y:auto"></div>
+      <div class="pixel tiny dim" style="margin-top:8px">ESC to close · Type to search</div>
+    </div>
+  </div>
+
+  <!-- TOP BAR -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">☰</button>
+      <div class="logo-pixel pixel-anim">IG</div>
+      <div class="logo-text">
+        <span class="logo-main">IGNOSHASHI</span>
+        <span class="logo-sub pixel">MEME COIN TERMINAL</span>
+      </div>
+      <div class="pixel tiny" id="liveTicker" style="color:var(--green);margin-left:12px;white-space:nowrap;overflow:hidden;max-width:300px;text-overflow:ellipsis">LIVE: --</div>
+      <span class="chain-status" id="chainStatus" title="Real on-chain status">⚙️ CHAIN: ...</span>
+    </div>
+    <div class="topbar-right">
+      <input id="globalSearch" class="pixel-input" placeholder="🔍 Search tokens... (/) " style="width:200px;margin:0;padding:6px 8px;font-size:12px" />
+      <div id="gasWidget" class="pixel tiny dim" style="margin-right:8px">⚡ GAS: --</div>
+      <div class="wallet-box" id="walletBox">
+        <img id="walletProfilePic" src="" alt="" style="width:24px;height:24px;border-radius:50%;border:2px solid var(--cyan);display:none;margin-right:6px;object-fit:cover;" />
+        <span class="pixel small" id="walletAddress">⛓ Connect</span>
+      </div>
+      <span class="network-badge" id="networkBadge">⬢ SOLANA MAINNET</span>
+      <button class="pixel tiny" id="toggleNetwork" style="background:var(--panel);border:2px solid var(--cyan);color:var(--cyan);padding:6px 10px;cursor:pointer;font-size:9px">⟲ SWAP</button>
+      <button class="pixel tiny" id="notificationBtn" style="background:var(--panel);border:2px solid var(--yellow);color:var(--yellow);padding:8px">🔔</button>
+      <button class="pixel tiny" id="soundToggle" style="background:var(--panel);border:2px solid var(--cyan);color:var(--cyan);padding:8px" title="Toggle UI sounds">🔊</button>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="sidebar" id="sidebar">
+    <button class="nav-item active" data-page="home">🏠 HOME</button>
+    <button class="nav-item" data-page="terminal">📡 TERMINAL</button>
+    <button class="nav-item" data-page="leaderboard">🏆 LEADERBOARD</button>
+    <button class="nav-item" data-page="create">🪙 CREATE</button>
+    <button class="nav-item" data-page="trade">📈 TRADE</button>
+    <button class="nav-item" data-page="rank">🔬 ANALYSIS</button>
+    <button class="nav-item" data-page="watchlist">👁 WATCHLIST</button>
+    <button class="nav-item" data-page="portfolio">💼 PORTFOLIO</button>
+    <button class="nav-item" data-page="launchpad">🚀 LAUNCHPAD</button>
+    <button class="nav-item" data-page="pumpfun">🎰 PUMP.FUN</button>
+    <button class="nav-item" data-page="news">📺 NEWS</button>
+    <button class="nav-item" data-page="tools">🛠️ TOOLS</button>
+    <button class="nav-item" data-page="api">🔌 DEV API</button>
+    <button class="nav-item" data-page="announce">📢 ANNOUNCE</button>
+    <button class="nav-item" data-page="earnings">💰 FEES</button>
+    <button class="nav-item" data-page="memecoin">🪙 MEME ANALYTICS</button>
+    <button class="nav-item" data-page="alerts">🔔 ALERTS</button>
+    <button class="nav-item" data-page="whale">🐋 WHALES</button>
+    <button class="nav-item" data-page="traders">🏆 TRADERS</button>
+    <button class="nav-item" data-page="settings">⚙️ SETTINGS</button>
+    <button class="nav-item" data-page="help">❓ HELP</button>
+    <button class="nav-item" data-page="about">ℹ️ ABOUT</button>
+    <button class="nav-item" data-page="achievements">🏆 ACHIEVEMENTS</button>
+    <button class="nav-item" data-page="dashboard">📊 DASHBOARD</button>
+    <button class="nav-item" data-page="history">📜 HISTORY</button>
+    <div class="nav-spacer"></div>
+    <div class="nav-status pixel tiny">
+      <span class="dot live"></span> LIVE
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+    <!-- HOME -->
+    <section class="page active" id="page-home">
+      <div class="black-hole"></div>
+      <div class="nebula"></div>
+      <div class="home-banner pixel-anim">
+        <h1 class="home-title glow-cyan">IGNOSHASHI</h1>
+        <p class="pixel subtitle">MAY THE MEMES BE WITH YOU</p>
+        <p class="pixel small dim">The galactic terminal for meme coin degens</p>
+        <div class="home-stats">
+          <div class="stat-block holo-active">
+            <span class="pixel tiny dim">TOKENS</span>
+            <span class="pixel lg stat-counter" id="statTokens">0</span>
+          </div>
+          <div class="stat-block holo-active">
+            <span class="pixel tiny dim">VOLUME</span>
+            <span class="pixel lg accent stat-counter" id="statVolume">0</span>
+          </div>
+          <div class="stat-block holo-active">
+            <span class="pixel tiny dim">LEADER</span>
+            <span class="pixel lg cyan stat-counter" id="statLeader">NONE</span>
+          </div>
+          <div class="stat-block holo-active">
+            <span class="pixel tiny dim">MARKET CAP</span>
+            <span class="pixel lg glow-yellow stat-counter" id="statMarketCap">$0</span>
+          </div>
+          <div class="stat-block holo-active">
+            <span class="pixel tiny dim">ACTIVE TRADERS</span>
+            <span class="pixel lg glow-purple stat-counter" id="statTraders">0</span>
+          </div>
+          <div class="stat-block holo-active">
+            <span class="pixel tiny dim">GRADUATED</span>
+            <span class="pixel lg glow-green stat-counter" id="statGraduated">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="crt-tv" style="margin-top:20px">
+        <div class="crt-screen">
+          <div class="crt-scanline"></div>
+          <canvas id="spaceCanvas" width="800" height="400" style="width:100%;height:400px;display:block" class="pixel-space-canvas"></canvas>
+        </div>
+        <div class="crt-controls">
+          <span class="pixel tiny dim">CH: 01</span>
+          <span class="pixel tiny dim" id="spaceLabel">GALACTIC VIEW</span>
+          <span class="pixel tiny dim">📡 LIVE</span>
+        </div>
+      </div>
+
+      <div class="token-of-day" id="tokenOfDay">
+        <div class="pixel tiny dim" style="margin-bottom:8px">⭐ TOKEN OF THE DAY</div>
+        <div class="pixel lg glow-yellow" id="todName">-</div>
+        <div class="pixel small cyan" id="todSymbol">-</div>
+        <div class="pixel tiny" id="todDesc" style="margin-top:6px"></div>
+        <span id="todId" class="hidden"></span>
+        <button class="pixel-btn small" style="margin-top:12px" onclick="global.selectToken(document.getElementById('todId').textContent)">🚀 TRADE NOW</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel" id="home-announce">
+          <div class="panel-title pixel">📢 GALACTIC ANNOUNCEMENTS</div>
+          <div class="panel-body" id="homeAnnounceList"><p class="dim pixel small loading-text">INITIALIZING DATA_</p></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title pixel">🏆 TOP LEADERS</div>
+          <div class="panel-body" id="homeLeaders"><p class="dim pixel small loading-text">FETCHING LEADERBOARD_</p></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title pixel">🪙 ALL TOKENS</div>
+        <div class="panel-body">
+          <div class="trending-tags">
+            <button class="trending-tag active" data-filter="all">🔥 ALL</button>
+            <button class="trending-tag" data-filter="solana">SOL</button>
+            <button class="trending-tag" data-filter="ethereum">ETH</button>
+            <button class="trending-tag" data-filter="verified">✅ VERIFIED</button>
+            <button class="trending-tag" data-filter="graduated">🎓 GRADUATED</button>
+            <button class="trending-tag" data-filter="trending">📈 TRENDING</button>
+          </div>
+          <div id="homeTokenGrid"><p class="dim pixel small loading-text">SCANNING GALAXY_</p></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title pixel">🌌 LIVE GALAXY ACTIVITY</div>
+        <div class="panel-body">
+          <canvas id="galaxyCanvas" width="1200" height="300" style="width:100%;height:300px;display:block" class="pixel-space-canvas"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title pixel">⭐ TRENDING TAGS</div>
+        <div class="panel-body">
+          <div class="trending-tags" id="trendingTags">
+            <span class="trending-tag">#pepe</span>
+            <span class="trending-tag">#doge</span>
+            <span class="trending-tag">#shiba</span>
+            <span class="trending-tag">#rocket</span>
+            <span class="trending-tag">#moon</span>
+            <span class="trending-tag">#chad</span>
+            <span class="trending-tag">#based</span>
+            <span class="trending-tag">#pixel</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">📈 MARKET OVERVIEW</div>
+          <div class="panel-body" id="marketOverview">
+            <div class="pixel tiny dim">Loading market data...</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🔥 RECENT TRADES</div>
+          <div class="panel-body" id="recentTrades">
+            <div class="pixel tiny dim">Loading trades...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title pixel">🚀 TOP MOVERS</div>
+        <div class="panel-body" id="topMovers">
+          <div class="pixel tiny dim">Loading top movers...</div>
+        </div>
+      </div>
+
+      <div class="panel holo" id="supportPanel">
+        <div class="panel-title pixel glow-yellow">💝 SUPPORT IGNOSHASHI — 2% PLATFORM FEE WALLETS</div>
+        <div class="panel-body">
+              <div class="pixel small" style="margin-bottom:12px">Every trade contributes 2% to keep the terminal running. Donate directly to support development:</div>
+          <div class="support-grid">
+            <div class="support-box">
+              <div class="pixel tiny dim">ETHEREUM (MAINNET)</div>
+              <code class="support-addr" id="supportEthAddr">0x5985a841601aE93D8Ddfec88715C755235490404</code>
+              <button class="pixel-btn small" onclick="global.copyToClipboard && global.copyToClipboard('supportEthAddr')">📋 COPY</button>
+            </div>
+            <div class="support-box">
+              <div class="pixel tiny dim">SOLANA (MAINNET)</div>
+              <code class="support-addr" id="supportSolAddr">J9mFgKsF9f2eNSrH7FqzBoADsgzU9diDQ3L9WUm9mDh7</code>
+              <button class="pixel-btn small" onclick="global.copyToClipboard && global.copyToClipboard('supportSolAddr')">📋 COPY</button>
+            </div>
+          </div>
+          <div class="pixel tiny dim" style="margin-top:10px">Tip: Donations help fund RPC nodes, server costs, and new features. 🙏</div>
+        </div>
+      </div>
+
+      <div class="lead-cta pixel-anim">
+        <button class="pixel-btn big" data-nav="create">🪙 LAUNCH A MEME COIN</button>
+        <button class="pixel-btn big ghost" data-nav="terminal">📡 OPEN TERMINAL</button>
+      </div>
+    </section>
+
+    <!-- TERMINAL -->
+    <section class="page" id="page-terminal">
+      <div class="page-head">
+        <h2 class="pixel glow-green">📡 LIVE TERMINAL</h2>
+        <button class="pixel-btn small" id="terminalPause">⏸ PAUSE</button>
+      </div>
+      <div class="terminal">
+        <div class="terminal-title-bar pixel tiny">
+          <span>ROOT@IGNOSHASHI: ~/live</span>
+          <span id="termStatus" class="dot live"></span>
+        </div>
+        <div id="terminalLog" class="terminal-log"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">🪙 SORT BY</div>
+        <div class="panel-body">
+          <div class="sort-row">
+            <button class="chip" data-sort="newest">Newest</button>
+            <button class="chip" data-sort="marketcap">Market Cap</button>
+            <button class="chip" data-sort="volume">Volume</button>
+          </div>
+          <div id="terminalTokenList" class="token-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section class="page" id="page-leaderboard">
+      <div class="page-head">
+        <h2 class="pixel glow-yellow">🏆 LIVE LEADERBOARD</h2>
+      </div>
+      <div class="panel">
+        <table class="pixel-table">
+          <thead>
+            <tr><th>#</th><th>TOKEN</th><th>PRICE</th><th>MKTCAP</th><th>VOLUME</th><th>NET</th><th></th></tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CREATE -->
+    <section class="page" id="page-create">
+      <div class="page-head"><h2 class="pixel glow-cyan">🪙 CREATE MEME COIN</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">TOKEN DESIGNER</div>
+          <div class="panel-body">
+            <label class="pixel small">NAME</label>
+            <input id="crName" class="pixel-input" placeholder="Baby Yoda Coin" maxlength="32" />
+            <label class="pixel small">SYMBOL</label>
+            <input id="crSymbol" class="pixel-input" placeholder="BYODA" maxlength="8" />
+            <label class="pixel small">DESCRIPTION</label>
+            <textarea id="crDesc" class="pixel-input" rows="3" placeholder="The force is strong with this meme"></textarea>
+            <label class="pixel small">SUPPLY</label>
+            <input id="crSupply" class="pixel-input" type="number" value="1000000000" />
+            <label class="pixel small">TOKEN IMAGE (PNG / JPG / GIF / HEIC / WEBP / SVG)</label>
+            <input id="crImage" class="pixel-input" type="file" accept="image/*,.gif,.heic,.heif,.png,.jpg,.jpeg,.webp,.svg,.bmp,.avif" />
+            <div class="tok-upload" id="crImagePreview"><span class="pixel tiny dim">NO IMAGE SELECTED</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+              <div>
+                <label class="pixel small">WEBSITE (optional)</label>
+                <input id="crWebsite" class="pixel-input" placeholder="https://..." />
+              </div>
+              <div>
+                <label class="pixel small">TWITTER (optional)</label>
+                <input id="crTwitter" class="pixel-input" placeholder="@username" />
+              </div>
+              <div>
+                <label class="pixel small">TELEGRAM (optional)</label>
+                <input id="crTelegram" class="pixel-input" placeholder="t.me/..." />
+              </div>
+              <div>
+                <label class="pixel small">BUY TAX % (optional, max 25)</label>
+                <input id="crBuyTax" class="pixel-input" type="number" value="0" min="0" max="25" />
+              </div>
+              <div>
+                <label class="pixel small">SELL TAX % (optional, max 25)</label>
+                <input id="crSellTax" class="pixel-input" type="number" value="0" min="0" max="25" />
+              </div>
+              <div>
+                <label class="pixel small">MARKETING TAX % (optional)</label>
+                <input id="crMktTax" class="pixel-input" type="number" value="0" min="0" max="10" />
+              </div>
+              <div>
+                <label class="pixel small">MAX WALLET % (anti-whale)</label>
+                <input id="crMaxWallet" class="pixel-input" type="number" value="2" min="0.1" max="20" />
+              </div>
+              <div>
+                <label class="pixel small">REFERRAL REWARD %</label>
+                <input id="crRefReward" class="pixel-input" type="number" value="0" min="0" max="10" />
+              </div>
+              <div>
+                <label class="pixel small">LP LOCK (days, 0 = no lock)</label>
+                <input id="crLPLock" class="pixel-input" type="number" value="0" min="0" max="3650" />
+              </div>
+              <div>
+                <label class="pixel small">TEAM VESTING (days)</label>
+                <input id="crVesting" class="pixel-input" type="number" value="0" min="0" max="1825" />
+              </div>
+              <div>
+                <label class="pixel small">HONEYPOT CHECK</label>
+                <select id="crHoneypot" class="pixel-input">
+                  <option value="0">Disabled</option>
+                  <option value="1" selected>Enabled (anti-rug)</option>
+                </select>
+              </div>
+            </div>
+            <div class="fee-banner pixel small" style="margin-top:10px">
+              💸 <b>2% PLATFORM FEE</b> routed to Ignoshashi vault
+            </div>
+            <div class="fee-banner pixel small" style="margin-top:6px;color:var(--yellow)">
+              ⚠️ <b>LIQUIDITY POOL REQUIRED</b> for trading. After deployment, create a pool on Uniswap (ETH) or Raydium (SOL).
+            </div>
+            <button id="btnCreate" class="pixel-btn big w100" style="margin-top:10px">🚀 DEPLOY TO MAINNET</button>
+            <button id="btnPublishPumpCreate" class="pixel-btn big w100" style="display:none;margin-top:8px;background:var(--yellow);color:#000">🎰 PUBLISH TO PUMP.FUN</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🔮 PREVIEW</div>
+          <div class="panel-body center">
+            <div class="token-avatar-big pixel-anim" id="pvAvatar">🪙</div>
+            <div class="pixel lg" id="pvName">-</div>
+            <div class="pixel small cyan" id="pvSymbol">$ -</div>
+            <div class="pixel tiny dim" id="pvSupply">SUPPLY: -</div>
+            <div class="pixel tiny dim" id="pvCreator" style="margin-top:8px">CREATOR: AUTO (CONNECTED WALLET)</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">📜 CONTRACT PREVIEW (SOLIDITY)</div>
+        <pre class="code" id="contractPreview"></pre>
+      </div>
+    </section>
+
+    <!-- TRADE -->
+    <section class="page" id="page-trade">
+      <div class="page-head">
+        <h2 class="pixel glow-green">📈 TRADE TERMINAL</h2>
+      </div>
+      <div class="trade-layout">
+        <div class="trade-left">
+          <div class="panel">
+            <div class="panel-title pixel">
+              <select id="tradeTokenSel" class="pixel-input inline"></select>
+            </div>
+            <div class="panel-body">
+              <div id="tradeInfo" class="trade-info">
+                <div><span class="pixel tiny dim">PRICE</span><span class="pixel lg cyan" id="tPrice">-</span></div>
+                <div><span class="pixel tiny dim">MKTCAP</span><span class="pixel lg" id="tCap">-</span></div>
+                <div><span class="pixel tiny dim">SUPPLY</span><span class="pixel lg" id="tSupply">-</span></div>
+                <div><span class="pixel tiny dim">NETWORK</span><span class="pixel lg accent" id="tNet">-</span></div>
+                <div id="tradeExtraInfo"></div>
+              <button id="btnGraduate" class="pixel-btn small w100" style="display:none;margin-top:8px">🎓 GRADUATE TO DEX</button>
+              <button id="btnPublishPump" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--yellow);color:#000">🎰 PUBLISH TO PUMP.FUN</button>
+              <button id="btnCopyTrade" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--purple);color:#fff">📋 COPY TRADE</button>
+              <button id="btnAlert" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--orange);color:#000">🔔 SET ALERT</button>
+              <button id="btnLimitModal" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--cyan);color:#000">📋 LIMIT ORDER</button>
+              <button id="btnSniperModal" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--yellow);color:#000">🎯 SNIPER BOT</button>
+              <button id="btnVerify" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--green);color:#000">✅ REQUEST VERIFICATION</button>
+              <button id="btnCreateLP" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--purple);color:#fff">💧 CREATE LIQUIDITY POOL</button>
+              <button id="btnLPGuide" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--orange);color:#000">📖 LP GUIDE</button>
+              <button id="btnWithdraw" class="pixel-btn small w100" style="display:none;margin-top:6px;background:var(--green);color:#000">💸 SELL & WITHDRAW</button>
+              </div>
+              <div class="chart-wrap" id="chartWrap">
+                <div class="chart-toolbar">
+                  <span class="chart-title pixel tiny dim">PIXEL CANDLESTICKS</span>
+                  <div class="chart-tf" id="chartTf">
+                    <button class="chip active" data-tf="1m">1m</button>
+                    <button class="chip" data-tf="5m">5m</button>
+                    <button class="chip" data-tf="15m">15m</button>
+                    <button class="chip" data-tf="1h">1h</button>
+                    <button class="chip" data-tf="4h">4h</button>
+                    <button class="chip" data-tf="1D">1D</button>
+                  </div>
+                  <div class="chart-ind" id="chartInd">
+                    <button class="chip" data-ind="sma">SMA</button>
+                    <button class="chip" data-ind="ema">EMA</button>
+                    <button class="chip" data-ind="rsi">RSI</button>
+                    <button class="chip" data-ind="macd">MACD</button>
+                    <button class="chip" data-ind="bb">BOLL</button>
+                  </div>
+                  <div class="chart-tools" id="chartTools">
+                    <button class="chip" data-tool="trend">✏️Trend</button>
+                    <button class="chip" data-tool="hline">— Line</button>
+                    <button class="chip" data-tool="fib">Fibonacci</button>
+                    <button class="chip" data-tool="rect">Rect</button>
+                    <button class="chip" data-tool="clear">🗑 Clear</button>
+                  </div>
+                </div>
+                <div class="chart-readout pixel tiny" id="chartReadout"></div>
+                <canvas id="candleChart"></canvas>
+                <div class="chart-tf-note pixel tiny dim" id="chartOracle"></div>
+                <div id="bondingCurveSection" style="margin-top:8px;display:none;">
+                  <div class="pixel tiny dim" style="margin-bottom:4px;">📈 BONDING CURVE</div>
+                  <canvas id="bondingCurveChart" style="width:100%;height:80px;background:#0a0a14;border:1px solid var(--panel-line);"></canvas>
+                  <div class="pixel tiny dim" style="margin-top:4px;" id="bondingCurveInfo">Bonded: 0 / 0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="trade-right">
+          <div class="panel">
+            <div class="panel-title pixel">💱 BUY / SELL</div>
+            <div class="panel-body">
+              <div class="buy-sell-tabs">
+                <button class="chip active" id="tabBuy">BUY</button>
+                <button class="chip" id="tabSell">SELL</button>
+              </div>
+              <label class="pixel small" id="amountLabel">AMOUNT (SOL / ETH)</label>
+              <input id="tradeQty" class="pixel-input" type="number" placeholder="0.0" />
+              <div class="quick-amounts">
+                <button class="chip" data-pct="0.25">25%</button>
+                <button class="chip" data-pct="0.5">50%</button>
+                <button class="chip" data-pct="0.75">75%</button>
+                <button class="chip" id="btnMax">MAX</button>
+              </div>
+              <div id="tradeEstimate" class="pixel tiny dim" style="margin-top:6px"></div>
+               <div class="row-space" style="margin-top:10px">
+                 <button class="pixel-btn buy w100" id="btnTrade">⇩ BUY</button>
+               </div>
+               <div id="tradeResult" class="pixel small"></div>
+               <div id="priceImpact" class="pixel tiny" style="margin-top:6px"></div>
+             </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title pixel">📜 RECENT TRADES</div>
+            <div id="tradeOrderbook" class="orderbook"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title pixel">📋 YOUR TRANSACTIONS</div>
+            <div id="userTxHistory" class="orderbook">
+              <p class="dim pixel small loading-text">AWAITING TRANSACTIONS_</p>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title pixel">🐋 WHALE ACTIVITY</div>
+            <div class="panel-body" id="whaleTradeFeed"><p class="dim pixel small">Loading whale data...</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RANK/ANALYSIS -->
+    <section class="page" id="page-rank">
+      <div class="page-head"><h2 class="pixel glow-purple">🔬 ANALYSIS</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">SELECT TOKEN TO ANALYZE</div>
+        <div class="panel-body">
+          <select id="rankTokenSel" class="pixel-input w100"></select>
+          <div id="rankResult"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WATCHLIST -->
+    <section class="page" id="page-watchlist">
+      <div class="page-head"><h2 class="pixel glow-cyan">👁 WATCHLIST</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">YOUR WATCHED TOKENS</div>
+          <div class="panel-body" id="watchlistBody"><p class="dim pixel small loading-text">NO SIGNAL — ADD TOKENS_</p></div>
+      </div>
+    </section>
+
+    <!-- ANNOUNCE -->
+    <section class="page" id="page-announce">
+      <div class="page-head"><h2 class="pixel glow-yellow">📢 ANNOUNCEMENTS</h2></div>
+      <div class="panel">
+          <div class="panel-body" id="announceBody"><p class="dim pixel small loading-text">NO SIGNAL_</p></div>
+      </div>
+    </section>
+
+    <!-- EARNINGS -->
+    <section class="page" id="page-earnings">
+      <div class="page-head"><h2 class="pixel glow-green">💰 EARNINGS & WITHDRAWAL</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">💵 YOUR EARNINGS</div>
+          <div class="panel-body" id="userEarnings">
+            <p class="dim pixel small">Connect wallet to view earnings</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🏦 WITHDRAW</div>
+          <div class="panel-body">
+            <label class="pixel small">WITHDRAW TO (WALLET ADDRESS)</label>
+            <input id="earningsWithdrawAddr" class="pixel-input" placeholder="Enter wallet address" style="width:100%;margin-bottom:10px" />
+            <label class="pixel small">NETWORK</label>
+            <select id="earningsWithdrawNetwork" class="pixel-input" style="width:100%;margin-bottom:10px">
+              <option value="SOL">SOLANA</option>
+              <option value="ETH">ETHEREUM</option>
+            </select>
+            <label class="pixel small">AMOUNT</label>
+            <input id="earningsWithdrawAmount" class="pixel-input" type="number" placeholder="0.0" style="width:100%;margin-bottom:10px" />
+            <button class="pixel-btn w100" id="btnEarningsWithdraw" style="background:var(--green);color:#000">💸 WITHDRAW EARNINGS</button>
+            <div id="earningsWithdrawResult" class="pixel tiny" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">📜 WITHDRAWAL HISTORY</div>
+        <div class="panel-body" id="withdrawalHistory"><p class="dim pixel small">No withdrawals yet</p></div>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section class="page" id="page-portfolio">
+      <div class="page-head"><h2 class="pixel glow-green">💼 PORTFOLIO</h2><button class="pixel-btn small" onclick="global.sharePortfolio()">📤 SHARE</button></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">📊 PERFORMANCE</div>
+          <div class="panel-body"><canvas id="portfolioChart" width="600" height="280"></canvas></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🍩 ALLOCATION</div>
+          <div class="panel-body"><canvas id="allocationChart" width="300" height="200"></canvas></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">YOUR HOLDINGS & PNL</div>
+        <div class="panel-body">
+          <div class="portfolio-summary" id="portfolioSummary"></div>
+          <div id="portfolioBody"><p class="dim pixel small loading-text">CONNECT WALLET TO SCAN_</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAUNCHPAD -->
+    <section class="page" id="page-launchpad">
+      <div class="page-head"><h2 class="pixel glow-yellow">🚀 LAUNCHPAD</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">FEATURED LAUNCHES</div>
+          <div class="panel-body" id="launchpadBody"><p class="dim pixel small loading-text">SCANNING LAUNCHPAD_</p></div>
+      </div>
+    </section>
+
+    <!-- DEVELOPER API -->
+    <section class="page" id="page-api">
+      <div class="page-head"><h2 class="pixel glow-cyan">🔌 DEVELOPER API</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">⚡ API KEYS (FOR TRADE BOTS)</div>
+        <div class="panel-body">
+          <div class="api-key-row">
+            <input id="apiKeyLabel" class="pixel-input" placeholder="Bot label (e.g. my-grid-bot)" style="flex:1" />
+            <button class="pixel-btn" id="btnCreateKey">⚡ GENERATE KEY</button>
+          </div>
+          <div id="apiKeysList" class="api-keys"><p class="dim pixel small loading-text">NO SIGNAL_</p></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">📚 ENDPOINTS</div>
+        <div class="panel-body">
+          <div id="apiEndpoints" class="api-endpoints"><p class="dim pixel small loading-text">LOADING DOCS_</p></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">🧠 QUICK START (NODE BOT)</div>
+        <div class="panel-body">
+          <pre class="code" id="apiSnippet"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPTIONS -->
+    <section class="page" id="page-options">
+      <div class="page-head"><h2 class="pixel glow-purple">📊 OPTIONS TRADING</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">SELECT UNDERLYING</div>
+          <div class="panel-body">
+            <input id="optionsUnderlying" class="pixel-input" placeholder="AAPL, TSLA, BTC, ETH..." value="AAPL" />
+            <label class="pixel small">EXPIRY</label>
+            <input id="optionsExpiry" class="pixel-input" type="date" value="2025-12-20" />
+            <button id="optionsLoadBtn" class="pixel-btn small w100">LOAD OPTIONS CHAIN</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">OPTIONS CHAIN</div>
+          <div class="panel-body" id="optionsChainBody"><p class="dim pixel small loading-text">NO SIGNAL — LOAD CHAIN_</p></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">📋 YOUR OPTIONS POSITIONS</div>
+          <div class="panel-body" id="optionsPositionsBody"><p class="dim pixel small loading-text">NO POSITIONS YET_</p></div>
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="page" id="page-tools">
+      <div class="page-head"><h2 class="pixel glow-yellow">🛠️ TOOLS SHOP</h2></div>
+      <p class="pixel small dim" style="margin-bottom:16px">Powerful trading tools. One-time purchase, lifetime access.</p>
+      <div id="toolsGrid" class="tools-grid"><p class="dim pixel small loading-text">LOADING TOOLS_</p></div>
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-title pixel">🔓 MY TOOLS</div>
+          <div class="panel-body" id="myToolsBody"><p class="dim pixel small loading-text">NO TOOLS UNLOCKED_</p></div>
+      </div>
+      <div class="grid-3" style="margin-top:20px">
+        <div class="panel">
+          <div class="panel-title pixel">💰 STAKING</div>
+          <div class="panel-body">
+            <button class="pixel-btn w100" onclick="document.getElementById('modalStaking').classList.remove('hidden')">💰 OPEN STAKING</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">✈️ AIRDROP</div>
+          <div class="panel-body">
+            <button class="pixel-btn w100" onclick="document.getElementById('modalAirdrop').classList.remove('hidden')">✈️ OPEN AIRDROP</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">📅 DCA</div>
+          <div class="panel-body">
+            <button class="pixel-btn w100" onclick="document.getElementById('modalDca').classList.remove('hidden')">📅 OPEN DCA</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:20px">
+        <div class="panel">
+          <div class="panel-title pixel">⏰ TIME-LOCK</div>
+          <div class="panel-body">
+            <button class="pixel-btn w100" onclick="document.getElementById('modalTimelock').classList.remove('hidden')">⏰ OPEN TIME-LOCK</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🔐 TOKEN GATE</div>
+          <div class="panel-body">
+            <button class="pixel-btn w100" onclick="document.getElementById('modalGating').classList.remove('hidden')">🔐 OPEN GATE</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🌉 BRIDGE</div>
+          <div class="panel-body">
+            <button class="pixel-btn w100" onclick="document.getElementById('modalBridge').classList.remove('hidden')">🌉 OPEN BRIDGE</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="page" id="page-pumpfun">
+      <div class="page-head">
+        <h2 class="pixel glow-yellow">🎰 PUMP.FUN MEME COINS</h2>
+        <button class="pixel-btn small" id="refreshPump">🔄 REFRESH</button>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">🔥 TRENDING & NEW MEME COINS</div>
+        <div class="panel-body" id="pumpfunBody"><p class="dim pixel small loading-text">CONNECTING TO PUMP.FUN_</p></div>
+      </div>
+    </section>
+
+    <!-- NEWS / CRT TV -->
+    <section class="page" id="page-news">
+      <div class="page-head">
+        <h2 class="pixel glow-green">📺 GALACTIC NEWS NETWORK</h2>
+        <div class="buy-sell-tabs">
+          <button class="chip active" id="newsCrypto">🌐 CRYPTO NEWS</button>
+          <button class="chip" id="newsMeme">🪙 MEME COIN NEWS</button>
+        </div>
+      </div>
+      <div class="news-ticker">
+        <div class="news-ticker-content" id="newsTicker">
+          <span>📡 BREAKING: Bitcoin hits new ATH</span>
+          <span>🚀 Memecoin market cap surges 40%</span>
+          <span>⚡ Ethereum Layer-2 adoption spikes</span>
+          <span>🌌 Solana DEX volume hits record</span>
+          <span>💎 New token launched on Ignoshashi</span>
+          <span>📡 BREAKING: Bitcoin hits new ATH</span>
+          <span>🚀 Memecoin market cap surges 40%</span>
+          <span>⚡ Ethereum Layer-2 adoption spikes</span>
+          <span>🌌 Solana DEX volume hits record</span>
+          <span>💎 New token launched on Ignoshashi</span>
+        </div>
+      </div>
+      <div class="crt-tv">
+        <div class="crt-screen">
+          <div class="crt-scanline"></div>
+          <div class="crt-content" id="newsContent">
+            <p class="dim pixel small loading-text">TUNING SIGNAL_</p>
+          </div>
+        </div>
+        <div class="crt-controls">
+          <span class="pixel tiny dim">CH: 03</span>
+          <span class="pixel tiny dim" id="newsChannelLabel">CRYPTO</span>
+          <span class="pixel tiny dim">VOL: ████████</span>
+        </div>
+      </div>
+    </section>
+    <!-- MEME ANALYTICS -->
+    <section class="page" id="page-memecoin">
+      <div class="page-head"><h2 class="pixel glow-yellow">🪙 MEME ANALYTICS</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">📊 BONDING CURVE</div>
+          <div class="panel-body">
+            <canvas id="bondingChart" width="400" height="200"></canvas>
+            <div class="pixel tiny dim" style="margin-top:8px">Real-time bonding curve visualization</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🔥 TRENDING SCORE</div>
+          <div class="panel-body" id="trendingScore">
+            <p class="dim pixel small">Select a token to view trending metrics</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">👑 CREATOR REWARDS</div>
+        <div class="panel-body" id="creatorRewards">
+          <p class="dim pixel small">Earn 2% of all trades on your tokens</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOKEN DETAIL -->
+    <section class="page" id="page-token">
+      <div class="page-head"><h2 class="pixel glow-cyan">🔍 TOKEN DETAIL</h2></div>
+      <div class="panel-body" id="tokenDetailBody"><p class="dim pixel small">Select a token to view details</p></div>
+    </section>
+
+    <!-- ALERTS -->
+    <section class="page" id="page-alerts">
+      <div class="page-head"><h2 class="pixel glow-yellow">🔔 PRICE ALERTS</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">YOUR ALERTS</div>
+        <div class="panel-body" id="alertsList"><p class="dim pixel small">Connect wallet to view alerts</p></div>
+      </div>
+    </section>
+
+    <!-- WHALE TRACKER -->
+    <section class="page" id="page-whale">
+      <div class="page-head"><h2 class="pixel glow-yellow">🐋 WHALE TRACKER</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">TOP WHALES</div>
+        <div class="panel-body" id="whaleList"><p class="dim pixel small">Loading whale data...</p></div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="page" id="page-dashboard">
+      <div class="page-head"><h2 class="pixel glow-cyan">📊 DASHBOARD</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">💰 PORTFOLIO VALUE</div>
+          <div class="panel-body">
+            <div class="pixel lg glow-green" id="dashPortfolioValue">$0</div>
+            <div class="pixel tiny" id="dashPortfolioChange">Loading...</div>
+            <canvas id="dashPortfolioChart" style="width:100%;height:180px;margin-top:12px"></canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">📈 TOP HOLDINGS</div>
+          <div class="panel-body" id="dashTopHoldings"><p class="dim pixel small">Connect wallet to view holdings</p></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">🔥 RECENT ACTIVITY</div>
+          <div class="panel-body" id="dashRecentActivity"><p class="dim pixel small">No activity yet</p></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🎯 WATCHLIST PERFORMANCE</div>
+          <div class="panel-body" id="dashWatchlistPerf"><p class="dim pixel small">Add tokens to watchlist</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACTION HISTORY -->
+    <section class="page" id="page-history">
+      <div class="page-head"><h2 class="pixel glow-green">📜 TRANSACTION HISTORY</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">RECENT TRANSACTIONS</div>
+        <div class="panel-body" id="txHistory"><p class="dim pixel small">No transactions yet</p></div>
+      </div>
+    </section>
+
+    <!-- TRADER LEADERBOARD -->
+    <section class="page" id="page-traders">
+      <div class="page-head"><h2 class="pixel glow-yellow">🏆 TRADER LEADERBOARD</h2></div>
+      <div class="panel">
+        <div class="panel-body" id="traderLeaderboardList"><p class="dim pixel small">Loading trader leaderboard...</p></div>
+      </div>
+    </section>
+
+    <!-- TOURNAMENT -->
+    <!-- SETTINGS -->
+    <section class="page" id="page-settings">
+      <div class="page-head"><h2 class="pixel glow-cyan">⚙️ SETTINGS</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">🎨 APPEARANCE</div>
+          <div class="panel-body">
+            <label class="pixel small">THEME</label>
+            <select id="settingTheme" class="pixel-input">
+              <option value="cyberpunk">🌃 CYBERPUNK</option>
+              <option value="terminal">💻 TERMINAL</option>
+              <option value="retro">👾 RETRO</option>
+              <option value="minimal">⬜ MINIMAL</option>
+            </select>
+            <label class="pixel small" style="margin-top:12px;display:block">SOUND</label>
+            <button class="pixel-btn w100" onclick="global.SoundEngine && global.SoundEngine.toggle()">🔊 TOGGLE SOUND</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🔔 NOTIFICATIONS</div>
+          <div class="panel-body">
+            <label class="pixel small">ALERT SOUND</label>
+            <button class="pixel-btn w100" id="btnTestSound">🔊 TEST SOUND</button>
+            <label class="pixel small" style="margin-top:12px;display:block">NOTIFICATION TYPE</label>
+            <select id="settingNotifType" class="pixel-input">
+              <option value="all">All</option>
+              <option value="price">Price only</option>
+              <option value="trade">Trade only</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">💾 DATA & PRIVACY</div>
+        <div class="panel-body">
+          <button class="pixel-btn" onclick="localStorage.clear();global.toast('Local data cleared')">🗑️ CLEAR LOCAL DATA</button>
+          <button class="pixel-btn ghost" style="margin-left:8px" onclick="global.toast('Export coming soon')">📤 EXPORT DATA</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP CENTER -->
+    <section class="page" id="page-help">
+      <div class="page-head"><h2 class="pixel glow-green">❓ HELP CENTER</h2></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">📖 QUICK START</div>
+          <div class="panel-body">
+            <div class="pixel small" style="margin-bottom:10px">1. Connect your wallet (Solana or Ethereum)</div>
+            <div class="pixel small" style="margin-bottom:10px">2. Browse tokens on Home or pump.fun page</div>
+            <div class="pixel small" style="margin-bottom:10px">3. Create your own memecoin</div>
+            <div class="pixel small" style="margin-bottom:10px">4. Trade with BUY/SELL</div>
+            <div class="pixel small" style="margin-bottom:10px">5. Set alerts and track portfolio</div>
+            <div class="pixel small">6. Use tools: staking, airdrop, DCA, bridge</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">⌨️ KEYBOARD SHORTCUTS</div>
+          <div class="panel-body">
+            <div class="ob-row"><span>T</span><span>Trade page</span></div>
+            <div class="ob-row"><span>P</span><span>Portfolio</span></div>
+            <div class="ob-row"><span>W</span><span>Watchlist</span></div>
+            <div class="ob-row"><span>N</span><span>News</span></div>
+            <div class="ob-row"><span>L</span><span>Launchpad</span></div>
+            <div class="ob-row"><span>C</span><span>Create</span></div>
+            <div class="ob-row"><span>/</span><span>Search</span></div>
+            <div class="ob-row"><span>ESC</span><span>Close modals</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">🔗 USEFUL LINKS</div>
+        <div class="panel-body">
+          <a href="https://pump.fun" target="_blank" rel="noopener" class="pixel-btn small ghost" style="margin-right:8px;text-decoration:none">🎰 PUMP.FUN</a>
+          <a href="https://jup.ag" target="_blank" rel="noopener" class="pixel-btn small ghost" style="margin-right:8px;text-decoration:none">🔄 JUPITER</a>
+          <a href="https://etherscan.io" target="_blank" rel="noopener" class="pixel-btn small ghost" style="margin-right:8px;text-decoration:none">⛓ ETHEREUM</a>
+          <a href="https://solscan.io" target="_blank" rel="noopener" class="pixel-btn small ghost" style="text-decoration:none">🌐 SOLSCAN</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="page" id="page-about">
+      <div class="page-head"><h2 class="pixel glow-cyan">ℹ️ ABOUT IGNOSHASHI</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">🚀 WHAT IS IGNOSHASHI?</div>
+        <div class="panel-body">
+          <div class="pixel small" style="margin-bottom:10px;line-height:1.8">
+            IGNOSHASHI is a <b>desktop-grade meme coin trading terminal</b> built for degens who want real tools, real data, and a retro Star Wars pixel-art interface. It runs as both a local web app and an Electron desktop app, giving you a unified terminal for discovering, creating, trading, and tracking meme coins across <b>Ethereum</b> and <b>Solana</b> mainnets.
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">⚔️ CORE FEATURES</div>
+          <div class="panel-body">
+            <div class="pixel small" style="margin-bottom:8px">🛒 <b>Trade</b> — Buy/sell tokens with live price feeds, limit orders, and sniper bots.</div>
+            <div class="pixel small" style="margin-bottom:8px">🪙 <b>Create</b> — Launch your own memecoin with one click. Includes on-chain deployment support.</div>
+            <div class="pixel small" style="margin-bottom:8px">🎰 <b>pump.fun</b> — Browse trending pump.fun coins, view bonding curves, and trade directly.</div>
+            <div class="pixel small" style="margin-bottom:8px">📈 <b>Terminal</b> — Real-time trade feed, candlestick charts, RSI/MACD/Bollinger overlays, and drawing tools.</div>
+            <div class="pixel small" style="margin-bottom:8px">💼 <b>Portfolio</b> — Track holdings, PnL, and asset allocation across connected wallets.</div>
+            <div class="pixel small" style="margin-bottom:8px">👁 <b>Watchlist</b> — Save favorite tokens and get price alerts.</div>
+            <div class="pixel small" style="margin-bottom:8px">🐋 <b>Whale Alerts</b> — Track large wallet movements in real time.</div>
+            <div class="pixel small" style="margin-bottom:8px">📋 <b>Copy Trade</b> — Follow top traders and mirror their moves automatically.</div>
+            <div class="pixel small" style="margin-bottom:8px">🔔 <b>Alerts</b> — Price thresholds, graduation alerts, and safety warnings.</div>
+            <div class="pixel small">🏆 <b>Leaderboard</b> — Compete for top trader status and earn achievements.</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🔐 BUILT-IN WALLETS</div>
+          <div class="panel-body">
+            <div class="pixel small" style="margin-bottom:8px">🔐 <b>Built-in ETH/SOL Wallets</b> — Generate real keypairs stored locally on your machine. Full send/receive support with live on-chain balances.</div>
+            <div class="pixel small" style="margin-bottom:8px">🔒 <b>Secure Storage</b> — Private keys never leave your device. Encrypted backup phrases for recovery.</div>
+            <div class="pixel small" style="margin-bottom:8px">🔄 <b>Network Toggle</b> — Switch between Ethereum and Solana mainnets instantly. All tools adapt to the selected chain.</div>
+            <div class="pixel small">💱 <b>Send/Receive</b> — Transfer ETH or SOL directly from the app with real on-chain transactions.</div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title pixel">🛠️ TOOLS & PROTOCOLS</div>
+          <div class="panel-body">
+            <div class="pixel small" style="margin-bottom:8px">💰 <b>Staking</b> — Stake tokens and earn yield directly in-app.</div>
+            <div class="pixel small" style="margin-bottom:8px">✈️ <b>Airdrop</b> — Create and manage airdrop campaigns.</div>
+            <div class="pixel small" style="margin-bottom:8px">📅 <b>DCA</b> — Set up dollar-cost averaging orders.</div>
+            <div class="pixel small" style="margin-bottom:8px">⏰ <b>Time-lock</b> — Lock tokens for a set duration.</div>
+            <div class="pixel small" style="margin-bottom:8px">🔐 <b>Token Gating</b> — Gate access to content or features by token holdings.</div>
+            <div class="pixel small" style="margin-bottom:8px">🌉 <b>Bridge</b> — Bridge assets across supported networks.</div>
+            <div class="pixel small" style="margin-bottom:8px">🔒 <b>Rug Safety Net</b> — Real-time safety monitoring with risk scores.</div>
+            <div class="pixel small" style="margin-bottom:8px">🎯 <b>Sniper Bot Pro</b> — Auto-buy new launches matching your filters.</div>
+            <div class="pixel small">📊 <b>Portfolio Pro</b> — Advanced analytics including best/worst performers and ROI tracking.</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title pixel">🏗️ TECH STACK</div>
+          <div class="panel-body">
+            <div class="pixel small" style="margin-bottom:8px">🖥️ <b>Desktop App</b> — Electron wrapper with native window management, tray icon, and Chrome extension bridge support.</div>
+            <div class="pixel small" style="margin-bottom:8px">⚙️ <b>Backend</b> — Express.js server with WebSocket live feed, SQLite persistence, rate limiting, and Helmet security hardening.</div>
+            <div class="pixel small" style="margin-bottom:8px">⛓ <b>Chains</b> — Ethereum mainnet via public RPC (ethers.js v6) and Solana mainnet via public RPC (@solana/web3.js).</div>
+            <div class="pixel small" style="margin-bottom:8px">🗄️ <b>Database</b> — better-sqlite3 for local storage of wallets, trades, portfolio data, API keys, and settings.</div>
+            <div class="pixel small" style="margin-bottom:8px">🎨 <b>Frontend</b> — Vanilla JS modules with a custom pixel-art CSS theme, VT323/Google Fonts, canvas charts, and CRT effects.</div>
+            <div class="pixel small" style="margin-bottom:8px">🔌 <b>Dev API</b> — REST API with API key auth for bots. Endpoints for state, OHLC, indicators, and trade execution.</div>
+            <div class="pixel small" style="margin-bottom:8px">📡 <b>WebSocket</b> — Real-time trade, create, and graduation events broadcast to all connected clients.</div>
+            <div class="pixel small">🖼️ <b>Design</b> — Star Wars-inspired retro terminal UI with particle starfield, neon glows, scanlines, and pixel fonts.</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title pixel">🎯 PROJECT GOALS</div>
+        <div class="panel-body">
+          <div class="pixel small" style="margin-bottom:10px;line-height:1.8">
+            IGNOSHASHI is built around three goals: <b>speed</b> (real-time data and instant trading), <b>control</b> (real wallets, real keys, no custody), and <b>fun</b> (a themed interface that makes memecoin trading feel like commanding a starship). The project is actively developed with new tools, networks, and integrations added regularly. All platform fees (2%) go to the developer fee vault and help fund RPC nodes, server costs, and ongoing development.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <section class="page" id="page-achievements">
+      <div class="page-head"><h2 class="pixel glow-yellow">🏆 ACHIEVEMENTS</h2></div>
+      <div class="panel">
+        <div class="panel-title pixel">YOUR BADGES</div>
+        <div class="panel-body" id="achievementsList"><p class="dim pixel small">Loading achievements...</p></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- GRADUATION OVERLAY -->
+  <div id="gradOverlay" class="grad-overlay hidden">
+    <div class="grad-box pixel-anim">
+      <div class="grad-emoji">🎓</div>
+      <div class="pixel lg glow-yellow">GRADUATED!</div>
+      <div class="pixel" id="gradName">TOKEN</div>
+      <div class="pixel tiny dim" id="gradMsg">has ascended to the outer rim</div>
+      <button class="pixel-btn" id="gradClose">COOL</button>
+    </div>
+  </div>
+
+  <div id="notificationPanel" class="notification-panel hidden"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Modals -->
+  <div id="modalLimitOrder" class="modal hidden" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--cyan);padding:20px;width:90%;max-width:400px">
+      <div class="pixel small glow-cyan" style="margin-bottom:12px">📋 LIMIT ORDER</div>
+      <select id="limitToken" class="pixel-input"></select>
+      <select id="limitSide" class="pixel-input"><option value="buy">BUY</option><option value="sell">SELL</option></select>
+      <input id="limitPrice" class="pixel-input" placeholder="Price (USD)" type="number" />
+      <input id="limitAmount" class="pixel-input" placeholder="Amount" type="number" />
+      <button id="btnLimitOrder" class="pixel-btn w100">📋 PLACE ORDER</button>
+      <button class="pixel-btn small ghost w100" style="margin-top:8px" onclick="document.getElementById('modalLimitOrder').classList.add('hidden')">CANCEL</button>
+    </div>
+  </div>
+
+  <div id="modalSniper" class="modal hidden" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--yellow);padding:20px;width:90%;max-width:400px">
+      <div class="pixel small glow-yellow" style="margin-bottom:12px">🎯 SNIPER BOT</div>
+      <input id="sniperMaxBuy" class="pixel-input" placeholder="Max buy (SOL)" type="number" value="1" />
+      <input id="sniperMinLiq" class="pixel-input" placeholder="Min liquidity (USD)" type="number" value="10000" />
+      <button id="btnSniper" class="pixel-btn w100">🎯 ENABLE SNIPER</button>
+      <button class="pixel-btn small ghost w100" style="margin-top:8px" onclick="document.getElementById('modalSniper').classList.add('hidden')">CANCEL</button>
+    </div>
+  </div>
+
+  <div id="modalStaking" class="modal hidden" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--green);padding:20px;width:90%;max-width:400px">
+      <div class="pixel small glow-green" style="margin-bottom:12px">💰 STAKING</div>
+      <select id="stakeToken" class="pixel-input"></select>
+      <input id="stakeAmount" class="pixel-input" placeholder="Amount" type="number" />
+      <button id="btnStake" class="pixel-btn w100">💰 STAKE</button>
+      <button class="pixel-btn small ghost w100" style="margin-top:8px" onclick="document.getElementById('modalStaking').classList.add('hidden')">CANCEL</button>
+    </div>
+  </div>
+
+  <div id="modalAirdrop" class="modal hidden" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--purple);padding:20px;width:90%;max-width:400px">
+      <div class="pixel small glow-purple" style="margin-bottom:12px">✈️ AIRDROP</div>
+      <select id="airdropToken" class="pixel-input"></select>
+      <textarea id="airdropRecipients" class="pixel-input" rows="4" placeholder="One address per line"></textarea>
+      <input id="airdropAmount" class="pixel-input" placeholder="Amount per recipient" type="number" />
+      <button id="btnAirdrop" class="pixel-btn w100">✈️ SEND AIRDROP</button>
+      <button class="pixel-btn small ghost w100" style="margin-top:8px" onclick="document.getElementById('modalAirdrop').classList.add('hidden')">CANCEL</button>
+    </div>
+  </div>
+
+  <div id="modalTimelock" class="modal hidden" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--orange);padding:20px;width:90%;max-width:400px">
+      <div class="pixel small" style="margin-bottom:12px;color:var(--orange)">⏰ TIME-LOCK</div>
+      <input id="timelockTo" class="pixel-input" placeholder="Recipient address" />
+      <input id="timelockAmount" class="pixel-input" placeholder="Amount" type="number" />
+      <input id="timelockTime" class="pixel-input" type="datetime-local" />
+      <button id="btnTimelock" class="pixel-btn w100">⏰ CREATE TIME-LOCK</button>
+      <button class="pixel-btn small ghost w100" style="margin-top:8px" onclick="document.getElementById('modalTimelock').classList.add('hidden')">CANCEL</button>
+    </div>
+  </div>
+
+  <div id="modalDca" class="modal hidden" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--cyan);padding:20px;width:90%;max-width:400px">
+      <div class="pixel small glow-cyan" style="margin-bottom:12px">📅 DCA (RECURRING BUY)</div>
+      <select id="dcaToken" class="pixel-input"></select>
+      <input id="dcaAmount" class="pixel-input" placeholder="Amount per buy" type="number" />
+      <select id="dcaFreq" class="pixel-input"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select>
+      <button id="btnDca" class="pixel-btn w100">📅 START DCA</button>
+      <button class="pixel-btn small ghost w100" style="margin-top:8px" onclick="document.getElementById('modalDca').classList.add('hidden')">CANCEL</button>
+    </div>
+  </div>
+
+  <div id="modalGating" class="modal hidden" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--yellow);padding:20px;width:90%;max-width:400px">
+      <div class="pixel small glow-yellow" style="margin-bottom:12px">🔐 TOKEN GATE</div>
+      <select id="gateToken" class="pixel-input"></select>
+      <input id="gateMinHold" class="pixel-input" placeholder="Min tokens to hold" type="number" />
+      <button id="btnGate" class="pixel-btn w100">🔐 CREATE GATE</button>
+      <button class="pixel-btn small ghost w100" style="margin-top:8px" onclick="document.getElementById('modalGating').classList.add('hidden')">CANCEL</button>
+    </div>
+  </div>
+
+  <div id="modalBridge" class="modal hidden" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,0.85)">
+    <div style="background:var(--bg2);border:3px solid var(--green);padding:20px;width:90%;max-width:400px">
+      <div class="pixel small glow-green" style="margin-bottom:12px">🌉 BRIDGE</div>
+      <select id="bridgeToken" class="pixel-input"><option value="SOL">SOL</option><option value="ETH">ETH</option><option value="USDC">USDC</option></select>
+      <input id="bridgeAmount" class="pixel-input" placeholder="Amount" type="number" />
+      <select id="bridgeDest" class="pixel-input"><option value="ethereum">Ethereum</option><option value="solana">Solana</option><option value="bsc">BSC</option></select>
+      <button id="btnBridge" class="pixel-btn w100">🌉 BRIDGE</button>
+      <button class="pixel-btn small ghost w100" style="margin-top:8px" onclick="document.getElementById('modalBridge').classList.add('hidden')">CANCEL</button>
+    </div>
+  </div>
+
+<!-- Scripts -->
+  <script src="https://js.stripe.com/v3/" defer></script>
+  <script src="/vendor/ethers.js?v=202511111786477643" defer></script>
+  <script src="/vendor/solana-web3.js?v=202511111786477643" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js?v=202511111786477643" defer></script>
+  <script src="js/api.js?v=202511111786477643" defer></script>
+  <script src="js/app.js?v=202511111786477643" defer></script>
+  <script src="js/space-theme.js?v=202511111786477643" defer></script>
+  <script src="js/wallet.js?v=202511111786477643" defer></script>
+  <script src="js/terminal.js?v=202511111786477643" defer></script>
+  <script src="js/charts.js?v=202511111786477643" defer></script>
+  <script src="js/drawtools.js?v=202511111786477643" defer></script>
+  <script src="js/indicators.js?v=202511111786477643" defer></script>
+  <script src="js/trade.js?v=202511111786477643" defer></script>
+  <script src="js/watchlist.js?v=202511111786477643" defer></script>
+  <script src="js/portfolio.js?v=202511111786477643" defer></script>
+  <script src="js/launchpad.js?v=202511111786477643" defer></script>
+  <script src="js/tools.js?v=202511111786477643" defer></script>
+  <script src="js/apiportal.js?v=202511111786477643" defer></script>
+  <script src="js/deploy.js?v=202511111786477643" defer></script>
+  <script src="js/sound.js?v=202511111786477643" defer></script>
+  <script src="js/pumpfun.js?v=202511111786477643" defer></script>
+  <script src="js/news.js?v=202511111786477643" defer></script>
+  <script src="js/memecoin.js?v=202511111786477643" defer></script>
+  <script src="js/search.js?v=202511111786477643" defer></script>
+  <script src="js/tokendetail.js?v=202511111786477643" defer></script>
+  <script src="js/portfoliocharts.js?v=202511111786477643" defer></script>
+  <script src="js/safety.js?v=202511111786477643" defer></script>
+  <script src="js/alerts.js?v=202511111786477643" defer></script>
+  <script src="js/leaderboard.js?v=202511111786477643" defer></script>
+  <script src="js/extras.js?v=202511111786477643" defer></script>
+  <script src="js/batch.js?v=202511111786477643" defer></script>
+  <script src="js/ticker.js?v=202511111786477643" defer></script>
+  <script src="js/settings.js?v=202511111786477643" defer></script>
+  <script src="js/achievements.js?v=202511111786477643" defer></script>
+  <script src="js/onboarding.js?v=202511111786477643" defer></script>
+  <script src="js/dashboard.js?v=202511111786477643" defer></script>
+  <script src="js/cmdpalette.js?v=202511111786477643" defer></script>
+  <script src="js/history.js?v=202511111786477643" defer></script>
+  <script src="js/particles.js?v=202511111786477643" defer></script>
+  <script src="js/mobile.js?v=202511111786477643" defer></script>
+  <script src="js/whalealerts.js?v=202511111786477643" defer></script>
+  <script src="js/earnings.js?v=202511111786477643" defer></script>
+  <script src="js/tools-engine.js?v=202511111786477643" defer></script>
+  <script src="js/pixel-space.js?v=202511111786477643" defer></script>
+  <script src="js/security.js?v=202511111786477643" defer></script>
+</body>
+</html>
+

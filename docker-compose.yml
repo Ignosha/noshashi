@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  ignoshashi:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/data
+      - ./backups:/backups
+    environment:
+      - NODE_ENV=production
+      - CHAIN_ENV=mainnet
+      - ENABLE_REAL_CHAIN=true
+      - PLATFORM_FEE_PERCENT=2
+      - PLATFORM_FEE_ETH=${PLATFORM_FEE_ETH}
+      - PLATFORM_FEE_SOLANA=${PLATFORM_FEE_SOLANA}
+      - DEFAULT_NETWORK=solana
+      - ALLOWED_ORIGIN=${ALLOWED_ORIGIN:-*}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); })"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # Optional: Backup service
+  backup:
+    image: alpine:latest
+    volumes:
+      - ./data:/data:ro
+      - ./backups:/backups
+    command: sh -c "while true; do cp /data/ignoshashi.db /backups/ignoshashi_$$(date +%F_%H%M).db; sleep 3600; done"
+    restart: unless-stopped

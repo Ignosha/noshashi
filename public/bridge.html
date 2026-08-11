@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IGNOSHASHI - Connect Wallet in Browser</title>
+  <style>
+    :root { --cyan:#32f2ff; --green:#39ff88; --red:#ff4d6d; --yellow:#ffe14d; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 50% 30%, #0f0f1f, #05050d);
+      color: #e6f7ff; font-family: 'Courier New', monospace;
+    }
+    .card {
+      background: #0a0a14; border: 3px solid var(--cyan); padding: 32px;
+      max-width: 420px; width: 90%; text-align: center; border-radius: 12px;
+      box-shadow: 0 0 40px rgba(50,242,255,0.15);
+    }
+    .logo { font-size: 26px; font-weight: 900; letter-spacing: 3px; color: var(--cyan); margin-bottom: 6px; text-shadow: 0 0 15px var(--cyan); }
+    .sub { font-size: 12px; color: #9fb3c8; margin-bottom: 24px; }
+    .option { display: block; width: 100%; margin: 10px 0; padding: 14px; font-size: 14px; font-weight: 700;
+      background: transparent; color: #e6f7ff; border: 2px solid var(--green); border-radius: 8px; cursor: pointer; }
+    .option:hover { background: rgba(57,255,136,0.1); }
+    .state { margin-top: 18px; font-size: 13px; min-height: 20px; color: var(--yellow); word-break: break-all; }
+    .ok { color: var(--green); }
+    .err { color: var(--red); }
+    .meta { display:none; width:100%; margin:10px 0; padding:14px; font-size:14px; font-weight:700;
+      background:transparent; color:#e6f7ff; border:2px solid var(--cyan); border-radius:8px; cursor:pointer; text-align:center;}
+    .btn { margin-top: 14px; padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">IGNOSHASHI</div>
+    <div class="sub">Connect a real browser-extension wallet to your desktop app</div>
+    <div class="state" id="status">Looking for wallets in this browser...</div>
+    <button class="meta" id="metaBtn">🦊 Connect MetaMask (Chrome extension)</button>
+    <button class="option" id="phantomBtn" style="border-color:#a855f7;">👻 Connect Phantom (wallets available)</button>
+    <div style="margin-top:14px;font-size:11px;color:#9fb3c8;line-height:1.6;">
+      The real address you approve here is sent securely to your running IGNOSHASHI desktop app over the local server and you can trade immediately.
+    </div>
+    <button class="btn" id="closeBtn" style="margin-top:18px;background:#3b3b5c;color:#fff;">Done / Close</button>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+      var statusEl = document.getElementById('status');
+      var metaBtn = document.getElementById('metaBtn');
+      var phantomBtn = document.getElementById('phantomBtn');
+      var ws = null;
+      var wsReady = false;
+
+      function status(msg, cls) {
+        statusEl.textContent = msg;
+        statusEl.className = 'state ' + (cls || '');
+      }
+
+      // Keep a live WebSocket to the internal server so a bridge POST is
+      // relayed to the desktop window even while connected.
+      try {
+        ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host);
+        ws.onopen = function () { wsReady = true; };
+      } catch (e) {}
+
+      function sendBridge(address, type, label) {
+        var payload = {
+          pair: 'chrome-bridge',
+          address: address,
+          type: type || 'evm',
+          label: label || 'browser wallet'
+        };
+        fetch('/api/wallet-bridge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(function (r) { return r.json(); }).then(function (d) {
+          status('✅ Connected: ' + address, 'ok');
+          if (wsReady) ws.send(JSON.stringify({ bridgeAck: true }));
+        }).catch(function (e) {
+          status('Server link failed: ' + e.message, 'err');
+        });
+      }
+
+      // Detected injected providers
+      var ethProvider = window.ethereum;
+      var solProvider = window.solana || window.phantom?.solana;
+
+      if (ethProvider) {
+        metaBtn.style.display = 'block';
+        status('Detected a browser wallet (EIP-1193). Click to connect.');
+      } else {
+        status('No injected wallet detected. If you use a MetaMask/Phantom browser extension, ensure it is enabled (right-click the icon → Pin) and reload this page.');
+      }
+
+      metaBtn.addEventListener('click', function () {
+        status('Waiting for approval in the extension...');
+        var p = ethProvider || window.ethereum;
+        if (p && p.request) {
+          p.request({ method: 'eth_requestAccounts' })
+            .then(function (acc) {
+              if (acc && acc[0]) sendBridge(acc[0], 'evm', 'MetaMask');
+              else status('No account approved.', 'err');
+            })
+            .catch(function (e) { status('Rejected: ' + e.message, 'err'); });
+        } else {
+          status('No EIP-1193 provider. Enable the MetaMask extension and reload.', 'err');
+        }
+      });
+
+      phantomBtn.addEventListener('click', function () {
+        status('Requesting Phantom wallet...');
+        var p = window.solana || window.phantom?.solana;
+        if (p && p.connect) {
+          p.connect()
+            .then(function (res) {
+              var addr = res && res.publicKey && res.publicKey.toString ? res.publicKey.toString() : (res ? res.publicKey : null);
+              if (addr) sendBridge(addr, 'solana', 'Phantom');
+              else status('Phantom returned no public key.', 'err');
+            })
+            .catch(function (e) { status('Rejected / not connected.', 'err'); });
+        } else {
+          status('No Phantom provider. Install the Phantom browser extension and reload.', 'err');
+        }
+      });
+
+      document.getElementById('closeBtn').addEventListener('click', function () {
+        window.close();
+      });
+    })();
+  </script>
+</body>
+</html>
+
