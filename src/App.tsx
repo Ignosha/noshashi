@@ -748,7 +748,7 @@ function ConsoleApp() {
 
   return (
     <TooltipProvider delayDuration={220}>
-      <HandoffProvider onNavigate={goTo}>
+      <HandoffProvider onNavigate={goTo} currentScene={scene}>
       <div className="scanlines vignette relative flex h-full w-full overflow-hidden bg-background text-foreground">
         <SkipLink />
         <Announcer

@@ -42,6 +42,18 @@
 
   /* Section-07 brand pattern, static */
   .orbit{position:absolute;pointer-events:none;opacity:.07;color:var(--brand)}
+  /*
+   * The orbit graphics are positioned with a negative offset so they bleed
+   * off the edge deliberately. Clip them at their own section rather than
+   * relying on overflow-x on the body, which does not stop the documentElement
+   * from reporting a wider scrollWidth — measured on the live site, the hero
+   * orbit pushed the page 39px wide at a 925px viewport, in the band just
+   * above the 900px breakpoint where .orbit is hidden.
+   *
+   * `clip` rather than `hidden`: it does not create a scroll container, so
+   * focus rings and anchor jumps behave normally.
+   */
+  .hero,section{overflow-x:clip}
   .layer{position:relative;z-index:1}
 
   header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);

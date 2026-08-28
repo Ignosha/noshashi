@@ -40,9 +40,15 @@ const Ctx = React.createContext<HandoffContext | null>(null);
 
 export function HandoffProvider({
   onNavigate,
+  currentScene,
   children,
 }: {
   onNavigate: (scene: SceneId) => void;
+  /**
+   * Where the operator actually is. Needed to expire a handoff that was
+   * never claimed — see the note on the effect below.
+   */
+  currentScene?: SceneId;
   children: React.ReactNode;
 }) {
   /*
@@ -66,6 +72,25 @@ export function HandoffProvider({
     pending.current = null; // Consume: a handoff explains one navigation only.
     return held;
   }, []);
+
+  /*
+   * Expire a handoff nobody claimed.
+   *
+   * A subject sent to a GATED scene is never claimed: the paywall renders
+   * in place of the scene body, so the hook that would consume it never
+   * mounts. Without this the subject sits in the ref indefinitely, and the
+   * day the operator subscribes and opens that scene it fires a lookup
+   * they asked for weeks earlier. Consume-once was supposed to prevent
+   * exactly that, and only handled the case where the scene did mount.
+   *
+   * So: once the operator has navigated somewhere that is not the target,
+   * the handoff has been overtaken by events and is dropped.
+   */
+  React.useEffect(() => {
+    if (!currentScene) return;
+    const held = pending.current;
+    if (held && held.scene !== currentScene) pending.current = null;
+  }, [currentScene]);
 
   const value = React.useMemo(() => ({ handOff, claim }), [handOff, claim]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
