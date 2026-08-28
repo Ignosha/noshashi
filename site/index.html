@@ -370,6 +370,26 @@
         <p>Scope every transfer against your jurisdiction's threshold, and score the settlement
            book with the Herfindahl-Hirschman Index — the same measure a regulator uses.</p>
       </div>
+      <div class="panel">
+        <p class="num">DELIVERED ≠ REQUESTED</p>
+        <h3>What a payment actually moved</h3>
+        <p>An XRPL payment carries the amount it asked to deliver and, separately, the amount
+           that arrived. On a partial payment those differ and the transaction still succeeds.
+           A real mainnet transfer we read asked for
+           <span class="mono">999,332.87</span> and delivered
+           <span class="mono">3,958.64</span> — <em>0.4%</em> — returning
+           <span class="mono">tesSUCCESS</span>. Credit the requested figure and you are out by
+           two hundred and fifty times. This is the mistake that has drained exchanges, and it
+           is one field.</p>
+      </div>
+      <div class="panel">
+        <p class="num">SIGNER WEIGHT · NOT HEADCOUNT</p>
+        <h3>How few people can move a treasury</h3>
+        <p>XRPL compares a multi-signature quorum against the <em>sum of signing weights</em>,
+           not a count of signers. Five signers where one carries the quorum is a single-key
+           account wearing a committee's clothes. We report the minimum number who must
+           actually agree, which is the only number that means anything.</p>
+      </div>
     </div>
   </section>
 
@@ -465,6 +485,7 @@
         <p class="who">Individuals and single desks</p>
         <ul>
           <li>Full console and menu bar HUD</li>
+            <li>Ledger sync — four public nodes compared</li>
           <li>Unlimited GO / HOLD / NO-GO gate checks</li>
           <li>10 address checks per month</li>
           <li>On-device compliance agent</li>
@@ -481,6 +502,10 @@
           <li>Everything in Operator</li>
           <li>Unlimited address checks</li>
           <li>Exit liquidity — freeze risk × depth × concentration</li>
+            <li>Settlement forensics — delivered vs requested</li>
+            <li>Counterparty provenance — age and funding source</li>
+            <li>Treasury control surface — signers and locked value</li>
+            <li>AMM pool governance — fee votes and auction slot</li>
           <li>Issuer freeze-rights and XLS-77 deep freeze analysis</li>
           <li>Counterparty concentration (HHI)</li>
           <li>Persistent adjudication ledger — 10,000 verdicts</li>
@@ -496,7 +521,8 @@
         <p class="who">Regulated venues and custodians</p>
         <ul>
           <li>Everything in Desk</li>
-          <li>Travel Rule (FATF R.16) scoping</li>
+          <li>Issuance surveillance — holder concentration</li>
+            <li>Travel Rule (FATF R.16) scoping</li>
           <li>Signed audit export — SHA-256 chain of custody</li>
           <li>Offline adjudication on segregated networks</li>
           <li>Compliance API and webhooks</li>

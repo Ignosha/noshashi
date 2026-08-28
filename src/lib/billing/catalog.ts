@@ -35,6 +35,7 @@ export const PLANS: Plan[] = [
     features: [
       "Full console and menu bar HUD",
       "Unlimited local gate checks",
+      "Ledger sync — four public nodes compared side by side",
       "On-device compliance agent",
       "CSV audit export",
       "Binary integrity verification",
@@ -54,6 +55,10 @@ export const PLANS: Plan[] = [
     features: [
       "Everything in Operator",
       "Multi-wallet portfolios with live gate status",
+      "Settlement forensics — what a transaction delivered, not what it requested",
+      "Counterparty provenance — account age and who funded it",
+      "Treasury control surface — how few signers can actually move a balance",
+      "AMM pool governance — who votes the fee, and who holds the discount",
       "Policy drift and credential expiry alerts",
       "Issuer freeze-rights analysis — know who can immobilise your balance",
       "Counterparty concentration (HHI) across the settlement book",
@@ -85,6 +90,7 @@ export const PLANS: Plan[] = [
     seatBased: false,
     features: [
       "Everything in Desk",
+      "Issuance surveillance — who holds your paper, and how concentrated",
       "Travel Rule (FATF R.16) scoping across every settlement",
       "Signed audit export — SHA-256 chain-of-custody for examiners",
       "Offline adjudication — run on a segregated network from captured state",
