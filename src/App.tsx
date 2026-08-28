@@ -53,6 +53,9 @@ const WorkstationScene = lazy(() =>
 const IssuanceScene = lazy(() =>
   import("@/components/scenes/IssuanceScene").then((m) => ({ default: m.IssuanceScene }))
 );
+const ProvenanceScene = lazy(() =>
+  import("@/components/scenes/ProvenanceScene").then((m) => ({ default: m.ProvenanceScene }))
+);
 const SettlementScene = lazy(() =>
   import("@/components/scenes/SettlementScene").then((m) => ({ default: m.SettlementScene }))
 );
@@ -130,6 +133,7 @@ export type SceneId =
   | "amm"
   | "network"
   | "settlement"
+  | "provenance"
   | "treasury"
   | "plans"
   | "account"
@@ -161,7 +165,7 @@ type SceneDef = {
  */
 const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "overview", label: "OVERVIEW", scenes: ["home", "control"] },
-  { id: "adjudication", label: "ADJUDICATION", scenes: ["verify", "credentials", "domains"] },
+  { id: "adjudication", label: "ADJUDICATION", scenes: ["verify", "provenance", "credentials", "domains"] },
   { id: "markets", label: "MARKETS & EXPOSURE", scenes: ["risk", "desk", "amm"] },
   { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance"] },
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
@@ -301,6 +305,16 @@ const SCENES: SceneDef[] = [
     digit: "",
     group: "primary",
     requires: "compliance_api",
+  },
+  {
+    id: "provenance",
+    label: "PROVENANCE",
+    title: "PROVENANCE",
+    hint: "Account age and funding source — who this counterparty came from",
+    icon: <NovaEye size={15} />,
+    digit: "",
+    group: "primary",
+    requires: "portfolios",
   },
   {
     id: "settlement",
@@ -940,6 +954,8 @@ function ConsoleApp() {
                       <SafeShopScene onUpgrade={openPlans} />
                     ) : scene === "treasury" ? (
                       <ControlScene onUpgrade={openPlans} onSignIn={openAuth} />
+                    ) : scene === "provenance" ? (
+                      <ProvenanceScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "settlement" ? (
                       <SettlementScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "network" ? (
