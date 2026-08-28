@@ -7,7 +7,14 @@ import {
   fetchIssuerObligations,
   isValidAddress,
 } from "@/lib/xrpl/client";
-import type { CredentialRecord, IssuerPosture } from "@/lib/xrpl/types";
+import type {
+  AccountInfo,
+  CredentialRecord,
+  IssuerObligations,
+  IssuerPosture,
+  TrustLine,
+  WalletTransaction,
+} from "@/lib/xrpl/types";
 
 /**
  * Counterparty check — the public-facing half of NOSHASHI.
@@ -168,6 +175,47 @@ export async function checkCounterparty(
   const posture = isIssuer
     ? await fetchIssuerPosture(address).catch(() => undefined)
     : undefined;
+
+  return assessCounterparty({
+    address,
+    account,
+    credentials,
+    lines,
+    transactions,
+    obligations,
+    posture,
+  });
+}
+
+/** Everything the assessment needs, once the reads are done. */
+export type CounterpartyFacts = {
+  address: string;
+  account: AccountInfo;
+  credentials: CredentialRecord[];
+  lines: TrustLine[];
+  transactions: WalletTransaction[];
+  obligations: IssuerObligations | null;
+  posture?: IssuerPosture;
+};
+
+/**
+ * Turn the gathered facts into findings and a verdict. Pure.
+ *
+ * Split from checkCounterparty because everything here was previously
+ * unreachable without a network: the whole module was one async function,
+ * so the logic that decides whether to tell someone to AVOID an address —
+ * the free tool, and the first thing a prospect touches — could not be
+ * tested at all.
+ *
+ * This is the fourth module in this codebase to need the same separation.
+ * The pattern is consistent: the reasoning is worth testing, and it is
+ * only testable once it stops being welded to the fetch.
+ */
+export function assessCounterparty(facts: CounterpartyFacts): CounterpartyReport {
+  const { address, account, credentials, lines, transactions, obligations, posture } =
+    facts;
+  const issuedCurrencies = Object.keys(obligations?.obligations ?? {});
+  const isIssuer = issuedCurrencies.length > 0;
 
   const findings: CheckFinding[] = [];
 
