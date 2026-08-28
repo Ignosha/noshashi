@@ -105,6 +105,9 @@ value. They are handled explicitly and documented at the top of each module.
 | Quorum is weight, not count | `lib/desk/control.ts` | Five signers where one carries the quorum is a single-key account. The headline reports minimum signers required. |
 | One node ≠ the network | `lib/net/sync.ts` | `server_info` describes the node that answered. Four are queried and their disagreement is the reading. |
 | Not disclosed ≠ unknown | `lib/net/sync.ts` | `s1`/`s2.ripple.com` redact version and peer count by choice. Rendered as "not disclosed", never as a gap. |
+| Sequence is not a count | `lib/desk/provenance.ts` | Since DeletableAccounts a new account's `Sequence` is seeded to its creation ledger index. A live AMM account reads 92,835,117 and has sent zero transactions — the obvious reading is wrong by the whole number. |
+| Ripple epoch ≠ Unix epoch | `lib/desk/control.ts` | Escrow times count from 2000-01-01. Reading them as Unix time puts every release date thirty years early. |
+| `+0000` is not portable | `lib/desk/amm.ts` | `amm_info` returns an auction expiry with a `+0000` offset. V8 parses it and WKWebView historically does not — and Tauri renders in WKWebView on macOS, so it would pass in dev and fail in the shipped app. |
 | `rpc` rejects, never returns `.error` | `lib/xrpl/client.ts` | `if (res.error)` is dead code. Inside a pagination walk, an uncaught rejection discards every page already gathered. |
 
 ### Amendments are checked, not assumed
@@ -160,10 +163,22 @@ src/
     desk/
       risk.ts              freeze rights, Travel Rule, HHI concentration
       liquidity.ts         exit liquidity — the compliance × market join
+      settlement.ts        delivered vs requested — the partial-payment trap
+      provenance.ts        account age and funding source
+      control.ts           signer weights, quorum, reserve and escrow locks
+      amm.ts               AMM fee votes and the auction slot
+      issuance.ts          issuer-side holder concentration
       watch.ts             issuer drift monitoring
       ledger.ts            durable local adjudication record
       rules.ts             operator-owned thresholds
       offline.ts           captured-state adjudication
+      __tests__/           the findings logic, tested by mutation
+    net/
+      sync.ts              four public nodes compared, disagreement as signal
+    agent/                 on-device analyst: providers, keyring, context
+    billing/               plan catalogue and entitlement resolution
+    nav/
+      handoff.tsx          carry a subject from one scene to the next
     public/
       counterparty.ts      the free public address check
     edition.ts             full vs demo, resolved at build time

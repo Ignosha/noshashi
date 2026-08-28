@@ -57,12 +57,18 @@ simulated, or backfilled.
 - **Editable rule set** — the operator states their own thresholds
 - **Signed audit export** — SHA-256 chain-of-custody over the exact bytes
 - **Offline adjudication** — captured state, stamped with ledger index and age
+- **Settlement forensics** — `delivered_amount` against the requested `Amount`. A partial payment can return `tesSUCCESS` having delivered a fraction of the stated figure; measured on mainnet, three of 223 consecutive payments carried the flag and one delivered 0.4%
+- **Counterparty provenance** — account age and the account that sent the first XRP in. Corrects for sequence numbers being seeded to the creation ledger index rather than counting transactions
+- **Treasury control surface** — the minimum number of signers who must agree, derived from summed signing weights rather than a headcount, plus master-key bypass and reserve/escrow locks
+- **Issuance surveillance** — holder concentration from the issuer's side, withheld entirely when the holder walk covers too little of the supply to support a figure
 - **Binary integrity verification** — hashes the running executable
 
 ### Market intelligence
 - **Order book depth** — real bids and asks via `book_offers`
 - **AMM pool state** — liquidity, trading fee, and frozen status via `amm_info`
 - **Issuer obligations** — real circulating supply per currency via `gateway_balances`
+- **AMM pool governance** — who votes the trading fee, on what share of the LP supply, and who holds the discounted auction slot
+- **Ledger sync** — four public nodes queried by name, with disagreement between them treated as the reading rather than smoothed away
 - **Exit liquidity analysis** — the synthesis: freeze risk × concentration × realisable depth
 
 ### Platform
@@ -70,6 +76,8 @@ simulated, or backfilled.
 - On-device compliance agent (any model; local defaults)
 - Multi-wallet portfolios and a compliance radar
 - Accounts, 2FA/OTP, subscription billing, entitlement gating
+- Subject handoff — an address found in one screen carries into the next, so a finding becomes the following question rather than a copy-paste
+- A test suite over the findings logic, verified by mutation rather than by passing
 
 ## What NOSHASHI is not
 
