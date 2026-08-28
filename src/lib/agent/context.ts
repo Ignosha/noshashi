@@ -77,13 +77,49 @@ export function buildSystemPrompt(mode: AgentMode, data: XrplState): string {
       SHARED_RULES,
       `- If a question needs a human, hand off to ${CONTACT.support} (${CONTACT.hours}, target response ${CONTACT.responseTarget}). Security reports go to ${CONTACT.security}.`,
       "",
-      "Console reference:",
-      "- Mission Control (Cmd+1): live mainnet telemetry, wallet gate, policy rule set.",
-      "- Verification (Cmd+2): describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast.",
-      "- Credentials (Cmd+3): XLS-70 objects held by the wallet, and which domains they unlock.",
-      "- Domain Grid (Cmd+4): XLS-80 permissioned domains and their rule sets.",
-      "- Audit Trail (Cmd+5): wallet history, filterable, exportable to CSV.",
-      "- Settings (Cmd+6): wallet address, notifications, launch at login, global shortcut, Keychain storage.",
+      /*
+       * Console reference.
+       *
+       * Kept exhaustive on purpose. SHARED_RULES tells this agent to say it
+       * does not have a fact when the fact is absent here — which means an
+       * incomplete list does not merely leave a gap, it makes the agent
+       * actively deny capabilities the product ships. Before this was
+       * corrected it knew six of twenty-four scenes and every shortcut it
+       * quoted was off by one, so it sent operators to the wrong screen and
+       * told them the rest did not exist.
+       *
+       * Shortcuts here must match the `digit` field in SCENES (src/App.tsx),
+       * which is bound as `mod+${digit}`. Scenes with no digit are reached
+       * through the sidebar or Cmd+K, and are listed without one.
+       *
+       * Plan requirements are stated so the agent does not send someone to a
+       * paywall it did not warn them about.
+       */
+      "Console reference — every scene, with the plan it needs:",
+      "- Overview (Cmd+1): what NOSHASHI is and what it reads. Free.",
+      "- Mission Control (Cmd+2): live mainnet telemetry, wallet gate, policy rule set. Free.",
+      "- Verification (Cmd+3): describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast. Free.",
+      "- Credentials (Cmd+4): XLS-70 objects held by the wallet, and which domains they unlock. Free.",
+      "- Domain Grid (Cmd+5): XLS-80 permissioned domains and their rule sets. Free.",
+      "- Audit Trail (Cmd+6): wallet history, filterable, exportable to CSV. Free.",
+      "- Agent (Cmd+7): this assistant. Free.",
+      "- Portfolio & Radar (Cmd+8): multi-wallet surveillance and the compliance radar. Requires Desk.",
+      "- Exposure Analysis (Cmd+9): issuer freeze rights, Travel Rule scope, counterparty concentration. Requires Desk.",
+      "- Ledger & Policy (Cmd+0): local adjudication history, editable rule set, signed export. Requires Desk.",
+      "- Check an Address: read what the ledger publishes about any account. Free.",
+      "- Ledger Sync: four public XRPL nodes queried and compared, with disagreement between them treated as the reading. Free, no account needed.",
+      "- Learn: short animated explainers. Free.",
+      "- Settlement: what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question. Requires Desk.",
+      "- Provenance: how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts. Requires Desk.",
+      "- Control Surface: how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable. Requires Desk.",
+      "- Pool Governance: who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot. Requires Desk.",
+      "- Issuance: holder concentration and enforcement history for an issuer, from the issuer's side. Requires Institution.",
+      "- Growth: platform-native drafts built from measured figures. Free.",
+      "- Pricing: plans, checkout and verification credits. Free.",
+      "- Account: subscription, two-factor authentication and API keys. Free.",
+      "- Business Plan: revenue streams, tiers and sequencing. Free.",
+      "- Legal & Accessibility: policies, accessibility statement and contact routes. Free.",
+      "- Settings: appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage. Free.",
       "- Cmd+K opens the command palette. Cmd+Shift+X toggles the menu bar HUD.",
       "",
       "Live state:",
