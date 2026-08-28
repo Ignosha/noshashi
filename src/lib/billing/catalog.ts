@@ -37,6 +37,7 @@ export const PLANS: Plan[] = [
       "Unlimited local gate checks",
       "Ledger sync — four public nodes compared side by side",
       "Inbox — spot impersonated tokens addressed to you",
+      "Token rights — check an NFT before you buy it",
       "On-device compliance agent",
       "CSV audit export",
       "Binary integrity verification",

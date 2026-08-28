@@ -109,6 +109,7 @@ value. They are handled explicitly and documented at the top of each module.
 | Ripple epoch ≠ Unix epoch | `lib/desk/control.ts` | Escrow times count from 2000-01-01. Reading them as Unix time puts every release date thirty years early. |
 | `+0000` is not portable | `lib/desk/amm.ts` | `amm_info` returns an auction expiry with a `+0000` offset. V8 parses it and WKWebView historically does not — and Tauri renders in WKWebView on macOS, so it would pass in dev and fail in the shipped app. |
 | Quoted depth is not fillable depth | `lib/desk/book.ts` | An offer rests whether or not its owner still holds the asset. Measured on mainnet, 92.8% of one book's visible depth could not fill, and a single offer advertised 1,400,100 USD against a 22,273 balance. |
+| An NFT is a pointer | `lib/desk/nft.ts` | The issuer may keep the right to destroy the token (lsfBurnable) or rewrite what its URI points at (lsfMutable). Neither is shown by any marketplace, and both are encoded in the NFTokenID itself. |
 | A ticker is not a name | `lib/desk/claims.ts` | Any account may issue a token called USDT and the ledger draws them identically. Only the issuer identifies a token, so a claim's amount says nothing about what it is worth. |
 | `rpc` rejects, never returns `.error` | `lib/xrpl/client.ts` | `if (res.error)` is dead code. Inside a pagination walk, an uncaught rejection discards every page already gathered. |
 
@@ -176,6 +177,7 @@ src/
       offline.ts           captured-state adjudication
       __tests__/           the findings logic, tested by mutation
       book.ts              order book: quoted depth vs depth that can fill
+      nft.ts               NFT rights decoded from the token id, offline
       claims.ts            unsolicited checks, with the claimed issuer verified
     net/
       sync.ts              four public nodes compared, disagreement as signal

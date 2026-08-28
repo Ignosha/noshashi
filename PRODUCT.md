@@ -69,6 +69,7 @@ simulated, or backfilled.
 - **AMM pool state** — liquidity, trading fee, and frozen status via `amm_info`
 - **Issuer obligations** — real circulating supply per currency via `gateway_balances`
 - **AMM pool governance** — who votes the trading fee, on what share of the LP supply, and who holds the discounted auction slot
+- **NFT rights** — what an issuer can still do to a token after selling it: destroy it, rewrite what its URI points at, block resale, or take a cut of every transfer. Decoded from the NFTokenID itself, offline
 - **Unsolicited claim detection** — checks a stranger has addressed to an account, with the claimed issuer verified. A currency code is not a name anyone owns, so an impersonated ticker from an issuer with zero obligations is identified as uncashable rather than rendered as a balance
 - **Ledger sync** — four public nodes queried by name, with disagreement between them treated as the reading rather than smoothed away
 - **Exit liquidity analysis** — the synthesis: freeze risk × concentration × realisable depth

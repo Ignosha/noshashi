@@ -53,6 +53,9 @@ const WorkstationScene = lazy(() =>
 const IssuanceScene = lazy(() =>
   import("@/components/scenes/IssuanceScene").then((m) => ({ default: m.IssuanceScene }))
 );
+const NftScene = lazy(() =>
+  import("@/components/scenes/NftScene").then((m) => ({ default: m.NftScene }))
+);
 const BookScene = lazy(() =>
   import("@/components/scenes/BookScene").then((m) => ({ default: m.BookScene }))
 );
@@ -143,6 +146,7 @@ export type SceneId =
   | "provenance"
   | "claims"
   | "book"
+  | "nft"
   | "treasury"
   | "plans"
   | "account"
@@ -179,7 +183,7 @@ const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance"] },
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
   { id: "intelligence", label: "INTELLIGENCE", scenes: ["agent"] },
-  { id: "public", label: "PUBLIC", scenes: ["safeshop", "claims", "network", "learn"] },
+  { id: "public", label: "PUBLIC", scenes: ["safeshop", "claims", "nft", "network", "learn"] },
   { id: "growth", label: "GROWTH", scenes: ["growth"] },
 ];
 
@@ -314,6 +318,15 @@ const SCENES: SceneDef[] = [
     digit: "",
     group: "primary",
     requires: "compliance_api",
+  },
+  {
+    id: "nft",
+    label: "TOKEN RIGHTS",
+    title: "TOKEN RIGHTS",
+    hint: "What an NFT's issuer can still do to it after you own it",
+    icon: <NovaVault size={15} />,
+    digit: "",
+    group: "primary",
   },
   {
     id: "book",
@@ -983,6 +996,8 @@ function ConsoleApp() {
                       <SafeShopScene onUpgrade={openPlans} />
                     ) : scene === "treasury" ? (
                       <ControlScene onUpgrade={openPlans} onSignIn={openAuth} />
+                    ) : scene === "nft" ? (
+                      <NftScene />
                     ) : scene === "book" ? (
                       <BookScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "claims" ? (

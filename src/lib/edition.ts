@@ -55,6 +55,7 @@ export const DEMO_INCLUDES = [
   "XLS-70 credential registry and XLS-80 domain grid",
   "Ledger sync — four public nodes compared, no account needed",
   "Inbox — unsolicited claims, with the claimed issuer verified",
+  "Token rights — what an NFT's issuer can still do to it after you own it",
   "Address checking — 10 per month, as on the free tier",
   "Network capability detection against live amendments",
   "The on-device compliance agent",

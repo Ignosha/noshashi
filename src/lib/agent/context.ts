@@ -107,6 +107,7 @@ export function buildSystemPrompt(mode: AgentMode, data: XrplState): string {
       "- Exposure Analysis (Cmd+9): issuer freeze rights, Travel Rule scope, counterparty concentration. Requires Desk.",
       "- Ledger & Policy (Cmd+0): local adjudication history, editable rule set, signed export. Requires Desk.",
       "- Check an Address: read what the ledger publishes about any account. Free.",
+      "- Token Rights: what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly. Free, no account needed.",
       "- Inbox: every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds. Free, no account needed.",
       "- Ledger Sync: four public XRPL nodes queried and compared, with disagreement between them treated as the reading. Free, no account needed.",
       "- Learn: short animated explainers. Free.",
