@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { SceneHeader } from "./SceneHeader";
-import { Panel } from "@/components/nova/Panel";
+import { Panel, StatCell } from "@/components/nova/Panel";
 import { Signal } from "@/components/nova/Signal";
 import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { NovaSat } from "@/components/nova/NovaIcon";
@@ -91,26 +91,13 @@ export function NetworkScene() {
             caveat: "of the reference fee",
           },
         ].map((stat) => (
-          <Panel key={stat.label} bodyClassName="p-3.5">
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
-              {stat.label}
-            </p>
-            <p
-              className={cn(
-                "data-font mt-1.5 text-[22px] font-[600] leading-none tabular-nums",
-                stat.tone === "no-go"
-                  ? "text-no-go"
-                  : stat.tone === "hold"
-                    ? "text-hold"
-                    : "text-foreground"
-              )}
-            >
-              {stat.value}
-            </p>
-            <p className="mono-font mt-1.5 text-[9px] leading-snug text-faint">
-              {stat.caveat}
-            </p>
-          </Panel>
+          <StatCell
+            key={stat.label}
+            label={stat.label}
+            value={stat.value}
+            caveat={stat.caveat}
+            tone={stat.tone}
+          />
         ))}
       </div>
 

@@ -131,6 +131,63 @@ export function DataRow({
   );
 }
 
+/**
+ * StatCell — the hero figure at the top of a read scene.
+ *
+ * Centralised because six scenes had grown their own copy of the same
+ * markup and the same tone ladder, which is how a colour budget drifts: one
+ * scene starts tinting a number green for "good" and the console stops
+ * meaning anything by colour. Here STATUS owns colour and nothing else does.
+ *
+ * `caveat` is not decoration. Every figure this console prints is qualified
+ * by how it was measured — a partial walk, an excluded wallet, a node that
+ * declined to answer — and the caveat line is where that qualification
+ * lives. A stat with something to disclose and nowhere to put it is how
+ * fabrication starts.
+ */
+export function StatCell({
+  label,
+  value,
+  caveat,
+  tone,
+  className,
+}: {
+  label: React.ReactNode;
+  value: React.ReactNode;
+  /** How this figure was measured, or what it excludes. */
+  caveat?: React.ReactNode;
+  tone?: "default" | "hold" | "no-go";
+  className?: string;
+}) {
+  return (
+    <Panel bodyClassName="p-3.5" className={className}>
+      <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+        {label}
+      </p>
+      <p
+        className={cn(
+          "data-font mt-1.5 truncate text-[22px] font-[600] leading-none tabular-nums",
+          tone === "no-go" && "text-no-go",
+          tone === "hold" && "text-hold",
+          (!tone || tone === "default") && "text-foreground"
+        )}
+      >
+        {value}
+      </p>
+      {caveat !== undefined && caveat !== null && (
+        <p
+          className={cn(
+            "mono-font mt-1.5 text-[9px] leading-snug",
+            tone === "no-go" ? "text-no-go/80" : "text-faint"
+          )}
+        >
+          {caveat}
+        </p>
+      )}
+    </Panel>
+  );
+}
+
 /** Eyebrow used outside a Panel header (section titles inside a body). */
 export function Eyebrow({
   children,

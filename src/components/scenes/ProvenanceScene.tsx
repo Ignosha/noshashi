@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SceneHeader } from "./SceneHeader";
-import { Panel } from "@/components/nova/Panel";
+import { Panel, StatCell } from "@/components/nova/Panel";
 import { EmptyState } from "@/components/nova/EmptyState";
 import { Gated } from "@/components/nova/Gated";
 import { Signal } from "@/components/nova/Signal";
@@ -15,7 +15,6 @@ import {
   provenanceFindings,
   type ProvenanceReport,
 } from "@/lib/desk/provenance";
-import { cn } from "@/lib/utils";
 
 /**
  * ProvenanceScene — how old this counterparty is, and who funded it.
@@ -129,22 +128,13 @@ function ProvenanceBody() {
               caveat: `${report.ownerCount} ledger objects · XRP`,
             },
           ].map((stat) => (
-            <Panel key={stat.label} bodyClassName="p-3.5">
-              <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
-                {stat.label}
-              </p>
-              <p
-                className={cn(
-                  "data-font mt-1.5 truncate text-[22px] font-[600] leading-none tabular-nums",
-                  stat.tone === "hold" ? "text-hold" : "text-foreground"
-                )}
-              >
-                {stat.value}
-              </p>
-              <p className="mono-font mt-1.5 text-[9px] leading-snug text-faint">
-                {stat.caveat}
-              </p>
-            </Panel>
+            <StatCell
+              key={stat.label}
+              label={stat.label}
+              value={stat.value}
+              caveat={stat.caveat}
+              tone={stat.tone}
+            />
           ))}
         </div>
       )}
