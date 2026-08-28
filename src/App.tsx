@@ -53,6 +53,9 @@ const WorkstationScene = lazy(() =>
 const IssuanceScene = lazy(() =>
   import("@/components/scenes/IssuanceScene").then((m) => ({ default: m.IssuanceScene }))
 );
+const ClaimsScene = lazy(() =>
+  import("@/components/scenes/ClaimsScene").then((m) => ({ default: m.ClaimsScene }))
+);
 const ProvenanceScene = lazy(() =>
   import("@/components/scenes/ProvenanceScene").then((m) => ({ default: m.ProvenanceScene }))
 );
@@ -135,6 +138,7 @@ export type SceneId =
   | "network"
   | "settlement"
   | "provenance"
+  | "claims"
   | "treasury"
   | "plans"
   | "account"
@@ -171,7 +175,7 @@ const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance"] },
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
   { id: "intelligence", label: "INTELLIGENCE", scenes: ["agent"] },
-  { id: "public", label: "PUBLIC", scenes: ["safeshop", "network", "learn"] },
+  { id: "public", label: "PUBLIC", scenes: ["safeshop", "claims", "network", "learn"] },
   { id: "growth", label: "GROWTH", scenes: ["growth"] },
 ];
 
@@ -306,6 +310,15 @@ const SCENES: SceneDef[] = [
     digit: "",
     group: "primary",
     requires: "compliance_api",
+  },
+  {
+    id: "claims",
+    label: "INBOX",
+    title: "INBOX",
+    hint: "Unsolicited claims addressed to an account, and whether the tokens exist",
+    icon: <NovaShield size={15} />,
+    digit: "",
+    group: "primary",
   },
   {
     id: "provenance",
@@ -956,6 +969,8 @@ function ConsoleApp() {
                       <SafeShopScene onUpgrade={openPlans} />
                     ) : scene === "treasury" ? (
                       <ControlScene onUpgrade={openPlans} onSignIn={openAuth} />
+                    ) : scene === "claims" ? (
+                      <ClaimsScene />
                     ) : scene === "provenance" ? (
                       <ProvenanceScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "settlement" ? (

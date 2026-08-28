@@ -54,6 +54,7 @@ export const DEMO_INCLUDES = [
   "Real SHA-256 receipts, byte-identical to the full build",
   "XLS-70 credential registry and XLS-80 domain grid",
   "Ledger sync — four public nodes compared, no account needed",
+  "Inbox — unsolicited claims, with the claimed issuer verified",
   "Address checking — 10 per month, as on the free tier",
   "Network capability detection against live amendments",
   "The on-device compliance agent",

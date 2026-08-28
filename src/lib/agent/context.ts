@@ -107,6 +107,7 @@ export function buildSystemPrompt(mode: AgentMode, data: XrplState): string {
       "- Exposure Analysis (Cmd+9): issuer freeze rights, Travel Rule scope, counterparty concentration. Requires Desk.",
       "- Ledger & Policy (Cmd+0): local adjudication history, editable rule set, signed export. Requires Desk.",
       "- Check an Address: read what the ledger publishes about any account. Free.",
+      "- Inbox: every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds. Free, no account needed.",
       "- Ledger Sync: four public XRPL nodes queried and compared, with disagreement between them treated as the reading. Free, no account needed.",
       "- Learn: short animated explainers. Free.",
       "- Settlement: what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question. Requires Desk.",

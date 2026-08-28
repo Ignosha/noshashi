@@ -36,6 +36,7 @@ export const PLANS: Plan[] = [
       "Full console and menu bar HUD",
       "Unlimited local gate checks",
       "Ledger sync — four public nodes compared side by side",
+      "Inbox — spot impersonated tokens addressed to you",
       "On-device compliance agent",
       "CSV audit export",
       "Binary integrity verification",
