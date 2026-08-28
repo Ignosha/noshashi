@@ -47,8 +47,9 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: asset: http://asset.localhost; connect-src 'self' ipc: http://ipc.localhost wss://xrplcluster.com wss://s1.ripple.com wss://s2.ripple.com https://xiurbiwuwcfowqnpmwki.supabase.co wss://xiurbiwuwcfowqnpmwki.supabase.co http://localhost:11434 http://127.0.0.1:11434 http://localhost:1234 http://127.0.0.1:1234 http://localhost:8080 http://127.0.0.1:8080 http://localhost:1337 http://127.0.0.1:1337 http://localhost:8000 http://127.0.0.1:8000 https://openrouter.ai https://api.groq.com https://api.together.xyz https://api.anthropic.com https://api.openai.com https://api.mistral.ai https://api.deepseek.com; media-src 'none'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; worker-src 'self' blob:",
-      "dangerousDisableAssetCspModification": false
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: asset: http://asset.localhost; connect-src 'self' ipc: http://ipc.localhost wss://xrplcluster.com wss://s1.ripple.com wss://s2.ripple.com wss://xrpl.ws https://xiurbiwuwcfowqnpmwki.supabase.co wss://xiurbiwuwcfowqnpmwki.supabase.co http://localhost:11434 http://127.0.0.1:11434 http://localhost:1234 http://127.0.0.1:1234 http://localhost:8080 http://127.0.0.1:8080 http://localhost:1337 http://127.0.0.1:1337 http://localhost:8000 http://127.0.0.1:8000 https://openrouter.ai https://api.groq.com https://api.together.xyz https://api.anthropic.com https://api.openai.com https://api.mistral.ai https://api.deepseek.com; media-src 'none'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; worker-src 'self' blob:",
+      "dangerousDisableAssetCspModification": false,
+      "freezePrototype": true
     },
     "trayIcon": {
       "id": "noshashi-tray",
