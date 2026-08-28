@@ -74,6 +74,18 @@ export function analyseIssuers(
 
     const balance = issuerLines.reduce((sum, line) => sum + line.balance, 0);
     const frozenHere = issuerLines.some((line) => line.frozenByIssuer);
+    /*
+     * XLS-77 deep freeze is a separate flag and a strictly worse position:
+     * an ordinary freeze stops the holder sending, a deep freeze stops them
+     * receiving as well. This module read only `frozenByIssuer`, so a line
+     * the issuer had deep-frozen without an ordinary freeze was reported as
+     * "issuer retains the right to freeze" at severity info — a present,
+     * total immobilisation described as a future possibility.
+     *
+     * The free public check already read both flags. The paid exposure
+     * analysis did not, which was exactly the wrong way round.
+     */
+    const deepFrozenHere = issuerLines.some((line) => line.deepFrozenByIssuer === true);
 
     let severity: Severity = "info";
     let headline = "Issuer retains the right to freeze this balance.";
@@ -81,6 +93,10 @@ export function analyseIssuers(
     if (posture.globalFreeze) {
       severity = "critical";
       headline = "Global freeze is ACTIVE — every balance from this issuer is immobilised now.";
+    } else if (deepFrozenHere) {
+      severity = "critical";
+      headline =
+        "This issuer has DEEP-frozen your line. The balance can neither be sent nor added to.";
     } else if (frozenHere) {
       severity = "critical";
       headline = "This issuer has frozen your line specifically. The balance cannot move.";
