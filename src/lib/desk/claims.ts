@@ -143,8 +143,6 @@ export async function readClaims(address: string): Promise<ClaimsReport> {
   }
 
   const objects = (res.account_objects ?? []) as Array<Record<string, any>>;
-  // account_objects returns checks addressed TO the account as well as ones
-  // it created. Only the former are claims against it.
   const incoming = objects.filter((o) => o.Destination === address);
 
   /*
@@ -173,6 +171,31 @@ export async function readClaims(address: string): Promise<ClaimsReport> {
       // or guilty; the finding layer reports it as unverified.
     }
   }
+
+  return interpretChecks(address, objects, issuers, Number(res.ledger_index ?? 0));
+}
+
+/** What a resolved issuer lookup carries. */
+export type IssuerFacts = { obligations: number; domain?: string };
+
+/**
+ * Turn raw check objects into a report.
+ *
+ * Split from the fetch so the partitioning can be tested. A mutation that
+ * removed the Destination filter — making an account's OWN outgoing checks
+ * register as claims against it — passed the entire suite, because every
+ * test built its report by hand and none exercised this step. The spammer's
+ * own account would have reported 34 threats against itself.
+ */
+export function interpretChecks(
+  address: string,
+  objects: Array<Record<string, any>>,
+  issuers: Map<string, IssuerFacts>,
+  ledgerIndex: number
+): ClaimsReport {
+  // account_objects returns checks addressed TO the account as well as ones
+  // it created. Only the former are claims against it.
+  const incoming = objects.filter((o) => o.Destination === address);
 
   const inbound: InboundClaim[] = incoming.map((check) => {
     const sendMax = check.SendMax;
@@ -211,7 +234,7 @@ export async function readClaims(address: string): Promise<ClaimsReport> {
     address,
     inbound,
     outboundCount: objects.length - incoming.length,
-    ledgerIndex: Number(res.ledger_index ?? 0),
+    ledgerIndex,
     readAt: new Date().toISOString(),
   };
 }
