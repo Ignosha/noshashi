@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+site/node_modules/
+
+# Build output
+dist/
+site/.next/
+src-tauri/target/
+src-tauri/gen/
+
+# Secrets — never commit. Paste credentials into the hosting provider's
+# own settings, not into this repo.
+.env
+.env.*
+!.env.example
+site/.env
+site/.env.*
+!site/.env.example
+*.pem
+*.key
+*.p12
+
+# Signed installers and release artefacts: large, and rebuilt by CI
+# (.github/workflows/release.yml) rather than tracked.
+release/
+site/download/*.dmg
+site/download/*.msi
+site/download/*.exe
+site/download/*.AppImage
+site/download/*.deb
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*

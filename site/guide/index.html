@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>NOSHASHI — A plain guide to the XRP Ledger and what NOSHASHI does</title>
+<meta name="description" content="No jargon. What the XRP Ledger is, what a freeze right is, what an amendment is, and why NOSHASHI reads both the rules and the market before you move anything.">
+<link rel="canonical" href="https://noshashi.app/guide/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0B0F14;--surface:#11161D;--elevated:#1C2330;
+    --ink:#E6E8EB;--muted:#A3A8B3;--faint:#747C8B;--rule:#2A313C;
+    --brand:#3A82F6;--tele:#00E0C6;--go:#35D49A;--hold:#F5B942;--nogo:#FF5F6D;
+    --r:10px;--shell:min(1180px,92vw);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ground);color:var(--ink);
+    font-family:"Space Grotesk",-apple-system,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.68}
+  a{color:var(--brand)}
+  .shell{width:var(--shell);margin:0 auto}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
+    background:color-mix(in srgb,var(--ground) 82%,transparent);border-bottom:1px solid var(--rule)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+  .brand span{font-weight:600;letter-spacing:.2em;font-size:14px}
+  .back{font-size:12px;color:var(--muted);text-decoration:none}
+  .back:hover{color:var(--ink)}
+
+  .hero{padding:72px 0 46px;max-width:70ch}
+  .kick{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.22em;color:var(--faint)}
+  h1{font-size:clamp(30px,4.4vw,46px);letter-spacing:-.03em;margin:14px 0 16px;line-height:1.12}
+  .lede{color:var(--muted);font-size:17px}
+
+  .wrap{display:grid;grid-template-columns:230px 1fr;gap:48px;padding-bottom:90px;align-items:start}
+  aside{position:sticky;top:86px}
+  aside p{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;color:var(--faint);margin-bottom:12px}
+  aside a{display:block;font-size:12.5px;color:var(--muted);text-decoration:none;padding:6px 0 6px 12px;
+    border-left:2px solid transparent;transition:.14s}
+  aside a:hover{color:var(--ink);border-left-color:var(--brand)}
+
+  article section{margin-bottom:44px;scroll-margin-top:86px}
+  article h2{font-size:24px;letter-spacing:-.02em;margin-bottom:14px}
+  article h3{font-size:15px;margin:26px 0 8px}
+  article p{color:var(--muted);font-size:15px;max-width:70ch;margin-bottom:14px}
+  article strong{color:var(--ink);font-weight:600}
+  article ul{margin:0 0 16px 0;list-style:none;display:grid;gap:9px}
+  article li{display:flex;gap:10px;color:var(--muted);font-size:14.5px;max-width:70ch}
+  article li::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--brand);margin-top:9px;flex:none}
+
+  .card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:24px;margin:18px 0}
+  .card .t{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;color:var(--faint);margin-bottom:10px}
+  .card p:last-child{margin-bottom:0}
+
+  .analogy{border-left:2px solid var(--tele);background:color-mix(in srgb,var(--tele) 6%,transparent);
+    border-radius:0 var(--r) var(--r) 0;padding:18px 22px;margin:18px 0}
+  .analogy .t{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;margin-bottom:8px}
+  .analogy p{color:var(--ink);margin-bottom:0;font-size:14.5px}
+
+  .verdict{display:grid;gap:10px;margin:18px 0}
+  .v{display:flex;gap:14px;align-items:flex-start;background:var(--surface);
+    border:1px solid var(--rule);border-radius:var(--r);padding:16px 18px}
+  .v b{font-family:"IBM Plex Mono",monospace;font-size:13px;min-width:64px}
+  .v.go b{color:var(--go)} .v.hold b{color:var(--hold)} .v.nogo b{color:var(--nogo)}
+  .v span{color:var(--muted);font-size:14px}
+
+  .kv{width:100%;border-collapse:collapse;font-size:14px;margin:16px 0}
+  .kv th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
+    color:var(--faint);font-weight:500;padding-bottom:10px}
+  .kv td{padding:11px 14px 11px 0;border-top:1px solid var(--rule);color:var(--muted);vertical-align:top}
+  .kv td:first-child{color:var(--ink);width:190px;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+  .yes{color:var(--go)} .no{color:var(--hold)}
+
+  footer{border-top:1px solid var(--rule);padding:34px 0;font-size:12px;color:var(--faint)}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+  .btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:#fff;
+    padding:11px 20px;font-size:12px;font-weight:600;text-decoration:none;border-radius:var(--r);border:1px solid var(--brand)}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;gap:26px}
+    aside{position:static}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 180 180" width="24" height="24" fill="none" aria-hidden="true">
+        <mask id="gm" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
+          <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
+          <path d="M95 99C91 80 94 64 103 50 114 59 121 70 123 83 116 91 106 97 95 99Z" fill="#000"/>
+          <circle cx="129" cy="63" r="5" fill="#000"/>
+        </mask>
+        <g stroke="#E6E8EB" stroke-width="7" stroke-linecap="round">
+          <path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/>
+        </g>
+        <circle cx="151" cy="69" r="7" fill="#E6E8EB"/>
+        <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#E6E8EB" mask="url(#gm)"/>
+        <path d="M92 111 63 132C60 116 66 103 78 93Z" fill="#E6E8EB"/>
+        <path d="M111 91 130 118C114 119 101 113 93 103Z" fill="#E6E8EB"/>
+        <path d="M82 121 67 150 94 132Z" fill="#E6E8EB"/>
+        <path d="M73 143 61 164 84 151Z" fill="#E6E8EB"/>
+      </svg>
+      <span>NOSHASHI</span>
+    </a>
+    <a class="back" href="/">&larr; Back to noshashi.app</a>
+  </div>
+</header>
+
+<div class="shell">
+  <div class="hero">
+    <p class="kick">START HERE · NO PRIOR KNOWLEDGE ASSUMED</p>
+    <h1>What all of this actually means</h1>
+    <p class="lede">
+      If you have never used the XRP Ledger, none of the words on the front page mean
+      anything yet. This page fixes that. No jargon that is not explained, and nothing
+      here requires you to own any crypto.
+    </p>
+  </div>
+
+  <div class="wrap">
+    <aside>
+      <p>CONTENTS</p>
+      <a href="#ledger">1 · What the XRP Ledger is</a>
+      <a href="#issued">2 · Who really owns a token</a>
+      <a href="#freeze">3 · Freeze rights</a>
+      <a href="#book">4 · Why "it's worth $X" can be false</a>
+      <a href="#amendments">5 · What an amendment is</a>
+      <a href="#gate">6 · What NOSHASHI does</a>
+      <a href="#everyone">7 · If you are not an institution</a>
+      <a href="#words">8 · Word list</a>
+    </aside>
+
+    <article>
+      <section id="ledger">
+        <h2>1 · What the XRP Ledger is</h2>
+        <p>
+          The XRP Ledger is a shared public record of who holds what. Around every four
+          seconds it agrees on a new version of that record — a <strong>ledger</strong> —
+          and once agreed, it never changes. Anyone can read it. Nobody needs permission.
+        </p>
+        <div class="analogy">
+          <p class="t">PUT ANOTHER WAY</p>
+          <p>
+            Think of a bank statement that the whole world can read, that updates every
+            four seconds, and that no single bank controls. That is roughly it.
+          </p>
+        </div>
+        <p>
+          The live numbers on our front page are read straight from that record, over a
+          public connection, at the moment you load the page. Nothing is cached or invented.
+        </p>
+      </section>
+
+      <section id="issued">
+        <h2>2 · Who really owns a token</h2>
+        <p>
+          XRP itself is the ledger's own currency and belongs to whoever holds it. But most
+          things on the ledger are not XRP — they are <strong>issued currencies</strong>: a
+          dollar, a euro, or a token that some company has put onto the ledger.
+        </p>
+        <p>
+          An issued token is closer to an IOU than to cash. A company called the
+          <strong>issuer</strong> promises it is worth something, and the ledger records who
+          holds how much of that promise.
+        </p>
+        <div class="analogy">
+          <p class="t">WHY THIS MATTERS</p>
+          <p>
+            Cash in your pocket is yours. A gift card is a promise from a shop — and the shop
+            has more say over it than you do. Most tokens are gift cards, not cash.
+          </p>
+        </div>
+      </section>
+
+      <section id="freeze">
+        <h2>3 · Freeze rights — the part almost nobody checks</h2>
+        <p>
+          The issuer of a token can usually <strong>freeze</strong> it. That is a real, built-in
+          power of the ledger, not a loophole. When an issuer freezes, the holder can no longer
+          send or redeem what they hold. The balance still shows in the wallet. It just cannot move.
+        </p>
+        <p>
+          There is a stronger version, called <strong>deep freeze</strong>, which also stops the
+          holder <em>receiving</em>. The difference matters: an ordinary freeze aimed at a
+          sanctioned address still lets that address keep accepting money.
+        </p>
+        <p>
+          Some issuers permanently give up this power. That is published on the ledger too, as a
+          flag called <span class="mono">lsfNoFreeze</span>, and once set it can never be undone.
+          An issuer that has set it can never freeze you.
+        </p>
+        <div class="card">
+          <p class="t">WHAT NOSHASHI READS</p>
+          <p>
+            For every token you hold, we read the issuer's flags and tell you plainly: can this
+            issuer freeze you, have they already, have they given up the right, and do they charge
+            a fee every time the token moves. Most wallets show you a balance and nothing else.
+          </p>
+        </div>
+      </section>
+
+      <section id="book">
+        <h2>4 · Why "it's worth $X" can be false</h2>
+        <p>
+          The ledger has a built-in marketplace. People post offers — "I will buy 500 of this at
+          this price" — and the collection of those offers is the <strong>order book</strong>.
+        </p>
+        <p>
+          A price is only real if somebody will actually trade at it. If the best offer is for
+          five dollars' worth, then the "price" describes five dollars, not your whole holding.
+          Selling more means walking down to worse and worse offers.
+        </p>
+        <div class="analogy">
+          <p class="t">A CONCRETE EXAMPLE, MEASURED ON THE REAL LEDGER</p>
+          <p>
+            One book appeared to hold <strong>12.7 million dollars</strong> of buyers. Once we
+            excluded offers priced so far from the market that nobody would ever fill them, the
+            genuinely reachable amount was <strong>13,894 dollars</strong> — about 913 times less.
+          </p>
+        </div>
+        <p>
+          That gap is not fraud. It is just what a raw order book looks like when nobody filters
+          it. But if you valued a position on the first number, you would be badly wrong.
+        </p>
+      </section>
+
+      <section id="amendments">
+        <h2>5 · What an amendment is</h2>
+        <p>
+          The XRP Ledger changes slowly and in public. A proposed change is written up as a
+          numbered document — you will see these as <span class="mono">XLS-70</span>,
+          <span class="mono">XLS-80</span> and so on — and then it has to be
+          <strong>voted in</strong> by the servers that run the network.
+        </p>
+        <p>A feature therefore exists in three different states, and they are easy to confuse:</p>
+        <table class="kv">
+          <thead><tr><th>State</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Specified</td><td>Somebody has written the document. Nothing works yet.</td></tr>
+            <tr><td>Implemented</td><td>The server software understands it. Still nothing works on the live network.</td></tr>
+            <tr><td class="yes">Activated</td><td>Enough of the network voted it in. <strong>Now it works.</strong></td></tr>
+          </tbody>
+        </table>
+        <p>
+          Software that checks only the second state will happily offer you a feature that every
+          server on the network will reject. NOSHASHI checks the third — it asks the live ledger
+          which amendments are actually switched on, and hides anything that is not.
+        </p>
+        <div class="card">
+          <p class="t">ACTIVATED TODAY, AND USED BY NOSHASHI</p>
+          <table class="kv">
+            <tbody>
+              <tr><td>XLS-70</td><td>Credentials — a verifiable statement about an account, issued by somebody else.</td></tr>
+              <tr><td>XLS-80</td><td>Permissioned domains — a walled garden where only accounts holding the right credentials may trade.</td></tr>
+              <tr><td>XLS-81</td><td>Permissioned order books — a members-only marketplace.</td></tr>
+              <tr><td>XLS-77</td><td>Deep freeze — blocks sending <em>and</em> receiving.</td></tr>
+              <tr><td>XLS-85</td><td>Token escrow — hold any token in escrow, not just XRP.</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:12px;font-size:13.5px">
+            Some things people expect — on-ledger lending and confidential transfers — are written
+            and built but <span class="no">not yet voted in</span>. We do not offer them, and we say so.
+          </p>
+        </div>
+      </section>
+
+      <section id="gate">
+        <h2>6 · What NOSHASHI actually does</h2>
+        <p>
+          Before you move anything, NOSHASHI answers two questions at once, from the same
+          four-second-old copy of the ledger:
+        </p>
+        <ul>
+          <li><strong>Am I allowed to move this?</strong> Checked against the rules of wherever it is going.</li>
+          <li><strong>Could I actually get out of it?</strong> Checked against the real order book and pool.</li>
+        </ul>
+        <p>It answers with one of three words, and always tells you which rule decided it:</p>
+        <div class="verdict">
+          <div class="v go"><b>GO</b><span>Every rule you configured passed.</span></div>
+          <div class="v hold"><b>HOLD</b><span>Something advisory failed. A person should look before continuing.</span></div>
+          <div class="v nogo"><b>NO-GO</b><span>A blocking rule failed. The settlement is refused.</span></div>
+        </div>
+        <p>
+          Nothing is signed and nothing is sent. It is a check you run <em>before</em> a transaction
+          exists, which is exactly why it can be run at all — it costs no fee and risks nothing.
+        </p>
+        <p>
+          Every answer comes with a receipt: a fingerprint of the check, computed the same way every
+          time. Two people running the same check get the same fingerprint, which is what makes it
+          worth handing to an auditor.
+        </p>
+      </section>
+
+      <section id="everyone">
+        <h2>7 · If you are not an institution</h2>
+        <p>
+          Most of the above is aimed at desks and companies. There is one part built for everybody,
+          and it is free: <strong>check an address before you pay it</strong>.
+        </p>
+        <p>
+          Paste any XRP Ledger address — a shop, a token, a person you are trading with — and read
+          what the ledger already publishes about it. Can they freeze what they issue? What do they
+          charge? How long have they been active? Who have they actually dealt with?
+        </p>
+        <div class="card">
+          <p class="t">WHAT IT DELIBERATELY WILL NOT DO</p>
+          <p>
+            It will not tell you somebody is trustworthy, and it does not keep a secret list of bad
+            actors — because we do not have one. Inventing a score people would act on is the single
+            most harmful thing a tool like this could do. It reports published facts and stops there.
+          </p>
+        </div>
+        <div class="cta">
+          <a class="btn" href="/#public">Try it free</a>
+          <a class="btn ghost" href="/#pricing">See the plans</a>
+        </div>
+      </section>
+
+      <section id="words">
+        <h2>8 · Word list</h2>
+        <table class="kv">
+          <tbody>
+            <tr><td>Ledger</td><td>One agreed version of the record. A new one about every four seconds.</td></tr>
+            <tr><td>Validated</td><td>Agreed and permanent. Never changes.</td></tr>
+            <tr><td>Issuer</td><td>Whoever put a token on the ledger and stands behind it.</td></tr>
+            <tr><td>Trust line</td><td>Your permission to hold a particular issuer's token.</td></tr>
+            <tr><td>Freeze</td><td>An issuer stopping a holder from moving their balance.</td></tr>
+            <tr><td>Deep freeze</td><td>Stronger — also stops them receiving.</td></tr>
+            <tr><td>Clawback</td><td>An issuer taking an issued balance back.</td></tr>
+            <tr><td>Order book</td><td>All the standing buy and sell offers for a pair.</td></tr>
+            <tr><td>Depth</td><td>How much could actually trade near the current price.</td></tr>
+            <tr><td>Slippage</td><td>How much worse your price gets because your own order moved the market.</td></tr>
+            <tr><td>AMM</td><td>A pool you trade against instead of another person.</td></tr>
+            <tr><td>Amendment</td><td>A change to the network's rules, voted in by its servers.</td></tr>
+            <tr><td>Credential</td><td>A statement about an account, issued and signed by somebody else.</td></tr>
+            <tr><td>Reserve</td><td>A small amount of XRP the ledger requires you to keep, so accounts are not free to spam.</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </article>
+  </div>
+</div>
+
+<footer>
+  <div class="shell">
+    © 2026 NOSHASHI Labs · <a href="/legal/">Legal &amp; accessibility</a> ·
+    Nothing here is financial or legal advice.
+  </div>
+</footer>
+</body>
+</html>

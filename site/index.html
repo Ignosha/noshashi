@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>NOSHASHI — Market Intelligence for the XRP Ledger</title>
+<meta name="description" content="Am I allowed to move this, and could I actually get out of it? NOSHASHI answers both from the same validated ledger state, in the same second.">
+<link rel="canonical" href="https://noshashi.app/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://noshashi.app/">
+<meta property="og:title" content="NOSHASHI — Market Intelligence, Reimagined">
+<meta property="og:description" content="Compliance tooling never reads the order book. Market terminals never read the flags. NOSHASHI reads both.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Brand board, section 05 */
+    --ground:#0B0F14; --surface:#11161D; --elevated:#1C2330;
+    --ink:#E6E8EB; --muted:#A3A8B3; --faint:#747C8B; --rule:#2A313C;
+    --brand:#3A82F6; --tele:#00E0C6;
+    --go:#35D49A; --hold:#F5B942; --nogo:#FF5F6D;
+    --shell:min(1180px, 92vw);
+    --r:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ground);color:var(--ink);
+    font-family:"Space Grotesk",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;
+  }
+  a{color:inherit}
+  code,.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .shell{width:var(--shell);margin:0 auto}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+  h1,h2,h3{letter-spacing:-.02em;font-weight:700;line-height:1.14}
+  .rule{height:1px;background:var(--rule)}
+
+  /* Section-07 brand pattern, static */
+  .orbit{position:absolute;pointer-events:none;opacity:.07;color:var(--brand)}
+  .layer{position:relative;z-index:1}
+
+  header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
+    background:color-mix(in srgb, var(--ground) 82%, transparent);border-bottom:1px solid var(--rule)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .brand span{font-weight:600;letter-spacing:.2em;font-size:14px}
+  .nav-links{display:flex;align-items:center;gap:24px}
+  .nav-links a{font-size:12px;color:var(--muted);text-decoration:none;transition:color .14s}
+  .nav-links a:hover{color:var(--ink)}
+  .btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:#fff;
+    padding:11px 20px;font-size:12px;font-weight:600;letter-spacing:.04em;
+    text-decoration:none;border:1px solid var(--brand);border-radius:var(--r);
+    transition:filter .14s,transform .14s}
+  .btn:hover{filter:brightness(1.1)}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+  .btn.ghost:hover{border-color:var(--brand);filter:none}
+
+  .hero{padding:104px 0 84px;position:relative}
+  .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);
+    background:var(--surface);border-radius:999px;padding:5px 13px;font-size:11px;color:var(--muted)}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--go)}
+  .hero h1{font-size:clamp(38px,6vw,68px);margin:26px 0 0;letter-spacing:-.035em;max-width:15ch}
+  .hero .sub{font-size:clamp(15px,1.7vw,19px);color:var(--muted);max-width:62ch;margin:24px 0 0;line-height:1.62}
+  .cta{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap}
+  .micro{font-size:11px;color:var(--faint);margin-top:20px}
+  .verdicts{display:inline-flex;gap:4px;font-weight:700}
+  .go{color:var(--go)} .hold{color:var(--hold)} .nogo{color:var(--nogo)}
+
+  /* The header is sticky, so an anchor jump would land the heading
+     underneath it without this. */
+  .ticker{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;
+    border:1px solid var(--rule);background:var(--surface);border-radius:var(--r);padding:14px 18px}
+  .tk{display:flex;flex-direction:column;gap:3px;min-width:132px;flex:1}
+  .tk b{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;color:var(--ink);
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .tk i{font-family:"IBM Plex Mono",monospace;font-style:normal;font-size:9px;
+    letter-spacing:.16em;color:var(--faint)}
+  .tk b.live{color:var(--tele)}
+  .tk b.down{color:var(--hold)}
+
+  section{padding:80px 0;position:relative;scroll-margin-top:72px}
+  .kicker-block{margin-bottom:36px;max-width:66ch}
+  .kicker-block h2{font-size:clamp(24px,3vw,34px);margin-top:10px}
+  .kicker-block p{color:var(--muted);margin-top:14px;font-size:15px}
+
+  .grid{display:grid;gap:14px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .panel{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:26px}
+  .panel h3{font-size:16px;margin-bottom:10px}
+  .panel p{color:var(--muted);font-size:13.5px;line-height:1.62}
+  .num{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint);letter-spacing:.18em;margin-bottom:14px}
+
+
+  /* Download */
+  .panel.dl{position:relative;overflow:hidden}
+  .panel.dl .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--brand)}
+  .verify{margin-top:22px;border-top:1px solid var(--rule);padding-top:16px;display:grid;gap:10px}
+  .verify div{display:grid;gap:4px}
+  .verify dt{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;color:var(--faint)}
+  .verify dd{font-size:11px;color:var(--muted);word-break:break-all;line-height:1.5}
+  .note{margin-top:16px;font-size:12px;line-height:1.6;color:var(--faint)}
+  .dl-list{list-style:none;display:grid;gap:8px;margin-top:4px}
+  .dl-list li{display:flex;gap:10px;font-size:13px;line-height:1.5;color:var(--muted)}
+  .dl-list li::before{content:"";width:12px;height:12px;flex:none;margin-top:4px;
+    border-radius:3px;border:1px solid var(--rule)}
+  .dl-list li.on::before{background:var(--go);border-color:var(--go)}
+  .dl-list li.off{color:var(--faint)}
+  .dl-list li.off::before{background:transparent}
+
+
+  /* Download — platform row */
+  .platforms{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .plat{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);
+    padding:24px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:6px}
+  .plat .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--rule)}
+  .plat.ready .cap{background:var(--brand)}
+  .plat.pending{border-style:dashed}
+  .pname{font-size:19px;font-weight:700;letter-spacing:-.02em}
+  .pver{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--faint)}
+  .plat .btn{margin-top:14px;align-self:flex-start}
+  .btn.disabled{opacity:.5;cursor:default;pointer-events:none}
+  .phash{margin-top:12px;font-size:10.5px;line-height:1.6;color:var(--faint);word-break:break-all}
+  .cmd{background:var(--ground);border:1px solid var(--rule);border-radius:6px;
+    padding:12px 14px;font-size:12px;color:var(--tele);overflow-x:auto}
+  @media (max-width:900px){ .platforms{grid-template-columns:1fr} }
+
+  /* Measured-numbers table */
+  .measure{width:100%;border-collapse:collapse;font-family:"IBM Plex Mono",monospace;font-size:13px}
+  .measure th{text-align:left;font-weight:500;color:var(--faint);font-size:10px;letter-spacing:.16em;padding:0 0 10px}
+  .measure td{padding:11px 0;border-top:1px solid var(--rule);color:var(--ink)}
+  .measure td.before{color:var(--nogo)}
+  .measure td.after{color:var(--go)}
+
+  .price{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+  .tier{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .tier.focus{border-color:color-mix(in srgb,var(--brand) 45%,var(--rule))}
+  .tier .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--rule)}
+  .tier.focus .cap{background:var(--brand)}
+  .tier.inst .cap{background:var(--tele)}
+  .tier .name{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--muted)}
+  .tier.focus .name{color:var(--brand)} .tier.inst .name{color:var(--tele)}
+  .tier .amt{font-size:34px;font-weight:700;margin:18px 0 2px;letter-spacing:-.02em}
+  .tier .per{color:var(--faint);font-size:11px;font-family:"IBM Plex Mono",monospace}
+  .tier .who{color:var(--faint);font-size:12px;margin-top:4px}
+  .tier ul{list-style:none;margin-top:22px;flex:1;display:grid;gap:9px}
+  .tier li{display:flex;gap:9px;font-size:13px;color:var(--muted);line-height:1.5}
+  .tier li::before{content:"";width:3px;height:3px;background:var(--go);margin-top:8px;flex:none;border-radius:50%}
+
+  .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .trust div{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:20px}
+  .trust b{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;color:var(--go);margin-bottom:7px}
+  .trust span{color:var(--muted);font-size:13px}
+
+  .disclaimer{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);padding:24px;color:var(--faint);font-size:12.5px;line-height:1.7}
+
+  footer{border-top:1px solid var(--rule);padding:36px 0;margin-top:24px}
+  .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  .foot .mono{color:var(--faint);font-size:12px}
+  .foot-links{display:flex;gap:22px;flex-wrap:wrap}
+  .foot-links a{font-size:12px;color:var(--muted);text-decoration:none}
+  .foot-links a:hover{color:var(--ink)}
+
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:900px){
+    .g3,.g2,.price,.trust{grid-template-columns:1fr}
+    .nav-links a:not(.btn){display:none}
+    .hero{padding:64px 0 56px}
+    section{padding:56px 0}
+    .orbit{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+<div class="layer">
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 180 180" width="24" height="24" fill="none" aria-hidden="true">
+        <mask id="hm" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
+          <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
+          <path d="M95 99C91 80 94 64 103 50 114 59 121 70 123 83 116 91 106 97 95 99Z" fill="#000"/>
+          <circle cx="129" cy="63" r="5" fill="#000"/>
+        </mask>
+        <g stroke="#E6E8EB" stroke-width="7" stroke-linecap="round">
+          <path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/>
+        </g>
+        <circle cx="151" cy="69" r="7" fill="#E6E8EB"/>
+        <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#E6E8EB" mask="url(#hm)"/>
+        <path d="M92 111 63 132C60 116 66 103 78 93Z" fill="#E6E8EB"/>
+        <path d="M111 91 130 118C114 119 101 113 93 103Z" fill="#E6E8EB"/>
+        <path d="M82 121 67 150 94 132Z" fill="#E6E8EB"/>
+        <path d="M73 143 61 164 84 151Z" fill="#E6E8EB"/>
+      </svg>
+      <span>NOSHASHI</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#thesis">The thesis</a>
+      <a href="#public">Check an address</a>
+      <a href="#enterprise">For institutions</a>
+      <a href="/guide/">New to XRP?</a>
+      <a href="#download">Download</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/legal/">Legal</a>
+      <a class="btn" href="mailto:institutions@noshashi.app">Request access</a>
+    </nav>
+  </div>
+</header>
+
+<main class="shell">
+  <section class="hero">
+    <svg class="orbit" style="right:-8%;top:-6%;width:620px;height:620px" viewBox="0 0 240 240" aria-hidden="true">
+      <g stroke="currentColor" stroke-width=".6" fill="none">
+        <ellipse cx="120" cy="120" rx="34" ry="46"/><ellipse cx="120" cy="120" rx="58" ry="76"/>
+        <ellipse cx="120" cy="120" rx="80" ry="102"/><ellipse cx="120" cy="120" rx="100" ry="126" transform="rotate(-14 120 120)"/>
+      </g>
+      <circle cx="120" cy="120" r="7" fill="currentColor"/><circle cx="120" cy="74" r="3" fill="currentColor"/>
+      <circle cx="120" cy="178" r="2.6" fill="currentColor"/><circle cx="62" cy="120" r="2" fill="currentColor"/>
+      <circle cx="178" cy="120" r="2" fill="currentColor"/>
+    </svg>
+
+    <span class="badge"><span class="dot"></span>Live on XRPL Mainnet · no testnet path exists</span>
+    <h1>Am I allowed to move this — and could I actually get out of it?</h1>
+    <p class="sub">
+      Compliance tooling reads account flags and never opens the order book. Market
+      terminals read the book and never check the flags. NOSHASHI answers both from the
+      same validated ledger state, in the same second, and returns
+      <span class="verdicts"><span class="go">GO</span>/<span class="hold">HOLD</span>/<span class="nogo">NO-GO</span></span>
+      with the exact rule that decided it.
+    </p>
+    <div class="cta">
+      <a class="btn" href="mailto:institutions@noshashi.app">Request access</a>
+      <a class="btn ghost" href="#download">Download for macOS</a>
+      <a class="btn ghost" href="/guide/">New to XRP? Start here</a>
+    </div>
+    <p class="micro">Free tier · no account required to start · nothing is ever signed</p>
+
+    <!-- Live mainnet ticker. Real data over the same public WebSocket the
+         desktop app uses; if it cannot connect it says so rather than
+         showing a plausible number. -->
+    <div class="ticker" id="ticker" aria-live="polite" aria-label="Live XRP Ledger telemetry">
+      <span class="tk"><b id="tk-state">CONNECTING</b><i>LINK</i></span>
+      <span class="tk"><b id="tk-ledger">—</b><i>VALIDATED LEDGER</i></span>
+      <span class="tk"><b id="tk-tx">—</b><i>TX IN LAST CLOSE</i></span>
+      <span class="tk"><b id="tk-fee">—</b><i>OPEN LEDGER FEE</i></span>
+      <span class="tk"><b id="tk-close">—</b><i>CLOSE INTERVAL</i></span>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section id="thesis" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">01 · The thesis</p>
+      <h2>An asset is two facts, not one</h2>
+      <p>An issued balance is only an asset if the issuer cannot immobilise it <em>and</em>
+         somebody will buy it. Either alone is a half-answer.</p>
+    </div>
+    <div class="grid g2">
+      <div class="panel">
+        <p class="num">THE COMPLIANCE HALF</p>
+        <h3>Who can take this away from you?</h3>
+        <p>XRPL publishes freeze rights in account flags that no wallet reads. We read every
+           issuer behind every position and report which can freeze you out, which have
+           permanently surrendered the right, and — via XLS-77 deep freeze — which can stop
+           you receiving as well as sending.</p>
+      </div>
+      <div class="panel">
+        <p class="num">THE MARKET HALF</p>
+        <h3>Would anyone buy it if they didn't?</h3>
+        <p>We walk the live DEX book and the AMM pool for every position you hold and compute
+           what a full exit would actually achieve — fill rate, price impact, and the depth
+           genuinely reachable rather than the depth nominally resting.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="measured" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">02 · Why the second half is hard</p>
+      <h2>Book depth is mostly fiction</h2>
+      <p>Summing every resting offer counts bids at a thousandth of the market as though they
+         were an exit. Measured on mainnet, GateHub USD/XRP:</p>
+    </div>
+    <div class="panel">
+      <table class="measure">
+        <thead><tr><th>Metric</th><th>Naive</th><th>NOSHASHI</th></tr></thead>
+        <tbody>
+          <tr><td>Spread</td><td class="before">−18,675 bps</td><td class="after">20 bps</td></tr>
+          <tr><td>Full-exit slippage</td><td class="before">9,340 bps</td><td class="after">10 bps</td></tr>
+          <tr><td>Usable bid depth</td><td class="before">12,692,991 USD</td><td class="after">13,894 USD</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:20px;color:var(--muted);font-size:13.5px;line-height:1.62">
+        The book advertised 12.7 million USD of depth. <strong style="color:var(--ink)">13,894 is
+        reachable — a 913× overstatement.</strong> The touch was poisoned by a single stale offer
+        priced at 29× the real market; the rest was lowball bids nobody would ever fill against.
+      </p>
+    </div>
+  </section>
+
+  <section id="public" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">03 · For everyone</p>
+      <h2>Check an address before you pay it</h2>
+      <p>A shop, a token issuer, someone on the other end of a trade. Paste the address and read
+         what the ledger publishes about it. Free, no account, nothing is signed.</p>
+    </div>
+    <div class="grid g3">
+      <div class="panel">
+        <p class="num">WHAT IT TELLS YOU</p>
+        <h3>Published facts</h3>
+        <p>Whether they can freeze your balance, what they charge to transfer, what they have
+           issued and how much is outstanding, what credentials they hold, and who they have
+           actually dealt with.</p>
+      </div>
+      <div class="panel">
+        <p class="num">WHAT IT WILL NOT DO</p>
+        <h3>No invented reputation</h3>
+        <p>There is no bad-actor list behind this and no reputation score, because we do not have
+           one. Inventing a number people act on would be the worst thing this product could do.</p>
+      </div>
+      <div class="panel">
+        <p class="num">WHY IT IS SAFE</p>
+        <h3>A lookup, not a wallet</h3>
+        <p>It moves no money, holds no key and signs nothing. That is deliberate: it keeps a
+           public utility a public utility, with none of the weight of a custodian or a ramp.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="enterprise" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">04 · For institutions</p>
+      <h2>Built only on what the network has actually activated</h2>
+      <p>XRPL ships features as amendments, and a feature exists in three states: specified,
+         implemented in rippled, and <em>activated by validator majority</em>. Only the third one
+         works. NOSHASHI reads the ledger's own amendments object and refuses to offer anything
+         that is not genuinely live.</p>
+    </div>
+    <div class="grid g3">
+      <div class="panel">
+        <p class="num">XLS-70 · XLS-80 · XLS-81</p>
+        <h3>Credentials, domains, permissioned DEX</h3>
+        <p>Adjudicate every settlement against a domain's published rule set. Walled gardens where
+           only holders of named credentials may transact, and order books restricted to an
+           approved membership.</p>
+      </div>
+      <div class="panel">
+        <p class="num">XLS-77 · CLAWBACK</p>
+        <h3>Freeze and recovery posture</h3>
+        <p>Deep freeze blocks a sanctioned holder from sending <em>and</em> receiving — an
+           ordinary freeze leaves them able to keep accepting funds. We read both, plus issuer
+           clawback rights on your positions.</p>
+      </div>
+      <div class="panel">
+        <p class="num">FATF R.16 · HHI</p>
+        <h3>Travel Rule and concentration</h3>
+        <p>Scope every transfer against your jurisdiction's threshold, and score the settlement
+           book with the Herfindahl-Hirschman Index — the same measure a regulator uses.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="download" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">05 · Download</p>
+      <h2>Run it on your own machine</h2>
+      <p>The full build, free to download. Paid capabilities unlock against your
+         subscription — the binary is the same one licensed desks run.</p>
+    </div>
+
+    <div class="platforms">
+      <div class="plat ready">
+        <span class="cap"></span>
+        <p class="pname">macOS</p>
+        <p class="pver">11 Big Sur or later · Apple silicon &amp; Intel</p>
+        <a class="btn" href="/download/NOSHASHI-0.1.0-macos.dmg" download>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M5 21h14"/>
+          </svg>
+          Download .dmg · 3.4 MB
+        </a>
+        <p class="phash mono">c62a15a022cd1b3f429bdd56683a11993b50b2e9728ea788addab7aa1737de9d</p>
+      </div>
+
+      <div class="plat pending">
+        <span class="cap"></span>
+        <p class="pname">Windows</p>
+        <p class="pver">10 and 11 · x64 · .msi and .exe</p>
+        <span class="btn ghost disabled" aria-disabled="true">Building in CI</span>
+        <p class="phash">Windows links against WebView2 and the MSVC toolchain, which cannot be
+           built from a Mac. It builds on a Windows runner — the pipeline is committed.</p>
+      </div>
+
+      <div class="plat pending">
+        <span class="cap"></span>
+        <p class="pname">Linux</p>
+        <p class="pver">x64 · .deb and .AppImage</p>
+        <span class="btn ghost disabled" aria-disabled="true">Building in CI</span>
+        <p class="phash">Linux links against WebKitGTK, which likewise needs a Linux runner.
+           Same pipeline, same commit.</p>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-top:14px">
+      <div class="panel">
+        <p class="num">VERIFY BEFORE YOU RUN IT</p>
+        <p style="margin-bottom:14px">Check the download matches the hash above:</p>
+        <pre class="cmd mono">shasum -a 256 NOSHASHI-0.1.0-macos.dmg</pre>
+        <p class="note">
+          The app also hashes its own running binary — Settings › Binary integrity — so you can
+          confirm nothing changed between this page and execution. That check is free on every
+          tier; charging for the ability to verify we are not malicious would be perverse.
+        </p>
+      </div>
+
+      <div class="panel">
+        <p class="num">WHAT YOU GET FREE</p>
+        <ul class="dl-list">
+          <li class="on">Live XRPL mainnet telemetry</li>
+          <li class="on">GO / HOLD / NO-GO adjudication, unlimited</li>
+          <li class="on">Cryptographic receipts</li>
+          <li class="on">Credential registry and domain grid</li>
+          <li class="on">10 address checks per month</li>
+          <li class="on">Animated explainers</li>
+          <li class="on">On-device compliance agent</li>
+          <li class="off">Exit liquidity, freeze-rights and control-surface analysis</li>
+          <li class="off">Persistent adjudication ledger</li>
+          <li class="off">Travel Rule scoping and signed export</li>
+        </ul>
+        <p class="note">
+          Not code-signed or notarised yet. macOS will warn about an unidentified developer —
+          right-click the app and choose Open the first time. Better said here than as a surprise.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">06 · Pricing</p>
+      <h2>Free where a human decides</h2>
+      <p>The console is free forever. Paid tiers begin where a desk needs something an individual
+         does not.</p>
+    </div>
+    <div class="price">
+      <div class="tier">
+        <span class="cap"></span>
+        <p class="name">OPERATOR</p>
+        <p class="amt">Free</p><p class="per">forever</p>
+        <p class="who">Individuals and single desks</p>
+        <ul>
+          <li>Full console and menu bar HUD</li>
+          <li>Unlimited GO / HOLD / NO-GO gate checks</li>
+          <li>10 address checks per month</li>
+          <li>On-device compliance agent</li>
+          <li>CSV audit export</li>
+          <li>Binary integrity verification</li>
+        </ul>
+      </div>
+      <div class="tier focus">
+        <span class="cap"></span>
+        <p class="name">DESK</p>
+        <p class="amt">$749</p><p class="per">per seat / month</p>
+        <p class="who">Trading desks and funds</p>
+        <ul>
+          <li>Everything in Operator</li>
+          <li>Unlimited address checks</li>
+          <li>Exit liquidity — freeze risk × depth × concentration</li>
+          <li>Issuer freeze-rights and XLS-77 deep freeze analysis</li>
+          <li>Counterparty concentration (HHI)</li>
+          <li>Persistent adjudication ledger — 10,000 verdicts</li>
+          <li>Wallet explorer and editable policy rule set</li>
+          <li>Issuer drift monitor with native alerts</li>
+          <li>5,000 API verifications · priority support</li>
+        </ul>
+      </div>
+      <div class="tier inst">
+        <span class="cap"></span>
+        <p class="name">INSTITUTION</p>
+        <p class="amt">$4,000</p><p class="per">per month</p>
+        <p class="who">Regulated venues and custodians</p>
+        <ul>
+          <li>Everything in Desk</li>
+          <li>Travel Rule (FATF R.16) scoping</li>
+          <li>Signed audit export — SHA-256 chain of custody</li>
+          <li>Offline adjudication on segregated networks</li>
+          <li>Compliance API and webhooks</li>
+          <li>White-labelled wallet · regulator read-only seats</li>
+          <li>100,000 API verifications · published SLA</li>
+        </ul>
+      </div>
+    </div>
+    <p class="micro" style="margin-top:18px">
+      Subscriptions renew automatically until cancelled. Cancel any time in two clicks.
+      Full refund within 14 days of a first charge if no paid capability was used.
+      NOSHASHI sells software. It does not transmit money, hold customer funds, or take custody of any asset.
+    </p>
+  </section>
+
+  <section id="security" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">07 · Security posture</p>
+      <h2>The smallest possible attack surface</h2>
+      <p>The safest data is data nobody holds. Without an account there is no server-side state at
+         all — no analytics, no telemetry, no crash reporting.</p>
+    </div>
+    <div class="trust">
+      <div><b>MAINNET ONLY</b><span>No testnet path exists in the build.</span></div>
+      <div><b>ZERO EGRESS</b><span>The AI agent runs on your own machine.</span></div>
+      <div><b>NO CUSTODY</b><span>It cannot hold, sign or move an asset.</span></div>
+      <div><b>OS KEYCHAIN</b><span>Secrets held by the system, never by the app.</span></div>
+      <div><b>ROW-LEVEL SECURITY</b><span>Every table scoped to its owning account.</span></div>
+      <div><b>NO CARD DATA</b><span>Payments handled entirely by Stripe.</span></div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="disclaimer">
+      <strong style="color:var(--muted)">Not advice.</strong>
+      Nothing produced by this software is legal, regulatory, tax or investment advice. A GO verdict
+      means the configured rules passed — it is not a representation that a transaction is lawful in
+      any jurisdiction and it does not discharge any obligation owed to a regulator. Determinations
+      carrying legal consequence must be reviewed by qualified counsel and the responsible compliance
+      officer. NOSHASHI Labs is not a bank, broker-dealer, money services business, money transmitter,
+      qualified custodian or registered investment adviser.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell foot">
+    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet</p>
+    <div class="foot-links">
+      <a href="mailto:support@noshashi.app">Support</a>
+      <a href="mailto:institutions@noshashi.app">Institutions</a>
+      <a href="mailto:security@noshashi.app">Security</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="mailto:privacy@noshashi.app">Privacy</a>
+    </div>
+  </div>
+</footer>
+</div>
+
+<script>
+(function () {
+  /* Scroll reveals. */
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '-60px' });
+    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+  }
+
+  /*
+   * Live XRPL telemetry.
+   *
+   * The same public WebSocket the desktop app uses. Two rules: it never
+   * shows a number it did not receive, and if the socket fails it says
+   * OFFLINE rather than leaving a stale figure on screen looking live.
+   * A marketing page that fakes a ticker is exactly the thing this
+   * product exists to argue against.
+   */
+  var $ = function (id) { return document.getElementById(id); };
+  var state = $('tk-state');
+  if (!state) return;
+
+  var ENDPOINTS = ['wss://xrplcluster.com', 'wss://s1.ripple.com', 'wss://s2.ripple.com'];
+  var idx = 0, ws = null, lastClose = 0, retry = 0;
+
+  function set(id, value, cls) {
+    var el = $(id); if (!el) return;
+    el.textContent = value;
+    el.className = cls || '';
+  }
+
+  function down(reason) {
+    set('tk-state', reason, 'down');
+    ['tk-ledger', 'tk-tx', 'tk-fee', 'tk-close'].forEach(function (k) { set(k, '—'); });
+  }
+
+  function connect() {
+    try { ws = new WebSocket(ENDPOINTS[idx % ENDPOINTS.length]); }
+    catch (e) { return down('OFFLINE'); }
+
+    ws.onopen = function () {
+      retry = 0;
+      set('tk-state', 'LIVE', 'live');
+      ws.send(JSON.stringify({ id: 1, command: 'subscribe', streams: ['ledger'] }));
+    };
+
+    ws.onmessage = function (ev) {
+      var m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+      if (m.type !== 'ledgerClosed') return;
+      set('tk-ledger', Number(m.ledger_index).toLocaleString());
+      set('tk-tx', String(m.txn_count));
+      /* fee_base is in drops. */
+      set('tk-fee', (Number(m.fee_base) / 1e6).toFixed(5) + ' XRP');
+      var now = Date.now();
+      if (lastClose) set('tk-close', ((now - lastClose) / 1000).toFixed(1) + ' s');
+      lastClose = now;
+    };
+
+    ws.onclose = function () {
+      idx += 1; retry += 1;
+      down(retry > 3 ? 'OFFLINE' : 'RECONNECTING');
+      /* Back off rather than hammering a public node. */
+      if (retry <= 6) setTimeout(connect, Math.min(1000 * retry * retry, 15000));
+    };
+    ws.onerror = function () { try { ws.close(); } catch (e) {} };
+  }
+
+  connect();
+  /* Stop the socket when the tab is hidden — a marketing page has no
+     business holding a subscription open in a background tab. */
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && ws) { try { ws.close(); } catch (e) {} }
+    else if (!document.hidden && (!ws || ws.readyState > 1)) { retry = 0; connect(); }
+  });
+})();
+</script>
+</body>
+</html>

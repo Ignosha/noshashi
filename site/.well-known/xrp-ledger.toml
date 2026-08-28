@@ -1,0 +1,27 @@
+# xrp-ledger.toml — NOSHASHI Labs
+#
+# The XRPL standard (XLS-26) for a domain to identify itself on-chain.
+# This is the honest alternative to broadcasting promotional memos: an
+# account that writes "noshashi.app" into its Domain field is only making a
+# claim, and it becomes verifiable when this file names the account back.
+#
+# NOSHASHI itself issues no currency, holds no account and signs nothing, so
+# the ACCOUNTS section is deliberately empty. It is here so the domain is
+# discoverable and so the shape is right if that ever changes.
+#
+# Served at: https://noshashi.app/.well-known/xrp-ledger.toml
+
+[METADATA]
+modified = 2026-08-24
+
+[[PRINCIPALS]]
+name = "NOSHASHI Labs"
+email = "institutions@noshashi.app"
+
+# No issued currencies. NOSHASHI is software, not an issuer.
+# [[ACCOUNTS]] intentionally omitted.
+
+[[SERVERS]]
+# NOSHASHI operates no public rippled node. It reads the network through
+# the community clusters, which is why it can make no claim about
+# availability beyond theirs.

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>NOSHASHI</title>
+  <defs>
+    <linearGradient id="nshBlue" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0077FF"/><stop offset="55%" stop-color="#00C8FF"/><stop offset="100%" stop-color="#EAF7FF"/>
+    </linearGradient>
+    <linearGradient id="nshMetal" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8D9AAA"/><stop offset="45%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#BFC9D5"/>
+    </linearGradient>
+    <linearGradient id="nshGround" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1018"/><stop offset="100%" stop-color="#05070A"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#nshGround)"/>
+  <g transform="translate(-39.1 28.1) scale(2.5651)">
+    <g fill="none" stroke="url(#nshBlue)" stroke-width="7" stroke-linecap="round">
+      <path d="M76 20 A56 56 0 0 1 150 68"/>
+      <path d="M164 92 A56 56 0 0 1 86 156"/>
+    </g>
+    <circle cx="151" cy="69" r="7" fill="#00C8FF"/>
+    <path d="M78 119 C82 86 98 53 129 29 C139 21 149 16 160 13 C157 29 151 43 141 56 C124 79 105 96 78 119Z" fill="url(#nshMetal)"/>
+    <path d="M95 99 C91 80 94 64 103 50 C114 59 121 70 123 83 C116 91 106 97 95 99Z" fill="#0B1017"/>
+    <path d="M92 111 L63 132 C60 116 66 103 78 93Z" fill="#DCE5EE"/>
+    <path d="M111 91 L130 118 C114 119 101 113 93 103Z" fill="#B7C3CF"/>
+    <path d="M82 121 L67 150 L94 132Z" fill="#00C8FF"/>
+    <path d="M73 143 L61 164 L84 151Z" fill="#0077FF"/>
+    <circle cx="129" cy="63" r="5" fill="#05070A"/>
+  </g>
+</svg>
