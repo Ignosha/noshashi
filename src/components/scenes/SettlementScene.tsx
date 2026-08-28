@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useState } from "react";
 import { SceneHeader } from "./SceneHeader";
 import { Panel } from "@/components/nova/Panel";
@@ -17,6 +18,7 @@ import {
   type SettlementReport,
 } from "@/lib/desk/settlement";
 import { cn } from "@/lib/utils";
+import { TraceButton } from "@/lib/nav/handoff";
 
 /**
  * SettlementScene — what a transaction actually moved.
@@ -166,13 +168,39 @@ function SettlementBody() {
 
           {report && (
             <Panel label="RECORD" bodyClassName="p-0">
-              {[
+              {([
                 ["TYPE", report.transactionType],
                 ["RESULT", report.result],
                 ["VALIDATED", report.validated ? "yes" : "NOT YET"],
                 ["LEDGER", report.ledgerIndex?.toLocaleString() ?? "—"],
-                ["FROM", shortAddress(report.account)],
-                ["TO", report.destination ? shortAddress(report.destination) : "—"],
+                [
+                  "FROM",
+                  <span className="inline-flex items-center gap-1.5">
+                    {shortAddress(report.account)}
+                    <TraceButton
+                      value={report.account}
+                      to="provenance"
+                      from="settlement"
+                      as="sender"
+                    />
+                  </span>,
+                ],
+                [
+                  "TO",
+                  report.destination ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      {shortAddress(report.destination)}
+                      <TraceButton
+                        value={report.destination}
+                        to="provenance"
+                        from="settlement"
+                        as="destination"
+                      />
+                    </span>
+                  ) : (
+                    "—"
+                  ),
+                ],
                 [
                   "FEE BURNED",
                   `${(report.feeDrops / 1_000_000).toLocaleString(undefined, {
@@ -180,7 +208,7 @@ function SettlementBody() {
                   })} XRP`,
                 ],
                 ["PARTIAL FLAG", report.partialFlagSet ? "SET" : "not set"],
-              ].map(([label, value]) => (
+              ] as Array<[string, React.ReactNode]>).map(([label, value]) => (
                 <div
                   key={label}
                   className="flex items-baseline gap-3 border-b border-border/30 px-3.5 py-1.5 last:border-0"

@@ -13,7 +13,9 @@
     "tauri:build": "tauri build",
     "icon": "tauri icon app-icon.svg",
     "build:demo": "VITE_NOSHASHI_EDITION=demo tsc -b && VITE_NOSHASHI_EDITION=demo vite build --outDir dist-demo --emptyOutDir",
-    "tauri:demo": "VITE_NOSHASHI_EDITION=demo tauri build --config src-tauri/tauri.demo.conf.json"
+    "tauri:demo": "VITE_NOSHASHI_EDITION=demo tauri build --config src-tauri/tauri.demo.conf.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
@@ -52,6 +54,7 @@
     "tailwindcss": "^4.0.0",
     "tw-animate-css": "^1.2.0",
     "typescript": "~5.6.2",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "vitest": "^4.1.11"
   }
 }

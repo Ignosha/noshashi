@@ -16,6 +16,7 @@ import {
   type ControlSurface,
 } from "@/lib/desk/control";
 import { cn } from "@/lib/utils";
+import { TraceButton } from "@/lib/nav/handoff";
 
 /**
  * ControlScene — who can actually move this treasury.
@@ -184,6 +185,12 @@ function ControlBody() {
                       <code className="text-[10.5px] text-muted-foreground">
                         {shortAddress(sgn.account)}
                       </code>
+                      <TraceButton
+                        value={sgn.account}
+                        to="provenance"
+                        from="treasury"
+                        as="signer"
+                      />
                       {unilateral && (
                         <span className="font-mono text-[8.5px] tracking-[0.14em] text-no-go">
                           CAN SIGN ALONE

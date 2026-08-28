@@ -114,6 +114,7 @@ import { useTrayTicker } from "@/lib/trayTicker";
 import { cn } from "@/lib/utils";
 import type { Status } from "@/lib/xrpl/types";
 import { DOMAIN_REGISTRY, evaluatePolicy } from "@/lib/policy";
+import { HandoffProvider } from "@/lib/nav/handoff";
 
 export type SceneId =
   | "home"
@@ -707,6 +708,7 @@ function ConsoleApp() {
 
   return (
     <TooltipProvider delayDuration={220}>
+      <HandoffProvider onNavigate={goTo}>
       <div className="scanlines vignette relative flex h-full w-full overflow-hidden bg-background text-foreground">
         <SkipLink />
         <Announcer
@@ -1033,6 +1035,7 @@ function ConsoleApp() {
           commands={commands}
         />
       </div>
+      </HandoffProvider>
     </TooltipProvider>
   );
 }

@@ -15,6 +15,7 @@ import {
   provenanceFindings,
   type ProvenanceReport,
 } from "@/lib/desk/provenance";
+import { useClaimedSubject } from "@/lib/nav/handoff";
 
 /**
  * ProvenanceScene — how old this counterparty is, and who funded it.
@@ -80,10 +81,26 @@ function ProvenanceBody() {
     }
   };
 
+  /*
+   * A subject handed over from another scene runs immediately. The operator
+   * already chose this address by clicking TRACE there; making them press a
+   * second button here would be asking the same question twice.
+   */
+  const claimed = useClaimedSubject("provenance", (subject) => {
+    void run(subject.value);
+  });
+
   const findings = report ? provenanceFindings(report) : [];
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
+      {claimed && (
+        <p className="mono-font shrink-0 text-[9px] leading-snug text-faint">
+          TRACED FROM {String(claimed.from ?? "").toUpperCase()}
+          {claimed.as && ` · ${claimed.as.toUpperCase()}`}
+        </p>
+      )}
+
       {report && (
         <div className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4">
           {[

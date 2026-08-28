@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { shortAddress, isValidAddress } from "@/lib/xrpl/client";
 import { readAmm, ammFindings, type AmmReport } from "@/lib/desk/amm";
 import { cn } from "@/lib/utils";
+import { TraceButton } from "@/lib/nav/handoff";
 
 /**
  * AmmScene — who sets the price of trading against a pool.
@@ -180,6 +181,12 @@ function AmmBody() {
                       <code className="text-[10.5px] text-muted-foreground">
                         {shortAddress(v.account)}
                       </code>
+                      <TraceButton
+                        value={v.account}
+                        to="provenance"
+                        from="amm"
+                        as="fee voter"
+                      />
                       <span className="ml-auto font-mono text-[10px] tabular-nums text-faint">
                         votes {v.votedFeePct.toFixed(3)}%
                       </span>

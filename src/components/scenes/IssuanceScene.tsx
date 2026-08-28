@@ -16,6 +16,7 @@ import {
   type IssuanceReport,
 } from "@/lib/desk/issuance";
 import { cn } from "@/lib/utils";
+import { TraceButton } from "@/lib/nav/handoff";
 
 /**
  * IssuanceScene — surveillance from the issuer's side of the trust line.
@@ -203,6 +204,12 @@ function IssuanceBody() {
                       <code className="text-[10.5px] text-muted-foreground">
                         {shortAddress(h.account)}
                       </code>
+                      <TraceButton
+                        value={h.account}
+                        to="provenance"
+                        from="issuance"
+                        as={`holder of ${report.currencies[0].currency}`}
+                      />
                       <span
                         className={cn(
                           "ml-auto font-mono text-[11px] tabular-nums",

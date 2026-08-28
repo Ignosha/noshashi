@@ -126,6 +126,23 @@ export async function readSettlement(hash: string): Promise<SettlementReport> {
     throw caught;
   }
 
+  return interpretTransaction(res, hash);
+}
+
+/**
+ * Turn a raw `tx` response into a report.
+ *
+ * Split out from the fetch so it can be tested without a network. That is
+ * not incidental: a mutation test showed that mapping `delivered_amount ===
+ * "unavailable"` to `false` — silently treating an unrecorded delivery as a
+ * recorded one — passed the entire suite, because every test built its
+ * report by hand and none of them exercised this parsing at all. The
+ * dangerous logic was the untested logic.
+ */
+export function interpretTransaction(
+  res: Record<string, any>,
+  fallbackHash = ""
+): SettlementReport {
   // The `tx` command returns fields flat on current rippled and nested under
   // tx_json on others. Accept either rather than assuming a version.
   const tx = (res.tx_json ?? res) as Record<string, any>;
@@ -151,7 +168,7 @@ export async function readSettlement(hash: string): Promise<SettlementReport> {
   }
 
   return {
-    hash: String(tx.hash ?? res.hash ?? hash),
+    hash: String(tx.hash ?? res.hash ?? fallbackHash),
     validated: res.validated === true,
     transactionType,
     result,
