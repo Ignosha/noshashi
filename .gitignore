@@ -20,14 +20,20 @@ site/.env.*
 *.key
 *.p12
 
-# Signed installers and release artefacts: large, and rebuilt by CI
-# (.github/workflows/release.yml) rather than tracked.
+# Tauri build output. Rebuilt by CI (.github/workflows/release.yml), so
+# there is no reason to carry it in history.
 release/
-site/download/*.dmg
-site/download/*.msi
-site/download/*.exe
-site/download/*.AppImage
-site/download/*.deb
+
+# NOTE: site/download/ is deliberately NOT ignored. That directory is not
+# build output — it is the content noshashi.app actually serves, and the
+# macOS .dmg is linked directly from the download section of
+# site/index.html. Ignoring it breaks the live download on any deploy that
+# publishes from this repository.
+#
+# The tradeoff is ~3.4 MB of binary per release carried in history. Once
+# there is a GitHub remote, move installers to GitHub Releases and point
+# the site at those URLs instead — the release workflow already builds and
+# uploads all four targets.
 
 # OS / editor
 .DS_Store
