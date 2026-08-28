@@ -1,0 +1,57 @@
+name: CI
+
+# Typecheck and tests on every push and pull request.
+#
+# The tests here are not about coverage. They assert the specific sentences
+# this product sells — that a tesSUCCESS payment delivering 0.4% is reported
+# as a shortfall, that concentration is withheld when the holder walk is too
+# thin to support it, that five signers where one carries quorum is reported
+# as one. A refactor can invert any of those while the build stays green,
+# which is precisely why the build is not the gate.
+#
+# Runs on one platform only. These are pure functions over hand-built
+# reports — no DOM, no network, no ledger — so a second runner would buy
+# nothing. Cross-platform coverage is the release workflow's job, and it
+# only matters there because Tauri links native webviews.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_call: # so release.yml can gate on this
+
+concurrency:
+  # A newer push supersedes an in-flight run on the same ref.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Audit production dependencies
+        # Only what ships. The dev toolchain carries known vite/esbuild
+        # dev-server advisories that cannot reach a built artefact, and
+        # failing the build on them would train everyone to ignore this step.
+        run: npm audit --omit=dev --audit-level=high

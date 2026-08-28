@@ -24,7 +24,14 @@ on:
         options: [full, demo]
 
 jobs:
+  # A release must not be able to ship a broken safety claim. Tagging
+  # bypasses whatever ran on the branch, so the gate is re-run here and the
+  # matrix depends on it — no installer is produced if a finding regressed.
+  verify:
+    uses: ./.github/workflows/ci.yml
+
   build:
+    needs: verify
     permissions:
       contents: write
     strategy:
