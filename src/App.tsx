@@ -53,6 +53,9 @@ const WorkstationScene = lazy(() =>
 const IssuanceScene = lazy(() =>
   import("@/components/scenes/IssuanceScene").then((m) => ({ default: m.IssuanceScene }))
 );
+const BookScene = lazy(() =>
+  import("@/components/scenes/BookScene").then((m) => ({ default: m.BookScene }))
+);
 const ClaimsScene = lazy(() =>
   import("@/components/scenes/ClaimsScene").then((m) => ({ default: m.ClaimsScene }))
 );
@@ -139,6 +142,7 @@ export type SceneId =
   | "settlement"
   | "provenance"
   | "claims"
+  | "book"
   | "treasury"
   | "plans"
   | "account"
@@ -171,7 +175,7 @@ type SceneDef = {
 const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "overview", label: "OVERVIEW", scenes: ["home", "control"] },
   { id: "adjudication", label: "ADJUDICATION", scenes: ["verify", "provenance", "credentials", "domains"] },
-  { id: "markets", label: "MARKETS & EXPOSURE", scenes: ["risk", "desk", "amm"] },
+  { id: "markets", label: "MARKETS & EXPOSURE", scenes: ["risk", "desk", "book", "amm"] },
   { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance"] },
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
   { id: "intelligence", label: "INTELLIGENCE", scenes: ["agent"] },
@@ -310,6 +314,16 @@ const SCENES: SceneDef[] = [
     digit: "",
     group: "primary",
     requires: "compliance_api",
+  },
+  {
+    id: "book",
+    label: "ORDER BOOK",
+    title: "ORDER BOOK",
+    hint: "How much quoted depth is backed by someone who still holds the asset",
+    icon: <NovaGrid size={15} />,
+    digit: "",
+    group: "primary",
+    requires: "portfolios",
   },
   {
     id: "claims",
@@ -969,6 +983,8 @@ function ConsoleApp() {
                       <SafeShopScene onUpgrade={openPlans} />
                     ) : scene === "treasury" ? (
                       <ControlScene onUpgrade={openPlans} onSignIn={openAuth} />
+                    ) : scene === "book" ? (
+                      <BookScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "claims" ? (
                       <ClaimsScene />
                     ) : scene === "provenance" ? (

@@ -64,6 +64,7 @@ export const DEMO_EXCLUDES = [
   "Multi-wallet portfolios and the compliance radar",
   "Exit liquidity analysis",
   "Settlement forensics — requested versus delivered on any transaction",
+  "Order book integrity — quoted depth versus depth that can actually fill",
   "Counterparty provenance — account age and funding source",
   "Treasury control surface — signer weights and locked value",
   "AMM pool governance — fee votes and the auction slot",

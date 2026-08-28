@@ -57,6 +57,7 @@ export const PLANS: Plan[] = [
       "Everything in Operator",
       "Multi-wallet portfolios with live gate status",
       "Settlement forensics — what a transaction delivered, not what it requested",
+      "Order book integrity — quoted depth against depth that can actually fill",
       "Counterparty provenance — account age and who funded it",
       "Treasury control surface — how few signers can actually move a balance",
       "AMM pool governance — who votes the fee, and who holds the discount",

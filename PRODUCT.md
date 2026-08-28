@@ -64,7 +64,8 @@ simulated, or backfilled.
 - **Binary integrity verification** — hashes the running executable
 
 ### Market intelligence
-- **Order book depth** — real bids and asks via `book_offers`
+- **Order book integrity** — quoted depth against depth an owner can actually deliver. An offer rests whether or not its owner kept the asset, and on measured mainnet books over 90% of visible depth could not fill
+- **Order book depth** — real bids and asks via `book_offers`, discounted to what is funded
 - **AMM pool state** — liquidity, trading fee, and frozen status via `amm_info`
 - **Issuer obligations** — real circulating supply per currency via `gateway_balances`
 - **AMM pool governance** — who votes the trading fee, on what share of the LP supply, and who holds the discounted auction slot

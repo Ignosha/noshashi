@@ -463,24 +463,72 @@ function bandedDepth(
 export const DEPTH_BAND = 0.1;
 
 /** Fold raw offers into price levels with a running cumulative depth. */
-function toLevels(
+/**
+ * Collapse raw offers into price levels.
+ *
+ * `quantity` is what can ACTUALLY FILL, not what the book advertises.
+ *
+ * An offer rests in the book whether or not its owner still holds the funds
+ * to honour it, and rippled reports the difference in `taker_gets_funded` —
+ * present only when the owner cannot cover the full listed amount, absent
+ * when they can. Measured against mainnet on 2026-08-28, this is not a
+ * rounding matter:
+ *
+ *   USD/Bitstamp   1,606,485 listed    116,107 fundable   92.8% phantom
+ *   USD/GateHub    1,881,039 listed    772,777 fundable   58.9% phantom
+ *
+ * One offer listed 1,400,100 USD against an owner balance of 22,273. Depth
+ * summed from `TakerGets`, which is what this did before, told an operator
+ * they could exit a position roughly fourteen times larger than the book
+ * could absorb — and exit liquidity is a paid capability that reads these
+ * numbers directly.
+ *
+ * `listedQuantity` keeps the advertised figure so the gap can be shown
+ * rather than silently corrected.
+ */
+export function toLevels(
   offers: Array<Record<string, any>>,
   invert: boolean
 ): BookLevel[] {
-  const levels = new Map<number, number>();
+  const levels = new Map<number, { funded: number; listed: number }>();
 
   for (const offer of offers) {
     const gets = amountToNumber(offer.TakerGets);
     const pays = amountToNumber(offer.TakerPays);
     if (gets <= 0 || pays <= 0) continue;
 
+    // Absent means fully funded; present means this is all they can cover.
+    const getsFunded =
+      offer.taker_gets_funded !== undefined
+        ? amountToNumber(offer.taker_gets_funded)
+        : gets;
+    const paysFunded =
+      offer.taker_pays_funded !== undefined
+        ? amountToNumber(offer.taker_pays_funded)
+        : pays;
+
     // `quality` is pays/gets. Which of those is "price" depends on which
-    // side of the pair we asked for, hence `invert`.
+    // side of the pair we asked for, hence `invert`. Price comes from the
+    // LISTED amounts — funding changes the size available at a price, not
+    // the price itself.
     const price = invert ? gets / pays : pays / gets;
-    const quantity = invert ? pays : gets;
     if (!Number.isFinite(price) || price <= 0) continue;
 
-    levels.set(price, (levels.get(price) ?? 0) + quantity);
+    const listed = invert ? pays : gets;
+    const funded = invert ? paysFunded : getsFunded;
+    if (!Number.isFinite(funded) || funded <= 0) {
+      // Wholly unfunded: it occupies the book and can fill nothing. Its
+      // listed size is still recorded so the phantom depth is visible.
+      const entry = levels.get(price) ?? { funded: 0, listed: 0 };
+      entry.listed += listed;
+      levels.set(price, entry);
+      continue;
+    }
+
+    const entry = levels.get(price) ?? { funded: 0, listed: 0 };
+    entry.funded += Math.min(funded, listed);
+    entry.listed += listed;
+    levels.set(price, entry);
   }
 
   const sorted = [...levels.entries()].sort((a, b) =>
@@ -488,9 +536,9 @@ function toLevels(
   );
 
   let running = 0;
-  return sorted.map(([price, quantity]) => {
-    running += quantity;
-    return { price, quantity, cumulative: running };
+  return sorted.map(([price, { funded, listed }]) => {
+    running += funded;
+    return { price, quantity: funded, listedQuantity: listed, cumulative: running };
   });
 }
 

@@ -153,8 +153,18 @@ export type FreezeState = {
 export type BookLevel = {
   /** Price in the quote currency per one unit of the base. */
   price: number;
-  /** Base-currency quantity available at this level. */
+  /**
+   * Base-currency quantity that can ACTUALLY FILL at this level, after
+   * discounting offers whose owner no longer holds the funds to honour
+   * them. This is the number every downstream calculation should use.
+   */
   quantity: number;
+  /**
+   * What the book advertises at this level, funded or not. Kept so the
+   * phantom depth can be shown rather than quietly removed — on some
+   * mainnet books it is over 90% of the total.
+   */
+  listedQuantity: number;
   /** Running total of `quantity` from the touch outward. */
   cumulative: number;
 };

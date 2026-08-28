@@ -113,6 +113,7 @@ export function buildSystemPrompt(mode: AgentMode, data: XrplState): string {
       "- Settlement: what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question. Requires Desk.",
       "- Provenance: how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts. Requires Desk.",
       "- Control Surface: how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable. Requires Desk.",
+      "- Order Book: how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill. Requires Desk.",
       "- Pool Governance: who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot. Requires Desk.",
       "- Issuance: holder concentration and enforcement history for an issuer, from the issuer's side. Requires Institution.",
       "- Growth: platform-native drafts built from measured figures. Free.",
