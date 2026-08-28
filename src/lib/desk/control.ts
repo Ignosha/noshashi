@@ -91,7 +91,7 @@ export type ControlFinding = {
  * A greedy walk is exact here: to minimise the count you always take the
  * largest remaining weight.
  */
-function minimumSignersForQuorum(signers: SignerEntry[], quorum: number): number {
+export function minimumSignersForQuorum(signers: SignerEntry[], quorum: number): number {
   const weights = signers.map((s) => s.weight).sort((a, b) => b - a);
   let total = 0;
   for (let i = 0; i < weights.length; i += 1) {
