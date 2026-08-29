@@ -53,6 +53,7 @@
 <div class="bar">
   <button id="play" class="primary">Play</button>
   <button id="rec">Record &amp; download</button>
+  <button id="mute" aria-pressed="false">Sound on</button>
   <span class="note" id="status"></span>
 </div>
 
@@ -240,11 +241,172 @@
     }
   }
 
+  /* ── Sound ────────────────────────────────────────────────────────
+   *
+   * Every tone here is synthesised. Nothing is sampled and nothing is
+   * fetched — partly because the CSP on the published page blocks external
+   * media, and mostly because shipping someone else's recording inside a
+   * commercial for a compliance product would be an odd way to behave.
+   *
+   * The palette is deliberately narrow: a low drone that holds the whole
+   * piece, a soft mark on each cut, and one sound that carries meaning —
+   * a falling tone under the collapse, so the drop is heard as well as
+   * seen. No melody, no percussion, no swell at the end. It should sit
+   * under the picture and be noticed only if removed.
+   */
+  let ac = null, master = null, monitor = null, recDest = null, drone = null;
+
+  /*
+   * The graph splits after the compressor:
+   *
+   *     sources → master → squeeze ─┬→ monitor → speakers
+   *                                 └→ recDest → MediaRecorder
+   *
+   * Muting touches `monitor` only. Hanging mute off `master` would silence
+   * the recorder too, so watching it quietly would hand back a silent file
+   * — a trap worth designing out rather than documenting.
+   */
+  function audioInit(){
+    if (ac) return ac;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ac = new AC();
+    master = ac.createGain();
+    master.gain.value = 0.0001;
+    const squeeze = ac.createDynamicsCompressor();
+    squeeze.threshold.value = -18; squeeze.ratio.value = 6;
+    master.connect(squeeze);
+
+    monitor = ac.createGain();
+    monitor.gain.value = 1;
+    squeeze.connect(monitor);
+    monitor.connect(ac.destination);
+
+    recDest = ac.createMediaStreamDestination();
+    squeeze.connect(recDest);
+    return ac;
+  }
+
+  /** Two detuned voices and a slow filter — a bed, not a tune. */
+  function startDrone(){
+    if (!ac || drone) return;
+    const g = ac.createGain();
+    g.gain.value = 0.5;
+    const lp = ac.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.setValueAtTime(220, ac.currentTime);
+    lp.frequency.linearRampToValueAtTime(520, ac.currentTime + TOTAL * 0.75);
+    lp.Q.value = 0.6;
+
+    const voices = [55, 55.4, 82.5].map((f, i) => {
+      const o = ac.createOscillator();
+      o.type = i === 2 ? "sine" : "triangle";
+      o.frequency.value = f;
+      const vg = ac.createGain();
+      vg.gain.value = i === 2 ? 0.16 : 0.30;
+      o.connect(vg); vg.connect(lp);
+      o.start();
+      return o;
+    });
+    lp.connect(g); g.connect(master);
+    drone = { voices, g };
+  }
+
+  function stopAudio(){
+    if (!ac) return;
+    master.gain.cancelScheduledValues(ac.currentTime);
+    master.gain.setTargetAtTime(0.0001, ac.currentTime, 0.25);
+    const d = drone;
+    drone = null;
+    if (d) setTimeout(() => d.voices.forEach(o => { try { o.stop(); } catch {} }), 1200);
+  }
+
+  /** A soft mark on a cut. Filtered noise, short, almost subliminal. */
+  function mark(at, level = 0.14){
+    if (!ac) return;
+    const t = ac.currentTime + at;
+    const len = Math.floor(ac.sampleRate * 0.22);
+    const buf = ac.createBuffer(1, len, ac.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 5);
+    const src = ac.createBufferSource(); src.buffer = buf;
+    const bp = ac.createBiquadFilter();
+    bp.type = "bandpass"; bp.frequency.value = 320; bp.Q.value = 0.8;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(level, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.24);
+    src.connect(bp); bp.connect(g); g.connect(master);
+    src.start(t); src.stop(t + 0.26);
+  }
+
+  /** The one sound that means something: the depth falling away. */
+  function fallingTone(at, dur = 1.5){
+    if (!ac) return;
+    const t = ac.currentTime + at;
+    const o = ac.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(440, t);
+    o.frequency.exponentialRampToValueAtTime(96, t + dur);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.14, t + 0.12);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + dur + 0.1);
+  }
+
+  /** A quiet, unresolved pair under the closing card. No triumphal chord. */
+  function closeTone(at){
+    if (!ac) return;
+    const t = ac.currentTime + at;
+    [146.83, 220].forEach((f, i) => {
+      const o = ac.createOscillator();
+      o.type = "sine"; o.frequency.value = f;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(i ? 0.06 : 0.09, t + 0.7);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 3.4);
+      o.connect(g); g.connect(master);
+      o.start(t); o.stop(t + 3.6);
+    });
+  }
+
+  /** Schedule the whole cue sheet against the scene boundaries. */
+  function scheduleAudio(){
+    if (!ac) return;
+    master.gain.cancelScheduledValues(ac.currentTime);
+    master.gain.setValueAtTime(0.0001, ac.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.55, ac.currentTime + 1.2);
+    startDrone();
+
+    let at = 0;
+    SCENES.forEach((s, i) => {
+      if (i > 0) mark(at, i === 2 ? 0.2 : 0.12);
+      at += s.d;
+    });
+    // Scene 3 is the collapse; its bar animates from 1.1s into the scene.
+    fallingTone(SCENES[0].d + SCENES[1].d + 1.1, 1.6);
+    closeTone(TOTAL - SCENES[SCENES.length - 1].d + 0.4);
+    // Ease the bed away just before the end so the card sits in near-silence.
+    master.gain.setTargetAtTime(0.18, ac.currentTime + TOTAL - 3.2, 1.1);
+  }
+
   /* ── Playback ─────────────────────────────────────────────────── */
   let raf = null, t0 = 0, recording = false;
   const playBtn = document.getElementById("play");
   const recBtn  = document.getElementById("rec");
   const status  = document.getElementById("status");
+  const muteBtn = document.getElementById("mute");
+  let muted = false;
+
+  muteBtn.addEventListener("click", () => {
+    muted = !muted;
+    muteBtn.textContent = muted ? "Sound off" : "Sound on";
+    muteBtn.setAttribute("aria-pressed", String(muted));
+    // Speakers only — the recorder branch is untouched, so muting to watch
+    // still records with sound.
+    if (monitor) monitor.gain.setTargetAtTime(muted ? 0.0001 : 1, ac.currentTime, 0.12);
+  });
 
   function run(onDone){
     cancelAnimationFrame(raf);
@@ -258,9 +420,12 @@
     raf = requestAnimationFrame(tick);
   }
 
-  playBtn.addEventListener("click", () => {
+  playBtn.addEventListener("click", async () => {
     playBtn.disabled = true;
-    run(() => { playBtn.disabled = false; });
+    audioInit();
+    if (ac && ac.state === "suspended") await ac.resume();
+    scheduleAudio();
+    run(() => { stopAudio(); playBtn.disabled = false; });
   });
 
   recBtn.addEventListener("click", async () => {
@@ -281,8 +446,20 @@
       return;
     }
 
+    // Video from the canvas, audio from the synth — merged into one
+    // stream, or the saved file would be silent.
+    audioInit();
+    if (ac && ac.state === "suspended") await ac.resume();
+
     const stream = c.captureStream(60);
-    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 12_000_000 });
+    if (recDest) {
+      for (const track of recDest.stream.getAudioTracks()) stream.addTrack(track);
+    }
+    const rec = new MediaRecorder(stream, {
+      mimeType: mime,
+      videoBitsPerSecond: 12_000_000,
+      audioBitsPerSecond: 192_000,
+    });
     const chunks = [];
     rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
     rec.onstop = () => {
@@ -297,9 +474,10 @@
       recording = false; recBtn.disabled = playBtn.disabled = false;
     };
 
-    status.textContent = `Recording ${TOTAL.toFixed(1)}s…`;
+    status.textContent = `Recording ${TOTAL.toFixed(1)}s with sound…`;
+    scheduleAudio();
     rec.start();
-    run(() => setTimeout(() => rec.stop(), 250));
+    run(() => setTimeout(() => { stopAudio(); rec.stop(); }, 400));
   });
 
   /*
