@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>NOSHASHI — Findings: what the XRP Ledger says when you actually read it</title>
+<meta name="description" content="Five measurements taken on XRPL mainnet: 92.8% of an order book's visible depth that could not fill, a successful payment that delivered 0.4%, and a token backing checks that has never been issued. Each figure carries the date it was taken and what would need re-checking.">
+<link rel="canonical" href="https://noshashi.app/research/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0B0F14;--surface:#11161D;--elevated:#1C2330;
+    --ink:#E6E8EB;--muted:#A3A8B3;--faint:#747C8B;--rule:#2A313C;
+    --brand:#3A82F6;--tele:#00E0C6;--go:#35D49A;--hold:#F5B942;--nogo:#FF5F6D;
+    --r:10px;--shell:min(1180px,92vw);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ground);color:var(--ink);
+    font-family:"Space Grotesk",-apple-system,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.68}
+  a{color:var(--brand)}
+  .shell{width:var(--shell);margin:0 auto}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
+    background:color-mix(in srgb,var(--ground) 82%,transparent);border-bottom:1px solid var(--rule)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:62px;gap:16px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);flex:none}
+  .brand span{font-weight:600;letter-spacing:.2em;font-size:14px}
+  .back{font-size:12px;color:var(--muted);text-decoration:none;flex:none}
+  .back:hover{color:var(--ink)}
+
+  .hero{padding:72px 0 30px;max-width:74ch}
+  .kick{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.22em;color:var(--faint)}
+  h1{font-size:clamp(30px,4.4vw,46px);letter-spacing:-.03em;margin:14px 0 16px;line-height:1.12;
+    text-wrap:balance}
+  .lede{color:var(--muted);font-size:17px;max-width:66ch}
+
+  /* The method note. It is the reason to trust the rest of the page. */
+  .method{border-left:2px solid var(--tele);background:color-mix(in srgb,var(--tele) 6%,transparent);
+    border-radius:0 var(--r) var(--r) 0;padding:20px 24px;margin:34px 0 0;max-width:74ch}
+  .method .t{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:10px;
+    letter-spacing:.18em;margin-bottom:9px}
+  .method p{color:var(--ink);font-size:14.5px}
+
+  .findings{display:grid;gap:20px;padding:44px 0 20px}
+
+  /* Each finding is one card. The rail colour encodes what kind of thing it is:
+     nogo = something is wrong right now, hold = something is being misread,
+     tele = a property of the protocol rather than an event. */
+  .f{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);
+    border-left:2px solid var(--kind,var(--rule));padding:26px 28px}
+  .f .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.2em;
+    color:var(--kind,var(--faint));margin-bottom:12px;text-transform:uppercase}
+  .f h2{font-size:clamp(19px,2.3vw,25px);letter-spacing:-.02em;line-height:1.24;
+    margin-bottom:14px;max-width:34ch;text-wrap:balance}
+  .f p{color:var(--muted);font-size:14.5px;max-width:72ch}
+  .f p + p{margin-top:11px}
+
+  /* The headline number, when a finding has one worth showing at size. */
+  .fig{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 18px;margin:4px 0 16px}
+  .fig b{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+    font-size:clamp(28px,5vw,46px);font-weight:500;letter-spacing:-.03em;line-height:1;
+    color:var(--kind,var(--ink))}
+  .fig s{text-decoration:none;font-family:"IBM Plex Mono",monospace;
+    font-variant-numeric:tabular-nums;font-size:clamp(16px,2.4vw,22px);color:var(--faint)}
+  .fig i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+
+  /* Advertised against fundable, drawn to scale. */
+  .gap{display:grid;gap:12px;margin:18px 0 4px;max-width:62ch}
+  .gap .row .lab{display:flex;justify-content:space-between;gap:12px;
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .gap .row .lab em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--muted)}
+  .bar{height:12px;background:var(--elevated);border-radius:2px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:2px;background:var(--muted)}
+  .bar.short i{background:var(--nogo)}
+
+  /* Every figure states when it expires. This is the page's whole posture. */
+  .stamp{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:20px;padding-top:16px;
+    border-top:1px solid var(--rule)}
+  .stamp div{min-width:0}
+  .stamp .k{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;
+    color:var(--faint);text-transform:uppercase;margin-bottom:4px}
+  .stamp .v{font-size:13px;color:var(--muted);max-width:56ch}
+  .stamp .v.date{font-family:"IBM Plex Mono",monospace;color:var(--ink);
+    font-variant-numeric:tabular-nums}
+
+  table.kv{width:100%;border-collapse:collapse;font-size:14px;margin:18px 0 4px}
+  table.kv th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10px;
+    letter-spacing:.16em;color:var(--faint);font-weight:500;padding-bottom:10px}
+  table.kv th + th, table.kv td + td{text-align:right;font-variant-numeric:tabular-nums}
+  table.kv td{padding:11px 0;border-top:1px solid var(--rule);color:var(--muted)}
+  table.kv td:first-child{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+    text-align:left}
+  .scroller{overflow-x:auto}
+
+  .closing{border-top:1px solid var(--rule);padding:44px 0 90px;max-width:74ch}
+  .closing h2{font-size:24px;letter-spacing:-.02em;margin-bottom:14px}
+  .closing p{color:var(--muted);font-size:15px;margin-bottom:14px}
+  .btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:#06121F;
+    text-decoration:none;font-weight:500;font-size:15px;padding:13px 22px;border-radius:var(--r);
+    margin-top:8px}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+  .fine{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);margin-top:14px}
+
+  @media (max-width:640px){
+    .hero{padding-top:48px}
+    .f{padding:22px 20px}
+    .stamp{gap:14px}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="shell nav">
+    <a class="brand" href="/"><span>NOSHASHI</span></a>
+    <a class="back" href="/">&larr; Back to noshashi.app</a>
+  </nav>
+</header>
+
+<main class="shell">
+
+  <div class="hero">
+    <p class="kick">FINDINGS &middot; XRPL MAINNET</p>
+    <h1>What the ledger says when you actually read it.</h1>
+    <p class="lede">
+      Every one of these was measured on XRPL mainnet, not modelled. Each is
+      something the ledger publishes in the open and that no interface we could
+      find reports. Two of them were found in NOSHASHI's own code first.
+    </p>
+    <div class="method">
+      <p class="t">WHY EACH FIGURE CARRIES A DATE</p>
+      <p>
+        A measurement quoted as current when it is three weeks old is the exact
+        failure this product exists to prevent. So every finding below states
+        when it was taken and what would need re-running before anyone repeats
+        it. Where a figure keeps — because it is a property of the protocol
+        rather than a reading of the market — that is said too.
+      </p>
+    </div>
+  </div>
+
+  <div class="findings">
+
+    <!-- 1. The order book. The strongest finding, and it was our own bug. -->
+    <article class="f" style="--kind:var(--nogo)">
+      <p class="eyebrow">Order book depth</p>
+      <h2>92.8% of a major order book's visible depth could not fill.</h2>
+      <div class="fig">
+        <s>1,606,485</s>
+        <i>advertised &rarr;</i>
+        <b>116,107</b>
+        <i>actually fundable</i>
+      </div>
+      <div class="gap">
+        <div class="row">
+          <div class="lab"><span>Advertised</span><em>1,606,485</em></div>
+          <div class="bar"><i style="width:100%"></i></div>
+        </div>
+        <div class="row">
+          <div class="lab"><span>Could fill</span><em>116,107</em></div>
+          <div class="bar short"><i style="width:7.2%"></i></div>
+        </div>
+      </div>
+      <p>
+        An offer rests in the book whether or not its owner still holds the asset
+        to honour it. <span class="mono">rippled</span> reports the difference in
+        <span class="mono">taker_gets_funded</span> — a field present only when
+        the owner cannot cover the listed amount, so its absence means fully
+        funded and its presence means that is all they actually have. Anything
+        that sums <span class="mono">TakerGets</span> counts offers nobody can
+        honour. One offer advertised 1,400,100 USD against an owner balance of
+        22,273.
+      </p>
+      <p>
+        We found it in our own code. NOSHASHI was summing the advertised figure,
+        and that number fed exit liquidity — so the console was telling operators
+        they could exit positions the book could not absorb, overstating depth by
+        roughly fourteen times. Fixing it is what turned it into a feature.
+      </p>
+      <div class="scroller">
+        <table class="kv">
+          <thead><tr><th>Book</th><th>Advertised</th><th>Fundable</th><th>Phantom</th></tr></thead>
+          <tbody>
+            <tr><td>USD / Bitstamp</td><td>1,606,485</td><td>116,107</td><td>92.8%</td></tr>
+            <tr><td>USD / GateHub</td><td>1,881,039</td><td>772,777</td><td>58.9%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="stamp">
+        <div><p class="k">Measured</p><p class="v date">2026-08-28</p></div>
+        <div><p class="k">Before you repeat it</p><p class="v">Order books move constantly. Re-run the measurement the day you quote it and use the fresh figure.</p></div>
+      </div>
+    </article>
+
+    <!-- 2. Partial payment. The one that has actually drained exchanges. -->
+    <article class="f" style="--kind:var(--nogo)">
+      <p class="eyebrow">Settlement</p>
+      <h2>A payment returned <span class="mono">tesSUCCESS</span> and delivered 0.4% of its stated amount.</h2>
+      <div class="fig">
+        <s>999,332.87</s>
+        <i>requested &rarr;</i>
+        <b>3,958.64</b>
+        <i>delivered</i>
+      </div>
+      <p>
+        <span class="mono">Amount</span> said 999,332.87 LRC.
+        <span class="mono">delivered_amount</span> said 3,958.64. The transaction
+        succeeded. Any system that credits the stated figure over-credits by
+        roughly 250&times;, and that is precisely the mistake that has drained
+        exchanges. Three of 223 consecutive payments carried the partial-payment
+        flag.
+      </p>
+      <div class="stamp">
+        <div><p class="k">Measured</p><p class="v date">2026-08-28</p></div>
+        <div><p class="k">Before you repeat it</p><p class="v">The transaction is immutable, so the example keeps. The 3-in-223 frequency is a sample and should be re-measured.</p></div>
+      </div>
+    </article>
+
+    <!-- 3. Impersonation. A live campaign, and the tell is verifiable. -->
+    <article class="f" style="--kind:var(--hold)">
+      <p class="eyebrow">Impersonation</p>
+      <h2>A live campaign, 1.1 million transactions deep, backed by a token that has never been issued.</h2>
+      <div class="fig">
+        <b>1,116,900</b>
+        <i>transactions in nine days</i>
+      </div>
+      <p>
+        One account was issuing checks denominated in USDT from an issuer with
+        zero obligations outstanding — a token nobody has ever been issued, so no
+        check it backs could ever be cashed. Sender and issuer publish the same
+        domain.
+      </p>
+      <p>
+        The tell is that a currency code is not a name anyone owns. Any account
+        may issue a token called USDT, and the only question that matters is
+        whether the issuer owes anything to anyone. That is a reading the ledger
+        will answer in one call, and almost nothing asks it.
+      </p>
+      <div class="stamp">
+        <div><p class="k">Measured</p><p class="v date">2026-08-28</p></div>
+        <div><p class="k">Before you repeat it</p><p class="v">Check whether the campaign is still running before describing it in the present tense.</p></div>
+      </div>
+    </article>
+
+    <!-- 4. Quorum. Protocol property, so it keeps. -->
+    <article class="f" style="--kind:var(--tele)">
+      <p class="eyebrow">Control surface</p>
+      <h2>Multi-signature that provides no second approval.</h2>
+      <div class="fig">
+        <b>5</b><i>signers &middot;</i><b>1</b><i>can act alone</i>
+      </div>
+      <p>
+        XRPL compares a signer quorum against the sum of signing <em>weights</em>,
+        not a count of signers. A list of five signers where one carries the
+        quorum is a single-key account wearing a committee's clothes — and no
+        interface we could find reports it that way.
+      </p>
+      <div class="stamp">
+        <div><p class="k">Measured</p><p class="v date">2026-08-27</p></div>
+        <div><p class="k">Before you repeat it</p><p class="v">A property of the protocol rather than a measurement. It keeps.</p></div>
+      </div>
+    </article>
+
+    <!-- 5. A negative result. Published because it is one. -->
+    <article class="f" style="--kind:var(--go)">
+      <p class="eyebrow">A negative result &middot; a tool we did not build</p>
+      <h2>XRPL's reserve prices out an attack that plagues other chains.</h2>
+      <div class="fig">
+        <b>0</b><i>lookalike pairs across 14 accounts scanned</i>
+      </div>
+      <p>
+        Address poisoning — seeding a victim's history with a lookalike address
+        so a later copy-paste sends to the attacker — costs only gas on an
+        account-free chain. On XRPL every lookalike must first be funded with the
+        1 XRP base reserve, so a thousand of them costs 1,000 XRP before a single
+        dust payment. Fourteen accounts scanned for lookalike counterparties
+        turned up none.
+      </p>
+      <p>
+        Detection was on our roadmap and the evidence removed it. The reserve is
+        a structural deterrent, and shipping a detector for a threat the ledger
+        already prices out would have meant inventing a problem to sell the
+        solution to. We are publishing the negative result because it is one.
+      </p>
+      <div class="stamp">
+        <div><p class="k">Measured</p><p class="v date">2026-08-28</p></div>
+        <div><p class="k">Before you repeat it</p><p class="v">The reserve is a protocol parameter and can be changed by amendment. Confirm the current value before quoting.</p></div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="closing">
+    <h2>How these were found</h2>
+    <p>
+      Each began the same way: taking a field at face value, then checking what
+      it actually means. <span class="mono">delivered_amount</span> against
+      <span class="mono">Amount</span>. Signing weight rather than a count of
+      signers. A currency code, which is not a name anyone owns. The ledger
+      publishes all of it. Nothing shows it to you.
+    </p>
+    <p>
+      Two of the five were bugs in NOSHASHI before they were features of it. The
+      logic that makes these claims carries 235 tests, verified by mutation
+      rather than by passing — each safety rule is deliberately broken to confirm
+      a test catches it.
+    </p>
+    <p>
+      Some work is blocked on infrastructure rather than effort: validator
+      decentralisation and per-validator amendment voting are admin-only
+      commands that public clusters refuse, and need a self-hosted node.
+    </p>
+    <a class="btn" href="/#public">Check an address free &rarr;</a>
+    <p class="fine">No account. Nothing is signed. The app reads.</p>
+  </div>
+
+</main>
+
+</body>
+</html>
