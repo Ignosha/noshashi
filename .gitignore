@@ -4,6 +4,7 @@ site/node_modules/
 
 # Build output
 dist/
+dist-demo/
 site/.next/
 src-tauri/target/
 src-tauri/gen/
