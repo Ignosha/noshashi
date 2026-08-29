@@ -89,7 +89,8 @@ Named rather than hidden:
 3. **Edge Functions have no rate limiting.** Add it before the Compliance
    API is opened to third parties.
 4. **Leaked-password protection is not yet enabled** in Supabase Auth.
-   It is a dashboard toggle — see `SETUP.md`.
+   It is a dashboard toggle: Authentication → Policies → leaked password
+   protection.
 5. **The Compliance API is deployed from the repository but not yet
    pushed to the Supabase project.** `supabase/functions/noshashi-verify`
    and its migration (`supabase/migrations/20260820_compliance_api.sql`)

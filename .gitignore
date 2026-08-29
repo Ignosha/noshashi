@@ -53,3 +53,7 @@ npm-debug.log*
 
 # Vite cache
 .vite/
+
+# Business/setup notes — kept locally, never committed (see ~/noshashi-private)
+COMMERCIALIZATION_PLAN.txt
+SETUP.md
