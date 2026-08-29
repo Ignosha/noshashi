@@ -9,6 +9,16 @@
 export type PlanId = "operator" | "desk" | "institution";
 
 export type Plan = {
+  /**
+   * Monthly price in USD as a NUMBER, for anything that needs to compute
+   * with it. priceLabel is for display; this is for arithmetic.
+   *
+   * Both exist because the business plan's revenue model was multiplying
+   * seats by a hard-coded 149 while the catalogue charged 749 — a fivefold
+   * understatement of Desk revenue that nothing caught, because the two
+   * numbers lived in different files and neither referenced the other.
+   */
+  monthlyUsd: number;
   id: PlanId;
   name: string;
   audience: string;
@@ -29,6 +39,7 @@ export const PLANS: Plan[] = [
     name: "OPERATOR",
     audience: "Individuals and single desks",
     priceLabel: "Free",
+    monthlyUsd: 0,
     cadence: "forever",
     priceId: null,
     seatBased: false,
@@ -50,6 +61,7 @@ export const PLANS: Plan[] = [
     name: "DESK",
     audience: "Trading desks and funds",
     priceLabel: "$749",
+    monthlyUsd: 749,
     cadence: "per seat / month",
     priceId: "price_1U6U1eGSxPXLjUKIGnORqp43",
     seatBased: true,
@@ -88,6 +100,7 @@ export const PLANS: Plan[] = [
     name: "INSTITUTION",
     audience: "Regulated venues and custodians",
     priceLabel: "$4,000",
+    monthlyUsd: 4000,
     cadence: "per month",
     priceId: "price_1U6U1sGSxPXLjUKI7mCncAIu",
     seatBased: false,

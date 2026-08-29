@@ -1,3 +1,4 @@
+import { PLANS } from "@/lib/billing/catalog";
 /**
  * Product substance: what ships today, what is being built, what is
  * genuinely novel in this space, and how the thing is meant to earn.
@@ -271,13 +272,28 @@ export type Tier = {
  * with design partners, not observed prices — nothing here has been
  * validated against a real buyer yet.
  */
+/**
+ * Pricing shown on the business plan comes from the billing catalogue.
+ *
+ * It used to be restated here, and drifted: this file said Desk was $149
+ * while the catalogue charged $749, so the revenue model on the business
+ * plan screen understated Desk revenue fivefold. Editorial copy stays
+ * here; the number comes from the one place that also drives checkout.
+ */
+const priced = (id: string) => {
+  const plan = PLANS.find((p) => p.id === id);
+  return {
+    price: plan?.priceLabel ?? "",
+    cadence: plan?.cadence ?? "",
+  };
+};
+
 export const TIERS: Tier[] = [
   {
     id: "operator",
     name: "OPERATOR",
     audience: "Individuals and single desks",
-    price: "Free",
-    cadence: "forever",
+    ...priced("operator"),
     features: [
       "Full console and menu bar HUD",
       "Unlimited local gate checks",
@@ -290,8 +306,7 @@ export const TIERS: Tier[] = [
     id: "desk",
     name: "DESK",
     audience: "Trading desks and small funds",
-    price: "$149",
-    cadence: "per seat / month",
+    ...priced("desk"),
     features: [
       "Everything in Operator",
       "Multi-wallet portfolios",
@@ -309,8 +324,7 @@ export const TIERS: Tier[] = [
     id: "institution",
     name: "INSTITUTION",
     audience: "Regulated venues and custodians",
-    price: "From $4,000",
-    cadence: "per month, annual",
+    ...priced("institution"),
     features: [
       "Everything in Desk",
       "Travel Rule (FATF R.16) scoping",

@@ -9,6 +9,7 @@ import { NovaBolt, NovaCredit, NovaShield, NovaVault } from "@/components/nova/N
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MILESTONES, REVENUE_STREAMS, TIERS } from "@/lib/roadmap";
+import { PLANS } from "@/lib/billing/catalog";
 import { CONTACT } from "@/lib/brand";
 import { formatCompact } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -72,8 +73,16 @@ export function RevenueScene() {
   const [xrpPrice, setXrpPrice] = useState(2.4);
 
   const model = useMemo(() => {
-    const deskRevenue = deskSeats * 149;
-    const institutionRevenue = institutions * 4_000;
+    /*
+     * Seat and venue prices come from the billing catalogue, never from a
+     * literal here. This line read `deskSeats * 149` while checkout charged
+     * 749, so every projection on this screen understated Desk revenue by
+     * a factor of five.
+     */
+    const deskPrice = PLANS.find((p) => p.id === "desk")?.monthlyUsd ?? 0;
+    const institutionPrice = PLANS.find((p) => p.id === "institution")?.monthlyUsd ?? 0;
+    const deskRevenue = deskSeats * deskPrice;
+    const institutionRevenue = institutions * institutionPrice;
     // API is metered per 1,000 calls at the same effective rate as the
     // per-verification fee, so the two never undercut each other.
     const perCallUsd = feeXrp * xrpPrice;

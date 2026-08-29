@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { PLANS, planFor, type PlanId } from "../catalog";
+import { TIERS } from "@/lib/roadmap";
 import { DEMO_LOCKED } from "@/lib/edition";
 
 /**
@@ -101,5 +102,55 @@ describe("entitlement invariants", () => {
     for (const plan of PLANS) {
       expect(planFor(plan.id).id).toBe(plan.id);
     }
+  });
+});
+
+/**
+ * Pricing consistency.
+ *
+ * Added because the business plan carried a fourth copy of the price list
+ * and it was wrong: roadmap.ts said Desk was $149 while checkout charged
+ * $749, and the revenue model on that screen multiplied seats by a
+ * hard-coded 149. Every projection understated Desk revenue fivefold, and
+ * nothing failed, because the two numbers lived in different files and
+ * neither referenced the other.
+ *
+ * Both now derive from PLANS. These tests hold them there.
+ */
+describe("pricing has one source", () => {
+  it("shows the same price on the business plan as at checkout", () => {
+    for (const tier of TIERS) {
+      const plan = PLANS.find((p) => p.id === tier.id);
+      if (!plan) continue;
+      expect(tier.price, `${tier.id} price`).toBe(plan.priceLabel);
+      expect(tier.cadence, `${tier.id} cadence`).toBe(plan.cadence);
+    }
+  });
+
+  it("gives every plan a numeric price that matches its label", () => {
+    for (const plan of PLANS) {
+      if (plan.monthlyUsd === 0) {
+        expect(plan.priceLabel.toLowerCase()).toBe("free");
+        continue;
+      }
+      // "$749" -> 749, "$4,000" -> 4000
+      const fromLabel = Number(plan.priceLabel.replace(/[^0-9.]/g, ""));
+      expect(fromLabel, `${plan.id} label vs monthlyUsd`).toBe(plan.monthlyUsd);
+    }
+  });
+
+  it("keeps the paid tiers ordered by price", () => {
+    const desk = PLANS.find((p) => p.id === "desk")!;
+    const institution = PLANS.find((p) => p.id === "institution")!;
+    const operator = PLANS.find((p) => p.id === "operator")!;
+    expect(operator.monthlyUsd).toBe(0);
+    expect(desk.monthlyUsd).toBeGreaterThan(operator.monthlyUsd);
+    expect(institution.monthlyUsd).toBeGreaterThan(desk.monthlyUsd);
+  });
+
+  it("charges 749 for a Desk seat", () => {
+    // Pinned explicitly: this is the number the business plan projects
+    // from and the number a customer is billed.
+    expect(PLANS.find((p) => p.id === "desk")!.monthlyUsd).toBe(749);
   });
 });
