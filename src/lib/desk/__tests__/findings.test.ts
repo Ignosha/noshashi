@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { settlementFindings, interpretTransaction, type SettlementReport } from "../settlement";
 import { issuanceFindings, type IssuanceReport } from "../issuance";
-import { provenanceFindings, type ProvenanceReport } from "../provenance";
+import {
+  provenanceFindings,
+  readControlEvents,
+  type ProvenanceReport,
+} from "../provenance";
 import { ammFindings, type AmmReport } from "../amm";
 
 /**
@@ -172,6 +176,8 @@ const provenance = (over: Partial<ProvenanceReport> = {}): ProvenanceReport => (
   historyIncomplete: false,
   nodeHistoryFrom: 32_570,
   ageDays: 618,
+  controlEvents: [],
+  controlHistoryPartial: false,
   readAt: "2026-08-28T00:00:00Z",
   ...over,
 });
@@ -369,5 +375,124 @@ describe("interpretTransaction — reading the raw response", () => {
     });
     expect(r.requested).toEqual({ kind: "xrp", drops: 319_847, value: 0.319847 });
     expect(r.deliveredFraction).toBeCloseTo(0.666666, 5);
+  });
+});
+
+/**
+ * Control-change forensics.
+ *
+ * These events are rare — 7,965 consecutive mainnet transactions on
+ * 2026-08-28 contained no SetRegularKey and no SignerListSet at all — and
+ * that rarity is what makes each one worth surfacing rather than what
+ * makes it unimportant.
+ *
+ * The finding that matters combines two facts, neither suspicious alone:
+ * an account established for years, whose signing authority moved days
+ * ago. Businesses rotate keys and dormant accounts wake up; it is the
+ * conjunction that looks like a stolen key.
+ */
+describe("readControlEvents and the findings over them", () => {
+  const A = "rSubject";
+  const tx = (over: Record<string, any> = {}) => ({
+    ledger_index: 1_000,
+    tx_json: { Account: A, date: 800_000_000, ...over },
+  });
+
+  it("reads a regular key being assigned and removed differently", () => {
+    const events = readControlEvents(
+      [
+        tx({ TransactionType: "SetRegularKey", RegularKey: "rOther", date: 100 }),
+        tx({ TransactionType: "SetRegularKey", date: 200 }), // no RegularKey = removed
+      ],
+      A
+    );
+    expect(events.map((e) => e.kind)).toEqual(["regular-key-set", "regular-key-removed"]);
+  });
+
+  it("treats a zero quorum as the signer list being deleted", () => {
+    // SignerListSet with SignerQuorum 0 removes the list rather than
+    // configuring one — reading it as "configured" would report the
+    // removal of multi-party approval as its introduction.
+    const [e] = readControlEvents(
+      [tx({ TransactionType: "SignerListSet", SignerQuorum: 0 })],
+      A
+    );
+    expect(e.kind).toBe("signer-list-removed");
+  });
+
+  it("reads the master key flag in both directions", () => {
+    const events = readControlEvents(
+      [
+        tx({ TransactionType: "AccountSet", SetFlag: 4 }),
+        tx({ TransactionType: "AccountSet", ClearFlag: 4 }),
+      ],
+      A
+    );
+    expect(events.map((e) => e.kind)).toEqual([
+      "master-key-disabled",
+      "master-key-enabled",
+    ]);
+  });
+
+  it("ignores an AccountSet that changes no control flag", () => {
+    // Setting a Domain is an AccountSet too, and is not a control change.
+    expect(readControlEvents([tx({ TransactionType: "AccountSet", SetFlag: 5 })], A)).toEqual(
+      []
+    );
+  });
+
+  it("ignores transactions sent BY someone else", () => {
+    // Only the account acting on itself changes its own control.
+    expect(
+      readControlEvents(
+        [tx({ TransactionType: "SetRegularKey", RegularKey: "x", Account: "rStranger" })],
+        A
+      )
+    ).toEqual([]);
+  });
+
+  it("raises a warning only when an OLD account changes control RECENTLY", () => {
+    const recent = new Date(Date.now() - 3 * 86_400_000);
+    const event = {
+      ledgerIndex: 9,
+      at: recent,
+      kind: "regular-key-set" as const,
+      label: "A regular key was assigned",
+    };
+    // Old account, recent change -> warn.
+    const alarming = provenanceFindings(
+      provenance({ ageDays: 2_000, controlEvents: [event] })
+    ).find((f) => f.id === "control-changed");
+    expect(alarming?.severity).toBe("warn");
+    expect(alarming!.action).toMatch(/does not depend on this account/i);
+
+    // Young account, same recent change -> info, no alarm.
+    const ordinary = provenanceFindings(
+      provenance({ ageDays: 10, controlEvents: [event] })
+    ).find((f) => f.id === "control-changed");
+    expect(ordinary?.severity).toBe("info");
+  });
+
+  it("does not claim stability it cannot prove from a partial walk", () => {
+    const partial = provenanceFindings(
+      provenance({ controlEvents: [], controlHistoryPartial: true })
+    ).find((f) => f.id === "control-stable");
+    expect(partial!.detail).toMatch(/not a guarantee/i);
+
+    const complete = provenanceFindings(
+      provenance({ controlEvents: [], controlHistoryPartial: false })
+    ).find((f) => f.id === "control-stable");
+    expect(complete!.detail).toMatch(/controlled it at the start controls it now/i);
+  });
+
+  it("flags approval requirements being removed", () => {
+    const f = provenanceFindings(
+      provenance({
+        controlEvents: [
+          { ledgerIndex: 1, kind: "signer-list-removed", label: "The signer list was deleted" },
+        ],
+      })
+    );
+    expect(f.find((x) => x.id === "control-weakened")?.severity).toBe("warn");
   });
 });

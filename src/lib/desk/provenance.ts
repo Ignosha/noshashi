@@ -39,6 +39,20 @@ const RIPPLE_EPOCH_OFFSET = 946_684_800;
 /** The first ledger any public node retains. */
 const HISTORY_GENESIS = 32_570;
 
+/** A moment when who could sign for this account changed. */
+export type ControlEvent = {
+  ledgerIndex: number;
+  at?: Date;
+  kind:
+    | "regular-key-set"
+    | "regular-key-removed"
+    | "signer-list-set"
+    | "signer-list-removed"
+    | "master-key-disabled"
+    | "master-key-enabled";
+  label: string;
+};
+
 export type ProvenanceReport = {
   address: string;
   balanceXrp: number;
@@ -64,8 +78,87 @@ export type ProvenanceReport = {
   nodeHistoryFrom?: number;
   ageDays?: number;
   lastActivityLedger?: number;
+  /** Times the signing authority over this account changed hands. */
+  controlEvents: ControlEvent[];
+  /** True when the history walk stopped before reaching the present. */
+  controlHistoryPartial: boolean;
   readAt: string;
 };
+
+/** Pages of history to walk when looking for control changes. */
+const CONTROL_PAGES = 10;
+
+/**
+ * Read the transactions that changed who can sign for this account.
+ *
+ * These are rare — a 60-ledger sample of mainnet on 2026-08-28 contained
+ * 7,965 transactions and not one SetRegularKey or SignerListSet. That
+ * rarity is exactly what makes each one worth surfacing: an account whose
+ * signing authority moved last week, after years of silence, looks the way
+ * a stolen key looks.
+ *
+ * The walk is bounded, so "no changes found" is reported together with how
+ * far back it actually reached. An unbounded claim of "never" from a
+ * partial read would be the same error as summing a partial order book.
+ */
+export function readControlEvents(
+  transactions: Array<Record<string, any>>,
+  address: string
+): ControlEvent[] {
+  const out: ControlEvent[] = [];
+  for (const entry of transactions) {
+    const tx = (entry.tx_json ?? entry.tx ?? entry) as Record<string, any>;
+    // Only the account acting on itself changes its own control.
+    if (tx.Account !== address) continue;
+
+    const ledgerIndex = Number(entry.ledger_index ?? tx.ledger_index ?? 0);
+    const rawDate = Number(tx.date);
+    const at = Number.isFinite(rawDate)
+      ? new Date((rawDate + RIPPLE_EPOCH_OFFSET) * 1000)
+      : undefined;
+
+    if (tx.TransactionType === "SetRegularKey") {
+      const assigned = Boolean(tx.RegularKey);
+      out.push({
+        ledgerIndex,
+        at,
+        kind: assigned ? "regular-key-set" : "regular-key-removed",
+        label: assigned
+          ? "A regular key was assigned — a second key able to sign"
+          : "The regular key was removed",
+      });
+    } else if (tx.TransactionType === "SignerListSet") {
+      // A quorum of zero deletes the list rather than configuring one.
+      const removed = Number(tx.SignerQuorum ?? 0) === 0;
+      out.push({
+        ledgerIndex,
+        at,
+        kind: removed ? "signer-list-removed" : "signer-list-set",
+        label: removed
+          ? "The signer list was deleted — multi-party approval ended"
+          : "A signer list was configured or replaced",
+      });
+    } else if (tx.TransactionType === "AccountSet") {
+      // asfDisableMaster is flag 4.
+      if (Number(tx.SetFlag) === 4) {
+        out.push({
+          ledgerIndex,
+          at,
+          kind: "master-key-disabled",
+          label: "The master key was disabled",
+        });
+      } else if (Number(tx.ClearFlag) === 4) {
+        out.push({
+          ledgerIndex,
+          at,
+          kind: "master-key-enabled",
+          label: "The master key was re-enabled",
+        });
+      }
+    }
+  }
+  return out.sort((a, b) => a.ledgerIndex - b.ledgerIndex);
+}
 
 export async function readProvenance(address: string): Promise<ProvenanceReport> {
   let info: Record<string, any>;
@@ -98,21 +191,40 @@ export async function readProvenance(address: string): Promise<ProvenanceReport>
     /* Not fatal — we simply cannot bound the history claim. */
   }
 
-  // forward: true is load-bearing. Without it this returns the NEWEST
-  // transaction and every date below would describe today.
+  /*
+   * forward: true is load-bearing. Without it this returns the NEWEST
+   * transaction and every date below would describe today.
+   *
+   * The same walk feeds the control-change history, so it runs to a page
+   * budget rather than stopping at the first entry.
+   */
   let earliest: Record<string, any> | undefined;
-  try {
-    const first = await rpc("account_tx", {
-      account: address,
-      ledger_index_min: -1,
-      ledger_index_max: -1,
-      binary: false,
-      forward: true,
-      limit: 5,
-    });
-    earliest = (first.transactions ?? [])[0];
-  } catch {
-    /* Leave origin undefined rather than guessing one. */
+  const history: Array<Record<string, any>> = [];
+  let controlHistoryPartial = false;
+  let cursor: unknown = undefined;
+  for (let page = 0; page < CONTROL_PAGES; page += 1) {
+    let res: Record<string, any>;
+    try {
+      res = await rpc("account_tx", {
+        account: address,
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        binary: false,
+        forward: true,
+        limit: 200,
+        ...(cursor ? { marker: cursor } : {}),
+      });
+    } catch {
+      // Keep whatever was gathered and record that it is incomplete.
+      if (page > 0) controlHistoryPartial = true;
+      break;
+    }
+    const batch = (res.transactions ?? []) as Array<Record<string, any>>;
+    if (!earliest) earliest = batch[0];
+    history.push(...batch);
+    cursor = res.marker;
+    if (!cursor) break;
+    if (page === CONTROL_PAGES - 1) controlHistoryPartial = true;
   }
 
   const tx = (earliest?.tx_json ?? earliest?.tx ?? {}) as Record<string, any>;
@@ -174,6 +286,8 @@ export async function readProvenance(address: string): Promise<ProvenanceReport>
     nodeHistoryFrom,
     ageDays,
     lastActivityLedger: Number(data.PreviousTxnLgrSeq ?? 0) || undefined,
+    controlEvents: readControlEvents(history, address),
+    controlHistoryPartial,
     readAt: new Date().toISOString(),
   };
 }
@@ -258,6 +372,62 @@ export function provenanceFindings(report: ProvenanceReport): ProvenanceFinding[
         ? `The account's sequence number reads ${report.sequence.toLocaleString()}, but that is not a count. Accounts created after the DeletableAccounts amendment have their sequence seeded to the ledger index they were created at (${report.originLedger.toLocaleString()} here), so the number of transactions actually sent is the difference — roughly ${report.approxSentCount.toLocaleString()}.`
         : `This account predates sequence seeding, so its sequence of ${report.sequence.toLocaleString()} does count upward from one.`,
     });
+  }
+
+  /* ── Who can sign, and when that last changed ──────────────────── */
+  if (report.controlEvents.length === 0) {
+    out.push({
+      id: "control-stable",
+      severity: "ok",
+      title: "No change of signing authority found",
+      detail: report.controlHistoryPartial
+        ? "Nothing in the history read, but the walk did not reach the present — this is what was seen, not a guarantee that nothing happened."
+        : "Across the account's readable history, no regular key was assigned, no signer list was configured or removed, and the master key was never disabled or re-enabled. Whoever controlled it at the start controls it now.",
+    });
+  } else {
+    const latest = report.controlEvents[report.controlEvents.length - 1];
+    const daysSince = latest.at
+      ? Math.floor((Date.now() - latest.at.getTime()) / 86_400_000)
+      : undefined;
+
+    /*
+     * A control change on an account that had been quiet for a long time
+     * is the shape a stolen key takes. Neither half is suspicious alone —
+     * a business rotates keys, and dormant accounts wake up — so the
+     * finding is only raised when both hold.
+     */
+    const suddenOnAnOldAccount =
+      daysSince !== undefined &&
+      daysSince <= 30 &&
+      report.ageDays !== undefined &&
+      report.ageDays > 365;
+
+    out.push({
+      id: "control-changed",
+      severity: suddenOnAnOldAccount ? "warn" : "info",
+      title: `Signing authority changed ${report.controlEvents.length} time${report.controlEvents.length === 1 ? "" : "s"}`,
+      detail:
+        `Most recently: ${latest.label.toLowerCase()}${latest.at ? ` on ${latest.at.toISOString().slice(0, 10)}` : ""}, at ledger ${latest.ledgerIndex.toLocaleString()}.` +
+        (suddenOnAnOldAccount
+          ? ` This account is ${(report.ageDays! / 365).toFixed(1)} years old and its control moved ${daysSince} day${daysSince === 1 ? "" : "s"} ago. A long-established account whose signing authority changes suddenly is the shape a compromised key takes — and equally the shape of an ordinary key rotation.`
+          : " Changing keys is routine hygiene; what matters is whether the operator expected it."),
+      action: suddenOnAnOldAccount
+        ? "Confirm with the operator, through a channel that does not depend on this account, that they made this change."
+        : undefined,
+    });
+
+    const removals = report.controlEvents.filter(
+      (e) => e.kind === "signer-list-removed" || e.kind === "master-key-enabled"
+    );
+    if (removals.length > 0) {
+      out.push({
+        id: "control-weakened",
+        severity: "warn",
+        title: "Approval requirements were removed at some point",
+        detail:
+          "The history contains a signer list being deleted or a master key being re-enabled. Both reduce the number of parties needed to move funds, which is the opposite direction from ordinary hardening.",
+      });
+    }
   }
 
   if (report.ownerCount === 0 && report.balanceXrp > 0) {
