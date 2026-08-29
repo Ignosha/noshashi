@@ -194,13 +194,25 @@
   .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
   .reveal.in{opacity:1;transform:none}
 
-  /* Tighten the link row before anything is dropped. */
+  /*
+   * Keep every link visible as long as it can be read.
+   *
+   * Hiding the nav the moment it stops fitting at full size threw away
+   * navigation the page still had room for. The row tightens in two steps
+   * instead, and only collapses to the CTA when the links genuinely cannot
+   * fit — measured, not guessed.
+   */
   @media (max-width:1180px){
-    .nav-links{gap:16px}
+    .nav-links{gap:15px}
     .nav-links a{font-size:11.5px}
   }
-  /* Below this the eight items genuinely do not fit; keep only the CTA. */
-  @media (max-width:1040px){
+  @media (max-width:1010px){
+    .nav-links{gap:11px}
+    .nav-links a{font-size:11px}
+    .nav-links a.btn{padding:8px 12px}
+  }
+  /* Below this seven links plus a button genuinely do not fit. */
+  @media (max-width:820px){
     .nav-links a:not(.btn){display:none}
   }
 
