@@ -11,6 +11,7 @@ import {
   draft,
   type Platform,
 } from "@/lib/growth/posts";
+import { AUDIENCES, EVIDENCE, composePitch } from "@/lib/growth/pitch";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import { cn } from "@/lib/utils";
 
@@ -30,8 +31,27 @@ import { cn } from "@/lib/utils";
  */
 export function GrowthScene({ data }: { data: XrplState }) {
   const { push } = useToast();
+  const [mode, setMode] = useState<"posts" | "pitch">("posts");
   const [platform, setPlatform] = useState<Platform>("x");
   const [angleId, setAngleId] = useState(ANGLES[0].id);
+  const [audienceId, setAudienceId] = useState(AUDIENCES[0].id);
+  const [picked, setPicked] = useState<string[]>([EVIDENCE[0].id]);
+
+  const pitch = useMemo(() => composePitch(audienceId, picked), [audienceId, picked]);
+
+  const togglePick = (id: string) =>
+    setPicked((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
+
+  const copyPitch = async () => {
+    try {
+      await navigator.clipboard.writeText(
+        `${pitch.subject}\n\n${pitch.body}`
+      );
+      push({ title: "COPIED", body: "Read it before you send it.", tone: "go" });
+    } catch {
+      push({ title: "CLIPBOARD UNAVAILABLE", body: "Select and copy manually.", tone: "hold" });
+    }
+  };
 
   const spec = PLATFORMS.find((p) => p.id === platform)!;
   const angle = ANGLES.find((a) => a.id === angleId)!;
@@ -61,6 +81,36 @@ export function GrowthScene({ data }: { data: XrplState }) {
         statusLabel="NO AUTOMATION"
       />
 
+      <div className="flex shrink-0 gap-1.5">
+        {([["posts", "SOCIAL DRAFTS"], ["pitch", "PITCH COMPOSER"]] as const).map(
+          ([id, label]) => (
+            <button
+              key={id}
+              onClick={() => setMode(id)}
+              aria-pressed={mode === id}
+              className={cn(
+                "mono-font rounded-[3px] border px-3 py-1.5 text-[9px] tracking-[0.16em] transition-colors",
+                mode === id
+                  ? "border-brand/50 bg-brand/10 text-brand"
+                  : "border-border/60 text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {label}
+            </button>
+          )
+        )}
+      </div>
+
+      {mode === "pitch" ? (
+        <PitchComposer
+          audienceId={audienceId}
+          setAudienceId={setAudienceId}
+          picked={picked}
+          togglePick={togglePick}
+          pitch={pitch}
+          onCopy={copyPitch}
+        />
+      ) : (
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="ANGLE" className="shrink-0">
@@ -182,6 +232,164 @@ export function GrowthScene({ data }: { data: XrplState }) {
             <span className="ml-auto font-mono text-[9px] tracking-[0.14em] text-faint">
               {angle.title.toUpperCase()}
             </span>
+          </div>
+        </Panel>
+      </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * PitchComposer — an outreach note built from findings, not adjectives.
+ *
+ * There is no send button, for the same reason there is no publish button
+ * on the social drafts, plus one specific to this: the reader of a pitch
+ * like this can verify the claim in about a minute, and arriving as
+ * automated volume costs exactly the credibility a real measurement buys.
+ *
+ * BEFORE YOU SEND is not a disclaimer. Order books move, so a depth figure
+ * quoted three weeks after it was taken is wrong in front of the one
+ * audience equipped to check it.
+ */
+function PitchComposer({
+  audienceId,
+  setAudienceId,
+  picked,
+  togglePick,
+  pitch,
+  onCopy,
+}: {
+  audienceId: string;
+  setAudienceId: (id: string) => void;
+  picked: string[];
+  togglePick: (id: string) => void;
+  pitch: ReturnType<typeof composePitch>;
+  onCopy: () => void;
+}) {
+  return (
+    <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
+      <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
+        <Panel label="WHO IS READING" className="shrink-0">
+          <div className="grid gap-1.5">
+            {AUDIENCES.map((a) => {
+              const on = a.id === audienceId;
+              return (
+                <button
+                  key={a.id}
+                  onClick={() => setAudienceId(a.id)}
+                  aria-pressed={on}
+                  className={cn(
+                    "inset-row px-3 py-2.5 text-left",
+                    on && "border-brand/50 bg-brand/10"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "text-[12px] font-medium",
+                      on ? "text-brand" : "text-foreground"
+                    )}
+                  >
+                    {a.label}
+                  </span>
+                  <p className="mt-1 text-[10px] leading-snug text-muted-foreground">
+                    {a.reader}
+                  </p>
+                  {on && (
+                    <p className="mt-1.5 border-t border-border/40 pt-1.5 text-[10px] leading-snug text-faint">
+                      <span className="text-hold">Usual mistake:</span> {a.pitfall}
+                    </p>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </Panel>
+
+        <Panel
+          label="WHAT YOU MEASURED"
+          className="min-h-0 flex-1"
+          bodyClassName="min-h-0 overflow-y-auto p-0"
+        >
+          {EVIDENCE.map((e) => {
+            const on = picked.includes(e.id);
+            return (
+              <button
+                key={e.id}
+                onClick={() => togglePick(e.id)}
+                aria-pressed={on}
+                className={cn(
+                  "block w-full border-b border-border/30 px-3.5 py-2.5 text-left transition-colors",
+                  on ? "bg-brand/10" : "hover:bg-popover/40"
+                )}
+              >
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className={cn(
+                      "mono-font text-[8px] tracking-[0.16em]",
+                      on ? "text-brand" : "text-faint"
+                    )}
+                  >
+                    {on ? "INCLUDED" : "ADD"}
+                  </span>
+                  <span className="ml-auto font-mono text-[8.5px] tabular-nums text-faint">
+                    {e.measuredOn}
+                  </span>
+                </div>
+                <p
+                  className={cn(
+                    "mt-1 text-[11px] leading-snug",
+                    on ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
+                  {e.headline}
+                </p>
+              </button>
+            );
+          })}
+          <p className="mono-font px-3.5 py-2.5 text-[9px] leading-relaxed text-faint">
+            The first one selected leads the pitch. A note that opens with a
+            measurement can be checked; one that opens with a category cannot
+            be ranked against anything.
+          </p>
+        </Panel>
+      </div>
+
+      <div className="flex min-h-0 flex-col gap-3 lg:col-span-3">
+        <Panel
+          label="DRAFT"
+          className="relative min-h-0 flex-1"
+          bodyClassName="min-h-0 overflow-y-auto"
+          right={
+            <span className="mono-font text-[8.5px] tracking-[0.16em] text-faint">
+              {pitch.audience.lengthHint}
+            </span>
+          }
+        >
+          <PatternMark element="orbit" size={180} opacity={0.04} className="-right-8 -top-6" />
+          {pitch.subject && (
+            <p className="mb-2 border-b border-border/40 pb-2 text-[12px] font-medium text-foreground">
+              {pitch.subject}
+            </p>
+          )}
+          <p className="whitespace-pre-wrap text-[12px] leading-relaxed text-muted-foreground">
+            {pitch.body}
+          </p>
+        </Panel>
+
+        <Panel label="BEFORE YOU SEND" className="shrink-0" bodyClassName="p-0">
+          {pitch.beforeYouSend.map((line, i) => (
+            <p
+              key={i}
+              className="border-b border-border/30 px-3.5 py-2 text-[10px] leading-snug text-faint last:border-0"
+            >
+              {line}
+            </p>
+          ))}
+          <div className="px-3.5 py-2.5">
+            <Button variant="outline" className="w-full" onClick={onCopy}>
+              COPY DRAFT — YOU SEND IT
+            </Button>
           </div>
         </Panel>
       </div>
