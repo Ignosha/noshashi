@@ -50,3 +50,6 @@ npm-debug.log*
 
 # Build caches
 *.tsbuildinfo
+
+# Vite cache
+.vite/
