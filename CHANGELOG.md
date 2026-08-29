@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.2.1
+
+Control-change forensics in Provenance: when the signing authority over an
+account last moved, and whether that is the shape of a stolen key. Rare
+events — 7,965 consecutive mainnet transactions contained none — which is
+what makes each one worth surfacing.
+
+Two site fixes. The header nav wrapped and collided with the wordmark
+between roughly 900 and 1100px. The hero graphic pushed the page 39px
+wider than the viewport in the same band.
+
+A handoff sent to a plan-gated scene never expired, so it could fire a
+stale lookup weeks later once the plan was bought.
+
+**Not built: address-poisoning detection.** It was on the roadmap and the
+evidence removed it. Fourteen accounts scanned for lookalike counterparties
+turned up nothing, and XRPL charges 1 XRP to bring an address into
+existence — a thousand lookalikes cost 1,000 XRP before a single dust
+payment, where the same attack on an account-free chain costs only gas.
+The reserve is a structural deterrent, and building a detector for a threat
+the ledger already prices out would have meant inventing a problem.
+
 ## 0.2.0
 
 Eight new read tools, two correctness fixes in capabilities that were
