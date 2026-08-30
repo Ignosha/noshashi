@@ -1560,11 +1560,52 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
      headers, so a page can never read them — a fallback that only works
      outside a browser is not a fallback. */
   var NODES = ["https://xrplcluster.com", "https://xrpl.ws", "https://xrpl.link"];
+  /* WebSocket rather than fetch, deliberately. The same hosts that refuse a
+     cross-origin POST accept a wss:// connection, and that unlocks Ripple's
+     own servers alongside the community clusters — so this compares
+     independent operators instead of three front doors onto one of them,
+     which is the only version of this question worth asking. */
   var ALL_NODES = [
-    { url: "https://xrplcluster.com", name: "xrplcluster.com" },
-    { url: "https://xrpl.ws", name: "xrpl.ws" },
-    { url: "https://xrpl.link", name: "xrpl.link" }
+    { url: "wss://xrplcluster.com", name: "xrplcluster.com", who: "community cluster" },
+    { url: "wss://xrpl.ws", name: "xrpl.ws", who: "community cluster" },
+    { url: "wss://s1.ripple.com", name: "s1.ripple.com", who: "operated by Ripple" },
+    { url: "wss://s2.ripple.com", name: "s2.ripple.com", who: "operated by Ripple" }
   ];
+
+  function askNode(n) {
+    return new Promise(function (resolve) {
+      var started = Date.now(), settled = false, ws;
+      function done(v) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        try { ws.close(); } catch (e) {}
+        resolve(v);
+      }
+      var timer = setTimeout(function () {
+        done({ name: n.name, who: n.who, idx: null, hash: null, ms: Date.now() - started });
+      }, 8000);
+      try { ws = new WebSocket(n.url); } catch (e) {
+        return done({ name: n.name, who: n.who, idx: null, hash: null, ms: 0 });
+      }
+      ws.onopen = function () {
+        ws.send(JSON.stringify({ id: 1, command: "ledger", ledger_index: "validated" }));
+      };
+      ws.onmessage = function (m) {
+        var L = null;
+        try { L = JSON.parse(m.data).result.ledger; } catch (e) {}
+        done({
+          name: n.name, who: n.who,
+          idx: L ? Number(L.ledger_index) : null,
+          hash: L ? L.ledger_hash : null,
+          ms: Date.now() - started
+        });
+      };
+      ws.onerror = function () {
+        done({ name: n.name, who: n.who, idx: null, hash: null, ms: Date.now() - started });
+      };
+    });
+  }
 
   function post(url, method, params) {
     return fetch(url, {
@@ -1854,15 +1895,7 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
   wire(nodeForm, nodeBtn, function () {
     busy(nodeOut, "Asking each node what it considers validated…");
     var t0 = Date.now();
-    return Promise.all(ALL_NODES.map(function (n) {
-      var s = Date.now();
-      return post(n.url, "ledger", { ledger_index: "validated" })
-        .then(function (r) {
-          var L = r.ledger || {};
-          return { name: n.name, idx: Number(L.ledger_index), hash: L.ledger_hash, ms: Date.now() - s };
-        })
-        .catch(function () { return { name: n.name, idx: null, hash: null, ms: Date.now() - s }; });
-    })).then(function (rs) {
+    return Promise.all(ALL_NODES.map(askNode)).then(function (rs) {
       var live = rs.filter(function (r) { return r.idx; });
       if (!live.length) { oops(nodeOut, "No public node answered."); return; }
       var idxs = live.map(function (r) { return r.idx; });
@@ -1887,9 +1920,10 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
         return fact(r.name,
           r.idx ? String(r.idx) : "No answer",
           r.idx ? ("mono" + (r.idx === max ? " good" : "")) : "unknown",
-          r.idx ? (r.hash ? '<span class="mono">' + esc(r.hash.slice(0, 16)) + "…</span> · " + r.ms + " ms"
-                          : r.ms + " ms")
-                : "Did not respond.");
+          esc(r.who) + " · " +
+          (r.idx ? (r.hash ? '<span class="mono">' + esc(r.hash.slice(0, 16)) + "…</span> · " + r.ms + " ms"
+                           : r.ms + " ms")
+                 : "did not respond"));
       });
 
       show(nodeOut, sev,
@@ -1900,9 +1934,9 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
         '<div class="facts">' + f.join("") + "</div>" +
         '<p class="foot">You are always reading the ledger through someone\'s server. When two ' +
         'disagree, the disagreement is the reading — the desktop app treats it that way rather ' +
-        'than picking a winner. Worth knowing: these are public clusters and some may share ' +
-        'infrastructure, so agreement here is weaker evidence than agreement between operators ' +
-        'you have chosen yourself. <a href="#download">Download it free</a>.</p>');
+        'than picking a winner. Two of these are run by Ripple and two are community clusters, ' +
+        'so agreement across them means more than agreement between three front doors onto the ' +
+        'same infrastructure. <a href="#download">Download it free</a>.</p>');
     });
   });
 })();
