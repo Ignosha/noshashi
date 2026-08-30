@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.2.2
+
+**Linux ships.** The 0.2.1 release run failed on one of its four build
+jobs — `Install Linux webview dependencies` on the Ubuntu runner — so no
+`.deb` or `.AppImage` was ever attached to that release, while macOS and
+Windows published normally. The dependency list had drifted from Tauri
+2's documented set for Ubuntu 22.04 in two ways: it carried the legacy
+`libappindicator3-dev` alongside the ayatana package that supersedes it,
+and it omitted `libxdo-dev`, which Tauri 2 requires. Both corrected.
+
+`pkg-config --modversion webkit2gtk-4.1` now runs immediately after the
+install, so a missing webview names itself at the step that installs it
+rather than surfacing minutes later as an opaque Rust link error.
+
+Releases are no longer marked as pre-releases. The 0.2.1 release carried
+that flag, which meant `releases/latest` returned nothing and the repo
+page never showed a current release.
+
+The site advertised Windows as "Building in CI" for a build that had
+succeeded and been published. The `.exe` and `.msi` are now real
+downloads with their SHA-256 beside them, and the Linux card states what
+actually happened rather than claiming a build is still running.
+
+Findings are published at [noshashi.app/research](https://noshashi.app/research/):
+the five mainnet measurements, each carrying the date it was taken and
+what would need re-running before anyone repeats it — including the
+negative result that removed address-poisoning detection from the
+roadmap.
+
 ## 0.2.1
 
 Control-change forensics in Provenance: when the signing authority over an
