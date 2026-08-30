@@ -463,22 +463,34 @@
         <p class="phash mono">46616ffc5eef01390e28c1399f3d64bdcdf4c1a66dd01b451b0fda9b993a3233</p>
       </div>
 
-      <div class="plat pending">
+      <div class="plat ready">
         <span class="cap"></span>
         <p class="pname">Windows</p>
-        <p class="pver">10 and 11 · x64 · .msi and .exe</p>
-        <span class="btn ghost disabled" aria-disabled="true">Building in CI</span>
-        <p class="phash">Windows links against WebView2 and the MSVC toolchain, which cannot be
-           built from a Mac. It builds on a Windows runner — the pipeline is committed.</p>
+        <p class="pver">10 and 11 · x64 · built on a Windows runner</p>
+        <a class="btn" href="https://github.com/Ignosha/noshashi/releases/download/v0.2.1/NOSHASHI_0.2.1_x64-setup.exe">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M5 21h14"/>
+          </svg>
+          Download .exe · 1.7 MB · v0.2.1
+        </a>
+        <p class="phash mono">6d3dbdf77216ba9d38aa2d48155068fcae1b12b32a1c95bca2ca9c3165ece6ce</p>
+        <p class="phash">Deploying it? The
+           <a href="https://github.com/Ignosha/noshashi/releases/download/v0.2.1/NOSHASHI_0.2.1_x64_en-US.msi">.msi</a>
+           is 2.2 MB, sha256 <span class="mono">f55d6f97…7281904</span>. Neither build is
+           code-signed, so SmartScreen will warn.</p>
       </div>
 
       <div class="plat pending">
         <span class="cap"></span>
         <p class="pname">Linux</p>
         <p class="pver">x64 · .deb and .AppImage</p>
-        <span class="btn ghost disabled" aria-disabled="true">Building in CI</span>
-        <p class="phash">Linux links against WebKitGTK, which likewise needs a Linux runner.
-           Same pipeline, same commit.</p>
+        <span class="btn ghost disabled" aria-disabled="true">Not in v0.2.1</span>
+        <p class="phash">Linux links against WebKitGTK and builds on a Linux runner.
+           The v0.2.1 run failed while installing the WebKitGTK development
+           packages, so no .deb or .AppImage was produced. The dependency list
+           is corrected and it ships with the next tag. Saying that is better
+           than leaving a button here that downloads nothing.</p>
       </div>
     </div>
 

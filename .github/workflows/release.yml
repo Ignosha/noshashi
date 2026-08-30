@@ -58,17 +58,30 @@ jobs:
       # WebKitGTK and its dependencies are the Linux webview. Without these
       # the Rust build fails at link time with missing pkg-config packages,
       # which reads as a Rust problem and is not one.
+      #
+      # This is Tauri 2's documented set for Ubuntu 22.04 and nothing else.
+      # The v0.2.1 release failed on this step, which is why no .deb or
+      # .AppImage shipped, and the list had drifted from that set twice: it
+      # carried the legacy libappindicator3-dev alongside the ayatana package
+      # that supersedes it, and it omitted libxdo-dev, which Tauri 2 needs.
+      #
+      # pkg-config runs afterwards so a missing webview names itself here
+      # rather than surfacing later as an opaque Rust link error.
       - name: Install Linux webview dependencies
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             libwebkit2gtk-4.1-dev \
-            libappindicator3-dev \
+            libayatana-appindicator3-dev \
             librsvg2-dev \
+            libxdo-dev \
+            libssl-dev \
+            libgtk-3-dev \
             patchelf \
             build-essential \
-            curl wget file libssl-dev libgtk-3-dev libayatana-appindicator3-dev
+            curl wget file
+          pkg-config --modversion webkit2gtk-4.1
 
       - uses: dtolnay/rust-toolchain@stable
         with:
