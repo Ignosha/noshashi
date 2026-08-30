@@ -271,6 +271,42 @@
   .checkout .foot a{color:var(--brand)}
   .checkout.err{--sev:var(--hold)}
   .checkout .spin{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
+
+  /* ── Free tools: tabs ─────────────────────────────────────────────
+     Three tools, one frame. Each answers a different question about the
+     same ledger, and the question is stated above the field so the tool
+     explains itself before it is used. */
+  .tools{margin:0 0 28px}
+  .tabs{display:flex;gap:2px;background:var(--rule);border:1px solid var(--rule);
+    border-radius:var(--r);padding:2px;width:fit-content;max-width:100%;overflow-x:auto}
+  .tab{background:transparent;border:0;border-radius:calc(var(--r) - 3px);color:var(--muted);
+    font:inherit;font-size:13px;padding:9px 18px;cursor:pointer;white-space:nowrap;
+    transition:background .14s,color .14s}
+  .tab:hover{color:var(--ink)}
+  .tab.on{background:var(--surface);color:var(--ink)}
+  .tab:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+  .pane{display:none;padding-top:20px}
+  .pane.on{display:block}
+  .ask{font-size:clamp(16px,2vw,20px);color:var(--ink);margin-bottom:14px;max-width:46ch;
+    letter-spacing:-.01em}
+  .checkbar select{flex:1 1 280px;min-width:0;background:var(--surface);color:var(--ink);
+    border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;font:inherit;
+    font-size:15px;cursor:pointer}
+  .checkbar select:focus{outline:none;border-color:var(--brand)}
+
+  /* Advertised against fundable, drawn to scale — the same figure the
+     research page publishes, measured live. */
+  .depth{display:grid;gap:12px;margin:4px 0 18px}
+  .depth .lab{display:flex;justify-content:space-between;gap:12px;
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .depth .lab em{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums}
+  .depth .bar{height:13px;background:var(--elevated);border-radius:2px;overflow:hidden}
+  .depth .bar i{display:block;height:100%;border-radius:2px;background:var(--muted);
+    transition:width .6s cubic-bezier(.22,1,.36,1)}
+  .depth .bar.fill i{background:var(--nogo)}
+  .depth .bar.ok i{background:var(--go)}
+  @media (prefers-reduced-motion:reduce){.depth .bar i{transition:none}}
 </style>
 </head>
 <body>
@@ -298,7 +334,7 @@
     </a>
     <nav class="nav-links">
       <a href="#thesis">The thesis</a>
-      <a href="#public">Check an address</a>
+      <a href="#public">Free tools</a>
       <a href="/research/">Findings</a>
       <a href="#enterprise">For institutions</a>
       <a href="/guide/">New to XRP?</a>
@@ -404,9 +440,11 @@
   <section id="public" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">03 · For everyone</p>
-      <h2>Check an address before you pay it</h2>
-      <p>A shop, a token issuer, someone on the other end of a trade. Paste the address and read
-         what the ledger publishes about it. Free, no account, nothing is signed.</p>
+      <h2>Check it before you pay it</h2>
+      <p>Three tools that read mainnet from this page: who you are paying, what a payment
+         actually delivered, and how much of a book could really fill. Free, no account,
+         nothing is signed — and each re-measures a finding <a href="/research/">we publish</a>,
+         so you never have to take the number on trust.</p>
     </div>
 
       <!-- The free check, running here rather than described here. Three reads
@@ -414,24 +452,70 @@
            gateway_balances for what an issuer actually owes, and the signer
            list for how few keys can move the account. Nothing is signed and
            nothing leaves the browser except the address itself. -->
-      <div class="checker">
-        <form id="checkForm" class="checkbar" autocomplete="off">
-          <label class="sr-only" for="addr">XRPL address</label>
-          <input id="addr" name="addr" type="text" spellcheck="false"
-                 placeholder="Paste an XRPL address — it starts with r"
-                 aria-describedby="checkNote">
-          <button class="btn" type="submit" id="checkBtn">Read the ledger</button>
-        </form>
-        <p class="checknote" id="checkNote">
-          Runs in your browser against a public XRPL node. No account, nothing signed,
-          nothing stored. Try
-          <button type="button" class="sample" data-a="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">a major USD issuer</button>
-          <span aria-hidden="true">·</span>
-          <button type="button" class="sample" data-a="rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh">an exchange account</button>
-          <span aria-hidden="true">·</span>
-          <button type="button" class="sample" data-a="rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn">an account with several signers</button>
-        </p>
-        <div id="checkOut" class="checkout" hidden aria-live="polite"></div>
+      <!-- Three free tools, each one reproducing a finding this site publishes.
+           They run in the browser against a public XRPL node. Nothing is
+           signed, no account exists, and nothing leaves the page except the
+           address, hash or currency pair being read. -->
+      <div class="tools">
+        <div class="tabs" role="tablist" aria-label="Free tools">
+          <button role="tab" id="tab-addr" aria-controls="pane-addr" aria-selected="true"  class="tab on">Address</button>
+          <button role="tab" id="tab-pay"  aria-controls="pane-pay"  aria-selected="false" class="tab">Payment</button>
+          <button role="tab" id="tab-book" aria-controls="pane-book" aria-selected="false" class="tab">Order book</button>
+        </div>
+
+        <div class="pane on" id="pane-addr" role="tabpanel" aria-labelledby="tab-addr">
+          <p class="ask">Can this account freeze what it issues you, and what does it charge?</p>
+          <form id="checkForm" class="checkbar" autocomplete="off">
+            <label class="sr-only" for="addr">XRPL address</label>
+            <input id="addr" name="addr" type="text" spellcheck="false"
+                   placeholder="Paste an XRPL address — it starts with r">
+            <button class="btn" type="submit" id="checkBtn">Read the ledger</button>
+          </form>
+          <p class="checknote">Try
+            <button type="button" class="sample" data-a="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">a major USD issuer</button>
+            <span aria-hidden="true">·</span>
+            <button type="button" class="sample" data-a="rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh">an exchange account</button>
+            <span aria-hidden="true">·</span>
+            <button type="button" class="sample" data-a="rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn">an account with several signers</button>
+          </p>
+          <div id="checkOut" class="checkout" hidden aria-live="polite"></div>
+        </div>
+
+        <div class="pane" id="pane-pay" role="tabpanel" aria-labelledby="tab-pay" hidden>
+          <p class="ask">A payment succeeded. Did it deliver what it said it would?</p>
+          <form id="payForm" class="checkbar" autocomplete="off">
+            <label class="sr-only" for="txh">Transaction hash</label>
+            <input id="txh" name="txh" type="text" spellcheck="false"
+                   placeholder="Paste a transaction hash — 64 hex characters">
+            <button class="btn" type="submit" id="payBtn">Read the transaction</button>
+          </form>
+          <p class="checknote">
+            A <span class="mono">tesSUCCESS</span> payment can deliver a fraction of its stated
+            amount. Crediting the stated figure is the mistake that has drained exchanges.
+            <button type="button" class="sample" id="findPartial">Find one happening right now</button>
+          </p>
+          <div id="payOut" class="checkout" hidden aria-live="polite"></div>
+        </div>
+
+        <div class="pane" id="pane-book" role="tabpanel" aria-labelledby="tab-book" hidden>
+          <p class="ask">How much of this book could actually fill?</p>
+          <form id="bookForm" class="checkbar" autocomplete="off">
+            <label class="sr-only" for="pair">Currency pair</label>
+            <select id="pair" name="pair">
+              <option value="USD|rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">USD / Bitstamp &rarr; XRP</option>
+              <option value="USD|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">USD / GateHub &rarr; XRP</option>
+              <option value="EUR|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">EUR / GateHub &rarr; XRP</option>
+              <option value="524C555344000000000000000000000000000000|rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">RLUSD / Ripple &rarr; XRP</option>
+            </select>
+            <button class="btn" type="submit" id="bookBtn">Measure the depth</button>
+          </form>
+          <p class="checknote">
+            An offer rests in the book whether or not its owner still holds the asset.
+            <span class="mono">rippled</span> reports the difference and most interfaces sum the
+            advertised figure anyway. <a href="/research/">How this was measured</a>.
+          </p>
+          <div id="bookOut" class="checkout" hidden aria-live="polite"></div>
+        </div>
       </div>
 
     <div class="grid g3">
@@ -1051,6 +1135,318 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
       .catch(function (e) { fail(e.message || "Could not reach a public XRPL node. Try again in a moment."); })
       .then(function () { btn.disabled = false; btn.textContent = was; });
   });
+})();
+</script>
+
+<script>
+/* Tabs, plus the payment and order-book tools.
+ *
+ * Both reproduce a claim made on /research/. That is the point: a figure
+ * a visitor can re-measure on the spot is worth more than one they have to
+ * take on trust, and if the live number disagrees with the published one
+ * the published one is what needs revisiting.
+ */
+(function () {
+  var NODES = ["https://xrplcluster.com", "https://s1.ripple.com:51234"];
+
+  function rpc(method, params) {
+    var i = 0;
+    function go() {
+      return fetch(NODES[i], {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method: method, params: [params] })
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (!j || !j.result) throw new Error("no result");
+        return j.result;
+      }).catch(function (e) {
+        i += 1;
+        if (i < NODES.length) return go();
+        throw e;
+      });
+    }
+    return go();
+  }
+
+  function esc(x) {
+    return String(x).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function fact(k, v, cls, note) {
+    return '<div class="fact"><p class="k">' + esc(k) + '</p><p class="v ' + (cls || "") + '">' +
+      v + '</p>' + (note ? '<p class="n">' + note + '</p>' : "") + "</div>";
+  }
+  function num(n, d) {
+    return Number(n).toLocaleString(undefined, { maximumFractionDigits: d === undefined ? 2 : d });
+  }
+  /* A currency code is either three characters or 40 hex digits that decode
+     to a name. Neither is owned by anyone — any account may issue "USD". */
+  function curName(c) {
+    if (!c) return "?";
+    if (c.length !== 40) return c;
+    try {
+      var t = (c.match(/.{1,2}/g) || []).filter(function (b) { return b !== "00"; });
+      var s = decodeURIComponent(t.map(function (b) { return "%" + b; }).join(""));
+      return /^[\x20-\x7e]+$/.test(s) ? s : c.slice(0, 8) + "…";
+    } catch (e) { return c.slice(0, 8) + "…"; }
+  }
+  function amtVal(a) { return typeof a === "object" ? Number(a.value) : Number(a) / 1e6; }
+  function amtCur(a) { return typeof a === "object" ? curName(a.currency) : "XRP"; }
+
+  /* ── Tabs ─────────────────────────────────────────────────────── */
+  var tabs = [].slice.call(document.querySelectorAll(".tab"));
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () {
+      tabs.forEach(function (o) {
+        var pane = document.getElementById(o.getAttribute("aria-controls"));
+        var on = o === t;
+        o.classList.toggle("on", on);
+        o.setAttribute("aria-selected", on ? "true" : "false");
+        if (pane) { pane.classList.toggle("on", on); pane.hidden = !on; }
+      });
+    });
+  });
+
+  /* ── Payment: what did it actually deliver? ───────────────────── */
+  var payForm = document.getElementById("payForm");
+  var txh = document.getElementById("txh");
+  var payBtn = document.getElementById("payBtn");
+  var payOut = document.getElementById("payOut");
+
+  function payFail(m) {
+    payOut.className = "checkout err";
+    payOut.style.setProperty("--sev", "var(--hold)");
+    payOut.innerHTML = '<p class="verdict">' + esc(m) + "</p>";
+    payOut.hidden = false;
+  }
+
+  function renderPay(hash, tx, meta) {
+    var type = tx.TransactionType;
+    if (type !== "Payment") {
+      payFail("That is a " + esc(type) + ", not a payment. This tool reads what a payment delivered.");
+      return;
+    }
+    var res = (meta && meta.TransactionResult) || "?";
+    var req = tx.Amount || tx.DeliverMax;
+    var del = meta && meta.delivered_amount;
+
+    if (del === "unavailable") {
+      payOut.className = "checkout";
+      payOut.style.setProperty("--sev", "var(--faint)");
+      payOut.innerHTML = '<p class="verdict">The ledger does not record what this delivered.</p>' +
+        '<p class="sub">Payments before 2014 predate <span class="mono">delivered_amount</span>. ' +
+        'The stated amount cannot be confirmed, and should not be assumed.</p>';
+      payOut.hidden = false;
+      return;
+    }
+
+    var rv = amtVal(req), dv = del ? amtVal(del) : null;
+    var ratio = (rv > 0 && dv !== null) ? dv / rv : null;
+    var partial = ratio !== null && ratio < 0.9999;
+
+    var sev = "var(--go)", verdict, sub;
+    if (res !== "tesSUCCESS") {
+      sev = "var(--faint)";
+      verdict = "This payment did not succeed.";
+      sub = "Result " + esc(res) + ". Nothing was delivered.";
+    } else if (partial) {
+      sev = "var(--nogo)";
+      verdict = "It succeeded and delivered " +
+        (ratio < 0.0001 ? "almost none" : num(ratio * 100, 2) + "%") + " of what it stated.";
+      sub = "Any system crediting the stated figure over-credits by " +
+        (ratio > 0 ? num(1 / ratio, 0) + "×" : "an unbounded factor") + ".";
+    } else {
+      verdict = "It delivered what it stated.";
+      sub = "Requested and delivered agree.";
+    }
+
+    var f = [];
+    f.push(fact("Result", esc(res), res === "tesSUCCESS" ? "good mono" : "warn mono",
+      res === "tesSUCCESS" ? "The transaction succeeded — which says nothing about the amount."
+                           : "The transaction did not succeed."));
+    f.push(fact("Stated amount", num(rv, 6) + " " + esc(amtCur(req)), "mono",
+      "The <span class=\"mono\">Amount</span> field. This is the figure naive systems credit."));
+    f.push(fact("Actually delivered",
+      dv === null ? "Not recorded" : num(dv, 6) + " " + esc(amtCur(del)),
+      dv === null ? "unknown" : ("mono" + (partial ? " bad" : " good")),
+      dv === null ? "No <span class=\"mono\">delivered_amount</span> in the metadata."
+                  : "The <span class=\"mono\">delivered_amount</span> field. This is what arrived."));
+    f.push(fact("Partial-payment flag", (tx.Flags & 0x00020000) ? "Set" : "Not set",
+      (tx.Flags & 0x00020000) ? "warn" : "",
+      (tx.Flags & 0x00020000)
+        ? "<span class=\"mono\">tfPartialPayment</span> permits delivering less than the stated amount."
+        : "The full amount was required for the payment to succeed."));
+
+    payOut.className = "checkout";
+    payOut.style.setProperty("--sev", sev);
+    payOut.innerHTML =
+      '<p class="verdict">' + verdict + "</p>" +
+      '<p class="sub">' + sub + ' <span class="mono">' + esc(hash.slice(0, 24)) + "…</span></p>" +
+      (partial ? '<div class="depth">' +
+        '<div><div class="lab"><span>Stated</span><em>' + num(rv, 6) + '</em></div>' +
+        '<div class="bar"><i style="width:100%"></i></div></div>' +
+        '<div><div class="lab"><span>Delivered</span><em>' + num(dv, 6) + '</em></div>' +
+        '<div class="bar fill"><i style="width:' + Math.max(ratio * 100, 0.4).toFixed(2) + '%"></i></div></div>' +
+        "</div>" : "") +
+      '<div class="facts">' + f.join("") + "</div>" +
+      '<p class="foot">Partial payments are legitimate and common — they are how the DEX fills what it can. ' +
+      'The danger is a system that reads <span class="mono">Amount</span> and reports success. ' +
+      '<a href="/research/">The measurement behind this</a>.</p>';
+    payOut.hidden = false;
+  }
+
+  if (payForm) {
+    payForm.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var h = (txh.value || "").trim().replace(/^0x/i, "").toUpperCase();
+      if (!/^[0-9A-F]{64}$/.test(h)) {
+        payFail("A transaction hash is 64 hexadecimal characters. That is " + h.length + ".");
+        return;
+      }
+      payBtn.disabled = true;
+      var was = payBtn.textContent; payBtn.textContent = "Reading…";
+      payOut.hidden = false; payOut.className = "checkout";
+      payOut.innerHTML = '<p class="spin">Reading the transaction…</p>';
+      rpc("tx", { transaction: h, binary: false }).then(function (r) {
+        if (r.error) {
+          throw new Error(r.error === "txnNotFound"
+            ? "No transaction with that hash is in this node's history. Public nodes keep only recent ledgers."
+            : "The ledger declined the read: " + r.error);
+        }
+        renderPay(h, r.tx_json || r, r.meta || r.metaData);
+      }).catch(function (e) { payFail(e.message || "Could not reach a public XRPL node."); })
+        .then(function () { payBtn.disabled = false; payBtn.textContent = was; });
+    });
+  }
+
+  /* Rather than hardcode a sample hash that public nodes will eventually
+     prune, walk back from the current ledger until a partial payment turns
+     up. It always does, which is itself the finding. */
+  var finder = document.getElementById("findPartial");
+  if (finder) {
+    finder.addEventListener("click", function () {
+      finder.disabled = true;
+      var was = finder.textContent; finder.textContent = "searching…";
+      payOut.hidden = false; payOut.className = "checkout";
+      payOut.innerHTML = '<p class="spin">Walking back through recent ledgers…</p>';
+
+      rpc("ledger_current", {}).then(function (c) {
+        var idx = c.ledger_current_index - 2, tried = 0;
+        function step() {
+          if (tried++ >= 8) throw new Error("No partial payment in the last few ledgers. That is unusual — try again.");
+          return rpc("ledger", { ledger_index: idx--, transactions: true, expand: true })
+            .then(function (r) {
+              var txs = (r.ledger && r.ledger.transactions) || [];
+              for (var i = 0; i < txs.length; i++) {
+                var t = txs[i], tx = t.tx_json || t, m = t.meta || t.metaData;
+                if (!tx || tx.TransactionType !== "Payment" || !m) continue;
+                if (m.TransactionResult !== "tesSUCCESS") continue;
+                var req = tx.Amount || tx.DeliverMax, del = m.delivered_amount;
+                if (!req || !del || del === "unavailable") continue;
+                var rv = amtVal(req), dv = amtVal(del);
+                if (rv > 0 && dv / rv < 0.99) {
+                  var hash = t.hash || tx.hash;
+                  if (txh) txh.value = hash;
+                  renderPay(hash, tx, m);
+                  return true;
+                }
+              }
+              return step();
+            });
+        }
+        return step();
+      }).catch(function (e) { payFail(e.message || "Could not reach a public XRPL node."); })
+        .then(function () { finder.disabled = false; finder.textContent = was; });
+    });
+  }
+
+  /* ── Order book: advertised against fundable ──────────────────── */
+  var bookForm = document.getElementById("bookForm");
+  var pair = document.getElementById("pair");
+  var bookBtn = document.getElementById("bookBtn");
+  var bookOut = document.getElementById("bookOut");
+
+  if (bookForm) {
+    bookForm.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var parts = pair.value.split("|");
+      var label = pair.options[pair.selectedIndex].textContent;
+      bookBtn.disabled = true;
+      var was = bookBtn.textContent; bookBtn.textContent = "Measuring…";
+      bookOut.hidden = false; bookOut.className = "checkout";
+      bookOut.innerHTML = '<p class="spin">Walking the live order book…</p>';
+
+      rpc("book_offers", {
+        taker_gets: { currency: parts[0], issuer: parts[1] },
+        taker_pays: { currency: "XRP" },
+        limit: 200,
+        ledger_index: "validated"
+      }).then(function (r) {
+        if (r.error) throw new Error("The ledger declined the read: " + r.error);
+        var offers = r.offers || [];
+        if (!offers.length) throw new Error("There are no resting offers on this book right now.");
+        var adv = 0, fund = 0, under = 0, worst = null;
+        offers.forEach(function (o) {
+          var a = amtVal(o.TakerGets);
+          var fnd = o.taker_gets_funded !== undefined ? amtVal(o.taker_gets_funded) : a;
+          adv += a; fund += fnd;
+          if (o.taker_gets_funded !== undefined) {
+            under += 1;
+            if (!worst || (a - fnd) > (worst.a - worst.f)) worst = { a: a, f: fnd };
+          }
+        });
+        var phantom = adv > 0 ? (1 - fund / adv) * 100 : 0;
+        var sev = phantom > 50 ? "var(--nogo)" : (phantom > 10 ? "var(--hold)" : "var(--go)");
+        var cur = curName(parts[0]);
+
+        var f = [];
+        f.push(fact("Offers resting", String(offers.length), "mono",
+          "Read from the top of the book, up to 200."));
+        f.push(fact("Not fully backed", under + " of " + offers.length,
+          "mono" + (under ? " warn" : ""),
+          under ? "Their owners no longer hold what they are offering."
+                : "Every offer is backed by an owner who still holds the asset."));
+        if (worst) {
+          f.push(fact("Largest single gap",
+            num(worst.a) + " offered<br>" + num(worst.f) + " backed", "mono bad",
+            "One offer, advertised against what its owner can actually deliver."));
+        }
+        f.push(fact("Depth you can rely on", num(fund) + " " + esc(cur),
+          "mono" + (phantom > 10 ? " warn" : " good"),
+          "Size an exit off this figure, not the advertised one."));
+
+        bookOut.style.setProperty("--sev", sev);
+        bookOut.className = "checkout";
+        bookOut.innerHTML =
+          '<p class="verdict">' +
+            (phantom < 1 ? "This book is fully backed."
+              : num(phantom, 1) + "% of this book’s visible depth could not fill.") + "</p>" +
+          '<p class="sub">' + esc(label) + " · measured just now against validated ledger " +
+            esc(r.ledger_index || r.ledger_current_index || "state") + "</p>" +
+          '<div class="depth">' +
+            '<div><div class="lab"><span>Advertised</span><em>' + num(adv) + "</em></div>" +
+            '<div class="bar"><i style="width:100%"></i></div></div>' +
+            '<div><div class="lab"><span>Could fill</span><em>' + num(fund) + "</em></div>" +
+            '<div class="bar ' + (phantom > 10 ? "fill" : "ok") + '"><i style="width:' +
+              Math.max(adv > 0 ? (fund / adv) * 100 : 0, 0.4).toFixed(2) + '%"></i></div></div>' +
+          "</div>" +
+          '<div class="facts">' + f.join("") + "</div>" +
+          '<p class="foot">An offer rests in the book whether or not its owner still holds the asset. ' +
+          '<span class="mono">rippled</span> reports the difference in ' +
+          '<span class="mono">taker_gets_funded</span>; summing ' +
+          '<span class="mono">TakerGets</span> counts offers nobody can honour. ' +
+          'The desktop app does this across every position you hold. ' +
+          '<a href="#download">Download it free</a>.</p>';
+        bookOut.hidden = false;
+      }).catch(function (e) {
+        bookOut.className = "checkout err";
+        bookOut.style.setProperty("--sev", "var(--hold)");
+        bookOut.innerHTML = '<p class="verdict">' + esc(e.message || "Could not reach a public XRPL node.") + "</p>";
+        bookOut.hidden = false;
+      }).then(function () { bookBtn.disabled = false; bookBtn.textContent = was; });
+    });
+  }
 })();
 </script>
 </body>
