@@ -226,6 +226,51 @@
     .reveal{opacity:1;transform:none;transition:none}
     html{scroll-behavior:auto}
   }
+
+  /* ── The free address check ───────────────────────────────────────
+     Verdict-led: the reading comes first at size, the evidence under it.
+     Severity uses the app's own three colours so the site and the console
+     say danger the same way. Anything the ledger will not answer is shown
+     as unknown rather than as a zero. */
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .checker{margin:0 0 28px}
+  .checkbar{display:flex;gap:10px;flex-wrap:wrap}
+  .checkbar input{flex:1 1 320px;min-width:0;background:var(--surface);color:var(--ink);
+    border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;font-size:15px;
+    font-family:"IBM Plex Mono",monospace;transition:border-color .14s}
+  .checkbar input:focus{outline:none;border-color:var(--brand)}
+  .checkbar input::placeholder{color:var(--faint);font-family:"Space Grotesk",sans-serif}
+  .checkbar .btn{flex:0 0 auto}
+  .checkbar .btn[disabled]{opacity:.55;cursor:progress}
+  .checknote{font-size:12.5px;color:var(--faint);margin-top:10px}
+  .sample{background:none;border:0;padding:0;font:inherit;color:var(--brand);cursor:pointer;
+    text-decoration:underline;text-underline-offset:2px}
+  .sample:hover{color:var(--ink)}
+
+  .checkout{margin-top:20px;background:var(--surface);border:1px solid var(--rule);
+    border-radius:var(--r);border-left:2px solid var(--sev,var(--rule));padding:24px 26px}
+  .checkout .verdict{font-size:clamp(18px,2.4vw,25px);letter-spacing:-.02em;line-height:1.28;
+    color:var(--ink);margin-bottom:6px;max-width:44ch;text-wrap:balance}
+  .checkout .sub{font-size:13.5px;color:var(--muted);margin-bottom:18px}
+  .checkout .sub .mono{color:var(--faint)}
+
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;
+    background:var(--rule);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+  .fact{background:var(--surface);padding:15px 17px;min-width:0}
+  .fact .k{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;
+    color:var(--faint);text-transform:uppercase;margin-bottom:7px}
+  .fact .v{font-size:15px;color:var(--ink);font-weight:500;overflow-wrap:anywhere}
+  .fact .v.mono{font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-variant-numeric:tabular-nums}
+  .fact .v.warn{color:var(--hold)} .fact .v.bad{color:var(--nogo)} .fact .v.good{color:var(--go)}
+  .fact .v.unknown{color:var(--faint);font-weight:400}
+  .fact .n{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5}
+
+  .checkout .foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--rule);
+    font-size:12px;color:var(--faint);line-height:1.6}
+  .checkout .foot a{color:var(--brand)}
+  .checkout.err{--sev:var(--hold)}
+  .checkout .spin{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -363,6 +408,32 @@
       <p>A shop, a token issuer, someone on the other end of a trade. Paste the address and read
          what the ledger publishes about it. Free, no account, nothing is signed.</p>
     </div>
+
+      <!-- The free check, running here rather than described here. Three reads
+           against a public XRPL node: account_info for the flags and the fee,
+           gateway_balances for what an issuer actually owes, and the signer
+           list for how few keys can move the account. Nothing is signed and
+           nothing leaves the browser except the address itself. -->
+      <div class="checker">
+        <form id="checkForm" class="checkbar" autocomplete="off">
+          <label class="sr-only" for="addr">XRPL address</label>
+          <input id="addr" name="addr" type="text" spellcheck="false"
+                 placeholder="Paste an XRPL address — it starts with r"
+                 aria-describedby="checkNote">
+          <button class="btn" type="submit" id="checkBtn">Read the ledger</button>
+        </form>
+        <p class="checknote" id="checkNote">
+          Runs in your browser against a public XRPL node. No account, nothing signed,
+          nothing stored. Try
+          <button type="button" class="sample" data-a="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">a major USD issuer</button>
+          <span aria-hidden="true">·</span>
+          <button type="button" class="sample" data-a="rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh">an exchange account</button>
+          <span aria-hidden="true">·</span>
+          <button type="button" class="sample" data-a="rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn">an account with several signers</button>
+        </p>
+        <div id="checkOut" class="checkout" hidden aria-live="polite"></div>
+      </div>
+
     <div class="grid g3">
       <div class="panel">
         <p class="num">WHAT IT TELLS YOU</p>
@@ -452,45 +523,55 @@
       <div class="plat ready">
         <span class="cap"></span>
         <p class="pname">macOS</p>
-        <p class="pver">11 Big Sur or later · universal binary — Apple silicon &amp; Intel</p>
-        <a class="btn" href="/download/NOSHASHI-0.2.1-macos.dmg" download>
+        <p class="pver">11 Big Sur or later · Apple silicon and Intel built separately</p>
+        <a class="btn" id="macPrimary" href="https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_aarch64.dmg">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M5 21h14"/>
           </svg>
-          Download .dmg · 5.3 MB · v0.2.1
+          <span id="macLabel">Download .dmg · Apple silicon · 3.3 MB</span>
         </a>
-        <p class="phash mono">46616ffc5eef01390e28c1399f3d64bdcdf4c1a66dd01b451b0fda9b993a3233</p>
+        <p class="phash mono" id="macHash">e144ab0b955494b4c5c9389da3afa4033280cb8432f1e3e1a0829a052bb974ef</p>
+        <p class="phash" id="macAlt">On an Intel Mac? <a href="https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_x64.dmg">Download the Intel build</a>
+           — 3.4 MB, sha256 <span class="mono">2ce31ffd…90d8326e</span>.
+           Not notarised, so Gatekeeper will warn: right-click &rsaquo; Open.</p>
       </div>
 
       <div class="plat ready">
         <span class="cap"></span>
         <p class="pname">Windows</p>
         <p class="pver">10 and 11 · x64 · built on a Windows runner</p>
-        <a class="btn" href="https://github.com/Ignosha/noshashi/releases/download/v0.2.1/NOSHASHI_0.2.1_x64-setup.exe">
+        <a class="btn" href="https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_x64-setup.exe">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M5 21h14"/>
           </svg>
-          Download .exe · 1.7 MB · v0.2.1
+          Download .exe · 1.7 MB · v0.2.2
         </a>
-        <p class="phash mono">6d3dbdf77216ba9d38aa2d48155068fcae1b12b32a1c95bca2ca9c3165ece6ce</p>
+        <p class="phash mono">689089ae5910b0e1e3b32e61f7c1519f4e3d02d4593e8e561b18679ca63f3dc9</p>
         <p class="phash">Deploying it? The
-           <a href="https://github.com/Ignosha/noshashi/releases/download/v0.2.1/NOSHASHI_0.2.1_x64_en-US.msi">.msi</a>
-           is 2.2 MB, sha256 <span class="mono">f55d6f97…7281904</span>. Neither build is
-           code-signed, so SmartScreen will warn.</p>
+           <a href="https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_x64_en-US.msi">.msi</a> is 2.2 MB,
+           sha256 <span class="mono">52baae06…03e496a4</span>. Neither build is code-signed,
+           so SmartScreen will warn.</p>
       </div>
 
-      <div class="plat pending">
+      <div class="plat ready">
         <span class="cap"></span>
         <p class="pname">Linux</p>
-        <p class="pver">x64 · .deb and .AppImage</p>
-        <span class="btn ghost disabled" aria-disabled="true">Not in v0.2.1</span>
-        <p class="phash">Linux links against WebKitGTK and builds on a Linux runner.
-           The v0.2.1 run failed while installing the WebKitGTK development
-           packages, so no .deb or .AppImage was produced. The dependency list
-           is corrected and it ships with the next tag. Saying that is better
-           than leaving a button here that downloads nothing.</p>
+        <p class="pver">x64 · .deb, .rpm and .AppImage</p>
+        <a class="btn" href="https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_amd64.deb">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M5 21h14"/>
+          </svg>
+          Download .deb · 2.4 MB · v0.2.2
+        </a>
+        <p class="phash mono">31f5ccddced8164bc963b8025cb4be6fbab09ad3aed9a2ae7080ae9a6763f420</p>
+        <p class="phash">Also
+           <a href="https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI-0.2.2-1.x86_64.rpm">.rpm</a> (2.4 MB, sha256 <span class="mono">b79846f0…f53eafbe</span>)
+           and <a href="https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_amd64.AppImage">.AppImage</a>
+           (76.7 MB, sha256 <span class="mono">01372e31…33847992</span>). The AppImage is large
+           because it carries its own WebKitGTK; the .deb uses yours.</p>
       </div>
     </div>
 
@@ -498,7 +579,8 @@
       <div class="panel">
         <p class="num">VERIFY BEFORE YOU RUN IT</p>
         <p style="margin-bottom:14px">Check the download matches the hash above:</p>
-        <pre class="cmd mono">shasum -a 256 NOSHASHI-0.2.1-macos.dmg</pre>
+        <pre class="cmd mono">shasum -a 256 NOSHASHI_0.2.2_aarch64.dmg   # macOS / Linux
+certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
         <p class="note">
           The app also hashes its own running binary — Settings › Binary integrity — so you can
           confirm nothing changed between this page and execution. That check is free on every
@@ -719,6 +801,255 @@
   document.addEventListener('visibilitychange', function () {
     if (document.hidden && ws) { try { ws.close(); } catch (e) {} }
     else if (!document.hidden && (!ws || ws.readyState > 1)) { retry = 0; connect(); }
+  });
+})();
+</script>
+
+<script>
+/* The free address check.
+ *
+ * Reads validated mainnet state and reports what the ledger publishes and
+ * most interfaces do not. Three things it deliberately never does: invent a
+ * reputation score, show a zero where the ledger gave no answer, or describe
+ * a right the issuer holds as something they have already done.
+ *
+ * Flag values are XRPL account root flags. NoFreeze is the one that matters
+ * most and reads backwards from instinct: its PRESENCE is the good news,
+ * because it is the issuer permanently surrendering the freeze right.
+ */
+(function () {
+  var NODES = ["https://xrplcluster.com", "https://s1.ripple.com:51234"];
+  var F = {
+    RequireDest:   0x00020000,
+    RequireAuth:   0x00040000,
+    DisallowXRP:   0x00080000,
+    DisableMaster: 0x00100000,
+    NoFreeze:      0x00200000,
+    GlobalFreeze:  0x00400000,
+    DefaultRipple: 0x00800000,
+    DepositAuth:   0x01000000,
+    Clawback:      0x80000000
+  };
+
+  var form = document.getElementById("checkForm");
+  var input = document.getElementById("addr");
+  var btn = document.getElementById("checkBtn");
+  var out = document.getElementById("checkOut");
+  if (!form) return;
+
+  [].forEach.call(document.querySelectorAll(".sample"), function (b) {
+    b.addEventListener("click", function () {
+      input.value = b.getAttribute("data-a");
+      form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+    });
+  });
+
+  function esc(x) {
+    return String(x).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  /* Try each node in turn. A single node being down is not a finding. */
+  function rpc(method, params) {
+    var i = 0;
+    function attempt() {
+      return fetch(NODES[i], {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method: method, params: [params] })
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (!j || !j.result) throw new Error("no result");
+        return j.result;
+      }).catch(function (e) {
+        i += 1;
+        if (i < NODES.length) return attempt();
+        throw e;
+      });
+    }
+    return attempt();
+  }
+
+  function hexToText(h) {
+    if (!h) return null;
+    try {
+      var t = h.replace(/[^0-9a-fA-F]/g, "").match(/.{1,2}/g) || [];
+      return decodeURIComponent(t.map(function (b) { return "%" + b; }).join(""));
+    } catch (e) { return null; }
+  }
+
+  function fact(k, v, cls, note) {
+    return '<div class="fact"><p class="k">' + esc(k) + '</p>' +
+           '<p class="v ' + (cls || "") + '">' + v + '</p>' +
+           (note ? '<p class="n">' + note + '</p>' : "") + "</div>";
+  }
+
+  function render(addr, info, gw, signers) {
+    var a = info.account_data || {};
+    var flags = a.Flags || 0;
+    var noFreeze = !!(flags & F.NoFreeze);
+    var globalFreeze = !!(flags & F.GlobalFreeze);
+    var clawback = !!(flags & F.Clawback);
+
+    /* The verdict. Ordered by what would hurt most if you did not know it. */
+    var sev = "var(--go)", verdict, sub;
+    if (globalFreeze) {
+      sev = "var(--nogo)";
+      verdict = "Every balance this issuer backs is frozen right now.";
+      sub = "Global freeze is set. Holders cannot send what they hold.";
+    } else if (clawback) {
+      sev = "var(--hold)";
+      verdict = "This issuer can claw back tokens it has issued.";
+      sub = "Clawback is enabled — issued balances can be taken back unilaterally.";
+    } else if (!noFreeze) {
+      sev = "var(--hold)";
+      verdict = "This account keeps the right to freeze balances it issues.";
+      sub = "Not a wrongdoing — most issuers keep it. It is a right you should know about before you hold their token.";
+    } else {
+      verdict = "This issuer has permanently given up the right to freeze.";
+      sub = "NoFreeze is set, and on XRPL that cannot be undone.";
+    }
+
+    var f = [];
+
+    f.push(fact("Freeze rights",
+      globalFreeze ? "Frozen now" : (noFreeze ? "Surrendered" : "Retained"),
+      globalFreeze ? "bad" : (noFreeze ? "good" : "warn"),
+      globalFreeze ? "Global freeze is currently set."
+        : (noFreeze ? "NoFreeze is set and is irreversible."
+                    : "The issuer may freeze an individual line at any time.")));
+
+    /* TransferRate is 0/absent for no fee, otherwise 1e9..2e9 for 0%..100%.
+       Values outside that range exist on old accounts and cannot be read as
+       a percentage — 0xFFFFFFFF would render as 329%, which is not a fee any
+       holder will ever be charged. Say it is uninterpretable instead of
+       inventing a figure. */
+    var rate = a.TransferRate;
+    if (!rate) {
+      f.push(fact("Transfer fee", "0%", "mono", "No transfer fee is set."));
+    } else if (rate >= 1e9 && rate <= 2e9) {
+      var pct = (((rate / 1e9) - 1) * 100).toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+      f.push(fact("Transfer fee", pct + "%", "mono" + (rate > 1e9 ? " warn" : ""),
+        rate > 1e9 ? "Charged on every transfer of this token between third parties."
+                   : "No transfer fee is charged."));
+    } else {
+      f.push(fact("Transfer fee", "Not interpretable", "unknown",
+        "The account stores " + esc(String(rate)) + ", which is outside the protocol's valid " +
+        "range of 0 or 1,000,000,000\u20132,000,000,000. It cannot be read as a percentage."));
+    }
+
+    var ob = (gw && gw.obligations) || null;
+    if (ob && Object.keys(ob).length) {
+      /* Show the largest few, but never silently. A capped list that does
+         not say it is capped is the same failure this tool exists to catch. */
+      var keys = Object.keys(ob).sort(function (x, y) { return Number(ob[y]) - Number(ob[x]); });
+      var shown = keys.slice(0, 3);
+      var parts = shown.map(function (c) {
+        return esc(c) + " " + Number(ob[c]).toLocaleString(undefined, { maximumFractionDigits: 2 });
+      });
+      var rest = keys.length - shown.length;
+      f.push(fact("Outstanding obligations", parts.join("<br>"), "mono",
+        "What this issuer currently owes to holders" +
+        (rest > 0 ? ", largest " + shown.length + " of " + keys.length + " currencies shown." : ".")));
+    } else if (gw) {
+      f.push(fact("Outstanding obligations", "None", "",
+        "This account has issued nothing that is still held. A token it backs could not be redeemed."));
+    } else {
+      f.push(fact("Outstanding obligations", "Not established", "unknown",
+        "The node did not answer this read."));
+    }
+
+    /* The quorum finding, from the research page, applied live. */
+    if (signers && signers.entries && signers.entries.length) {
+      var weights = signers.entries.map(function (e) { return e.SignerEntry.SignerWeight; });
+      var total = weights.reduce(function (x, y) { return x + y; }, 0);
+      var q = signers.quorum;
+      var solo = weights.filter(function (w) { return w >= q; }).length;
+      f.push(fact("Signers",
+        signers.entries.length + " signers · quorum " + q + " of " + total,
+        "mono" + (solo ? " warn" : ""),
+        solo ? solo + " of them meets the quorum alone, so this is a single-key account wearing a committee's clothes."
+             : "No single signer meets the quorum."));
+    } else if (flags & F.DisableMaster) {
+      f.push(fact("Master key", "Disabled", "",
+        "The original key can no longer sign. Control sits with a regular key or a signer list."));
+    } else {
+      f.push(fact("Signers", "Single key", "",
+        "No signer list. One key moves this account."));
+    }
+
+    var dom = hexToText(a.Domain);
+    f.push(fact("Domain", dom ? esc(dom) : "Not set", dom ? "mono" : "unknown",
+      dom ? "Self-declared by the account. It is a claim, not a verification."
+          : "No domain is published."));
+
+    f.push(fact("Requires destination tag",
+      (flags & F.RequireDest) ? "Yes" : "No",
+      (flags & F.RequireDest) ? "warn" : "",
+      (flags & F.RequireDest) ? "A payment without a tag will be rejected — this is usually an exchange."
+                              : "Payments without a destination tag are accepted."));
+
+    out.className = "checkout";
+    out.style.setProperty("--sev", sev);
+    out.innerHTML =
+      '<p class="verdict">' + verdict + "</p>" +
+      '<p class="sub">' + sub + ' <span class="mono">' + esc(addr) + "</span></p>" +
+      '<div class="facts">' + f.join("") + "</div>" +
+      '<p class="foot">Read from validated ledger ' +
+        (info.ledger_index ? esc(info.ledger_index) : "state") +
+        '. This is what the ledger publishes — there is no reputation score behind it and no ' +
+        'bad-actor list, because inventing one would be the worst thing this tool could do. ' +
+        'The desktop app goes further: counterparty history, issuance concentration and ' +
+        'settlement adjudication. <a href="#download">Download it free</a>.</p>';
+    out.hidden = false;
+  }
+
+  function fail(msg) {
+    out.className = "checkout err";
+    out.style.setProperty("--sev", "var(--hold)");
+    out.innerHTML = '<p class="verdict">' + esc(msg) + "</p>";
+    out.hidden = false;
+  }
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var addr = (input.value || "").trim();
+    if (!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(addr)) {
+      fail("That does not look like an XRPL address. They begin with r and are 25–35 characters.");
+      return;
+    }
+    btn.disabled = true;
+    var was = btn.textContent;
+    btn.textContent = "Reading…";
+    out.hidden = false;
+    out.className = "checkout";
+    out.innerHTML = '<p class="spin">Reading validated ledger state…</p>';
+
+    rpc("account_info", { account: addr, ledger_index: "validated" })
+      .then(function (info) {
+        if (info.error) {
+          /* Say what happened in the reader's terms. A raw rippled error
+             code is accurate and useless to the person who typed it. */
+          var says = {
+            actNotFound: "No such account on mainnet. An address that has never been funded does not exist on the ledger, so there is nothing to read.",
+            actMalformed: "That is not a valid XRPL address — it has the right shape but fails its checksum, which usually means a mistyped or transposed character.",
+            invalidParams: "That address was not accepted by the ledger. Check it for a missing or extra character."
+          };
+          throw new Error(says[info.error] || ("The ledger declined the read: " + info.error));
+        }
+        return Promise.all([
+          info,
+          rpc("gateway_balances", { account: addr, ledger_index: "validated" }).catch(function () { return null; }),
+          rpc("account_objects", { account: addr, type: "signer_list", ledger_index: "validated" })
+            .then(function (r) {
+              var l = (r.account_objects || [])[0];
+              return l ? { quorum: l.SignerQuorum, entries: l.SignerEntries } : null;
+            }).catch(function () { return null; })
+        ]);
+      })
+      .then(function (r) { render(addr, r[0], r[1], r[2]); })
+      .catch(function (e) { fail(e.message || "Could not reach a public XRPL node. Try again in a moment."); })
+      .then(function () { btn.disabled = false; btn.textContent = was; });
   });
 })();
 </script>
