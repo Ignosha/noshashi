@@ -1321,8 +1321,11 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
   }
 
   /* Rather than hardcode a sample hash that public nodes will eventually
-     prune, walk back from the current ledger until a partial payment turns
-     up. It always does, which is itself the finding. */
+     prune, walk back from the current ledger looking for a live partial
+     payment. They run at roughly one to two percent of payments, so a
+     handful of ledgers is not a big enough sample — this reads twenty, four
+     at a time, and says plainly when it comes up empty rather than implying
+     something is wrong. */
   var finder = document.getElementById("findPartial");
   if (finder) {
     finder.addEventListener("click", function () {
@@ -1331,31 +1334,53 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
       payOut.hidden = false; payOut.className = "checkout";
       payOut.innerHTML = '<p class="spin">Walking back through recent ledgers…</p>';
 
-      rpc("ledger_current", {}).then(function (c) {
-        var idx = c.ledger_current_index - 2, tried = 0;
-        function step() {
-          if (tried++ >= 8) throw new Error("No partial payment in the last few ledgers. That is unusual — try again.");
-          return rpc("ledger", { ledger_index: idx--, transactions: true, expand: true })
-            .then(function (r) {
-              var txs = (r.ledger && r.ledger.transactions) || [];
-              for (var i = 0; i < txs.length; i++) {
-                var t = txs[i], tx = t.tx_json || t, m = t.meta || t.metaData;
-                if (!tx || tx.TransactionType !== "Payment" || !m) continue;
-                if (m.TransactionResult !== "tesSUCCESS") continue;
-                var req = tx.Amount || tx.DeliverMax, del = m.delivered_amount;
-                if (!req || !del || del === "unavailable") continue;
-                var rv = amtVal(req), dv = amtVal(del);
-                if (rv > 0 && dv / rv < 0.99) {
-                  var hash = t.hash || tx.hash;
-                  if (txh) txh.value = hash;
-                  renderPay(hash, tx, m);
-                  return true;
-                }
-              }
-              return step();
-            });
+      var LEDGERS = 20, BATCH = 4, scanned = 0, payments = 0;
+
+      /* A ledger's transactions come back flat: the fields sit on the object
+         itself with metaData beside them, not under a tx_json wrapper. */
+      function scan(r) {
+        var txs = (r && r.ledger && r.ledger.transactions) || [];
+        for (var i = 0; i < txs.length; i++) {
+          var t = txs[i], tx = t.tx_json || t, m = t.meta || t.metaData;
+          if (!tx || tx.TransactionType !== "Payment" || !m) continue;
+          if (m.TransactionResult !== "tesSUCCESS") continue;
+          payments += 1;
+          var req = tx.Amount || tx.DeliverMax, del = m.delivered_amount;
+          if (!req || !del || del === "unavailable") continue;
+          var rv = amtVal(req), dv = amtVal(del);
+          if (rv > 0 && dv / rv < 0.99) return { hash: t.hash || tx.hash, tx: tx, meta: m };
         }
-        return step();
+        return null;
+      }
+
+      rpc("ledger_current", {}).then(function (c) {
+        var idx = c.ledger_current_index - 2;
+        function round() {
+          if (scanned >= LEDGERS) {
+            throw new Error("No partial payment in the last " + scanned + " ledgers (" +
+              payments + " payments). They run at roughly one to two percent of payments, " +
+              "so an empty window is normal — try again, or paste a hash you already have.");
+          }
+          var batch = [];
+          for (var k = 0; k < BATCH; k++) {
+            batch.push(rpc("ledger", { ledger_index: idx--, transactions: true, expand: true })
+              .catch(function () { return null; }));
+            scanned += 1;
+          }
+          finder.textContent = "searching " + scanned + " ledgers…";
+          return Promise.all(batch).then(function (rs) {
+            for (var j = 0; j < rs.length; j++) {
+              var hit = scan(rs[j]);
+              if (hit) {
+                if (txh) txh.value = hit.hash;
+                renderPay(hit.hash, hit.tx, hit.meta);
+                return true;
+              }
+            }
+            return round();
+          });
+        }
+        return round();
       }).catch(function (e) { payFail(e.message || "Could not reach a public XRPL node."); })
         .then(function () { finder.disabled = false; finder.textContent = was; });
     });
