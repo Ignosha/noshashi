@@ -27,6 +27,33 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
+/**
+ * The service-role client, and its type.
+ *
+ * Both exist because `ReturnType<typeof createClient>` does not describe
+ * what `createClient(url, key)` actually returns. Read off the generic
+ * signature rather than off a call, its type parameters fall back to
+ * their declared defaults and the schema parameter resolves to `never` —
+ * so a client typed that way rejects the very value it was meant to
+ * describe, and `.schema("noshashi")` on it is an error because no string
+ * is assignable to `never`.
+ *
+ * Nothing caught this: tsconfig.json includes only `src`, so no build
+ * step type-checked this file. `deno check` reported seven errors here,
+ * all of them this one cause.
+ *
+ * Wrapping the call fixes it at the root. `ServiceClient` is the return
+ * type of a *call site* with concrete arguments, so it is exactly the
+ * type of the value every helper below is handed.
+ */
+function createServiceClient(url: string, serviceRoleKey: string) {
+  return createClient(url, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+type ServiceClient = ReturnType<typeof createServiceClient>;
+
 const PUBLISHED_RIPPLE_HTTP = [
   "https://s1.ripple.com:51234/",
   "https://s2.ripple.com:51234/",
@@ -512,7 +539,7 @@ type ApiKeyAuth = { accountId: string; keyId: string };
 type AuthFailure = "malformed" | "unknown" | "revoked" | "expired" | "out_of_scope";
 
 async function authenticate(
-  client: ReturnType<typeof createClient>,
+  client: ServiceClient,
   authorization: string | null
 ): Promise<{ auth: ApiKeyAuth } | { failure: AuthFailure }> {
   if (!authorization?.startsWith("Bearer nsh_live_")) return { failure: "malformed" };
@@ -576,7 +603,7 @@ async function authenticate(
 type RateDecision = { allowed: boolean; limit: number; remaining: number; resetAt: string };
 
 async function takeRate(
-  client: ReturnType<typeof createClient>,
+  client: ServiceClient,
   keyId: string,
   windowSeconds: number,
   limit: number
@@ -762,9 +789,7 @@ async function handle(request: Request, requestId: string): Promise<Response> {
       requestId
     );
   }
-  const supabase = createClient(projectUrl, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const supabase = createServiceClient(projectUrl, serviceKey);
 
   /* 1. Authenticate the key. ---------------------------------------- */
   const authResult = await authenticate(supabase, request.headers.get("authorization"));
@@ -1133,7 +1158,7 @@ async function handle(request: Request, requestId: string): Promise<Response> {
  * key — which is the one thing the key is supposed to rule out.
  */
 async function replayStoredReceipt(
-  client: ReturnType<typeof createClient>,
+  client: ServiceClient,
   accountId: string,
   idempotencyKey: string,
   requestId: string
