@@ -46,36 +46,57 @@ recreates them, in order to "create" tables that already exist and hold
 customer rows. A reconciliation problem in a metadata table is not worth
 rewriting production access control to solve.
 
-## Outstanding: the repo cannot rebuild this database from scratch
+## How the four remote versions were reconciled
 
-The four August migrations were authored in the dashboard, so their SQL was
-never committed. What is here describes the same end state but is not the
-bytes that produced it, and there are no local files matching those four
-versions — so `db push` still reports them as missing.
+Moving these files out was necessary but not sufficient. `db push` still
+failed, and so did the repair the CLI suggests:
 
-Two things close that gap, in this order:
+```
+glob supabase/migrations/20260820111940_*.sql: file does not exist
+```
+
+`supabase migration repair` and `supabase db push` both resolve a remote
+version by globbing for a **local file** whose name starts with it. With no
+such file, neither command can proceed — repair cannot mark the version,
+and push cannot decide whether it is accounted for.
+
+`db push --include-all` does not help. It changes which *local* migrations
+are considered, not whether remote history has to match; the failure is
+identical.
+
+So `supabase/migrations/` now carries an empty placeholder for each of the
+four versions:
+
+```
+20260820111940_remote_dashboard_change.sql
+20260820121754_remote_dashboard_change.sql
+20260821034423_remote_dashboard_change.sql
+20260828071334_remote_dashboard_change.sql
+```
+
+They are inert on purpose. Each version is already in remote history, so
+the file's contents will never execute against this project. Put schema in
+one and it runs only on a *fresh* database — out of order relative to the
+real history, which is worse than not having it.
+
+With those present, remote history and local filenames agree, and `db push`
+has exactly one migration left to apply:
+`20260910000000_api_hardening.sql`.
+
+## Still outstanding: the repo cannot rebuild this database from scratch
+
+The placeholders reconcile the history table; they do not restore the lost
+SQL. The four August migrations were authored in the dashboard and never
+committed, so their exact bytes are gone. The files in this directory
+describe the same end state, but they are documentation — not the
+statements that produced it.
+
+To close that properly:
 
 ```bash
-# 1. Capture the true remote schema as a local migration.
 supabase db pull
 ```
 
 That writes a new migration reflecting exactly what is live. Review it
-against these files; where they disagree, the pull is right.
-
-```bash
-# 2. Record the four dashboard migrations as applied, so history reconciles.
-supabase migration repair --status applied 20260820111940 20260820121754 20260821034423 20260828071334
-```
-
-Note `applied`, **not** `reverted`. This asserts what is already true
-rather than discarding it.
-
-Until both are done, deploy new schema with an explicit target:
-
-```bash
-supabase db push --include-all
-```
-
-which applies only what is in `supabase/migrations/` — currently the single
-pending hardening migration — without demanding that remote history match.
+against the files here; where they disagree, the pull is right. Only after
+that can this repository stand up an equivalent database on its own.

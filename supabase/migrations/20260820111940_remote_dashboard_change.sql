@@ -1,0 +1,23 @@
+-- Placeholder for a migration that is ALREADY APPLIED to project
+-- xiurbiwuwcfowqnpmwki, recorded in
+-- supabase_migrations.schema_migrations as version 20260820111940.
+--
+-- Intentionally empty. This file exists so the Supabase CLI can match a
+-- local filename to that remote version. Without one, both
+-- `supabase db push` and `supabase migration repair` fail:
+--
+--     Remote migration versions not found in local migrations directory.
+--     glob supabase/migrations/20260820111940_*.sql: file does not exist
+--
+-- The original SQL was authored in the Supabase dashboard and never
+-- committed, so its exact bytes are not recoverable from this repository.
+-- `supabase/history/` holds hand-written records describing the same end
+-- state; they are documentation, not these statements.
+--
+-- DO NOT put schema in this file. It is already applied, so anything added
+-- here would never run against this project -- and WOULD run against a
+-- fresh one, where it would be out of order relative to the real history.
+--
+-- To replace these placeholders with the true schema, run `supabase db
+-- pull`: it writes a new migration reflecting exactly what is live. See
+-- supabase/history/README.md.
