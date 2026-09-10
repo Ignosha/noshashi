@@ -34,6 +34,94 @@ const PUBLISHED_RIPPLE_HTTP = [
 
 const ADDRESS_RE = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 
+/** Largest body this endpoint will read. The contract is three fields. */
+const MAX_BODY_BYTES = 4096;
+
+/**
+ * Published rate limits, by entitlement tier.
+ *
+ * Two windows per tier because one number cannot describe both a burst
+ * and a sustained rate: a caller allowed 50/sec is not thereby allowed
+ * 3,000 every second of every minute. `institution` is the ceiling for a
+ * contract that has not negotiated its own; a negotiated limit is set
+ * per-account and read from entitlements.
+ */
+const TIER_LIMITS: Record<string, { perSecond: number; perMinute: number }> = {
+  operator:    { perSecond: 2,   perMinute: 30 },
+  desk:        { perSecond: 50,  perMinute: 1_500 },
+  institution: { perSecond: 200, perMinute: 9_000 },
+};
+
+/* ------------------------------------------------------------------ */
+/* Address validation                                                  */
+/* ------------------------------------------------------------------ */
+
+const BASE58_XRPL = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
+
+/**
+ * Full base58check validation of a classic XRPL address.
+ *
+ * The regex above only describes the *shape* of an address. It accepts a
+ * mistyped character, and a mistyped address is a different, usually
+ * unfunded, account. That mattered here more than on the client: this
+ * endpoint charges a credit and then adjudicates whatever the caller
+ * sent, so a single wrong character produced a billed, digested,
+ * audit-logged NO-GO receipt about an account the caller never meant to
+ * ask about. The checksum is what distinguishes "this account fails the
+ * policy" from "this is not an account".
+ *
+ * Payload is a one-byte type prefix (0x00 for an AccountID), 20 bytes of
+ * account id, and four bytes of double-SHA-256 checksum.
+ */
+async function isValidClassicAddress(address: string): Promise<boolean> {
+  if (!ADDRESS_RE.test(address)) return false;
+
+  // base58 → big-endian bytes, by repeated multiply-and-carry.
+  const bytes: number[] = [0];
+  for (const char of address) {
+    const value = BASE58_XRPL.indexOf(char);
+    if (value < 0) return false;
+    let carry = value;
+    for (let i = bytes.length - 1; i >= 0; i -= 1) {
+      carry += bytes[i] * 58;
+      bytes[i] = carry & 0xff;
+      carry >>= 8;
+    }
+    while (carry > 0) {
+      bytes.unshift(carry & 0xff);
+      carry >>= 8;
+    }
+  }
+
+  // A leading zero byte is not representable in the arithmetic above — it
+  // multiplies away — so base58 encodes each one as a leading alphabet[0]
+  // character instead. In this alphabet that character is 'r', which is
+  // exactly why every classic address begins with one: it *is* the 0x00
+  // AccountID type prefix. Count them back on, and drop the zero padding
+  // the accumulator started with.
+  let encodedZeros = 0;
+  while (encodedZeros < address.length && address[encodedZeros] === BASE58_XRPL[0]) {
+    encodedZeros += 1;
+  }
+  let significant = 0;
+  while (significant < bytes.length && bytes[significant] === 0) significant += 1;
+
+  const decoded = new Uint8Array(encodedZeros + (bytes.length - significant));
+  decoded.set(bytes.slice(significant), encodedZeros);
+
+  if (decoded.length !== 25) return false;
+  if (decoded[0] !== 0x00) return false;
+
+  const payload = decoded.slice(0, 21);
+  const checksum = decoded.slice(21);
+  const first = await crypto.subtle.digest("SHA-256", payload);
+  const second = new Uint8Array(await crypto.subtle.digest("SHA-256", first));
+  for (let i = 0; i < 4; i += 1) {
+    if (second[i] !== checksum[i]) return false;
+  }
+  return true;
+}
+
 /* ------------------------------------------------------------------ */
 /* Policy engine — mirror of src/lib/policy.ts                         */
 /* ------------------------------------------------------------------ */
@@ -420,154 +508,506 @@ async function sha256Hex(value: string): Promise<string> {
 
 type ApiKeyAuth = { accountId: string; keyId: string };
 
+/** Why a key was refused. Never returned to the caller — see below. */
+type AuthFailure = "malformed" | "unknown" | "revoked" | "expired" | "out_of_scope";
+
 async function authenticate(
   client: ReturnType<typeof createClient>,
   authorization: string | null
-): Promise<ApiKeyAuth | null> {
-  if (!authorization?.startsWith("Bearer nsh_live_")) return null;
+): Promise<{ auth: ApiKeyAuth } | { failure: AuthFailure }> {
+  if (!authorization?.startsWith("Bearer nsh_live_")) return { failure: "malformed" };
   const raw = authorization.slice("Bearer ".length).trim();
   const keyHash = await sha256Hex(raw);
 
   const { data, error } = await client
     .schema("noshashi")
     .from("api_keys")
-    .select("id, account_id, revoked_at")
+    .select("id, account_id, revoked_at, expires_at, scopes")
     .eq("key_hash", keyHash)
     .maybeSingle();
   if (error) throw error;
-  if (!data || data.revoked_at) return null;
-  return { accountId: String(data.account_id), keyId: String(data.id) };
+
+  if (!data) return { failure: "unknown" };
+  if (data.revoked_at) return { failure: "revoked" };
+
+  // Hard expiry. A key handed to a counterparty or an examiner for a
+  // defined engagement has to stop working when the engagement ends,
+  // without anyone having to remember to revoke it.
+  if (data.expires_at && new Date(String(data.expires_at)).getTime() <= Date.now()) {
+    return { failure: "expired" };
+  }
+
+  // Scopes exist so a key can be narrower than the account. A key issued
+  // for a webhook receiver or a usage reader should not be able to spend
+  // verification credits just because it authenticates.
+  const scopes = (data.scopes as string[] | null) ?? [];
+  if (!scopes.includes("verify")) return { failure: "out_of_scope" };
+
+  return { auth: { accountId: String(data.account_id), keyId: String(data.id) } };
 }
 
 /* ------------------------------------------------------------------ */
-/* Basic per-instance rate limit (see README — replace with a managed  */
-/* limiter before opening to third parties)                            */
+/* Rate limiting                                                       */
 /* ------------------------------------------------------------------ */
 
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 60;
-const rateBuckets = new Map<string, { count: number; resetAt: number }>();
+/**
+ * Durable, per-key, tier-aware rate limiting.
+ *
+ * What this replaces was a Map in module scope keyed on
+ * `x-forwarded-for`. Three things were wrong with it and all three are
+ * the kind an institutional review finds:
+ *
+ *   - It was per-instance. Edge Functions scale horizontally and cold
+ *     start, so the counter reset whenever the platform felt like it and
+ *     never aggregated across concurrent instances. The published limit
+ *     was not the enforced limit.
+ *   - It was keyed on a caller-supplied header, and checked BEFORE
+ *     authentication. Anyone could rotate the header to get a fresh
+ *     bucket, and one noisy IP could exhaust a bucket shared with
+ *     paying callers behind the same NAT.
+ *   - It was one flat 60/minute for everybody, which is neither the
+ *     50/sec Pro is sold nor anything an Institutional contract would
+ *     accept.
+ *
+ * The counter now lives in Postgres, keyed on the api_key id, and is
+ * taken after the key is known to be good. The IP pre-filter below is
+ * kept, but only as a cheap shield on the unauthenticated path.
+ */
+type RateDecision = { allowed: boolean; limit: number; remaining: number; resetAt: string };
 
-function rateLimited(key: string): boolean {
+async function takeRate(
+  client: ReturnType<typeof createClient>,
+  keyId: string,
+  windowSeconds: number,
+  limit: number
+): Promise<RateDecision> {
+  const { data, error } = await client
+    .schema("noshashi")
+    .rpc("api_rate_take", {
+      p_key: keyId,
+      p_window_seconds: windowSeconds,
+      p_limit: limit,
+    });
+  if (error) throw error;
+  const row = (data ?? {}) as Record<string, unknown>;
+  return {
+    allowed: row.allowed === true,
+    limit: Number(row.limit ?? limit),
+    remaining: Number(row.remaining ?? 0),
+    resetAt: String(row.reset_at ?? new Date(Date.now() + windowSeconds * 1000).toISOString()),
+  };
+}
+
+/**
+ * Unauthenticated pre-filter. Deliberately generous: its only job is to
+ * keep an unauthenticated flood from reaching the database at all. It is
+ * not the enforced limit and is not sold as one.
+ */
+const PREFILTER_WINDOW_MS = 10_000;
+const PREFILTER_MAX = 100;
+const prefilter = new Map<string, { count: number; resetAt: number }>();
+
+function prefilterExceeded(request: Request): boolean {
+  // x-forwarded-for is a list; the platform appends, so the left-most
+  // entry is the closest thing to a client address available here.
+  const forwarded = (request.headers.get("x-forwarded-for") ?? "").split(",")[0].trim();
+  const key = forwarded || "unattributed";
   const now = Date.now();
-  const bucket = rateBuckets.get(key);
+  const bucket = prefilter.get(key);
+
+  // Bound the map. Without this a spray of spoofed headers grows it until
+  // the instance is evicted for memory.
+  if (prefilter.size > 10_000) prefilter.clear();
+
   if (!bucket || bucket.resetAt < now) {
-    rateBuckets.set(key, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    prefilter.set(key, { count: 1, resetAt: now + PREFILTER_WINDOW_MS });
     return false;
   }
   bucket.count += 1;
-  return bucket.count > RATE_MAX;
+  return bucket.count > PREFILTER_MAX;
 }
 
 /* ------------------------------------------------------------------ */
 /* HTTP helpers                                                        */
 /* ------------------------------------------------------------------ */
 
-function json(status: number, body: Record<string, unknown>): Response {
-  return new Response(JSON.stringify(body), {
+/**
+ * Headers every response carries.
+ *
+ * `no-store` is the load-bearing one. A response body here is a
+ * compliance verdict about a named account at a named moment; a shared
+ * cache holding one and serving it to the next caller would be both a
+ * disclosure and a stale adjudication. There is no CORS header by design:
+ * this is a server-to-server endpoint, and a browser holding a
+ * `nsh_live_` key has already leaked it.
+ */
+function baseHeaders(requestId: string): Record<string, string> {
+  return {
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store, no-cache, must-revalidate, private",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+    "X-Request-Id": requestId,
+  };
+}
+
+function json(
+  status: number,
+  body: Record<string, unknown>,
+  requestId: string,
+  extra: Record<string, string> = {}
+): Response {
+  return new Response(JSON.stringify({ ...body, request_id: requestId }), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { ...baseHeaders(requestId), ...extra },
   });
 }
 
-Deno.serve(async (request: Request) => {
+/* ------------------------------------------------------------------ */
+/* Request handling                                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Every response carries a request id, and every refusal is explained in
+ * the body rather than by the status code alone.
+ *
+ * The outer wrapper exists because the handler previously let errors from
+ * `authenticate`, the entitlement read and the credit RPC propagate out
+ * of the top-level Deno.serve callback. The runtime turns an uncaught
+ * throw into a 500 whose body is the platform's own error rendering —
+ * which can carry the message and stack of a database error, and which
+ * is not JSON, so a caller parsing the documented error envelope gets a
+ * parse failure instead of an error. Now: one shape for every outcome,
+ * details in the logs, and a correlation id shared by both.
+ */
+Deno.serve(async (request: Request): Promise<Response> => {
+  const requestId = crypto.randomUUID();
+  try {
+    return await handle(request, requestId);
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        level: "error",
+        request_id: requestId,
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      })
+    );
+    return json(
+      500,
+      {
+        error: "internal_error",
+        message:
+          "The request could not be completed. Quote request_id when reporting this.",
+      },
+      requestId
+    );
+  }
+});
+
+async function handle(request: Request, requestId: string): Promise<Response> {
   const method = request.method.toUpperCase();
-  const rateKey = `${request.headers.get("x-forwarded-for") ?? "unknown"}|${method}`;
-  if (rateLimited(rateKey)) {
-    return json(429, { error: "rate_limited", message: "Too many requests. Slow down and retry." });
+
+  // Cheap shield on the unauthenticated path. Not the published limit.
+  if (prefilterExceeded(request)) {
+    return json(
+      429,
+      { error: "rate_limited", message: "Too many unauthenticated requests." },
+      requestId,
+      { "Retry-After": "10" }
+    );
   }
 
   if (method === "GET") {
-    return json(200, {
-      name: "noshashi-verify",
-      contract: "POST JSON { subject, domain, amount_xrp } with Authorization: Bearer nsh_live_…",
-      domains: DOMAIN_REGISTRY.map((domain) => domain.code),
-    });
+    return json(
+      200,
+      {
+        name: "noshashi-verify",
+        contract:
+          "POST JSON { subject, domain, amount_xrp } with Authorization: Bearer nsh_live_…",
+        domains: DOMAIN_REGISTRY.map((domain) => domain.code),
+        idempotency: "Send Idempotency-Key to make a retry replay rather than re-charge.",
+        published_limits: TIER_LIMITS,
+      },
+      requestId
+    );
   }
   if (method !== "POST") {
-    return json(405, { error: "method_not_allowed", message: "Only POST is supported." });
+    return json(
+      405,
+      { error: "method_not_allowed", message: "Only GET and POST are supported." },
+      requestId,
+      { Allow: "GET, POST" }
+    );
   }
 
   const started = performance.now();
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
 
-  // 1. Authenticate the key.
-  const auth = await authenticate(supabase, request.headers.get("authorization"));
-  if (!auth) {
-    return json(401, { error: "unauthorized", message: "Valid nsh_live_ key required." });
+  const projectUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!projectUrl || !serviceKey) {
+    // The non-null assertions this replaces threw a TypeError deep inside
+    // createClient on a misconfigured deploy, which surfaced as an opaque
+    // 500 on every request. Say what is wrong, once, in the log.
+    console.error(
+      JSON.stringify({
+        level: "error",
+        request_id: requestId,
+        message: "missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
+      })
+    );
+    return json(
+      503,
+      { error: "not_configured", message: "Service is not configured. This is not your fault." },
+      requestId
+    );
+  }
+  const supabase = createClient(projectUrl, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  /* 1. Authenticate the key. ---------------------------------------- */
+  const authResult = await authenticate(supabase, request.headers.get("authorization"));
+  if ("failure" in authResult) {
+    // One message for every failure mode. Distinguishing "revoked" from
+    // "unknown" in the response would confirm that a key had once been
+    // valid, which turns this endpoint into an oracle for testing
+    // harvested keys. The reason goes to the log, where the account's own
+    // operator can be told it.
+    console.warn(
+      JSON.stringify({
+        level: "warn",
+        request_id: requestId,
+        event: "auth_refused",
+        reason: authResult.failure,
+      })
+    );
+    return json(
+      401,
+      {
+        error: "unauthorized",
+        message: "A valid, unexpired nsh_live_ key with the verify scope is required.",
+      },
+      requestId,
+      { "WWW-Authenticate": 'Bearer realm="noshashi"' }
+    );
+  }
+  const auth = authResult.auth;
+
+  /* 2. Entitlement and tier. ---------------------------------------- */
+  const { data: entitlements, error: entitlementError } = await supabase
+    .schema("noshashi")
+    .from("entitlements")
+    .select("tier, verification_quota, features, valid_until, rate_limit_per_second")
+    .eq("account_id", auth.accountId)
+    .maybeSingle();
+  if (entitlementError) throw entitlementError;
+
+  const tier = String(entitlements?.tier ?? "operator");
+  const features = (entitlements?.features as string[] | undefined) ?? [];
+  const expired =
+    entitlements?.valid_until &&
+    new Date(String(entitlements.valid_until)).getTime() < Date.now();
+
+  /* 3. Rate limit — durable, per key, two windows. ------------------- */
+  const published = TIER_LIMITS[tier] ?? TIER_LIMITS.operator;
+  // A negotiated Institutional limit overrides the published ceiling.
+  // Null means "use the published figure for the tier".
+  const negotiated = entitlements?.rate_limit_per_second;
+  const hasNegotiated = negotiated !== null && negotiated !== undefined;
+  const perSecond = hasNegotiated ? Number(negotiated) : published.perSecond;
+  // Sustained allowance is 30x the burst rate rather than 60x: a caller
+  // is not expected to hold their peak rate for every second of a
+  // minute, and pricing the sustained window at the full product would
+  // make the per-second limit decorative.
+  const perMinute = hasNegotiated ? Number(negotiated) * 30 : published.perMinute;
+
+  for (const [windowSeconds, limit] of [[1, perSecond], [60, perMinute]] as const) {
+    const decision = await takeRate(supabase, auth.keyId, windowSeconds, limit);
+    if (!decision.allowed) {
+      const retryAfter = Math.max(
+        1,
+        Math.ceil((new Date(decision.resetAt).getTime() - Date.now()) / 1000)
+      );
+      return json(
+        429,
+        {
+          error: "rate_limited",
+          message: `Exceeded ${limit} requests per ${windowSeconds}s for the ${tier} tier.`,
+        },
+        requestId,
+        {
+          "Retry-After": String(retryAfter),
+          "RateLimit-Limit": String(decision.limit),
+          "RateLimit-Remaining": "0",
+          "RateLimit-Reset": String(retryAfter),
+        }
+      );
+    }
   }
 
-  // 2. Parse and validate the request body.
-  let body: { subject?: unknown; domain?: unknown; amount_xrp?: unknown };
+  /* 4. Read and validate the body. ---------------------------------- */
+  const contentType = (request.headers.get("content-type") ?? "").toLowerCase();
+  if (!contentType.includes("application/json")) {
+    return json(
+      415,
+      { error: "unsupported_media_type", message: "Content-Type must be application/json." },
+      requestId
+    );
+  }
+
+  // Two checks, not one. The declared length is a courtesy that lets an
+  // oversized body be refused without reading it; the measured length is
+  // the one that is true, because Content-Length can lie or be absent
+  // under chunked transfer.
+  const declaredLength = Number(request.headers.get("content-length") ?? Number.NaN);
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_BODY_BYTES) {
+    return json(
+      413,
+      { error: "payload_too_large", message: `Body must be under ${MAX_BODY_BYTES} bytes.` },
+      requestId
+    );
+  }
+  const rawBody = await request.text();
+  if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    return json(
+      413,
+      { error: "payload_too_large", message: `Body must be under ${MAX_BODY_BYTES} bytes.` },
+      requestId
+    );
+  }
+
+  let parsed: unknown;
   try {
-    body = await request.json();
+    parsed = JSON.parse(rawBody);
   } catch {
-    return json(400, { error: "invalid_json", message: "Request body must be JSON." });
+    return json(400, { error: "invalid_json", message: "Request body must be JSON." }, requestId);
   }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    return json(
+      400,
+      { error: "invalid_json", message: "Request body must be a JSON object." },
+      requestId
+    );
+  }
+  const body = parsed as { subject?: unknown; domain?: unknown; amount_xrp?: unknown };
 
   const subject = typeof body.subject === "string" ? body.subject.trim() : "";
   const domainCode = typeof body.domain === "string" ? body.domain.trim().toUpperCase() : "";
   const amountXrp = Number(body.amount_xrp);
 
-  if (!ADDRESS_RE.test(subject)) {
-    return json(400, { error: "invalid_subject", message: "subject must be an XRPL classic address." });
+  if (!(await isValidClassicAddress(subject))) {
+    return json(
+      400,
+      {
+        error: "invalid_subject",
+        message: "subject must be an XRPL classic address that passes its base58 checksum.",
+      },
+      requestId
+    );
   }
   if (!Number.isFinite(amountXrp) || amountXrp < 0) {
-    return json(400, { error: "invalid_amount", message: "amount_xrp must be a non-negative number." });
+    return json(
+      400,
+      { error: "invalid_amount", message: "amount_xrp must be a non-negative number." },
+      requestId
+    );
+  }
+  // XRP is capped at 100 billion by protocol. An amount above that is not
+  // a transfer anyone can make, and letting it through would produce a
+  // confident, billed NO-GO about an impossible transaction.
+  if (amountXrp > 100_000_000_000) {
+    return json(
+      400,
+      { error: "invalid_amount", message: "amount_xrp exceeds the total XRP supply." },
+      requestId
+    );
   }
   const domain = DOMAIN_REGISTRY.find((entry) => entry.code === domainCode);
   if (!domain) {
-    return json(404, {
-      error: "unknown_domain",
-      message: `Unknown domain. Known: ${DOMAIN_REGISTRY.map((entry) => entry.code).join(", ")}`,
-    });
+    return json(
+      404,
+      {
+        error: "unknown_domain",
+        message: `Unknown domain. Known: ${DOMAIN_REGISTRY.map((entry) => entry.code).join(", ")}`,
+      },
+      requestId
+    );
   }
 
-  // 3. Feature gate (read-only; the authoritative decrement is in SQL).
-  const { data: entitlements, error: entitlementError } = await supabase
-    .schema("noshashi")
-    .from("entitlements")
-    .select("verification_quota, features, valid_until")
-    .eq("account_id", auth.accountId)
-    .maybeSingle();
-  if (entitlementError) throw entitlementError;
-
-  const features = (entitlements?.features as string[] | undefined) ?? [];
+  /* 5. Feature gate. ------------------------------------------------- */
   if (!features.includes("compliance_api")) {
-    return json(403, {
-      error: "feature_not_enabled",
-      message: "The Compliance API requires the Institution plan.",
-    });
+    return json(
+      403,
+      {
+        error: "feature_not_enabled",
+        message: "The Compliance API requires the Institutional plan.",
+      },
+      requestId
+    );
   }
-  const expired =
-    entitlements?.valid_until &&
-    new Date(String(entitlements.valid_until)).getTime() < Date.now();
   if (expired) {
-    return json(403, {
-      error: "entitlement_expired",
-      message: "Entitlement has expired. Renew to continue.",
-    });
+    return json(
+      403,
+      { error: "entitlement_expired", message: "Entitlement has expired. Renew to continue." },
+      requestId
+    );
   }
 
-  // 4. Atomically consume one prepaid credit. The SQL function is the
-  //    single source of truth for the balance: it decrements only when
-  //    quota >= 1, so concurrent calls can never overspend.
+  /* 6. Idempotent retry. --------------------------------------------- */
+  // Checked before the credit is spent. A caller whose request timed out
+  // has no way to know whether it was adjudicated, so without this the
+  // safe behaviour on their side — retry — costs them a second credit and
+  // writes a second audit row for one decision.
+  const idempotencyKey = (request.headers.get("idempotency-key") ?? "").trim() || null;
+  if (idempotencyKey) {
+    if (idempotencyKey.length > 255) {
+      return json(
+        400,
+        {
+          error: "invalid_idempotency_key",
+          message: "Idempotency-Key must be 255 characters or fewer.",
+        },
+        requestId
+      );
+    }
+    const replay = await replayStoredReceipt(supabase, auth.accountId, idempotencyKey, requestId);
+    if (replay) return replay;
+  }
+
+  /* 7. Consume one prepaid credit, atomically. ----------------------- */
   const { data: consumed, error: consumeError } = await supabase
     .schema("noshashi")
     .rpc("consume_verification_credit", { p_account: auth.accountId });
   if (consumeError) throw consumeError;
   if (consumed !== true) {
-    return json(402, {
-      error: "quota_exhausted",
-      message: "No verification credits remaining. Purchase a credit pack.",
-    });
+    return json(
+      402,
+      {
+        error: "quota_exhausted",
+        message: "No verification credits remaining. Purchase a credit pack.",
+      },
+      requestId
+    );
   }
 
-  // 5. Read live ledger state. The credit is already consumed at this
-  //    point; on an infra failure the credit can be refunded manually.
+  /** Give the credit back. Called on every path that fails after step 7. */
+  const refund = async (reason: string) => {
+    const { error } = await supabase
+      .schema("noshashi")
+      .rpc("refund_verification_credit", { p_account: auth.accountId });
+    console.warn(
+      JSON.stringify({
+        level: "warn",
+        request_id: requestId,
+        event: "credit_refunded",
+        reason,
+        refund_failed: error ? error.message : undefined,
+      })
+    );
+  };
+
+  /* 8. Read live ledger state. --------------------------------------- */
   let account: Awaited<ReturnType<typeof fetchLedgerAccount>>;
   let credentials: Awaited<ReturnType<typeof fetchLedgerCredentials>>;
   try {
@@ -576,49 +1016,141 @@ Deno.serve(async (request: Request) => {
       fetchLedgerCredentials(subject),
     ]);
   } catch (error) {
-    console.error("ledger read failed", error);
-    return json(502, {
-      error: "ledger_unavailable",
-      message: "Could not read ledger state. Try again shortly.",
-    });
+    // The credit was spent a moment ago for a verdict that will never
+    // exist. Returning it here is the difference between an outage and a
+    // billing dispute.
+    await refund("ledger_unavailable");
+    console.error(
+      JSON.stringify({
+        level: "error",
+        request_id: requestId,
+        event: "ledger_read_failed",
+        message: error instanceof Error ? error.message : String(error),
+      })
+    );
+    return json(
+      502,
+      { error: "ledger_unavailable", message: "Could not read ledger state. Try again shortly." },
+      requestId
+    );
   }
 
-  // 6. Evaluate with the same rule set the console uses, and digest the
-  //    receipt exactly as the client does so they can never disagree.
+  /* 9. Adjudicate, and digest exactly as the console does. ----------- */
   const evaluation = evaluatePolicy({ account, credentials, domain, amountXrp });
   const digest = await receiptDigest(evaluation);
   const elapsedMs = Math.max(1, Math.round(performance.now() - started));
-  const receipt = { ...evaluation, digest, latencyMs: elapsedMs };
 
-  // 7. Audit trail: one row per verification, and a last-used stamp on
-  //    the key so the console's key list shows real activity.
-  await supabase
+  const responseBody = {
+    verdict: evaluation.verdict,
+    domain: domain.code,
+    subject,
+    amount_xrp: amountXrp,
+    checks: evaluation.checks,
+    digest,
+    evaluated_at: evaluation.evaluatedAt,
+    latency_ms: elapsedMs,
+  };
+
+  /* 10. Audit trail — fail closed. ----------------------------------- */
+  // A verdict served without a record of having served it is exactly the
+  // gap an examiner asks about, so the record is written before the
+  // response, and a failure to write it refuses the response. The stored
+  // receipt is also what makes step 6 able to replay a retry.
+  const { error: auditError } = await supabase
     .schema("noshashi")
     .from("verification_events")
     .insert({
       account_id: auth.accountId,
       api_key_id: auth.keyId,
-      subject,
+      request_id: requestId,
+      idempotency_key: idempotencyKey,
+      subject_address: subject,
       domain_code: domain.code,
       amount_xrp: amountXrp,
-      verdict: receipt.verdict,
-      receipt_digest: receipt.digest,
+      verdict: evaluation.verdict,
+      receipt_digest: digest,
+      receipt: responseBody,
+      latency_ms: elapsedMs,
       created_at: new Date().toISOString(),
     });
-  await supabase
+
+  if (auditError) {
+    // 23505 on the idempotency index means a concurrent request with the
+    // same key won the race. That is not an error to the caller — it is
+    // precisely the outcome they asked for by sending the header.
+    if (auditError.code === "23505" && idempotencyKey) {
+      await refund("idempotent_duplicate");
+      const replay = await replayStoredReceipt(supabase, auth.accountId, idempotencyKey, requestId);
+      if (replay) return replay;
+    }
+    await refund("audit_write_failed");
+    console.error(
+      JSON.stringify({
+        level: "error",
+        request_id: requestId,
+        event: "audit_write_failed",
+        message: auditError.message,
+      })
+    );
+    return json(
+      503,
+      {
+        error: "receipt_not_recorded",
+        message:
+          "The verdict could not be written to the audit trail, so it was not served. No credit was charged. Retry.",
+      },
+      requestId
+    );
+  }
+
+  // Best-effort. The key list showing a stale "last used" is a cosmetic
+  // defect; failing the request over it would not be.
+  const { error: touchError } = await supabase
     .schema("noshashi")
     .from("api_keys")
     .update({ last_used_at: new Date().toISOString() })
     .eq("id", auth.keyId);
+  if (touchError) {
+    console.warn(
+      JSON.stringify({
+        level: "warn",
+        request_id: requestId,
+        event: "last_used_not_stamped",
+        message: touchError.message,
+      })
+    );
+  }
 
-  return json(200, {
-    verdict: receipt.verdict,
-    domain: domain.code,
-    subject,
-    amount_xrp: amountXrp,
-    checks: receipt.checks,
-    digest: receipt.digest,
-    evaluated_at: receipt.evaluatedAt,
-    latency_ms: receipt.latencyMs,
+  return json(200, responseBody, requestId, { "RateLimit-Limit": String(perSecond) });
+}
+
+/**
+ * Serve a stored receipt for a previously-seen Idempotency-Key.
+ *
+ * Replays the stored bytes rather than re-adjudicating. Re-running the
+ * policy would read a ledger that has moved on, so a retry could return a
+ * different verdict and a different digest under the same idempotency
+ * key — which is the one thing the key is supposed to rule out.
+ */
+async function replayStoredReceipt(
+  client: ReturnType<typeof createClient>,
+  accountId: string,
+  idempotencyKey: string,
+  requestId: string
+): Promise<Response | null> {
+  const { data, error } = await client
+    .schema("noshashi")
+    .from("verification_events")
+    .select("receipt, request_id")
+    .eq("account_id", accountId)
+    .eq("idempotency_key", idempotencyKey)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data?.receipt) return null;
+
+  return json(200, data.receipt as Record<string, unknown>, requestId, {
+    "X-Idempotent-Replay": "true",
+    "X-Original-Request-Id": String(data.request_id ?? ""),
   });
-});
+}
+

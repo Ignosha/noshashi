@@ -16,6 +16,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { shortAddress } from "@/lib/xrpl/client";
 import { useIssuerRisk } from "@/lib/desk/useRisk";
 import { useExitLiquidity } from "@/lib/desk/useLiquidity";
+import { StressPanel, StressSidebar, useStressReport } from "./StressPanel";
 import { EXIT_COPY } from "@/lib/desk/liquidity";
 import {
   analyseConcentration,
@@ -123,7 +124,7 @@ function RiskBody({
 }) {
   const { has } = useBilling();
   const [tab, setTab] = useState<
-    "issuers" | "exit" | "travel" | "concentration"
+    "issuers" | "exit" | "stress" | "travel" | "concentration"
   >("issuers");
   const [rate, setRate] = useState("2.40");
   const [preset, setPreset] = useState(0);
@@ -136,6 +137,11 @@ function RiskBody({
   // book says whether anyone would buy it if they didn't.
   const liq = useExitLiquidity(exposures);
   const trappedCount = liq.assessments.filter((a) => a.verdict === "trapped").length;
+
+  // Portfolio-level version of the same join. The EXIT tab reads one
+  // position at a time; this reads the book as a whole, which is not the
+  // sum of those — positions on one issuer contend for the same depth.
+  const stress = useStressReport(exposures, liq.books, liq.pools);
 
   const issuerResults = useMemo(() => issuerFindings(exposures), [exposures]);
 
@@ -193,9 +199,13 @@ function RiskBody({
           label={
             tab === "issuers"
               ? "ISSUER & FREEZE EXPOSURE"
-              : tab === "travel"
-                ? "TRAVEL RULE SCOPE"
-                : "COUNTERPARTY CONCENTRATION"
+              : tab === "exit"
+                ? "EXIT LIQUIDITY"
+                : tab === "stress"
+                  ? "REDEMPTION STRESS TEST"
+                  : tab === "travel"
+                    ? "TRAVEL RULE SCOPE"
+                    : "COUNTERPARTY CONCENTRATION"
           }
           corners
           className="col-span-3 min-h-0"
@@ -213,6 +223,7 @@ function RiskBody({
                       </span>
                     )}
                   </TabsTrigger>
+                  <TabsTrigger value="stress">STRESS</TabsTrigger>
                   <TabsTrigger value="travel">TRAVEL RULE</TabsTrigger>
                   <TabsTrigger value="concentration">BOOK</TabsTrigger>
                 </TabsList>
@@ -370,13 +381,21 @@ function RiskBody({
             </div>
           )}
 
+          {tab === "stress" && (
+            <StressPanel
+              controller={stress}
+              loading={liq.loading}
+              omitted={liq.omitted}
+            />
+          )}
+
           {tab === "travel" && (
             <div className="p-3">
               {!has("compliance_api") ? (
                 <EmptyState
                   icon={<NovaGrid size={16} />}
                   title="TRAVEL RULE REQUIRES INSTITUTION"
-                  body="FATF Recommendation 16 scoping is part of the Institution plan, alongside the Compliance API and regulator seats."
+                  body="FATF Recommendation 16 scoping is part of the Institutional plan, alongside the Compliance API and regulator seats."
                   action={<Button size="sm" onClick={onUpgrade}>SEE PLANS</Button>}
                 />
               ) : travel.inScope.length === 0 ? (
@@ -458,6 +477,17 @@ function RiskBody({
 
         {/* Findings + controls */}
         <div className="col-span-2 flex min-h-0 flex-col gap-3">
+          {tab === "stress" ? (
+            /*
+              The stress tab replaces the rail rather than adding to it.
+              Its findings are the waterfall on the left — repeating them
+              here as a list would say the same thing twice and push the
+              scenario parameters, which are the only thing the reader
+              needs alongside the number, off the bottom.
+            */
+            <StressSidebar report={stress.inputs.length > 0 ? stress.report : null} />
+          ) : (
+          <>
           {tab === "travel" && has("compliance_api") && (
             <Panel label="THRESHOLD" corners className="shrink-0">
               <Eyebrow className="mb-1.5">JURISDICTION</Eyebrow>
@@ -545,6 +575,8 @@ function RiskBody({
               </div>
             ))}
           </Panel>
+          </>
+          )}
         </div>
       </div>
     </div>

@@ -38,13 +38,13 @@ export const isDemo: boolean = EDITION === "demo";
 
 /** Capabilities the demo closes off, with the reason shown to the user. */
 export const DEMO_LOCKED: Record<string, string> = {
-  portfolios: "Multi-wallet portfolios are part of the Desk plan.",
-  alerts: "Drift and expiry alerts are part of the Desk plan.",
-  compliance_api: "The compliance API is part of the Institution plan.",
-  webhooks: "Webhooks are part of the Institution plan.",
-  regulator_seats: "Regulator seats are part of the Institution plan.",
-  white_label: "White labelling is part of the Institution plan.",
-  sla: "The published SLA is part of the Institution plan.",
+  portfolios: "Multi-wallet portfolios are part of the Pro plan.",
+  alerts: "Drift and expiry alerts are part of the Pro plan.",
+  compliance_api: "The compliance API is part of the Institutional plan.",
+  webhooks: "Webhooks are part of the Institutional plan.",
+  regulator_seats: "Regulator seats are part of the Institutional plan.",
+  white_label: "White labelling is part of the Institutional plan.",
+  sla: "The published SLA is part of the Institutional plan.",
 };
 
 /** What the demo *does* include, stated plainly so it can be trusted. */

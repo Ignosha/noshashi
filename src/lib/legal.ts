@@ -302,7 +302,7 @@ export const BILLING: Policy = {
         "Desk is $749 per seat per month and renews every month until cancelled.",
         "Institution is $4,000 per month and renews every month until cancelled.",
         "Verification credit packs are one-time purchases. They do not renew and they do not expire.",
-        "The Operator plan is free and never asks for a payment method.",
+        "The Free plan is free and never asks for a payment method.",
       ],
     },
     {

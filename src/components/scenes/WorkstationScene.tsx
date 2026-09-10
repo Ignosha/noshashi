@@ -615,7 +615,7 @@ function WorkstationBody({
               <EmptyState
                 icon={<NovaVault size={16} />}
                 title="SIGNED EXPORT REQUIRES INSTITUTION"
-                body="Chain-of-custody signing is part of the Institution plan. Desk can still export an unsigned CSV from the Audit Trail."
+                body="Chain-of-custody signing is part of the Institutional plan. Pro can still export an unsigned CSV from the Audit Trail."
                 action={<Button size="sm" onClick={onUpgrade}>SEE PLANS</Button>}
               />
             ) : (

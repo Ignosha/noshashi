@@ -8,6 +8,20 @@
 
 export type PlanId = "operator" | "desk" | "institution";
 
+/**
+ * Note on naming: the customer-facing names are FREE, PRO and
+ * INSTITUTIONAL. The identifiers are `operator`, `desk` and
+ * `institution`, and they are deliberately not renamed to match.
+ *
+ * Those strings are load-bearing outside this file: they are the values
+ * of the `tier` check constraint on noshashi.entitlements, the tier the
+ * Stripe webhook writes on a successful checkout, and the tier the
+ * Compliance API reads to pick a rate limit. Renaming the display name is
+ * a copy change; renaming the identifier is a migration, a webhook
+ * deploy and an Edge Function deploy that have to land together or every
+ * paying account loses its entitlements in the gap. The mapping lives
+ * here, once, instead.
+ */
 export type Plan = {
   /**
    * Monthly price in USD as a NUMBER, for anything that needs to compute
@@ -31,18 +45,42 @@ export type Plan = {
   features: string[];
   /** Entitlement flags this plan grants; must match the webhook. */
   grants: string[];
+
+  /**
+   * Annual prepay. Two months free against twelve at the monthly rate,
+   * so the discount is stated as the arithmetic rather than as a
+   * percentage nobody can check: 10 x monthly.
+   */
+  annualUsd?: number;
+  annualPriceId?: string | null;
+  /**
+   * How this plan is bought.
+   *
+   * `self_serve` goes to Stripe Checkout. `contact_sales` does not, and
+   * that is a commercial decision rather than a missing feature:
+   * Institutional requires an executed MSA, and a card payment that
+   * completes before anyone has signed one creates an entitlement with
+   * no contract behind it.
+   */
+  purchase: "free" | "self_serve" | "contact_sales";
 };
+
+/** Two months free — the annual figure every tier is quoted at. */
+export function annualFor(plan: Plan): number | undefined {
+  return plan.monthlyUsd > 0 ? plan.monthlyUsd * 10 : undefined;
+}
 
 export const PLANS: Plan[] = [
   {
     id: "operator",
-    name: "OPERATOR",
+    name: "FREE",
     audience: "Individuals and single desks",
     priceLabel: "Free",
     monthlyUsd: 0,
     cadence: "forever",
     priceId: null,
     seatBased: false,
+    purchase: "free",
     features: [
       "Full console and menu bar HUD",
       "Unlimited local gate checks",
@@ -58,16 +96,23 @@ export const PLANS: Plan[] = [
   },
   {
     id: "desk",
-    name: "DESK",
+    name: "PRO",
     audience: "Trading desks and funds",
     priceLabel: "$749",
     monthlyUsd: 749,
     cadence: "per seat / month",
     priceId: "price_1U6U1eGSxPXLjUKIGnORqp43",
+    annualUsd: 7_490,
+    // Set once the annual price is created in Stripe. Null keeps the
+    // annual toggle honest rather than sending a checkout to a price id
+    // that does not exist.
+    annualPriceId: null,
+    purchase: "self_serve",
     seatBased: true,
     emphasis: true,
     features: [
-      "Everything in Operator",
+      "Everything in Free",
+      "Redemption stress testing — liquidity-adjusted recoverable value across the book",
       "Multi-wallet portfolios with live gate status",
       "Settlement forensics — what a transaction delivered, not what it requested",
       "Order book integrity — quoted depth against depth that can actually fill",
@@ -97,15 +142,22 @@ export const PLANS: Plan[] = [
   },
   {
     id: "institution",
-    name: "INSTITUTION",
+    name: "INSTITUTIONAL",
     audience: "Regulated venues and custodians",
     priceLabel: "$4,000",
     monthlyUsd: 4000,
     cadence: "per month",
     priceId: "price_1U6U1sGSxPXLjUKI7mCncAIu",
+    annualUsd: 40_000,
+    annualPriceId: null,
+    purchase: "contact_sales",
     seatBased: false,
     features: [
-      "Everything in Desk",
+      "Everything in Pro, unlimited seats",
+      "SSO — SAML 2.0 or OIDC, with SCIM provisioning",
+      "Immutable audit log of every adjudication, export and settings change",
+      "Bulk portfolio monitoring — unlimited wallets, scheduled stress runs",
+      "Custom alert logic — your own thresholds, expressions and destinations",
       "Issuance surveillance — who holds your paper, and how concentrated",
       "Travel Rule (FATF R.16) scoping across every settlement",
       "Signed audit export — SHA-256 chain-of-custody for examiners",
@@ -114,7 +166,9 @@ export const PLANS: Plan[] = [
       "White-labelled wallet",
       "Regulator read-only seats",
       "100,000 API verifications included",
-      "Published SLA and named support",
+      "99.9% uptime SLA with service credits",
+      "Dedicated onboarding and a named support contact",
+      "Invoice, ACH, wire, NET-30 — MSA required",
     ],
     grants: [
       "console",
@@ -130,6 +184,10 @@ export const PLANS: Plan[] = [
       "regulator_seats",
       "white_label",
       "sla",
+      "sso",
+      "audit_log",
+      "bulk_monitoring",
+      "custom_alert_logic",
     ],
   },
 ];
@@ -250,6 +308,36 @@ export const FEATURE_CATALOG: Record<
     label: "Regulator seats",
     requires: "institution",
     blurb: "Scoped, time-boxed read-only access for an examiner.",
+  },
+  redemption_stress: {
+    label: "Redemption stress testing",
+    requires: "desk",
+    blurb:
+      "What the whole book would actually realise if it had to be raised as cash — routed across the DEX and the AMM together, shocked for depth that walks away, and discounted for balances an issuer could immobilise. A mark-to-mid portfolio value assumes every unit sells at the touch and that nobody can freeze it; both assumptions are false and neither is priced anywhere else.",
+  },
+  sso: {
+    label: "Single sign-on",
+    requires: "institution",
+    blurb:
+      "SAML 2.0 or OIDC against your identity provider, with SCIM provisioning so a leaver loses access when HR says so rather than when someone remembers.",
+  },
+  audit_log: {
+    label: "Immutable audit log",
+    requires: "institution",
+    blurb:
+      "Append-only record of every adjudication, export, key issuance and settings change, with the actor and the time. The question an examiner asks is not what the policy is, it is who changed it and when.",
+  },
+  bulk_monitoring: {
+    label: "Bulk portfolio monitoring",
+    requires: "institution",
+    blurb:
+      "Unlimited wallets under watch, with stress runs on a schedule rather than on a click, so a position that became unexitable overnight is an alert instead of a discovery.",
+  },
+  custom_alert_logic: {
+    label: "Custom alert logic",
+    requires: "institution",
+    blurb:
+      "Your own thresholds and expressions over the same measured facts, routed to your own destinations. A compliance function that cannot state its own trigger is using someone else's risk appetite.",
   },
 };
 

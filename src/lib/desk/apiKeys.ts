@@ -19,13 +19,46 @@ export type ApiKeyRow = {
   revokedAt: string | null;
 };
 
-const KEY_BYTES = 32;
+/** Characters of secret in a key. 40 base62 characters is ~238 bits. */
+const KEY_CHARS = 40;
 
-function toBase62(bytes: Uint8Array): string {
-  const alphabet =
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const KEY_ALPHABET =
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+/**
+ * Uniformly random base62, by rejection sampling.
+ *
+ * The previous implementation was `alphabet[byte % 62]` over 32 random
+ * bytes. 62 does not divide 256, so the first eight characters of the
+ * alphabet — 0 through 7 — came up on five byte values each while the
+ * remaining fifty-four came up on four. Every character of every key was
+ * drawn from that skewed distribution: a fifth of the alphabet was 25%
+ * more likely than the rest.
+ *
+ * The practical loss was small — roughly 190 bits of entropy instead of
+ * 190.5, still far past brute force — so this was never an exploitable
+ * key. It is fixed anyway for two reasons. Modulo bias in a credential
+ * generator is the first thing a security review greps for, and being
+ * able to say the generator is uniform is worth more than the half-bit.
+ *
+ * 248 is the largest multiple of 62 below 256, so bytes at or above it
+ * are discarded rather than folded, which is what makes the result
+ * uniform. Discards are refilled in batches instead of one byte at a
+ * time; each draw keeps ~97% of its bytes, so one refill is almost
+ * always enough.
+ */
+function randomBase62(length: number): string {
+  const limit = 256 - (256 % KEY_ALPHABET.length); // 248
   let out = "";
-  for (const byte of bytes) out += alphabet[byte % alphabet.length];
+  while (out.length < length) {
+    const draw = new Uint8Array((length - out.length) * 2);
+    crypto.getRandomValues(draw);
+    for (const byte of draw) {
+      if (byte >= limit) continue;
+      out += KEY_ALPHABET[byte % KEY_ALPHABET.length];
+      if (out.length === length) break;
+    }
+  }
   return out;
 }
 
@@ -63,10 +96,7 @@ export async function createApiKey(
   accountId: string,
   name: string
 ): Promise<{ raw: string; row: ApiKeyRow }> {
-  const bytes = new Uint8Array(KEY_BYTES);
-  crypto.getRandomValues(bytes);
-  const secret = toBase62(bytes);
-  const raw = `nsh_live_${secret}`;
+  const raw = `nsh_live_${randomBase62(KEY_CHARS)}`;
   const prefix = raw.slice(0, 16);
   const keyHash = await sha256Hex(raw);
 
@@ -91,12 +121,24 @@ export async function createApiKey(
   };
 }
 
-export async function revokeApiKey(id: string): Promise<void> {
+/**
+ * Revoke a key. Terminal: the database trigger refuses to write
+ * revoked_at back to null, so this cannot be undone from any client.
+ *
+ * The account filter is redundant against row level security, which
+ * already scopes the update to the caller. It is here anyway because it
+ * costs one predicate: an unscoped `eq("id", …)` is only safe for as long
+ * as the policy is correct, and defence that depends on exactly one
+ * control being right is the kind that fails quietly when the policy is
+ * next edited.
+ */
+export async function revokeApiKey(accountId: string, id: string): Promise<void> {
   const { error } = await supabase()
     .schema("noshashi")
     .from("api_keys")
     .update({ revoked_at: new Date().toISOString() })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("account_id", accountId);
   if (error) throw new Error(supabaseErrorMessage(error));
 }
 
@@ -106,25 +148,56 @@ export type UsageSummary = {
   byVerdict: Record<string, number>;
 };
 
+/**
+ * Usage, counted rather than sampled.
+ *
+ * This used to select up to 1,000 rows and report `rows.length` as the
+ * total. Past a thousand verifications the number simply stopped moving,
+ * and the thirty-day figure and the verdict split were computed over the
+ * same truncated window — so an account doing real volume saw a usage
+ * dashboard that under-reported it and then stayed still. On a page a
+ * customer reconciles against an invoice, that is the worst kind of
+ * wrong: stable, plausible and false.
+ *
+ * Four exact counts from the database instead of arithmetic over a page
+ * of rows. `head: true` transfers no rows at all — only the count.
+ */
 export async function readUsage(accountId: string): Promise<UsageSummary> {
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const { data, error } = await supabase()
-    .schema("noshashi")
-    .from("verification_events")
-    .select("verdict, created_at")
-    .eq("account_id", accountId)
-    .order("created_at", { ascending: false })
-    .limit(1000);
-  if (error) throw new Error(supabaseErrorMessage(error));
+  const events = () =>
+    supabase().schema("noshashi").from("verification_events");
 
-  const rows = data ?? [];
-  const byVerdict: Record<string, number> = { go: 0, hold: 0, "no-go": 0 };
-  let last30Days = 0;
-  for (const row of rows) {
-    const verdict = String(row.verdict);
-    byVerdict[verdict] = (byVerdict[verdict] ?? 0) + 1;
-    if (String(row.created_at) >= since) last30Days += 1;
+  const [total, last30, go, hold, noGo] = await Promise.all([
+    events().select("id", { count: "exact", head: true }).eq("account_id", accountId),
+    events()
+      .select("id", { count: "exact", head: true })
+      .eq("account_id", accountId)
+      .gte("created_at", since),
+    events()
+      .select("id", { count: "exact", head: true })
+      .eq("account_id", accountId)
+      .eq("verdict", "go"),
+    events()
+      .select("id", { count: "exact", head: true })
+      .eq("account_id", accountId)
+      .eq("verdict", "hold"),
+    events()
+      .select("id", { count: "exact", head: true })
+      .eq("account_id", accountId)
+      .eq("verdict", "no-go"),
+  ]);
+
+  for (const result of [total, last30, go, hold, noGo]) {
+    if (result.error) throw new Error(supabaseErrorMessage(result.error));
   }
 
-  return { total: rows.length, last30Days, byVerdict };
+  return {
+    total: total.count ?? 0,
+    last30Days: last30.count ?? 0,
+    byVerdict: {
+      go: go.count ?? 0,
+      hold: hold.count ?? 0,
+      "no-go": noGo.count ?? 0,
+    },
+  };
 }

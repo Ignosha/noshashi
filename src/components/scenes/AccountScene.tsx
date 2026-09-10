@@ -571,7 +571,7 @@ function ApiTab({
                 <button
                   onClick={() =>
                     void (async () => {
-                      await revokeApiKey(key.id);
+                      await revokeApiKey(accountId, key.id);
                       await load();
                       onNotify({ title: "KEY REVOKED", tone: "info" });
                     })()

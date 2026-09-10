@@ -2,41 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "noshashi-web",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "dev"
-      ],
-      "port": 1420,
-      "autoPort": false
-    },
-    {
-      "name": "noshashi-alt",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "dev",
-        "--",
-        "--port",
-        "1425",
-        "--strictPort"
-      ],
-      "port": 1425,
-      "autoPort": false
-    },
-    {
-      "name": "noshashi-site",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": [
-        "-m",
-        "http.server",
-        "4173",
-        "--directory",
-        "site"
-      ],
-      "port": 4173,
-      "autoPort": false
+      "name": "site",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", "site", "-l", "4321", "--no-clipboard"],
+      "port": 4321
     }
   ]
 }

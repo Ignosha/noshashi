@@ -291,7 +291,7 @@ const priced = (id: string) => {
 export const TIERS: Tier[] = [
   {
     id: "operator",
-    name: "OPERATOR",
+    name: "FREE",
     audience: "Individuals and single desks",
     ...priced("operator"),
     features: [
@@ -304,11 +304,11 @@ export const TIERS: Tier[] = [
   },
   {
     id: "desk",
-    name: "DESK",
+    name: "PRO",
     audience: "Trading desks and small funds",
     ...priced("desk"),
     features: [
-      "Everything in Operator",
+      "Everything in Free",
       "Multi-wallet portfolios",
       "Policy drift and expiry alerts",
       "Issuer freeze-rights analysis",
@@ -322,11 +322,11 @@ export const TIERS: Tier[] = [
   },
   {
     id: "institution",
-    name: "INSTITUTION",
+    name: "INSTITUTIONAL",
     audience: "Regulated venues and custodians",
     ...priced("institution"),
     features: [
-      "Everything in Desk",
+      "Everything in Pro",
       "Travel Rule (FATF R.16) scoping",
       "Signed audit export (chain-of-custody)",
       "Offline adjudication from captured state",
