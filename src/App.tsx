@@ -120,6 +120,7 @@ import { AccessibilityWidget } from "@/components/nova/AccessibilityWidget";
 import { BRAND } from "@/lib/brand";
 import { sceneVariants } from "@/lib/motion";
 import { useTrayTicker } from "@/lib/trayTicker";
+import { checkOnStartup } from "@/lib/updates";
 import { cn } from "@/lib/utils";
 import type { Status } from "@/lib/xrpl/types";
 import { DOMAIN_REGISTRY, evaluatePolicy } from "@/lib/policy";
@@ -563,6 +564,30 @@ function ConsoleApp() {
   useEffect(() => {
     document.title = `${BRAND.name} · ${active.title}`;
   }, [active.title]);
+
+  /**
+   * Startup update check.
+   *
+   * Announces an available release and stops there — Settings › Updates is
+   * where it gets installed, by a person. Silent when there is nothing to
+   * report, including when the release host cannot be reached: an operator
+   * opening a compliance console does not need a network complaint about
+   * something unrelated to the ledger in front of them.
+   */
+  useEffect(() => {
+    let cancelled = false;
+    void checkOnStartup().then((update) => {
+      if (cancelled || !update || update.state !== "available") return;
+      push({
+        title: `UPDATE AVAILABLE · v${update.version}`,
+        body: "Settings › Updates to review and install it.",
+        tone: "info",
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [push]);
 
   const goTo = useCallback((next: string) => {
     if (!SCENE_BY_ID.has(next as SceneId)) return;

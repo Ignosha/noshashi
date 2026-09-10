@@ -28,7 +28,13 @@ export type PermissionedDomain = {
   institution: string;
   /** Credential types that must be held, accepted and unrevoked. */
   requirements: CredentialType[];
-  /** Ceiling per settlement, in XRP. Zero means uncapped. */
+  /**
+   * Ceiling per settlement, in XRP.
+   *
+   * Zero does NOT mean uncapped — it means the domain is not settling, and
+   * TRANSFER_CEILING fails outright. Reading it the other way round would
+   * pass any size through a closed domain.
+   */
   transferCeilingXrp: number;
   /** Domains under governance review gate to HOLD rather than GO. */
   governance: "active" | "review" | "suspended";
@@ -175,9 +181,17 @@ export function evaluatePolicy(input: {
     label: "Account activated on mainnet",
     severity: "block",
     passed: Boolean(account) && (account?.sequence ?? 0) >= 1,
-    detail: account
-      ? "Account is funded and has a validated sequence number."
-      : "No validated account object found for this address.",
+    // fetchAccount returns a real object with `unfunded: true` for a
+    // well-formed address that was never funded, so `account` being present
+    // is not the same as the account existing on-ledger. Saying "Account is
+    // funded" beside a failed check put a false statement in an audit
+    // receipt. The digest covers only [id, passed], so this wording is safe
+    // to correct without invalidating historical receipts.
+    detail: !account
+      ? "No validated account object found for this address."
+      : account.unfunded
+        ? "Address is well-formed but has never been funded on mainnet."
+        : "Account is funded and has a validated sequence number.",
   });
 
   for (const requirement of domain.requirements) {

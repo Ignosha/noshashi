@@ -22,6 +22,18 @@ OUT="release"
 mkdir -p "$OUT"
 WHICH="${1:-both}"
 
+# The version and the host architecture both appear in the DMG filename
+# Tauri produces. Both were hard-coded — the paths below still said 0.1.0
+# and x64 long after package.json reached 0.2.2, so the real DMG was never
+# found, every build silently fell through to the hdiutil fallback, and the
+# staged artefact was named for a version that no longer existed. Read them
+# from the source of truth instead.
+VERSION="$(node -p "require('./package.json').version")"
+case "$(uname -m)" in
+  arm64|aarch64) ARCH="aarch64" ;;
+  *)             ARCH="x64" ;;
+esac
+
 # Remove the previous artefact BEFORE building. Otherwise a failed build
 # leaves the old file sitting in release/ looking current — which is worse
 # than an empty directory, because nothing tells you it is stale.
@@ -54,28 +66,30 @@ stage() {           # stage <source-dmg> <destination-name> [app-path] [volume]
     echo "  FAILED: $dest was not produced" >&2
     return 1
   fi
+  # wc/awk rather than python3: a release script should not fail to report
+  # a size because an interpreter it never otherwise needs is absent.
   local size
-  size=$(python3 -c "import os;print(f'{os.path.getsize(\"$dest\")/1024/1024:.1f} MB')")
+  size=$(wc -c < "$dest" | awk '{printf "%.1f MB", $1/1024/1024}')
   echo "  staged  $dest  ($size)"
   echo "  sha256  $(shasum -a 256 "$dest" | cut -d' ' -f1)"
 }
 
 if [[ "$WHICH" == "full" || "$WHICH" == "both" ]]; then
   echo "==> FULL edition"
-  retire "NOSHASHI_0.1.0.dmg"
+  retire "NOSHASHI_${VERSION}.dmg"
   npm run tauri build || echo "  (tauri reported a bundling error — checking for the .app)"
-  stage "src-tauri/target/release/bundle/dmg/NOSHASHI_0.1.0_x64.dmg" \
-        "NOSHASHI_0.1.0.dmg" \
+  stage "src-tauri/target/release/bundle/dmg/NOSHASHI_${VERSION}_${ARCH}.dmg" \
+        "NOSHASHI_${VERSION}.dmg" \
         "src-tauri/target/release/bundle/macos/NOSHASHI.app" \
         "NOSHASHI"
 fi
 
 if [[ "$WHICH" == "demo" || "$WHICH" == "both" ]]; then
   echo "==> DEMO edition"
-  retire "NOSHASHI_Demo_0.1.0.dmg"
+  retire "NOSHASHI_Demo_${VERSION}.dmg"
   npm run tauri:demo || echo "  (tauri reported a bundling error — checking for the .app)"
-  stage "src-tauri/target/release/bundle/dmg/NOSHASHI Demo_0.1.0_x64.dmg" \
-        "NOSHASHI_Demo_0.1.0.dmg" \
+  stage "src-tauri/target/release/bundle/dmg/NOSHASHI Demo_${VERSION}_${ARCH}.dmg" \
+        "NOSHASHI_Demo_${VERSION}.dmg" \
         "src-tauri/target/release/bundle/macos/NOSHASHI Demo.app" \
         "NOSHASHI Demo"
 fi

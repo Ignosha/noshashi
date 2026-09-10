@@ -19,11 +19,37 @@ tauri-plugin-global-shortcut = "2"
 tauri-plugin-notification = "2"
 tauri-plugin-positioner = { version = "2", features = ["tray-icon"] }
 tauri-plugin-store = "2"
-keyring = { version = "3", features = ["apple-native"] }
+# Signed in-place updates. The updater verifies a minisign signature over
+# the downloaded bundle with the public key in tauri.conf.json, which is
+# what makes an unsigned, un-notarised application safe to update at all:
+# the release host is not trusted, the key is.
+tauri-plugin-updater = "2"
+# Restarting into the installed version is the last step of an update.
+tauri-plugin-process = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 url = "2"
 sha2 = "0.10"
+
+# keyring 3 compiles NO credential store unless a backend feature asks for
+# one, and silently falls back to an in-process mock when none is enabled.
+# Only `apple-native` was listed, so the Windows and Linux installers that
+# release.yml ships stored every secret — the compliance API key and each
+# model-provider key — in memory: `store_api_secret` reported success,
+# `has_api_secret` said yes, and the value was gone at the next launch.
+# The backend has to be selected per target, because each one only builds
+# on its own platform.
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3", features = ["apple-native"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+keyring = { version = "3", features = ["windows-native"] }
+
+# secret-service over zbus — pure Rust, so this adds no libdbus/openssl
+# package to the Linux build. `crypto-rust` encrypts the session with the
+# keyring daemon rather than passing the secret in the clear.
+[target.'cfg(target_os = "linux")'.dependencies]
+keyring = { version = "3", features = ["sync-secret-service", "crypto-rust"] }
 
 [profile.release]
 lto = true

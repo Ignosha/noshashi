@@ -25,3 +25,12 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/**
+ * The version from package.json, substituted at build time by vite.config.ts.
+ *
+ * Every user-facing version string reads this. Hard-coding it meant the About
+ * panel, the footer and the legal BUILD row all still said 0.1.0 three
+ * releases later, which is a bad thing for the legal row in particular to say.
+ */
+declare const __APP_VERSION__: string;
