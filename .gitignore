@@ -57,3 +57,7 @@ npm-debug.log*
 # Business/setup notes — kept locally, never committed (see ~/noshashi-private)
 COMMERCIALIZATION_PLAN.txt
 SETUP.md
+# Supabase CLI local state. Written by supabase link and rewritten on
+# every command: which project this checkout is linked to, the pooler
+# host, and the versions the CLI last saw. Per-machine and not shared.
+supabase/.temp/
