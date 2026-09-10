@@ -152,6 +152,37 @@ https://supabase.com/dashboard/project/xiurbiwuwcfowqnpmwki/auth/providers
 Screens new and changed passwords against HaveIBeenPwned. Flagged as
 outstanding in `20260828_harden_function_grants.sql` and still open.
 
+## `db pull` and `db dump` both need Docker
+
+Attempted, and neither works on a machine without a container runtime:
+
+```
+supabase db pull  → Creating shadow database... docker: command not found (podman also not found)
+supabase db dump  → Dumping schemas from remote database... docker: command not found
+```
+
+`db pull` stands up a shadow database to diff against; `db dump` runs
+pg_dump. Both do it in a container, so both are blocked. Installing
+Docker Desktop is the only way to use them — admin rights, a WSL2 backend
+and usually a reboot.
+
+`introspect_remote_schema.sql` in this directory is the substitute: eight
+read-only catalog queries returning the same facts a dump would — columns,
+constraints, indexes, RLS state and policies, functions with their
+security mode and pinned search_path, triggers, and table- and
+column-level grants. Paste it into the SQL editor and read the output
+against `20260910_noshashi_schema_baseline.sql`.
+
+Two results are worth reading closely rather than skimming:
+
+- **`relrowsecurity` per table**, from query 4. A table with policies and
+  RLS switched off is wide open, and those two facts live in different
+  catalogs — policies alone prove nothing.
+- **Column privileges on `api_keys`**, from query 8. `authenticated` must
+  hold `UPDATE` on exactly `name` and `revoked_at`. Anything more and a
+  customer's own session can edit the columns that decide whether their
+  key is trusted.
+
 ## Still outstanding: the repo cannot rebuild this database from scratch
 
 The placeholders reconcile the history table; they do not restore the lost
