@@ -30,6 +30,83 @@ running it.
 
 ---
 
+## Where this stands
+
+Last updated **2026-09-10**. Read this first if you are picking the project
+back up.
+
+### Deployed and verified
+
+| | State |
+|---|---|
+| Compliance API (`noshashi-verify`) | **Deployed.** `GET` returns the descriptor and published limits; an invalid key returns 401 with `X-Request-Id`, `no-store` and `nosniff` — not a 500 |
+| API hardening migration | **Applied** (by hand via the SQL editor) and recorded with `migration repair --status applied 20260910000000` |
+| Migration history | **Reconciled.** `supabase migration list` reports `local == remote` for all five versions, so plain `db push` works — no `--include-all` |
+| Pricing page | Written at `site/pricing/`, linked from the home page and the sitemap |
+| Redemption stress testing | Engine, tests and UI all in. `STRESS` tab in the Risk scene |
+
+### Open
+
+1. **Leaked-password protection is off.** Not settable from the CLI —
+   `config.toml` has no field for it, so `config push` cannot do it even in
+   principle. Dashboard only: Authentication → Sign In / Providers →
+   Password settings → "Prevent use of leaked passwords". Flagged as
+   outstanding in `20260828_harden_function_grants.sql` and still open.
+2. **The repo cannot rebuild the database from scratch.** Four migrations
+   were authored in the dashboard and never committed, so
+   `supabase/history/20260910_noshashi_schema_baseline.sql` is a
+   reconstruction written from memory rather than the bytes that built the
+   schema. `db pull` and `db dump` both need Docker, which is not installed;
+   `supabase/history/introspect_remote_schema.sql` is the no-Docker
+   substitute. Run it and reconcile.
+3. **Annual Stripe prices do not exist yet.** `annualPriceId` is `null` for
+   both paid tiers in `src/lib/billing/catalog.ts`. The pricing page quotes
+   $7,490 and $40,000; nothing can be bought at those numbers until the
+   prices are created.
+
+### ⚠️ Do not run `supabase config push`
+
+It would disable authentication email (Resend) and SMS (Twilio). A
+`config pull` skips six remote values it cannot complete without
+`smtp.pass` and `twilio.account_sid`, so local config says SMTP is absent
+and Twilio is off — and a push sends local. Detail and the fix in
+[`supabase/history/README.md`](supabase/history/README.md).
+
+### Commercial naming
+
+Customer-facing tiers are **Free**, **Pro** ($749/seat/mo) and
+**Institutional** ($4,000/mo). The plan *identifiers* stay `operator`,
+`desk` and `institution` — they are the `tier` check constraint on
+`noshashi.entitlements`, the value the Stripe webhook writes on checkout,
+and the value the Compliance API reads to pick a rate limit. Renaming a
+display name is a copy change; renaming an identifier is a migration plus
+two deploys that have to land together or every paying account loses its
+entitlements in the gap. The mapping lives in
+`src/lib/billing/catalog.ts`.
+
+### Go-to-market documents
+
+| File | What it is |
+|---|---|
+| [`docs/API.md`](docs/API.md) | Compliance API spec — auth, rate limits, idempotency, webhook schemas, every error code, Node and Python quickstarts. Endpoints not yet built are marked `NOT BUILT` |
+| [`docs/FEATURE_MATRIX.md`](docs/FEATURE_MATRIX.md) | Entitlements per tier, the `grants` reference table, and the deliberate omissions with reasons |
+| [`docs/SALES.md`](docs/SALES.md) | Cold outreach templates by segment, institutional one-pager, Product Hunt and Show HN copy, research-to-SEO pipeline |
+| [`docs/ONBOARDING.md`](docs/ONBOARDING.md) | Payment → API key → first call, three welcome emails, in-app checklist, docs tree |
+| [`docs/LAUNCH.md`](docs/LAUNCH.md) | Launch plan, gate-sequenced rather than dated |
+
+Legal drafts (ToS, Privacy, MSA, SLA, DPA) are **not** in the repo and are
+hard gates: Pro cannot take a card without ToS and Privacy, and
+Institutional cannot be invoiced without an entity, MSA, SLA and DPA.
+
+### Toolchain
+
+This machine has no system Git, Node, Supabase CLI or Deno. Portable copies
+live in `C:\Users\<user>\dev-tools\` (`git\cmd`, `node`, `supabase`,
+`deno`) and are on the user PATH. **An already-open terminal will not see
+them** — PowerShell reads PATH once at startup, so open a new one.
+
+---
+
 ## The two editions
 
 NOSHASHI builds from one source tree into two artefacts that install side by
@@ -166,6 +243,9 @@ src/
     desk/
       risk.ts              freeze rights, Travel Rule, HHI concentration
       liquidity.ts         exit liquidity — the compliance × market join
+      stress.ts            portfolio redemption stress — CLOB+AMM routing,
+                           shared-book contention, priced freeze rights
+      apiKeys.ts           key issuance, terminal revocation, usage counts
       settlement.ts        delivered vs requested — the partial-payment trap
       provenance.ts        account age and funding source
       control.ts           signer weights, quorum, reserve and escrow locks
@@ -198,7 +278,20 @@ scripts/
   build-legal-page.mjs     generate site/legal/ from src/lib/legal.ts
 docs/
   build_briefing.py        generate the 8-page briefing PDF
+  API.md                   Compliance API specification
+  FEATURE_MATRIX.md        entitlements per tier
+  SALES.md                 outreach, one-pager, launch copy
+  ONBOARDING.md            payment to first successful API call
+  LAUNCH.md                gate-sequenced launch plan
+supabase/
+  functions/
+    noshashi-verify/       the Compliance API — server-side twin of policy.ts
+  migrations/              pending only; five versions, history reconciled
+  history/                 applied schema records + why they are not migrations
+    introspect_remote_schema.sql   read the live schema back (no Docker needed)
+  verify_api_hardening.sql PRESENT/MISSING check for the hardening migration
 site/                      noshashi.app — deploy with `vercel deploy --prod`
+  pricing/                 tier cards, comparison table, FAQ
 ```
 
 `PRODUCT.md` holds product truth. `DESIGN.md` holds the design system and the
@@ -226,9 +319,27 @@ Report anything you find to **security@noshashi.app**.
 npm run dev            # frontend only, in a browser
 npm run tauri:dev      # the real desktop app
 npm run build          # typecheck + production frontend
+npm test               # 272 tests
 npx tsc --noEmit       # typecheck alone
+npm run check:functions               # type-check the Edge Function
 node scripts/build-legal-page.mjs     # regenerate site/legal/
 python3 docs/build_briefing.py out.pdf
+```
+
+`check:functions` exists because `tsconfig.json` includes only
+`["src", "vite.config.ts"]`, so **nothing in the normal build type-checks
+`supabase/functions/`**. When that was first run against the Compliance API
+it reported seven errors in a file that was about to be deployed. It needs
+`deno` on PATH.
+
+Deploying the API is two steps, in this order — the function reads
+`entitlements.rate_limit_per_second`, `api_keys.scopes` and
+`verification_events.receipt`, so a function deployed ahead of its schema
+returns 500 on every request:
+
+```bash
+supabase db push
+supabase functions deploy noshashi-verify
 ```
 
 ### House rules
