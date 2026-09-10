@@ -1,5 +1,61 @@
 # Changelog
 
+## Unreleased
+
+**The Compliance API refused every credentialed subject.** `CredentialType`
+is a variable-length blob and arrives hex-encoded — `KYC_LEVEL_1` reaches the
+edge function as `4B59435F4C4556454C5F31`. The console decodes it; the server
+did not, and compared raw hex against the domain's plain-text requirement. It
+never matched. Every `CREDENTIAL_*` check failed for subjects who genuinely
+held the credential, and the API's answer was `no-go` regardless of the
+ledger. Decoded now, exactly as `fetchWalletCredentials` does.
+
+**The same function invented ledger state when it could not read any.**
+rippled's HTTP JSON-RPC reports a command error *inside* `result` and sends
+HTTP 200 doing it — only the WebSocket API puts the error at the top level,
+which is the shape the code tested for. An unknown or unreadable account
+therefore arrived as an empty result and became an account with a zero
+balance and no credentials, which was then adjudicated as though it had been
+read. It now raises the ledger's own error code: an unfunded account gets the
+same unfunded record the console produces, so both sides digest the same
+receipt, and anything else returns 502 rather than a verdict.
+
+**Windows and Linux stored no secrets at all.** `keyring` compiles no
+credential store unless a backend feature asks for one, and falls back to an
+in-process mock in silence. Only `apple-native` was listed, so on the Windows
+and Linux builds the compliance API key and every model-provider key were
+written to memory: the UI reported success, and the value was gone at the
+next launch. Backends are now selected per target.
+
+**`open_external` could run arbitrary commands on Windows.** It shelled out
+through `cmd /C start`, and cmd re-parses its command line with rules Rust's
+argument quoting does not cover — `&`, `|` and `^` reach it unquoted, so a URL
+of `https://example.com/?a=b&calc.exe` ran `calc.exe`. That is the exact
+escape the command's scheme check exists to prevent. It now uses `rundll32`,
+which is not a shell.
+
+**`export_text_file` could write outside Downloads on Windows.** Taking the
+last path segment does not help when `join` *replaces* the base path for an
+argument carrying a drive prefix, so `C:audit.csv` escaped intact. Names
+carrying a separator, a drive letter or a control character are refused
+rather than salvaged.
+
+**The version was wrong everywhere it was shown.** The About panel, the
+footer and the legal BUILD row all read 0.1.0 at version 0.2.2, as did both
+DMG packaging scripts — which meant the release script never found the DMG it
+had just built and silently repackaged from the `.app` every time. All of it
+now reads `package.json`, substituted at build time.
+
+**Automatic updates.** Signed, verified against a key compiled into the
+application, and never installed without a click — see `docs/UPDATES.md`.
+Inert until a signing keypair exists, and it says so rather than offering a
+button that cannot work.
+
+Two receipt lines corrected: `ACCOUNT_ACTIVATED` said "Account is funded"
+beside a *failed* check for an address that had never been funded, and the
+`transferCeilingXrp` documentation said zero meant uncapped where the engine
+— correctly, and under test — treats it as a closed domain.
+
 ## 0.2.2
 
 **Linux ships.** The 0.2.1 release run failed on one of its four build

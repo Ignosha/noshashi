@@ -7,7 +7,8 @@
 export const BRAND = {
   name: "NOSHASHI",
   tagline: "Autonomous Compliance Layer",
-  version: "0.1.0",
+  /** Substituted from package.json at build time — never edit by hand. */
+  version: __APP_VERSION__,
   /** Update when the operating entity is registered. */
   legalEntity: "NOSHASHI Labs",
   jurisdiction: "United States",

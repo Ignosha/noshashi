@@ -9,7 +9,16 @@ set -euo pipefail
 
 BUNDLE="src-tauri/target/release/bundle"
 APP="$BUNDLE/macos/NOSHASHI.app"
-OUT="$BUNDLE/dmg/NOSHASHI_0.1.0_x64.dmg"
+
+# Read the version and architecture rather than restating them: this said
+# 0.1.0_x64 while the project was at 0.2.2 on Apple Silicon, so it wrote a
+# DMG whose name matched no release it could have contained.
+VERSION="$(node -p "require('./package.json').version")"
+case "$(uname -m)" in
+  arm64|aarch64) ARCH="aarch64" ;;
+  *)             ARCH="x64" ;;
+esac
+OUT="$BUNDLE/dmg/NOSHASHI_${VERSION}_${ARCH}.dmg"
 
 [ -d "$APP" ] || { echo "No .app found. Run: npm run tauri:build" >&2; exit 1; }
 

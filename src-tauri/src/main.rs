@@ -130,11 +130,23 @@ fn clear_api_secret() -> Result<(), String> {
 #[tauri::command]
 fn export_text_file(app: AppHandle, filename: String, contents: String) -> Result<String, String> {
     // Never let the webview escape the target directory.
-    let safe_name = filename
-        .rsplit(['/', '\\'])
-        .next()
-        .filter(|name| !name.is_empty() && *name != "." && *name != "..")
-        .ok_or_else(|| "Invalid file name".to_string())?;
+    //
+    // Taking the last path segment is not enough on Windows: `join` REPLACES
+    // the base path when the argument carries a drive prefix, so a filename
+    // of `C:audit.csv` survives the split intact and writes to whatever the
+    // process's current directory on C: happens to be. Reject anything
+    // carrying a separator, a drive letter, or a control character rather
+    // than trying to salvage a tail from it.
+    let name = filename.trim();
+    let looks_like_a_path = name.is_empty()
+        || name == "."
+        || name == ".."
+        || name.contains(['/', '\\', ':'])
+        || name.chars().any(char::is_control);
+    if looks_like_a_path {
+        return Err("Invalid file name".to_string());
+    }
+    let safe_name = name;
 
     let directory = app
         .path()
@@ -293,10 +305,19 @@ fn open_external(url: String) -> Result<(), String> {
 
     #[cfg(target_os = "macos")]
     let result = Command::new("/usr/bin/open").arg(parsed.as_str()).spawn();
+
+    // NOT `cmd /C start`. cmd.exe re-parses its command line with its own
+    // rules, which Rust's argument quoting does not cover: `&`, `|` and `^`
+    // are separators to cmd and are passed through unquoted, so a URL of
+    // `https://example.com/?a=b&calc.exe` ran calc.exe. That is precisely
+    // the escape this command exists to prevent, reachable from any front
+    // end able to call open_external. rundll32 is an ordinary executable —
+    // no shell, standard argument quoting, and no console window flash.
     #[cfg(target_os = "windows")]
-    let result = Command::new("cmd")
-        .args(["/C", "start", "", parsed.as_str()])
+    let result = Command::new("rundll32")
+        .args(["url.dll,FileProtocolHandler", parsed.as_str()])
         .spawn();
+
     #[cfg(all(unix, not(target_os = "macos")))]
     let result = Command::new("xdg-open").arg(parsed.as_str()).spawn();
 
@@ -350,8 +371,37 @@ fn build_app_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     Menu::with_items(app, &[&app_menu, &file_menu, &edit_menu, &window_menu])
 }
 
+/// Whether this build carries an updater public key.
+///
+/// The updater plugin refuses to initialise without one, and that failure
+/// takes the whole application down at startup — so a checkout that has not
+/// had `npm run tauri signer generate` run against it would not launch at
+/// all. Reading the committed config at compile time lets the plugin be
+/// registered only when it can actually work; `updater_configured` is
+/// exposed to the front end so the Settings panel can say which it is
+/// rather than showing a button that fails.
+const TAURI_CONF: &str = include_str!("../tauri.conf.json");
+
+fn updater_public_key() -> String {
+    serde_json::from_str::<serde_json::Value>(TAURI_CONF)
+        .ok()
+        .and_then(|conf| {
+            conf.get("plugins")?
+                .get("updater")?
+                .get("pubkey")?
+                .as_str()
+                .map(str::to_owned)
+        })
+        .unwrap_or_default()
+}
+
+#[tauri::command]
+fn updater_configured() -> bool {
+    !updater_public_key().trim().is_empty()
+}
+
 fn main() {
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_positioner::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_notification::init())
@@ -384,7 +434,8 @@ fn main() {
             store_provider_key,
             get_provider_key,
             has_provider_key,
-            clear_provider_key
+            clear_provider_key,
+            updater_configured
         ])
         .setup(|app| {
             let handle = app.handle().clone();
@@ -451,8 +502,11 @@ fn main() {
                 });
             }
 
-            // The console starts hidden so the window never appears
-            // half-painted; the webview reveals it once React has mounted.
+            // The window is configured `visible: false` so it never appears
+            // half-painted while the webview loads, and it is revealed here
+            // once setup has finished. Nothing in the front end shows it, so
+            // this call is what actually puts the console on screen —
+            // removing it leaves the app running with no window at all.
             if let Some(window) = app.get_webview_window(MAIN_WINDOW) {
                 let _ = window.show();
                 let _ = window.set_focus();
@@ -475,7 +529,18 @@ fn main() {
                 }
             }
             _ => {}
-        })
+        });
+
+    // Registered last and only when signed updates can actually be verified.
+    // With no public key the plugin's own initialisation fails, and that is a
+    // startup failure for the whole application rather than a missing button.
+    if updater_configured() {
+        builder = builder
+            .plugin(tauri_plugin_updater::Builder::new().build())
+            .plugin(tauri_plugin_process::init());
+    }
+
+    builder
         .run(tauri::generate_context!())
         .expect("error while running NOSHASHI");
 }

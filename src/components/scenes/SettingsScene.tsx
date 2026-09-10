@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { BRAND } from "@/lib/brand";
 import { sendNativeNotification } from "@/lib/notifications";
 import { isTauri, isMac } from "@/lib/env";
 import { isValidAddress, formatUptime } from "@/lib/xrpl/client";
@@ -25,6 +26,14 @@ import { useAppearance, TEXT_SCALES, type ThemeMode, type MotionMode } from "@/l
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import { staggerChild, staggerParent } from "@/lib/motion";
 import { readCapabilities, type CapabilityReport } from "@/lib/xrpl/amendments";
+import { useSetting } from "@/lib/store";
+import {
+  AUTO_CHECK_KEY,
+  checkForUpdate,
+  installPendingUpdate,
+  type UpdateAvailability,
+  type UpdateProgress,
+} from "@/lib/updates";
 
 function SettingRow({
   icon,
@@ -491,6 +500,10 @@ export function SettingsScene({
           </motion.div>
 
           <motion.div variants={staggerChild}>
+            <AutomaticUpdates />
+          </motion.div>
+
+          <motion.div variants={staggerChild}>
             <Panel label="BINARY INTEGRITY" corners>
               <p className="text-[10px] leading-relaxed text-muted-foreground">
                 Hashes the executable that is currently running. Compare the digest
@@ -566,7 +579,7 @@ export function SettingsScene({
                 <NovaLogo size={34} className="text-foreground" />
                 <div>
                   <p className="display text-[12px] font-[700] tracking-[0.1em] text-foreground">
-                    NOSHASHI v0.1.0
+                    {BRAND.name} v{BRAND.version}
                   </p>
                   <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
                     Autonomous Compliance Layer · XRPL Mainnet.
@@ -607,6 +620,138 @@ export function SettingsScene({
  * amendment has to have activated, and until it does every transaction of
  * that type is rejected by every validator on the network.
  */
+/**
+ * Automatic updates.
+ *
+ * The install is a click, never a surprise. This tool issues receipts an
+ * examiner is expected to be able to reason about, and a rule set that
+ * changed itself between two of them — without anyone at the desk knowing
+ * which build produced which — would undermine exactly the property the
+ * product is sold on. So: checking is automatic, applying is deliberate,
+ * and the version is on screen either way.
+ *
+ * What makes it safe to offer at all is that the release host is not
+ * trusted. See src/lib/updates.ts.
+ */
+function AutomaticUpdates() {
+  const { push } = useToast();
+  const [autoCheck, setAutoCheck] = useSetting(AUTO_CHECK_KEY, true);
+  const [status, setStatus] = useState<UpdateAvailability | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [progress, setProgress] = useState<UpdateProgress | null>(null);
+
+  const run = async () => {
+    setChecking(true);
+    setProgress(null);
+    try {
+      setStatus(await checkForUpdate());
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const install = async () => {
+    setProgress({ downloaded: 0 });
+    try {
+      // The application restarts into the new version on success, so there
+      // is no "done" state to render here — only a failure to report.
+      await installPendingUpdate(setProgress);
+    } catch (error) {
+      setProgress(null);
+      push({
+        title: "UPDATE REFUSED",
+        body: error instanceof Error ? error.message : "The download did not verify.",
+        tone: "no-go",
+      });
+    }
+  };
+
+  const pct =
+    progress && progress.total
+      ? Math.min(100, Math.round((progress.downloaded / progress.total) * 100))
+      : null;
+
+  return (
+    <Panel
+      label="UPDATES"
+      corners
+      right={
+        <Button size="sm" variant="outline" onClick={() => void run()} disabled={checking}>
+          {checking ? "CHECKING…" : "CHECK NOW"}
+        </Button>
+      }
+    >
+      <p className="text-[10px] leading-relaxed text-muted-foreground">
+        Every update is signed, and the signature is checked against a key
+        compiled into this build before anything is written to disk. An
+        unsigned or altered download is refused, whatever served it. Nothing
+        installs until you say so.
+      </p>
+
+      <div className="mt-1">
+        <SettingRow
+          icon={<NovaSat size={14} />}
+          title="Check automatically"
+          description="Once at launch, at most every six hours. No installs without a click."
+        >
+          <Switch checked={autoCheck} onCheckedChange={setAutoCheck} />
+        </SettingRow>
+      </div>
+
+      <div className="inset-row mt-3 p-2.5">
+        <Eyebrow>INSTALLED</Eyebrow>
+        <p className="mono-font mt-1 text-[11px] text-foreground">v{BRAND.version}</p>
+
+        {status?.state === "available" && (
+          <>
+            <Eyebrow className="mt-3">AVAILABLE</Eyebrow>
+            <p className="mono-font mt-1 text-[11px] text-go">
+              v{status.version}
+              {status.date ? ` · ${status.date.slice(0, 10)}` : ""}
+            </p>
+            {status.notes && (
+              <p className="mt-2 whitespace-pre-line text-[10px] leading-relaxed text-muted-foreground">
+                {status.notes}
+              </p>
+            )}
+            <Button
+              size="sm"
+              className="mt-3 w-full gap-2"
+              disabled={progress !== null}
+              onClick={() => void install()}
+            >
+              <NovaShield size={13} />
+              {progress === null
+                ? `INSTALL v${status.version} AND RESTART`
+                : pct === null
+                  ? "DOWNLOADING…"
+                  : `DOWNLOADING ${pct}%`}
+            </Button>
+          </>
+        )}
+
+        {status?.state === "current" && (
+          <p className="mt-2 text-[10px] text-muted-foreground">
+            This is the current release.
+          </p>
+        )}
+
+        {(status?.state === "unsupported" ||
+          status?.state === "unconfigured" ||
+          status?.state === "error") && (
+          <p
+            className={`mt-2 text-[10px] leading-relaxed ${
+              status.state === "error" ? "text-no-go" : "text-hold"
+            }`}
+          >
+            {status.reason}
+          </p>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
 function NetworkCapabilities() {
   const [report, setReport] = useState<CapabilityReport | null>(null);
   const [error, setError] = useState<string | null>(null);

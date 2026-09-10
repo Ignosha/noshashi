@@ -133,7 +133,14 @@ function heldCredentialTypes(credentials: Array<Record<string, unknown>>): Set<s
   for (const credential of credentials) {
     const accepted = Number(credential.Flags ?? 0) & 0x00010000;
     if (accepted !== 0 && !credential.Revoked) {
-      held.add(String(credential.CredentialType ?? "").toUpperCase());
+      // CredentialType is a variable-length blob and arrives hex-encoded —
+      // "KYC_LEVEL_1" reaches us as 4B59435F4C4556454C5F31. The console
+      // decodes it in fetchWalletCredentials; this side did not, so the
+      // requirement comparison was hex against plain text, never matched,
+      // and every credential check failed for subjects who genuinely hold
+      // the credential. Decode first, exactly as the client does.
+      const raw = String(credential.CredentialType ?? "");
+      held.add((decodeHexDomain(raw) ?? raw).toUpperCase());
     }
   }
   return held;
@@ -158,7 +165,14 @@ function decodeHexDomain(hex: string): string | undefined {
 
 /** The full rule set, identical to evaluatePolicy in src/lib/policy.ts. */
 function evaluatePolicy(body: {
-  account: { address: string; balanceXrp: string; sequence: number; ownerCount: number; domain?: string } | null;
+  account: {
+    address: string;
+    balanceXrp: string;
+    sequence: number;
+    ownerCount: number;
+    domain?: string;
+    unfunded?: boolean;
+  } | null;
   credentials: Array<Record<string, unknown>>;
   domain: PermissionedDomain;
   amountXrp: number;
@@ -176,9 +190,11 @@ function evaluatePolicy(body: {
     label: "Account activated on mainnet",
     severity: "block",
     passed: Boolean(account) && (account?.sequence ?? 0) >= 1,
-    detail: account
-      ? "Account is funded and has a validated sequence number."
-      : "No validated account object found for this address.",
+    detail: !account
+      ? "No validated account object found for this address."
+      : account.unfunded
+        ? "Address is well-formed but has never been funded on mainnet."
+        : "Account is funded and has a validated sequence number.",
   });
 
   for (const requirement of domain.requirements) {
@@ -287,6 +303,17 @@ async function receiptDigest(
 /* Ledger reads (public rippled JSON-RPC, server-side)                 */
 /* ------------------------------------------------------------------ */
 
+/** A refusal from rippled itself, carrying the ledger's own error code. */
+class RippledError extends Error {
+  constructor(
+    message: string,
+    readonly code: string
+  ) {
+    super(message);
+    this.name = "RippledError";
+  }
+}
+
 async function rippleRpc(command: string, params: Record<string, unknown>): Promise<Record<string, any>> {
   let lastError: Error | null = null;
   for (const endpoint of PUBLISHED_RIPPLE_HTTP) {
@@ -297,10 +324,33 @@ async function rippleRpc(command: string, params: Record<string, unknown>): Prom
         body: JSON.stringify({ method: command, params: [params] }),
       });
       if (!response.ok) throw new Error(`rippled replied ${response.status}`);
-      const payload = (await response.json()) as { result?: Record<string, any>; error?: string };
-      if (payload.error) throw new Error(payload.error);
-      return payload.result ?? {};
+      const payload = (await response.json()) as {
+        result?: Record<string, any>;
+        error?: string;
+        error_message?: string;
+      };
+
+      // rippled's HTTP JSON-RPC reports a command error INSIDE `result` —
+      // {"result":{"status":"error","error":"actNotFound",...}} — and sends
+      // HTTP 200 while doing it. Only the WebSocket API puts the error at
+      // the top level. Testing `payload.error` alone therefore saw no error
+      // at all: an unknown or unreadable account came back as an empty
+      // result, and fetchLedgerAccount below turned that into a real-looking
+      // account with a zero balance. The API then adjudicated invented
+      // ledger state instead of saying it could not read it.
+      const result = payload.result ?? {};
+      const code = String(result.error ?? payload.error ?? "");
+      if (code) {
+        throw new RippledError(
+          String(result.error_message ?? payload.error_message ?? code),
+          code
+        );
+      }
+      return result;
     } catch (error) {
+      // A refusal is the ledger's answer, not a sick node — the next
+      // endpoint would only repeat it. Transport failures do get retried.
+      if (error instanceof RippledError) throw error;
       lastError = error instanceof Error ? error : new Error(String(error));
     }
   }
@@ -320,10 +370,24 @@ async function fetchLedgerAccount(subject: string) {
       sequence: Number(data.Sequence ?? 0),
       ownerCount: Number(data.OwnerCount ?? 0),
       domain: decodeHexDomain(String(data.Domain ?? "")),
+      unfunded: false,
     };
   } catch (error) {
-    if (String((error as Error).message).toLowerCase().includes("actnotfound")) {
-      return null; // well-formed, never funded → the policy's ACCOUNT_ACTIVATED check refuses
+    if (error instanceof RippledError && error.code === "actNotFound") {
+      // Well-formed but never funded. The console's fetchAccount returns the
+      // same shape rather than null, and it has to: `subject` in the receipt
+      // body is `account?.address ?? "unknown"`, so returning null here would
+      // digest "unknown" on this side and the address on the client's — two
+      // different receipts for one set of facts. ACCOUNT_ACTIVATED still
+      // refuses it, on both sides, because the sequence is zero.
+      return {
+        address: subject,
+        balanceXrp: "0.00",
+        sequence: 0,
+        ownerCount: 0,
+        domain: undefined,
+        unfunded: true,
+      };
     }
     throw error;
   }
