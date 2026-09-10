@@ -83,6 +83,75 @@ With those present, remote history and local filenames agree, and `db push`
 has exactly one migration left to apply:
 `20260910000000_api_hardening.sql`.
 
+## Resolved: history now reconciles
+
+`supabase migration list` reports `local == remote` for all five versions,
+so plain `supabase db push` works — no `--include-all`, no repair:
+
+```
+20260820111940  20260820121754  20260821034423  20260828071334  20260910000000
+```
+
+`20260910000000_api_hardening.sql` was applied by hand through the SQL
+editor and then recorded with
+`supabase migration repair --status applied 20260910000000`, which is why
+it appears on both sides despite never having been run by the CLI.
+
+## Do not run `supabase config push` on this project
+
+Not yet, and not without checking the diff first.
+
+`config pull --force` was run here while looking for the leaked-password
+setting. It reported six `remote_only` values it **refused to write
+locally**, each marked `would_invalidate`:
+
+| Setting | Remote | Local after pull |
+|---|---|---|
+| `auth.email.smtp.enabled` | `true` | absent |
+| `auth.email.smtp.host` | `smtp.resend.com` | absent |
+| `auth.email.smtp.admin_email` | `team@noshashi.app` | absent |
+| `auth.email.smtp.user` | `resend` | absent |
+| `auth.email.smtp.port` | `465` | absent |
+| `auth.sms.twilio.enabled` | `true` | `false` |
+
+They were skipped because the corresponding secrets — `smtp.pass` and
+`twilio.account_sid` — are not declared locally, and the CLI will not
+write a credential block it cannot complete. That is the right call on
+the way in. On the way *out* it is a trap: a `config push` from that
+state would send the local values, and local says SMTP is absent and
+Twilio is off. **Auth emails through Resend and SMS through Twilio would
+stop.**
+
+`supabase/config.toml` was therefore deleted rather than committed. It
+could not do the job it was pulled for (see below) and leaving it in the
+tree only invites someone to push it. Regenerate it when needed:
+
+```bash
+supabase init && supabase config pull --force
+supabase config diff        # read this before ever pushing
+```
+
+Before any future `config push`, declare `SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN`
+and the SMTP password in the environment so those blocks round-trip
+completely.
+
+## Leaked-password protection is not settable from the CLI
+
+`config.toml` has no field for it. The pulled config exposes
+`minimum_password_length`, `password_requirements` and
+`secure_password_change`, and nothing matching `hibp`, `leaked`, `pwned`
+or `breach`. So `config push` cannot enable it even in principle.
+
+It is a dashboard toggle:
+
+**Authentication → Sign In / Providers → Password settings → "Prevent use
+of leaked passwords"**
+
+https://supabase.com/dashboard/project/xiurbiwuwcfowqnpmwki/auth/providers
+
+Screens new and changed passwords against HaveIBeenPwned. Flagged as
+outstanding in `20260828_harden_function_grants.sql` and still open.
+
 ## Still outstanding: the repo cannot rebuild this database from scratch
 
 The placeholders reconcile the history table; they do not restore the lost
