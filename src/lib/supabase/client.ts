@@ -7,6 +7,16 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * on its own. Every table is behind row level security, so a row is only
  * ever reachable by the account that owns it, and the service-role key
  * (which would bypass that) exists only inside Edge Functions.
+ *
+ * Both values fall back to the production project rather than requiring
+ * environment variables, because the release workflow supplies neither and a
+ * packaged build must work without them. See .env.example to override locally.
+ *
+ * The origin below is repeated in the Content Security Policy of both
+ * src-tauri configs, over https and over wss. That policy is compiled into the
+ * installer while the dev server relaxes it, so a change here alone would pass
+ * every local check and then block every request in the shipped application.
+ * client-csp.test.ts fails when the three drift apart.
  */
 
 export const SUPABASE_URL =

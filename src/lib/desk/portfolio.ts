@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { supabaseErrorMessage } from "@/lib/supabase/errors";
 import { fetchAccount, fetchWalletCredentials, isValidAddress } from "@/lib/xrpl/client";
 import { DOMAIN_REGISTRY, evaluatePolicy, heldCredentialTypes } from "@/lib/policy";
 import { rippleTimeToDate } from "@/lib/format";
@@ -73,7 +74,7 @@ export function usePortfolio() {
       .order("created_at", { ascending: true })
       .limit(1)
       .maybeSingle();
-    if (readError) throw new Error(readError.message);
+    if (readError) throw new Error(supabaseErrorMessage(readError));
     if (existing?.id) return existing.id as string;
 
     const { data: created, error: insertError } = await db
@@ -81,7 +82,7 @@ export function usePortfolio() {
       .insert({ account_id: user.id, name: "Primary book" })
       .select("id")
       .single();
-    if (insertError) throw new Error(insertError.message);
+    if (insertError) throw new Error(supabaseErrorMessage(insertError));
     return created.id as string;
   }, [user]);
 
@@ -104,7 +105,7 @@ export function usePortfolio() {
         .select("id, address, label")
         .eq("portfolio_id", id)
         .order("created_at", { ascending: true });
-      if (readError) throw new Error(readError.message);
+      if (readError) throw new Error(supabaseErrorMessage(readError));
 
       setWallets(
         (data ?? []).map((row) => ({
@@ -219,7 +220,7 @@ export function usePortfolio() {
         .from("portfolio_wallets")
         .delete()
         .eq("id", id);
-      if (deleteError) throw new Error(deleteError.message);
+      if (deleteError) throw new Error(supabaseErrorMessage(deleteError));
       await loadWallets();
     },
     [loadWallets]

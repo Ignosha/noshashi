@@ -8,6 +8,7 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
+import { supabaseErrorMessage } from "@/lib/supabase/errors";
 
 /**
  * Authentication.
@@ -141,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
         options: { data: displayName ? { display_name: displayName } : undefined },
       });
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(supabaseErrorMessage(error));
     },
     []
   );
@@ -149,7 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = useCallback(
     async (email: string, password: string) => {
       const { error } = await supabase().auth.signInWithPassword({ email, password });
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(supabaseErrorMessage(error));
       const { data } = await supabase().auth.mfa.getAuthenticatorAssuranceLevel();
       const needsSecondFactor =
         data?.nextLevel === "aal2" && data?.currentLevel !== "aal2";
@@ -164,7 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       options: { shouldCreateUser: false },
     });
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(supabaseErrorMessage(error));
   }, []);
 
   const verifyOtp = useCallback(async (email: string, token: string) => {
@@ -173,7 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       token: token.trim(),
       type: "email",
     });
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(supabaseErrorMessage(error));
   }, []);
 
   const signOut = useCallback(async () => {
@@ -182,7 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase().auth.resetPasswordForEmail(email);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(supabaseErrorMessage(error));
   }, []);
 
   const updatePassword = useCallback(async (password: string) => {
@@ -191,7 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(`Password needs: ${problems.join(", ").toLowerCase()}.`);
     }
     const { error } = await supabase().auth.updateUser({ password });
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(supabaseErrorMessage(error));
   }, []);
 
   const enrollTotp = useCallback(async () => {
@@ -199,7 +200,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       factorType: "totp",
       friendlyName: `NOSHASHI ${new Date().toISOString().slice(0, 10)}`,
     });
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(supabaseErrorMessage(error));
     return {
       factorId: data.id,
       qrCode: data.totp.qr_code,
@@ -211,14 +212,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (factorId: string, code: string) => {
       const { data: challenge, error: challengeError } =
         await supabase().auth.mfa.challenge({ factorId });
-      if (challengeError) throw new Error(challengeError.message);
+      if (challengeError) throw new Error(supabaseErrorMessage(challengeError));
 
       const { error } = await supabase().auth.mfa.verify({
         factorId,
         challengeId: challenge.id,
         code: code.trim(),
       });
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(supabaseErrorMessage(error));
       await refreshFactors();
     },
     [refreshFactors]
@@ -228,14 +229,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (factorId: string, code: string) => {
       const { data: challenge, error: challengeError } =
         await supabase().auth.mfa.challenge({ factorId });
-      if (challengeError) throw new Error(challengeError.message);
+      if (challengeError) throw new Error(supabaseErrorMessage(challengeError));
 
       const { error } = await supabase().auth.mfa.verify({
         factorId,
         challengeId: challenge.id,
         code: code.trim(),
       });
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(supabaseErrorMessage(error));
       setMfaRequired(false);
       await refreshFactors();
     },
@@ -245,7 +246,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const unenrollFactor = useCallback(
     async (factorId: string) => {
       const { error } = await supabase().auth.mfa.unenroll({ factorId });
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(supabaseErrorMessage(error));
       await refreshFactors();
     },
     [refreshFactors]

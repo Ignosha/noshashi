@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
+import { supabaseErrorMessage } from "@/lib/supabase/errors";
 
 /**
  * Compliance API keys.
@@ -45,7 +46,7 @@ export async function listApiKeys(accountId: string): Promise<ApiKeyRow[]> {
     .select("id, name, prefix, created_at, last_used_at, revoked_at")
     .eq("account_id", accountId)
     .order("created_at", { ascending: false });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(supabaseErrorMessage(error));
 
   return (data ?? []).map((row) => ({
     id: row.id as string,
@@ -75,7 +76,7 @@ export async function createApiKey(
     .insert({ account_id: accountId, name: name.trim() || "Untitled key", prefix, key_hash: keyHash })
     .select("id, name, prefix, created_at, last_used_at, revoked_at")
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(supabaseErrorMessage(error));
 
   return {
     raw,
@@ -96,7 +97,7 @@ export async function revokeApiKey(id: string): Promise<void> {
     .from("api_keys")
     .update({ revoked_at: new Date().toISOString() })
     .eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(supabaseErrorMessage(error));
 }
 
 export type UsageSummary = {
@@ -114,7 +115,7 @@ export async function readUsage(accountId: string): Promise<UsageSummary> {
     .eq("account_id", accountId)
     .order("created_at", { ascending: false })
     .limit(1000);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(supabaseErrorMessage(error));
 
   const rows = data ?? [];
   const byVerdict: Record<string, number> = { go: 0, hold: 0, "no-go": 0 };

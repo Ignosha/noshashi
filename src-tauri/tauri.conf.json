@@ -64,7 +64,7 @@
     "targets": "all",
     "category": "Business",
     "shortDescription": "Autonomous compliance layer for XRPL mainnet",
-    "longDescription": "NOSHASHI is mission control for the Autonomous Compliance Layer \u2014 live XRPL mainnet telemetry, XLS-70 credential registry, XLS-80 permissioned domains, and an explainable GO / HOLD / NO-GO settlement gate, in the macOS menu bar.",
+    "longDescription": "NOSHASHI is mission control for the Autonomous Compliance Layer \u2014 live XRPL mainnet telemetry, XLS-70 credential registry, XLS-80 permissioned domains, and an explainable GO / HOLD / NO-GO settlement gate, in the macOS menu bar and the Windows and Linux system tray.",
     "copyright": "\u00a9 2026 NOSHASHI",
     "icon": [
       "icons/32x32.png",
