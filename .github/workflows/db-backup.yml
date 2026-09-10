@@ -1,0 +1,117 @@
+# Nightly encrypted backup of the Supabase database.
+#
+# The free Supabase plan includes no automated backups. This closes that gap at
+# no cost, which is the whole point: it buys the main thing the paid plan was
+# going to buy.
+#
+# SECURITY — read before changing anything here. Workflow artifacts on a PUBLIC
+# repository can be downloaded by anyone. A raw dump of this database contains
+# auth.users, meaning real email addresses. So the dump is encrypted with GPG
+# BEFORE it is ever uploaded, and the plaintext is deleted in the same step that
+# creates it. Never add an upload step that runs before the encryption step, and
+# never commit a dump to the repository itself.
+#
+# ── Required secrets ────────────────────────────────────────────────────────
+# Settings → Secrets and variables → Actions → New repository secret.
+#
+#   SUPABASE_DB_URL
+#     Supabase dashboard → Project Settings → Database → Connection string →
+#     **Session pooler**. It looks like:
+#       postgresql://postgres.xiurbiwuwcfowqnpmwki:<PASSWORD>@aws-0-us-east-2.pooler.supabase.com:5432/postgres
+#     Use the session pooler on port 5432, NOT the direct connection and NOT the
+#     transaction pooler on 6543. Direct connections are IPv6-only and GitHub
+#     runners are IPv4; the transaction pooler cannot serve pg_dump.
+#
+#   BACKUP_PASSPHRASE
+#     Any long random string. This is the ONLY thing standing between a public
+#     artifact and your users' data, so make it long, and store it somewhere you
+#     will still have if this repository is gone. A backup you cannot decrypt is
+#     not a backup.
+#
+# ── To restore ──────────────────────────────────────────────────────────────
+#   gpg --decrypt --output restore.dump noshashi-<stamp>.dump.gpg
+#   pg_restore --dbname="$SUPABASE_DB_URL" --no-owner --no-privileges restore.dump
+#
+# Test this at least once before you need it. An untested backup is a guess.
+
+name: Database backup
+
+on:
+  schedule:
+    - cron: "40 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Install pg_dump 17
+        run: |
+          set -euo pipefail
+          # The runner ships an older client. pg_dump refuses to dump a server
+          # newer than itself, and this database is Postgres 17.
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error \
+            -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+          pg_dump --version
+
+      - name: Dump and encrypt
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+
+          # Fail loudly on a missing secret rather than uploading an empty or
+          # unencrypted artifact.
+          if [ -z "${DB_URL}" ]; then echo "::error::SUPABASE_DB_URL is not set"; exit 1; fi
+          if [ -z "${PASSPHRASE}" ]; then echo "::error::BACKUP_PASSPHRASE is not set"; exit 1; fi
+
+          stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          echo "STAMP=${stamp}" >> "${GITHUB_ENV}"
+
+          # noshashi holds the application data; public holds what little lives
+          # outside it; auth holds the accounts, without which a restore gives
+          # you rows nobody can log in to reach.
+          pg_dump "${DB_URL}" \
+            --schema=noshashi \
+            --schema=public \
+            --schema=auth \
+            --no-owner \
+            --no-privileges \
+            --format=custom \
+            --file="noshashi-${stamp}.dump"
+
+          gpg --batch --yes --symmetric \
+            --cipher-algo AES256 \
+            --passphrase "${PASSPHRASE}" \
+            --output "noshashi-${stamp}.dump.gpg" \
+            "noshashi-${stamp}.dump"
+
+          # Remove the plaintext before this step ends, so no later step and no
+          # failure path can pick it up.
+          shred --remove "noshashi-${stamp}.dump" 2>/dev/null || rm -f "noshashi-${stamp}.dump"
+
+          if [ -f "noshashi-${stamp}.dump" ]; then echo "::error::plaintext dump survived"; exit 1; fi
+          ls -lh "noshashi-${stamp}.dump.gpg"
+
+      - name: Upload encrypted backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ env.STAMP }}
+          path: "*.dump.gpg"
+          retention-days: 90
+          if-no-files-found: error
