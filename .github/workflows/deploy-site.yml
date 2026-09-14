@@ -67,8 +67,10 @@ jobs:
             echo "::error title=Missing VERCEL_TOKEN::Add VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID as repository secrets. Until then this workflow cannot deploy."
             exit 1
           fi
-          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          vercel deploy --prod --yes --token="$VERCEL_TOKEN" > deployment-url.txt
+          # Deploy directly. `vercel pull` tries to read project settings
+          # before deployment and fails for valid projects whose token can
+          # deploy but cannot read the settings endpoint.
+          vercel deploy --prod --yes --token="$VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" > deployment-url.txt
           echo "Deployed: $(cat deployment-url.txt)"
           echo "### Site deployed" >> "$GITHUB_STEP_SUMMARY"
           echo "$(cat deployment-url.txt)" >> "$GITHUB_STEP_SUMMARY"
