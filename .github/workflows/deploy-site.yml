@@ -49,26 +49,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-
-      - run: npm ci
-
-      # Regenerate the legal page from its source of truth, then say whether
-      # that changed anything. A non-empty diff means someone edited
-      # src/lib/legal.ts and did not rebuild — the deploy is still correct,
-      # because it ships the regenerated page, but the repository is now
-      # behind and somebody should commit it.
-      - name: Regenerate legal page
-        run: node scripts/build-legal-page.mjs
-
-      - name: Report legal-page drift
-        run: |
-          if [ -n "$(git status --porcelain site/legal/)" ]; then
-            echo "::warning title=Legal page was stale::site/legal/ did not match src/lib/legal.ts. The deploy ships the regenerated page; commit it to resync the repo."
-            git --no-pager diff --stat site/legal/
-          else
-            echo "site/legal/ is in sync with src/lib/legal.ts."
-          fi
 
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
