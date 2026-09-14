@@ -1,0 +1,35 @@
+{
+  "name": "NOSHASHI XRPL Edge Pack",
+  "version": "0.1.0",
+  "channel": "experimental",
+  "network": "XRPL Mainnet",
+  "mode": "read-only",
+  "features": [
+    {
+      "id": "liquidity-escape-map",
+      "question": "What is the shortest credible path from a held issued asset to an XRP exit?",
+      "inputs": ["validated ledger index", "trust lines", "issuer flags", "funded order-book offers"],
+      "output": "evidence graph with unknown states preserved"
+    },
+    {
+      "id": "amendment-drift-radar",
+      "question": "Do current amendment assumptions still match the evidence receipt?",
+      "inputs": ["active amendments", "receipt rule ids", "ledger close time"],
+      "output": "replay warning when assumptions have drifted"
+    },
+    {
+      "id": "counterparty-recovery-graph",
+      "question": "Which published dependencies can change remediation of a blocked position?",
+      "inputs": ["issuer account", "signer list", "credentials", "permissioned domains"],
+      "output": "dependency graph with unavailable data marked unknown"
+    }
+  ],
+  "safety": {
+    "signing": false,
+    "custody": false,
+    "broadcast": false,
+    "advice": false,
+    "human_review_required": true
+  },
+  "license_note": "Use subject to the NOSHASHI terms at https://noshashi.app/legal/"
+}

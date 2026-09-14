@@ -345,6 +345,42 @@ export function HomeScene({
           </div>
         </Reveal>
 
+        {/* ── Edge Lab handoff ─────────────────────────────────── */}
+        <Reveal className="mt-10">
+          <Panel label="XRPL EDGE LAB · EXPERIMENTAL" bodyClassName="p-4">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="max-w-[680px]">
+                <p className="display text-[17px] font-[700] text-foreground">
+                  Test the question before you trust the answer.
+                </p>
+                <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+                  The portable Edge Pack documents three read-only analyses: liquidity escape
+                  paths, amendment drift and counterparty recovery dependencies. It is research
+                  material, not an automated action path or a compliance conclusion.
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <a
+                  href="https://noshashi.app/downloads/xrpl-edge-pack/"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-[10px] font-semibold tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/85"
+                >
+                  OPEN EDGE PACK
+                </a>
+                <a
+                  href="https://noshashi.app/docs/NOSHASHI_XRPL_Edge_Lab_Brief.pdf"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-[10px] font-semibold tracking-[0.08em] text-foreground transition-colors hover:border-brand/50"
+                >
+                  READ PDF BRIEF
+                </a>
+              </div>
+            </div>
+          </Panel>
+        </Reveal>
+
         {/* ── Standards & contact ──────────────────────────────── */}
         <Reveal className="mt-10">
           <div className="grid grid-cols-3 gap-3">

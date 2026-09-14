@@ -5,4 +5,6 @@
   <url><loc>https://noshashi.app/guide/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://noshashi.app/research/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://noshashi.app/legal/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://noshashi.app/downloads/xrpl-edge-pack/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://noshashi.app/docs/NOSHASHI_XRPL_Edge_Lab_Brief.pdf</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
 <title>NOSHASHI — Market Intelligence for the XRP Ledger</title>
 <meta name="description" content="Am I allowed to move this, and could I actually get out of it? NOSHASHI answers both from the same validated ledger state, in the same second.">
 <link rel="canonical" href="https://noshashi.app/">
@@ -25,6 +25,12 @@
     --go:#35D49A; --hold:#F5B942; --nogo:#FF5F6D;
     --shell:min(1180px, 92vw);
     --r:10px;
+  }
+  html[data-theme="light"]{
+    --ground:#F4F7FA; --surface:#FFFFFF; --elevated:#E8EEF5;
+    --ink:#142033; --muted:#4A586B; --faint:#64748B; --rule:#C9D4E0;
+    --brand:#145FD1; --tele:#007D70;
+    --go:#087A50; --hold:#9A6500; --nogo:#B42332;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -194,6 +200,10 @@
   .btn:hover{filter:brightness(1.1)}
   .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
   .btn.ghost:hover{border-color:var(--brand);filter:none}
+  .theme-toggle{display:inline-flex;align-items:center;gap:7px;background:transparent;
+    color:var(--muted);border:1px solid var(--rule);border-radius:var(--r);padding:8px 11px;
+    font:11px "IBM Plex Mono",monospace;cursor:pointer;white-space:nowrap}
+  .theme-toggle:hover,.theme-toggle:focus-visible{color:var(--ink);border-color:var(--brand)}
 
   .hero{padding:104px 0 84px;position:relative}
   .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);
@@ -342,6 +352,16 @@
   .trust span{color:var(--muted);font-size:13px}
 
   .disclaimer{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);padding:24px;color:var(--faint);font-size:12.5px;line-height:1.7}
+  .edge-lab{display:grid;grid-template-columns:1.15fr repeat(3,1fr);gap:1px;background:var(--rule);
+    border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+  .edge-lab > div{background:var(--surface);padding:20px}
+  .edge-lab > div:first-child{background:var(--elevated)}
+  .edge-lab h3{font-size:15px;margin:10px 0 8px}
+  .edge-lab p{font-size:12.5px;color:var(--muted);line-height:1.6}
+  .edge-lab .edge-tag{font:10px "IBM Plex Mono",monospace;letter-spacing:.16em;color:var(--tele)}
+  .edge-lab .edge-state{display:block;margin-top:14px;font:10px "IBM Plex Mono",monospace;
+    letter-spacing:.14em;color:var(--faint)}
+  @media (max-width:900px){ .edge-lab{grid-template-columns:1fr} }
 
   footer{border-top:1px solid var(--rule);padding:36px 0;margin-top:24px}
   .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
@@ -518,7 +538,11 @@
       <a href="#enterprise">For institutions</a>
       <a href="/guide/">New to XRP?</a>
       <a href="#download">Download</a>
+      <a href="#edge-lab">Edge Lab</a>
       <a href="/pricing/">Pricing</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
+      </button>
       <a class="btn" href="mailto:institutions@noshashi.app">Request access</a>
     </nav>
   </div>
@@ -1142,9 +1166,50 @@
     </p>
   </section>
 
+  <section id="edge-lab" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">08 · XRPL Edge Lab</p>
+      <h2>New questions for a public ledger</h2>
+      <p>Three experimental analyses built from validated XRPL state. They are designed to expose
+         operational blind spots, not to predict markets or replace an accountable review.</p>
+    </div>
+    <div class="edge-lab" aria-label="Experimental XRPL analyses">
+      <div>
+        <span class="edge-tag">EDGE PACK / 0.1</span>
+        <h3>Download the lab</h3>
+        <p>Get the portable manifest, replay checklist and data dictionary for controlled review.
+           The pack contains no signing keys and cannot submit transactions.</p>
+        <a class="btn" href="/downloads/xrpl-edge-pack/">Open download system</a>
+      </div>
+      <div>
+        <span class="edge-tag">EXIT PATH</span>
+        <h3>Liquidity escape map</h3>
+        <p>Trace the shortest credible path from a held issued asset to an XRP exit, including
+           issuer controls, trust-line constraints and observed book depth.</p>
+        <span class="edge-state">READ-ONLY · EXPERIMENTAL</span>
+      </div>
+      <div>
+        <span class="edge-tag">STATE DRIFT</span>
+        <h3>Amendment drift radar</h3>
+        <p>Compare the active amendment set with the rule assumptions used in an evidence receipt,
+           so a previously valid control cannot quietly age into a false comfort.</p>
+        <span class="edge-state">REPLAYABLE · NO PREDICTION</span>
+      </div>
+      <div>
+        <span class="edge-tag">COUNTERPARTY</span>
+        <h3>Recovery graph</h3>
+        <p>Surface issuer, signer-list and credential dependencies that can change who is able to
+           remediate a blocked position. Unknown data stays unknown.</p>
+        <span class="edge-state">PUBLIC DATA · REVIEW REQUIRED</span>
+      </div>
+    </div>
+    <p class="micro">Experimental means the rule definitions and coverage may change. Do not use an
+       Edge Lab output as the sole basis for a trade, filing, customer decision or legal conclusion.</p>
+  </section>
+
   <section id="download" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">08 · Download</p>
+      <p class="eyebrow">09 · Download</p>
       <h2>Take the instrument offline</h2>
       <p>The full build, free to download. Bring the same adjudication engine to a
          controlled workstation, then verify the artifact before it ever touches a desk.</p>
@@ -1375,7 +1440,7 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
 
   <section id="security" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">10 · Security posture</p>
+      <p class="eyebrow">11 · Security posture</p>
       <h2>The smallest possible attack surface</h2>
       <p>The safest data is data nobody holds. Without an account there is no server-side state at
          all — no analytics, no telemetry, no crash reporting.</p>
@@ -1399,6 +1464,10 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
       carrying legal consequence must be reviewed by qualified counsel and the responsible compliance
       officer. NOSHASHI Labs is not a bank, broker-dealer, money services business, money transmitter,
       qualified custodian or registered investment adviser.
+      Experimental Edge Lab outputs are research features, may be incomplete, and are not a
+      representation of liquidity, solvency, legality, ownership, title or recoverability. You are
+      responsible for independent verification, jurisdiction-specific review, sanctions screening,
+      privacy compliance and decisions made from the software.
     </div>
   </section>
 </main>
@@ -1421,6 +1490,26 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
 
 <script>
 (function () {
+  /* Keep the chosen reading mode local to this device. No preference leaves
+     the OS/browser choice in charge, which is the safest first visit. */
+  var themeToggle = document.getElementById("themeToggle");
+  var themeLabel = document.getElementById("themeLabel");
+  var savedTheme = "";
+  try { savedTheme = localStorage.getItem("noshashi-theme") || ""; } catch (e) {}
+  if (savedTheme === "light" || savedTheme === "dark") document.documentElement.setAttribute("data-theme", savedTheme);
+  function updateThemeButton() {
+    var light = document.documentElement.getAttribute("data-theme") === "light";
+    if (themeLabel) themeLabel.textContent = light ? "DARK" : "LIGHT";
+    if (themeToggle) themeToggle.setAttribute("aria-label", light ? "Switch to dark mode" : "Switch to light mode");
+  }
+  updateThemeButton();
+  if (themeToggle) themeToggle.addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("noshashi-theme", next); } catch (e) {}
+    updateThemeButton();
+  });
+
   /* Hash copies are deliberately small and explicit: verification belongs
      in the operator's workflow, not hidden behind a secondary page. */
   document.querySelectorAll('.copyhash').forEach(function (button) {

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>NOSHASHI — XRPL Edge Pack</title>
+<meta name="description" content="Portable, read-only research materials for the NOSHASHI XRPL Edge Lab.">
+<link rel="canonical" href="https://noshashi.app/downloads/xrpl-edge-pack/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#0B0F14;--surface:#11161D;--elevated:#1C2330;--ink:#E6E8EB;--muted:#A3A8B3;--faint:#747C8B;--rule:#2A313C;--brand:#3A82F6;--tele:#00E0C6;--go:#35D49A;--shell:min(980px,92vw);--r:10px}
+html[data-theme="light"]{--ground:#F4F7FA;--surface:#FFF;--elevated:#E8EEF5;--ink:#142033;--muted:#4A586B;--faint:#64748B;--rule:#C9D4E0;--brand:#145FD1;--tele:#007D70;--go:#087A50}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--ground);color:var(--ink);font:16px/1.6 "Space Grotesk",sans-serif;-webkit-font-smoothing:antialiased}.shell{width:var(--shell);margin:auto}header{border-bottom:1px solid var(--rule);padding:18px 0}.nav{display:flex;justify-content:space-between;align-items:center;gap:18px}.brand{color:var(--ink);font-weight:700;letter-spacing:.2em;text-decoration:none}.nav a{color:var(--muted);font:12px "IBM Plex Mono",monospace;text-decoration:none}.nav a:hover{color:var(--ink)}main{padding:80px 0}.eyebrow,.label{color:var(--faint);font:10px "IBM Plex Mono",monospace;letter-spacing:.18em;text-transform:uppercase}.eyebrow{color:var(--tele)}h1{font-size:clamp(38px,7vw,72px);line-height:1.05;letter-spacing:-.04em;max-width:11ch;margin:20px 0}h2{font-size:20px;margin-bottom:12px}.lede{color:var(--muted);max-width:62ch}.rail{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;margin:42px 0}.rail div{background:var(--surface);padding:18px}.rail strong{display:block;font:14px "IBM Plex Mono",monospace;margin-top:7px}.download{display:inline-flex;background:var(--brand);color:#fff;border-radius:var(--r);padding:12px 17px;text-decoration:none;font-size:13px;font-weight:600;margin-top:22px}.download:hover{filter:brightness(1.1)}.manifest{margin-top:26px;padding:18px;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);color:var(--muted);font-size:13px}.manifest code{font:12px "IBM Plex Mono",monospace;color:var(--ink)}.notice{margin-top:34px;border-top:1px solid var(--rule);padding-top:22px;color:var(--faint);font-size:12.5px}.theme{background:transparent;border:1px solid var(--rule);color:var(--muted);border-radius:var(--r);padding:7px 10px;font:10px "IBM Plex Mono",monospace;cursor:pointer}@media(max-width:640px){.rail{grid-template-columns:1fr}.nav{align-items:flex-start}.nav a{font-size:10px}}
+</style>
+</head>
+<body>
+<header><div class="shell nav"><a class="brand" href="/">NOSHASHI</a><div><button class="theme" id="theme" type="button">LIGHT</button> <a href="/">BACK TO INSTRUMENT</a></div></div></header>
+<main class="shell">
+  <p class="eyebrow">XRPL EDGE LAB / PORTABLE MATERIALS</p>
+  <h1>Download the questions before the answers.</h1>
+  <p class="lede">The Edge Pack is a small, read-only research bundle for institutions that want to
+     reproduce the lab's assumptions on a controlled workstation. It contains definitions and
+     replay guidance, not a wallet, signer, trading system or promise of outcome.</p>
+  <div class="rail">
+    <div><span class="label">CHANNEL</span><strong>Experimental · 0.1</strong></div>
+    <div><span class="label">NETWORK</span><strong>XRPL Mainnet</strong></div>
+    <div><span class="label">CAPABILITY</span><strong>Read-only</strong></div>
+  </div>
+  <h2>Choose the material</h2>
+  <p class="lede">Start with the portable manifest. Use the source archive when your review process
+     requires line-by-line inspection of the public site and its rule language.</p>
+  <a class="download" href="/downloads/xrpl-edge-pack/manifest.json" download>Download Edge Pack manifest</a>
+  <a class="download" href="/docs/NOSHASHI_XRPL_Edge_Lab_Brief.pdf" download>Download operator brief PDF</a>
+  <a class="download" href="https://github.com/Ignosha/noshashi/archive/refs/heads/main.zip" rel="noopener">Download source archive</a>
+  <div class="manifest"><span class="label">INCLUDED</span><br>
+    <code>edge-pack.json</code> · feature definitions, evidence fields and replay boundaries<br>
+    <code>REPLAY.md</code> · operator checklist for recording ledger index and node source<br>
+    <code>BOUNDARIES.md</code> · limitations, unknown states and human review requirements
+  </div>
+  <p class="notice"><strong>Important:</strong> This is experimental research tooling. It may be
+     incomplete or change without notice. It does not provide legal, tax, investment, sanctions or
+     liquidity advice; it does not establish ownership or recoverability; and it must not be the
+     sole basis for a transaction, filing, customer decision or legal conclusion. Review the
+     <a href="/legal/">legal terms and privacy policy</a> before operational use.</p>
+</main>
+<script>
+(function(){var b=document.getElementById("theme"),t="";try{t=localStorage.getItem("noshashi-theme")||""}catch(e){}if(t)document.documentElement.setAttribute("data-theme",t);function u(){var l=document.documentElement.getAttribute("data-theme")==="light";b.textContent=l?"DARK":"LIGHT"}u();b.onclick=function(){var n=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("noshashi-theme",n)}catch(e){}u()}})();
+</script>
+</body>
+</html>
