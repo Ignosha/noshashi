@@ -56,6 +56,116 @@
   .hero,section{overflow-x:clip}
   .layer{position:relative;z-index:1}
 
+  /* ── Instrument field ──────────────────────────────────────────────
+     Board section 07, built out. Four static elements — concentric
+     orbits, a dot grid, a tilted ellipse carrying bodies, and a
+     diagonal hatch — layered rather than placed one at a time, so a
+     section reads as sitting on an instrument panel instead of on a
+     flat navy rectangle.
+
+     Every rule DESIGN.md sets on the pattern still holds: it is static
+     (no rAF loop, no parallax), it bleeds off an edge rather than
+     sitting in the layout, it never exceeds 8% opacity, and it takes
+     --brand or --faint, never a status colour. It is background for
+     data, and it loses every contest with data.
+
+     .field is the positioned container; .field > svg are the plates. */
+  /* Negative, not 0. An absolutely positioned element paints in step 8
+     of the painting order and in-flow content in steps 4–5, so at z-index
+     0 the field would sit on top of the headline rather than behind it.
+     .layer establishes the stacking context these resolve against. */
+  .field{position:absolute;inset:0;pointer-events:none;overflow:clip;z-index:-1}
+  .field svg{position:absolute;color:var(--brand)}
+  .field .plate-grid{color:var(--faint)}
+
+  /*
+   * A navy lift behind the fold. DESIGN.md bans decorative gradients
+   * and "purple/blue AI" washes; this is neither. It is one radial of
+   * the ground colour's own lighter neighbour, at 55% of the way to
+   * --surface, which is what makes the accent read as lit rather than
+   * printed on top — the reason the token file specifies navy and not
+   * neutral black in the first place. No hue is introduced.
+   */
+  .hero::before{
+    content:"";position:absolute;inset:-20% -30% 30% -30%;pointer-events:none;z-index:-1;
+    background:radial-gradient(60% 55% at 50% 0%,
+      color-mix(in srgb,var(--surface) 55%, transparent) 0%,
+      transparent 70%);
+  }
+
+  /* Hairline horizon closing a section. A rule that fades at both ends
+     rather than stopping dead, so the band edge is felt, not drawn. */
+  .horizon{height:1px;border:0;margin:0;
+    background:linear-gradient(90deg,transparent,var(--rule) 18%,var(--rule) 82%,transparent)}
+
+  /* ── Mechanism diagram ─────────────────────────────────────────────
+     The two halves joining. Monochrome, --brand only, labelled — it
+     answers "where does a verdict come from" in one look, which is the
+     six-word test DESIGN.md sets for any visualisation. */
+  .flow{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);
+    padding:30px 26px;position:relative;overflow:hidden}
+  .flow svg{display:block;width:100%;height:auto}
+  .flowcap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px;
+    padding-top:20px;border-top:1px solid var(--rule)}
+  .flowcap p{font-size:13px;color:var(--muted);line-height:1.6}
+  .flowcap b{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;
+    letter-spacing:.16em;color:var(--faint);margin-bottom:6px}
+  @media (max-width:900px){ .flowcap{grid-template-columns:1fr} }
+
+  /* ── Traps ─────────────────────────────────────────────────────────
+     Each row is a field that lies if read at face value, and the
+     measured consequence of believing it. No status colour: these are
+     not verdicts, they are engineering notes. The figure carries the
+     weight, so it is set in mono at size. */
+  .traps{display:grid;gap:1px;background:var(--rule);
+    border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+  .trap{background:var(--surface);padding:22px 24px;display:grid;
+    grid-template-columns:minmax(0,1.05fr) minmax(0,1.35fr) minmax(0,.85fr);
+    gap:20px;align-items:start}
+  .trap .tf{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink);
+    line-height:1.5;overflow-wrap:anywhere}
+  .trap .tw{font-size:13px;color:var(--muted);line-height:1.6}
+  .trap .tm{font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--ink);
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.3}
+  .trap .tm small{display:block;font-family:"Space Grotesk",sans-serif;font-size:11px;
+    color:var(--faint);letter-spacing:0;margin-top:5px;line-height:1.5}
+  @media (max-width:900px){
+    .trap{grid-template-columns:1fr;gap:10px}
+    .trap .tm{font-size:15px}
+  }
+
+  /* ── Amendment state ───────────────────────────────────────────────
+     Three states, and only the third one works. Live takes telemetry
+     cyan because it genuinely describes current network state; the
+     unactivated column takes --faint, not --no-go, because an
+     amendment that has not passed is not a fault. */
+  .amend{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .amend-col{background:var(--surface);border:1px solid var(--rule);
+    border-radius:var(--r);padding:24px;position:relative;overflow:hidden}
+  .amend-col .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--rule)}
+  .amend-col.live .cap{background:var(--tele)}
+  .amend-col h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
+    font-weight:500;color:var(--faint);margin-bottom:16px}
+  .amend-col.live h3{color:var(--tele)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-family:"IBM Plex Mono",monospace;font-size:11.5px;padding:5px 10px;
+    border:1px solid var(--rule);border-radius:999px;color:var(--muted);white-space:nowrap}
+  .amend-col.live .chip{color:var(--ink);border-color:color-mix(in srgb,var(--tele) 30%,var(--rule))}
+  .amend-col.dormant .chip{color:var(--faint);border-style:dashed}
+  @media (max-width:900px){ .amend{grid-template-columns:1fr} }
+
+  /* ── Evidence strip ────────────────────────────────────────────────
+     What an examiner can be handed. Numbered, because the order is the
+     chain of custody and the order is the point. */
+  .eck{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);
+    border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+  .eck div{background:var(--surface);padding:22px 20px}
+  .eck .step{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.2em;
+    color:var(--brand);margin-bottom:12px}
+  .eck h3{font-size:14px;margin-bottom:8px}
+  .eck p{font-size:12.5px;color:var(--muted);line-height:1.6}
+  @media (max-width:900px){ .eck{grid-template-columns:1fr} }
+
   header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
     background:color-mix(in srgb, var(--ground) 82%, transparent);border-bottom:1px solid var(--rule)}
   /*
@@ -220,7 +330,9 @@
     .g3,.g2,.price,.trust{grid-template-columns:1fr}
     .hero{padding:64px 0 56px}
     section{padding:56px 0}
-    .orbit{display:none}
+    /* The field bleeds off both edges by design; on a phone that is
+       scrollWidth, not atmosphere. Hidden with the orbit it extends. */
+    .orbit,.field{display:none}
   }
   @media (prefers-reduced-motion:reduce){
     .reveal{opacity:1;transform:none;transition:none}
@@ -365,15 +477,60 @@
 
 <main class="shell">
   <section class="hero">
-    <svg class="orbit" style="right:-8%;top:-6%;width:620px;height:620px" viewBox="0 0 240 240" aria-hidden="true">
-      <g stroke="currentColor" stroke-width=".6" fill="none">
-        <ellipse cx="120" cy="120" rx="34" ry="46"/><ellipse cx="120" cy="120" rx="58" ry="76"/>
-        <ellipse cx="120" cy="120" rx="80" ry="102"/><ellipse cx="120" cy="120" rx="100" ry="126" transform="rotate(-14 120 120)"/>
-      </g>
-      <circle cx="120" cy="120" r="7" fill="currentColor"/><circle cx="120" cy="74" r="3" fill="currentColor"/>
-      <circle cx="120" cy="178" r="2.6" fill="currentColor"/><circle cx="62" cy="120" r="2" fill="currentColor"/>
-      <circle cx="178" cy="120" r="2" fill="currentColor"/>
-    </svg>
+    <!--
+      Instrument field. Four static plates from board section 07, layered.
+      No animation loop, no parallax, nothing that competes with the
+      ticker directly beneath it. Opacities are set per plate and none
+      exceeds 8%.
+    -->
+    <div class="field" aria-hidden="true">
+      <!-- Concentric orbital system, bleeding off the right edge. -->
+      <svg class="orbit" style="right:-8%;top:-6%;width:620px;height:620px" viewBox="0 0 240 240">
+        <g stroke="currentColor" stroke-width=".6" fill="none">
+          <ellipse cx="120" cy="120" rx="34" ry="46"/><ellipse cx="120" cy="120" rx="58" ry="76"/>
+          <ellipse cx="120" cy="120" rx="80" ry="102"/><ellipse cx="120" cy="120" rx="100" ry="126" transform="rotate(-14 120 120)"/>
+        </g>
+        <circle cx="120" cy="120" r="7" fill="currentColor"/><circle cx="120" cy="74" r="3" fill="currentColor"/>
+        <circle cx="120" cy="178" r="2.6" fill="currentColor"/><circle cx="62" cy="120" r="2" fill="currentColor"/>
+        <circle cx="178" cy="120" r="2" fill="currentColor"/>
+      </svg>
+
+      <!-- Dot grid. The plane the orbits sit over. -->
+      <svg class="plate-grid" style="left:-4%;top:8%;width:540px;height:420px;opacity:.10" viewBox="0 0 540 420">
+        <defs>
+          <pattern id="fld-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="1.4" cy="1.4" r="1.4" fill="currentColor"/>
+          </pattern>
+          <linearGradient id="fld-fade" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity=".85"/>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+          <mask id="fld-mask"><rect width="540" height="420" fill="url(#fld-fade)"/></mask>
+        </defs>
+        <rect width="540" height="420" fill="url(#fld-dots)" mask="url(#fld-mask)"/>
+      </svg>
+
+      <!-- Tilted ellipse carrying bodies on the path. -->
+      <svg style="right:14%;bottom:-16%;width:460px;height:300px;opacity:.07" viewBox="0 0 460 300">
+        <g transform="rotate(-18 230 150)">
+          <ellipse cx="230" cy="150" rx="215" ry="74" fill="none" stroke="currentColor" stroke-width=".8"/>
+          <ellipse cx="230" cy="150" rx="150" ry="50" fill="none" stroke="currentColor" stroke-width=".6"/>
+          <circle cx="445" cy="150" r="4" fill="currentColor"/>
+          <circle cx="126" cy="112" r="2.6" fill="currentColor"/>
+          <circle cx="330" cy="196" r="2" fill="currentColor"/>
+        </g>
+      </svg>
+
+      <!-- Diagonal hatch, closing the lower left. -->
+      <svg style="left:2%;bottom:-8%;width:300px;height:220px;opacity:.06" viewBox="0 0 300 220">
+        <defs>
+          <pattern id="fld-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="9" stroke="currentColor" stroke-width=".9"/>
+          </pattern>
+        </defs>
+        <rect width="300" height="220" fill="url(#fld-hatch)"/>
+      </svg>
+    </div>
 
     <span class="badge"><span class="dot"></span>Live on XRPL Mainnet · no testnet path exists</span>
     <h1>Am I allowed to move this — and could I actually get out of it?</h1>
@@ -460,9 +617,108 @@
     </div>
   </section>
 
+  <section id="mechanism" class="reveal">
+    <div class="field" aria-hidden="true">
+      <svg style="right:-6%;top:-10%;width:420px;height:420px;opacity:.06" viewBox="0 0 240 240">
+        <g stroke="currentColor" stroke-width=".7" fill="none">
+          <circle cx="120" cy="120" r="44"/><circle cx="120" cy="120" r="76"/><circle cx="120" cy="120" r="108"/>
+        </g>
+        <g stroke="currentColor" stroke-width=".7"><path d="M120 4v232M4 120h232"/></g>
+      </svg>
+    </div>
+
+    <div class="kicker-block">
+      <p class="eyebrow">03 · How a verdict is made</p>
+      <h2>One ledger read, two questions, one receipt</h2>
+      <p>Both halves are answered from the same validated ledger state, in the same pass.
+         That is the whole architecture — and it is why the two answers can be trusted
+         against each other rather than compared across two tools reading at two moments.</p>
+    </div>
+
+    <div class="flow">
+      <svg viewBox="0 0 960 286" role="img"
+           aria-label="Validated mainnet state feeds a compliance read and a market read in parallel; both enter a deterministic policy engine, which emits a GO, HOLD or NO-GO verdict and a SHA-256 receipt digest.">
+        <defs>
+          <marker id="fl-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 10 5 0 10z" style="fill:var(--faint)"/>
+          </marker>
+        </defs>
+
+        <!-- Source -->
+        <rect x="1" y="98" width="176" height="90" rx="8"
+              style="fill:var(--elevated);stroke:var(--rule)"/>
+        <text x="89" y="128" text-anchor="middle"
+              style="fill:var(--ink);font:600 15px 'Space Grotesk',sans-serif">Validated ledger</text>
+        <text x="89" y="150" text-anchor="middle"
+              style="fill:var(--faint);font:400 11.5px 'IBM Plex Mono',monospace">XRPL MAINNET</text>
+        <text x="89" y="168" text-anchor="middle"
+              style="fill:var(--faint);font:400 11.5px 'IBM Plex Mono',monospace">4 NODES COMPARED</text>
+
+        <!-- Split -->
+        <path d="M177 143h42q10 0 10-10V72q0-10 10-10h32" fill="none"
+              style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
+        <path d="M177 143h42q10 0 10 10v61q0 10 10 10h32" fill="none"
+              style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
+
+        <!-- Compliance half -->
+        <rect x="277" y="26" width="232" height="92" rx="8"
+              style="fill:var(--surface);stroke:var(--rule)"/>
+        <text x="297" y="52" style="fill:var(--brand);font:400 10px 'IBM Plex Mono',monospace;letter-spacing:.18em">THE COMPLIANCE HALF</text>
+        <text x="297" y="76" style="fill:var(--ink);font:600 14.5px 'Space Grotesk',sans-serif">Am I allowed to move this?</text>
+        <text x="297" y="99" style="fill:var(--muted);font:400 12px 'Space Grotesk',sans-serif">Flags · credentials · freeze rights · quorum</text>
+
+        <!-- Market half -->
+        <rect x="277" y="168" width="232" height="92" rx="8"
+              style="fill:var(--surface);stroke:var(--rule)"/>
+        <text x="297" y="194" style="fill:var(--brand);font:400 10px 'IBM Plex Mono',monospace;letter-spacing:.18em">THE MARKET HALF</text>
+        <text x="297" y="218" style="fill:var(--ink);font:600 14.5px 'Space Grotesk',sans-serif">Could I actually get out?</text>
+        <text x="297" y="241" style="fill:var(--muted);font:400 12px 'Space Grotesk',sans-serif">Book · AMM · fillable depth · impact</text>
+
+        <!-- Join -->
+        <path d="M509 72h32q10 0 10 10v51q0 10 10 10h20" fill="none"
+              style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
+        <path d="M509 214h32q10 0 10-10v-51q0-10 10-10h20" fill="none"
+              style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
+
+        <!-- Engine -->
+        <rect x="601" y="98" width="164" height="90" rx="8"
+              style="fill:var(--elevated);stroke:var(--rule)"/>
+        <text x="683" y="127" text-anchor="middle"
+              style="fill:var(--ink);font:600 15px 'Space Grotesk',sans-serif">Policy engine</text>
+        <text x="683" y="149" text-anchor="middle"
+              style="fill:var(--faint);font:400 11.5px 'IBM Plex Mono',monospace">DETERMINISTIC</text>
+        <text x="683" y="167" text-anchor="middle"
+              style="fill:var(--faint);font:400 11.5px 'IBM Plex Mono',monospace">policy.ts</text>
+
+        <path d="M765 143h30" fill="none" style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
+
+        <!-- Verdict -->
+        <rect x="805" y="98" width="154" height="90" rx="8"
+              style="fill:var(--surface);stroke:var(--rule)"/>
+        <text x="822" y="128" style="font:700 15px 'Space Grotesk',sans-serif">
+          <tspan style="fill:var(--go)">GO</tspan><tspan style="fill:var(--faint)"> / </tspan><tspan style="fill:var(--hold)">HOLD</tspan>
+        </text>
+        <text x="822" y="150" style="fill:var(--nogo);font:700 15px 'Space Grotesk',sans-serif">NO-GO</text>
+        <text x="822" y="171" style="fill:var(--faint);font:400 10.5px 'IBM Plex Mono',monospace">+ SHA-256 RECEIPT</text>
+      </svg>
+
+      <div class="flowcap">
+        <p><b>SAME STATE</b>Both halves read one validated snapshot. A freeze right found at
+           ledger <em>n</em> is weighed against depth measured at ledger <em>n</em>, not against
+           a book that has since moved.</p>
+        <p><b>NO SIGNING PATH</b>The engine is pure. It takes state and returns a verdict — it
+           cannot hold a key, build a transaction or broadcast one, because none of that exists
+           in the build.</p>
+        <p><b>BYTE-STABLE</b>The receipt digest covers the verdict and every check id and result.
+           Restyling cannot change it; a changed digest would invalidate every receipt ever
+           issued, so the engine is fixed by test.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="public" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">03 · For everyone</p>
+      <p class="eyebrow">04 · For everyone</p>
       <h2>Check it before you pay it</h2>
       <p>Three tools that read mainnet from this page: who you are paying, what a payment
          actually delivered, and how much of a book could really fill. Free, no account,
@@ -615,7 +871,7 @@
 
   <section id="enterprise" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">04 · For institutions</p>
+      <p class="eyebrow">05 · For institutions</p>
       <h2>Built only on what the network has actually activated</h2>
       <p>XRPL ships features as amendments, and a feature exists in three states: specified,
          implemented in rippled, and <em>activated by validator majority</em>. Only the third one
@@ -667,9 +923,157 @@
   </section>
 
 
+  <section id="traps" class="reveal">
+    <div class="field" aria-hidden="true">
+      <svg style="left:-8%;bottom:-14%;width:380px;height:280px;opacity:.055" viewBox="0 0 380 280">
+        <defs>
+          <pattern id="tr-hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+            <line x1="0" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width=".9"/>
+          </pattern>
+        </defs>
+        <rect width="380" height="280" fill="url(#tr-hatch)"/>
+      </svg>
+    </div>
+
+    <div class="kicker-block">
+      <p class="eyebrow">06 · What the ledger will let you believe</p>
+      <h2>Every reading here exists because a field lies</h2>
+      <p>Not edge cases. These are the default readings — what you get if you take the
+         obvious field at face value — and each one is handled explicitly, documented at the
+         top of the module that handles it. The figures are measured on mainnet, not modelled.</p>
+    </div>
+
+    <div class="traps">
+      <div class="trap">
+        <p class="tf">delivered_amount ≠ Amount</p>
+        <p class="tw">A <span class="mono">tesSUCCESS</span> payment carries the amount it asked to
+           deliver and, separately, the amount that arrived. On a partial payment those differ and
+           the transaction still succeeds.</p>
+        <p class="tm">250×<small>Over-credit from reading the requested figure. One real transfer
+           asked 999,332.87 and delivered 3,958.64.</small></p>
+      </div>
+      <div class="trap">
+        <p class="tf">Quoted depth ≠ fillable depth</p>
+        <p class="tw">An offer rests in the book whether or not its owner still holds the asset.
+           Summing the advertised figure counts exits that cannot happen.</p>
+        <p class="tm">92.8%<small>Of one book's visible depth could not fill. A single offer
+           advertised 1,400,100 USD against a 22,273 balance.</small></p>
+      </div>
+      <div class="trap">
+        <p class="tf">Sequence is not a count</p>
+        <p class="tw">Since DeletableAccounts a new account's sequence is seeded to its creation
+           ledger index, so it describes when the account began, not what it has done.</p>
+        <p class="tm">92,835,117<small>Read from a live AMM account that has sent zero
+           transactions. The obvious reading is wrong by the whole number.</small></p>
+      </div>
+      <div class="trap">
+        <p class="tf">Quorum is weight, not headcount</p>
+        <p class="tw">XRPL compares a multi-signature quorum against the sum of signing weights.
+           Counting signers describes a committee that may not exist.</p>
+        <p class="tm">5 → 1<small>Five signers where one carries the quorum is a single-key
+           account. We report the minimum who must actually agree.</small></p>
+      </div>
+      <div class="trap">
+        <p class="tf">Absent ≠ false</p>
+        <p class="tw">A trust line carries <span class="mono">freeze</span> and
+           <span class="mono">authorized</span> only when set. Reading absence as "not frozen"
+           asserts a guarantee the ledger never made.</p>
+        <p class="tm">not stated<small>What we report instead. An unset flag is unknown, and
+           unknown is not the same as safe.</small></p>
+      </div>
+      <div class="trap">
+        <p class="tf">Ripple epoch ≠ Unix epoch</p>
+        <p class="tw">Escrow times count from 2000-01-01, not 1970-01-01. The two are both
+           plausible integers and only one is right.</p>
+        <p class="tm">30 years<small>How early every release date reads if the offset is
+           missed. Silent, and wrong in the safe-looking direction.</small></p>
+      </div>
+    </div>
+
+    <p class="micro" style="margin-top:18px">
+      Thirteen are documented in full, with the module that handles each, in the
+      <a href="https://github.com/Ignosha/noshashi" rel="noopener" style="color:var(--brand)">repository README</a>.
+    </p>
+  </section>
+
+  <section id="network" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">07 · Network reality</p>
+      <h2>A feature exists in three states and only the third one works</h2>
+      <p>XRPL ships features as amendments: <em>specified</em>, <em>implemented in rippled</em>,
+         and <em>activated by validator majority</em>. Until the third, every transaction of that
+         type is rejected by every validator on the network. NOSHASHI reads the ledger's own
+         amendments object and computes each id locally — SHA-512Half of the feature name — so no
+         lookup table can drift, and anything not activated is never offered.</p>
+    </div>
+
+    <div class="amend">
+      <div class="amend-col live">
+        <span class="cap"></span>
+        <h3>ACTIVATED — BUILT ON</h3>
+        <div class="chips">
+          <span class="chip">Credentials · XLS-70</span>
+          <span class="chip">PermissionedDomains · XLS-80</span>
+          <span class="chip">PermissionedDEX · XLS-81</span>
+          <span class="chip">DeepFreeze · XLS-77</span>
+          <span class="chip">TokenEscrow · XLS-85</span>
+          <span class="chip">MPTokensV1</span>
+          <span class="chip">Clawback</span>
+          <span class="chip">AMMClawback</span>
+          <span class="chip">DID</span>
+          <span class="chip">PriceOracle</span>
+        </div>
+      </div>
+      <div class="amend-col dormant">
+        <span class="cap"></span>
+        <h3>NOT ACTIVATED — NOT OFFERED</h3>
+        <div class="chips">
+          <span class="chip">SingleAssetVault · XLS-65</span>
+          <span class="chip">LendingProtocol · XLS-66</span>
+          <span class="chip">ConfidentialMPT · XLS-96</span>
+          <span class="chip">DynamicMPT</span>
+          <span class="chip">Batch</span>
+          <span class="chip">PermissionDelegation</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="eck" style="margin-top:14px">
+      <div>
+        <p class="step">01</p>
+        <h3>Read</h3>
+        <p>Validated mainnet state, with four public nodes compared and their disagreement
+           reported rather than averaged away.</p>
+      </div>
+      <div>
+        <p class="step">02</p>
+        <h3>Adjudicate</h3>
+        <p>A deterministic rule set. The same state and the same rules return the same verdict,
+           on your machine and through the API.</p>
+      </div>
+      <div>
+        <p class="step">03</p>
+        <h3>Digest</h3>
+        <p>SHA-256 over the verdict and every check id and result. Byte-stable, so a receipt
+           can be re-verified years later.</p>
+      </div>
+      <div>
+        <p class="step">04</p>
+        <h3>Hand over</h3>
+        <p>Signed export with a chain of custody an examiner can follow, plus the request id
+           that names the same adjudication in your logs and ours.</p>
+      </div>
+    </div>
+
+    <p class="micro" style="margin-top:18px">
+      Amendment state verified against mainnet on 2026-08-24 — rippled 3.3.0, 93 amendments
+      active. The app re-reads it live; this list is the state at the last audit of this page.
+    </p>
+  </section>
+
   <section id="download" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">05 · Download</p>
+      <p class="eyebrow">08 · Download</p>
       <h2>Run it on your own machine</h2>
       <p>The full build, free to download. Paid capabilities unlock against your
          subscription — the binary is the same one licensed desks run.</p>
@@ -773,7 +1177,7 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
 
   <section id="pricing" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">06 · Pricing</p>
+      <p class="eyebrow">09 · Pricing</p>
       <h2>Free where a human decides</h2>
       <p>The console is free forever. Paid tiers begin where a desk needs something an individual
          does not.</p>
@@ -848,7 +1252,7 @@ certutil -hashfile NOSHASHI_0.2.2_x64-setup.exe SHA256   # Windows</pre>
 
   <section id="security" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">07 · Security posture</p>
+      <p class="eyebrow">10 · Security posture</p>
       <h2>The smallest possible attack surface</h2>
       <p>The safest data is data nobody holds. Without an account there is no server-side state at
          all — no analytics, no telemetry, no crash reporting.</p>

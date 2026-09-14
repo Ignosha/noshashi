@@ -3,7 +3,7 @@ import { SceneHeader } from "./SceneHeader";
 import { Panel, Eyebrow } from "@/components/nova/Panel";
 import { EmptyState } from "@/components/nova/EmptyState";
 import { Signal } from "@/components/nova/Signal";
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
+import { PatternField } from "@/components/nova/brand/BrandPattern";
 import { NovaSearch, NovaShield } from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,7 +169,7 @@ export function SafeShopScene({ onUpgrade }: { onUpgrade: () => void }) {
           className="relative col-span-3 min-h-0"
           bodyClassName="min-h-0 overflow-y-auto p-0"
         >
-          <PatternMark element="orbital" size={220} opacity={0.05} className="-right-14 -top-10" />
+          <PatternField variant="approach" />
 
           {!report ? (
             <EmptyState

@@ -4,7 +4,7 @@ import { Panel, Eyebrow, StatCell } from "@/components/nova/Panel";
 import { EmptyState } from "@/components/nova/EmptyState";
 import { Gated } from "@/components/nova/Gated";
 import { Signal } from "@/components/nova/Signal";
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
+import { PatternField } from "@/components/nova/brand/BrandPattern";
 import { NovaVault, NovaSearch } from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -237,7 +237,7 @@ function IssuanceBody() {
           className="relative min-h-0 lg:col-span-3"
           bodyClassName="min-h-0 overflow-y-auto p-0"
         >
-          <PatternMark element="orbital" size={200} opacity={0.05} className="-right-12 -top-8" />
+          <PatternField variant="survey" />
           {!report ? (
             <EmptyState
               icon={<NovaVault size={16} />}

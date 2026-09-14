@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SceneHeader } from "./SceneHeader";
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
+import { PatternField } from "@/components/nova/brand/BrandPattern";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
 import { EmptyState } from "@/components/nova/EmptyState";
 import { StatusDot } from "@/components/nova/StatusDot";
@@ -284,7 +284,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
               )
             }
           >
-            <PatternMark element="orbit" size={190} className="-bottom-14 -right-14" opacity={0.07} />
+            <PatternField variant="orbital" />
 
             <AnimatePresence mode="wait">
               {running ? (

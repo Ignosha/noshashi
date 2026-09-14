@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { SceneHeader } from "./SceneHeader";
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
+import { PatternField } from "@/components/nova/brand/BrandPattern";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
 import { Meter } from "@/components/nova/Charts";
 import { StatusDot } from "@/components/nova/StatusDot";
@@ -233,7 +233,7 @@ export function DomainsScene({ data }: { data: XrplState }) {
             }
           >
             <div className="relative">
-              <PatternMark element="orbital" size={180} className="-right-12 -top-12" opacity={0.08} />
+              <PatternField variant="orbital" />
               <p className="display text-[13px] font-[700] leading-tight text-foreground">
                 {selected.name}
               </p>

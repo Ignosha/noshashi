@@ -1,11 +1,12 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { SceneHeader } from "./SceneHeader";
 import { Panel, StatCell } from "@/components/nova/Panel";
 import { Signal } from "@/components/nova/Signal";
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
+import { PatternField } from "@/components/nova/brand/BrandPattern";
 import { NovaSat } from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
 import { readSync, syncFindings, type SyncReport } from "@/lib/net/sync";
+import { useLiveRefresh, stalenessLabel } from "@/lib/live";
 import { cn } from "@/lib/utils";
 
 /**
@@ -23,20 +24,27 @@ import { cn } from "@/lib/utils";
  */
 export function NetworkScene() {
   const [report, setReport] = useState<SyncReport | null>(null);
-  const [busy, setBusy] = useState(false);
 
-  const run = useCallback(async () => {
-    setBusy(true);
-    try {
-      setReport(await readSync());
-    } finally {
-      setBusy(false);
-    }
+  const read = useCallback(async () => {
+    setReport(await readSync());
   }, []);
 
-  useEffect(() => {
-    void run();
-  }, [run]);
+  /**
+   * Re-read on an interval rather than only on mount.
+   *
+   * This is the scene an operator leaves open, so it is the one where a
+   * reading from half an hour ago set in the same type as a fresh one does
+   * the most damage — node disagreement is only a signal if it is current.
+   *
+   * Thirty seconds against four public nodes: slower than the roughly
+   * four-second close interval, so a spread that matters persists across at
+   * least one read, and slow enough to stay a polite guest on infrastructure
+   * nobody is paying for. The hook stops entirely while the window is hidden
+   * or the machine is offline, and reads immediately on return.
+   */
+  const { lastRunAt, running, paused, refresh } = useLiveRefresh(read, {
+    intervalMs: 30_000,
+  });
 
   const findings = report ? syncFindings(report) : [];
 
@@ -160,13 +168,27 @@ export function NetworkScene() {
               this machine. They describe reachability from here, not the
               node's own speed.
             </p>
+            {/*
+              Say how old the reading is, and stop claiming liveness when it
+              is not live. DESIGN.md reserves the telemetry treatment for a
+              value updating right now; a paused window is not that, and a
+              caption that kept saying "live" while nothing polled would be
+              the same lie this scene exists to refuse.
+            */}
+            <p className="mono-font mt-2 text-[9px] leading-relaxed text-faint">
+              {paused
+                ? "AUTO-REFRESH PAUSED · WINDOW HIDDEN OR OFFLINE"
+                : `AUTO-REFRESH EVERY 30s${
+                    stalenessLabel(lastRunAt) ? ` · READ ${stalenessLabel(lastRunAt)}` : ""
+                  }`}
+            </p>
             <Button
               variant="outline"
               className="mt-2.5 w-full"
-              onClick={() => void run()}
-              disabled={busy}
+              onClick={() => void refresh()}
+              disabled={running}
             >
-              {busy ? "QUERYING NODES…" : "QUERY AGAIN"}
+              {running ? "QUERYING NODES…" : "QUERY AGAIN"}
             </Button>
           </div>
         </Panel>
@@ -176,7 +198,7 @@ export function NetworkScene() {
           className="relative min-h-0 lg:col-span-3"
           bodyClassName="min-h-0 overflow-y-auto p-0"
         >
-          <PatternMark element="orbit" size={190} opacity={0.05} className="-right-10 -top-6" />
+          <PatternField variant="orbital" />
           {!report ? (
             <div className="flex h-full items-center justify-center p-8">
               <p className="mono-font text-[10px] tracking-[0.2em] text-faint">

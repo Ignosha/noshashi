@@ -161,3 +161,92 @@ export function PatternMark({
     </div>
   );
 }
+
+/**
+ * PatternField — two or three plates layered into one background.
+ *
+ * A single mark in one corner reads as a decal applied to a flat surface.
+ * Two plates at opposing corners, at different scales, read as depth: the
+ * panel becomes something the data is sitting *on*. Same geometry, same
+ * opacity ceiling, no new elements on screen — only an arrangement.
+ *
+ * Three registers, so scenes of different character are not all wearing the
+ * identical backdrop while still coming from one vocabulary:
+ *
+ *   orbital  — concentric system. Whole-network scenes: sync, domains.
+ *   survey   — grid and hatch. Measurement scenes: books, issuance, stress.
+ *   approach — the tilted orbit, echoing the mark's own arcs. Subject
+ *              scenes, where one account or one token is being read.
+ *
+ * Opacity is capped well under the 8% the design system allows, because
+ * these sit inside panels that already carry a lit top edge. No z-index is
+ * set, deliberately: Panel is positioned but forms no stacking context, so
+ * a negative index would drop the field behind the panel's own background
+ * and out of sight. At these opacities the overlay is imperceptible, which
+ * is the same bargain every PatternMark on the console already makes.
+ */
+export function PatternField({
+  variant = "orbital",
+  className,
+}: {
+  variant?: "orbital" | "survey" | "approach";
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "pointer-events-none absolute inset-0 select-none overflow-hidden",
+        className
+      )}
+      aria-hidden
+    >
+      {variant === "orbital" && (
+        <>
+          <OrbitalSystem
+            size={300}
+            opacity={0.06}
+            className="absolute -right-16 -top-16 text-foreground"
+          />
+          <DotGrid
+            size={190}
+            gap={20}
+            opacity={0.05}
+            className="absolute -bottom-6 -left-6 text-foreground"
+          />
+        </>
+      )}
+
+      {variant === "survey" && (
+        <>
+          <DotGrid
+            size={240}
+            gap={18}
+            opacity={0.05}
+            className="absolute -right-8 -top-8 text-foreground"
+          />
+          <DiagonalHatch
+            size={210}
+            opacity={0.045}
+            className="absolute -bottom-10 -left-10 text-foreground"
+          />
+        </>
+      )}
+
+      {variant === "approach" && (
+        <>
+          <EllipseOrbit
+            size={280}
+            opacity={0.055}
+            className="absolute -right-14 -top-10 text-foreground"
+          />
+          <DotGrid
+            size={170}
+            gap={22}
+            opacity={0.04}
+            className="absolute -bottom-4 -left-4 text-foreground"
+          />
+        </>
+      )}
+    </div>
+  );
+}

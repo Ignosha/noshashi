@@ -409,6 +409,18 @@ body {
    ------------------------------------------------------------ */
 .panel-lit {
   position: relative;
+  /* The light the top edge catches has to come from somewhere, or the
+     hairline below reads as a drawn line rather than a lit edge. One very
+     short fall-off from the top — 22% of the panel and gone — using the
+     foreground at 3.5%, which on the navy ground is roughly the step from
+     --card to --popover. No hue is introduced and no shadow is cast: this
+     is the same "lit rather than printed on top" reasoning the token file
+     gives for the ground being navy instead of neutral black. */
+  background-image: linear-gradient(
+    to bottom,
+    hsl(var(--foreground) / 0.035),
+    transparent 22%
+  );
 }
 .panel-lit::before {
   content: "";
@@ -423,6 +435,62 @@ body {
     hsl(var(--foreground) / 0.14) 82%,
     transparent
   );
+}
+/* A nested panel sits ON the parent surface by definition, so it must not
+   re-light: two lit edges inside one bezel is the card-prison rule
+   reappearing as a gradient. */
+.panel-lit:where(.bg-transparent) {
+  background-image: none;
+}
+
+/* ------------------------------------------------------------
+   MEASURED RULE
+   The masthead rule, given a bezel scale. Instrument faces are
+   ruled, not merely divided — the ticks say the line is a scale
+   and not a border, which is the whole difference between a
+   console and a web page.
+
+   Drawn with two backgrounds rather than elements: a repeating
+   tick every 8px along the left two-thirds, and the hairline
+   itself fading out to the right. Static, monochrome, and free —
+   it spends nothing from the colour budget.
+   ------------------------------------------------------------ */
+.rule-measured {
+  background-image:
+    /* Major graduations, every 60px, full height. */
+    repeating-linear-gradient(
+      to right,
+      hsl(var(--foreground) / 0.24) 0 1px,
+      transparent 1px 60px
+    ),
+    /* Minor graduations, every 12px, two thirds height. Ticks at a single
+       even spacing read as a dotted line rather than a scale; it is the
+       two tiers that make it a bezel. */
+      repeating-linear-gradient(
+        to right,
+        hsl(var(--foreground) / 0.12) 0 1px,
+        transparent 1px 12px
+      ),
+    /* The rule itself, fading out to the right so the masthead ends in
+       air rather than against a hard stop. */
+      linear-gradient(
+        to right,
+        hsl(var(--border)),
+        hsl(var(--border)) 62%,
+        transparent
+      );
+  /* The graduated band covers the left 44% only. A scale that ran the
+     whole width would be wallpaper; stopping it early leaves the rule
+     reading as an instrument edge with a scale at one end. */
+  background-size:
+    44% 3px,
+    44% 2px,
+    100% 1px;
+  background-position:
+    left top,
+    left top,
+    left top;
+  background-repeat: no-repeat, no-repeat, no-repeat;
 }
 
 /* Interactive surfaces settle rather than snap. */

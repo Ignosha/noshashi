@@ -1,0 +1,94 @@
+name: Deploy site
+
+# Publishes site/ to noshashi.app on every push to main that touches it.
+#
+# This replaces running `vercel deploy --prod` by hand. The manual step was
+# not merely inconvenient: site/legal/ is GENERATED from src/lib/legal.ts by
+# scripts/build-legal-page.mjs, so a hand-deploy from a working tree where
+# nobody re-ran the generator publishes a legal page that no longer matches
+# the terms the application enforces. Regenerating here makes that drift
+# impossible rather than merely unlikely.
+#
+# Triggers deliberately narrowly. A push that only changes src/ or docs/
+# does not redeploy a static marketing site, and paying the deploy on every
+# commit would train everyone to ignore whether it succeeded.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "src/lib/legal.ts"
+      - "scripts/build-legal-page.mjs"
+      - ".github/workflows/deploy-site.yml"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why this manual deploy"
+        required: false
+        type: string
+
+concurrency:
+  # Never let two deploys race to production. A newer push supersedes an
+  # in-flight one, but the running deploy is allowed to finish rather than
+  # being cancelled mid-upload and leaving a half-published state.
+  group: deploy-site
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    environment:
+      name: production
+      url: https://noshashi.app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Regenerate the legal page from its source of truth, then say whether
+      # that changed anything. A non-empty diff means someone edited
+      # src/lib/legal.ts and did not rebuild — the deploy is still correct,
+      # because it ships the regenerated page, but the repository is now
+      # behind and somebody should commit it.
+      - name: Regenerate legal page
+        run: node scripts/build-legal-page.mjs
+
+      - name: Report legal-page drift
+        run: |
+          if [ -n "$(git status --porcelain site/legal/)" ]; then
+            echo "::warning title=Legal page was stale::site/legal/ did not match src/lib/legal.ts. The deploy ships the regenerated page; commit it to resync the repo."
+            git --no-pager diff --stat site/legal/
+          else
+            echo "site/legal/ is in sync with src/lib/legal.ts."
+          fi
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      # --prebuilt is deliberately NOT used: site/ is hand-written static
+      # HTML with no build step, so there is nothing to prebuild and the
+      # flag would make Vercel look for a .vercel/output that does not exist.
+      - name: Deploy to production
+        working-directory: site
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error title=Missing VERCEL_TOKEN::Add VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID as repository secrets. Until then this workflow cannot deploy."
+            exit 1
+          fi
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel deploy --prod --yes --token="$VERCEL_TOKEN" > deployment-url.txt
+          echo "Deployed: $(cat deployment-url.txt)"
+          echo "### Site deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "$(cat deployment-url.txt)" >> "$GITHUB_STEP_SUMMARY"

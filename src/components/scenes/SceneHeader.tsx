@@ -73,8 +73,15 @@ export function SceneHeader({
         </div>
       </div>
 
+      {/*
+        The masthead rule, ruled rather than merely drawn. Instrument faces
+        carry a scale; a plain 1px divider is a web page's convention, not a
+        console's. Three pixels tall so the ticks have somewhere to live —
+        see .rule-measured, which draws them from two backgrounds rather
+        than from elements, and costs nothing from the colour budget.
+      */}
       <motion.div
-        className="mt-2 h-px origin-left bg-border"
+        className="rule-measured mt-2 h-[3px] origin-left"
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}

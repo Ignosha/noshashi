@@ -3,7 +3,7 @@ import { SceneHeader } from "./SceneHeader";
 import { Panel, StatCell } from "@/components/nova/Panel";
 import { EmptyState } from "@/components/nova/EmptyState";
 import { Signal } from "@/components/nova/Signal";
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
+import { PatternField } from "@/components/nova/brand/BrandPattern";
 import { NovaShield, NovaSearch } from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -193,7 +193,7 @@ export function ClaimsScene() {
           className="relative min-h-0 lg:col-span-3"
           bodyClassName="min-h-0 overflow-y-auto p-0"
         >
-          <PatternMark element="orbit" size={190} opacity={0.05} className="-right-10 -top-6" />
+          <PatternField variant="approach" />
           {!report ? (
             <EmptyState
               icon={<NovaShield size={16} />}

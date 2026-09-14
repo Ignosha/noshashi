@@ -1,4 +1,4 @@
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
+import { PatternField } from "@/components/nova/brand/BrandPattern";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SceneHeader } from "./SceneHeader";
@@ -126,7 +126,7 @@ export function CredentialsScene({ data }: { data: XrplState }) {
               </span>
             }
           >
-            <PatternMark element="dots" size={260} opacity={0.06} className="-right-16 -top-16" />
+            <PatternField variant="orbital" />
 
             {accountError ? (
               <EmptyState

@@ -60,47 +60,35 @@ describe the live database. The 09-10 baseline predates the `api_hardening`
 work (`20260910000000`), which was applied by hand through the SQL editor and
 never written back.
 
-Absent from all three files:
+The 09-10 baseline alone is missing everything the `api_hardening` work added:
+`api_rate_windows`, four of the seven functions, the `api_keys_guard` trigger,
+`api_keys.expires_at` / `.scopes`, `entitlements.rate_limit_per_second`,
+`verification_events.request_id` / `.idempotency_key` / `.receipt`, the
+idempotency index, and every column comment.
 
-| Missing | Consequence for a rebuild |
-|---|---|
-| `noshashi.api_rate_windows` — the whole table, its composite PK, FK, sweep index and RLS enable | `api_rate_take()` and `api_rate_sweep()` have nothing to write to |
-| `api_keys_guard()`, `refund_verification_credit()`, `api_rate_take()`, `api_rate_sweep()` | 4 of the 7 live functions have no source in the repo |
-| the `api_keys_guard` trigger | revocation stops being terminal — `revoked_at` can be set back to null |
-| `api_keys.expires_at`, `api_keys.scopes` | key expiry and scope checking have no columns to read |
-| `entitlements.rate_limit_per_second` | **noshashi-verify reads this column.** A rebuilt database returns 500 on every API request — the exact failure the README's deploy-order note warns about |
-| `verification_events.request_id`, `.idempotency_key`, `.receipt`, and `verification_events_idempotency_idx` | no `X-Request-Id` correlation, and idempotent retries re-adjudicate and double-charge instead of replaying |
-| all 7 column comments | — |
+**But it is not meant to stand alone.**
+`supabase/migrations/20260910000000_api_hardening.sql` is committed, carries
+real SQL, and supplies all of it — including the column-grant fix
+(`revoke update … grant update (name, revoked_at)`), the guard trigger, and
+the PUBLIC revokes on all four new functions. Applied in order, baseline then
+migration, the repo reaches the live end state. The 09-10 baseline is
+incomplete as a snapshot, not wrong as a layer.
 
-### One grant is not merely missing — it is wider than production
+### What actually blocks a from-scratch rebuild
 
-The 09-10 baseline writes:
+Not missing DDL — ordering. `supabase/migrations/` holds four **empty
+placeholders** (the August versions, deliberately blank so the CLI can match
+filenames) plus `20260910000000_api_hardening.sql`. Against a fresh project,
+`db push` therefore runs only `api_hardening`, whose first statement is
+`alter table noshashi.api_keys …` on a table that does not exist yet. It
+fails on line 30.
 
-```sql
-grant select, insert, update on noshashi.api_keys to authenticated;
-```
-
-Table-level UPDATE, every column. Production instead holds `select, insert`
-plus a column-scoped `grant update (name, revoked_at)`. So the repo's version
-of `api_keys` differs from the live one in three independent controls at once
-— no column scoping, no `api_keys_guard` trigger, and no `scopes` column to
-protect. Rebuild from the repo, then re-add the hardening columns on top, and
-an account holder can rewrite their own `scopes` and `expires_at`.
-
-That is the single most important line in this diff, and it is the reason the
-09-10 file should be deleted rather than left beside the new one as an
-alternative.
-
-### Function EXECUTE hardening is recorded for only one function
-
-`20260820_compliance_api.sql` revokes PUBLIC and grants `service_role` on
-`consume_verification_credit(uuid)`. Production does the same for all seven
-functions. Nothing in the repo records that for the other six — and
-`refund_verification_credit(uuid)` is SECURITY DEFINER and increments
-`verification_quota` for any account id passed to it. It is absent from the
-repo today, so there is no live exposure from this; the risk is that whoever
-recreates it by hand has no record that PUBLIC must be revoked, and the
-default grant is PUBLIC EXECUTE.
+The core schema lives only in `supabase/history/`, which the CLI never runs.
+So the rebuild path is manual by construction: apply the history baseline by
+hand, then push. That is what "cannot rebuild from scratch" actually means
+here — and it is why a single self-contained baseline read from the live
+database is worth having, since it collapses the two layers into one file
+with no ordering to get wrong.
 
 ### Unrelated: the 08-28 file is about the `public` schema
 
