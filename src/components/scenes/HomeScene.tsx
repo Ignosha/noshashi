@@ -76,12 +76,23 @@ function RelayWorld({
           <pattern id="world-grid" width="5" height="5" patternUnits="userSpaceOnUse">
             <path d="M5 0H0V5" fill="none" stroke="currentColor" strokeWidth=".12" opacity=".32" />
           </pattern>
+          <radialGradient id="world-atmo" cx="50%" cy="45%" r="58%">
+            <stop offset="0" stopColor="hsl(var(--brand))" stopOpacity=".18" />
+            <stop offset=".7" stopColor="hsl(var(--brand))" stopOpacity=".04" />
+            <stop offset="1" stopColor="hsl(var(--brand))" stopOpacity="0" />
+          </radialGradient>
           <linearGradient id="world-fade" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0" stopColor="currentColor" stopOpacity=".22" />
             <stop offset="1" stopColor="currentColor" stopOpacity="0" />
           </linearGradient>
         </defs>
         <rect width="100" height="88" fill="url(#world-grid)" opacity=".6" />
+        <rect width="100" height="88" fill="url(#world-atmo)" />
+        <g fill="none" stroke="currentColor" strokeWidth=".12" opacity=".3">
+          <ellipse cx="50" cy="43" rx="42" ry="13" />
+          <ellipse cx="50" cy="43" rx="34" ry="25" />
+          <path d="M8 43h84M14 30c20 6 52 6 72 0M14 56c20-6 52-6 72 0" />
+        </g>
         <path
           d="M5 31 12 25 20 23 28 28 34 27 39 33 47 27 55 26 62 30 69 26 78 29 87 25 96 31V53L89 58 81 57 73 63 65 59 57 65 48 58 39 62 30 57 21 61 12 55 5 57Z"
           fill="url(#world-fade)"
@@ -118,6 +129,10 @@ function RelayWorld({
           <text x="53" y="42" fill="hsl(var(--foreground))" fontSize="2.4" fontFamily="IBM Plex Mono, monospace">VALIDATED</text>
           <text x="53" y="45" fill="currentColor" fontSize="2.1" fontFamily="IBM Plex Mono, monospace">XRPL FABRIC</text>
         </g>
+        <g fill="currentColor" fontSize="1.8" fontFamily="IBM Plex Mono, monospace" opacity=".65">
+          <text x="5" y="7">N 60°</text><text x="5" y="84">S 60°</text>
+          <text x="14" y="82">01</text><text x="47" y="82">02</text><text x="80" y="82">03</text>
+        </g>
       </svg>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 px-3 py-2">
         <span className="mono-font text-[8px] tracking-[0.12em] text-muted-foreground">
@@ -131,6 +146,11 @@ function RelayWorld({
         Packet lanes represent live ledger-event cadence through the observed relay topology. This
         is not transaction geolocation: XRPL publishes ledger events and node responses, not physical origin.
       </p>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border/40 px-3 pb-3 pt-2 mono-font text-[8px] tracking-[0.1em] text-muted-foreground">
+        <span><i className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[hsl(var(--telemetry))]" />RELAY NODE</span>
+        <span><i className="mr-1.5 inline-block h-px w-4 align-middle bg-[hsl(var(--telemetry))]" />EVENT LANE</span>
+        <span><i className="mr-1.5 inline-block h-px w-4 align-middle border-t border-dashed border-brand" />SECONDARY ROUTE</span>
+      </div>
     </div>
   );
 }

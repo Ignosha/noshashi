@@ -254,6 +254,10 @@
   @keyframes relayPulse{0%{r:2;opacity:.8}100%{r:8;opacity:0}}
   @keyframes packetRun{to{stroke-dashoffset:-16}}
   .relay-console-foot{display:flex;justify-content:space-between;gap:12px;padding:10px 16px;border-top:1px solid var(--rule);color:var(--faint);font:9px "IBM Plex Mono",monospace}
+  .relay-console-legend{display:flex;flex-wrap:wrap;gap:12px;border-top:1px solid color-mix(in srgb,var(--rule) 70%,transparent);padding:9px 16px;color:var(--faint);font:8px "IBM Plex Mono",monospace;letter-spacing:.1em}
+  .relay-console-legend i{display:inline-block;width:14px;height:1px;margin-right:5px;vertical-align:middle;background:var(--tele)}
+  .relay-console-legend i.node-key{width:6px;height:6px;border-radius:50%}
+  .relay-console-legend i.secondary-key{height:0;border-top:1px dashed var(--brand);background:transparent}
   @media (prefers-reduced-motion:reduce){.relay-map .node-pulse,.relay-map .route.packet{animation:none;opacity:.35}}
   @media (max-width:900px){.operator-brief{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:560px){.operator-brief{grid-template-columns:1fr}}
@@ -693,12 +697,17 @@
           <circle class="node-pulse" cx="84" cy="23" r="2"/><circle class="node" cx="84" cy="23" r="1"/>
           <circle class="node-pulse" cx="84" cy="34" r="2"/><circle class="node" cx="84" cy="34" r="1"/>
         </g>
+        <g fill="none" stroke="currentColor" stroke-width=".12" opacity=".28">
+          <ellipse cx="50" cy="21" rx="41" ry="12"/><ellipse cx="50" cy="21" rx="33" ry="20"/>
+          <path d="M9 21h82M15 12c20 5 50 5 70 0M15 30c20-5 50-5 70 0"/>
+        </g>
         <text x="19" y="18" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">AMERICAS · 01</text>
         <text x="53" y="18" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">EUROPE</text>
         <text x="86" y="20" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">APAC</text>
         <text x="86" y="31" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">OCEANIA</text>
       </svg>
       <div class="relay-console-foot"><span>PACKETS = LIVE LEDGER EVENTS · RELAY REGIONS 04</span><span>TOPOLOGY MODEL · NOT GEOLOCATION</span></div>
+      <div class="relay-console-legend"><span><i class="node-key"></i>RELAY NODE</span><span><i></i>EVENT LANE</span><span><i class="secondary-key"></i>SECONDARY ROUTE</span></div>
     </div>
   </section>
 
