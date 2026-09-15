@@ -189,15 +189,28 @@
     gap:20px;flex-wrap:nowrap}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:0 0 auto}
   .brand span{font-weight:600;letter-spacing:.2em;font-size:14px;white-space:nowrap}
-  .nav-links{display:flex;align-items:center;gap:24px;flex-wrap:nowrap;min-width:0}
-  .nav-links a{font-size:12px;color:var(--muted);text-decoration:none;transition:color .14s;
+  .nav-links{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}
+  .nav-links a{font-size:11px;color:var(--muted);text-decoration:none;transition:
+    color .14s,background .14s,border-color .14s,transform .14s;
     white-space:nowrap}
-  .nav-links a:hover{color:var(--ink)}
+  .nav-links a:not(.btn){display:inline-flex;align-items:center;gap:7px;
+    min-height:34px;padding:7px 10px;border:1px solid transparent;border-radius:var(--r);
+    background:transparent}
+  .nav-links a:not(.btn)::before{content:"";width:4px;height:4px;border-radius:50%;
+    background:var(--rule);transition:background .14s,box-shadow .14s}
+  .nav-links a:not(.btn):hover,.nav-links a:not(.btn):focus-visible{
+    color:var(--ink);background:var(--surface);border-color:var(--rule);
+    transform:translateY(-1px)}
+  .nav-links a:not(.btn):hover::before,.nav-links a:not(.btn):focus-visible::before{
+    background:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
+  .nav-links a:focus-visible,.theme-toggle:focus-visible{
+    outline:2px solid var(--tele);outline-offset:3px}
   .btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:#fff;
     padding:11px 20px;font-size:12px;font-weight:600;letter-spacing:.04em;
     text-decoration:none;border:1px solid var(--brand);border-radius:var(--r);
-    transition:filter .14s,transform .14s}
-  .btn:hover{filter:brightness(1.1)}
+    transition:filter .14s,transform .14s,box-shadow .14s}
+  .btn:hover,.btn:focus-visible{filter:brightness(1.1);transform:translateY(-1px);
+    box-shadow:0 6px 18px color-mix(in srgb,var(--brand) 22%,transparent)}
   .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
   .btn.ghost:hover{border-color:var(--brand);filter:none}
   .theme-toggle{display:inline-flex;align-items:center;gap:7px;background:transparent;
@@ -425,12 +438,17 @@
    * fit — measured, not guessed.
    */
   @media (max-width:1180px){
-    .nav-links{gap:15px}
-    .nav-links a{font-size:11.5px}
+    .nav-links{gap:4px}
+    .nav-links a{font-size:10.5px}
+    .nav-links a:not(.btn){padding-inline:8px}
+  }
+  @media (max-width:1100px){
+    .nav-links a.optional{display:none}
   }
   @media (max-width:1010px){
-    .nav-links{gap:11px}
-    .nav-links a{font-size:11px}
+    .nav-links{gap:2px}
+    .nav-links a{font-size:10px}
+    .nav-links a:not(.btn){padding-inline:6px}
     .nav-links a.btn{padding:8px 12px}
   }
   /* Below this seven links plus a button genuinely do not fit. */
@@ -574,15 +592,15 @@
       <span>NOSHASHI</span>
     </a>
     <nav class="nav-links">
-      <a href="#thesis">The thesis</a>
-      <a href="#public">Free tools</a>
-      <a href="/research/">Findings</a>
-      <a href="https://github.com/Ignosha/noshashi" rel="noopener">Source on GitHub</a>
-      <a href="#enterprise">For institutions</a>
-      <a href="/guide/">New to XRP?</a>
-      <a href="#download">Download</a>
-      <a href="#edge-lab">Edge Lab</a>
-      <a href="/pricing/">Pricing</a>
+      <a class="nav-link" href="#thesis">Thesis</a>
+      <a class="nav-link" href="#public">Free tools</a>
+      <a class="nav-link" href="/research/">Findings</a>
+      <a class="nav-link optional" href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a>
+      <a class="nav-link" href="#enterprise">Institutions</a>
+      <a class="nav-link optional" href="/guide/">XRP guide</a>
+      <a class="nav-link" href="#download">Download</a>
+      <a class="nav-link optional" href="#edge-lab">Edge Lab</a>
+      <a class="nav-link optional" href="/pricing/">Pricing</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
         <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
       </button>
