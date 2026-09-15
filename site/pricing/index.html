@@ -297,7 +297,9 @@
           <li>Priority support — one business day</li>
         </ul>
         <div class="act">
-          <a class="btn block" href="/billing/?plan=pro">Subscribe with card</a>
+          <form action="/api/create-checkout-session" method="post">
+            <button class="btn block" type="submit">Subscribe with card</button>
+          </form>
           <p class="terms">
             Stripe Checkout. Cancel any time from the billing portal; access runs to
             the end of the period you have paid for. Per seat, and a seat is a person.
