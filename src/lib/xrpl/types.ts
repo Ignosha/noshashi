@@ -68,6 +68,21 @@ export type LedgerStreamClose = {
   baseFeeXrp: string;
   reserveBaseXrp: string;
   closeTime: string;
+  /**
+   * The ledger's own close time as epoch millis — the same instant
+   * `closeTime` formats, kept in a form that can be subtracted.
+   *
+   * Cadence is the interval between consecutive closes, and that cannot be
+   * recovered from the formatted string. It is deliberately *not* the moment
+   * the frame arrived here: arrival interval measures this machine's
+   * connection, and a network stall would render as the ledger slowing down,
+   * which is a claim about XRPL that we would not have measured.
+   *
+   * Zero when the frame omits `ledger_time`. Consumers must skip it rather
+   * than treat it as a date — `rippleTimeToDate(0)` is 2000-01-01, thirty
+   * years adrift, and differencing against it would manufacture an interval.
+   */
+  closeAt: number;
 };
 
 export type LedgerStreamMessage = LedgerStreamTransaction | LedgerStreamClose;

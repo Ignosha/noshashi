@@ -36,6 +36,8 @@ export type LedgerTick = {
   txnCount: number;
   baseFeeXrp: number;
   closeTime: string;
+  /** Epoch millis of the close itself. Zero when the node omitted it. */
+  closeAt: number;
 };
 
 const HISTORY_LIMIT = 48;
@@ -146,6 +148,7 @@ export function useXRPL(address: string) {
                 txnCount: message.txnCount,
                 baseFeeXrp: Number(message.baseFeeXrp),
                 closeTime: message.closeTime,
+                closeAt: message.closeAt,
               },
             ].slice(-HISTORY_LIMIT)
           );

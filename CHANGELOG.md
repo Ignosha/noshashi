@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+## 0.3.0
+
+**LEDGER CADENCE was not measuring cadence.** The panel plotted transactions
+per close, which is throughput: a ledger carrying four hundred transactions
+and one carrying none can close on exactly the same rhythm, and a network
+genuinely slowing down would not have moved the line at all. The one reading
+the panel is named for was the one reading it did not contain. It now draws
+the interval between consecutive closes against the three-to-four-second
+window a healthy network closes in, with the observed median as a centre line
+and the distribution of intervals down the right edge — twenty closes
+crossing the band and twenty pressed against one edge of it look alike in
+sequence and mean different things about the network.
+
+This needed the close time carried through as a number. `LedgerTick` kept
+only the formatted string, and an interval cannot be recovered from
+`"14:32:07"`. `LedgerStreamClose.closeAt` is the ledger's own close time in
+epoch millis — deliberately not the moment the frame arrived here, because
+arrival interval measures this machine's connection and a local network
+stall would otherwise render as XRPL slowing down. It is zero rather than a
+date when a node omits `ledger_time`, since `rippleTimeToDate(0)` is
+2000-01-01 and differencing against it would manufacture an interval.
+
+**Two things in COMPLIANCE COVERAGE were drawn as measurements that were not
+measurements.** `DOMAIN ENFORCEMENT` was `connected ? 100 : 0` and `NODE LOAD
+FACTOR` was `100 / loadFactor`, both rendered as percentage bars. A bar
+implies a scale and a measured position on it; a binary has no such
+continuum, and an inverted multiplier is not a percentage of anything. Both
+are now states, showing the actual load multiplier and distinguishing "not
+read" from "off" — a node that never reported a load factor is not a node
+under no load.
+
+The two figures that *are* proportions became bullet graphs, so each carries
+the threshold it is judged against rather than leaving the reader to supply
+one from memory. Credential coverage is judged at 100: a permissioned domain
+admits on all of its requirements or none, so eighty percent is not most of
+the way there.
+
 **The Compliance API refused every credentialed subject.** `CredentialType`
 is a variable-length blob and arrives hex-encoded — `KYC_LEVEL_1` reaches the
 edge function as `4B59435F4C4556454C5F31`. The console decodes it; the server

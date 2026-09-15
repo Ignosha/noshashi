@@ -408,3 +408,318 @@ export function Meter({
     </div>
   );
 }
+
+/** XRPL closes every three to four seconds. Anything outside is worth seeing. */
+export const CADENCE_NORMAL_MIN_S = 3;
+export const CADENCE_NORMAL_MAX_S = 4;
+
+/**
+ * CadenceRibbon — the interval between consecutive ledger closes.
+ *
+ * The panel this sits in is called LEDGER CADENCE, and it used to plot
+ * transactions per close. That is throughput: a ledger carrying four hundred
+ * transactions and one carrying none can close at exactly the same rhythm,
+ * and a network genuinely stalling would not move the line at all. Cadence is
+ * the *timing*, so this draws the timing.
+ *
+ * Each bar is one interval. The band behind them is the three-to-four-second
+ * window a healthy network closes in, drawn rather than described so that
+ * "normal" is a thing you see a bar sitting inside instead of a claim in a
+ * caption.
+ *
+ * Deviation is encoded by opacity and a marker, never by hue: DESIGN.md
+ * spends `--go`/`--hold`/`--no-go` on verdicts alone, and a slow ledger close
+ * is an observation, not an adjudication. The newest bar is the only thing
+ * drawn in `--telemetry`, which is reserved for a value updating right now.
+ */
+export function CadenceRibbon({
+  intervals,
+  height = 62,
+  live = false,
+  labelAt,
+  className,
+}: {
+  /** Seconds between consecutive closes, oldest first. */
+  intervals: number[];
+  height?: number;
+  /** Draw the newest interval as live. False when the stream is down. */
+  live?: boolean;
+  labelAt?: (index: number) => string;
+  className?: string;
+}) {
+  const reduced = usePrefersReducedMotion();
+
+  if (intervals.length === 0) {
+    return (
+      <div className={cn("flex items-center", className)} style={{ height }}>
+        <p className="mono-font text-[10px] text-muted-foreground">
+          TWO CLOSES NEEDED TO MEASURE AN INTERVAL…
+        </p>
+      </div>
+    );
+  }
+
+  // Headroom above the normal band so an in-band ribbon does not fill the
+  // panel and read as though every close were at maximum.
+  const scale = Math.max(CADENCE_NORMAL_MAX_S + 2, ...intervals);
+  const y = (seconds: number) => (Math.min(seconds, scale) / scale) * height;
+
+  const sorted = [...intervals].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  const newest = intervals[intervals.length - 1];
+
+  /**
+   * Marginal distribution down the right edge, sharing the run chart's y
+   * scale so a bucket sits at the height of the intervals inside it.
+   *
+   * This is the half of the picture a run chart alone cannot show. Twenty
+   * bars stepping in and out of the band and twenty bars sitting hard
+   * against one edge of it look similar in sequence and mean completely
+   * different things about the network; the shape of the distribution is
+   * what separates them, and it costs twenty pixels.
+   */
+  const BUCKETS = 11;
+  const histogram = Array.from({ length: BUCKETS }, () => 0);
+  for (const seconds of intervals) {
+    const slot = Math.min(BUCKETS - 1, Math.floor((Math.min(seconds, scale) / scale) * BUCKETS));
+    histogram[slot] += 1;
+  }
+  const peak = Math.max(...histogram, 1);
+
+  return (
+    <div className={className}>
+      <div className="flex w-full items-stretch gap-1.5" style={{ height }}>
+        <div className="relative min-w-0 flex-1">
+          {/* The healthy window, behind the data. */}
+          <div
+            className="pointer-events-none absolute inset-x-0 border-y border-dashed border-border/70 bg-secondary/40"
+            style={{
+              bottom: y(CADENCE_NORMAL_MIN_S),
+              height: Math.max(1, y(CADENCE_NORMAL_MAX_S) - y(CADENCE_NORMAL_MIN_S)),
+            }}
+          />
+          {/* Observed median. A run chart without a centre line asks the eye
+              to average twenty bars, which it does badly and confidently. */}
+          <div
+            className="pointer-events-none absolute inset-x-0 border-t border-foreground/45"
+            style={{ bottom: y(median) }}
+          />
+          <div className="absolute inset-0 flex items-end gap-px">
+            {intervals.map((seconds, index) => {
+              const isNewest = index === intervals.length - 1;
+              const outOfBand =
+                seconds < CADENCE_NORMAL_MIN_S || seconds > CADENCE_NORMAL_MAX_S;
+              return (
+                <motion.span
+                  key={index}
+                  className={cn(
+                    "min-w-px flex-1 rounded-t-[1px]",
+                    isNewest && live ? "bg-[hsl(var(--telemetry))]" : "bg-brand",
+                    // Weight, not hue. An unusual interval reads as denser ink.
+                    outOfBand ? "opacity-100" : "opacity-40"
+                  )}
+                  style={{ height: Math.max(2, y(seconds)) }}
+                  initial={reduced ? false : { scaleY: 0 }}
+                  animate={{ scaleY: 1 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  title={
+                    labelAt
+                      ? `${labelAt(index)} · ${seconds.toFixed(2)}s`
+                      : `${seconds.toFixed(2)}s`
+                  }
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Distribution. Deliberately unlabelled and recessive — it is a
+            shape to be read at a glance, not a second chart competing with
+            the first for attention. */}
+        <div
+          className="relative w-[26px] shrink-0 border-l border-border/60"
+          title="Distribution of observed intervals"
+          aria-hidden
+        >
+          {histogram.map((count, slot) => (
+            <div
+              key={slot}
+              className="absolute left-0 bg-foreground/25"
+              style={{
+                bottom: (slot / BUCKETS) * height,
+                height: Math.max(1, height / BUCKETS - 1),
+                width: `${(count / peak) * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-1.5 flex items-center justify-between gap-2">
+        <span className="mono-font text-[8px] tracking-[0.1em] text-muted-foreground">
+          BAND {CADENCE_NORMAL_MIN_S}–{CADENCE_NORMAL_MAX_S}s · MEDIAN{" "}
+          {median.toFixed(2)}s
+        </span>
+        <span className="mono-font text-[8px] tabular-nums text-muted-foreground">
+          NOW{" "}
+          <span
+            className={cn(
+              "text-foreground",
+              live && "text-[hsl(var(--telemetry))]"
+            )}
+          >
+            {newest.toFixed(2)}s
+          </span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * BulletRow — a measured percentage against the threshold it is judged by.
+ *
+ * A `Meter` answers "how much"; it cannot answer "is that enough", so the
+ * reader supplies a threshold from memory and usually supplies the wrong one.
+ * The bullet graph carries both: the bar is the measurement, the notch is the
+ * threshold, and the bands behind them are the qualitative ranges. Same
+ * height as the bar it replaces.
+ *
+ * Bands are drawn in neutral ink rather than red/amber/green. DESIGN.md
+ * spends status hue on verdicts, and "68% of reserve is spendable" is a
+ * reading, not an adjudication — the notch already says whether it cleared.
+ */
+export function BulletRow({
+  label,
+  value,
+  threshold,
+  caption,
+  tone = "default",
+  className,
+}: {
+  label: string;
+  /** 0–100. */
+  value: number;
+  /** 0–100. The figure this is judged against, when there is one. */
+  threshold?: number;
+  /** What the measurement is of, when the label alone is ambiguous. */
+  caption?: string;
+  tone?: "default" | "go" | "hold" | "no-go";
+  className?: string;
+}) {
+  const reduced = usePrefersReducedMotion();
+  const pct = Math.max(0, Math.min(100, value));
+  const cleared = threshold === undefined || pct >= threshold;
+
+  const fill =
+    tone === "go"
+      ? "bg-go"
+      : tone === "hold"
+        ? "bg-hold"
+        : tone === "no-go"
+          ? "bg-no-go"
+          : "bg-foreground";
+
+  return (
+    <div className={className}>
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <span className="stencil min-w-0 truncate text-[8px] tracking-[0.14em] text-muted-foreground">
+          {label}
+        </span>
+        <span className="flex shrink-0 items-baseline gap-1.5">
+          <span className="data-font text-[11px] tabular-nums text-foreground">
+            {Math.round(pct)}%
+          </span>
+          {threshold !== undefined && (
+            // Word beside the mark: the notch alone would be colour-adjacent
+            // encoding, and this has to read in forced-colours too.
+            <span className="mono-font text-[8px] tracking-[0.1em] text-muted-foreground">
+              {cleared ? "MET" : "SHORT"}
+            </span>
+          )}
+        </span>
+      </div>
+
+      <div className="relative h-[7px] w-full">
+        {/* Qualitative bands — recessive, three steps of the same ink. */}
+        <div className="absolute inset-0 bg-secondary" />
+        <div className="absolute inset-y-0 left-0 w-[60%] bg-foreground/[0.06]" />
+        <div className="absolute inset-y-0 left-0 w-[30%] bg-foreground/[0.10]" />
+
+        {/* The measurement, thinner than its bands so it reads as a mark on
+            them rather than as another band. */}
+        <motion.span
+          className={cn("absolute left-0 top-[2px] h-[3px]", fill)}
+          initial={reduced ? false : { width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        />
+
+        {threshold !== undefined && (
+          <span
+            className="absolute top-[-1px] h-[9px] w-px bg-foreground"
+            style={{ left: `${Math.max(0, Math.min(100, threshold))}%` }}
+            title={`Threshold ${threshold}%`}
+          />
+        )}
+      </div>
+
+      {caption && (
+        <p className="mt-1 text-[9px] leading-snug text-muted-foreground">{caption}</p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * StateRow — a fact that is either true or false, drawn as a state.
+ *
+ * Exists because binary conditions were being rendered as `Meter` bars at 0
+ * or 100 percent. A bar carries an implied scale, so a reader sees a
+ * measurement with a value somewhere on a continuum; "is the stream
+ * connected" has no such continuum, and 100% enforcement is not a coverage
+ * figure anyone computed. Drawing it as a bar claims a precision that was
+ * never measured, which is the one thing this product is sold on not doing.
+ */
+export function StateRow({
+  label,
+  active,
+  activeLabel = "ACTIVE",
+  inactiveLabel = "INACTIVE",
+  detail,
+  className,
+}: {
+  label: string;
+  active: boolean;
+  activeLabel?: string;
+  inactiveLabel?: string;
+  /** Why it is in this state, when that is not obvious from the label. */
+  detail?: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="stencil min-w-0 truncate text-[8px] tracking-[0.14em] text-muted-foreground">
+          {label}
+        </span>
+        <span className="flex shrink-0 items-center gap-1.5">
+          {/* Glyph plus word: never colour alone. */}
+          <span
+            aria-hidden
+            className={cn(
+              "inline-block h-1.5 w-1.5 rounded-full",
+              active ? "bg-go" : "bg-no-go"
+            )}
+          />
+          <span className="mono-font text-[9px] tracking-[0.1em] text-foreground">
+            {active ? activeLabel : inactiveLabel}
+          </span>
+        </span>
+      </div>
+      {detail && (
+        <p className="mt-1 text-[9px] leading-snug text-muted-foreground">{detail}</p>
+      )}
+    </div>
+  );
+}

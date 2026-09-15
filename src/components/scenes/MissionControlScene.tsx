@@ -4,7 +4,15 @@ import { SceneHeader } from "./SceneHeader";
 import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
 import { CountUp } from "@/components/nova/CountUp";
-import { Meter, RingGauge, Sparkline } from "@/components/nova/Charts";
+import {
+  BulletRow,
+  CADENCE_NORMAL_MAX_S,
+  CADENCE_NORMAL_MIN_S,
+  CadenceRibbon,
+  RingGauge,
+  Sparkline,
+  StateRow,
+} from "@/components/nova/Charts";
 import { StatusDot } from "@/components/nova/StatusDot";
 import { EmptyState } from "@/components/nova/EmptyState";
 import {
@@ -101,6 +109,40 @@ export function MissionControlScene({
   const txnSeries = history.map((tick) => tick.txnCount);
   const feeSeries = history.map((tick) => tick.baseFeeXrp * 1_000_000);
 
+  /**
+   * Seconds between consecutive closes.
+   *
+   * Pairs are dropped rather than repaired when either side reports no close
+   * time, or when the difference is not positive — a node can re-announce a
+   * ledger, and a zero or negative interval is a stream artefact, not a
+   * network that closed twice in the same instant. Interpolating across the
+   * gap would invent a cadence nobody measured.
+   */
+  const cadence = useMemo(() => {
+    const out: Array<{ seconds: number; index: number; closeTime: string }> = [];
+    for (let i = 1; i < history.length; i += 1) {
+      const previous = history[i - 1];
+      const current = history[i];
+      if (!previous.closeAt || !current.closeAt) continue;
+      const seconds = (current.closeAt - previous.closeAt) / 1000;
+      if (seconds <= 0) continue;
+      out.push({ seconds, index: current.index, closeTime: current.closeTime });
+    }
+    return out;
+  }, [history]);
+
+  /** Median, not mean: one stalled close should not move the typical figure. */
+  const medianCadence = useMemo(() => {
+    if (cadence.length === 0) return null;
+    const sorted = cadence.map((c) => c.seconds).sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+  }, [cadence]);
+
+  const outOfBand = cadence.filter(
+    (c) => c.seconds < CADENCE_NORMAL_MIN_S || c.seconds > CADENCE_NORMAL_MAX_S
+  ).length;
+
   /** Live gate verdict against the wallet's default settlement domain. */
   const gate = useMemo(() => {
     const domain = DOMAIN_REGISTRY[0];
@@ -194,7 +236,7 @@ export function MissionControlScene({
             right={
               <span className="flex items-center gap-2">
                 <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
-                  {history.length}/48 CLOSES
+                  {medianCadence === null ? "—" : `${medianCadence.toFixed(1)}s MEDIAN`}
                 </span>
                 <StatusDot status={status} size={5} pulse={connected} />
               </span>
@@ -210,22 +252,48 @@ export function MissionControlScene({
                 </div>
               ) : (
                 <>
-                  <Sparkline
-                    values={txnSeries}
+                  <CadenceRibbon
+                    intervals={cadence.map((c) => c.seconds)}
                     height={62}
-                    tone="default"
-                    interactive
-                    label="TX / CLOSE"
-                    format={(v) => `${Math.round(v)} TX`}
+                    live={connected}
                     labelAt={(i) =>
-                      history[i]
-                        ? `LGR ${history[i].index.toLocaleString()} · ${history[i].closeTime}`
+                      cadence[i]
+                        ? `LGR ${cadence[i].index.toLocaleString()} · ${cadence[i].closeTime}`
                         : ""
                     }
                   />
+                  {/* Throughput kept, but secondary: it answers a different
+                      question than the panel's title, and conflating the two
+                      is what made a stalling network invisible here. */}
+                  <div className="mt-2 border-t border-border/50 pt-2">
+                    <div className="mb-1 flex items-baseline justify-between">
+                      <span className="stencil text-[8px] tracking-[0.14em] text-muted-foreground">
+                        THROUGHPUT
+                      </span>
+                      <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+                        AVG {avgTxn} TX · PEAK {Math.max(0, ...txnSeries)} TX
+                      </span>
+                    </div>
+                    <Sparkline
+                      values={txnSeries}
+                      height={26}
+                      tone="default"
+                      interactive
+                      label="TX / CLOSE"
+                      format={(v) => `${Math.round(v)} TX`}
+                      labelAt={(i) =>
+                        history[i]
+                          ? `LGR ${history[i].index.toLocaleString()} · ${history[i].closeTime}`
+                          : ""
+                      }
+                    />
+                  </div>
                   <div className="mt-2 flex items-center justify-between border-t border-border/50 pt-2">
                     <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
-                      AVG {avgTxn} TX · PEAK {Math.max(0, ...txnSeries)} TX
+                      {cadence.length} INTERVAL{cadence.length === 1 ? "" : "S"}
+                      {outOfBand > 0
+                        ? ` · ${outOfBand} OUTSIDE ${CADENCE_NORMAL_MIN_S}–${CADENCE_NORMAL_MAX_S}s`
+                        : " · ALL IN WINDOW"}
                     </span>
                     <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
                       LAST CLOSE {history[history.length - 1]?.closeTime ?? "—"}
@@ -271,7 +339,11 @@ export function MissionControlScene({
                   a narrow panel produced "CREDENTIAL COV…", which tells the
                   operator nothing. */}
               <div className="grid grid-cols-1 gap-x-6 gap-y-3 lg:grid-cols-2">
-                <Meter
+                {/* A domain admits on all of its requirements or none, so the
+                    threshold here is genuinely 100 — a partial holder is not
+                    partially admitted, and a bar without that notch reads as
+                    though 80% were most of the way there. */}
+                <BulletRow
                   label="CREDENTIAL COVERAGE"
                   value={
                     DOMAIN_REGISTRY[0].requirements.length === 0
@@ -287,27 +359,44 @@ export function MissionControlScene({
                           DOMAIN_REGISTRY[0].requirements.length) *
                         100
                   }
+                  threshold={100}
                   tone={credentials.length > 0 ? "go" : "no-go"}
+                  caption={`${DOMAIN_REGISTRY[0].requirements.length} required by ${DOMAIN_REGISTRY[0].name}`}
                 />
-                <Meter
+                <BulletRow
                   label="RESERVE HEADROOM"
                   value={balance > 0 ? Math.min(100, (spendable / balance) * 100) : 0}
                   tone="default"
+                  caption={`${spendable.toFixed(2)} XRP spendable of ${balance.toFixed(2)} held`}
                 />
-                <Meter
+                {/* Both of these were bars. Neither is a proportion:
+                    enforcement was `connected ? 100 : 0`, and load factor was
+                    inverted into `100 / loadFactor` so that a multiplier read
+                    as a percentage of something. A bar implies a scale and a
+                    measured position on it; these have neither, so they are
+                    drawn as what they are. */}
+                <StateRow
                   label="DOMAIN ENFORCEMENT"
-                  value={connected ? 100 : 0}
-                  tone={connected ? "go" : "no-go"}
+                  active={connected}
+                  activeLabel="ENFORCING"
+                  inactiveLabel="NOT READ"
+                  detail={
+                    connected
+                      ? undefined
+                      : "Enforcement state is read from the live stream. Without it this is unknown, not off."
+                  }
                 />
-                <Meter
+                <StateRow
                   label="NODE LOAD FACTOR"
-                  value={server ? Math.min(100, 100 / Math.max(1, server.loadFactor)) : 0}
-                  tone={
-                    server && server.loadFactor > 4
-                      ? "hold"
-                      : server
-                        ? "go"
-                        : "no-go"
+                  active={server ? server.loadFactor <= 4 : false}
+                  activeLabel={server ? `${server.loadFactor.toFixed(1)}x NOMINAL` : "—"}
+                  inactiveLabel={
+                    server ? `${server.loadFactor.toFixed(1)}x ELEVATED` : "NOT READ"
+                  }
+                  detail={
+                    server
+                      ? undefined
+                      : "The node has not reported a load factor on this connection."
                   }
                 />
               </div>

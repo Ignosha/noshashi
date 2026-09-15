@@ -261,6 +261,10 @@ export function subscribeLedger(
 ): () => void {
   const offStream = xrplLink.onStream((frame) => {
     if (frame.type === "ledgerClosed") {
+      // Read once and reused: a second rippleTimeToDate call for closeAt
+      // could disagree with closeTime if the frame were ever re-read.
+      const rawCloseTime = Number(frame.ledger_time ?? 0);
+      const closedAt = rippleTimeToDate(rawCloseTime);
       onMessage({
         type: "ledgerClosed",
         ledgerIndex: Number(frame.ledger_index ?? 0),
@@ -268,10 +272,10 @@ export function subscribeLedger(
         txnCount: Number(frame.txn_count ?? 0),
         baseFeeXrp: dropsToXrp(Number(frame.fee_base ?? 10)),
         reserveBaseXrp: dropsToXrp(Number(frame.reserve_base ?? 0)),
-        closeTime: rippleTimeToDate(Number(frame.ledger_time ?? 0)).toLocaleTimeString(
-          "en-US",
-          { hour12: false }
-        ),
+        closeTime: closedAt.toLocaleTimeString("en-US", { hour12: false }),
+        // Zero, not the epoch date, when the node omitted the field — see
+        // the note on LedgerStreamClose.closeAt.
+        closeAt: rawCloseTime > 0 ? closedAt.getTime() : 0,
       });
       return;
     }
