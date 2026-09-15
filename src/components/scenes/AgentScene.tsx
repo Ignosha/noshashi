@@ -75,6 +75,9 @@ export function AgentScene({ data }: { data: XrplState }) {
   const [diagnostics, setDiagnostics] = useState<Diagnostic[] | null>(null);
   const [diagnosing, setDiagnosing] = useState(false);
   const [probing, setProbing] = useState(true);
+  const [probeMs, setProbeMs] = useState<number | null>(null);
+  const [modelFilter, setModelFilter] = useState("");
+  const [testingRuntime, setTestingRuntime] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -88,6 +91,7 @@ export function AgentScene({ data }: { data: XrplState }) {
   const probe = useCallback(
     async (target?: AgentConfig) => {
       const active = target ?? config;
+      const started = performance.now();
       setProbing(true);
       setRuntimeError(null);
       try {
@@ -122,6 +126,7 @@ export function AgentScene({ data }: { data: XrplState }) {
             : "No model runtime reachable."
         );
       } finally {
+        setProbeMs(Math.round(performance.now() - started));
         setProbing(false);
       }
     },
@@ -154,6 +159,43 @@ export function AgentScene({ data }: { data: XrplState }) {
   }, [turns]);
 
   const ready = Boolean(config.model) && models.length > 0 && !runtimeError;
+  const visibleModels = models.filter((entry) => {
+    const query = modelFilter.trim().toLowerCase();
+    return (
+      !query ||
+      entry.name.toLowerCase().includes(query) ||
+      entry.detail.toLowerCase().includes(query)
+    );
+  });
+
+  const testRuntime = async () => {
+    if (!ready || testingRuntime) return;
+    setTestingRuntime(true);
+    try {
+      let response = "";
+      await chatStream({
+        config,
+        messages: [{ role: "user", content: "Reply with READY only." }],
+        onToken: (token) => {
+          response += token;
+        },
+        temperature: 0,
+      });
+      push({
+        title: "MODEL RESPONDED",
+        body: response.trim() ? `Probe returned: ${response.trim().slice(0, 80)}` : "The runtime accepted the request.",
+        tone: "go",
+      });
+    } catch (error) {
+      push({
+        title: "MODEL TEST FAILED",
+        body: error instanceof Error ? error.message : "The runtime did not return a response.",
+        tone: "no-go",
+      });
+    } finally {
+      setTestingRuntime(false);
+    }
+  };
 
   const send = async (text: string) => {
     const prompt = text.trim();
@@ -509,6 +551,11 @@ export function AgentScene({ data }: { data: XrplState }) {
               />
               <DataRow label="MODELS" value={models.length} />
               <DataRow
+                label="LAST CHECK"
+                value={probeMs === null ? "pending" : `${probeMs} ms`}
+                tone={probeMs !== null && probeMs < 1000 ? "go" : "muted"}
+              />
+              <DataRow
                 label="ACTIVE"
                 value={config.model || "none"}
                 tone={config.model ? "go" : "no-go"}
@@ -646,9 +693,20 @@ export function AgentScene({ data }: { data: XrplState }) {
 
             {models.length > 0 && (
               <>
-                <Eyebrow className="mb-1.5 mt-3">AVAILABLE MODELS</Eyebrow>
+                <div className="mb-1.5 mt-3 flex items-center gap-2">
+                  <Eyebrow className="min-w-0 flex-1">AVAILABLE MODELS · {visibleModels.length}/{models.length}</Eyebrow>
+                  {models.length > 3 && (
+                    <Input
+                      value={modelFilter}
+                      onChange={(event) => setModelFilter(event.target.value)}
+                      placeholder="FILTER"
+                      aria-label="Filter available models"
+                      className="mono-font h-6 w-24 text-[8px]"
+                    />
+                  )}
+                </div>
                 <div className="max-h-[132px] space-y-1 overflow-y-auto">
-                  {models.map((entry) => (
+                  {visibleModels.map((entry) => (
                     <button
                       key={entry.name}
                       onClick={() => setConfig({ ...config, model: entry.name })}
@@ -668,19 +726,33 @@ export function AgentScene({ data }: { data: XrplState }) {
                       </span>
                     </button>
                   ))}
+                  {visibleModels.length === 0 && (
+                    <p className="border border-border/60 px-2 py-2 text-[9px] text-muted-foreground">
+                    No models match this filter.
+                    </p>
+                  )}
                 </div>
               </>
             )}
 
-            <Button
-              size="sm"
-              variant="outline"
-              className="mt-3 w-full"
-              onClick={() => void probe()}
-              disabled={probing}
-            >
-              {probing ? "PROBING…" : "RE-DETECT"}
-            </Button>
+            <div className="mt-3 grid grid-cols-2 gap-1.5">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void probe()}
+                disabled={probing}
+              >
+                {probing ? "PROBING…" : "RE-DETECT"}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void testRuntime()}
+                disabled={!ready || testingRuntime}
+              >
+                {testingRuntime ? "TESTING…" : "TEST MODEL"}
+              </Button>
+            </div>
           </Panel>
 
           {mode === "support" && (

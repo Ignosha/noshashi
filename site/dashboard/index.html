@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Workspace — NOSHASHI</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/dashboard/dashboard.css">
+</head>
+<body>
+<div class="dashboard-shell">
+  <aside class="sidebar">
+    <a class="wordmark" href="/"><span class="wordmark-mark">N</span>NOSHASHI</a>
+    <p class="side-label">WORKSPACE</p>
+    <nav id="tabs" aria-label="Workspace sections">
+      <button class="tab active" data-view="overview">Overview</button>
+      <button class="tab" data-view="evidence" data-requires="pro">Evidence queue <span class="tab-lock">PRO</span></button>
+      <button class="tab" data-view="workflows" data-requires="pro">Workflow studio <span class="tab-lock">PRO</span></button>
+      <button class="tab" data-view="team" data-requires="pro">Team controls <span class="tab-lock">PRO</span></button>
+      <button class="tab" data-view="settings">Settings</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip" id="userEmail">Loading session…</div>
+      <button class="signout" id="signout">SIGN OUT</button>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topline">
+      <div><p class="eyebrow">PRIVATE OPERATIONS WORKSPACE</p><h1 id="pageTitle">Workspace overview</h1></div>
+      <span class="status-pill">SESSION VERIFIED</span>
+    </header>
+    <section class="view active" id="overview">
+      <div class="grid">
+        <article class="metric"><small>Open evidence</small><strong>04</strong><p>Items waiting for a human review.</p></article>
+        <article class="metric"><small>Active workflows</small><strong>07</strong><p>Reusable operating sequences configured.</p></article>
+        <article class="metric"><small>Workspace posture</small><strong style="color:var(--go)">READY</strong><p>Authentication and local controls are healthy.</p></article>
+      </div>
+      <div class="workspace-grid">
+        <article class="workspace-card locked"><span class="card-kicker">EVIDENCE QUEUE · PRO</span><h3>Review-ready evidence handling</h3><p>Annotate, assign and export review trails around the deterministic ledger verdict. A separate workspace layer for teams.</p><a class="upgrade-link" href="/pricing/">UNLOCK WITH PRO</a></article>
+        <article class="workspace-card locked"><span class="card-kicker">WORKFLOW STUDIO · PRO</span><h3>Build a repeatable handoff</h3><p>Compose intake, analyst review and evidence export steps without changing the deterministic compliance engine.</p><a class="upgrade-link" href="/pricing/">UNLOCK WITH PRO</a></article>
+      </div>
+    </section>
+    <section class="view" id="evidence"><div class="workspace-grid"><article class="workspace-card"><span class="card-kicker">EVIDENCE QUEUE · 04 OPEN</span><h3>Human review queue</h3><p>Organize receipts, annotations and next actions for internal review. This workspace layer does not replace the XRPL verdict engine.</p><div class="settings-row"><label>Receipt 7F3A · issuer freeze review</label><span class="status-pill">PENDING</span></div><div class="settings-row"><label>Receipt 42B1 · liquidity exception</label><span class="status-pill">ASSIGNED</span></div><div class="settings-row"><label>Receipt 90D4 · credential scope</label><span class="status-pill">PENDING</span></div></article><article class="workspace-card"><span class="card-kicker">RETENTION</span><h3>Evidence handling</h3><p>Keep review notes bounded to your workspace. Exports should be independently checked before they are used in a filing or decision.</p><button class="primary-button" type="button" onclick="alert('Export controls are available after a queue item is selected.')">EXPORT POLICY</button></article></div></section>
+    <section class="view" id="workflows"><div class="workspace-grid"><article class="workspace-card"><span class="card-kicker">WORKFLOW STUDIO</span><h3>Reusable operating sequences</h3><p>Define the handoff around the product: intake, policy check, analyst sign-off and evidence export.</p><div class="settings-row"><label>Settlement review</label><span class="status-pill">ACTIVE</span></div><div class="settings-row"><label>New issuer intake</label><span class="status-pill">DRAFT</span></div><button class="primary-button" type="button" onclick="alert('Workflow editor is ready for your first sequence.')">NEW WORKFLOW</button></article><article class="workspace-card"><span class="card-kicker">GUARDRAIL</span><h3>Automation stays bounded</h3><p>Workflows can route work and preserve evidence. They cannot sign, custody funds, broadcast transactions or establish legal conclusions.</p></article></div></section>
+    <section class="view" id="team"><div class="workspace-grid"><article class="workspace-card"><span class="card-kicker">TEAM CONTROLS</span><h3>Roles and handoffs</h3><p>Keep operators, reviewers and observers distinct so every action has an accountable owner.</p><div class="settings-row"><label>Workspace owner</label><span class="status-pill">OWNER</span></div><div class="settings-row"><label>Reviewer seats</label><span class="status-pill">02</span></div><button class="primary-button" type="button" onclick="alert('Invite controls will be enabled when team billing is connected.')">INVITE REVIEWER</button></article><article class="workspace-card"><span class="card-kicker">ACCESS LOG</span><h3>Recent workspace activity</h3><p>Sign-in events, assignment changes and export requests appear here in the connected workspace.</p></article></div></section>
+    <section class="view" id="settings"><div class="settings"><div class="settings-row"><label for="workspaceName">Workspace name</label><input id="workspaceName" value="NOSHASHI Operations"></div><div class="settings-row"><label for="timezone">Display timezone</label><select id="timezone"><option>UTC</option><option>America/New_York</option><option>Europe/London</option></select></div><div class="settings-row"><label>Review notifications</label><button class="toggle on" aria-pressed="true"><i></i></button></div><div class="settings-row"><label>Reduced motion</label><button class="toggle" aria-pressed="false"><i></i></button></div><button class="primary-button" id="saveSettings">SAVE SETTINGS</button><p id="settingsStatus" class="auth-status"></p></div></section>
+  </main>
+</div>
+<script>
+const SUPABASE_URL="https://xiurbiwuwcfowqnpmwki.supabase.co",SUPABASE_KEY="sb_publishable_5Kk09a9QEwX1iALqmX-w8g_2fLY7tHO";
+const auth=JSON.parse(localStorage.getItem("noshashi-auth")||"null");
+if(!auth?.access_token){location.replace("/login/");}
+else{
+  fetch(`${SUPABASE_URL}/auth/v1/user`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${auth.access_token}`}})
+    .then(r=>r.ok?r.json():Promise.reject(new Error("Session expired")))
+    .then(user=>{document.getElementById("userEmail").textContent=user.email||"Authenticated operator";})
+    .catch(()=>{localStorage.removeItem("noshashi-auth");location.replace("/login/");});
+}
+const titles={overview:"Workspace overview",evidence:"Evidence queue",workflows:"Workflow studio",team:"Team controls",settings:"Workspace settings"};
+const hasPaidAccess=Boolean(auth.user?.user_metadata?.plan==="pro"||auth.user?.app_metadata?.plan==="pro");
+function show(view){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.view===view));document.querySelectorAll(".view").forEach(s=>s.classList.toggle("active",s.id===view));document.getElementById("pageTitle").textContent=titles[view];}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.requires==="pro"&&!hasPaidAccess){location.href="/pricing/";return;}show(b.dataset.view);}));
+document.querySelectorAll("[data-jump]").forEach(b=>b.addEventListener("click",()=>{if(!hasPaidAccess){location.href="/pricing/";return;}show(b.dataset.jump);}));
+document.getElementById("signout").addEventListener("click",async()=>{try{await fetch(`${SUPABASE_URL}/auth/v1/logout`,{method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${auth.access_token}`}});}finally{localStorage.removeItem("noshashi-auth");location.replace("/login/");}});
+document.querySelectorAll(".toggle").forEach(toggle=>toggle.addEventListener("click",()=>{const next=toggle.getAttribute("aria-pressed")!=="true";toggle.setAttribute("aria-pressed",String(next));toggle.classList.toggle("on",next);}));
+document.getElementById("saveSettings").addEventListener("click",()=>{document.getElementById("settingsStatus").textContent="Settings saved on this device.";document.getElementById("settingsStatus").dataset.tone="good";});
+</script>
+</body>
+</html>

@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) {
+  if (!secretKey || secretKey.includes("placeholder")) {
     return res.status(503).json({ error: "Checkout is not configured yet." });
   }
 

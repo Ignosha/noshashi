@@ -1,4 +1,10 @@
-import { findProvider, isEndpointSafe, MODEL_PREFERENCE, type AgentConfig } from "./providers";
+import {
+  findProvider,
+  isEndpointSafe,
+  MODEL_PREFERENCE,
+  normalizeEndpoint,
+  type AgentConfig,
+} from "./providers";
 import { getProviderKey } from "./keys";
 
 /**
@@ -46,7 +52,17 @@ async function fetchWithTimeout(
 
 /** Strip a trailing slash so path joins never double up. */
 function base(url: string): string {
-  return url.replace(/\/+$/, "");
+  return normalizeEndpoint(url);
+}
+
+function apiBase(config: AgentConfig): string {
+  const provider = findProvider(config.providerId);
+  const endpoint = base(config.baseUrl);
+  if (provider.api === "ollama") return endpoint.replace(/\/v1$/, "");
+  if (provider.local && provider.api === "openai" && new URL(endpoint).pathname === "/") {
+    return `${endpoint}/v1`;
+  }
+  return endpoint;
 }
 
 /**
@@ -83,7 +99,7 @@ export async function listModels(config: AgentConfig): Promise<AgentModel[]> {
   const headers = await authHeaders(config);
 
   if (provider.api === "anthropic") {
-    const response = await fetchWithTimeout(`${base(config.baseUrl)}/models`, { headers });
+    const response = await fetchWithTimeout(`${apiBase(config)}/models`, { headers });
     if (!response.ok) {
       throw new AgentUnavailableError(`Anthropic replied ${response.status}.`);
     }
@@ -96,7 +112,7 @@ export async function listModels(config: AgentConfig): Promise<AgentModel[]> {
   }
 
   if (provider.api === "ollama") {
-    const response = await fetchWithTimeout(`${base(config.baseUrl)}/api/tags`);
+    const response = await fetchWithTimeout(`${apiBase(config)}/api/tags`);
     if (!response.ok) {
       throw new AgentUnavailableError(`Runtime replied ${response.status}.`);
     }
@@ -108,7 +124,7 @@ export async function listModels(config: AgentConfig): Promise<AgentModel[]> {
     }));
   }
 
-  const response = await fetchWithTimeout(`${base(config.baseUrl)}/models`, { headers });
+  const response = await fetchWithTimeout(`${apiBase(config)}/models`, { headers });
   if (!response.ok) {
     throw new AgentUnavailableError(`Runtime replied ${response.status}.`);
   }
@@ -142,20 +158,27 @@ export async function autodetect(): Promise<AgentConfig | null> {
     (provider) => provider.autodetect
   );
 
-  const probes = candidates.map(async (provider) => {
-    try {
-      const config: AgentConfig = {
-        providerId: provider.id,
-        baseUrl: provider.defaultBaseUrl,
-        model: "",
-        hasStoredKey: false,
-      };
-      const models = await listModels(config);
-      if (models.length === 0) return null;
-      return { ...config, model: pickModel(models) ?? "" };
-    } catch {
-      return null;
+  const probes = candidates.flatMap((provider) => {
+    const endpoints = new Set([provider.defaultBaseUrl]);
+    if (provider.defaultBaseUrl.includes("localhost")) {
+      endpoints.add(provider.defaultBaseUrl.replace("localhost", "127.0.0.1"));
     }
+
+    return [...endpoints].map(async (baseUrl) => {
+      try {
+        const config: AgentConfig = {
+          providerId: provider.id,
+          baseUrl,
+          model: "",
+          hasStoredKey: false,
+        };
+        const models = await listModels(config);
+        if (models.length === 0) return null;
+        return { ...config, model: pickModel(models) ?? "" };
+      } catch {
+        return null;
+      }
+    });
   });
 
   const results = await Promise.all(probes);
@@ -200,10 +223,10 @@ export async function chatStream({
   const conversation = messages.filter((message) => message.role !== "system");
 
   const url = isAnthropic
-    ? `${base(config.baseUrl)}/messages`
+    ? `${apiBase(config)}/messages`
     : provider.api === "ollama"
-      ? `${base(config.baseUrl)}/api/chat`
-      : `${base(config.baseUrl)}/chat/completions`;
+      ? `${apiBase(config)}/api/chat`
+      : `${apiBase(config)}/chat/completions`;
 
   const body = isAnthropic
     ? {

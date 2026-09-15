@@ -196,6 +196,15 @@ export function findProvider(id: string): Provider {
   return PROVIDERS.find((provider) => provider.id === id) ?? PROVIDERS[0];
 }
 
+/** Normalize an operator-entered endpoint before it is used by fetch. */
+export function normalizeEndpoint(baseUrl: string): string {
+  const candidate = baseUrl.trim();
+  const withScheme = /^[a-z][a-z\d+.-]*:\/\//i.test(candidate)
+    ? candidate
+    : `http://${candidate}`;
+  return withScheme.replace(/\/+$/, "");
+}
+
 /**
  * Preference order when the operator has not chosen a model. Small,
  * instruction-following models beat large chat models for this job:
@@ -235,9 +244,14 @@ export function defaultConfig(): AgentConfig {
 
 /** A remote endpoint must be TLS — never ship a key over plaintext. */
 export function isEndpointSafe(baseUrl: string): { ok: boolean; reason?: string } {
+  const candidate = baseUrl.trim();
+  if (!candidate) {
+    return { ok: false, reason: "Enter a local runtime endpoint." };
+  }
+
   let url: URL;
   try {
-    url = new URL(baseUrl);
+    url = new URL(normalizeEndpoint(candidate));
   } catch {
     return { ok: false, reason: "Not a valid URL." };
   }
