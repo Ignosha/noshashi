@@ -215,6 +215,28 @@
   .micro{font-size:11px;color:var(--faint);margin-top:20px}
   .verdicts{display:inline-flex;gap:4px;font-weight:700}
   .go{color:var(--go)} .hold{color:var(--hold)} .nogo{color:var(--nogo)}
+  .hero-brief{display:grid;grid-template-columns:1.2fr repeat(3,1fr);gap:1px;
+    margin-top:34px;background:var(--rule);border:1px solid var(--rule);
+    border-radius:var(--r);overflow:hidden;position:relative}
+  .hero-brief::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+    background:linear-gradient(90deg,var(--tele),var(--brand) 42%,transparent 78%)}
+  .hero-brief-cell{background:var(--surface);padding:17px 18px;min-width:0}
+  .hero-brief-cell:first-child{background:var(--elevated)}
+  .hero-brief-cell .label{display:block;color:var(--faint);font:9px "IBM Plex Mono",monospace;
+    letter-spacing:.18em;margin-bottom:9px}
+  .hero-brief-cell strong{display:block;font-size:14px;line-height:1.3}
+  .hero-brief-cell p{margin-top:7px;color:var(--muted);font-size:11.5px;line-height:1.5}
+  .hero-brief-cell .signal{color:var(--tele)}
+  .decision-loop{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:14px;
+    border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .decision-step{position:relative;padding:12px 14px 12px 0;margin-right:14px}
+  .decision-step:not(:last-child)::after{content:"";position:absolute;right:0;top:21px;width:10px;
+    height:1px;background:var(--brand);opacity:.55}
+  .decision-step b{display:block;color:var(--brand);font:9px "IBM Plex Mono",monospace;letter-spacing:.16em}
+  .decision-step span{display:block;margin-top:5px;color:var(--ink);font-size:12px}
+  .decision-step small{display:block;margin-top:3px;color:var(--faint);font-size:10px;line-height:1.4}
+  @media (max-width:900px){.hero-brief{grid-template-columns:repeat(2,1fr)}.decision-loop{grid-template-columns:repeat(2,1fr);row-gap:4px}}
+  @media (max-width:560px){.hero-brief{grid-template-columns:1fr}.decision-loop{grid-template-columns:1fr}.decision-step:not(:last-child)::after{display:none}}
 
   /* The header is sticky, so an anchor jump would land the heading
      underneath it without this. */
@@ -641,6 +663,34 @@
       <a class="btn ghost" href="/guide/">New to XRP? Start here</a>
     </div>
     <p class="micro">Free tier · no account required to start · nothing is ever signed</p>
+    <div class="hero-brief" aria-label="Institutional operating brief">
+      <div class="hero-brief-cell">
+        <span class="label">THE INSTITUTIONAL QUESTION</span>
+        <strong>Can this decision survive review?</strong>
+        <p>One validated state, one deterministic rule set, one receipt an examiner can replay.</p>
+      </div>
+      <div class="hero-brief-cell">
+        <span class="label">INPUT</span>
+        <strong>Public ledger state</strong>
+        <p>Flags, trust lines, credentials, domains, book depth and amendments.</p>
+      </div>
+      <div class="hero-brief-cell">
+        <span class="label">OUTPUT</span>
+        <strong class="signal">GO · HOLD · NO-GO</strong>
+        <p>The exact rule, evidence and timestamp behind the answer.</p>
+      </div>
+      <div class="hero-brief-cell">
+        <span class="label">CONTROL</span>
+        <strong>Before the signature</strong>
+        <p>Read-only by design. No custody, key storage or broadcast path.</p>
+      </div>
+    </div>
+    <div class="decision-loop" aria-label="NOSHASHI decision loop">
+      <div class="decision-step"><b>01 / READ</b><span>Validated state</span><small>same ledger snapshot</small></div>
+      <div class="decision-step"><b>02 / TEST</b><span>Policy engine</span><small>deterministic checks</small></div>
+      <div class="decision-step"><b>03 / PROVE</b><span>SHA-256 receipt</span><small>byte-stable evidence</small></div>
+      <div class="decision-step"><b>04 / HAND OVER</b><span>Review-ready export</span><small>traceable custody</small></div>
+    </div>
 
     <!-- Live mainnet ticker. Real data over the same public WebSocket the
          desktop app uses; if it cannot connect it says so rather than
