@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+## 0.3.1
+
+**LEDGER CADENCE reported a healthy network as failing.** 0.3.0 measured the
+interval between closes by differencing `ledger_time`, which is not a
+timestamp of the resolution that implies: XRPL rounds a close time to the
+ledger's `close_time_resolution`, and when the rounded value collides with
+the parent's it takes parent + 1 second instead. Consecutive closes inside
+one resolution bucket therefore report exactly 1s, and the bucket boundary
+reports 8s or 9s.
+
+Measured against mainnet on 2026-09-15, thirty-three consecutive intervals
+read 9,1,1,8,1,1,8 — never once the three to four seconds the network
+actually runs at. Their mean was 3.94s, which is right, because the rounding
+preserves the total and destroys the distribution. Drawn per-interval it
+announced eighteen of twenty-eight closes as out of band while the network
+was entirely healthy — the panel inventing a fault, which is the one thing
+this product is sold on not doing.
+
+Cadence is now measured from when each close reaches this machine, and
+labelled as that rather than as the ledger's own rhythm: it includes the
+local network path, exactly as `roundTripMs` does in `net/sync.ts`. The same
+window now reads 3.72–4.08s with a mean of 3.85s. `closeAt` is kept for
+labelling a ledger and carries a note against using it for intervals.
+
+The ribbon also became a dot strip. As bars it had to be anchored at zero or
+it would misstate every ratio, and at that scale the real signal — four
+tenths of a second of spread — was a few pixels inside a wall of identical
+bars. A dot encodes position rather than length, claims no baseline, and can
+carry a range zoomed to the data honestly, with the 3–4s band drawn behind
+it supplying the reference the axis no longer does.
+
+**The application icon had white corners.** It painted a rounded rectangle on
+a square canvas, leaving four transparent corners — which render white on any
+light ground and bake white in through a converter that flattens. Every
+platform masks an icon itself, so the second rounding underneath was never
+wanted. The ground is now full-bleed and the mark is centred, six pixels left
+of true before.
+
 ## 0.3.0
 
 **LEDGER CADENCE was not measuring cadence.** The panel plotted transactions

@@ -25,16 +25,19 @@ site/.env.*
 # there is no reason to carry it in history.
 release/
 
-# NOTE: site/download/ is deliberately NOT ignored. That directory is not
-# build output — it is the content noshashi.app actually serves, and the
-# macOS .dmg is linked directly from the download section of
-# site/index.html. Ignoring it breaks the live download on any deploy that
-# publishes from this repository.
+# NOTE: site/download/ no longer holds installers, and nothing links to it.
 #
-# The tradeoff is ~3.4 MB of binary per release carried in history. Once
-# there is a GitHub remote, move installers to GitHub Releases and point
-# the site at those URLs instead — the release workflow already builds and
-# uploads all four targets.
+# It used to: the site served the .dmg out of this repository, so the
+# directory could not be ignored without breaking the live download. That
+# migration is done — every button in site/index.html now points at a
+# GitHub Release asset, which is where the release workflow uploads all
+# four targets. The installers that were carried here (0.1.0, 0.2.0, 0.2.1)
+# were deleted in v0.3.0 along with this note's previous warning.
+#
+# The directory is still tracked because site/downloads/ carries the XRPL
+# edge pack, which is content rather than build output. Installers do not
+# belong here again — a release asset has a checksum, a download count and
+# no cost in repository history.
 
 # OS / editor
 .DS_Store

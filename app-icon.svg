@@ -1,5 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <title>NOSHASHI</title>
+  <!--
+    Source for `npm run icon` (tauri icon app-icon.svg), which generates every
+    platform size from this one file.
+
+    Full-bleed by design. This used to paint a rounded rect (rx="112"), which
+    left the four corners transparent — and transparent corners render white
+    on any light ground, bake white in through a converter that flattens, and
+    show as white notches behind a Windows taskbar icon. Every platform masks
+    an app icon itself: macOS applies its own squircle, Windows keeps the
+    square, Linux varies by theme. Supplying a second rounding underneath
+    theirs is what produced the corners, so the ground now runs edge to edge
+    and each OS cuts its own shape out of it.
+
+    Do not reintroduce a corner radius here.
+  -->
   <defs>
     <linearGradient id="nshBlue" x1="0" y1="1" x2="1" y2="0">
       <stop offset="0%" stop-color="#0077FF"/><stop offset="55%" stop-color="#00C8FF"/><stop offset="100%" stop-color="#EAF7FF"/>
@@ -11,8 +26,15 @@
       <stop offset="0%" stop-color="#0A1018"/><stop offset="100%" stop-color="#05070A"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="112" fill="url(#nshGround)"/>
-  <g transform="translate(-39.1 28.1) scale(2.5651)">
+  <rect width="512" height="512" fill="url(#nshGround)"/>
+  <!--
+    Optically centred. The previous translate put the mark's bounding box at
+    x 117.4–381.6 and y 61.4–448.8, so its centre sat at (249.5, 255.1) rather
+    than (256, 256) — six pixels left of true. Invisible against transparent
+    corners; not invisible once the ground reaches the edge and the OS mask
+    crops symmetrically around the centre.
+  -->
+  <g transform="translate(-32.6 29.0) scale(2.5651)">
     <g fill="none" stroke="url(#nshBlue)" stroke-width="7" stroke-linecap="round">
       <path d="M76 20 A56 56 0 0 1 150 68"/>
       <path d="M164 92 A56 56 0 0 1 86 156"/>

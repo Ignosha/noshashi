@@ -110,21 +110,25 @@ export function MissionControlScene({
   const feeSeries = history.map((tick) => tick.baseFeeXrp * 1_000_000);
 
   /**
-   * Seconds between consecutive closes.
+   * Seconds between consecutive closes *arriving here*.
    *
-   * Pairs are dropped rather than repaired when either side reports no close
-   * time, or when the difference is not positive — a node can re-announce a
-   * ledger, and a zero or negative interval is a stream artefact, not a
-   * network that closed twice in the same instant. Interpolating across the
-   * gap would invent a cadence nobody measured.
+   * Measured from `receivedAt`, not `closeAt`. `ledger_time` is rounded to
+   * the ledger's close-time resolution and bumped to parent + 1 on a
+   * collision, so differencing it yields 1s inside a bucket and 8–9s at the
+   * boundary — a pattern that has nothing to do with the network's actual
+   * rhythm. The note on `LedgerTick.receivedAt` carries the measurement.
+   *
+   * Pairs with a non-positive difference are dropped rather than repaired: a
+   * node can re-announce a ledger, and two closes in the same instant is a
+   * stream artefact, not a reading.
    */
   const cadence = useMemo(() => {
     const out: Array<{ seconds: number; index: number; closeTime: string }> = [];
     for (let i = 1; i < history.length; i += 1) {
       const previous = history[i - 1];
       const current = history[i];
-      if (!previous.closeAt || !current.closeAt) continue;
-      const seconds = (current.closeAt - previous.closeAt) / 1000;
+      if (!previous.receivedAt || !current.receivedAt) continue;
+      const seconds = (current.receivedAt - previous.receivedAt) / 1000;
       if (seconds <= 0) continue;
       out.push({ seconds, index: current.index, closeTime: current.closeTime });
     }
@@ -290,7 +294,7 @@ export function MissionControlScene({
                   </div>
                   <div className="mt-2 flex items-center justify-between border-t border-border/50 pt-2">
                     <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
-                      {cadence.length} INTERVAL{cadence.length === 1 ? "" : "S"}
+                      {cadence.length} ARRIVAL INTERVAL{cadence.length === 1 ? "" : "S"}
                       {outOfBand > 0
                         ? ` · ${outOfBand} OUTSIDE ${CADENCE_NORMAL_MIN_S}–${CADENCE_NORMAL_MAX_S}s`
                         : " · ALL IN WINDOW"}
@@ -335,9 +339,10 @@ export function MissionControlScene({
                 />
               </div>
 
-              {/* Meters stack below xl: two columns of a truncating label in
-                  a narrow panel produced "CREDENTIAL COV…", which tells the
-                  operator nothing. */}
+              {/* Rows stack below lg: two columns of a truncating label in a
+                  narrow panel produced "CREDENTIAL COV…", which tells the
+                  operator nothing. Still true of the bullet and state rows
+                  that replaced the meters — they carry the same label. */}
               <div className="grid grid-cols-1 gap-x-6 gap-y-3 lg:grid-cols-2">
                 {/* A domain admits on all of its requirements or none, so the
                     threshold here is genuinely 100 — a partial holder is not

@@ -36,8 +36,35 @@ export type LedgerTick = {
   txnCount: number;
   baseFeeXrp: number;
   closeTime: string;
-  /** Epoch millis of the close itself. Zero when the node omitted it. */
+  /**
+   * Epoch millis of the close itself. Zero when the node omitted it.
+   *
+   * Good for labelling a ledger. **Useless for measuring cadence** — see
+   * `receivedAt`.
+   */
   closeAt: number;
+  /**
+   * Epoch millis when this close reached this machine.
+   *
+   * Cadence has to be measured from this rather than from `closeAt`, because
+   * `ledger_time` is not a timestamp of the resolution that implies. XRPL
+   * rounds a close time to `close_time_resolution`, and when the rounded
+   * value collides with the parent ledger's it takes parent + 1 second
+   * instead. Consecutive closes inside one resolution bucket therefore report
+   * intervals of exactly 1s, and the bucket boundary reports 8s or 9s.
+   *
+   * Measured against mainnet on 2026-09-15: thirty-three consecutive
+   * intervals read 9,1,1,8,1,1,8… — never once the three to four seconds the
+   * network actually runs at. Their mean was 3.94s, which is correct, because
+   * the rounding preserves the total and destroys the distribution. Drawing
+   * those numbers per-interval reported a healthy network as eighteen closes
+   * out of band.
+   *
+   * Arrival interval is a real measurement and is labelled as what it is: it
+   * includes this machine's network path, exactly as `roundTripMs` in
+   * net/sync.ts does, and it is never presented as the ledger's own rhythm.
+   */
+  receivedAt: number;
 };
 
 const HISTORY_LIMIT = 48;
@@ -149,6 +176,7 @@ export function useXRPL(address: string) {
                 baseFeeXrp: Number(message.baseFeeXrp),
                 closeTime: message.closeTime,
                 closeAt: message.closeAt,
+                receivedAt: Date.now(),
               },
             ].slice(-HISTORY_LIMIT)
           );

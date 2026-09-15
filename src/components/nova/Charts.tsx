@@ -459,10 +459,28 @@ export function CadenceRibbon({
     );
   }
 
-  // Headroom above the normal band so an in-band ribbon does not fill the
-  // panel and read as though every close were at maximum.
-  const scale = Math.max(CADENCE_NORMAL_MAX_S + 2, ...intervals);
-  const y = (seconds: number) => (Math.min(seconds, scale) / scale) * height;
+  /**
+   * Zoomed to the data, not anchored at zero — and that is why these are
+   * dots rather than bars.
+   *
+   * A bar encodes magnitude as length from a baseline, so truncating its
+   * axis misstates every ratio on the chart; bars start at zero or they lie.
+   * Drawn that way, though, this chart was useless: every interval sits
+   * between 3.7 and 4.1 seconds, which on a 0–6s axis is four pixels of
+   * variation inside a wall of identical bars. The reading the panel exists
+   * to give — is the network holding its rhythm, and how tightly — was
+   * invisible.
+   *
+   * A dot encodes position, not length. Nothing about it claims a baseline,
+   * so a zoomed range is honest, and the band drawn behind supplies the
+   * reference the axis no longer does. The range always contains the whole
+   * 3–4s window, so the band can never fall off-scale and flatter the
+   * reading by cropping.
+   */
+  const lo = Math.min(CADENCE_NORMAL_MIN_S, ...intervals) - 0.3;
+  const hi = Math.max(CADENCE_NORMAL_MAX_S, ...intervals) + 0.3;
+  const span = hi - lo || 1;
+  const y = (seconds: number) => ((seconds - lo) / span) * height;
 
   const sorted = [...intervals].sort((a, b) => a - b);
   const median = sorted[Math.floor(sorted.length / 2)];
@@ -481,7 +499,10 @@ export function CadenceRibbon({
   const BUCKETS = 11;
   const histogram = Array.from({ length: BUCKETS }, () => 0);
   for (const seconds of intervals) {
-    const slot = Math.min(BUCKETS - 1, Math.floor((Math.min(seconds, scale) / scale) * BUCKETS));
+    const slot = Math.min(
+      BUCKETS - 1,
+      Math.max(0, Math.floor(((seconds - lo) / span) * BUCKETS))
+    );
     histogram[slot] += 1;
   }
   const peak = Math.max(...histogram, 1);
@@ -504,30 +525,46 @@ export function CadenceRibbon({
             className="pointer-events-none absolute inset-x-0 border-t border-foreground/45"
             style={{ bottom: y(median) }}
           />
-          <div className="absolute inset-0 flex items-end gap-px">
+          <div className="absolute inset-0 flex items-stretch gap-px">
             {intervals.map((seconds, index) => {
               const isNewest = index === intervals.length - 1;
               const outOfBand =
                 seconds < CADENCE_NORMAL_MIN_S || seconds > CADENCE_NORMAL_MAX_S;
               return (
-                <motion.span
+                <div
                   key={index}
-                  className={cn(
-                    "min-w-px flex-1 rounded-t-[1px]",
-                    isNewest && live ? "bg-[hsl(var(--telemetry))]" : "bg-brand",
-                    // Weight, not hue. An unusual interval reads as denser ink.
-                    outOfBand ? "opacity-100" : "opacity-40"
-                  )}
-                  style={{ height: Math.max(2, y(seconds)) }}
-                  initial={reduced ? false : { scaleY: 0 }}
-                  animate={{ scaleY: 1 }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative min-w-[2px] flex-1"
                   title={
                     labelAt
                       ? `${labelAt(index)} · ${seconds.toFixed(2)}s`
                       : `${seconds.toFixed(2)}s`
                   }
-                />
+                >
+                  {/* A hairline down to the band's floor. Not a bar — it is a
+                      drop line, which is what lets the eye follow a sequence
+                      of dots without implying length from zero. */}
+                  <span
+                    className={cn(
+                      "absolute left-1/2 w-px -translate-x-1/2 bg-foreground/15",
+                      outOfBand && "bg-foreground/30"
+                    )}
+                    style={{ bottom: 0, height: Math.max(0, y(seconds)) }}
+                  />
+                  <motion.span
+                    className={cn(
+                      "absolute left-1/2 h-[3px] w-[3px] -translate-x-1/2 translate-y-1/2 rounded-full",
+                      isNewest && live
+                        ? "h-[5px] w-[5px] bg-[hsl(var(--telemetry))]"
+                        : "bg-brand",
+                      // Weight, not hue — status hue is reserved for verdicts.
+                      outOfBand ? "opacity-100" : "opacity-70"
+                    )}
+                    style={{ bottom: y(seconds) }}
+                    initial={reduced ? false : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.25 }}
+                  />
+                </div>
               );
             })}
           </div>
@@ -557,8 +594,8 @@ export function CadenceRibbon({
 
       <div className="mt-1.5 flex items-center justify-between gap-2">
         <span className="mono-font text-[8px] tracking-[0.1em] text-muted-foreground">
-          BAND {CADENCE_NORMAL_MIN_S}–{CADENCE_NORMAL_MAX_S}s · MEDIAN{" "}
-          {median.toFixed(2)}s
+          ARRIVAL, MEASURED HERE · BAND {CADENCE_NORMAL_MIN_S}–
+          {CADENCE_NORMAL_MAX_S}s · MEDIAN {median.toFixed(2)}s
         </span>
         <span className="mono-font text-[8px] tabular-nums text-muted-foreground">
           NOW{" "}

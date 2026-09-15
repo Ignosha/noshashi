@@ -33,7 +33,15 @@ could later catch by running it themselves.
 | A4 | Verdict card, whatever it really says | VERIFICATION | The hero frame |
 | A5 | Receipt with digest visible | VERIFICATION | Proof, not decoration |
 | A6 | LEDGER SYNC, four nodes | LEDGER SYNC | The "we asked four" frame |
-| A7 | Order book: quoted vs fillable | EXPOSURE ANALYSIS | The strongest single number we have |
+| A7 | Order book: quoted vs fillable | **GROWTH**, not ORDER BOOK | The strongest single number we have |
+
+> **A7 moved.** ORDER BOOK, EXPOSURE ANALYSIS, PORTFOLIO & RADAR, PROVENANCE,
+> POOL GOVERNANCE, CONTROL SURFACE, ISSUANCE, SETTLEMENT and LEDGER & POLICY
+> all render the paid-tier wall on an unentitled account — nine of the
+> twenty-six scenes. The depth figure survives because GROWTH quotes it as
+> copy: "An 88% order book advertised $1,140,181 of depth. $11,868 was
+> actually reachable within 10% of mid." Shoot it there, or entitle the demo
+> account before recording and shoot the real panel.
 
 ---
 
