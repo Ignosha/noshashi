@@ -61,3 +61,9 @@ SETUP.md
 # every command: which project this checkout is linked to, the pooler
 # host, and the versions the CLI last saw. Per-machine and not shared.
 supabase/.temp/
+
+# Per-machine toolchain shim. Dot-source it (`. .\env.ps1`) to put the
+# portable git/node/supabase/deno on PATH for one terminal, on a machine
+# where the persistent user PATH does not stick. It hardcodes this
+# machine's layout, so it is local setup rather than project code.
+env.ps1
