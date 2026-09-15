@@ -1,7 +1,7 @@
 import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Panel, Eyebrow } from "@/components/nova/Panel";
+import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
 import { NovaLogo } from "@/components/nova/NovaLogo";
 import { CountUp } from "@/components/nova/CountUp";
 import { StatusDot } from "@/components/nova/StatusDot";
@@ -22,6 +22,105 @@ import { BRAND, CONTACT, LINKS, copyrightLine } from "@/lib/brand";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import { cn } from "@/lib/utils";
 import { SPRING } from "@/lib/motion";
+
+const RELAY_REGIONS = [
+  { name: "AMERICAS", short: "US", x: 22, y: 40 },
+  { name: "EUROPE", short: "EU", x: 47, y: 30 },
+  { name: "ASIA PACIFIC", short: "AP", x: 78, y: 47 },
+  { name: "OCEANIA", short: "OC", x: 86, y: 76 },
+];
+
+function RelayWorld({
+  connected,
+  eventCount,
+  ledgerIndex,
+}: {
+  connected: boolean;
+  eventCount: number;
+  ledgerIndex: number;
+}) {
+  const pulseKey = `${ledgerIndex}-${eventCount}`;
+  return (
+    <div className="relative overflow-hidden rounded-md border border-border/70 bg-background/35">
+      <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
+        <div>
+          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            GLOBAL RELAY PULSE
+          </p>
+          <p className="mono-font mt-1 text-[9px] text-muted-foreground">
+            {connected ? "LIVE CONNECTION FABRIC" : "RECONNECTING TO RELAY FABRIC"}
+          </p>
+        </div>
+        <span className="flex items-center gap-1.5 mono-font text-[9px] text-muted-foreground">
+          <StatusDot status={connected ? "go" : "hold"} size={5} pulse={connected} />
+          {eventCount} EVENTS
+        </span>
+      </div>
+      <svg
+        viewBox="0 0 100 88"
+        className="block h-[260px] w-full text-brand/30"
+        role="img"
+        aria-label="Illustrative XRPL relay regions and live event pulse"
+      >
+        <defs>
+          <pattern id="world-grid" width="5" height="5" patternUnits="userSpaceOnUse">
+            <path d="M5 0H0V5" fill="none" stroke="currentColor" strokeWidth=".12" opacity=".32" />
+          </pattern>
+          <linearGradient id="world-fade" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="currentColor" stopOpacity=".22" />
+            <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <rect width="100" height="88" fill="url(#world-grid)" opacity=".6" />
+        <path
+          d="M5 31 12 25 20 23 28 28 34 27 39 33 47 27 55 26 62 30 69 26 78 29 87 25 96 31V53L89 58 81 57 73 63 65 59 57 65 48 58 39 62 30 57 21 61 12 55 5 57Z"
+          fill="url(#world-fade)"
+          stroke="currentColor"
+          strokeWidth=".22"
+          opacity=".42"
+        />
+        <path d="M22 40C34 24 55 22 78 47M47 30C56 40 69 50 86 76M22 40C39 52 61 51 86 76" fill="none" stroke="currentColor" strokeWidth=".22" strokeDasharray="1.3 1.2" opacity=".7" />
+        {RELAY_REGIONS.map((region, index) => (
+          <g key={region.short}>
+            <circle cx={region.x} cy={region.y} r="4.8" fill="currentColor" opacity=".1">
+              {connected && (
+                <animate attributeName="r" values="3;6;3" dur={`${2.8 + index * 0.4}s`} repeatCount="indefinite" />
+              )}
+            </circle>
+            <circle cx={region.x} cy={region.y} r="1.45" fill="hsl(var(--telemetry))">
+              {connected && (
+                <animate attributeName="opacity" values=".35;1;.35" dur={`${1.7 + index * 0.25}s`} repeatCount="indefinite" />
+              )}
+            </circle>
+            <text x={region.x + 3} y={region.y - 2.5} fill="currentColor" fontSize="2.3" fontFamily="IBM Plex Mono, monospace">
+              {region.short}
+            </text>
+          </g>
+        ))}
+        <g key={pulseKey}>
+          <circle cx="50" cy="43" r="2" fill="hsl(var(--brand))" opacity=".9">
+            {connected && <animate attributeName="r" values="1.5;5;1.5" dur="2.2s" repeatCount="indefinite" />}
+            {connected && <animate attributeName="opacity" values=".9;0;.9" dur="2.2s" repeatCount="indefinite" />}
+          </circle>
+          <text x="53" y="42" fill="hsl(var(--foreground))" fontSize="2.4" fontFamily="IBM Plex Mono, monospace">VALIDATED</text>
+          <text x="53" y="45" fill="currentColor" fontSize="2.1" fontFamily="IBM Plex Mono, monospace">XRPL FABRIC</text>
+        </g>
+      </svg>
+      <div className="flex items-center justify-between border-t border-border/50 px-3 py-2">
+        <span className="mono-font text-[8px] tracking-[0.12em] text-muted-foreground">
+          LEDGER {ledgerIndex ? ledgerIndex.toLocaleString() : "—"}
+        </span>
+        <span className="mono-font text-[8px] tracking-[0.12em] text-muted-foreground">
+          RELAY REGIONS {RELAY_REGIONS.length}
+        </span>
+      </div>
+      <p className="px-3 pb-3 pt-2 text-[9px] leading-relaxed text-muted-foreground">
+        Illustrative relay regions, not transaction geolocation. XRPL publishes ledger events and
+        node responses—not the physical origin of a transaction.
+      </p>
+    </div>
+  );
+}
 
 const maturityTone: Record<Maturity, "go" | "hold" | "outline"> = {
   live: "go",
@@ -195,6 +294,45 @@ export function HomeScene({
             </div>
           </Reveal>
         </section>
+
+        {/* ── Live network picture ────────────────────────────── */}
+        <Reveal className="mt-10">
+          <div className="grid gap-3 lg:grid-cols-[1.35fr_.65fr]">
+            <Panel
+              label="LIVE NETWORK PICTURE"
+              right={
+                <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+                  {data.history.length}/48 CLOSES
+                </span>
+              }
+              bodyClassName="p-3"
+            >
+              <RelayWorld
+                connected={connected}
+                eventCount={events.length}
+                ledgerIndex={ledger?.ledgerIndex ?? 0}
+              />
+            </Panel>
+            <Panel label="EVENT VELOCITY" bodyClassName="p-3">
+              <div className="flex h-full flex-col justify-between gap-4">
+                <div>
+                  <p className="data-font text-[34px] font-[600] leading-none text-foreground">
+                    {events.length}
+                  </p>
+                  <p className="stencil mt-2 text-[8px] tracking-[0.22em] text-muted-foreground">
+                    OBSERVED IN LIVE WINDOW
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <DataRow label="STREAM" value={connected ? "LOCKED" : "OFFLINE"} tone={connected ? "go" : "hold"} />
+                  <DataRow label="SUCCESS" value={`${successRate}%`} tone={successRate > 95 ? "go" : "hold"} />
+                  <DataRow label="LATEST" value={events[0]?.type ?? "WAITING"} />
+                  <DataRow label="LEDGER" value={events[0]?.ledger?.toLocaleString() ?? "—"} />
+                </div>
+              </div>
+            </Panel>
+          </div>
+        </Reveal>
 
         {/* ── Problem / answer ─────────────────────────────────── */}
         <Reveal className="mt-10">
