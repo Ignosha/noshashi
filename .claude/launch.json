@@ -3,15 +3,9 @@
   "configurations": [
     {
       "name": "site",
-      "runtimeExecutable": "C:\\Users\\JacksonvillePublic\\dev-tools\\node\\npx.cmd",
+      "runtimeExecutable": "npx",
       "runtimeArgs": ["--yes", "serve", "site", "-l", "4321", "--no-clipboard"],
       "port": 4321
-    },
-    {
-      "name": "app",
-      "runtimeExecutable": "C:\\Users\\JacksonvillePublic\\dev-tools\\node\\npm.cmd",
-      "runtimeArgs": ["run", "dev"],
-      "port": 1420
     }
   ]
 }
