@@ -244,13 +244,17 @@
   .relay-console-head span{font:10px "IBM Plex Mono",monospace;color:var(--tele)}
   .relay-map{display:block;width:100%;height:190px;color:var(--brand);background:color-mix(in srgb,var(--ground) 72%,var(--surface))}
   .relay-map .route{fill:none;stroke:currentColor;stroke-width:.22;stroke-dasharray:1.5 1.4;opacity:.65}
+  .relay-map .route.secondary{stroke-width:.12;opacity:.35;stroke-dasharray:.7 1.6}
+  .relay-map .route.packet{stroke:var(--tele);stroke-width:.32;stroke-dasharray:1 3;animation:packetRun 2.6s linear infinite}
+  .relay-map .route.packet:nth-of-type(2){animation-delay:.8s}.relay-map .route.packet:nth-of-type(3){animation-delay:1.5s}
   .relay-map .land{fill:currentColor;opacity:.10;stroke:currentColor;stroke-width:.2}
   .relay-map .node{fill:var(--tele);stroke:var(--surface);stroke-width:.6}
   .relay-map .node-pulse{fill:none;stroke:var(--tele);stroke-width:.35;opacity:.8;animation:relayPulse 2.8s ease-out infinite}
   .relay-map .node-pulse:nth-of-type(2){animation-delay:.7s}.relay-map .node-pulse:nth-of-type(3){animation-delay:1.4s}
   @keyframes relayPulse{0%{r:2;opacity:.8}100%{r:8;opacity:0}}
+  @keyframes packetRun{to{stroke-dashoffset:-16}}
   .relay-console-foot{display:flex;justify-content:space-between;gap:12px;padding:10px 16px;border-top:1px solid var(--rule);color:var(--faint);font:9px "IBM Plex Mono",monospace}
-  @media (prefers-reduced-motion:reduce){.relay-map .node-pulse{animation:none;opacity:.35}}
+  @media (prefers-reduced-motion:reduce){.relay-map .node-pulse,.relay-map .route.packet{animation:none;opacity:.35}}
   @media (max-width:900px){.operator-brief{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:560px){.operator-brief{grid-template-columns:1fr}}
 
@@ -673,24 +677,28 @@
     </div>
     <div class="relay-console" aria-label="Illustrative XRPL relay connectivity visualization">
       <div class="relay-console-head">
-        <strong>GLOBAL RELAY PICTURE · LIVE SIGNAL</strong>
-        <span><span class="dot" style="display:inline-block;background:var(--tele);margin-right:6px"></span>MAINNET LINK</span>
+        <strong>XRPL RELAY TOPOLOGY · LIVE SIGNAL</strong>
+        <span><span class="dot" style="display:inline-block;background:var(--tele);margin-right:6px"></span>MAINNET LINK · 04 REGIONS</span>
       </div>
       <svg class="relay-map" viewBox="0 0 100 42" role="img" aria-label="Illustrative relay regions connected to the validated XRPL fabric">
         <path class="land" d="M4 15 13 11 22 13 28 10 36 15 43 12 51 14 59 11 68 14 78 12 91 16 97 13V28L88 31 79 29 70 34 60 30 50 34 41 29 31 33 21 29 11 31 4 27Z"/>
         <path class="route" d="M17 21C30 12 42 11 51 21M51 21C62 12 76 16 84 23M51 21C60 25 72 28 84 34M17 21C33 27 42 24 51 21"/>
+        <path class="route secondary" d="M17 21C25 29 35 31 50 34M28 16C43 18 60 12 76 18M51 21C58 16 66 25 84 23M17 21C25 15 35 14 43 12"/>
+        <path class="route packet" d="M17 21C30 12 42 11 51 21"/>
+        <path class="route packet" d="M51 21C62 12 76 16 84 23"/>
+        <path class="route packet" d="M17 21C33 27 42 24 51 21"/>
         <g>
           <circle class="node-pulse" cx="17" cy="21" r="2"/><circle class="node" cx="17" cy="21" r="1"/>
           <circle class="node-pulse" cx="51" cy="21" r="2"/><circle class="node" cx="51" cy="21" r="1"/>
           <circle class="node-pulse" cx="84" cy="23" r="2"/><circle class="node" cx="84" cy="23" r="1"/>
           <circle class="node-pulse" cx="84" cy="34" r="2"/><circle class="node" cx="84" cy="34" r="1"/>
         </g>
-        <text x="19" y="18" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">AMERICAS</text>
+        <text x="19" y="18" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">AMERICAS · 01</text>
         <text x="53" y="18" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">EUROPE</text>
         <text x="86" y="20" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">APAC</text>
         <text x="86" y="31" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">OCEANIA</text>
       </svg>
-      <div class="relay-console-foot"><span>VALIDATED FABRIC · RELAY REGIONS 04</span><span>NOT TRANSACTION GEOLOCATION</span></div>
+      <div class="relay-console-foot"><span>PACKETS = LIVE LEDGER EVENTS · RELAY REGIONS 04</span><span>TOPOLOGY MODEL · NOT GEOLOCATION</span></div>
     </div>
   </section>
 

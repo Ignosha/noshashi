@@ -40,6 +40,16 @@ function RelayWorld({
   ledgerIndex: number;
 }) {
   const pulseKey = `${ledgerIndex}-${eventCount}`;
+  const relayNodes = [
+    { short: "US", x: 22, y: 40 },
+    { short: "EU", x: 47, y: 30 },
+    { short: "AP", x: 78, y: 47 },
+    { short: "OC", x: 86, y: 76 },
+    { short: "CA", x: 30, y: 34 },
+    { short: "ME", x: 59, y: 36 },
+    { short: "IN", x: 69, y: 54 },
+    { short: "BR", x: 31, y: 65 },
+  ];
   return (
     <div className="relative overflow-hidden rounded-md border border-border/70 bg-background/35">
       <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
@@ -79,15 +89,18 @@ function RelayWorld({
           strokeWidth=".22"
           opacity=".42"
         />
-        <path d="M22 40C34 24 55 22 78 47M47 30C56 40 69 50 86 76M22 40C39 52 61 51 86 76" fill="none" stroke="currentColor" strokeWidth=".22" strokeDasharray="1.3 1.2" opacity=".7" />
-        {RELAY_REGIONS.map((region, index) => (
+        <path d="M22 40C34 24 55 22 78 47M47 30C56 40 69 50 86 76M22 40C39 52 61 51 86 76M30 34C45 36 59 36 69 54M31 65C38 53 45 45 47 30M59 36C67 39 74 43 78 47" fill="none" stroke="currentColor" strokeWidth=".22" strokeDasharray="1.3 1.2" opacity=".7" />
+        <path d="M22 40C34 24 55 22 78 47M47 30C56 40 69 50 86 76M31 65C42 62 57 55 69 54" fill="none" stroke="hsl(var(--telemetry))" strokeWidth=".32" strokeDasharray="1 3" opacity=".8">
+          <animate attributeName="stroke-dashoffset" from="0" to="-16" dur="2.4s" repeatCount="indefinite" />
+        </path>
+        {relayNodes.map((region, index) => (
           <g key={region.short}>
             <circle cx={region.x} cy={region.y} r="4.8" fill="currentColor" opacity=".1">
               {connected && (
                 <animate attributeName="r" values="3;6;3" dur={`${2.8 + index * 0.4}s`} repeatCount="indefinite" />
               )}
             </circle>
-            <circle cx={region.x} cy={region.y} r="1.45" fill="hsl(var(--telemetry))">
+            <circle cx={region.x} cy={region.y} r={index < 4 ? "1.45" : "1"} fill="hsl(var(--telemetry))">
               {connected && (
                 <animate attributeName="opacity" values=".35;1;.35" dur={`${1.7 + index * 0.25}s`} repeatCount="indefinite" />
               )}
@@ -106,17 +119,17 @@ function RelayWorld({
           <text x="53" y="45" fill="currentColor" fontSize="2.1" fontFamily="IBM Plex Mono, monospace">XRPL FABRIC</text>
         </g>
       </svg>
-      <div className="flex items-center justify-between border-t border-border/50 px-3 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 px-3 py-2">
         <span className="mono-font text-[8px] tracking-[0.12em] text-muted-foreground">
           LEDGER {ledgerIndex ? ledgerIndex.toLocaleString() : "—"}
         </span>
         <span className="mono-font text-[8px] tracking-[0.12em] text-muted-foreground">
-          RELAY REGIONS {RELAY_REGIONS.length}
+          RELAY NODES {relayNodes.length} · REGIONS {RELAY_REGIONS.length}
         </span>
       </div>
       <p className="px-3 pb-3 pt-2 text-[9px] leading-relaxed text-muted-foreground">
-        Illustrative relay regions, not transaction geolocation. XRPL publishes ledger events and
-        node responses—not the physical origin of a transaction.
+        Packet lanes represent live ledger-event cadence through the observed relay topology. This
+        is not transaction geolocation: XRPL publishes ledger events and node responses, not physical origin.
       </p>
     </div>
   );
