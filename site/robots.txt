@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://noshashi.app/sitemap.xml
+
+Sitemap: https://www.noshashi.app/sitemap.xml

@@ -35,7 +35,7 @@ import { getNews } from "../api/_lib/news.js";
 import { getMarket } from "../api/_lib/market.js";
 import { getProjectFeed, deriveStatus } from "../api/_lib/project-feed.js";
 import { ENTRIES as KB } from "../api/_lib/kb.js";
-import { renderPage, breadcrumb, ORGANIZATION } from "../api/_lib/shell.js";
+import { renderPage, breadcrumb, ORGANIZATION, ORIGIN } from "../api/_lib/shell.js";
 import { esc, isoDate, ago } from "../api/_lib/html.js";
 import {
   renderNews, renderNewsHead, renderLog, renderBoard, renderClock,
@@ -65,6 +65,7 @@ async function buildHome({ news, market, feed, status, release }) {
   let html = await readFile(path.join(ROOT, "templates", "home.html"), "utf8");
 
   const slots = {
+    ORIGIN: ORIGIN,
     VERSION: release ? esc(release.tag) : "beta",
     MARKETHEAD: renderMarketHead(market),
     MARKET: renderMarket(market),
@@ -94,7 +95,7 @@ async function buildHome({ news, market, feed, status, release }) {
           { "@type": "Offer", name: "Pro", price: "749", priceCurrency: "USD" },
           { "@type": "Offer", name: "Institutional", price: "4000", priceCurrency: "USD" },
         ],
-        url: "https://noshashi.app/",
+        url: `${ORIGIN}/`,
       },
       faqStructuredData(FAQ),
     ]),
@@ -557,7 +558,7 @@ async function buildContact() {
     body,
     structured: [
       breadcrumb("Contact", "/contact/"),
-      { "@type": "ContactPage", name: "Contact NOSHASHI", url: "https://noshashi.app/contact/" },
+      { "@type": "ContactPage", name: "Contact NOSHASHI", url: `${ORIGIN}/contact/` },
     ],
     scripts: script,
   }));
@@ -582,7 +583,7 @@ async function buildSitemap() {
   const urls = pages
     .map(
       ([loc, freq, priority]) =>
-        `  <url><loc>https://noshashi.app${loc}</loc><lastmod>${today}</lastmod>` +
+        `  <url><loc>${ORIGIN}${loc}</loc><lastmod>${today}</lastmod>` +
         `<changefreq>${freq}</changefreq><priority>${priority}</priority></url>`
     )
     .join("\n");
@@ -590,6 +591,15 @@ async function buildSitemap() {
     "sitemap.xml",
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`
   );
+}
+
+/*
+ * robots.txt is generated for one reason: it names the sitemap by
+ * absolute URL, and a sitemap URL on a host that redirects is the same
+ * mismatch the canonical tags had. Generating it keeps the two in step.
+ */
+async function buildRobots() {
+  await write("robots.txt", `User-agent: *\nAllow: /\n\nSitemap: ${ORIGIN}/sitemap.xml\n`);
 }
 
 /* ── run ──────────────────────────────────────────────────────────── */
@@ -640,7 +650,9 @@ async function main() {
   await buildProgress({ feed, release, releases });
   await buildContact();
   await buildSitemap();
+  await buildRobots();
 
+  log(`canonical origin: ${ORIGIN}`);
   log("done.");
 }
 

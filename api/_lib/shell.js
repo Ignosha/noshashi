@@ -13,6 +13,22 @@
 
 import { esc, attrUrl } from "./html.js";
 
+/*
+ * The canonical origin.
+ *
+ * This has to be the host that actually returns 200. The apex
+ * `noshashi.app` 308-redirects to `www`, so every canonical tag,
+ * sitemap entry and JSON-LD URL naming the apex was pointing a crawler
+ * at a URL that immediately redirects — the page asserting one address
+ * while the server insists on another. Google resolves it, but the two
+ * signals disagree and the resolution is not ours to control.
+ *
+ * Set PUBLIC_SITE_URL to change it. To make the bare domain canonical
+ * instead, flip the primary domain in the Vercel project *and* set this
+ * — changing one without the other just reverses the mismatch.
+ */
+export const ORIGIN = (process.env.PUBLIC_SITE_URL || "https://www.noshashi.app").replace(/\/+$/, "");
+
 export const MARK = `<svg viewBox="0 0 180 180" width="24" height="24" fill="none" aria-hidden="true">
 <mask id="nm" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
 <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
@@ -138,8 +154,8 @@ export const ORGANIZATION = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "NOSHASHI Labs",
-  url: "https://noshashi.app/",
-  logo: "https://noshashi.app/favicon.svg",
+  url: `${ORIGIN}/`,
+  logo: `${ORIGIN}/favicon.svg`,
   description:
     "Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.",
   sameAs: ["https://github.com/Ignosha/noshashi"],
@@ -153,8 +169,8 @@ export function breadcrumb(name, path) {
   return {
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://noshashi.app/" },
-      { "@type": "ListItem", position: 2, name, item: `https://noshashi.app${path}` },
+      { "@type": "ListItem", position: 1, name: "Home", item: `${ORIGIN}/` },
+      { "@type": "ListItem", position: 2, name, item: `${ORIGIN}${path}` },
     ],
   };
 }
@@ -177,7 +193,7 @@ export function renderPage({
   scripts = "",
   structured = [],
 }) {
-  const canonical = `https://noshashi.app${path}`;
+  const canonical = `${ORIGIN}${path}`;
   return `<!doctype html>
 <html lang="en">
 <head>
