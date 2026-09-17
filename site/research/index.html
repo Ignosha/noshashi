@@ -8,9 +8,11 @@
 <meta name="description" content="Five measurements taken on XRPL mainnet: 92.8% of an order book's visible depth that could not fill, a successful payment that delivered 0.4%, and a token backing checks that has never been issued. Each figure carries the date it was taken and what would need re-checking.">
 <link rel="canonical" href="https://noshashi.app/research/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Typefaces served from this origin; no font CDN is contacted. -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/modules.css">
 <style>
   :root{
     --ground:#0B0F14;--surface:#11161D;--elevated:#1C2330;
@@ -326,5 +328,6 @@
 
 </main>
 
+<script src="/assets/support.js" defer></script>
 </body>
 </html>

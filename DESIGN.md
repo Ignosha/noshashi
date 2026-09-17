@@ -229,6 +229,29 @@ loop for the life of the session behind live telemetry — a permanent frame
 cost, animating in the same field of view as numbers the operator is reading.
 The board's geometry is static.
 
+### One exception: the marketing hero
+
+`site/assets/cosmos.js` draws a drifting starfield behind the landing page's
+opening section. This is a deliberate exception, granted on the product
+owner's instruction, and it is bounded so that it cannot become the thing the
+rule above was written against:
+
+| The objection | How the hero sky answers it |
+|---|---|
+| "a permanent frame cost" | The loop runs only while the hero intersects the viewport, and stops on `visibilitychange`. Scrolled past, it is zero cost. |
+| "behind live telemetry" | It is mounted in `.hero` only. No panel, table, chart, ticker or verdict ever has moving pixels behind it. |
+| "in the same field of view as numbers" | A radial mask fades it out before the copy starts, and it is hidden entirely below 900px. |
+| motion as decoration | `prefers-reduced-motion` renders the field once and never animates it. The picture survives; the movement does not. |
+
+The orbital rings in the brand lockup are the same exception on the same
+terms: rotation only, hero only, stopped under reduced motion.
+
+**This exception does not travel.** It applies to the public marketing hero
+and nowhere else — not to the application, not to a panel, and not to any
+surface where a number is being read. A field that drifts down the page and
+ends up behind a reading is the original mistake, and should be deleted
+rather than argued about.
+
 ## Signals
 
 An alert is a **reading**, not a coloured box — `src/components/nova/Signal.tsx`.
@@ -251,7 +274,7 @@ Explicitly banned in this codebase:
 - Purple/blue AI gradients · glassmorphism · neon cyberpunk
 - Rounded-rectangle overload · nested cards · giant glowing buttons
 - Rainbow charts · gradient chart fills · fake 3D · unnecessary blur
-- Decorative particles, starfields, or warp effects behind working data
+- Decorative particles, starfields, or warp effects behind working data (the marketing hero is the single bounded exception — see the brand-pattern section)
 - Emoji as interface icons · mixed icon libraries (Lucide only)
 - Giant headings · fake futuristic terminology · decorative data
 - **Fabricated data of any kind**, including plausible placeholder numbers in an unconfigured module

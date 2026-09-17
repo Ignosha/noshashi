@@ -8,9 +8,11 @@
 <meta name="description" content="Terms, privacy, accessibility statement, billing, data processing, acceptable use and regulatory disclosures for NOSHASHI.">
 <link rel="canonical" href="https://noshashi.app/legal/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Typefaces served from this origin; no font CDN is contacted. -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/modules.css">
 <style>
   :root{
     --ground:#0B0F14;--surface:#11161D;--elevated:#1C2330;
@@ -378,7 +380,10 @@
 </div>
 
 <footer>
-  <div class="shell">© 2026 NOSHASHI Labs · Generated from src/lib/legal.ts · XRPL Mainnet</div>
+  <div class="shell">© 2026 NOSHASHI Labs · Generated from src/lib/legal.ts · XRPL Mainnet<br>
+    <a href="/">Home</a> · <a href="/news/">Newsroom</a> · <a href="/progress/">Progress</a> ·
+    <a href="/status/">Status</a> · <a href="/contact/">Contact</a></div>
 </footer>
+<script src="/assets/support.js" defer></script>
 </body>
 </html>

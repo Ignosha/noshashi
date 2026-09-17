@@ -12,5 +12,10 @@ export default defineConfig({
   // Mirrors the build-time substitution in vite.config.ts, so a test that
   // pulls in anything reading BRAND.version does not hit an undefined global.
   define: { __APP_VERSION__: JSON.stringify("0.0.0-test") },
-  test: { environment: "node", include: ["src/**/*.test.ts"] },
+  test: {
+    environment: "node",
+    // tests/ covers the public site's server-rendered layer, which lives
+    // in api/_lib and is plain ESM JavaScript rather than app TypeScript.
+    include: ["src/**/*.test.ts", "tests/**/*.test.js"],
+  },
 });

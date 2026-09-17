@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Progress — what has shipped and what has not · NOSHASHI</title>
+<meta name="description" content="An honest build state for NOSHASHI: shipped capabilities with the releases that prove them, work in progress, and what has not been started.">
+<link rel="canonical" href="https://noshashi.app/progress/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://noshashi.app/progress/">
+<meta property="og:title" content="Progress — what has shipped and what has not · NOSHASHI">
+<meta property="og:description" content="An honest build state for NOSHASHI: shipped capabilities with the releases that prove them, work in progress, and what has not been started.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Progress — what has shipped and what has not · NOSHASHI">
+<meta name="twitter:description" content="An honest build state for NOSHASHI: shipped capabilities with the releases that prove them, work in progress, and what has not been started.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://noshashi.app/","logo":"https://noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://noshashi.app/"},{"@type":"ListItem","position":2,"name":"Progress","item":"https://noshashi.app/progress/"}]}]}</script>
+
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><svg viewBox="0 0 180 180" width="24" height="24" fill="none" aria-hidden="true">
+<mask id="nm" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
+<path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
+<path d="M95 99C91 80 94 64 103 50 114 59 121 70 123 83 116 91 106 97 95 99Z" fill="#000"/>
+<circle cx="129" cy="63" r="5" fill="#000"/></mask>
+<g stroke="currentColor" stroke-width="7" stroke-linecap="round">
+<path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/></g>
+<circle cx="151" cy="69" r="7" fill="currentColor"/>
+<path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="currentColor" mask="url(#nm)"/>
+<path d="M92 111 63 132C60 116 66 103 78 93Z" fill="currentColor"/>
+<path d="M111 91 130 118C114 119 101 113 93 103Z" fill="currentColor"/>
+<path d="M82 121 67 150 94 132Z" fill="currentColor"/>
+<path d="M73 143 61 164 84 151Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/#public">Free tools</a>
+      <a class="nav-link" href="/news/">Newsroom</a>
+      <a class="nav-link" href="/progress/" aria-current="page">Progress</a>
+      <a class="nav-link optional" href="/status/">Status</a>
+      <a class="nav-link optional" href="/research/">Findings</a>
+      <a class="nav-link optional" href="/guide/">XRP guide</a>
+      <a class="nav-link" href="/#download">Download</a>
+      <a class="nav-link" href="/pricing/">Pricing</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/">Contact</a>
+      <a class="btn" href="/#download">Download beta</a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head">
+  <p class="eyebrow">Progress</p>
+  <h1>Where this project actually is</h1>
+  <p>Written the way the product reports a verdict: each line says what is counted, and anything
+     unfinished says so plainly. Nothing below is aspirational — where it claims something shipped,
+     the release on the download page is the evidence.</p>
+</div>
+
+<section>
+  <div class="rail">
+    <div><span class="label">CURRENT BUILD</span><strong>v0.3.1</strong><small>Beta channel, unsigned, built by CI.</small></div>
+    <div><span class="label">RELEASES SHIPPED</span><strong>4</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
+    <div><span class="label">TESTS PASSING</span><strong>272</strong><small>On the logic that makes claims. Run with npm test.</small></div>
+    <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>No sign-up exists. Nothing is held server-side.</small></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <p class="eyebrow">Build state</p>
+    <h2>Shipped, in progress, not started</h2>
+    <p>Three states, and the third one is the useful one. A roadmap with no "not started" row is
+       a brochure.</p>
+  </div>
+  <div class="prog">
+    <div class="prog-line" data-state="done">
+      <div class="prog-head"><b>Adjudication engine</b><span>shipped</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
+      <p class="prog-note">GO / HOLD / NO-GO against validated ledger state, with the deciding rule and a SHA-256 receipt attached. In every build on the download page.</p>
+    </div>
+    <div class="prog-line" data-state="done">
+      <div class="prog-head"><b>Live mainnet telemetry</b><span>shipped</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
+      <p class="prog-note">Ledger sync across four public nodes, cadence measured from arrival, and the DEX-derived price used on this site&#39;s ticker.</p>
+    </div>
+    <div class="prog-line" data-state="done">
+      <div class="prog-head"><b>Free public tools</b><span>6 of 6 tools</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
+      <p class="prog-note">Address, payment, order book, exposure, NFT and node checks, all on the landing page without an account.</p>
+    </div>
+    <div class="prog-line" data-state="done">
+      <div class="prog-head"><b>Public website</b><span>server-rendered</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
+      <p class="prog-note">Newsroom, mission log, progress, status and contact, rendered before they are served so the content is in the HTML rather than assembled afterwards.</p>
+    </div>
+    <div class="prog-line" data-state="open">
+      <div class="prog-head"><b>Release signing and notarisation</b><span>in progress</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:25%"></div></div>
+      <p class="prog-note">Builds are reproducible from CI and hash-verified, but not yet code-signed or notarised. This is the single largest thing standing between the beta channel and a 1.0.</p>
+    </div>
+    <div class="prog-line" data-state="open">
+      <div class="prog-head"><b>Compliance API and webhooks</b><span>institutional tier</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:40%"></div></div>
+      <p class="prog-note">The verification surface exists in the product; the hosted API and webhook delivery are being built out against the institutional tier.</p>
+    </div>
+    <div class="prog-line" data-state="open">
+      <div class="prog-head"><b>Independent security review</b><span>not started</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:0%"></div></div>
+      <p class="prog-note">Stated as not started rather than left off the list. An audit that has not happened is a fact about the project, and hiding it would be the same dishonesty the product exists to argue against.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <p class="eyebrow">Recent movement</p>
+    <h2>The last few entries in the log</h2>
+  </div>
+  <div class="console"><div class="console-body">
+    <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="milestone">
+      <div class="log-meta">
+        <time datetime="2026-09-17T12:00:00.000Z">2026-09-17</time>
+        <span class="log-kind">MILESTONE</span>
+      </div>
+      <h3>Every download is now labelled BETA</h3>
+      <p>The desktop builds are pre-1.0 and unsigned while the release pipeline is hardened. The download section now says so on every artifact rather than only in the operator note underneath, so the channel is never read as stable by accident.</p>
+      <a class="log-link" href="/#download">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="note">
+      <div class="log-meta">
+        <time datetime="2026-09-17T11:30:00.000Z">2026-09-17</time>
+        <span class="log-kind">NOTE</span>
+      </div>
+      <h3>Public site rebuilt around live feeds</h3>
+      <p>The site now carries a live XRP newsroom, this mission log, a support console and a contact channel. Every page is rendered on the server before it is served, so the content is in the HTML a crawler receives rather than assembled afterwards in the browser.</p>
+      <a class="log-link" href="/status/">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="note">
+      <div class="log-meta">
+        <time datetime="2026-09-17T11:00:00.000Z">2026-09-17</time>
+        <span class="log-kind">NOTE</span>
+      </div>
+      <h3>Accounts and the hosted workspace were withdrawn from the site</h3>
+      <p>Sign-in and the hosted dashboard are gone. NOSHASHI runs on your machine and reads public ledger state; the website no longer asks anyone to create an account to evaluate it. Existing links redirect rather than breaking.</p>
+      <a class="log-link" href="/#download">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-09-15T17:32:32.000Z">2026-09-15</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>NOSHASHI v0.3.1</h3>
+      <p>Built from 01f6d043e5681cea4443a7bf58ddfa8bda82bc00 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v0.3.1" rel="noopener">RELEASE NOTES →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-09-15T16:46:33.000Z">2026-09-15</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>NOSHASHI v0.3.0</h3>
+      <p>Built from d2df012ff9397db2e77304fef90a2303b0e5bbd6 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v0.3.0" rel="noopener">RELEASE NOTES →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-08-30T12:04:47.000Z">2026-08-30</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>NOSHASHI v0.2.2</h3>
+      <p>Built from 53b0ce89fb37d4f0a26db59bbe533013f97bd404 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v0.2.2" rel="noopener">RELEASE NOTES →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-08-29T13:03:58.000Z">2026-08-29</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>NOSHASHI v0.2.1</h3>
+      <p>Built from 103e6075f6ac0554d6df9c8213e8d1b16bc35738 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v0.2.1" rel="noopener">RELEASE NOTES →</a>
+    </article>
+  </div>
+  </div></div>
+  <div class="form-actions" style="margin-top:18px">
+    <a class="btn ghost" href="/status/">Full mission log</a>
+    <a class="btn ghost" href="https://github.com/Ignosha/noshashi/releases" rel="noopener">Releases on GitHub</a>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <p class="eyebrow">What "beta" means here</p>
+    <h2>The honest version</h2>
+  </div>
+  <div class="grid g3">
+    <div class="panel">
+      <h3>What is solid</h3>
+      <p>The readings. The engine is deterministic, the tests cover the logic that makes claims,
+         and every number on screen came from the ledger or is not shown at all.</p>
+    </div>
+    <div class="panel">
+      <h3>What is not</h3>
+      <p>Distribution. Unsigned binaries mean your operating system will warn you, and you are
+         relying on a SHA-256 check rather than a signature. That is a real gap, not a formality.</p>
+    </div>
+    <div class="panel">
+      <h3>What that means for you</h3>
+      <p>Use it to inform a decision a person is making, verify the hash, and do not make it the
+         sole basis of anything carrying legal consequence. That is also true at 1.0.</p>
+    </div>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="shell foot">
+    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
+    <div class="foot-links">
+      <a href="/contact/">Contact</a>
+      <a href="/news/">Newsroom</a>
+      <a href="/progress/">Progress</a>
+      <a href="/status/">Status</a>
+      <a href="/research/">Findings</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="https://github.com/Ignosha/noshashi">GitHub</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script>
+(function(){
+  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
+  if(!button)return;
+  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
+    if(label)label.textContent=light?"DARK":"LIGHT";
+    button.setAttribute("aria-label",light?"Switch to dark mode":"Switch to light mode");}
+  sync();
+  button.addEventListener("click",function(){
+    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
+    sync();});
+})();
+</script>
+
+</body>
+</html>

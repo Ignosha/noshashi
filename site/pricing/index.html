@@ -13,9 +13,11 @@
 <meta property="og:description" content="Two questions, one answer, one ledger read. Free, Pro at $749/month, Institutional at $4,000/month.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Typefaces served from this origin; no font CDN is contacted. -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/modules.css">
 <style>
   /* Tokens are the brand board, section 05 — identical to the home page.
      Each page on this site inlines its own CSS rather than sharing a
@@ -182,15 +184,15 @@
         <span>NOSHASHI</span>
       </a>
       <nav class="nav-links" aria-label="Primary">
-        <a href="/#thesis">The thesis</a>
         <a href="/#public">Free tools</a>
+        <a href="/news/">Newsroom</a>
+        <a href="/progress/">Progress</a>
+        <a href="/status/">Status</a>
         <a href="/research/">Findings</a>
-        <a href="https://github.com/Ignosha/noshashi" rel="noopener">Source on GitHub</a>
         <a href="/pricing/" aria-current="page">Pricing</a>
-        <a href="/guide/">New to XRP?</a>
         <a href="/#download">Download</a>
-        <a class="btn ghost" href="/login/">Sign in</a>
-        <a class="btn" href="mailto:institutions@noshashi.app?subject=NOSHASHI%20Institutional%20enquiry">Contact sales</a>
+        <a class="btn ghost" href="/contact/">Contact</a>
+        <a class="btn" href="/contact/?topic=institutions">Talk to sales</a>
       </nav>
     </nav>
   </div>
@@ -298,8 +300,10 @@
           <li>Priority support — one business day</li>
         </ul>
         <div class="act">
-          <form action="/api/create-checkout-session" method="post">
+          <form class="checkout-form" action="/api/create-checkout-session" method="post">
             <button class="btn block" type="submit">Subscribe with card</button>
+            <p class="checkout-error" role="alert" hidden
+               style="margin-top:10px;font-size:12px;line-height:1.55;color:var(--hold)"></p>
           </form>
           <p class="terms">
             Stripe Checkout. Cancel any time from the billing portal; access runs to
@@ -586,13 +590,15 @@
   <div class="shell foot">
     <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet</p>
     <div class="foot-links">
-      <a href="mailto:support@noshashi.app">Support</a>
-      <a href="mailto:institutions@noshashi.app">Institutions</a>
-      <a href="mailto:security@noshashi.app">Security</a>
-      <a href="/legal/">Legal &amp; accessibility</a>
-      <a href="/guide/">Plain-language guide</a>
+      <a href="/contact/">Contact</a>
+      <a href="/news/">Newsroom</a>
+      <a href="/progress/">Progress</a>
+      <a href="/status/">Status</a>
       <a href="/research/">Findings</a>
-      <a href="mailto:privacy@noshashi.app">Privacy</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a>
     </div>
   </div>
 </footer>
@@ -637,5 +643,34 @@
   annual.addEventListener("click", function () { apply("annual"); });
 })();
 </script>
+<script>
+/*
+ * Progressive enhancement only: without this the form still posts and
+ * the endpoint still redirects to Stripe. This exists so a failure is
+ * readable in place instead of a navigation to an error page.
+ */
+(function(){
+  document.querySelectorAll(".checkout-form").forEach(function(form){
+    var error=form.querySelector(".checkout-error"),button=form.querySelector("button");
+    form.addEventListener("submit",function(event){
+      event.preventDefault();
+      if(error){error.hidden=true;error.textContent="";}
+      var original=button.textContent;
+      button.disabled=true;button.textContent="OPENING STRIPE…";
+      fetch(form.action,{method:"POST",headers:{Accept:"application/json"}})
+        .then(function(r){return r.json().then(function(b){return {ok:r.ok,body:b};});})
+        .then(function(result){
+          if(result.ok&&result.body.url){location.href=result.body.url;return;}
+          throw new Error(result.body.error||"Checkout could not start.");
+        })
+        .catch(function(e){
+          button.disabled=false;button.textContent=original;
+          if(error){error.textContent=e.message;error.hidden=false;}
+        });
+    });
+  });
+})();
+</script>
+<script src="/assets/support.js" defer></script>
 </body>
 </html>

@@ -7,9 +7,11 @@
 <title>NOSHASHI — XRPL Edge Pack</title>
 <meta name="description" content="Portable, read-only research materials for the NOSHASHI XRPL Edge Lab.">
 <link rel="canonical" href="https://noshashi.app/downloads/xrpl-edge-pack/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Typefaces served from this origin; no font CDN is contacted. -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/modules.css">
 <style>
 :root{--ground:#0B0F14;--surface:#11161D;--elevated:#1C2330;--ink:#E6E8EB;--muted:#A3A8B3;--faint:#747C8B;--rule:#2A313C;--brand:#3A82F6;--tele:#00E0C6;--go:#35D49A;--shell:min(980px,92vw);--r:10px}
 html[data-theme="light"]{--ground:#F4F7FA;--surface:#FFF;--elevated:#E8EEF5;--ink:#142033;--muted:#4A586B;--faint:#64748B;--rule:#C9D4E0;--brand:#145FD1;--tele:#007D70;--go:#087A50}
@@ -48,5 +50,6 @@ html[data-theme="light"]{--ground:#F4F7FA;--surface:#FFF;--elevated:#E8EEF5;--in
 <script>
 (function(){var b=document.getElementById("theme"),t="";try{t=localStorage.getItem("noshashi-theme")||""}catch(e){}if(t)document.documentElement.setAttribute("data-theme",t);function u(){var l=document.documentElement.getAttribute("data-theme")==="light";b.textContent=l?"DARK":"LIGHT"}u();b.onclick=function(){var n=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("noshashi-theme",n)}catch(e){}u()}})();
 </script>
+<script src="/assets/support.js" defer></script>
 </body>
 </html>

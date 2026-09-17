@@ -230,6 +230,102 @@ Every reading is mainnet or it is absent.
 
 ---
 
+## The public website
+
+`noshashi.app` is a static site with a small serverless layer. It is
+**rendered on the server before it is served** — the newsroom, the XRP
+market panel, the mission log and the download section are all in the
+HTML a crawler receives, not assembled afterwards in the browser.
+
+### Generated versus hand-written
+
+This is the distinction that matters most when editing:
+
+| Path | Status |
+|---|---|
+| `templates/home.html` | **Source** for the landing page |
+| `site/index.html` | **Generated** — edits here are erased by the next build |
+| `site/news/`, `site/status/`, `site/progress/`, `site/contact/` | **Generated** from `scripts/build-site.mjs` |
+| `site/sitemap.xml` | **Generated** |
+| `site/pricing/`, `site/guide/`, `site/research/`, `site/legal/`, `site/downloads/` | Hand-written; edit in place |
+| `site/assets/`, `site/data/` | Hand-written |
+
+```bash
+npm run site:build    # render site/ from the templates and live sources
+npm run site:dev      # render, then preview on http://localhost:4321
+```
+
+The preview server applies the real `vercel.json` headers and redirects,
+so the Content-Security-Policy is exercised locally rather than first
+meeting a browser in production.
+
+`.claude/skills/omniroute` answers "which file owns this change" if the
+table above is not enough.
+
+### Where the live data comes from
+
+| Section | Source | Refresh |
+|---|---|---|
+| XRP price, 24h change, 7-day history | CoinGecko public API | Build time, then `/api/xrp-market` |
+| Validated ledger, base fee, peers | `xrplcluster.com` `server_info` | Build time, then `/api/xrp-market` |
+| Newsroom | Google News, Cointelegraph, CoinDesk RSS | Build time, then `/api/xrp-news` |
+| Mission log | `site/data/updates.json` + GitHub Releases API | Build time, then `/api/project-feed` |
+| Download links, sizes, SHA-256 | GitHub Releases API | Build time |
+
+No key is required for any of them. Every one degrades to an honest
+empty state rather than a stale or invented figure, and a failed fetch
+never fails the build.
+
+Because the rendered copy is only as fresh as the last deploy,
+`.github/workflows/refresh-site.yml` redeploys three times a day. It
+needs a `VERCEL_DEPLOY_HOOK_URL` secret and exits cleanly without one.
+
+### Serverless endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/create-checkout-session` | Stripe Checkout for Pro |
+| `GET /api/stripe-status` | Is checkout actually wired up? Reports the key's mode and whether the price exists, without revealing the key |
+| `POST /api/contact` | Enquiry delivery |
+| `GET /api/contact-status` | Which delivery channels are configured, and where mail lands |
+| `POST /api/support-chat` | Support console |
+| `GET /api/xrp-news`, `GET /api/xrp-market`, `GET /api/project-feed` | The live feeds as JSON |
+
+`api/_lib/` is shared code and is not routable — Vercel excludes
+underscore-prefixed paths. The site deploys with `installCommand: ""`,
+so **nothing under `api/` may take a dependency**; all of it is built on
+Node built-ins and `fetch`.
+
+### Receiving enquiries
+
+The contact form delivers to every channel that is configured, and says
+which succeeded. Set these in the Vercel project (never in the repo):
+
+| Variable | Effect |
+|---|---|
+| `RESEND_API_KEY` | Enables email delivery |
+| `CONTACT_TO` | Where enquiries land. Comma-separated for several recipients |
+| `CONTACT_FROM` | Sender; must be on a domain verified in Resend |
+| `CONTACT_WEBHOOK_URL` | Optional second copy to Slack, Zapier, Make or a sheet |
+
+Replies reach the sender directly — `reply_to` is set to their address,
+so answering the forwarded mail from an ordinary inbox is the whole
+workflow. There is no separate inbox to log into, deliberately: an
+enquiries database would be the only server-side state on this site and
+would carry a retention question for no gain.
+
+With nothing configured, `/api/contact` returns 503 and the page shows
+the direct address. It will not accept a message it cannot deliver.
+
+### The support console
+
+`api/_lib/kb.js` is the single source for both the support console and
+the landing page's questions section. Without `ANTHROPIC_API_KEY` it
+answers by retrieval over that file; with one it answers with Claude,
+given the same file as its only permitted source and instructed to hand
+off rather than guess. Both modes refuse to state a figure the site does
+not state, and both end at the contact form when they do not know.
+
 ## Project layout
 
 ```

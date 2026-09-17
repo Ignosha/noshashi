@@ -2,6 +2,111 @@
 
 ## Unreleased
 
+### The public site is now rendered before it is served
+
+The website was a hand-maintained static page whose most important
+section had gone stale. The download block named **v0.3.0** while the
+repository was on **v0.3.1**, with byte sizes and SHA-256 values to
+match — on a page whose whole argument is that you should verify the
+hash before running the binary. A wrong hash there does not just fail;
+it teaches the reader that the check is noise.
+
+The download section is now generated from the GitHub Releases API at
+build time. It cannot disagree with the release again, because there is
+no second copy to disagree with. Every artifact is labelled **BETA**:
+the builds are pre-1.0 and unsigned, and that belonged on each one
+rather than only in a note underneath.
+
+`scripts/build-site.mjs` renders the landing page from
+`templates/home.html`, plus four new pages — `/news/`, `/status/`,
+`/progress/` and `/contact/`. Rendering at deploy time rather than per
+request was chosen deliberately: it puts the same content in the HTML a
+crawler receives, without making the homepage's availability depend on a
+news site's uptime. A failed upstream fetch renders an honest empty
+state and never fails the build.
+
+### Live XRP data, and an honest empty state for it
+
+A market panel carrying spot price, seven days of history, reported
+volume, and the validated ledger the network is on right now — read
+server-side from CoinGecko and an XRPL public node, so the page makes no
+cross-origin request and the CSP stays closed. The charts are SVG
+rendered on the server with a crosshair, a tooltip carrying the exact
+value and timestamp, labelled axes and keyboard traversal.
+
+The 24-hour change is **not** coloured green or red. Status colour is
+spent on GO/HOLD/NO-GO and a price moving is not a verdict; direction is
+carried by a glyph and a signed number, which also survives a reader who
+cannot separate the two hues.
+
+The newsroom merges three public RSS feeds. Two of the three were
+silently returning nothing at first: the tag extractor stripped markup
+before unwrapping CDATA, and `<![CDATA[Ripple files a brief]]>` matches
+a tag-stripper end to end, which deleted the headline and dropped the
+whole source. Decode first, then strip.
+
+### Accounts and the hosted workspace were withdrawn
+
+`/login/`, `/dashboard/` and `/auth/` are deleted and redirect to the
+root. The workspace presented fabricated figures — "04 open evidence",
+"07 active workflows" — which is the one thing this codebase bans
+outright. NOSHASHI runs on your machine and reads public ledger state;
+the site no longer asks anyone to create an account to evaluate it.
+
+### Checkout failures are now diagnosable
+
+Every Stripe error collapsed into `502 "Stripe could not create
+checkout."` — the same five words whether the key was from the wrong
+mode, the price had been archived, or the account was restricted. Stripe
+returns a precise code for all three and the handler discarded it. The
+real error is now logged, the price ID moved to `STRIPE_PRO_PRICE_ID`
+(a price ID is mode-scoped, so a literal can only be correct in one of
+test or live), the `fetch` is guarded, and the endpoint answers JSON
+when asked so the page can show the reason in place.
+
+`/api/stripe-status` reports whether checkout actually works, without
+revealing the key.
+
+### Contact, support and the mission log
+
+A contact form that delivers to every configured channel and refuses to
+claim a delivery it did not perform — with nothing configured it returns
+503 and shows the address that works, rather than accepting a message
+nobody will receive. `/api/contact-status` reports what is configured.
+
+A support console answering from `api/_lib/kb.js`, which is also the
+source for the landing page's questions section. It works with no API
+key by retrieval and upgrades to Claude when one is present; both modes
+refuse to state a figure the site does not state. A price-prediction
+question used to reach the entry about which network is read, on the
+word "xrp" alone — a confident answer to a question nobody asked. It now
+refuses.
+
+A mission log built from repository notices merged with the GitHub
+releases feed, so a release cannot appear in it without a build behind
+it, and a status board derived from the log rather than maintained
+separately.
+
+### Elsewhere
+
+- Typefaces are self-hosted on the site, matching the desktop build's
+  policy. Opening a page no longer announces the visitor to a font CDN,
+  and two render-blocking connections are gone.
+- Security headers, including a Content-Security-Policy, and a local
+  preview server that applies them — so the policy is exercised against
+  a real browser before it meets production.
+- `/assets/*` moved to a five-minute browser cache with a long CDN
+  cache. The filenames carry no content hash, so the previous one-hour
+  browser cache could leave a visitor on new markup with the previous
+  deploy's stylesheet.
+- The landing page opens with the name and the mission, over a starfield
+  confined to the hero — a bounded exception to the motion rules,
+  recorded in DESIGN.md with the terms it is granted on.
+- 32 tests covering the render layer, most of them about escaping
+  third-party feed text, which is the difference between a newsroom and
+  a stored XSS on the marketing site.
+
+
 ## 0.3.1
 
 **LEDGER CADENCE reported a healthy network as failing.** 0.3.0 measured the
