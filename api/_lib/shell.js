@@ -227,6 +227,7 @@ ${renderHeader(current)}
 ${body}
 </main>
 ${renderFooter()}
+<script src="/assets/nav.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
 ${THEME_TOGGLE}
