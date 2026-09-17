@@ -39,6 +39,7 @@
   if (!context) return;
 
   var still = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var SKY_MAX = 920;
   var stars = [];
   var meteors = [];
   var width = 0;
@@ -85,7 +86,21 @@
   function resize() {
     var rect = hero.getBoundingClientRect();
     width = Math.max(1, Math.round(rect.width));
-    height = Math.max(1, Math.round(rect.height));
+    /*
+     * The cap is stated here rather than read back off the element.
+     *
+     * Measuring the canvas's own box is circular: this function writes
+     * an inline height, so the next read returns whatever was written
+     * last. Called before layout settled it read the full hero — some
+     * 2,600px — wrote that inline, and the inline value then overrode
+     * the CSS cap for the rest of the session. The result was a buffer
+     * nearly three times the pixels on screen with the same star count
+     * spread thinly across it.
+     *
+     * SKY_MAX must stay equal to the cap in modules.css
+     * (`height:min(100%,920px)`); the two are the same decision.
+     */
+    height = Math.max(1, Math.min(SKY_MAX, Math.round(rect.height)));
     ratio = Math.min(2, window.devicePixelRatio || 1);
     canvas.width = Math.round(width * ratio);
     canvas.height = Math.round(height * ratio);
