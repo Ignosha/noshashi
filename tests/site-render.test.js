@@ -19,6 +19,7 @@ import { parseFeed } from "../api/_lib/news.js";
 import { deriveStatus } from "../api/_lib/project-feed.js";
 import { answer, search, CONFIDENT, ENTRIES } from "../api/_lib/kb.js";
 import { renderNews, renderLog, renderDownloads, renderBoard } from "../api/_lib/sections.js";
+import { ungroundedFigures } from "../api/support-chat.js";
 
 describe("escaping", () => {
   it("neutralises the characters that close a tag or an attribute", () => {
@@ -294,5 +295,48 @@ describe("renderDownloads", () => {
     const html = renderDownloads(null);
     expect(html).toContain("github.com/Ignosha/noshashi/releases");
     expect(html).not.toContain("v0.3");
+  });
+});
+
+describe("support console figure guard", () => {
+  /*
+   * The system prompt tells the model not to state a figure the
+   * knowledge base does not contain. Claude follows that; a 70B
+   * open-weight model on a free tier follows it most of the time, and
+   * on a site whose argument is that it does not invent figures, most
+   * of the time is not good enough. Every money amount, percentage and
+   * version in a model reply is checked, and a reply carrying an
+   * ungrounded one is discarded in favour of the deterministic answer.
+   */
+  it("passes figures the site actually states", () => {
+    expect(ungroundedFigures("Pro is $749 per seat per month.")).toEqual([]);
+    expect(ungroundedFigures("Institutional is $4,000 a month.")).toEqual([]);
+    expect(ungroundedFigures("You get 10 address checks per month.")).toEqual([]);
+  });
+
+  it("catches an invented price", () => {
+    expect(ungroundedFigures("Pro costs $299 per month.")).toEqual(["$299"]);
+  });
+
+  it("catches an invented percentage", () => {
+    expect(ungroundedFigures("It is about 45% faster.")).toEqual(["45%"]);
+  });
+
+  it("catches a version number, even a true one", () => {
+    // The knowledge base deliberately states no version — versions
+    // change and the download page is the source. A bot repeating one
+    // is a bot that will still be repeating it three releases later.
+    expect(ungroundedFigures("The current build is v0.3.1.")).toEqual(["v0.3.1"]);
+  });
+
+  it("is not defeated by thousands separators", () => {
+    // "$4,000" and "$4000" are the same claim and both appear in the
+    // wild; comparing with separators stripped keeps a true statement
+    // from being thrown away over a comma.
+    expect(ungroundedFigures("Institutional is $4000 a month.")).toEqual([]);
+  });
+
+  it("ignores prose with no figures in it", () => {
+    expect(ungroundedFigures("It reads validated ledger state and returns a verdict.")).toEqual([]);
   });
 });

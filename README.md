@@ -320,11 +320,27 @@ the direct address. It will not accept a message it cannot deliver.
 ### The support console
 
 `api/_lib/kb.js` is the single source for both the support console and
-the landing page's questions section. Without `ANTHROPIC_API_KEY` it
-answers by retrieval over that file; with one it answers with Claude,
-given the same file as its only permitted source and instructed to hand
-off rather than guess. Both modes refuse to state a figure the site does
-not state, and both end at the contact form when they do not know.
+the landing page's questions section.
+
+It answers in three tiers, falling through on any failure:
+
+| Tier | Requires | Notes |
+|---|---|---|
+| Claude | `ANTHROPIC_API_KEY` | Best phrasing and instruction-following |
+| Any OpenAI-compatible provider | `SUPPORT_LLM_BASE_URL`, `SUPPORT_LLM_API_KEY`, `SUPPORT_LLM_MODEL` | Groq, Cerebras, OpenRouter, Together, local Ollama or vLLM |
+| Retrieval | nothing | Always available, deterministic, no network |
+
+The knowledge base is the model's only permitted source, and the
+retrieval tier is what ships regardless — a model reply has to beat it.
+
+**The figure guard.** A system prompt telling a model not to invent a
+price is followed reliably by Claude and *mostly* by a 70B open-weight
+model, and "mostly" is not good enough on a site whose argument is that
+it does not invent figures. So the instruction is not trusted on its
+own: every money amount, percentage and version string in a model reply
+is checked against the knowledge base, and a reply carrying one that is
+not there is discarded and the deterministic answer sent instead. Prose
+is the model's job; figures are the knowledge base's.
 
 ## Project layout
 
