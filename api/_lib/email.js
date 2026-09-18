@@ -261,3 +261,39 @@ export function enquiryEmail(enquiry) {
     }),
   };
 }
+
+/**
+ * A one-to-one outreach email in the site's design.
+ *
+ * Deliberately quieter than the product templates: no call-to-action
+ * slab, no panels, no eyebrow. A cold email that arrives looking like a
+ * campaign gets read as a campaign. The branding here is the header and
+ * the footer; the body is a letter.
+ *
+ * `paragraphs` is plain text, one string per paragraph. `signoff` is
+ * the sender's own name — there is no default, because an outreach
+ * email signed by a company rather than a person is the thing this
+ * format exists to avoid.
+ */
+export function outreachEmail({ subject, paragraphs, signoff, note = "" }) {
+  const body = `
+    ${(paragraphs || []).map((p) => `<p style="margin:0 0 16px;font-family:${SANS};font-size:15px;
+      color:${T.ink};line-height:1.68;">${esc(p)}</p>`).join("")}
+    <p style="margin:26px 0 0;font-family:${SANS};font-size:15px;color:${T.ink};line-height:1.68;">
+      ${esc(signoff || "")}</p>
+    <p style="margin:4px 0 0;font-family:${SANS};font-size:13.5px;color:${T.muted};line-height:1.6;">
+      NOSHASHI Labs &nbsp;·&nbsp;
+      <a href="${SITE}/" style="color:${T.brand};text-decoration:none;">noshashi.app</a></p>
+    ${note ? `<p style="margin:20px 0 0;font-family:${MONO};font-size:10.5px;letter-spacing:.12em;
+      color:${T.faint};line-height:1.7;">${esc(note)}</p>` : ""}`;
+
+  return {
+    subject,
+    html: shell({
+      title: subject,
+      preheader: (paragraphs && paragraphs[0]) ? String(paragraphs[0]).slice(0, 110) : subject,
+      body,
+      footNote: "Sent individually, not as part of a campaign. Reply and it reaches a person.",
+    }),
+  };
+}
