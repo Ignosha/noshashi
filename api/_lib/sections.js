@@ -450,3 +450,30 @@ export function renderMarketFoot(market) {
     <span>MARKET DATA, NOT A VERDICT</span>
   </div>`;
 }
+
+/* ── Subscribe ────────────────────────────────────────────────────────
+   One field, stated plainly. The copy says what arrives and how often,
+   because "subscribe to our newsletter" is a promise nobody can check
+   and this product's whole argument is that its claims are checkable.
+   ──────────────────────────────────────────────────────────────────── */
+export function renderSubscribe({ compact = false } = {}) {
+  return `<div class="subscribe${compact ? " compact" : ""}">
+    <div class="subscribe-copy">
+      <p class="num">PRODUCT UPDATES</p>
+      <p>An email when a build ships or a capability lands — drawn from the same mission log
+         this page publishes, so an email cannot claim something the site does not.
+         No schedule, no digest, one click to leave.</p>
+    </div>
+    <form class="subscribe-form" id="subscribe-form" novalidate>
+      <label class="sr-only" for="subscribe-email">Your email address</label>
+      <input id="subscribe-email" name="email" type="email" autocomplete="email"
+             maxlength="200" placeholder="you@institution.com" required>
+      <button class="btn" type="submit" id="subscribe-send">Subscribe</button>
+      <div class="form-trap" aria-hidden="true">
+        <label for="subscribe_company">Leave empty</label>
+        <input id="subscribe_company" name="company_website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <p class="form-status" id="subscribe-status" role="status" aria-live="polite"></p>
+    </form>
+  </div>`;
+}

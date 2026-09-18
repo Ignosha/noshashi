@@ -34,6 +34,7 @@
 
 import { clientKey, take } from "./_lib/rate-limit.js";
 import { fetchWithTimeout } from "./_lib/html.js";
+import { enquiryEmail } from "./_lib/email.js";
 
 const LIMITS = { name: 120, email: 200, org: 160, subject: 160, message: 4000 };
 const TOPICS = new Set(["support", "institutions", "security", "privacy", "other"]);
@@ -71,6 +72,10 @@ async function deliverByEmail(enquiry) {
 
   const to = recipients(enquiry.topic);
   const from = process.env.CONTACT_FROM || "NOSHASHI site <noreply@noshashi.app>";
+  // Both parts are sent: the HTML carries the site's design, and the
+  // plain-text alternative is what a text-only client and most spam
+  // filters actually read. HTML-only mail scores worse and is unreadable
+  // in the clients that strip it.
   const lines = [
     `Topic:   ${enquiry.topic}`,
     `Name:    ${enquiry.name}`,
@@ -81,6 +86,7 @@ async function deliverByEmail(enquiry) {
     "",
     enquiry.message,
   ].filter(Boolean);
+  const branded = enquiryEmail(enquiry);
 
   const response = await fetchWithTimeout("https://api.resend.com/emails", {
     timeout: 10_000,
@@ -91,7 +97,8 @@ async function deliverByEmail(enquiry) {
       to,
       // Answering the forwarded mail replies to the sender directly.
       reply_to: enquiry.email,
-      subject: `[${enquiry.topic}] ${enquiry.subject}`,
+      subject: branded.subject,
+      html: branded.html,
       text: lines.join("\n"),
     }),
   });

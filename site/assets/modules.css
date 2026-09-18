@@ -554,3 +554,26 @@ canvas.cosmos{position:absolute;inset:0 0 auto 0;width:100%;height:min(100%,920p
      the wordmark and the menu are not against the bezel. */
   .nav{gap:12px}
 }
+
+/* ── Subscribe ──────────────────────────────────────────────────────
+   A single field on one rule. Not a boxed card: the card-prison rule
+   applies, and this sits inside sections that already have frames. */
+.subscribe{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:28px;
+  align-items:start;padding:24px 0 0;border-top:1px solid var(--rule);margin-top:22px}
+.subscribe .subscribe-copy p:not(.num){font-size:13px;color:var(--muted);line-height:1.62;
+  max-width:52ch;margin:0}
+.subscribe-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;
+  align-items:start;position:relative}
+.subscribe-form input[type="email"]{background:var(--ground);color:var(--ink);
+  border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;font-size:14px;
+  font-family:inherit;min-width:0;transition:border-color .14s}
+.subscribe-form input[type="email"]:focus{outline:none;border-color:var(--brand)}
+.subscribe-form input[type="email"]::placeholder{color:var(--faint)}
+.subscribe-form .btn{white-space:nowrap}
+.subscribe-form .form-status{grid-column:1 / -1;margin:0;font-size:12.5px}
+@media (max-width:860px){
+  .subscribe{grid-template-columns:1fr;gap:18px}
+}
+@media (max-width:520px){
+  .subscribe-form{grid-template-columns:1fr}
+}

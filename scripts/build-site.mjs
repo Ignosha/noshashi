@@ -40,7 +40,7 @@ import { esc, isoDate, ago } from "../api/_lib/html.js";
 import {
   renderNews, renderNewsHead, renderLog, renderBoard, renderClock,
   renderDownloads, renderVerifyCommand, renderFaq, faqStructuredData,
-  renderProgress, renderRail, renderMarket, renderMarketHead, renderMarketFoot,
+  renderProgress, renderRail, renderMarket, renderMarketHead, renderMarketFoot, renderSubscribe,
 } from "../api/_lib/sections.js";
 import { jsonLd } from "../api/_lib/shell.js";
 
@@ -78,6 +78,7 @@ async function buildHome({ news, market, feed, status, release }) {
     BOARD: renderBoard(status),
     LOG: renderLog(feed.entries, { limit: 5 }),
     FAQ: renderFaq(FAQ),
+    SUBSCRIBE: renderSubscribe(),
     JSONLD: jsonLd([
       ORGANIZATION,
       {
@@ -254,6 +255,10 @@ ${notice}
   <div class="console"><div class="console-body">
     ${renderLog(feed.entries, { limit: 20 })}
   </div></div>
+</section>
+
+<section>
+  ${renderSubscribe()}
 </section>
 
 <section>

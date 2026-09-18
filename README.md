@@ -317,6 +317,49 @@ would carry a retention question for no gain.
 With nothing configured, `/api/contact` returns 503 and the page shows
 the direct address. It will not accept a message it cannot deliver.
 
+### Email
+
+Every email the site sends is rendered by `api/_lib/email.js` in the
+site's own design language — the same tokens, the same eyebrow labels,
+the same mission-log rails. Email's constraints are not the web's, and
+the renderer is built around them rather than against them: tables
+rather than flex (Outlook's Word engine is still a large share of
+institutional inboxes), inline styles (Gmail strips `<style>` in several
+contexts), an explicit background and colour on every cell (a client
+forcing its own theme would otherwise paint dark text on a dark ground),
+and web fonts named first with a system fallback, because they do not
+load in most clients.
+
+Three templates: `welcomeEmail` on subscribe, `updateEmail` for a
+product update, `enquiryEmail` for the copy of a contact-form message
+that reaches the team.
+
+### The update list
+
+Subscribers are stored in a **Resend Audience**, not a database. The
+site has no server-side state anywhere else, and a subscribers table
+would be the first — carrying a retention question, an export
+obligation and a breach surface — to store what Resend already stores,
+with unsubscribe handling included.
+
+| Variable | Effect |
+|---|---|
+| `RESEND_AUDIENCE_ID` | Enables `/api/subscribe`. Without it the endpoint returns 503 and says so |
+
+Sending an update:
+
+```bash
+# 1. Add the entry to site/data/updates.json and deploy
+# 2. Dry run — renders the email, sends nothing
+node scripts/send-update.mjs --headline "v0.4.0 is out"
+# 3. Send it
+node scripts/send-update.mjs --headline "v0.4.0 is out" --send
+```
+
+The body is built from the mission log, so **an email cannot announce
+something the site does not already say**. The dry run is the default
+because a broadcast cannot be recalled.
+
 ### The support console
 
 `api/_lib/kb.js` is the single source for both the support console and

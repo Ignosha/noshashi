@@ -74,7 +74,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 
 <section>
   <div class="clockbar" id="mission-clock" data-epoch="2026-08-29T00:00:00Z">
-    <div><span class="label">UTC</span><span class="value live" id="clock-utc">09:02:53</span></div>
+    <div><span class="label">UTC</span><span class="value live" id="clock-utc">15:08:15</span></div>
     <div><span class="label">MISSION ELAPSED</span><span class="value" id="clock-met">T+20d</span></div>
     <div><span class="label">SINCE FIRST RELEASE</span><span class="value">2026-08-29</span></div>
   </div>
@@ -178,6 +178,28 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 </section>
 
 <section>
+  <div class="subscribe">
+    <div class="subscribe-copy">
+      <p class="num">PRODUCT UPDATES</p>
+      <p>An email when a build ships or a capability lands — drawn from the same mission log
+         this page publishes, so an email cannot claim something the site does not.
+         No schedule, no digest, one click to leave.</p>
+    </div>
+    <form class="subscribe-form" id="subscribe-form" novalidate>
+      <label class="sr-only" for="subscribe-email">Your email address</label>
+      <input id="subscribe-email" name="email" type="email" autocomplete="email"
+             maxlength="200" placeholder="you@institution.com" required>
+      <button class="btn" type="submit" id="subscribe-send">Subscribe</button>
+      <div class="form-trap" aria-hidden="true">
+        <label for="subscribe_company">Leave empty</label>
+        <input id="subscribe_company" name="company_website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <p class="form-status" id="subscribe-status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<section>
   <div class="grid g2">
     <div class="panel">
       <h3>Reporting a problem</h3>
@@ -212,6 +234,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   </div>
 </footer>
 <script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
 <script>

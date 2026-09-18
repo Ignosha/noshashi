@@ -60,6 +60,12 @@ export default async function handler(req, res) {
         sender: process.env.CONTACT_FROM ? "CONTACT_FROM is set" : "default (noreply@noshashi.app)",
       },
       webhook: { configured: Boolean(webhook) },
+      updateList: {
+        configured: Boolean(process.env.RESEND_AUDIENCE_ID),
+        note: process.env.RESEND_AUDIENCE_ID
+          ? "Subscribers are stored in a Resend Audience."
+          : "Set RESEND_AUDIENCE_ID to accept subscribers; /api/subscribe returns 503 until then.",
+      },
     },
     problem: null,
     configure: null,
