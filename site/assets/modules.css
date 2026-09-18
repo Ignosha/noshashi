@@ -577,3 +577,72 @@ canvas.cosmos{position:absolute;inset:0 0 auto 0;width:100%;height:min(100%,920p
 @media (max-width:520px){
   .subscribe-form{grid-template-columns:1fr}
 }
+
+/* ── Subscribe dialog ───────────────────────────────────────────────
+   A dialog the visitor has earned, not one that fires on load.
+
+   Two constraints shape it. Google treats an interstitial that covers
+   the content on mobile as intrusive and demotes the page for it, which
+   would undo the SEO work the rest of this site is built around — so on
+   a phone it is a bottom sheet that leaves the content visible, never a
+   full cover. And DESIGN.md's register is Operate: the visitor is doing
+   something, so this waits until they have read a screen or two, shows
+   once, and remembers a dismissal.
+
+   It is not a marketing overlay. It is one field, the same promise the
+   inline form makes, and a close control that is a real target. */
+.sub-dialog{position:fixed;inset:0;z-index:80;display:grid;place-items:center;
+  padding:24px;opacity:0;pointer-events:none;transition:opacity .22s cubic-bezier(.2,0,0,1)}
+.sub-dialog.open{opacity:1;pointer-events:auto}
+.sub-dialog[hidden]{display:none}
+.sub-scrim{position:absolute;inset:0;background:color-mix(in srgb,var(--ground) 78%,transparent);
+  backdrop-filter:blur(6px)}
+.sub-card{position:relative;width:min(470px,100%);background:var(--surface);
+  border:1px solid var(--rule);border-radius:14px;padding:30px 30px 26px;
+  box-shadow:0 30px 80px rgba(0,0,0,.55);
+  transform:translateY(14px) scale(.985);
+  transition:transform .26s cubic-bezier(.16,1,.3,1)}
+.sub-dialog.open .sub-card{transform:none}
+
+/* The orbital mark, reused from the hero lockup at a smaller size. */
+.sub-mark{position:relative;width:62px;height:62px;display:grid;place-items:center;
+  margin-bottom:20px}
+.sub-mark .ring{position:absolute;inset:0;border-radius:50%;
+  border:1px solid color-mix(in srgb,var(--brand) 40%,transparent)}
+.sub-mark .ring:nth-child(2){inset:9px;border-color:color-mix(in srgb,var(--tele) 28%,transparent)}
+.sub-mark svg{width:28px;height:28px;color:var(--ink);position:relative;z-index:2}
+
+.sub-card h2{font-size:23px;letter-spacing:-.02em;margin:0 0 10px;line-height:1.22}
+.sub-card .lede{font-size:13.5px;color:var(--muted);line-height:1.62;margin:0 0 20px;max-width:44ch}
+.sub-card form{display:grid;gap:10px}
+.sub-card input[type="email"]{background:var(--ground);color:var(--ink);
+  border:1px solid var(--rule);border-radius:var(--r);padding:13px 15px;font-size:15px;
+  font-family:inherit;width:100%;transition:border-color .14s}
+.sub-card input[type="email"]:focus{outline:none;border-color:var(--brand)}
+.sub-card input[type="email"]::placeholder{color:var(--faint)}
+.sub-card .btn{justify-content:center;width:100%}
+.sub-card .form-status{margin:2px 0 0;font-size:12.5px;min-height:1.5em}
+.sub-terms{margin:16px 0 0;font-size:11px;color:var(--faint);line-height:1.6}
+.sub-close{position:absolute;top:12px;right:12px;width:40px;height:40px;
+  display:grid;place-items:center;background:transparent;border:1px solid transparent;
+  border-radius:8px;color:var(--faint);font:14px "IBM Plex Mono",monospace;cursor:pointer;
+  transition:color .14s,border-color .14s}
+.sub-close:hover,.sub-close:focus-visible{color:var(--ink);border-color:var(--rule)}
+.sub-close:focus-visible{outline:2px solid var(--tele);outline-offset:2px}
+.sub-later{background:none;border:0;padding:8px 0 0;color:var(--faint);font:inherit;
+  font-size:12.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.sub-later:hover{color:var(--muted)}
+
+/* On a phone it is a sheet, not a cover: the page stays visible behind
+   it, which is what keeps it outside Google's intrusive-interstitial
+   rule and what stops it feeling like a trap. */
+@media (max-width:640px){
+  .sub-dialog{place-items:end center;padding:0}
+  .sub-scrim{background:color-mix(in srgb,var(--ground) 55%,transparent);backdrop-filter:blur(3px)}
+  .sub-card{width:100%;border-radius:16px 16px 0 0;border-bottom:0;padding:26px 22px 24px;
+    transform:translateY(100%)}
+  .sub-dialog.open .sub-card{transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .sub-dialog,.sub-card{transition:none}
+}
