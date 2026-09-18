@@ -227,6 +227,7 @@ ${renderHeader(current)}
 ${body}
 </main>
 ${renderFooter()}
+<script src="/assets/i18n.js" defer></script>
 <script src="/assets/nav.js" defer></script>
 <script src="/assets/subscribe.js" defer></script>
 <script src="/assets/chart.js" defer></script>

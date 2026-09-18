@@ -604,19 +604,19 @@
       <span>NOSHASHI</span>
     </a>
     <nav class="nav-links">
-      <a class="nav-link" href="#public">Free tools</a>
-      <a class="nav-link" href="/news/">Newsroom</a>
-      <a class="nav-link" href="/progress/">Progress</a>
-      <a class="nav-link optional" href="/status/">Status</a>
-      <a class="nav-link optional" href="/research/">Findings</a>
-      <a class="nav-link optional" href="/guide/">XRP guide</a>
-      <a class="nav-link" href="#download">Download</a>
-      <a class="nav-link" href="/pricing/">Pricing</a>
+      <a class="nav-link" href="#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/news/"><span data-i18n="nav.news">Newsroom</span></a>
+      <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
+      <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
+      <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
+      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
+      <a class="nav-link" href="#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
         <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
       </button>
-      <a class="btn ghost" href="/contact/">Contact</a>
-      <a class="btn" href="#download">Download beta</a>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
     </nav>
   </div>
 </header>
@@ -717,20 +717,20 @@
       </div>
       <div class="lockup-word">
         <h2>NOSHASHI</h2>
-        <span class="tagline">Analyze · Discover · Navigate</span>
+        <span class="tagline" data-i18n="hero.tagline">Analyze · Discover · Navigate</span>
       </div>
       </div>
 
-      <p class="mission">
+      <p class="mission" data-i18n="hero.mission">
         A <strong>zero-trust intelligence workstation for the XRP Ledger</strong> — compliance
         adjudication and market intelligence read from one validated ledger state, in the same
         second. Every other tool on this chain gives you one half.
       </p>
     </div>
 
-    <span class="badge"><span class="dot"></span>Live on XRPL Mainnet · no testnet path exists</span>
-    <span class="badge" style="margin-left:8px"><span class="dot hold"></span>Beta channel · <!--SLOT:VERSION--> · unsigned builds</span>
-    <h1>Am I allowed to move this — and could I actually get out of it?</h1>
+    <span class="badge"><span class="dot"></span><span data-i18n="hero.badge.live">Live on XRPL Mainnet · no testnet path exists</span></span>
+    <span class="badge" style="margin-left:8px"><span class="dot hold"></span><span data-i18n="hero.badge.beta">Beta channel</span> · <!--SLOT:VERSION--> · <span data-i18n="hero.badge.unsigned">unsigned builds</span></span>
+    <h1 data-i18n="hero.h1">Am I allowed to move this — and could I actually get out of it?</h1>
     <p class="sub">
       Compliance tooling reads account flags and never opens the order book. Market
       terminals read the book and never check the flags. NOSHASHI answers both from the
@@ -739,11 +739,11 @@
       with the exact rule that decided it.
     </p>
     <div class="cta">
-      <a class="btn" href="#download">Download the beta</a>
-      <a class="btn ghost" href="/contact/?topic=institutions">Talk to us</a>
-      <a class="btn ghost" href="/guide/">New to XRP? Start here</a>
+      <a class="btn" href="#download"><span data-i18n="hero.cta.download">Download the beta</span></a>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="hero.cta.talk">Talk to us</span></a>
+      <a class="btn ghost" href="/guide/"><span data-i18n="hero.cta.guide">New to XRP? Start here</span></a>
     </div>
-    <p class="micro">Free tier · no account, anywhere on this site · nothing is ever signed</p>
+    <p class="micro" data-i18n="hero.micro">Free tier · no account, anywhere on this site · nothing is ever signed</p>
     <div class="hero-brief" aria-label="Institutional operating brief">
       <div class="hero-brief-cell">
         <span class="label">THE INSTITUTIONAL QUESTION</span>
@@ -1350,7 +1350,7 @@
 
   <section id="newsroom" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">08 · XRP, live</p>
+      <p class="eyebrow">08 · <span data-i18n="sec.xrp">XRP, live</span></p>
       <h2>The asset, the network, and what is being said about both</h2>
       <p>Price and seven days of history, the validated ledger the network is on right now, and
          headlines from three public feeds — all read on the server before this page was sent.
@@ -1424,7 +1424,7 @@
 
   <section id="download" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">10 · Download</p>
+      <p class="eyebrow">10 · <span data-i18n="sec.download">Download</span></p>
       <h2>Take the instrument offline</h2>
       <p>The full build, free to download. Bring the same adjudication engine to a
          controlled workstation, then verify the artifact before it ever touches a desk.</p>
@@ -1473,7 +1473,7 @@
 
   <section id="mission" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">11 · Mission log</p>
+      <p class="eyebrow">11 · <span data-i18n="sec.mission">Mission log</span></p>
       <h2>Every change, with the build that proves it</h2>
       <p>Releases reach this log from the GitHub Releases API, which means an entry cannot appear
          without CI having produced an artifact first. Maintenance and incidents are written in the
@@ -1504,7 +1504,7 @@
 
   <section id="pricing" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">12 · Pricing</p>
+      <p class="eyebrow">12 · <span data-i18n="sec.pricing">Pricing</span></p>
       <h2>Free where a human decides</h2>
       <p>The console is free forever. Paid tiers begin where a desk needs something an individual
          does not.</p>
@@ -1593,7 +1593,7 @@
 
   <section id="questions" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">13 · Common questions</p>
+      <p class="eyebrow">13 · <span data-i18n="sec.questions">Common questions</span></p>
       <h2>The things people ask before they download it</h2>
       <p>The same answers the support console gives, from the same file. If the two ever disagree,
          this page is right and the console is a bug.</p>
@@ -1606,7 +1606,7 @@
 
   <section id="security" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">14 · Security posture</p>
+      <p class="eyebrow">14 · <span data-i18n="sec.security">Security posture</span></p>
       <h2>The smallest possible attack surface</h2>
       <p>The safest data is data nobody holds. Without an account there is no server-side state at
          all — no analytics, no telemetry, no crash reporting.</p>
@@ -1623,7 +1623,7 @@
 
   <section id="contact-cta" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">15 · Contact</p>
+      <p class="eyebrow">15 · <span data-i18n="sec.contact">Contact</span></p>
       <h2>Talk to somebody who built it</h2>
       <p>There is no sales qualification funnel and no account to create first. Say what you are
          trying to work out and you will get a straight answer.</p>
@@ -1676,7 +1676,7 @@
 
 <footer>
   <div class="shell foot">
-    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
+    <p class="mono">© 2026 <span data-i18n="foot.rights">NOSHASHI Labs · XRPL Mainnet · All builds BETA</span></p>
     <div class="foot-links">
       <a href="/contact/">Contact</a>
       <a href="/news/">Newsroom</a>
@@ -1694,6 +1694,7 @@
 
 <script src="/assets/cosmos.js" defer></script>
 <script src="/assets/chart.js" defer></script>
+<script src="/assets/i18n.js" defer></script>
 <script src="/assets/nav.js" defer></script>
 <script src="/assets/subscribe.js" defer></script>
 <script src="/assets/support.js" defer></script>

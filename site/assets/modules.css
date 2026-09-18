@@ -646,3 +646,33 @@ canvas.cosmos{position:absolute;inset:0 0 auto 0;width:100%;height:min(100%,920p
 @media (prefers-reduced-motion:reduce){
   .sub-dialog,.sub-card{transition:none}
 }
+
+/* ── Language ───────────────────────────────────────────────────────
+   A select in the footer, and a one-line bar when a language was
+   applied from the visitor's connection rather than chosen. The bar
+   states what is not translated: on a compliance product that is not a
+   disclaimer, it is the difference between a translated interface and
+   a translated claim. */
+.lang-switch{display:flex;align-items:center;gap:8px}
+.lang-switch select{background:var(--surface);color:var(--muted);
+  border:1px solid var(--rule);border-radius:var(--r);
+  padding:7px 10px;font:12px "IBM Plex Mono",monospace;cursor:pointer;
+  min-height:36px}
+.lang-switch select:hover{color:var(--ink);border-color:var(--brand)}
+.lang-switch select:focus-visible{outline:2px solid var(--tele);outline-offset:2px}
+
+.lang-bar{position:fixed;left:0;right:0;bottom:0;z-index:70;
+  display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;
+  padding:11px 18px;background:var(--elevated);border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--muted);line-height:1.5}
+.lang-bar[hidden]{display:none}
+.lang-bar b{color:var(--ink);font-weight:600}
+.lang-bar .lang-note{color:var(--faint);font-size:11.5px;max-width:52ch}
+.lang-bar button{background:transparent;border:1px solid var(--rule);border-radius:var(--r);
+  color:var(--ink);font:inherit;font-size:12px;padding:7px 13px;cursor:pointer;
+  white-space:nowrap;min-height:36px}
+.lang-bar button:hover,.lang-bar button:focus-visible{border-color:var(--brand)}
+@media (max-width:700px){
+  .lang-bar{gap:8px;padding:10px 14px}
+  .lang-bar .lang-note{display:none}
+}

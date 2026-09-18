@@ -459,16 +459,16 @@ export function renderMarketFoot(market) {
 export function renderSubscribe({ compact = false } = {}) {
   return `<div class="subscribe${compact ? " compact" : ""}">
     <div class="subscribe-copy">
-      <p class="num">PRODUCT UPDATES</p>
-      <p>An email when a build ships or a capability lands — drawn from the same mission log
+      <p class="num" data-i18n="sub.title">PRODUCT UPDATES</p>
+      <p data-i18n="sub.body">An email when a build ships or a capability lands — drawn from the same mission log
          this page publishes, so an email cannot claim something the site does not.
          No schedule, no digest, one click to leave.</p>
     </div>
     <form class="subscribe-form" id="subscribe-form" novalidate>
       <label class="sr-only" for="subscribe-email">Your email address</label>
       <input id="subscribe-email" name="email" type="email" autocomplete="email"
-             maxlength="200" placeholder="you@institution.com" required>
-      <button class="btn" type="submit" id="subscribe-send">Subscribe</button>
+             maxlength="200" placeholder="you@institution.com" data-i18n="sub.placeholder" required>
+      <button class="btn" type="submit" id="subscribe-send" data-i18n="sub.button">Subscribe</button>
       <div class="form-trap" aria-hidden="true">
         <label for="subscribe_company">Leave empty</label>
         <input id="subscribe_company" name="company_website" type="text" tabindex="-1" autocomplete="off">
