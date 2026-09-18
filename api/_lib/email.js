@@ -44,15 +44,22 @@ const SANS = "'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvet
 const MONO = "'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
 const SITE = "https://www.noshashi.app";
 
-/** The rocket, as an inline SVG. Falls back to the wordmark alone. */
-const MARK = `<svg width="26" height="26" viewBox="0 0 180 180" fill="none" style="vertical-align:middle">
-<g stroke="${T.ink}" stroke-width="7" stroke-linecap="round" fill="none">
-<path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/></g>
-<circle cx="151" cy="69" r="7" fill="${T.ink}"/>
-<path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="${T.ink}"/>
-<path d="M92 111 63 132C60 116 66 103 78 93Z" fill="${T.ink}"/>
-<path d="M111 91 130 118C114 119 101 113 93 103Z" fill="${T.ink}"/>
-<path d="M82 121 67 150 94 132Z" fill="${T.ink}"/></svg>`;
+/*
+ * The mark, as a hosted PNG rather than inline SVG.
+ *
+ * This was an inline <svg>, which was a real bug: Gmail, Outlook and
+ * Yahoo all strip SVG from email bodies, so the logo was rendering as
+ * nothing in most of the inboxes it was sent to — and it looked correct
+ * in every browser-based preview, which is exactly why it survived.
+ *
+ * A PNG on an absolute URL is the only broadly reliable option. It is
+ * served at 240px and displayed at 64, so it stays sharp on a retina
+ * screen. `alt` matters more than usual: many clients block images by
+ * default, and the alt text is then the entire logo.
+ */
+const MARK_URL = `${SITE}/assets/email-mark.png`;
+const MARK = `<img src="${MARK_URL}" width="64" height="64" alt="NOSHASHI"
+  style="display:block;border:0;outline:none;text-decoration:none;width:64px;height:64px;">`;
 
 /** A monospace, letter-spaced label — the site's `.eyebrow`. */
 export function eyebrow(text) {
@@ -129,9 +136,9 @@ ${esc(preheader)}</div>
 
     <tr><td style="padding:0 0 26px;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td style="padding-right:10px;">${MARK}</td>
-        <td style="font-family:${SANS};font-size:15px;font-weight:600;letter-spacing:.2em;color:${T.ink};">
-          NOSHASHI</td>
+        <td style="padding-right:16px;" valign="middle">${MARK}</td>
+        <td valign="middle" style="font-family:${SANS};font-size:17px;font-weight:600;
+          letter-spacing:.2em;color:${T.ink};">NOSHASHI</td>
       </tr></table>
     </td></tr>
 
