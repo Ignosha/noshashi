@@ -21,7 +21,7 @@
 (function () {
   "use strict";
 
-  var BREAKPOINT = 820;
+  var BREAKPOINT = 760;  // must match modules.css
 
   var bar = document.querySelector("header .nav-links");
   if (!bar) return;

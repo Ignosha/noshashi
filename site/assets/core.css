@@ -106,5 +106,6 @@ footer{border-top:1px solid var(--rule);padding:36px 0;margin-top:24px}
   .g2,.g3{grid-template-columns:1fr}
   main{padding:40px 0 16px}
 }
-@media (max-width:820px){ .nav-links a:not(.btn){display:none} }
+/* Must match the menu breakpoint in modules.css — see the note there. */
+@media (max-width:760px){ .nav-links a:not(.btn){display:none} }
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
