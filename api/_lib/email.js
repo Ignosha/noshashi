@@ -52,10 +52,20 @@ const SITE = "https://www.noshashi.app";
  * nothing in most of the inboxes it was sent to — and it looked correct
  * in every browser-based preview, which is exactly why it survived.
  *
- * A PNG on an absolute URL is the only broadly reliable option. It is
- * served at 240px and displayed at 64, so it stays sharp on a retina
- * screen. `alt` matters more than usual: many clients block images by
- * default, and the alt text is then the entire logo.
+ * The PNG is transparent, so it carries no square of its own and sits
+ * on whatever is behind it. That is the right file to ship, and it has
+ * one failure mode worth guarding: the mark is white, so on a white
+ * ground it disappears completely. A client that forces its own light
+ * theme would show an empty space where the logo is.
+ *
+ * So the cell behind it states the navy explicitly. On our own dark
+ * email that changes nothing — it is the same colour as everything
+ * around it and no edge is visible. In a client that overrides the
+ * theme it is a small navy patch holding a readable logo, which beats
+ * a correctly-transparent logo nobody can see.
+ *
+ * Served at 240px, displayed at 64. `alt` matters more than usual:
+ * many clients block images by default, and the alt is then the logo.
  */
 const MARK_URL = `${SITE}/assets/email-mark.png`;
 const MARK = `<img src="${MARK_URL}" width="64" height="64" alt="NOSHASHI"
@@ -136,7 +146,7 @@ ${esc(preheader)}</div>
 
     <tr><td style="padding:0 0 26px;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td style="padding-right:16px;" valign="middle">${MARK}</td>
+        <td bgcolor="${T.ground}" style="padding-right:16px;background:${T.ground};" valign="middle">${MARK}</td>
         <td valign="middle" style="font-family:${SANS};font-size:17px;font-weight:600;
           letter-spacing:.2em;color:${T.ink};">NOSHASHI</td>
       </tr></table>
