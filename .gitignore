@@ -70,3 +70,9 @@ supabase/.temp/
 # where the persistent user PATH does not stick. It hardcodes this
 # machine's layout, so it is local setup rather than project code.
 env.ps1
+
+# Python bytecode. Regenerated on every run and machine-specific —
+# three of these were tracked, so running any ads/ script dirtied the
+# tree with a diff nobody would ever read.
+__pycache__/
+*.py[cod]
