@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.3.1",
   "type": "module",
-  "description": "NOSHASHI \u2014 autonomous compliance layer mission control",
+  "description": "NOSHASHI — autonomous compliance layer mission control",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -56,6 +56,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.63.0",
     "tailwindcss": "^4.0.0",
     "tw-animate-css": "^1.2.0",
     "typescript": "~5.6.2",
