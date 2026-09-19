@@ -45,24 +45,25 @@ const MONO = "'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospa
 const SITE = "https://www.noshashi.app";
 
 /*
- * The mark, as a hosted PNG rather than inline SVG.
+ * The mark, as a hosted transparent PNG.
  *
- * This was an inline <svg>, which was a real bug: Gmail, Outlook and
- * Yahoo all strip SVG from email bodies, so the logo was rendering as
- * nothing in most of the inboxes it was sent to — and it looked correct
- * in every browser-based preview, which is exactly why it survived.
+ * It was an inline <svg>, which was a real bug: Gmail, Outlook and
+ * Yahoo all strip SVG from email bodies, so the logo rendered as
+ * nothing in most of the inboxes it was sent to — and looked correct in
+ * every browser-based preview, which is why it survived being written.
  *
- * The PNG is transparent, so it carries no square of its own and sits
- * on whatever is behind it. That is the right file to ship, and it has
- * one failure mode worth guarding: the mark is white, so on a white
- * ground it disappears completely. A client that forces its own light
- * theme would show an empty space where the logo is.
+ * Fully transparent, with nothing painted behind it. The cell carried
+ * an explicit navy for a while to guard one case: the mark is white, so
+ * against a white ground it does not merely degrade, it disappears. A
+ * client that forces its own light theme shows an empty space where the
+ * logo should be. That guard is gone at the product owner's direction —
+ * the logo now sits on whatever the client paints, which is what keeps
+ * it clean on every dark client and is the common case by a wide
+ * margin.
  *
- * So the cell behind it states the navy explicitly. On our own dark
- * email that changes nothing — it is the same colour as everything
- * around it and no edge is visible. In a client that overrides the
- * theme it is a small navy patch holding a readable logo, which beats
- * a correctly-transparent logo nobody can see.
+ * If it ever reads as missing in a real inbox, the fix is a dark-ink
+ * variant swapped on `prefers-color-scheme`, which some clients honour —
+ * not repainting a box behind this one.
  *
  * Served at 240px, displayed at 64. `alt` matters more than usual:
  * many clients block images by default, and the alt is then the logo.
@@ -146,7 +147,7 @@ ${esc(preheader)}</div>
 
     <tr><td style="padding:0 0 26px;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td bgcolor="${T.ground}" style="padding-right:16px;background:${T.ground};" valign="middle">${MARK}</td>
+        <td style="padding-right:16px;" valign="middle">${MARK}</td>
         <td valign="middle" style="font-family:${SANS};font-size:17px;font-weight:600;
           letter-spacing:.2em;color:${T.ink};">NOSHASHI</td>
       </tr></table>
