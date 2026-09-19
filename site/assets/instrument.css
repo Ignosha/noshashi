@@ -101,20 +101,25 @@
    now, so a cell that has not resolved shows an em dash in --faint and
    keeps its label — never a placeholder digit, never a spinner
    pretending to be data. */
+/* The 1px gap over a --rule background draws the dividers, instead of
+   per-cell borders. It costs nothing and it is correct at every width:
+   when the rail wraps to 2x2 on a phone the row divider appears on its
+   own, which a border-right cannot do without knowing where the rows
+   broke. */
 .rail{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:var(--hair);
   border:var(--hair) solid var(--rule);
   border-radius:var(--ri);
-  background:var(--surface);
+  background:var(--rule);
   overflow:hidden;
 }
 .rail .cell{
   padding:10px 14px;
-  border-right:var(--hair) solid var(--rule);
+  background:var(--surface);
   min-width:0;
 }
-.rail .cell:last-child{border-right:0}
 .rail .k{
   display:block;
   font-family:"IBM Plex Mono",ui-monospace,monospace;
@@ -154,17 +159,26 @@
    hairline between each, a mono marker, tight leading. Reads as spec
    sheet, which is what it is. */
 .spec{list-style:none;margin:0;padding:0}
+/* The marker is absolutely positioned rather than a grid or flex child.
+   Both of those promote EVERY child of the <li> to a box of its own —
+   so a row like "<strong>Redemption stress testing</strong> — what the
+   whole book would realise" puts the <strong> in the text column and
+   the trailing text node into the next implicit cell, which is the
+   14px marker column. It renders one word per line. Absolute
+   positioning leaves the row's inline content in normal flow, where
+   mixed markup wraps the way prose is supposed to. */
 .spec li{
-  display:grid; grid-template-columns:14px 1fr; gap:9px;
-  padding:7px 0;
+  position:relative;
+  padding:7px 0 7px 22px;
   border-top:var(--hair) solid color-mix(in srgb, var(--rule) 60%, transparent);
   font-size:12.5px; line-height:1.5; color:var(--muted);
 }
 .spec li:first-child{border-top:0}
 .spec li::before{
   content:"+";
+  position:absolute; left:0; top:7px;
   font-family:"IBM Plex Mono",ui-monospace,monospace;
-  font-size:11px; color:var(--go); line-height:1.55;
+  font-size:11px; color:var(--go); line-height:1.5;
 }
 .spec li.key{color:var(--ink)}
 .spec li.key::before{content:"\25B8";color:var(--brand)}
