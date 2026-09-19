@@ -12,6 +12,7 @@ import { useBilling } from "@/lib/billing/useEntitlements";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useToast } from "@/lib/toast";
 import { CONTACT } from "@/lib/brand";
+import { openExternal } from "@/lib/external";
 import { cn } from "@/lib/utils";
 import { SPRING, staggerChild, staggerParent } from "@/lib/motion";
 
@@ -325,8 +326,22 @@ function PlanCard({
           ))}
         </ul>
 
+        {/*
+          Branch on how the plan is *bought*, not on whether a price id
+          happens to exist.
+
+          Institutional has a price id — it has to, so an invoice can be
+          raised against it — and this used to read `plan.priceId ?` and
+          offer it as a card purchase. The pricing page promises the
+          opposite in as many words: "Not available by card. Institutional
+          access requires an executed MSA." The tier carries a 99.9%
+          uptime SLA with service credits, a DPA, regulator read-only
+          seats and white labelling, so a card that cleared here would
+          have created every one of those obligations against nobody's
+          signature.
+        */}
         <div className="mt-4">
-          {plan.priceId ? (
+          {plan.purchase === "self_serve" && plan.priceId ? (
             <Button
               className="w-full gap-2"
               variant={plan.emphasis ? "default" : "outline"}
@@ -335,6 +350,22 @@ function PlanCard({
             >
               <NovaCredit size={13} />
               {current ? "ACTIVE PLAN" : busy ? "OPENING CHECKOUT…" : `GET ${plan.name}`}
+            </Button>
+          ) : plan.purchase === "contact_sales" ? (
+            <Button
+              className="w-full gap-2"
+              variant="outline"
+              disabled={current}
+              onClick={() =>
+                void openExternal(
+                  `mailto:${CONTACT.sales}?subject=${encodeURIComponent(
+                    "NOSHASHI Institutional enquiry",
+                  )}`,
+                )
+              }
+            >
+              <NovaCredit size={13} />
+              {current ? "ACTIVE PLAN" : "TALK TO SALES"}
             </Button>
           ) : (
             <Button className="w-full" variant="outline" disabled>

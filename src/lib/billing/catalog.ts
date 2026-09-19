@@ -103,10 +103,7 @@ export const PLANS: Plan[] = [
     cadence: "per seat / month",
     priceId: "price_1U6U1eGSxPXLjUKIGnORqp43",
     annualUsd: 7_490,
-    // Set once the annual price is created in Stripe. Null keeps the
-    // annual toggle honest rather than sending a checkout to a price id
-    // that does not exist.
-    annualPriceId: null,
+    annualPriceId: "price_1UHV60GSxPXLjUKIytehVDNd",
     purchase: "self_serve",
     seatBased: true,
     emphasis: true,
@@ -138,6 +135,12 @@ export const PLANS: Plan[] = [
       "alerts",
       "receipt_anchoring",
       "priority_support",
+      // Pro is sold "5,000 API verifications included" and the verify
+      // function publishes a 50 req/sec limit for this tier. Without
+      // this flag every one of those calls answered 403: the quota and
+      // the key have to be granted by the same tier, or one of them is
+      // a line on a pricing page that nothing honours.
+      "compliance_api",
     ],
   },
   {
@@ -149,7 +152,7 @@ export const PLANS: Plan[] = [
     cadence: "per month",
     priceId: "price_1U6U1sGSxPXLjUKI7mCncAIu",
     annualUsd: 40_000,
-    annualPriceId: null,
+    annualPriceId: "price_1UHV6AGSxPXLjUKIyxTwSBpO",
     purchase: "contact_sales",
     seatBased: false,
     features: [
@@ -296,8 +299,9 @@ export const FEATURE_CATALOG: Record<
   },
   compliance_api: {
     label: "Compliance API",
-    requires: "institution",
-    blurb: "Issue keys and let your own systems ask the gate the same question.",
+    requires: "desk",
+    blurb:
+      "Issue keys and let your own systems ask the gate the same question. Pro includes 5,000 verifications a month; Institutional includes 100,000 and negotiates its own rate limit.",
   },
   webhooks: {
     label: "Webhooks",

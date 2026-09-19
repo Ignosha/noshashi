@@ -114,6 +114,14 @@
   .tier li::before{content:"";width:3px;height:3px;background:var(--go);margin-top:8px;flex:none;border-radius:50%}
   .tier .act{margin-top:24px;display:grid;gap:8px}
   .tier .terms{font-size:11px;color:var(--faint);line-height:1.55}
+  .seats{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    border:1px solid var(--rule);border-radius:var(--r);padding:9px 12px;margin-bottom:8px}
+  .seats span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint)}
+  .seats input{width:5.5rem;background:var(--ground);color:var(--ink);border:1px solid var(--rule);
+    border-radius:6px;padding:7px 9px;font:inherit;font-family:"IBM Plex Mono",monospace;
+    font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+  .seats input:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 
   /* ── Comparison table ───────────────────────────────────────────── */
   .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:var(--r);background:var(--surface)}
@@ -302,6 +310,17 @@
         </ul>
         <div class="act">
           <form class="checkout-form" action="/api/create-checkout-session" method="post">
+            <!-- A seat is a person, so the count is asked for before
+                 Stripe rather than assumed to be one. It is clamped
+                 again server-side; this field decides an invoice. -->
+            <label class="seats" for="pro-seats">
+              <span>Seats</span>
+              <input id="pro-seats" name="seats" type="number" inputmode="numeric"
+                     value="1" min="1" max="500" step="1">
+            </label>
+            <!-- Mirrors the billing-period switch above, so the period
+                 the visitor chose is the period they are charged for. -->
+            <input type="hidden" name="cadence" id="pro-cadence" value="monthly">
             <button class="btn block" type="submit">Subscribe with card</button>
             <p class="checkout-error" role="alert" hidden
                style="margin-top:10px;font-size:12px;line-height:1.55;color:var(--hold)"></p>
@@ -400,7 +419,7 @@
           <tr><th scope="row">Issuance surveillance</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
 
           <tr class="grp"><th scope="rowgroup" colspan="4">Integration</th></tr>
-          <tr><th scope="row">Compliance API</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
+          <tr><th scope="row">Compliance API</th><td class="no">—</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
           <tr><th scope="row">API verifications included</th><td class="no">—</td><td>5,000 / mo</td><td>100,000 / mo</td></tr>
           <tr><th scope="row">API rate limit</th><td class="no">—</td><td>50 req/sec</td><td>Negotiated</td></tr>
           <tr><th scope="row">Webhooks</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
@@ -632,6 +651,10 @@
     }
     monthly.setAttribute("aria-pressed", String(period === "monthly"));
     annual.setAttribute("aria-pressed", String(period === "annual"));
+    // The switch used to change only the rendered figures, so a visitor
+    // who chose "Annual prepay" and paid was put on the monthly price.
+    var cadenceField = document.getElementById("pro-cadence");
+    if (cadenceField) cadenceField.value = period;
     if (note) {
       note.textContent =
         period === "annual"
@@ -658,7 +681,13 @@
       if(error){error.hidden=true;error.textContent="";}
       var original=button.textContent;
       button.disabled=true;button.textContent="OPENING STRIPE…";
-      fetch(form.action,{method:"POST",headers:{Accept:"application/json"}})
+      var payload={};
+      new FormData(form).forEach(function(value,key){payload[key]=value;});
+      fetch(form.action,{
+        method:"POST",
+        headers:{Accept:"application/json","Content-Type":"application/json"},
+        body:JSON.stringify(payload)
+      })
         .then(function(r){return r.json().then(function(b){return {ok:r.ok,body:b};});})
         .then(function(result){
           if(result.ok&&result.body.url){location.href=result.body.url;return;}

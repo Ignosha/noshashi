@@ -22,6 +22,24 @@
  * 4. It only ever answered with a redirect, so the pricing page could
  *    not call it with `fetch` and show a real error — a failure just
  *    navigated the visitor to a blank error page.
+ * 5. Quantity was the literal "1". The page sells Pro "per seat / month"
+ *    and a seat is a person, so a four-person desk that bought here paid
+ *    for one seat and the other three were free. Seats now come from the
+ *    request, clamped server-side, and the Stripe page lets the buyer
+ *    adjust them.
+ * 6. The annual/monthly switch on the pricing page changed the rendered
+ *    figures and nothing else: a visitor who chose "Annual prepay" and
+ *    paid was put on the $749 *monthly* price. The cadence is now part
+ *    of the request and selects a real annual price.
+ * 7. The session carried no metadata, so `noshashi-stripe-webhook` —
+ *    which keys entitlements off `metadata.account_id` — dropped the
+ *    event and provisioned nothing. Somebody could pay $749 here and
+ *    receive no entitlement at all. The tier and cadence now ride on the
+ *    subscription, and the webhook resolves the account from the
+ *    customer's email when no account id is present.
+ * 8. `allow_promotion_codes` was unconditionally true, which is what let
+ *    a one-off internal test coupon take a $749 subscription to $0.50.
+ *    It is now off unless STRIPE_ALLOW_PROMOTION_CODES is set.
  *
  * `/api/stripe-status` reports which of these applies without exposing
  * the key.
@@ -29,10 +47,56 @@
 
 import { clientKey, take } from "./_lib/rate-limit.js";
 
-const DEFAULT_PRO_PRICE_ID = "price_1U6U1eGSxPXLjUKIGnORqp43";
+/**
+ * Pro, by billing period. Both are overridable by environment because a
+ * test-mode key needs test-mode prices, and a price id is the one piece
+ * of this that differs between the two modes.
+ */
+const DEFAULT_PRICE_IDS = {
+  monthly: "price_1U6U1eGSxPXLjUKIGnORqp43",
+  annual: "price_1UHV60GSxPXLjUKIytehVDNd",
+};
+
+/** A seat is a person. Nobody buys none, and 500 is well past a desk. */
+const MIN_SEATS = 1;
+const MAX_SEATS = 500;
 
 function isConfigured(key) {
   return Boolean(key) && !key.includes("placeholder") && /^sk_(test|live)_/.test(key);
+}
+
+/**
+ * The body arrives as JSON from the pricing page's `fetch`, or as form
+ * fields from the no-script `<form>` fallback. Vercel parses both into
+ * `req.body`, but a body-less POST leaves it undefined.
+ */
+function readBody(req) {
+  const body = req.body;
+  if (!body) return {};
+  if (typeof body === "string") {
+    try {
+      return JSON.parse(body);
+    } catch {
+      return Object.fromEntries(new URLSearchParams(body));
+    }
+  }
+  return body;
+}
+
+/**
+ * Clamped server-side on purpose. The seat count decides the invoice, so
+ * it is not something a posted form gets to be trusted about: a hand
+ * -edited `seats=0` would otherwise be a free subscription, and a
+ * `seats=1e9` an invoice nobody can pay.
+ */
+function readSeats(body) {
+  const seats = Math.floor(Number(body.seats));
+  if (!Number.isFinite(seats)) return MIN_SEATS;
+  return Math.max(MIN_SEATS, Math.min(MAX_SEATS, seats));
+}
+
+function readCadence(body) {
+  return String(body.cadence ?? "monthly") === "annual" ? "annual" : "monthly";
 }
 
 export default async function handler(req, res) {
@@ -71,20 +135,40 @@ export default async function handler(req, res) {
     );
   }
 
-  const priceId = process.env.STRIPE_PRO_PRICE_ID || DEFAULT_PRO_PRICE_ID;
+  const body = readBody(req);
+  const cadence = readCadence(body);
+  const seats = readSeats(body);
+
+  const priceId =
+    cadence === "annual"
+      ? process.env.STRIPE_PRO_ANNUAL_PRICE_ID || DEFAULT_PRICE_IDS.annual
+      : process.env.STRIPE_PRO_PRICE_ID || DEFAULT_PRICE_IDS.monthly;
+
   const origin = process.env.PUBLIC_SITE_URL || `https://${req.headers.host}`;
 
   const form = new URLSearchParams({
     mode: "subscription",
     "line_items[0][price]": priceId,
-    "line_items[0][quantity]": "1",
+    "line_items[0][quantity]": String(seats),
+    // The buyer can still correct the seat count on Stripe's own page,
+    // which is where they are when they realise they miscounted.
+    "line_items[0][adjustable_quantity][enabled]": "true",
+    "line_items[0][adjustable_quantity][minimum]": String(MIN_SEATS),
+    "line_items[0][adjustable_quantity][maximum]": String(MAX_SEATS),
     success_url: `${origin}/billing/success/?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/billing/cancelled/`,
     billing_address_collection: "auto",
-    allow_promotion_codes: "true",
-    // Lets a subscriber reach Stripe's own portal to cancel, which is
-    // the "cancel any time in two clicks" the pricing page promises.
+    // Off by default. A discount should be a decision, not the standing
+    // state of every checkout this site opens.
+    allow_promotion_codes: process.env.STRIPE_ALLOW_PROMOTION_CODES === "true" ? "true" : "false",
+    // The webhook reads the tier off the subscription to decide which
+    // entitlements to write. Without it the payment lands and the buyer
+    // is provisioned nothing.
+    "subscription_data[metadata][tier]": "desk",
+    "subscription_data[metadata][cadence]": cadence,
     "subscription_data[metadata][source]": "noshashi.app",
+    "metadata[tier]": "desk",
+    "metadata[cadence]": cadence,
   });
 
   try {
@@ -112,11 +196,13 @@ export default async function handler(req, res) {
         param: stripeError.param,
         message: stripeError.message,
         priceId,
+        cadence,
+        seats,
       });
 
       const readable =
         stripeError.code === "resource_missing"
-          ? "The configured Pro price does not exist on this Stripe account — most often a live key paired with a test-mode price ID. Set STRIPE_PRO_PRICE_ID to a price from the same mode as STRIPE_SECRET_KEY."
+          ? "The configured Pro price does not exist on this Stripe account — most often a live key paired with a test-mode price ID. Set STRIPE_PRO_PRICE_ID (and STRIPE_PRO_ANNUAL_PRICE_ID) to prices from the same mode as STRIPE_SECRET_KEY."
           : stripeError.message ||
             "Stripe declined the checkout request. The error has been logged.";
 
