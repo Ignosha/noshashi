@@ -590,14 +590,28 @@ export function authorityChecks(surface) {
   }
 
   const currency = primaryCurrency(surface.issuance);
+  /*
+   * "Not walked" and "walked, and the read failed" are different
+   * findings and used to print the same sentence.
+   *
+   * The walk is optional, so a null issuance legitimately means the
+   * caller did not ask for one. But readAuthoritySurface also catches a
+   * failed walk into `unreadable` and returns null — so a caller who
+   * DID ask, and whose read then broke, was told the supply "was not
+   * walked for this certificate", as though that had been their
+   * choice. Same shape as the posture bug above: a failure wearing the
+   * clothes of a benign state.
+   */
+  const walkFailed = surface.unreadable.find((entry) => entry.startsWith("issuance:"));
   if (!surface.issuance) {
     checks.push({
       id: "SUPPLY_CONCENTRATION",
       label: "Supply concentration",
       severity: "warn",
       passed: false,
-      detail:
-        "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass.",
+      detail: walkFailed
+        ? `The holder walk was requested and could not be completed (${walkFailed.replace(/^issuance:\s*/, "")}), so no concentration finding is made. This is a failed read, not an abstention and not a pass.`
+        : "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass.",
     });
   } else if (!currency) {
     checks.push({

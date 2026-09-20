@@ -240,6 +240,10 @@ const CASES: Array<{ name: string; surface: AuthoritySurface }> = [
     }),
   },
   { name: "supply not walked", surface: surface({ issuance: null }) },
+  {
+    name: "supply walk failed",
+    surface: surface({ issuance: null, unreadable: ["issuance: rippled replied 503"] }),
+  },
   { name: "no outstanding obligations", surface: surface({ issuance: issuance([]) }) },
   {
     name: "coverage below the floor",

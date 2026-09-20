@@ -61,6 +61,9 @@ export default async function handler(req, res) {
       // that produce the identical certificate. It is here because a
       // coverage figure on its own does not say whether the walk ended
       // early or simply ran out of holders to count.
+      // A read that failed is never silent here. Without this the only
+      // trace of a broken walk was a check that said "not walked".
+      unreadable: surface.unreadable.length > 0 ? surface.unreadable : undefined,
       walk: surface.issuance
         ? {
             pages: surface.issuance.pages,

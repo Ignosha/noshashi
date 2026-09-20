@@ -329,6 +329,50 @@ describe("a regular key is a single key", () => {
 });
 
 /**
+ * A walk that broke is not a walk nobody asked for.
+ *
+ * The supply walk is optional, so a null issuance legitimately means
+ * the caller declined it. But readAuthoritySurface also catches a
+ * FAILED walk into `unreadable` and returns null, so both arrived at
+ * the same sentence: "Supply was not walked for this certificate."
+ *
+ * Live mainnet showed why that matters. SOLO was certified with
+ * walk=1 explicitly requested, the walk failed, and the certificate
+ * reported it as not walked — indistinguishable from the caller
+ * having chosen to skip it. The endpoint gave no other trace, so a
+ * broken read looked like a configuration choice.
+ */
+describe("a failed supply walk says so", () => {
+  it("reports a caught walk failure as a failed read", () => {
+    const s = surface({
+      issuance: null,
+      unreadable: ["issuance: rippled replied 503"],
+    });
+    const check = byId(s, "SUPPLY_CONCENTRATION");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("could not be completed");
+    expect(check.detail).toContain("rippled replied 503");
+    expect(check.detail).toContain("failed read");
+  });
+
+  it("still reports a skipped walk as an abstention", () => {
+    const check = byId(surface({ issuance: null, unreadable: [] }), "SUPPLY_CONCENTRATION");
+    expect(check.detail).toContain("was not walked");
+    expect(check.detail).toContain("abstention, not a pass");
+  });
+
+  it("does not mistake an unrelated failure for a walk failure", () => {
+    // A posture or control failure short-circuits earlier, so the only
+    // way to reach this branch is an entry that is genuinely the walk's.
+    const check = byId(
+      surface({ issuance: null, unreadable: ["control: something else"] }),
+      "SUPPLY_CONCENTRATION"
+    );
+    expect(check.detail).toContain("was not walked");
+  });
+});
+
+/**
  * A blackholed account is the strongest surrender, not the weakest.
  *
  * Setting the regular key to an address whose private key does not
