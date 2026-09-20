@@ -1,6 +1,7 @@
 import type { Status } from "../xrpl/types";
 import type { PolicyCheck } from "../policy";
 import { digestOf } from "../policy";
+import { decodeCurrency } from "../format";
 import { fetchIssuerPosture } from "../xrpl/client";
 import { readControlSurface, type ControlSurface } from "./control";
 import { readIssuance, type IssuanceReport, type CurrencySurveillance } from "./issuance";
@@ -62,8 +63,21 @@ export type AuthoritySurface = {
 export type AuthorityCertificate = {
   verdict: Status;
   issuer: string;
-  /** The currency the concentration checks were scoped to, if any. */
+  /**
+   * The currency the concentration checks were scoped to, as the ledger
+   * holds it — a three-character code, or 40 hex characters for
+   * anything longer. THIS is what the digest is computed over, so it
+   * stays raw: a reader re-deriving the digest from a printed
+   * certificate has to be able to use the value they were given.
+   */
   currency?: string;
+  /**
+   * The same currency, decoded for a person to read. Display only, and
+   * deliberately outside the digest — RLUSD reaches the page as
+   * 524C555344000000000000000000000000000000, which tells a reader
+   * nothing at all.
+   */
+  currencyLabel?: string;
   checks: PolicyCheck[];
   /** SHA-256 over the canonical body, via the shared digest. */
   digest: string;
@@ -305,16 +319,16 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
     // number about a different population.
     checks.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${currency.currency} supply concentration`,
+      label: `${decodeCurrency(currency.currency)} supply concentration`,
       severity: "warn",
       passed: false,
-      detail: `The holder lines read account for ${(currency.coverage * 100).toFixed(1)}% of the outstanding ${currency.currency}. Below ${COVERAGE_FLOOR * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`,
+      detail: `The holder lines read account for ${(currency.coverage * 100).toFixed(1)}% of the outstanding ${decodeCurrency(currency.currency)}. Below ${COVERAGE_FLOOR * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`,
     });
   } else {
     const concentrated = currency.hhi >= HHI_CONCENTRATED;
     checks.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${currency.currency} supply not concentrated`,
+      label: `${decodeCurrency(currency.currency)} supply not concentrated`,
       severity: "warn",
       passed: !concentrated,
       detail: concentrated
@@ -398,6 +412,7 @@ export async function certificateFrom(
     verdict,
     issuer: surface.issuer,
     currency,
+    currencyLabel: currency ? decodeCurrency(currency) : undefined,
     checks,
     digest,
     ledgerIndex: surface.ledgerIndex,

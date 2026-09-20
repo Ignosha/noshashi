@@ -57,3 +57,33 @@ export function toCsv(rows: Array<Record<string, unknown>>): string {
   }
   return lines.join("\n");
 }
+
+/**
+ * Turn a 160-bit currency code into the ticker a person recognises.
+ *
+ * XRPL carries any currency longer than three characters as 40 hex
+ * characters, zero-padded. RLUSD is
+ * 524C555344000000000000000000000000000000 on the wire, and printing
+ * that to a reader is printing nothing — it was doing exactly that on
+ * the public certificate page until a live read showed it.
+ *
+ * Anything that is not the fixed 40-character form is returned
+ * unchanged, including the ordinary three-character codes, which are
+ * already tickers. So is a decode that produces non-printable bytes:
+ * some 160-bit codes are not text at all, and a mojibake rendering
+ * would be worse than the hex, which at least can be looked up.
+ *
+ * DISPLAY ONLY. The raw code is what the ledger uses to identify an
+ * issuance and what an authority certificate's digest is computed
+ * over, so decoding before hashing would mean a certificate could not
+ * be re-verified from the code the ledger actually holds.
+ */
+export function decodeCurrency(code: string): string {
+  if (!/^[0-9A-F]{40}$/i.test(code)) return code;
+  const decoded = (code.match(/../g) ?? [])
+    .map((byte) => String.fromCharCode(parseInt(byte, 16)))
+    .join("")
+    .replace(/\0+$/, "")
+    .trim();
+  return decoded && /^[\x20-\x7E]+$/.test(decoded) ? decoded : code;
+}

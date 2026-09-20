@@ -449,3 +449,70 @@ describe("settlement receipts issued before today still verify", () => {
     );
   });
 });
+
+/**
+ * A currency code a person can read, and a digest that still verifies.
+ *
+ * XRPL carries anything longer than three characters as 40 hex
+ * characters. RLUSD is 524C555344000000000000000000000000000000 on the
+ * wire, and that is what the public page printed on its first live
+ * read — a check headed "524C555344000000000000000000000000000000
+ * supply concentration", which tells a reader nothing.
+ *
+ * The fix has a trap in it, which is what these tests hold down. The
+ * digest must keep hashing the RAW code. Someone re-deriving a digest
+ * from a printed certificate uses the `currency` field they were
+ * given, so if the certificate carried "RLUSD" while the digest was
+ * taken over the hex, every genuine certificate for a long-coded
+ * currency would fail verification.
+ */
+describe("hex currency codes are decoded for display only", () => {
+  const RLUSD_HEX = "524C555344000000000000000000000000000000";
+
+  it("labels the check with the ticker, not the hex", async () => {
+    const s = surface({ issuance: issuance([currency({ currency: RLUSD_HEX })]) });
+    expect(byId(s, "SUPPLY_CONCENTRATION").label).toBe("RLUSD supply not concentrated");
+  });
+
+  it("uses the ticker in the coverage abstention too", () => {
+    const s = surface({
+      issuance: issuance([currency({ currency: RLUSD_HEX, coverage: 0.087 })]),
+    });
+    const detail = byId(s, "SUPPLY_CONCENTRATION").detail;
+    expect(detail).toContain("outstanding RLUSD");
+    expect(detail).not.toContain(RLUSD_HEX);
+  });
+
+  it("keeps the raw code on the certificate and digests that", async () => {
+    const s = surface({ issuance: issuance([currency({ currency: RLUSD_HEX })]) });
+    const cert = await certificateFrom(s);
+    expect(cert.currency).toBe(RLUSD_HEX);
+    expect(cert.currencyLabel).toBe("RLUSD");
+
+    // The digest is reproducible from the raw code alone, which is what
+    // the verify verb re-derives it from.
+    expect(cert.digest).toBe(
+      await digestOf({
+        kind: "authority",
+        subject: s.issuer,
+        scope: { currency: RLUSD_HEX, ledgerIndex: s.ledgerIndex, verdict: cert.verdict },
+        checks: authorityChecks(s),
+        evaluatedAt: s.readAt,
+      })
+    );
+  });
+
+  it("leaves a three-character code alone", async () => {
+    const cert = await certificateFrom(surface());
+    expect(cert.currency).toBe("USD");
+    expect(cert.currencyLabel).toBe("USD");
+  });
+
+  it("leaves a hex code that is not text as hex", () => {
+    // Some 160-bit codes are not ASCII at all. Mojibake would be worse
+    // than the hex, which can at least be looked up.
+    const odd = "0158415500000000C1F76FF6ECB0BAC600000000";
+    const s = surface({ issuance: issuance([currency({ currency: odd })]) });
+    expect(byId(s, "SUPPLY_CONCENTRATION").label).toBe(`${odd} supply not concentrated`);
+  });
+});

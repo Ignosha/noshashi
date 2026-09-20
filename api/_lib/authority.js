@@ -88,6 +88,23 @@ async function rippleRpc(command, params, timeout = 8000) {
   throw lastError ?? new Error("Ledger unreachable");
 }
 
+/**
+ * Turn a 160-bit currency code into the ticker a person recognises.
+ *
+ * Mirrors decodeCurrency in src/lib/format.ts. DISPLAY ONLY — the raw
+ * code is what the digest is computed over, so a reader re-deriving a
+ * digest from a printed certificate can use the value they were given.
+ */
+export function decodeCurrency(code) {
+  if (!/^[0-9A-F]{40}$/i.test(code)) return code;
+  const decoded = (code.match(/../g) ?? [])
+    .map((byte) => String.fromCharCode(parseInt(byte, 16)))
+    .join("")
+    .replace(/\0+$/, "")
+    .trim();
+  return decoded && /^[\x20-\x7E]+$/.test(decoded) ? decoded : code;
+}
+
 /** Fewest signers that reach quorum, heaviest first. Greedy is exact. */
 export function minimumSignersForQuorum(signers, quorum) {
   const weights = signers.map((s) => s.weight).sort((a, b) => b - a);
@@ -421,16 +438,16 @@ export function authorityChecks(surface) {
   } else if (currency.coverage < COVERAGE_FLOOR) {
     checks.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${currency.currency} supply concentration`,
+      label: `${decodeCurrency(currency.currency)} supply concentration`,
       severity: "warn",
       passed: false,
-      detail: `The holder lines read account for ${(currency.coverage * 100).toFixed(1)}% of the outstanding ${currency.currency}. Below ${COVERAGE_FLOOR * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`,
+      detail: `The holder lines read account for ${(currency.coverage * 100).toFixed(1)}% of the outstanding ${decodeCurrency(currency.currency)}. Below ${COVERAGE_FLOOR * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`,
     });
   } else {
     const concentrated = currency.hhi >= HHI_CONCENTRATED;
     checks.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${currency.currency} supply not concentrated`,
+      label: `${decodeCurrency(currency.currency)} supply not concentrated`,
       severity: "warn",
       passed: !concentrated,
       detail: concentrated
@@ -482,6 +499,7 @@ export async function certificateFrom(surface) {
     verdict,
     issuer: surface.issuer,
     currency,
+    currencyLabel: currency ? decodeCurrency(currency) : undefined,
     checks,
     digest,
     ledgerIndex: surface.ledgerIndex,

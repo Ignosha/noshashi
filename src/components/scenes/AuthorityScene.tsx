@@ -146,7 +146,7 @@ function AuthorityBody() {
           <StatCell
             label="CHECKS PASSED"
             value={`${certificate.checks.length - failing}/${certificate.checks.length}`}
-            caveat={certificate.currency ? `scoped to ${certificate.currency}` : "flags only"}
+            caveat={certificate.currencyLabel ? `scoped to ${certificate.currencyLabel}` : "flags only"}
             tone={failing > 0 ? "hold" : "default"}
           />
           <StatCell
@@ -291,7 +291,7 @@ function AuthorityBody() {
                 </p>
                 <p className="mt-1.5 font-mono text-[9px] tabular-nums text-faint">
                   LEDGER {certificate.ledgerIndex.toLocaleString()}
-                  {certificate.currency && ` · ${certificate.currency}`}
+                  {certificate.currencyLabel && ` · ${certificate.currencyLabel}`}
                 </p>
               </div>
               {certificate.checks.map((check) => (

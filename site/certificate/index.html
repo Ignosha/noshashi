@@ -220,7 +220,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       '<h2>'+esc(cert.issuer)+'</h2>'+
       '<p>'+esc(copy.text)+'</p>'+
       '<p class="cert-meta">LEDGER '+esc(String(cert.ledgerIndex))+
-        (cert.currency?' · '+esc(cert.currency):'')+
+        (cert.currencyLabel?' · '+esc(cert.currencyLabel):'')+
         ' · READ '+esc(new Date(cert.evaluatedAt).toLocaleString())+
         '<br>DIGEST '+esc(cert.digest)+'</p>'+
       '</div><div class="cert-checks">';

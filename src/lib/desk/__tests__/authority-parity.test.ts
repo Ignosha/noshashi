@@ -242,6 +242,22 @@ const CASES: Array<{ name: string; surface: AuthoritySurface }> = [
     surface: surface({ posture: posture({ unreadable: "connect ETIMEDOUT" }) }),
   },
   {
+    name: "a 160-bit hex currency code",
+    // RLUSD as the ledger actually carries it. Live mainnet printed
+    // this straight to the page before it was decoded.
+    surface: surface({
+      issuance: issuance([
+        currency({ currency: "524C555344000000000000000000000000000000", hhi: 300 }),
+      ]),
+    }),
+  },
+  {
+    name: "a hex code that does not decode to text",
+    surface: surface({
+      issuance: issuance([currency({ currency: "0158415500000000C1F76FF6ECB0BAC600000000", hhi: 300 })]),
+    }),
+  },
+  {
     name: "several currencies, largest wins",
     surface: surface({
       issuance: issuance([
@@ -275,6 +291,7 @@ describe("console and endpoint agree, check for check", () => {
       expect(theirs.digest).toBe(ours.digest);
       expect(theirs.verdict).toBe(ours.verdict);
       expect(theirs.currency).toBe(ours.currency);
+      expect(theirs.currencyLabel).toBe(ours.currencyLabel);
       expect(theirs.ledgerIndex).toBe(ours.ledgerIndex);
     });
   }
