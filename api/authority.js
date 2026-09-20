@@ -66,11 +66,17 @@ export default async function handler(req, res) {
       unreadable: surface.unreadable.length > 0 ? surface.unreadable : undefined,
       walk: surface.issuance
         ? {
+            source: surface.issuance.source ?? "ledger",
+            source_name: surface.issuance.sourceName,
+            reconciled_against_ledger: surface.issuance.reconciledAgainstLedger ?? false,
             pages: surface.issuance.pages,
             lines_walked: surface.issuance.linesWalked,
             truncated: surface.issuance.truncated,
             stopped_because: surface.issuance.stoppedBecause,
             elapsed_ms: surface.issuance.elapsedMs,
+            // Present only when the indexer was tried and refused, so
+            // a fallback to the slow path is never mysterious.
+            indexer_refused: surface.issuance.indexerRefused,
           }
         : null,
       disclaimer:

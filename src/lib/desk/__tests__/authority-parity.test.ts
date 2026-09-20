@@ -250,6 +250,26 @@ const CASES: Array<{ name: string; surface: AuthoritySurface }> = [
     surface: surface({ issuance: issuance([currency({ coverage: 0.41, observedHeld: 410_000 })]) }),
   },
   {
+    name: "indexer-sourced distribution",
+    surface: surface({
+      issuance: {
+        ...issuance([currency({ hhi: 702, holders: 67_339, topHolderPct: 14.1 })]),
+        source: "indexer",
+        sourceName: "xrpscan.com",
+      },
+    }),
+  },
+  {
+    name: "indexer-sourced and concentrated",
+    surface: surface({
+      issuance: {
+        ...issuance([currency({ hhi: 7400, topHolderPct: 81.2 })]),
+        source: "indexer",
+        sourceName: "xrpscan.com",
+      },
+    }),
+  },
+  {
     name: "supply concentrated",
     surface: surface({
       issuance: issuance([currency({ hhi: 7400, holders: 3, topHolderPct: 81.2, topFivePct: 100 })]),

@@ -23,6 +23,7 @@
  */
 
 import { fetchWithTimeout } from "./html.js";
+import { readDistribution } from "./indexer.js";
 
 /**
  * Public rippled HTTP endpoints, tried in order.
@@ -406,6 +407,11 @@ async function readIssuanceSupply(
     // distinguish "we read every line there is and they only account
     // for 9% of the obligations" from "we ran out of pages" — and those
     // demand completely different responses.
+    // The slow path, and it says so. Both readers set this, so nothing
+    // downstream has to infer provenance from which fields are present.
+    source: "ledger",
+    sourceName: "xrplcluster.com",
+    reconciledAgainstLedger: true,
     pages,
     stoppedBecause: !marker
       ? "no_more_lines"
@@ -418,6 +424,63 @@ async function readIssuanceSupply(
             : "page_failed",
     elapsedMs: Date.now() - (deadline - budgetMs),
   };
+}
+
+/**
+ * Supply distribution, by whichever route can actually produce one.
+ *
+ * The indexer answers in about four seconds where the ledger walk
+ * needs nine minutes, so it is tried first — but only ever as a
+ * reconciled reading. `readDistribution` refuses its own answer when
+ * the indexer's total disagrees with the ledger's obligations, and a
+ * refusal arrives here as a throw.
+ *
+ * The walk remains the fallback and is not deprecated. It is the
+ * reading that depends on nobody, and it is what still works when
+ * XRPScan is down, rate-limits us, changes its shape, or starts
+ * disagreeing with the ledger. An issuer small enough for the walk to
+ * finish gets a fully ledger-derived figure from it.
+ *
+ * Whichever route answers, the result carries `source`, and every
+ * finding printed from it says which.
+ */
+async function readSupply(issuer) {
+  // The ledger's own obligations, first and always. This is the figure
+  // the indexer is measured against, so it cannot come from the
+  // indexer.
+  const balances = await rippleRpc("gateway_balances", {
+    account: issuer,
+    ledger_index: "validated",
+  });
+  const outstanding = {};
+  for (const [currency, value] of Object.entries(balances.obligations ?? {})) {
+    const n = Number(value);
+    if (Number.isFinite(n) && n > 0) outstanding[currency] = n;
+  }
+  if (Object.keys(outstanding).length === 0) {
+    return {
+      issuer,
+      currencies: [],
+      linesWalked: 0,
+      truncated: false,
+      source: "ledger",
+      sourceName: "xrplcluster.com",
+      reconciledAgainstLedger: true,
+      ledgerIndex: Number(balances.ledger_index ?? 0),
+    };
+  }
+
+  try {
+    const distribution = await readDistribution(issuer, outstanding);
+    return { ...distribution, ledgerIndex: Number(balances.ledger_index ?? 0) };
+  } catch (error) {
+    // Not fatal, and not silent: the reason the indexer was refused
+    // rides along on the walk's result, so a caller can see the fast
+    // path was tried and why it was not used.
+    const indexerRefused = error?.message ?? String(error);
+    const walked = await readIssuanceSupply(issuer);
+    return { ...walked, indexerRefused };
+  }
 }
 
 /** Read everything the certificate needs, at one ledger. */
@@ -434,7 +497,7 @@ export async function readAuthoritySurface(issuer, { walkSupply = false } = {}) 
       return null;
     }),
     walkSupply
-      ? readIssuanceSupply(issuer).catch((error) => {
+      ? readSupply(issuer).catch((error) => {
           unreadable.push(`issuance: ${error?.message ?? String(error)}`);
           return null;
         })
@@ -631,14 +694,37 @@ export function authorityChecks(surface) {
     });
   } else {
     const concentrated = currency.hhi >= HHI_CONCENTRATED;
+    /*
+     * Provenance is part of the finding, not a footnote.
+     *
+     * Every other check on this certificate is read from validated
+     * ledger state and can be re-derived by anyone with a node. A
+     * concentration figure may instead come from an indexer, because
+     * the ledger cannot produce one for a large issuer inside a web
+     * request. That is a materially weaker kind of statement, and a
+     * reader is entitled to know which one they are holding — so the
+     * source is named in the finding itself, where it cannot be
+     * separated from the number it qualifies.
+     *
+     * Reconciliation is stated with the same care. Agreeing with the
+     * ledger on the TOTAL proves nothing material is missing or
+     * invented; it does not prove each line is attributed to the right
+     * account. Claiming more than that would be the exact overreach
+     * this module exists to avoid.
+     */
+    const provenance =
+      surface.issuance.source === "indexer"
+        ? ` Holder balances are from ${surface.issuance.sourceName}, not read from the ledger directly; their total was reconciled against the ledger's own obligations to within ${Math.abs(currency.coverage - 1) * 100 < 0.01 ? "0.01" : (Math.abs(currency.coverage - 1) * 100).toFixed(2)}%, which establishes that none are missing or invented but not that each is attributed correctly.`
+        : " Holder balances were read from validated ledger state.";
     checks.push({
       id: "SUPPLY_CONCENTRATION",
       label: `${decodeCurrency(currency.currency)} supply not concentrated`,
       severity: "warn",
       passed: !concentrated,
-      detail: concentrated
-        ? `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${currency.topHolderPct.toFixed(1)}% and the top five carry ${currency.topFivePct.toFixed(1)}%.`
-        : `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage, below the ${HHI_CONCENTRATED} threshold.`,
+      detail:
+        (concentrated
+          ? `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${currency.topHolderPct.toFixed(1)}% and the top five carry ${currency.topFivePct.toFixed(1)}%.`
+          : `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage, below the ${HHI_CONCENTRATED} threshold.`) + provenance,
     });
   }
 

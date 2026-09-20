@@ -382,14 +382,37 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
     });
   } else {
     const concentrated = currency.hhi >= HHI_CONCENTRATED;
+    /*
+     * Provenance is part of the finding, not a footnote.
+     *
+     * Every other check on this certificate is read from validated
+     * ledger state and can be re-derived by anyone with a node. A
+     * concentration figure may instead come from an indexer, because
+     * the ledger cannot produce one for a large issuer inside a web
+     * request. That is a materially weaker kind of statement, and a
+     * reader is entitled to know which one they are holding — so the
+     * source is named in the finding itself, where it cannot be
+     * separated from the number it qualifies.
+     *
+     * Reconciliation is stated with the same care. Agreeing with the
+     * ledger on the TOTAL proves nothing material is missing or
+     * invented; it does not prove each line is attributed to the right
+     * account. Claiming more than that would be the exact overreach
+     * this module exists to avoid.
+     */
+    const provenance =
+      surface.issuance.source === "indexer"
+        ? ` Holder balances are from ${surface.issuance.sourceName}, not read from the ledger directly; their total was reconciled against the ledger's own obligations to within ${Math.abs(currency.coverage - 1) * 100 < 0.01 ? "0.01" : (Math.abs(currency.coverage - 1) * 100).toFixed(2)}%, which establishes that none are missing or invented but not that each is attributed correctly.`
+        : " Holder balances were read from validated ledger state.";
     checks.push({
       id: "SUPPLY_CONCENTRATION",
       label: `${decodeCurrency(currency.currency)} supply not concentrated`,
       severity: "warn",
       passed: !concentrated,
-      detail: concentrated
-        ? `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${currency.topHolderPct.toFixed(1)}% and the top five carry ${currency.topFivePct.toFixed(1)}%.`
-        : `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage, below the ${HHI_CONCENTRATED} threshold.`,
+      detail:
+        (concentrated
+          ? `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${currency.topHolderPct.toFixed(1)}% and the top five carry ${currency.topFivePct.toFixed(1)}%.`
+          : `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage, below the ${HHI_CONCENTRATED} threshold.`) + provenance,
     });
   }
 

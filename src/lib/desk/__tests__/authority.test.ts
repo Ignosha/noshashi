@@ -329,6 +329,65 @@ describe("a regular key is a single key", () => {
 });
 
 /**
+ * Where a number came from is part of the number.
+ *
+ * Every other check on a certificate is read from validated ledger
+ * state and can be re-derived by anyone with a node. Concentration may
+ * instead come from an indexer, because the ledger cannot produce a
+ * distribution for a large issuer inside a web request — RLUSD has
+ * ~98,000 trust lines and the walk needs about nine minutes.
+ *
+ * That is a materially weaker kind of statement, and on a document
+ * whose entire value is that it was read from the ledger, letting it
+ * pass unlabelled would hollow out the claim. So the source is named
+ * in the finding itself, where it cannot be separated from the figure
+ * it qualifies.
+ */
+describe("a concentration figure says where it came from", () => {
+  it("names the indexer, and what reconciliation does and does not prove", () => {
+    const s = surface({
+      issuance: {
+        ...issuance([currency({ hhi: 702, holders: 67_339, topHolderPct: 14.1 })]),
+        source: "indexer",
+        sourceName: "xrpscan.com",
+      },
+    });
+    const detail = byId(s, "SUPPLY_CONCENTRATION").detail;
+    expect(detail).toContain("xrpscan.com");
+    expect(detail).toContain("not read from the ledger directly");
+    expect(detail).toContain("reconciled");
+    // The limit of the claim is stated, not implied.
+    expect(detail).toContain("not that each is attributed correctly");
+  });
+
+  it("says so plainly when the ledger was read directly", () => {
+    const detail = byId(surface(), "SUPPLY_CONCENTRATION").detail;
+    expect(detail).toContain("read from validated ledger state");
+    expect(detail).not.toContain("xrpscan");
+  });
+
+  it("treats an absent source as the ledger, the claim that asserts less", () => {
+    // Existing constructions predate the field. Defaulting to
+    // "indexer" would have them assert a third party they never used.
+    const s = surface({ issuance: issuance([currency()]) });
+    expect(byId(s, "SUPPLY_CONCENTRATION").detail).toContain("validated ledger state");
+  });
+
+  it("labels a concentrated finding too, not just a clean one", () => {
+    const s = surface({
+      issuance: {
+        ...issuance([currency({ hhi: 7400, topHolderPct: 81.2, topFivePct: 100 })]),
+        source: "indexer",
+        sourceName: "xrpscan.com",
+      },
+    });
+    const check = byId(s, "SUPPLY_CONCENTRATION");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("xrpscan.com");
+  });
+});
+
+/**
  * A walk that broke is not a walk nobody asked for.
  *
  * The supply walk is optional, so a null issuance legitimately means
