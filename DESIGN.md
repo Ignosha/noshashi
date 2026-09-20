@@ -252,6 +252,27 @@ surface where a number is being read. A field that drifts down the page and
 ends up behind a reading is the original mistake, and should be deleted
 rather than argued about.
 
+### The second exception: the hero bloom
+
+`scripts/gen-hero-bloom.mjs` generates a decorative organic form that fills
+the middle of the landing hero. It is decoration, which the ban above would
+otherwise refuse outright. It is granted on the product owner's instruction,
+on the same pattern as the sky, and bounded on the same principle:
+
+| The objection | How the bloom answers it |
+|---|---|
+| "decoration is banned" | Granted explicitly, hero only, and recorded here rather than left as an undocumented drift in the template. |
+| "decorative data" | It is not data and must never resemble any. No axis, no baseline, no trace, no tick, no numeral. A visitor cannot mistake it for a measurement, so no figure on this site is decorative and no decoration is a figure. |
+| "a permanent frame cost" | It is a static inline SVG. There is no loop, no canvas, no timer, nothing to stop under reduced motion, and nothing to pause on `visibilitychange`. |
+| "behind live telemetry" | Hidden below 1024px, and no panel, table, chart, ticker or verdict sits over it at any width. It shares the hero with the headline and the brief card only. |
+| "a third-party asset" | Generated here from a fixed seed, committed as `templates/hero-bloom.svg`, served from our own origin. `default-src 'self'` would refuse anything else, and a stock render would not be ours. |
+| "unreadable in one theme" | Every stop is `currentColor`. The dark theme carries it at `#BBD8FF`; on `#F4F7FA` a translucent white petal is invisible, so the light theme takes the brand hue at a lower weight. |
+
+**This exception does not travel either.** Same terms as the sky: the public
+marketing hero and nowhere else. Decoration behind a reading stays banned,
+and "decorative data" stays banned without qualification — the bloom is
+permitted *because* it is not data, not in spite of it.
+
 ## Signals
 
 An alert is a **reading**, not a coloured box — `src/components/nova/Signal.tsx`.
