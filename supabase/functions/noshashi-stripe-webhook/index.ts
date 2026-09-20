@@ -18,24 +18,39 @@ const TOLERANCE_SECONDS = 300;
 /**
  * Which features each tier turns on. Read by the console's gating.
  *
- * `desk` carries `compliance_api` because the tier is sold "5,000 API
- * verifications included" at a published 50 req/sec, and this function
- * writes `verification_quota: 5000` for it below. Withholding the flag
- * meant every one of those 5,000 calls answered 403 — the quota and the
- * key have to be granted by the same tier, or one of them is a line on
- * a pricing page that nothing honours.
+ * THIS TABLE MUST MATCH `grants` IN src/lib/billing/catalog.ts. It is
+ * the same fact written twice, because the console cannot import from
+ * an Edge Function and the Edge Function cannot import from src. What
+ * is written here is what a paying account actually receives; what is
+ * written there is what the pricing page promises and what the UI
+ * unlocks. When they disagree, the customer is billed for one and
+ * given the other.
+ *
+ * This is not hypothetical. `desk` is sold "5,000 API verifications
+ * included" at a published 50 req/sec, and this function writes
+ * `verification_quota: 5000` for it below — but `compliance_api` was
+ * missing from this list, so every one of those 5,000 calls answered
+ * 403. The quota and the key have to be granted by the same tier, or
+ * one of them is a line on a pricing page that nothing honours.
+ *
+ * src/lib/billing/__tests__/entitlement-parity.test.ts reads both files
+ * and fails when they drift. Change one, change the other, and redeploy
+ * this function — a catalog edit alone changes what is advertised and
+ * nothing about what is granted.
  */
 const TIER_FEATURES: Record<string, string[]> = {
   operator: ["console", "gate", "agent", "export"],
   desk: [
     "console", "gate", "agent", "export",
     "portfolios", "alerts", "receipt_anchoring", "priority_support",
-    "compliance_api",
+    "authority_certificate", "compliance_api",
   ],
   institution: [
     "console", "gate", "agent", "export",
     "portfolios", "alerts", "receipt_anchoring", "priority_support",
-    "compliance_api", "webhooks", "regulator_seats", "white_label", "sla",
+    "authority_certificate", "compliance_api",
+    "webhooks", "regulator_seats", "white_label", "sla",
+    "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
   ],
 };
 

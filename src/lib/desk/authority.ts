@@ -1,6 +1,7 @@
 import type { Status } from "../xrpl/types";
 import type { PolicyCheck } from "../policy";
 import { digestOf } from "../policy";
+import { decodeCurrency } from "../format";
 import { fetchIssuerPosture } from "../xrpl/client";
 import { readControlSurface, type ControlSurface } from "./control";
 import { readIssuance, type IssuanceReport, type CurrencySurveillance } from "./issuance";
@@ -62,8 +63,21 @@ export type AuthoritySurface = {
 export type AuthorityCertificate = {
   verdict: Status;
   issuer: string;
-  /** The currency the concentration checks were scoped to, if any. */
+  /**
+   * The currency the concentration checks were scoped to, as the ledger
+   * holds it — a three-character code, or 40 hex characters for
+   * anything longer. THIS is what the digest is computed over, so it
+   * stays raw: a reader re-deriving the digest from a printed
+   * certificate has to be able to use the value they were given.
+   */
   currency?: string;
+  /**
+   * The same currency, decoded for a person to read. Display only, and
+   * deliberately outside the digest — RLUSD reaches the page as
+   * 524C555344000000000000000000000000000000, which tells a reader
+   * nothing at all.
+   */
+  currencyLabel?: string;
   checks: PolicyCheck[];
   /** SHA-256 over the canonical body, via the shared digest. */
   digest: string;
@@ -81,6 +95,40 @@ export type AuthorityCertificate = {
  */
 const COVERAGE_FLOOR = 0.95;
 
+/**
+ * Addresses whose private key provably does not exist.
+ *
+ * Setting the regular key to one of these and then disabling the
+ * master key is how an XRPL issuer gives up control — "blackholing".
+ * The account keeps issuing what it already issued and can never sign
+ * another transaction, because nobody can produce a signature for a
+ * key nobody holds. Alongside lsfNoFreeze it is the strongest
+ * surrender the ledger offers.
+ *
+ * Which makes it the worst thing to get backwards, and the first
+ * version did. Having just been taught to read the regular key, the
+ * check treated any regular key as a controller and marked Sologenic's
+ * SOLO — blackholed to ACCOUNT_ONE — as controlled by
+ * rrrrrrrrrrrrrrrrrrrrBZbvji "on its own". The most decentralised
+ * configuration available scored worst, and on the page built to
+ * inform a decentralisation argument.
+ *
+ * These four are reserved by the protocol and are not the product of
+ * any keypair: ACCOUNT_ZERO and ACCOUNT_ONE are the base58 encodings
+ * of 0 and 1, and the other two are rippled's own sentinels.
+ */
+const UNUSABLE_KEYS = new Set([
+  "rrrrrrrrrrrrrrrrrrrrrhoLvTp", // ACCOUNT_ZERO
+  "rrrrrrrrrrrrrrrrrrrrBZbvji", // ACCOUNT_ONE
+  "rrrrrrrrrrrrrrrrrNAMEtxvNvQ", // reserved for name lookups
+  "rrrrrrrrrrrrrrrrrrrn5RM1rHd", // rippled's NaN sentinel
+]);
+
+/** True when a regular key is set to something that can actually sign. */
+export function regularKeyCanSign(regularKey: string | undefined): boolean {
+  return Boolean(regularKey) && !UNUSABLE_KEYS.has(regularKey!);
+}
+
 /** HHI at or above which a supply is called concentrated. */
 const HHI_CONCENTRATED = 2500;
 
@@ -90,7 +138,7 @@ export async function readAuthoritySurface(
 ): Promise<AuthoritySurface> {
   const unreadable: string[] = [];
 
-  const [control, posture, issuance] = await Promise.all([
+  const [control, rawPosture, issuance] = await Promise.all([
     readControlSurface(issuer).catch((error: unknown) => {
       unreadable.push(`control: ${error instanceof Error ? error.message : String(error)}`);
       return null;
@@ -108,6 +156,25 @@ export async function readAuthoritySurface(
         })
       : Promise.resolve(null),
   ]);
+
+  /**
+   * fetchIssuerPosture NEVER REJECTS. It catches its own failure and
+   * returns a posture object with `unreadable` set and every flag
+   * false — which is why the .catch() above cannot be relied on and
+   * this check exists.
+   *
+   * Left unhandled, a posture that failed to read produced
+   * globalFreeze: false and requireAuth: false, and both of those are
+   * PASSES — one of them on a blocking check. An issuer nobody could
+   * read would have been certified as not frozen and openly holdable,
+   * which is the precise failure this module claims to rule out: a
+   * certificate that looks clean because a request did not come back.
+   * An absent reading is not a negative reading.
+   */
+  const posture = rawPosture?.unreadable ? null : rawPosture;
+  if (rawPosture?.unreadable) {
+    unreadable.push(`posture: ${rawPosture.unreadable}`);
+  }
 
   return {
     issuer,
@@ -137,14 +204,35 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
   const { control, posture } = surface;
 
   /* ── Could the issuer be read at all? ───────────────────────────── */
-  if (!posture || !control) {
+  /*
+   * `posture.unreadable` is tested here as well as in
+   * readAuthoritySurface, and the duplication is deliberate.
+   *
+   * fetchIssuerPosture reports its own failure in-band: it resolves with
+   * every flag false and `unreadable` set, rather than rejecting. A
+   * surface carrying that object is not a surface with a posture, it is
+   * a surface with a record of a failed read — and the flags on it are
+   * defaults, not findings. Reading them as findings certifies an issuer
+   * nobody could reach as un-frozen and openly holdable.
+   *
+   * readAuthoritySurface already normalises this to null, so on the live
+   * path the branch below never sees it. The guard is here because
+   * certificateFrom is exported for surfaces this module did not build:
+   * one captured for offline re-certification, or one assembled
+   * server-side. Those callers cannot be relied on to have normalised
+   * anything, and the check that matters must hold wherever the surface
+   * came from.
+   */
+  if (!posture || posture.unreadable || !control) {
     checks.push({
       id: "AUTHORITY_READABLE",
       label: "Issuer state readable",
       severity: "block",
       passed: false,
       detail:
-        surface.unreadable.join("; ") ||
+        [...surface.unreadable, posture?.unreadable ? `posture: ${posture.unreadable}` : ""]
+          .filter(Boolean)
+          .join("; ") ||
         "The issuer account could not be read from validated state, so no authority claim can be made about it.",
     });
     return checks;
@@ -186,25 +274,55 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
   });
 
   /* ── Unilateral control of the issuer account ───────────────────── */
-  // The decisive question, and the one a flag alone cannot answer: a
-  // signer list looks like shared control until you notice one member
-  // carries the quorum by themselves.
+  /*
+   * Three ways to sign for an XRPL account, and all three have to be
+   * read before anything can be said about unilateral control:
+   *
+   *   a signer list   quorum against SUMMED WEIGHTS, not a headcount
+   *   a regular key   one key, signing alone — unless it is unusable
+   *   the master key  one key, signing alone, unless disabled
+   *
+   * Both halves of this were found on live mainnet rather than
+   * reasoned out, and they fail in opposite directions.
+   *
+   * Reading no regular key at all passed Bitstamp's USD issuer, which
+   * has the master key disabled and rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ
+   * signing alone: "the account cannot currently be signed for at all".
+   *
+   * Reading every regular key as a controller then failed Sologenic's
+   * SOLO, blackholed to ACCOUNT_ONE, which nobody can sign for. The
+   * key has to be one that can actually sign.
+   */
+  const signersUnreadable = Boolean(control.signers.unreadable);
+  const blackholed =
+    !control.masterKeyEnabled &&
+    Boolean(control.regularKey) &&
+    !regularKeyCanSign(control.regularKey);
+
   const unilateral = control.signers.present
     ? control.signers.minimumSigners <= 1
-    : control.masterKeyEnabled;
+    : regularKeyCanSign(control.regularKey) || control.masterKeyEnabled;
 
   checks.push({
     id: "NO_UNILATERAL_SIGNER",
     label: "No single key controls the issuer",
     severity: "block",
-    passed: !unilateral,
-    detail: control.signers.present
-      ? control.signers.minimumSigners <= 1
-        ? `A signer list is present, but ${control.signers.unilateralSigners.length || 1} signer reaches the quorum of ${control.signers.quorum} alone. This is a single-key account wearing a committee's clothes.`
-        : `${control.signers.minimumSigners} signers must agree to reach the quorum of ${control.signers.quorum}, derived from summed weights rather than a headcount.`
-      : control.masterKeyEnabled
-        ? "No signer list, and the master key is enabled. One key signs for this issuer."
-        : "The master key is disabled and no signer list is present, so the account cannot currently be signed for at all.",
+    // A signer list that could not be read cannot be ruled out, and an
+    // unverifiable absence must not read as an absence.
+    passed: !unilateral && !signersUnreadable,
+    detail: signersUnreadable
+      ? `The signer list could not be read (${control.signers.unreadable}), so it cannot be established whether a committee controls this account or one key does. This is an unknown, not a pass.`
+      : control.signers.present
+        ? control.signers.minimumSigners <= 1
+          ? `A signer list is present, but ${control.signers.unilateralSigners.length || 1} signer reaches the quorum of ${control.signers.quorum} alone. This is a single-key account wearing a committee's clothes.`
+          : `${control.signers.minimumSigners} signers must agree to reach the quorum of ${control.signers.quorum}, derived from summed weights rather than a headcount.`
+        : blackholed
+          ? `The master key is disabled and the regular key is set to ${control.regularKey}, an address whose private key does not exist. The account is blackholed: it can never sign another transaction, so no party can act on this issuance.`
+          : regularKeyCanSign(control.regularKey)
+            ? `No signer list. The master key is ${control.masterKeyEnabled ? "enabled" : "disabled"} and a regular key is set, so ${control.regularKey} signs for this issuer on its own.`
+            : control.masterKeyEnabled
+              ? `No signer list and no usable regular key, and the master key is enabled. One key signs for this issuer.`
+              : "The master key is disabled, no regular key is set and no signer list is present, so the account cannot currently be signed for at all.",
   });
 
   /* ── Cost of transacting ────────────────────────────────────────── */
@@ -243,16 +361,16 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
     // number about a different population.
     checks.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${currency.currency} supply concentration`,
+      label: `${decodeCurrency(currency.currency)} supply concentration`,
       severity: "warn",
       passed: false,
-      detail: `The holder lines read account for ${(currency.coverage * 100).toFixed(1)}% of the outstanding ${currency.currency}. Below ${COVERAGE_FLOOR * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`,
+      detail: `The holder lines read account for ${(currency.coverage * 100).toFixed(1)}% of the outstanding ${decodeCurrency(currency.currency)}. Below ${COVERAGE_FLOOR * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`,
     });
   } else {
     const concentrated = currency.hhi >= HHI_CONCENTRATED;
     checks.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${currency.currency} supply not concentrated`,
+      label: `${decodeCurrency(currency.currency)} supply not concentrated`,
       severity: "warn",
       passed: !concentrated,
       detail: concentrated
@@ -263,6 +381,37 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
 
   return checks;
 }
+
+/**
+ * What each verdict means for a certificate.
+ *
+ * Separate from VERDICT_COPY in policy.ts, which says things like
+ * "cleared to broadcast" — true of a settlement and meaningless about
+ * an issuer. Reusing it would have put settlement language on a
+ * document that makes no claim about any transaction.
+ *
+ * The wording is about retained authority and nothing else. None of it
+ * says safe, compliant, decentralised or sound, because the certificate
+ * does not establish any of those and a reader in a hurry will quote
+ * whatever the headline says.
+ */
+export const AUTHORITY_VERDICT_COPY: Record<Status, { title: string; blurb: string }> = {
+  go: {
+    title: "NO UNILATERAL AUTHORITY FOUND",
+    blurb:
+      "On the checks run, no single party was found able to freeze, gate or unilaterally sign for this issuance at this ledger. This describes the authority observed, not the conduct of whoever holds it.",
+  },
+  hold: {
+    title: "AUTHORITY RETAINED, CONSTRAINED",
+    blurb:
+      "No single party can act alone, but the issuer has kept powers that bear on a holder — a freeze it has not surrendered, a fee it sets, or a supply too concentrated or too unreadable to call dispersed.",
+  },
+  "no-go": {
+    title: "UNILATERAL AUTHORITY PRESENT",
+    blurb:
+      "A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control.",
+  },
+};
 
 /** Blocking failure → NO-GO; advisory failure → HOLD; otherwise GO. */
 export function verdictFor(checks: PolicyCheck[]): Status {
@@ -305,6 +454,7 @@ export async function certificateFrom(
     verdict,
     issuer: surface.issuer,
     currency,
+    currencyLabel: currency ? decodeCurrency(currency) : undefined,
     checks,
     digest,
     ledgerIndex: surface.ledgerIndex,

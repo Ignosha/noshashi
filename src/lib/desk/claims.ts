@@ -1,3 +1,4 @@
+import { decodeCurrency } from "@/lib/format";
 import { rpc, XrplError } from "@/lib/xrpl/client";
 
 /**
@@ -105,16 +106,6 @@ function decodeHexField(value: string): string {
     .replace(/\0+$/, "")
     .trim();
   return decoded && /^[\x20-\x7E]+$/.test(decoded) ? decoded : value;
-}
-
-function decodeCurrency(code: string): string {
-  if (!/^[0-9A-F]{40}$/i.test(code)) return code;
-  const decoded = (code.match(/../g) ?? [])
-    .map((b) => String.fromCharCode(parseInt(b, 16)))
-    .join("")
-    .replace(/\0+$/, "")
-    .trim();
-  return decoded && /^[\x20-\x7E]+$/.test(decoded) ? decoded : code;
 }
 
 export function formatClaim(amount: ClaimAmount): string {

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   authorityChecks,
+  regularKeyCanSign,
   verdictFor,
   certificateFrom,
   primaryCurrency,
@@ -273,6 +274,221 @@ describe("the certificate digest", () => {
 });
 
 /**
+ * A regular key signs alone, and nothing else on the account says so.
+ *
+ * There are three ways to sign for an XRPL account and only two are
+ * obvious. The regular key is a plain field on the account root rather
+ * than an object hanging off it, so a reader looking for "a signer
+ * list, or the master key" misses it entirely — and what it misses is
+ * an account controlled by exactly one key.
+ *
+ * Live mainnet proved the cost. RLUSD's issuer has the master key
+ * disabled and no signer list, so the check reported that the account
+ * "cannot currently be signed for at all" and passed it. An issuance
+ * being actively minted was certified as controlled by nobody.
+ */
+describe("a regular key is a single key", () => {
+  const noList = {
+    present: false, quorum: 0, signers: [],
+    totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+  };
+
+  it("fails when a regular key is set and the master key is disabled", () => {
+    const s = surface({
+      control: control({ masterKeyEnabled: false, regularKey: "rHotKey", signers: noList }),
+    });
+    const check = byId(s, "NO_UNILATERAL_SIGNER");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("rHotKey");
+    expect(verdictFor(authorityChecks(s))).toBe("no-go");
+  });
+
+  it("fails when a regular key is set and the master key is also enabled", () => {
+    const s = surface({
+      control: control({ masterKeyEnabled: true, regularKey: "rHotKey", signers: noList }),
+    });
+    expect(byId(s, "NO_UNILATERAL_SIGNER").passed).toBe(false);
+  });
+
+  it("still passes an account that genuinely cannot be signed for", () => {
+    // All three absent. This is the only shape that earns the pass.
+    const s = surface({
+      control: control({ masterKeyEnabled: false, regularKey: undefined, signers: noList }),
+    });
+    const check = byId(s, "NO_UNILATERAL_SIGNER");
+    expect(check.passed).toBe(true);
+    expect(check.detail).toContain("no regular key is set");
+  });
+
+  it("does not let a regular key override a real quorum", () => {
+    // A signer list is the authority when one exists; the regular key
+    // cannot bypass it.
+    const s = surface({ control: control({ regularKey: "rHotKey" }) });
+    expect(byId(s, "NO_UNILATERAL_SIGNER").passed).toBe(true);
+  });
+});
+
+/**
+ * A blackholed account is the strongest surrender, not the weakest.
+ *
+ * Setting the regular key to an address whose private key does not
+ * exist and then disabling the master key is how an XRPL issuer
+ * permanently gives up control. The issuance survives; the ability to
+ * sign for it does not.
+ *
+ * Having just been taught to read the regular key, the check treated
+ * every regular key as a controller — and marked Sologenic's SOLO,
+ * blackholed to ACCOUNT_ONE, as controlled by rrrrrrrrrrrrrrrrrrrrBZbvji
+ * "on its own". The most decentralised configuration the ledger offers
+ * scored worst of all, on a page built to inform an argument about
+ * decentralisation. Found on live mainnet, one issuer after the one
+ * that proved the opposite bug.
+ */
+describe("a key nobody holds is not a controller", () => {
+  const noList = {
+    present: false, quorum: 0, signers: [],
+    totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+  };
+  const blackholeKeys = [
+    "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+    "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "rrrrrrrrrrrrrrrrrNAMEtxvNvQ",
+    "rrrrrrrrrrrrrrrrrrrn5RM1rHd",
+  ];
+
+  for (const key of blackholeKeys) {
+    it(`passes an account blackholed to ${key}`, () => {
+      const s = surface({
+        control: control({ masterKeyEnabled: false, regularKey: key, signers: noList }),
+      });
+      const check = byId(s, "NO_UNILATERAL_SIGNER");
+      expect(check.passed).toBe(true);
+      expect(check.detail).toContain("blackholed");
+      expect(check.detail).toContain("private key does not exist");
+    });
+  }
+
+  it("still fails when the master key is left enabled beside a burn key", () => {
+    // Half-done blackholing. The regular key cannot sign, but the
+    // master key never stopped being able to, so one key still does.
+    const s = surface({
+      control: control({
+        masterKeyEnabled: true,
+        regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji",
+        signers: noList,
+      }),
+    });
+    const check = byId(s, "NO_UNILATERAL_SIGNER");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("no usable regular key");
+  });
+
+  it("does not mistake an ordinary key for a burn address", () => {
+    expect(regularKeyCanSign("rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ")).toBe(true);
+    expect(regularKeyCanSign("rrrrrrrrrrrrrrrrrrrrBZbvji")).toBe(false);
+    expect(regularKeyCanSign(undefined)).toBe(false);
+  });
+
+  it("a signer list still decides, even beside a burn key", () => {
+    const s = surface({ control: control({ regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji" }) });
+    expect(byId(s, "NO_UNILATERAL_SIGNER").passed).toBe(true);
+  });
+});
+
+/**
+ * A signer list nobody could read is not a signer list nobody has.
+ *
+ * Same in-band-failure shape as the posture read below: the request is
+ * tolerated so one failed object read does not lose the whole control
+ * surface, and the tolerance used to turn a timeout into "no committee
+ * here" — the reassuring answer.
+ */
+describe("an unreadable signer list is an unknown, not an absence", () => {
+  it("fails the blocking check when the list could not be read", () => {
+    const s = surface({
+      control: control({
+        masterKeyEnabled: false,
+        signers: {
+          present: false, unreadable: "connect ETIMEDOUT", quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    });
+    const check = byId(s, "NO_UNILATERAL_SIGNER");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("could not be read");
+    expect(check.detail).toContain("not a pass");
+  });
+
+  it("fails even when everything else about the account looks settled", () => {
+    const s = surface({
+      control: control({
+        masterKeyEnabled: false,
+        regularKey: undefined,
+        signers: {
+          present: false, unreadable: "no node answered", quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    });
+    expect(verdictFor(authorityChecks(s))).toBe("no-go");
+  });
+});
+
+/**
+ * A read that failed is not a reading of "no".
+ *
+ * fetchIssuerPosture does not reject when it cannot reach the ledger.
+ * It resolves with `unreadable` set and every flag false, and three of
+ * those falses are passes — globalFreeze on a BLOCKING check, plus
+ * requireAuth and the transfer fee. So an issuer nobody could read
+ * scored better than most issuers that were read, which is the exact
+ * failure this module exists to prevent.
+ *
+ * The surfaces below are the ones certificateFrom accepts from outside:
+ * captured for offline re-certification, or assembled server-side.
+ * Neither can be trusted to have normalised anything first.
+ */
+describe("an unreadable posture never reads as a clean one", () => {
+  it("refuses to certify when the posture carries a read failure", () => {
+    const s = surface({
+      posture: posture({
+        unreadable: "connect ETIMEDOUT",
+        noFreeze: false,
+        globalFreeze: false,
+        requireAuth: false,
+      }),
+    });
+    const checks = authorityChecks(s);
+    expect(checks).toHaveLength(1);
+    expect(checks[0].id).toBe("AUTHORITY_READABLE");
+    expect(checks[0].passed).toBe(false);
+    expect(verdictFor(checks)).toBe("no-go");
+  });
+
+  it("says what failed, even when the surface did not record it", () => {
+    const s = surface({
+      posture: posture({ unreadable: "connect ETIMEDOUT" }),
+      unreadable: [],
+    });
+    expect(authorityChecks(s)[0].detail).toContain("connect ETIMEDOUT");
+  });
+
+  it("does not emit the flag checks that a defaulted posture would pass", () => {
+    const ids = authorityChecks(
+      surface({ posture: posture({ unreadable: "no node answered" }) })
+    ).map((c) => c.id);
+    expect(ids).not.toContain("NOT_GLOBALLY_FROZEN");
+    expect(ids).not.toContain("OPEN_HOLDING");
+    expect(ids).not.toContain("SUPPLY_CONCENTRATION");
+  });
+
+  it("still certifies normally when unreadable is absent", () => {
+    expect(verdictFor(authorityChecks(surface()))).toBe("go");
+  });
+});
+
+/**
  * The settlement digest is frozen by contract.
  *
  * Pinned to a literal rather than compared against a re-computation,
@@ -299,5 +515,72 @@ describe("settlement receipts issued before today still verify", () => {
     expect(await receiptDigest(body)).toBe(
       "E1891C65FBE8CE5D76036EB805658218FCD741B5912B09D23FE5C53598AB3FBF"
     );
+  });
+});
+
+/**
+ * A currency code a person can read, and a digest that still verifies.
+ *
+ * XRPL carries anything longer than three characters as 40 hex
+ * characters. RLUSD is 524C555344000000000000000000000000000000 on the
+ * wire, and that is what the public page printed on its first live
+ * read — a check headed "524C555344000000000000000000000000000000
+ * supply concentration", which tells a reader nothing.
+ *
+ * The fix has a trap in it, which is what these tests hold down. The
+ * digest must keep hashing the RAW code. Someone re-deriving a digest
+ * from a printed certificate uses the `currency` field they were
+ * given, so if the certificate carried "RLUSD" while the digest was
+ * taken over the hex, every genuine certificate for a long-coded
+ * currency would fail verification.
+ */
+describe("hex currency codes are decoded for display only", () => {
+  const RLUSD_HEX = "524C555344000000000000000000000000000000";
+
+  it("labels the check with the ticker, not the hex", async () => {
+    const s = surface({ issuance: issuance([currency({ currency: RLUSD_HEX })]) });
+    expect(byId(s, "SUPPLY_CONCENTRATION").label).toBe("RLUSD supply not concentrated");
+  });
+
+  it("uses the ticker in the coverage abstention too", () => {
+    const s = surface({
+      issuance: issuance([currency({ currency: RLUSD_HEX, coverage: 0.087 })]),
+    });
+    const detail = byId(s, "SUPPLY_CONCENTRATION").detail;
+    expect(detail).toContain("outstanding RLUSD");
+    expect(detail).not.toContain(RLUSD_HEX);
+  });
+
+  it("keeps the raw code on the certificate and digests that", async () => {
+    const s = surface({ issuance: issuance([currency({ currency: RLUSD_HEX })]) });
+    const cert = await certificateFrom(s);
+    expect(cert.currency).toBe(RLUSD_HEX);
+    expect(cert.currencyLabel).toBe("RLUSD");
+
+    // The digest is reproducible from the raw code alone, which is what
+    // the verify verb re-derives it from.
+    expect(cert.digest).toBe(
+      await digestOf({
+        kind: "authority",
+        subject: s.issuer,
+        scope: { currency: RLUSD_HEX, ledgerIndex: s.ledgerIndex, verdict: cert.verdict },
+        checks: authorityChecks(s),
+        evaluatedAt: s.readAt,
+      })
+    );
+  });
+
+  it("leaves a three-character code alone", async () => {
+    const cert = await certificateFrom(surface());
+    expect(cert.currency).toBe("USD");
+    expect(cert.currencyLabel).toBe("USD");
+  });
+
+  it("leaves a hex code that is not text as hex", () => {
+    // Some 160-bit codes are not ASCII at all. Mojibake would be worse
+    // than the hex, which can at least be looked up.
+    const odd = "0158415500000000C1F76FF6ECB0BAC600000000";
+    const s = surface({ issuance: issuance([currency({ currency: odd })]) });
+    expect(byId(s, "SUPPLY_CONCENTRATION").label).toBe(`${odd} supply not concentrated`);
   });
 });

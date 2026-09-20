@@ -77,6 +77,9 @@ const AmmScene = lazy(() =>
 const ControlScene = lazy(() =>
   import("@/components/scenes/ControlScene").then((m) => ({ default: m.ControlScene }))
 );
+const AuthorityScene = lazy(() =>
+  import("@/components/scenes/AuthorityScene").then((m) => ({ default: m.AuthorityScene }))
+);
 const GrowthScene = lazy(() =>
   import("@/components/scenes/GrowthScene").then((m) => ({ default: m.GrowthScene }))
 );
@@ -141,6 +144,7 @@ export type SceneId =
   | "learn"
   | "growth"
   | "issuance"
+  | "authority"
   | "amm"
   | "network"
   | "settlement"
@@ -181,7 +185,7 @@ const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "overview", label: "OVERVIEW", scenes: ["home", "control"] },
   { id: "adjudication", label: "ADJUDICATION", scenes: ["verify", "provenance", "credentials", "domains"] },
   { id: "markets", label: "MARKETS & EXPOSURE", scenes: ["risk", "desk", "book", "amm"] },
-  { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance"] },
+  { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance", "authority"] },
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
   { id: "intelligence", label: "INTELLIGENCE", scenes: ["agent"] },
   { id: "public", label: "PUBLIC", scenes: ["safeshop", "claims", "nft", "network", "learn"] },
@@ -319,6 +323,16 @@ const SCENES: SceneDef[] = [
     digit: "",
     group: "primary",
     requires: "compliance_api",
+  },
+  {
+    id: "authority",
+    label: "AUTHORITY",
+    title: "AUTHORITY CERTIFICATE",
+    hint: "What the issuer of an asset can still do to it, digested so the reading can be re-checked",
+    icon: <NovaShield size={15} />,
+    digit: "",
+    group: "primary",
+    requires: "authority_certificate",
   },
   {
     id: "nft",
@@ -1037,6 +1051,8 @@ function ConsoleApp() {
                       <AmmScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "issuance" ? (
                       <IssuanceScene onUpgrade={openPlans} onSignIn={openAuth} />
+                    ) : scene === "authority" ? (
+                      <AuthorityScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "growth" ? (
                       <GrowthScene data={data} />
                     ) : scene === "learn" ? (

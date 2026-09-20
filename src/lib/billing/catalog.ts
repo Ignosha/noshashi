@@ -118,6 +118,7 @@ export const PLANS: Plan[] = [
       "AMM pool governance — who votes the fee, and who holds the discount",
       "Policy drift and credential expiry alerts",
       "Issuer freeze-rights analysis — know who can immobilise your balance",
+      "Authority certificate — a signed, re-checkable record of who can still freeze, seize or gate an issuance",
       "Counterparty concentration (HHI) across the settlement book",
       "Persistent adjudication ledger — 10,000 verdicts, survives restart",
       "Wallet explorer — every address ever scanned, sortable by risk",
@@ -135,6 +136,7 @@ export const PLANS: Plan[] = [
       "alerts",
       "receipt_anchoring",
       "priority_support",
+      "authority_certificate",
       // Pro is sold "5,000 API verifications included" and the verify
       // function publishes a 50 req/sec limit for this tier. Without
       // this flag every one of those calls answered 403: the quota and
@@ -182,6 +184,7 @@ export const PLANS: Plan[] = [
       "alerts",
       "receipt_anchoring",
       "priority_support",
+      "authority_certificate",
       "compliance_api",
       "webhooks",
       "regulator_seats",
@@ -296,6 +299,12 @@ export const FEATURE_CATALOG: Record<
     requires: "institution",
     blurb:
       "Identifies which transfers cross the FATF Recommendation 16 threshold and lack counterparty data.",
+  },
+  authority_certificate: {
+    label: "Authority certificate",
+    requires: "desk",
+    blurb:
+      "Seven questions about one issuance, answered from validated ledger state at a named ledger index, and digested so the answer can be re-checked months later by anyone holding it. Deliberately not a score and deliberately not a legal finding: it reports what authority the issuer has kept, and leaves the conclusion to whoever is required to draw it.",
   },
   compliance_api: {
     label: "Compliance API",
