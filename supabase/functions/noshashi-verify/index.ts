@@ -1234,12 +1234,15 @@ async function replayStoredReceipt(
  * reconstruct a body from a printed certificate without having to know
  * which order the fields happened to be written in.
  *
- * supabase/functions/__tests__/authority-digest-parity.test.ts compares
- * this expression against the TypeScript one as source text, because a
- * Deno module cannot be imported into the Vite test suite. If the two
- * drift, a certificate issued by the console stops verifying here —
- * which makes the digest worthless precisely when someone is trying to
- * rely on it.
+ * src/lib/desk/__tests__/authority-digest-runtimes.test.ts holds the
+ * three together. A Deno module cannot be imported into the Vite test
+ * suite, so that test lifts THIS function out of this file as source
+ * text and executes it, against the same inputs as the other two —
+ * running it rather than merely matching its characters, because a file
+ * whose text looks right and does not run is the failure that matters.
+ * If the three drift, a certificate issued by the console stops
+ * verifying here, which makes the digest worthless precisely when
+ * someone is trying to rely on it.
  */
 async function authorityDigest(input: {
   kind: string;
