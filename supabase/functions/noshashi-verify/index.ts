@@ -1345,6 +1345,14 @@ async function checkAuthorityCertificate(
   const ledgerIndex = Number(body.ledger_index ?? body.ledgerIndex);
   const currency = typeof body.currency === "string" ? body.currency : "";
   const checks = Array.isArray(body.checks) ? body.checks : null;
+  // Inside the digest, so it must be supplied rather than defaulted:
+  // guessing it would turn "you omitted a field" into a digest
+  // mismatch, which reads as tampering and is a much worse answer.
+  const source = typeof body.source === "string" ? body.source : "";
+  // Also inside the digest, and also required rather than defaulted:
+  // a certificate issued under an older rule set must not verify as
+  // though it were issued under the current one.
+  const rulesVersion = Number(body.rules_version ?? body.rulesVersion);
 
   const missing: string[] = [];
   if (!issuer) missing.push("issuer");
@@ -1353,12 +1361,36 @@ async function checkAuthorityCertificate(
   if (!evaluatedAt) missing.push("evaluated_at");
   if (!Number.isFinite(ledgerIndex)) missing.push("ledger_index");
   if (!checks) missing.push("checks");
+  if (!source) missing.push("source");
+  if (!Number.isFinite(rulesVersion)) missing.push("rules_version");
   if (missing.length > 0) {
     return json(
       400,
       {
         error: "incomplete_certificate",
         message: `A certificate needs ${missing.join(", ")}. Send the body exactly as it was issued.`,
+      },
+      requestId
+    );
+  }
+
+  if (source !== "ledger" && source !== "indexer" && source !== "none") {
+    return json(
+      400,
+      {
+        error: "invalid_source",
+        message: 'source must be one of "ledger", "indexer" or "none".',
+      },
+      requestId
+    );
+  }
+
+  if (!Number.isInteger(rulesVersion) || rulesVersion < 1) {
+    return json(
+      400,
+      {
+        error: "invalid_rules_version",
+        message: "rules_version must be a positive integer, exactly as it was issued.",
       },
       requestId
     );
@@ -1400,7 +1432,7 @@ async function checkAuthorityCertificate(
   const recomputed = await authorityDigest({
     kind: "authority",
     subject: issuer,
-    scope: { currency, ledgerIndex, verdict },
+    scope: { currency, ledgerIndex, verdict, source, rules: rulesVersion },
     checks: normalised,
     evaluatedAt,
   });
@@ -1431,6 +1463,7 @@ async function checkAuthorityCertificate(
       verdict,
       ledger_index: ledgerIndex,
       evaluated_at: evaluatedAt,
+      rules_version: rulesVersion,
       digest_claimed: claimed,
       digest_recomputed: recomputed,
       checks_digested: normalised.length,

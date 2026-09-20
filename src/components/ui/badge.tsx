@@ -14,6 +14,9 @@ const badgeVariants = cva(
         go: "border-go/40 bg-go-dim text-go",
         hold: "border-hold/40 bg-hold-dim text-hold",
         "no-go": "border-no-go/40 bg-no-go-dim text-no-go",
+        // Neutral: an unread determination is not a verdict, and status
+        // colour is reserved for verdicts.
+        "insufficient-data": "border-border bg-transparent text-muted-foreground",
       },
     },
     defaultVariants: { variant: "default" },

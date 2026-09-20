@@ -21,6 +21,7 @@ const verdictText: Record<Status, string> = {
   go: "text-go",
   hold: "text-hold",
   "no-go": "text-no-go",
+  "insufficient-data": "text-muted-foreground",
 };
 
 /**

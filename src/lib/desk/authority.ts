@@ -83,6 +83,24 @@ export type AuthorityCertificate = {
   digest: string;
   ledgerIndex: number;
   evaluatedAt: string;
+  /**
+   * Where the holder distribution came from: read from the ledger,
+   * from a reconciled third-party indexer, or not read at all.
+   *
+   * Published because it is inside the digest. A verifier recomputes
+   * the digest from the certificate body, so every field the digest
+   * binds has to travel with it — a field the issuer keeps to itself
+   * makes the certificate unverifiable.
+   */
+  source: "ledger" | "indexer" | "none";
+  /**
+   * Which version of the rule set decided these checks.
+   *
+   * Published for the same reason as `source`: it is inside the
+   * digest, and a verifier recomputes from the body, so a bound field
+   * the issuer keeps to itself makes the certificate unverifiable.
+   */
+  rulesVersion: number;
 };
 
 /**
@@ -131,6 +149,28 @@ export function regularKeyCanSign(regularKey: string | undefined): boolean {
 
 /** HHI at or above which a supply is called concentrated. */
 const HHI_CONCENTRATED = 2500;
+
+/**
+ * The version of the rule set below.
+ *
+ * §58: a historical analysis has to stay interpretable after the
+ * algorithm changes. Two certificates can carry the same issuer, the
+ * same ledger and the same seven [id, passed] pairs and still be
+ * different claims, because the thresholds those pairs were decided
+ * against moved between them. Binding the version is what keeps the
+ * older one readable rather than silently reinterpreted.
+ *
+ * Bump this whenever the rules change BEHAVIOUR: a threshold, a
+ * severity, a check added or removed, or a predicate that decides
+ * differently. Not for a reworded detail string, which no digest sees.
+ *
+ * You are not trusted to remember. authority-rules-version.test.ts
+ * runs the rules over a fixed battery of surfaces, hashes the
+ * outcomes, and fails when that fingerprint moves while this number
+ * does not — so a changed rule cannot reach main wearing an old
+ * version.
+ */
+export const AUTHORITY_RULES_VERSION = 1;
 
 export async function readAuthoritySurface(
   issuer: string,
@@ -448,11 +488,42 @@ export const AUTHORITY_VERDICT_COPY: Record<Status, { title: string; blurb: stri
     blurb:
       "A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control.",
   },
+  "insufficient-data": {
+    title: "NOT ESTABLISHED",
+    blurb:
+      "A source needed to reach a conclusion could not be read at this ledger, and no blocking finding was established without it. This is a statement about the reading, not about the issuer: it is not a clearance, and it is not an allegation.",
+  },
 };
 
-/** Blocking failure → NO-GO; advisory failure → HOLD; otherwise GO. */
-export function verdictFor(checks: PolicyCheck[]): Status {
+/**
+ * Blocking failure → NO-GO; a source that would not read → INSUFFICIENT
+ * DATA; advisory failure → HOLD; otherwise GO.
+ *
+ * The precedence is the whole point, and NO-GO deliberately outranks
+ * INSUFFICIENT DATA. If the control surface read cleanly and shows the
+ * issuer can freeze, that finding is established and stays established
+ * whether or not some other source also failed. Letting a failed read
+ * downgrade a real finding to "not established" would hide exactly the
+ * thing a holder needs to know, and would hand anyone who can break one
+ * of our reads a way to suppress a NO-GO.
+ *
+ * INSUFFICIENT DATA outranks HOLD for the opposite reason. A HOLD is a
+ * conclusion, and with a source missing there is not enough to conclude
+ * — the failed advisory check is still listed, so nothing is hidden by
+ * summarising the reading as incomplete rather than as a soft refusal.
+ *
+ * `unreadable` means a source THREW. It is not the same as the
+ * concentration checks abstaining because no supply walk was requested:
+ * that is a deliberate scope choice by the caller, it is already stated
+ * in the checks, and it must not turn every flags-only certificate into
+ * INSUFFICIENT DATA.
+ */
+export function verdictFor(
+  checks: PolicyCheck[],
+  options: { unreadable?: string[] } = {}
+): Status {
   if (checks.some((c) => c.severity === "block" && !c.passed)) return "no-go";
+  if ((options.unreadable?.length ?? 0) > 0) return "insufficient-data";
   if (checks.some((c) => !c.passed)) return "hold";
   return "go";
 }
@@ -471,7 +542,7 @@ export async function certificateFrom(
   surface: AuthoritySurface
 ): Promise<AuthorityCertificate> {
   const checks = authorityChecks(surface);
-  const verdict = verdictFor(checks);
+  const verdict = verdictFor(checks, { unreadable: surface.unreadable });
   const currency = primaryCurrency(surface.issuance)?.currency;
   const evaluatedAt = surface.readAt;
 
@@ -482,7 +553,22 @@ export async function certificateFrom(
     // claim about one ledger, not about an issuer in general. The same
     // issuer at a later ledger is a different assertion and must not
     // share a digest with this one.
-    scope: { currency: currency ?? "", ledgerIndex: surface.ledgerIndex, verdict },
+    // `source` is in the scope because the concentration figures can
+    // come from the ledger directly or from a third-party indexer
+    // reconciled against it, and those are not the same evidence. The
+    // finding names the source in its prose, but digestOf hashes only
+    // [id, passed] per check — prose is not covered. Without this key
+    // an indexer-derived certificate and a ledger-walked one over the
+    // same issuer and ledger share a digest, which would let the
+    // weaker evidence inherit the stronger one's attestation.
+    // "none" when supply was not read at all and the checks abstain.
+    scope: {
+      currency: currency ?? "",
+      ledgerIndex: surface.ledgerIndex,
+      verdict,
+      source: surface.issuance?.source ?? "none",
+      rules: AUTHORITY_RULES_VERSION,
+    },
     checks,
     evaluatedAt,
   });
@@ -496,5 +582,7 @@ export async function certificateFrom(
     digest,
     ledgerIndex: surface.ledgerIndex,
     evaluatedAt,
+    source: surface.issuance?.source ?? "none",
+    rulesVersion: AUTHORITY_RULES_VERSION,
   };
 }

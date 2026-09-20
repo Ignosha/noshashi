@@ -20,6 +20,8 @@ const VERDICT_GLYPH: Record<Status, string> = {
   go: "●",
   hold: "◐",
   "no-go": "○",
+  // Dotted, not filled or hollow: neither a pass nor a failure.
+  "insufficient-data": "◌",
 };
 
 /** 106_421_178 → "106.42M" — a full ledger index will not fit. */

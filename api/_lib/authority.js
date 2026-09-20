@@ -108,6 +108,14 @@ export function regularKeyCanSign(regularKey) {
 /** HHI at or above which a supply is called concentrated. */
 const HHI_CONCENTRATED = 2500;
 
+/*
+ * Mirrors AUTHORITY_RULES_VERSION in src/lib/desk/authority.ts. The
+ * two must move together: the cross-runtime parity suite compares
+ * digests, and the version is inside the digest scope, so a mismatch
+ * fails there immediately.
+ */
+export const AUTHORITY_RULES_VERSION = 1;
+
 const LSF_REQUIRE_AUTH = 0x00040000;
 const LSF_GLOBAL_FREEZE = 0x00400000;
 const LSF_NO_FREEZE = 0x00200000;
@@ -731,8 +739,16 @@ export function authorityChecks(surface) {
   return checks;
 }
 
-export function verdictFor(checks) {
+/*
+ * Mirrors src/lib/desk/authority.ts. NO-GO outranks INSUFFICIENT DATA
+ * so a failed read cannot suppress an established blocking finding;
+ * INSUFFICIENT DATA outranks HOLD because with a source missing there
+ * is not enough to conclude. `unreadable` means a source threw — not
+ * that a supply walk was simply not requested.
+ */
+export function verdictFor(checks, options = {}) {
   if (checks.some((c) => c.severity === "block" && !c.passed)) return "no-go";
+  if ((options.unreadable?.length ?? 0) > 0) return "insufficient-data";
   if (checks.some((c) => !c.passed)) return "hold";
   return "go";
 }
@@ -755,14 +771,24 @@ export async function digestOf({ kind, subject, scope, checks, evaluatedAt }) {
 
 export async function certificateFrom(surface) {
   const checks = authorityChecks(surface);
-  const verdict = verdictFor(checks);
+  const verdict = verdictFor(checks, { unreadable: surface.unreadable });
   const currency = primaryCurrency(surface.issuance)?.currency;
   const evaluatedAt = surface.readAt;
 
   const digest = await digestOf({
     kind: "authority",
     subject: surface.issuer,
-    scope: { currency: currency ?? "", ledgerIndex: surface.ledgerIndex, verdict },
+    // Mirrors src/lib/desk/authority.ts. `source` is in the scope so an
+    // indexer-derived certificate cannot share a digest with one walked
+    // from the ledger: digestOf hashes [id, passed] per check, not the
+    // prose where the source is named. "none" when supply was not read.
+    scope: {
+      currency: currency ?? "",
+      ledgerIndex: surface.ledgerIndex,
+      verdict,
+      source: surface.issuance?.source ?? "none",
+      rules: AUTHORITY_RULES_VERSION,
+    },
     checks,
     evaluatedAt,
   });
@@ -776,6 +802,11 @@ export async function certificateFrom(surface) {
     digest,
     ledgerIndex: surface.ledgerIndex,
     evaluatedAt,
+    // Published because it is inside the digest: a verifier recomputes
+    // from the certificate body, so a field the digest binds has to
+    // travel with it or the certificate cannot be verified at all.
+    source: surface.issuance?.source ?? "none",
+    rulesVersion: AUTHORITY_RULES_VERSION,
   };
 }
 

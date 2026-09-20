@@ -56,11 +56,16 @@ export default async function handler(req, res) {
     cacheHeaders(res, 300, 3600);
     return res.status(200).json({
       ...certificate,
-      // Outside the digest deliberately: this describes how the reading
-      // was taken, not what was read, and it changes between two runs
-      // that produce the identical certificate. It is here because a
-      // coverage figure on its own does not say whether the walk ended
-      // early or simply ran out of holders to count.
+      // Telemetry, outside the digest deliberately: this describes how
+      // the reading was taken, not what was read, and it changes
+      // between two runs that produce the identical certificate. It is
+      // here because a coverage figure on its own does not say whether
+      // the walk ended early or simply ran out of holders to count.
+      //
+      // One exception, and it matters: `walk.source` repeats the
+      // certificate's own top-level `source`, which IS inside the
+      // digest. A verifier must read the top-level field — this block
+      // is a human-facing description and carries no guarantee.
       // A read that failed is never silent here. Without this the only
       // trace of a broken walk was a check that said "not walked".
       unreadable: surface.unreadable.length > 0 ? surface.unreadable : undefined,

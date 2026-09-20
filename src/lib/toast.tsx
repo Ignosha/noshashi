@@ -72,6 +72,7 @@ const toneAccent: Record<ToastTone, string> = {
   go: "bg-go",
   hold: "bg-hold",
   "no-go": "bg-no-go",
+  "insufficient-data": "bg-muted-foreground",
   info: "bg-foreground",
 };
 
@@ -79,6 +80,7 @@ const toneText: Record<ToastTone, string> = {
   go: "text-go",
   hold: "text-hold",
   "no-go": "text-no-go",
+  "insufficient-data": "text-muted-foreground",
   info: "text-foreground",
 };
 

@@ -666,11 +666,108 @@ describe("hex currency codes are decoded for display only", () => {
       await digestOf({
         kind: "authority",
         subject: s.issuer,
-        scope: { currency: RLUSD_HEX, ledgerIndex: s.ledgerIndex, verdict: cert.verdict },
+        scope: {
+          currency: RLUSD_HEX,
+          ledgerIndex: s.ledgerIndex,
+          verdict: cert.verdict,
+          source: cert.source,
+          rules: cert.rulesVersion,
+        },
         checks: authorityChecks(s),
         evaluatedAt: s.readAt,
       })
     );
+  });
+
+  it("says INSUFFICIENT DATA when a source would not read", async () => {
+    // A source threw. Nothing blocking was established without it, so
+    // there is no honest verdict to give — and "hold" would be a
+    // conclusion we did not reach.
+    const cert = await certificateFrom(
+      surface({ unreadable: ["posture: node refused"] })
+    );
+    expect(cert.verdict).toBe("insufficient-data");
+  });
+
+  it("keeps NO-GO when a source failed AND a blocking check failed", async () => {
+    // The precedence that matters most. The control surface read
+    // cleanly and shows one key can sign for the issuer; that finding
+    // is established and must survive an unrelated source failing.
+    // If a failed read could downgrade this to "not established",
+    // anyone able to break one of our reads could suppress a NO-GO.
+    const controlled = surface({
+      control: control({
+        masterKeyEnabled: true,
+        signers: {
+          present: false,
+          quorum: 0,
+          signers: [],
+          totalWeight: 0,
+          minimumSigners: 0,
+          unilateralSigners: [],
+        },
+      }),
+      unreadable: ["issuance: indexer refused"],
+    });
+    const cert = await certificateFrom(controlled);
+    expect(cert.checks.some((c) => c.severity === "block" && !c.passed)).toBe(true);
+    expect(cert.verdict).toBe("no-go");
+  });
+
+  it("does not call a flags-only certificate INSUFFICIENT DATA", async () => {
+    // Regression guard. The concentration checks abstain whenever no
+    // supply walk was requested, which is the DEFAULT. Treating that
+    // abstention as missing evidence would turn almost every
+    // certificate into INSUFFICIENT DATA and make the state useless.
+    const cert = await certificateFrom(surface({ issuance: null, unreadable: [] }));
+    expect(cert.verdict).not.toBe("insufficient-data");
+  });
+
+  it("digests INSUFFICIENT DATA apart from HOLD", async () => {
+    // verdict is inside the digest scope, so the two must not collide.
+    const unread = await certificateFrom(surface({ unreadable: ["posture: timeout"] }));
+    const read = await certificateFrom(surface({ unreadable: [] }));
+    expect(unread.verdict).toBe("insufficient-data");
+    expect(unread.digest).not.toBe(read.digest);
+  });
+
+  it("digests indexer and ledger provenance differently", async () => {
+    // The point of putting `source` in the digest scope. These two
+    // surfaces are identical in every respect the checks can see — same
+    // issuer, same ledger, same currency, same holders, same verdict —
+    // and differ only in where the holder distribution was read from.
+    //
+    // A ledger walk is read directly from the validated ledger. An
+    // indexer's figures come from a third party and are only reconciled
+    // against the ledger's obligations to within a tolerance. Those are
+    // not the same evidence, so they must not share an attestation: a
+    // shared digest would let the weaker one inherit the stronger one's
+    // signature. digestOf hashes [id, passed] per check and not the
+    // prose where the source is named, so the scope is the only place
+    // this distinction can live.
+    const walked = await certificateFrom(
+      surface({ issuance: { ...issuance(), source: "ledger" } })
+    );
+    const indexed = await certificateFrom(
+      surface({ issuance: { ...issuance(), source: "indexer" } })
+    );
+
+    expect(walked.verdict).toBe(indexed.verdict);
+    expect(walked.source).toBe("ledger");
+    expect(indexed.source).toBe("indexer");
+    expect(walked.digest).not.toBe(indexed.digest);
+  });
+
+  it("digests an unread distribution as its own provenance", async () => {
+    // Abstaining is a third state, and must not collide with either
+    // real source.
+    const none = await certificateFrom(surface({ issuance: null }));
+    expect(none.source).toBe("none");
+
+    const walked = await certificateFrom(
+      surface({ issuance: { ...issuance(), source: "ledger" } })
+    );
+    expect(none.digest).not.toBe(walked.digest);
   });
 
   it("leaves a three-character code alone", async () => {

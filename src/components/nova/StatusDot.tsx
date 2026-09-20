@@ -5,6 +5,10 @@ const statusColor: Record<Status, string> = {
   go: "bg-go",
   hold: "bg-hold",
   "no-go": "bg-no-go",
+  // Neutral by design. Status colour is spent on GO/HOLD/NO-GO; an
+  // unread determination is a statement about our evidence, not a
+  // finding about the subject, and must not borrow a verdict's colour.
+  "insufficient-data": "bg-muted-foreground",
 };
 
 export function StatusDot({

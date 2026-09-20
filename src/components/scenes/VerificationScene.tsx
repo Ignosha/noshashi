@@ -33,12 +33,14 @@ const verdictText: Record<Status, string> = {
   go: "text-go",
   hold: "text-hold",
   "no-go": "text-no-go",
+  "insufficient-data": "text-muted-foreground",
 };
 
 const verdictBorder: Record<Status, string> = {
   go: "border-go/50",
   hold: "border-hold/50",
   "no-go": "border-no-go/50",
+  "insufficient-data": "border-muted-foreground/50",
 };
 
 /**

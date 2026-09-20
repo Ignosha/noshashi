@@ -343,6 +343,10 @@ describe("console and endpoint agree, check for check", () => {
       expect(theirs.currency).toBe(ours.currency);
       expect(theirs.currencyLabel).toBe(ours.currencyLabel);
       expect(theirs.ledgerIndex).toBe(ours.ledgerIndex);
+      // Published as well as digested: a verifier recomputes from the
+      // body, so the two runtimes must agree on what they emit, not
+      // only on what they hash.
+      expect(theirs.source).toBe(ours.source);
     });
   }
 

@@ -650,10 +650,21 @@ async function buildCertificate() {
   <div class="panel" style="margin-top:14px">
     <p class="num">THE DIGEST</p>
     <p>Every certificate carries a SHA-256 digest over the verdict, the issuer, the currency it
-       was scoped to, <strong>the ledger index</strong> and every check with its result. The
+       was scoped to, <strong>the ledger index</strong>, <strong>where the holder distribution
+       was read from</strong>, <strong>the version of the rule set that decided it</strong>
+       and every check with its result. The
        ledger index is inside the digest deliberately: the same issuer at a later ledger is a
        different assertion and does not share this one. Keep the digest and the reading can be
        shown to be the reading that was taken, months later, by anyone holding it.</p>
+    <p style="margin-top:12px">The rule-set version is in there because the checks can be
+       tightened. Two certificates can carry the same issuer, the same ledger and the same
+       results and still be different claims, if the thresholds those results were decided
+       against moved between them. Binding the version keeps the older reading readable
+       instead of quietly reinterpreted under rules it was never evaluated against.</p>
+    <p style="margin-top:12px">The source is in there for the same reason. A distribution read
+       from the ledger and one taken from an indexer and reconciled against the ledger's
+       obligations are not the same evidence, and a certificate resting on the second must not
+       be able to carry the digest of one resting on the first.</p>
   </div>
 </section>`;
 
@@ -669,6 +680,9 @@ async function buildCertificate() {
 .cert-verdict p{color:var(--muted);font-size:13.5px;line-height:1.62;max-width:72ch}
 .cert-verdict.go{border-left:3px solid var(--go)} .cert-verdict.go .tag{color:var(--go)}
 .cert-verdict.hold{border-left:3px solid var(--hold)} .cert-verdict.hold .tag{color:var(--hold)}
+/* Neutral rule, not a status colour: "not established" is a statement
+   about the reading, not a finding about the issuer. */
+.cert-verdict.unknown{border-left:3px solid var(--muted)} .cert-verdict.unknown .tag{color:var(--muted)}
 .cert-verdict.nogo{border-left:3px solid var(--nogo)} .cert-verdict.nogo .tag{color:var(--nogo)}
 .cert-meta{font:10.5px "IBM Plex Mono",monospace;color:var(--faint);
   font-variant-numeric:tabular-nums;margin-top:12px;word-break:break-all;line-height:1.7}
@@ -709,11 +723,31 @@ async function buildCertificate() {
     "hold":{cls:"hold",tag:"Authority retained, constrained",
       text:"No single party can act alone, but the issuer has kept powers that bear on a holder — a freeze it has not surrendered, a fee it sets, or a supply too concentrated or too unreadable to call dispersed."},
     "no-go":{cls:"nogo",tag:"Unilateral authority present",
-      text:"A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control."}
+      text:"A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control."},
+    "insufficient-data":{cls:"unknown",tag:"Not established",
+      text:"A source needed to reach a conclusion could not be read at this ledger, and no blocking finding was established without it. This is a statement about the reading, not about the issuer: it is not a clearance, and it is not an allegation."}
+  };
+
+  /* Provenance of the holder distribution. Printed because it is
+     inside the digest: a reader recomputing the digest from what is on
+     this page needs every field it binds, and because "read from the
+     ledger" and "taken from an indexer and reconciled" are not the
+     same evidence. */
+  var SOURCE_LABEL={
+    ledger:'DISTRIBUTION READ FROM LEDGER',
+    indexer:'DISTRIBUTION FROM RECONCILED INDEXER',
+    none:'DISTRIBUTION NOT READ'
   };
 
   function render(cert){
-    var copy=COPY[cert.verdict]||COPY["no-go"];
+    /* An unrecognised verdict falls back to "not established", NEVER to
+       no-go. The previous fallback was COPY["no-go"], which meant any
+       verdict this page did not know about — including insufficient-data
+       the moment it was added — rendered on a PUBLIC page as "unilateral
+       authority present" about a real, named issuer. Defaulting an
+       unknown to the most damaging reading is the wrong direction to
+       fail, and it is a false allegation rather than a display bug. */
+    var copy=COPY[cert.verdict]||COPY["insufficient-data"];
     var html='<div class="cert-verdict '+copy.cls+'">'+
       '<p class="tag">'+esc(copy.tag)+'</p>'+
       '<h2>'+esc(cert.issuer)+'</h2>'+
@@ -721,6 +755,12 @@ async function buildCertificate() {
       '<p class="cert-meta">LEDGER '+esc(String(cert.ledgerIndex))+
         (cert.currencyLabel?' · '+esc(cert.currencyLabel):'')+
         ' · READ '+esc(new Date(cert.evaluatedAt).toLocaleString())+
+        ' · '+esc(SOURCE_LABEL[cert.source]||'DISTRIBUTION UNSTATED')+
+        /* Also inside the digest, so a reader recomputing from this page
+           needs it. Printed plainly rather than hidden behind a label:
+           it is the difference between two certificates that otherwise
+           read identically. */
+        (cert.rulesVersion ? ' · RULES v'+esc(String(cert.rulesVersion)) : '')+
         '<br>DIGEST '+esc(cert.digest)+'</p>'+
       '</div><div class="cert-checks">';
 
