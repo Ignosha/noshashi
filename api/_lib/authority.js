@@ -108,6 +108,14 @@ export function regularKeyCanSign(regularKey) {
 /** HHI at or above which a supply is called concentrated. */
 const HHI_CONCENTRATED = 2500;
 
+/*
+ * Mirrors AUTHORITY_RULES_VERSION in src/lib/desk/authority.ts. The
+ * two must move together: the cross-runtime parity suite compares
+ * digests, and the version is inside the digest scope, so a mismatch
+ * fails there immediately.
+ */
+export const AUTHORITY_RULES_VERSION = 1;
+
 const LSF_REQUIRE_AUTH = 0x00040000;
 const LSF_GLOBAL_FREEZE = 0x00400000;
 const LSF_NO_FREEZE = 0x00200000;
@@ -779,6 +787,7 @@ export async function certificateFrom(surface) {
       ledgerIndex: surface.ledgerIndex,
       verdict,
       source: surface.issuance?.source ?? "none",
+      rules: AUTHORITY_RULES_VERSION,
     },
     checks,
     evaluatedAt,
@@ -797,6 +806,7 @@ export async function certificateFrom(surface) {
     // from the certificate body, so a field the digest binds has to
     // travel with it or the certificate cannot be verified at all.
     source: surface.issuance?.source ?? "none",
+    rulesVersion: AUTHORITY_RULES_VERSION,
   };
 }
 

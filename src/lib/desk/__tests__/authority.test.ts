@@ -671,6 +671,7 @@ describe("hex currency codes are decoded for display only", () => {
           ledgerIndex: s.ledgerIndex,
           verdict: cert.verdict,
           source: cert.source,
+          rules: cert.rulesVersion,
         },
         checks: authorityChecks(s),
         evaluatedAt: s.readAt,

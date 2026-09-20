@@ -93,6 +93,14 @@ export type AuthorityCertificate = {
    * makes the certificate unverifiable.
    */
   source: "ledger" | "indexer" | "none";
+  /**
+   * Which version of the rule set decided these checks.
+   *
+   * Published for the same reason as `source`: it is inside the
+   * digest, and a verifier recomputes from the body, so a bound field
+   * the issuer keeps to itself makes the certificate unverifiable.
+   */
+  rulesVersion: number;
 };
 
 /**
@@ -141,6 +149,28 @@ export function regularKeyCanSign(regularKey: string | undefined): boolean {
 
 /** HHI at or above which a supply is called concentrated. */
 const HHI_CONCENTRATED = 2500;
+
+/**
+ * The version of the rule set below.
+ *
+ * §58: a historical analysis has to stay interpretable after the
+ * algorithm changes. Two certificates can carry the same issuer, the
+ * same ledger and the same seven [id, passed] pairs and still be
+ * different claims, because the thresholds those pairs were decided
+ * against moved between them. Binding the version is what keeps the
+ * older one readable rather than silently reinterpreted.
+ *
+ * Bump this whenever the rules change BEHAVIOUR: a threshold, a
+ * severity, a check added or removed, or a predicate that decides
+ * differently. Not for a reworded detail string, which no digest sees.
+ *
+ * You are not trusted to remember. authority-rules-version.test.ts
+ * runs the rules over a fixed battery of surfaces, hashes the
+ * outcomes, and fails when that fingerprint moves while this number
+ * does not — so a changed rule cannot reach main wearing an old
+ * version.
+ */
+export const AUTHORITY_RULES_VERSION = 1;
 
 export async function readAuthoritySurface(
   issuer: string,
@@ -537,6 +567,7 @@ export async function certificateFrom(
       ledgerIndex: surface.ledgerIndex,
       verdict,
       source: surface.issuance?.source ?? "none",
+      rules: AUTHORITY_RULES_VERSION,
     },
     checks,
     evaluatedAt,
@@ -552,5 +583,6 @@ export async function certificateFrom(
     ledgerIndex: surface.ledgerIndex,
     evaluatedAt,
     source: surface.issuance?.source ?? "none",
+    rulesVersion: AUTHORITY_RULES_VERSION,
   };
 }

@@ -651,10 +651,16 @@ async function buildCertificate() {
     <p class="num">THE DIGEST</p>
     <p>Every certificate carries a SHA-256 digest over the verdict, the issuer, the currency it
        was scoped to, <strong>the ledger index</strong>, <strong>where the holder distribution
-       was read from</strong> and every check with its result. The
+       was read from</strong>, <strong>the version of the rule set that decided it</strong>
+       and every check with its result. The
        ledger index is inside the digest deliberately: the same issuer at a later ledger is a
        different assertion and does not share this one. Keep the digest and the reading can be
        shown to be the reading that was taken, months later, by anyone holding it.</p>
+    <p style="margin-top:12px">The rule-set version is in there because the checks can be
+       tightened. Two certificates can carry the same issuer, the same ledger and the same
+       results and still be different claims, if the thresholds those results were decided
+       against moved between them. Binding the version keeps the older reading readable
+       instead of quietly reinterpreted under rules it was never evaluated against.</p>
     <p style="margin-top:12px">The source is in there for the same reason. A distribution read
        from the ledger and one taken from an indexer and reconciled against the ledger's
        obligations are not the same evidence, and a certificate resting on the second must not
@@ -750,6 +756,11 @@ async function buildCertificate() {
         (cert.currencyLabel?' · '+esc(cert.currencyLabel):'')+
         ' · READ '+esc(new Date(cert.evaluatedAt).toLocaleString())+
         ' · '+esc(SOURCE_LABEL[cert.source]||'DISTRIBUTION UNSTATED')+
+        /* Also inside the digest, so a reader recomputing from this page
+           needs it. Printed plainly rather than hidden behind a label:
+           it is the difference between two certificates that otherwise
+           read identically. */
+        (cert.rulesVersion ? ' · RULES v'+esc(String(cert.rulesVersion)) : '')+
         '<br>DIGEST '+esc(cert.digest)+'</p>'+
       '</div><div class="cert-checks">';
 
