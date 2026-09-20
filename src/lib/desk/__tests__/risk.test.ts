@@ -161,16 +161,33 @@ describe("analyseTravelRule — what falls in scope", () => {
     expect(r.totalConsidered).toBe(0);
   });
 
-  it("marks a counterparty it holds no identity for as unresolved", () => {
+  it("does not call a transfer unresolved when no register was supplied", () => {
+    // This replaces a test that asserted the opposite and so encoded the
+    // defect. NOSHASHI holds no counterparty identity records of its
+    // own, and the scene never passed a register, so every in-scope
+    // transfer was reported as MISSING and counted toward a "transfers
+    // without counterparty data" finding. That is a Travel Rule gap
+    // asserted about a check that never ran.
     const r = analyseTravelRule([tx({ amountXrp: 7_000 })], config);
-    expect(r.inScope[0].counterpartyUnknown).toBe(true);
-    expect(r.unresolved).toBe(1);
+    expect(r.recordsSupplied).toBe(false);
+    expect(r.inScope[0].counterpartyRecord).toBe("not-evaluated");
+    expect(r.unresolved).toBe(0);
+    expect(r.notEvaluated).toBe(1);
   });
 
-  it("does not mark a known counterparty unresolved", () => {
+  it("marks a counterparty absent from a supplied register as missing", () => {
+    const r = analyseTravelRule([tx({ amountXrp: 7_000 })], config, new Set(["rSomeoneElse"]));
+    expect(r.recordsSupplied).toBe(true);
+    expect(r.inScope[0].counterpartyRecord).toBe("missing");
+    expect(r.unresolved).toBe(1);
+    expect(r.notEvaluated).toBe(0);
+  });
+
+  it("marks a counterparty present in a supplied register as held", () => {
     const r = analyseTravelRule([tx({ amountXrp: 7_000 })], config, new Set(["rOther"]));
-    expect(r.inScope[0].counterpartyUnknown).toBe(false);
+    expect(r.inScope[0].counterpartyRecord).toBe("held");
     expect(r.unresolved).toBe(0);
+    expect(r.notEvaluated).toBe(0);
   });
 
   it("sorts the largest in-scope transfer first", () => {

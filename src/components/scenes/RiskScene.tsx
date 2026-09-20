@@ -429,8 +429,29 @@ function RiskBody({
                           {hit.amountFiat.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </td>
                         <td className="py-2">
-                          <Badge variant={hit.counterpartyUnknown ? "no-go" : "go"} className="text-[8px]">
-                            {hit.counterpartyUnknown ? "MISSING" : "HELD"}
+                          {/*
+                            Three states. "NOT CHECKED" is neutral and is
+                            what shows unless the operator supplied a
+                            counterparty register: NOSHASHI holds no
+                            identity records of its own, so a red MISSING
+                            here would assert a Travel Rule gap nobody
+                            assessed.
+                          */}
+                          <Badge
+                            variant={
+                              hit.counterpartyRecord === "missing"
+                                ? "no-go"
+                                : hit.counterpartyRecord === "held"
+                                  ? "go"
+                                  : "insufficient-data"
+                            }
+                            className="text-[8px]"
+                          >
+                            {hit.counterpartyRecord === "missing"
+                              ? "MISSING"
+                              : hit.counterpartyRecord === "held"
+                                ? "HELD"
+                                : "NOT CHECKED"}
                           </Badge>
                         </td>
                       </tr>
@@ -532,7 +553,15 @@ function RiskBody({
                   value={Number.isFinite(travel.thresholdXrp) ? travel.thresholdXrp.toFixed(2) : "—"}
                 />
                 <DataRow label="IN SCOPE" value={travel.inScope.length} tone={travel.inScope.length > 0 ? "hold" : "go"} />
-                <DataRow label="DATA MISSING" value={travel.unresolved} tone={travel.unresolved > 0 ? "no-go" : "go"} />
+                {travel.recordsSupplied ? (
+                  <DataRow
+                    label="DATA MISSING"
+                    value={travel.unresolved}
+                    tone={travel.unresolved > 0 ? "no-go" : "go"}
+                  />
+                ) : (
+                  <DataRow label="COUNTERPARTY DATA" value="NOT CHECKED" />
+                )}
               </div>
             </Panel>
           )}
@@ -542,7 +571,15 @@ function RiskBody({
               {(tab === "concentration" ? concentrationResults : issuerResults).map((f) => (
                 <FindingRow key={f.id} finding={f} />
               ))}
-              {tab === "travel" && has("compliance_api") && travel.unresolved > 0 && (
+              {/*
+                Only a real evaluation raises a finding. Before this the
+                condition was `unresolved > 0`, and unresolved counted
+                every in-scope transfer because nothing ever supplied a
+                register — so the panel reported "N transfers without
+                counterparty data" as a compliance finding on a check
+                that had not run.
+              */}
+              {tab === "travel" && has("compliance_api") && travel.recordsSupplied && travel.unresolved > 0 && (
                 <FindingRow
                   finding={{
                     id: "tr-missing",

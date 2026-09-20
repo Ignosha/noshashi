@@ -206,8 +206,19 @@ export type TravelRuleHit = {
   counterparty: string;
   amountXrp: number;
   amountFiat: number;
-  /** True when we hold no identifying data for the counterparty. */
-  counterpartyUnknown: boolean;
+  /**
+   * Whether a counterparty record is held for this transfer.
+   *
+   * Three states, not a boolean, because "we looked and found nothing"
+   * and "nobody gave us anything to look in" are different claims and
+   * only one of them is a compliance finding.
+   *
+   * NOSHASHI holds no counterparty identity records of its own and
+   * deliberately maintains no such list, so unless a caller supplies
+   * one this is `not-evaluated`. Reporting that as `missing` would be
+   * asserting a Travel Rule gap that was never assessed.
+   */
+  counterpartyRecord: "held" | "missing" | "not-evaluated";
 };
 
 export type TravelRuleReport = {
@@ -215,7 +226,16 @@ export type TravelRuleReport = {
   thresholdXrp: number;
   inScope: TravelRuleHit[];
   totalConsidered: number;
+  /**
+   * In-scope transfers checked against supplied records and not found.
+   * Zero when no records were supplied — an unchecked transfer is not
+   * an unresolved one.
+   */
   unresolved: number;
+  /** In-scope transfers that could not be checked at all. */
+  notEvaluated: number;
+  /** Whether the caller supplied any counterparty records to check against. */
+  recordsSupplied: boolean;
 };
 
 export function analyseTravelRule(
@@ -224,6 +244,9 @@ export function analyseTravelRule(
   knownCounterparties: Set<string> = new Set()
 ): TravelRuleReport {
   const thresholdXrp = config.xrpRate > 0 ? config.thresholdFiat / config.xrpRate : Infinity;
+  // An empty set is the default and means the caller supplied nothing,
+  // not that they supplied an empty register.
+  const recordsSupplied = knownCounterparties.size > 0;
 
   const inScope: TravelRuleHit[] = [];
   let considered = 0;
@@ -242,7 +265,11 @@ export function analyseTravelRule(
       counterparty: entry.counterparty,
       amountXrp: entry.amountXrp,
       amountFiat: entry.amountXrp * config.xrpRate,
-      counterpartyUnknown: !knownCounterparties.has(entry.counterparty),
+      counterpartyRecord: !recordsSupplied
+        ? "not-evaluated"
+        : knownCounterparties.has(entry.counterparty)
+          ? "held"
+          : "missing",
     });
   }
 
@@ -253,7 +280,9 @@ export function analyseTravelRule(
     thresholdXrp,
     inScope,
     totalConsidered: considered,
-    unresolved: inScope.filter((hit) => hit.counterpartyUnknown).length,
+    unresolved: inScope.filter((hit) => hit.counterpartyRecord === "missing").length,
+    notEvaluated: inScope.filter((hit) => hit.counterpartyRecord === "not-evaluated").length,
+    recordsSupplied,
   };
 }
 

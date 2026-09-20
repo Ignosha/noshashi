@@ -107,12 +107,41 @@ both the loop and the thresholds from one constant. 10 tests.
 **Still open:** only NetworkScene consumes it. The other scenes using
 `useLiveRefresh` still render prose alone.
 
-### G3 — Counterparty attribution has no confidence states  (§14, §66)
+### G3 — A fabricated compliance finding  (§14, §66, §83, §87)  — CLOSED
 
-`desk/risk.ts` handles counterparties but there is no
-`VERIFIED / ATTRIBUTED / PROBABLE / UNVERIFIED / UNKNOWN` enum. §66
-forbids naming an institution without evidence, source, timestamp and
-confidence. The type system does not currently make that impossible.
+The gap here turned out not to be the missing confidence enum. NOSHASHI
+attributes nothing: `lib/public/counterparty.ts` states outright that it
+keeps no list of known actors, "because NOSHASHI does not have one and
+pretending otherwise would be the worst kind of fabrication". Adding a
+`VERIFIED / ATTRIBUTED / PROBABLE / …` enum with no attribution source
+would have been a second WATCH — a type with no producer.
+
+The real defect was in the Travel Rule panel. `analyseTravelRule` took
+an optional `knownCounterparties` set; **RiskScene never passed one**.
+The set was therefore always empty, `counterpartyUnknown` was always
+true, and so:
+
+- every in-scope transfer rendered a red `MISSING` badge,
+- a `DATA MISSING` figure counted every transfer, and
+- the panel raised a finding, "N in-scope transfers without counterparty
+  data", on an evaluation that had never run.
+
+That is a fabricated compliance claim (§87) presented as a per-row
+result (§83). A test asserted the behaviour, so it was encoded rather
+than merely overlooked.
+
+**Done:** `counterpartyUnknown: boolean` is now
+`counterpartyRecord: "held" | "missing" | "not-evaluated"`, because "we
+looked and found nothing" and "nobody gave us anything to look in" are
+different claims and only the first is a finding. The report carries
+`recordsSupplied` and a separate `notEvaluated` count; `unresolved`
+counts only genuine misses. The badge renders neutral "NOT CHECKED"
+unless a register was supplied, and the finding only raises on a real
+evaluation. The test that encoded the defect was replaced by three that
+cover each state.
+
+**Still open:** nothing supplies a register yet. That is an operator
+address book, and it belongs with G5.
 
 ### G4 — Policies are not versioned  (§17, §58)
 
