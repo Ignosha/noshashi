@@ -1234,12 +1234,15 @@ async function replayStoredReceipt(
  * reconstruct a body from a printed certificate without having to know
  * which order the fields happened to be written in.
  *
- * supabase/functions/__tests__/authority-digest-parity.test.ts compares
- * this expression against the TypeScript one as source text, because a
- * Deno module cannot be imported into the Vite test suite. If the two
- * drift, a certificate issued by the console stops verifying here —
- * which makes the digest worthless precisely when someone is trying to
- * rely on it.
+ * src/lib/desk/__tests__/authority-digest-runtimes.test.ts holds the
+ * three together. A Deno module cannot be imported into the Vite test
+ * suite, so that test lifts THIS function out of this file as source
+ * text and executes it, against the same inputs as the other two —
+ * running it rather than merely matching its characters, because a file
+ * whose text looks right and does not run is the failure that matters.
+ * If the three drift, a certificate issued by the console stops
+ * verifying here, which makes the digest worthless precisely when
+ * someone is trying to rely on it.
  */
 async function authorityDigest(input: {
   kind: string;
@@ -1402,7 +1405,23 @@ async function checkAuthorityCertificate(
     evaluatedAt,
   });
 
-  const matches = timingSafeEqual(recomputed, claimed);
+  /*
+   * A plain comparison, deliberately, where the webhook uses a
+   * constant-time one.
+   *
+   * The webhook compares an HMAC an attacker is trying to forge against
+   * one derived from a signing secret they do not have, so leaking how
+   * far the comparison got is a real oracle. Here the caller supplies
+   * both the body and the digest, and the digest is recomputed from
+   * their own input — there is no secret on this side to guess at, so
+   * constant time would protect nothing and reaching for it would only
+   * suggest a threat that is not present.
+   *
+   * (This line originally called timingSafeEqual, which is defined in
+   * the Stripe webhook function and does not exist in this one. It
+   * would have thrown a ReferenceError on every request to this verb.)
+   */
+  const matches = recomputed === claimed;
 
   return json(
     200,
