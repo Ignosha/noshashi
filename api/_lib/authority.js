@@ -38,6 +38,38 @@ const RIPPLE_HTTP = [
 
 /** Inherited from issuance.ts. Below this, concentration abstains. */
 const COVERAGE_FLOOR = 0.95;
+
+/**
+ * How far the holder walk goes, and why it is bounded twice.
+ *
+ * MAX_PAGES matches src/lib/desk/issuance.ts deliberately. It was 12
+ * here against the console's 250, so the free endpoint measured
+ * concentration over roughly a fiftieth of what the product measured —
+ * and RLUSD came back at 8.7% coverage, abstaining every time. An
+ * abstention is honest, but an endpoint that can only ever abstain is
+ * not measuring anything.
+ *
+ * The page size asked for is NOT the page size returned: public
+ * clusters cap `account_lines` at 200 rows however large a `limit` is
+ * sent (measured against mainnet on 2026-08-27, and the reason the
+ * comment in issuance.ts exists). So the real ceiling is MAX_PAGES x
+ * 200, not x PAGE_SIZE, and any arithmetic that uses PAGE_SIZE to
+ * predict depth is wrong by half.
+ *
+ * WALK_BUDGET_MS is the bound that actually fires. The console runs
+ * over a WebSocket with a person watching a progress count and no
+ * platform deadline; this runs in a Vercel function that is killed at
+ * maxDuration, and a killed function returns nothing at all — not a
+ * partial reading, not an abstention, just a 504. The budget stops the
+ * walk early enough to always return the honest partial answer, which
+ * for a big issuer is coverage below the floor and therefore an
+ * abstention. Pages are sequential by construction, because each one
+ * needs the previous page's marker, so this cannot be parallelised
+ * away.
+ */
+const MAX_PAGES = 250;
+const PAGE_SIZE = 400;
+const WALK_BUDGET_MS = 25_000;
 /**
  * Addresses whose private key provably does not exist.
  *
@@ -234,7 +266,11 @@ async function readPosture(issuer) {
  * concentration check then abstains instead of reporting a number about
  * the holders that happened to fit in the pages read.
  */
-async function readIssuanceSupply(issuer, { maxPages = 12, pageLimit = 400 } = {}) {
+async function readIssuanceSupply(
+  issuer,
+  { maxPages = MAX_PAGES, pageLimit = PAGE_SIZE, budgetMs = WALK_BUDGET_MS } = {}
+) {
+  const deadline = Date.now() + budgetMs;
   const balances = await rippleRpc("gateway_balances", {
     account: issuer,
     ledger_index: "validated",
@@ -282,6 +318,14 @@ async function readIssuanceSupply(issuer, { maxPages = 12, pageLimit = 400 } = {
     marker = page.marker;
     pages += 1;
     if (pages >= maxPages && marker) {
+      truncated = true;
+      break;
+    }
+    // Out of time. Reported exactly like the page cap: the walk is
+    // short, coverage will say how short, and the concentration check
+    // abstains on it. Stopping here is what makes the difference
+    // between a partial answer and a 504 with no answer at all.
+    if (marker && Date.now() >= deadline) {
       truncated = true;
       break;
     }
