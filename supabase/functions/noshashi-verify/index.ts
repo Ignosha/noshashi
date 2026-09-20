@@ -1402,7 +1402,23 @@ async function checkAuthorityCertificate(
     evaluatedAt,
   });
 
-  const matches = timingSafeEqual(recomputed, claimed);
+  /*
+   * A plain comparison, deliberately, where the webhook uses a
+   * constant-time one.
+   *
+   * The webhook compares an HMAC an attacker is trying to forge against
+   * one derived from a signing secret they do not have, so leaking how
+   * far the comparison got is a real oracle. Here the caller supplies
+   * both the body and the digest, and the digest is recomputed from
+   * their own input — there is no secret on this side to guess at, so
+   * constant time would protect nothing and reaching for it would only
+   * suggest a threat that is not present.
+   *
+   * (This line originally called timingSafeEqual, which is defined in
+   * the Stripe webhook function and does not exist in this one. It
+   * would have thrown a ReferenceError on every request to this verb.)
+   */
+  const matches = recomputed === claimed;
 
   return json(
     200,
