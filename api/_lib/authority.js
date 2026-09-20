@@ -292,6 +292,7 @@ async function readIssuanceSupply(
   let pages = 0;
   let linesWalked = 0;
   let truncated = false;
+  let floorUnreachable = false;
   let ledgerIndex = 0;
 
   do {
@@ -329,6 +330,51 @@ async function readIssuanceSupply(
       truncated = true;
       break;
     }
+
+    /*
+     * Give up early when the floor is out of reach.
+     *
+     * Measured against RLUSD on mainnet: 400 lines a page, ~750ms a
+     * page, and 13,600 lines covering 8.8% of obligations — so roughly
+     * 155,000 trust lines, and about nine minutes of sequential
+     * requests to clear the 95% floor. No serverless function has nine
+     * minutes, and the console's own 250-page cap tops out near 64% on
+     * that issuer, so the honest answer for an issuance of that size is
+     * an abstention no matter how long anyone waits.
+     *
+     * Without this the endpoint spent the entire 25-second budget
+     * arriving at the abstention it could have reached in two, burning
+     * the time and the public nodes' patience to produce the identical
+     * result. Raising the page cap made that worse rather than better,
+     * which is the opposite of what raising it was for.
+     *
+     * The projection is deliberately crude and deliberately generous:
+     * extrapolate the pages needed at the rate observed so far, and
+     * stop only when that exceeds what the cap or the clock could ever
+     * allow. Holders are not ordered by balance, so a late whale can
+     * lift coverage sharply — hence the 4x headroom before concluding
+     * it is hopeless, and hence never stopping in the first few pages
+     * where the rate is still noise.
+     */
+    if (marker && pages >= 5) {
+      const seen = Object.entries(held).reduce(
+        (sum, [currency, amounts]) =>
+          sum + amounts.reduce((a, b) => a + b, 0) / (outstanding[currency] || Infinity),
+        0
+      );
+      const coverageSoFar = seen / Object.keys(outstanding).length;
+      if (coverageSoFar > 0) {
+        const pagesNeeded = (pages / coverageSoFar) * COVERAGE_FLOOR;
+        const msPerPage = (Date.now() - (deadline - budgetMs)) / pages;
+        const reachable =
+          pagesNeeded <= maxPages * 4 && pagesNeeded * msPerPage <= budgetMs * 4;
+        if (!reachable) {
+          truncated = true;
+          floorUnreachable = true;
+          break;
+        }
+      }
+    }
   } while (marker);
 
   const currencies = Object.entries(outstanding).map(([currency, total]) => {
@@ -363,11 +409,13 @@ async function readIssuanceSupply(
     pages,
     stoppedBecause: !marker
       ? "no_more_lines"
-      : pages >= maxPages
-        ? "page_cap"
-        : Date.now() >= deadline
-          ? "time_budget"
-          : "page_failed",
+      : floorUnreachable
+        ? "floor_unreachable"
+        : pages >= maxPages
+          ? "page_cap"
+          : Date.now() >= deadline
+            ? "time_budget"
+            : "page_failed",
     elapsedMs: Date.now() - (deadline - budgetMs),
   };
 }
