@@ -632,12 +632,17 @@
   .hero-instrument{
     position:relative;isolation:isolate;overflow:hidden;
     width:100vw;margin-inline:calc(50% - 50vw);
-    min-height:max(560px, calc(100svh - 76px));
+    /* Full-height only from 1024 up. Below that the node cluster is
+     * hidden, and forcing 100svh left a dead band between the headline
+     * and the bottom row with nothing to put in it. A floor keeps the
+     * hero from collapsing onto the brief on a phone. */
+    min-height:max(440px, 64svh);
     display:flex;flex-direction:column;
     background:var(--ground);
     --hi-gut:20px;
   }
   @media(min-width:768px){ .hero-instrument{--hi-gut:35px} }
+  @media(min-width:1024px){ .hero-instrument{min-height:max(560px, calc(100svh - 76px))} }
 
   .hero-instrument .cosmos{position:absolute;inset:0;width:100%;height:100%;z-index:0}
 
@@ -664,9 +669,9 @@
    * the diagram in type too small to read. It is the decoration, so it
    * is what goes. */
   @media(min-width:1024px){ .hi-nodes{display:block} }
-  .hi-sq{position:absolute;width:80px;height:80px;border:1px solid var(--muted);
+  .hi-sq{position:absolute;width:56px;height:56px;border:1px solid var(--muted);
     animation:hiScale .7s cubic-bezier(.16,1,.3,1) both}
-  @media(min-width:1024px){ .hi-sq{width:100px;height:100px} }
+  @media(min-width:1024px){ .hi-sq{width:68px;height:68px} }
   /* The CONTROL node sits in the band the info card claims once the
    * card's copy wraps to four lines, which it does from 1024 down to
    * about 1280. Below 1280 that square is the thing that goes; its
@@ -679,13 +684,13 @@
 
   .hi-label{position:absolute;z-index:3;display:none}
   @media(min-width:1024px){ .hi-label{display:block} }
-  .hi-label .t{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  .hi-label .t{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
     color:var(--ink);white-space:nowrap}
-  .hi-label p{margin-top:4px;font-size:11px;line-height:1.35;color:var(--muted)}
+  .hi-label p{margin-top:4px;font-size:10px;line-height:1.4;color:var(--muted)}
 
   /* ── Foreground: status strip, headline, bottom row. ───────────── */
   .hi-face{position:relative;z-index:4;display:flex;flex-direction:column;flex:1;
-    padding:var(--hi-gut);gap:20px}
+    padding:var(--hi-gut);gap:20px;width:100%;max-width:1280px;margin-inline:auto}
 
   .hi-status{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
     animation:hiRight .8s cubic-bezier(.16,1,.3,1) both}
@@ -750,6 +755,8 @@
   }
 
   @media(max-width:767px){
+    /* Content-driven on a phone. A floor here only ever produced a
+     * band of nothing under the CTA — measured, not assumed. */
     .hero-instrument{min-height:auto;padding-block:16px}
     .hero-instrument h1{margin-top:28px}
     .hi-bottom{margin-top:32px}
@@ -864,15 +871,15 @@
       <svg class="hi-wire" style="animation-delay:1.40s"><line x1="40%" y1="74%" x2="44%" y2="62%"/></svg>
     </div>
 
-    <div class="hi-label" style="top:16%;left:60%;max-width:180px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.77s">
+    <div class="hi-label" style="top:16%;left:60%;max-width:165px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.77s">
       <span class="t">[ INPUT ]</span>
       <p>Flags, trust lines, credentials, domains, book depth and amendments.</p>
     </div>
-    <div class="hi-label" style="top:72%;left:30%;max-width:180px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.98s">
+    <div class="hi-label" style="top:72%;left:30%;max-width:165px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.98s">
       <span class="t">[ OUTPUT ]</span>
       <p>The exact rule, evidence and timestamp behind the answer.</p>
     </div>
-    <div class="hi-label" style="top:46%;left:80%;max-width:190px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:1.19s">
+    <div class="hi-label" style="top:46%;left:80%;max-width:165px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:1.19s">
       <span class="t">[ CONTROL ]</span>
       <p>Read-only by design. No custody, key storage or broadcast path.</p>
     </div>
