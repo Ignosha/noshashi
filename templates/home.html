@@ -32,7 +32,7 @@
     --brand:#3A82F6; --tele:#00E0C6;
     --go:#35D49A; --hold:#F5B942; --nogo:#FF5F6D;
     --shell:min(1180px, 92vw);
-    --r:10px;
+    --r:3px;
   }
   html[data-theme="light"]{
     --ground:#F4F7FA; --surface:#FFFFFF; --elevated:#E8EEF5;
@@ -222,12 +222,12 @@
     font:11px "IBM Plex Mono",monospace;cursor:pointer;white-space:nowrap}
   .theme-toggle:hover,.theme-toggle:focus-visible{color:var(--ink);border-color:var(--brand)}
 
-  .hero{padding:72px 0 76px;position:relative}
+  .hero{padding:44px 0 44px;position:relative}
   .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);
     background:var(--surface);border-radius:999px;padding:5px 13px;font-size:11px;color:var(--muted)}
   .dot{width:6px;height:6px;border-radius:50%;background:var(--go)}
-  .hero h1{font-size:clamp(38px,6vw,68px);margin:26px 0 0;letter-spacing:-.035em;max-width:15ch}
-  .hero .sub{font-size:clamp(15px,1.7vw,19px);color:var(--muted);max-width:62ch;margin:24px 0 0;line-height:1.62}
+  .hero h1{font-size:clamp(30px,3.6vw,46px);margin:18px 0 0;letter-spacing:-.03em;max-width:22ch}
+  .hero .sub{font-size:clamp(14px,1.3vw,16px);color:var(--muted);max-width:74ch;margin:16px 0 0;line-height:1.6}
   .cta{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap}
   .micro{font-size:11px;color:var(--faint);margin-top:20px}
   .verdicts{display:inline-flex;gap:4px;font-weight:700}
@@ -257,7 +257,7 @@
 
   /* The header is sticky, so an anchor jump would land the heading
      underneath it without this. */
-  .ticker{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;
+  .ticker{display:flex;flex-wrap:wrap;gap:1px;margin-top:18px;
     border:1px solid var(--rule);background:var(--surface);border-radius:var(--r);padding:14px 18px}
   .tk{display:flex;flex-direction:column;gap:3px;min-width:132px;flex:1}
   .tk b{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;color:var(--ink);
@@ -301,22 +301,43 @@
   @media (max-width:900px){.operator-brief{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:560px){.operator-brief{grid-template-columns:1fr}}
 
-  section{padding:80px 0;position:relative;scroll-margin-top:72px}
-  .kicker-block{margin-bottom:36px;max-width:66ch}
-  .kicker-block h2{font-size:clamp(24px,3vw,34px);margin-top:10px}
+  section{padding:52px 0;position:relative;scroll-margin-top:72px}
+  .kicker-block{margin-bottom:24px;max-width:70ch}
+  .kicker-block h2{font-size:clamp(21px,2.5vw,29px);margin-top:9px}
+  /* The index is a coordinate, not a caption: it takes the brand so a
+     reader can navigate by number the way a spec document is read. */
+  .kicker-block .eyebrow{color:var(--brand)}
+  .kicker-block p{font-size:14px}
   .kicker-block p{color:var(--muted);margin-top:14px;font-size:15px}
 
-  .grid{display:grid;gap:14px}
+  /* One panel, divided — not a scatter of cards.
+     The 1px gap over a --rule ground draws every divider, so the cells
+     share hairlines the way a real instrument's faces do, and a grid
+     that does not divide evenly leaves a cell rather than a hole. */
+  .grid{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+    border-radius:var(--r);overflow:hidden}
   .g3{grid-template-columns:repeat(3,1fr)}
   .g2{grid-template-columns:repeat(2,1fr)}
-  .panel{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:26px}
-  .panel h3{font-size:16px;margin-bottom:10px}
-  .panel p{color:var(--muted);font-size:13.5px;line-height:1.62}
-  .num{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint);letter-spacing:.18em;margin-bottom:14px}
+  /* Close the rectangle.
+     Five cards in three columns left a sixth cell with nothing in it.
+     As separate floating cards that was a gap you read past; as cells of
+     one panel it is a hole in the instrument, and it shows the divider
+     colour rather than a face. Rather than pad the markup with an empty
+     div, the final cell widens to take the rest of its row, so any count
+     fills its grid exactly. */
+  .g3 > .panel:last-child:nth-child(3n+1){grid-column:span 3}
+  .g3 > .panel:last-child:nth-child(3n+2){grid-column:span 2}
+  .g2 > .panel:last-child:nth-child(odd){grid-column:span 2}
+  .panel{background:var(--surface);border:0;border-radius:0;padding:20px 18px}
+  .panel h3{font-size:15px;margin-bottom:8px}
+  .panel p{color:var(--muted);font-size:13px;line-height:1.56}
+  .num{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--brand);
+    letter-spacing:.18em;margin-bottom:11px}
 
 
   /* Download */
-  .panel.dl{position:relative;overflow:hidden}
+  .panel.dl{position:relative;overflow:hidden;border:1px solid var(--rule);
+    border-radius:var(--r);padding:24px}
   .panel.dl .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--brand)}
   .verify{margin-top:22px;border-top:1px solid var(--rule);padding-top:16px;display:grid;gap:10px}
   .verify div{display:grid;gap:4px}
