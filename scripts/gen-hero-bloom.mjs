@@ -122,7 +122,7 @@ for (let i = 0; i < 18; i++) {
 
 const svg = `<svg class="hi-bloom" viewBox="0 0 1000 760" fill="none"
      xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
-     preserveAspectRatio="xMidYMid meet">
+     preserveAspectRatio="xMidYMid slice">
   <defs>
     <!-- IDs are prefixed per DESIGN.md: two inline marks on one page
          must not be able to collide on a gradient id. -->
