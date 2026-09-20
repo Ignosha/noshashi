@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   authorityChecks,
+  regularKeyCanSign,
   verdictFor,
   certificateFrom,
   primaryCurrency,
@@ -323,6 +324,73 @@ describe("a regular key is a single key", () => {
     // A signer list is the authority when one exists; the regular key
     // cannot bypass it.
     const s = surface({ control: control({ regularKey: "rHotKey" }) });
+    expect(byId(s, "NO_UNILATERAL_SIGNER").passed).toBe(true);
+  });
+});
+
+/**
+ * A blackholed account is the strongest surrender, not the weakest.
+ *
+ * Setting the regular key to an address whose private key does not
+ * exist and then disabling the master key is how an XRPL issuer
+ * permanently gives up control. The issuance survives; the ability to
+ * sign for it does not.
+ *
+ * Having just been taught to read the regular key, the check treated
+ * every regular key as a controller — and marked Sologenic's SOLO,
+ * blackholed to ACCOUNT_ONE, as controlled by rrrrrrrrrrrrrrrrrrrrBZbvji
+ * "on its own". The most decentralised configuration the ledger offers
+ * scored worst of all, on a page built to inform an argument about
+ * decentralisation. Found on live mainnet, one issuer after the one
+ * that proved the opposite bug.
+ */
+describe("a key nobody holds is not a controller", () => {
+  const noList = {
+    present: false, quorum: 0, signers: [],
+    totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+  };
+  const blackholeKeys = [
+    "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+    "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "rrrrrrrrrrrrrrrrrNAMEtxvNvQ",
+    "rrrrrrrrrrrrrrrrrrrn5RM1rHd",
+  ];
+
+  for (const key of blackholeKeys) {
+    it(`passes an account blackholed to ${key}`, () => {
+      const s = surface({
+        control: control({ masterKeyEnabled: false, regularKey: key, signers: noList }),
+      });
+      const check = byId(s, "NO_UNILATERAL_SIGNER");
+      expect(check.passed).toBe(true);
+      expect(check.detail).toContain("blackholed");
+      expect(check.detail).toContain("private key does not exist");
+    });
+  }
+
+  it("still fails when the master key is left enabled beside a burn key", () => {
+    // Half-done blackholing. The regular key cannot sign, but the
+    // master key never stopped being able to, so one key still does.
+    const s = surface({
+      control: control({
+        masterKeyEnabled: true,
+        regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji",
+        signers: noList,
+      }),
+    });
+    const check = byId(s, "NO_UNILATERAL_SIGNER");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("no usable regular key");
+  });
+
+  it("does not mistake an ordinary key for a burn address", () => {
+    expect(regularKeyCanSign("rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ")).toBe(true);
+    expect(regularKeyCanSign("rrrrrrrrrrrrrrrrrrrrBZbvji")).toBe(false);
+    expect(regularKeyCanSign(undefined)).toBe(false);
+  });
+
+  it("a signer list still decides, even beside a burn key", () => {
+    const s = surface({ control: control({ regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji" }) });
     expect(byId(s, "NO_UNILATERAL_SIGNER").passed).toBe(true);
   });
 });

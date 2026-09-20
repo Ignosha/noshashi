@@ -190,6 +190,32 @@ const CASES: Array<{ name: string; surface: AuthoritySurface }> = [
     }),
   },
   {
+    name: "blackholed to ACCOUNT_ONE",
+    surface: surface({
+      control: control({
+        masterKeyEnabled: false,
+        regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji",
+        signers: {
+          present: false, quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    }),
+  },
+  {
+    name: "burn key but master still enabled",
+    surface: surface({
+      control: control({
+        masterKeyEnabled: true,
+        regularKey: "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+        signers: {
+          present: false, quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    }),
+  },
+  {
     name: "signer list unreadable",
     surface: surface({
       control: control({

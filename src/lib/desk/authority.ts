@@ -95,6 +95,40 @@ export type AuthorityCertificate = {
  */
 const COVERAGE_FLOOR = 0.95;
 
+/**
+ * Addresses whose private key provably does not exist.
+ *
+ * Setting the regular key to one of these and then disabling the
+ * master key is how an XRPL issuer gives up control — "blackholing".
+ * The account keeps issuing what it already issued and can never sign
+ * another transaction, because nobody can produce a signature for a
+ * key nobody holds. Alongside lsfNoFreeze it is the strongest
+ * surrender the ledger offers.
+ *
+ * Which makes it the worst thing to get backwards, and the first
+ * version did. Having just been taught to read the regular key, the
+ * check treated any regular key as a controller and marked Sologenic's
+ * SOLO — blackholed to ACCOUNT_ONE — as controlled by
+ * rrrrrrrrrrrrrrrrrrrrBZbvji "on its own". The most decentralised
+ * configuration available scored worst, and on the page built to
+ * inform a decentralisation argument.
+ *
+ * These four are reserved by the protocol and are not the product of
+ * any keypair: ACCOUNT_ZERO and ACCOUNT_ONE are the base58 encodings
+ * of 0 and 1, and the other two are rippled's own sentinels.
+ */
+const UNUSABLE_KEYS = new Set([
+  "rrrrrrrrrrrrrrrrrrrrrhoLvTp", // ACCOUNT_ZERO
+  "rrrrrrrrrrrrrrrrrrrrBZbvji", // ACCOUNT_ONE
+  "rrrrrrrrrrrrrrrrrNAMEtxvNvQ", // reserved for name lookups
+  "rrrrrrrrrrrrrrrrrrrn5RM1rHd", // rippled's NaN sentinel
+]);
+
+/** True when a regular key is set to something that can actually sign. */
+export function regularKeyCanSign(regularKey: string | undefined): boolean {
+  return Boolean(regularKey) && !UNUSABLE_KEYS.has(regularKey!);
+}
+
 /** HHI at or above which a supply is called concentrated. */
 const HHI_CONCENTRATED = 2500;
 
@@ -245,23 +279,29 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
    * read before anything can be said about unilateral control:
    *
    *   a signer list   quorum against SUMMED WEIGHTS, not a headcount
-   *   a regular key   one key, signing alone, set as a plain field
+   *   a regular key   one key, signing alone — unless it is unusable
    *   the master key  one key, signing alone, unless disabled
    *
-   * Reading only the first and the last produced the worst possible
-   * answer on live mainnet data. RLUSD's issuer has the master key
-   * disabled and no signer list, so the check concluded the account
-   * "cannot currently be signed for at all" and PASSED — an issuance
-   * being actively minted, reported as controlled by nobody. It has a
-   * regular key. That key signs alone.
+   * Both halves of this were found on live mainnet rather than
+   * reasoned out, and they fail in opposite directions.
    *
-   * A genuinely unsignable account does exist and still passes, but it
-   * now means all three are absent rather than two.
+   * Reading no regular key at all passed Bitstamp's USD issuer, which
+   * has the master key disabled and rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ
+   * signing alone: "the account cannot currently be signed for at all".
+   *
+   * Reading every regular key as a controller then failed Sologenic's
+   * SOLO, blackholed to ACCOUNT_ONE, which nobody can sign for. The
+   * key has to be one that can actually sign.
    */
   const signersUnreadable = Boolean(control.signers.unreadable);
+  const blackholed =
+    !control.masterKeyEnabled &&
+    Boolean(control.regularKey) &&
+    !regularKeyCanSign(control.regularKey);
+
   const unilateral = control.signers.present
     ? control.signers.minimumSigners <= 1
-    : Boolean(control.regularKey) || control.masterKeyEnabled;
+    : regularKeyCanSign(control.regularKey) || control.masterKeyEnabled;
 
   checks.push({
     id: "NO_UNILATERAL_SIGNER",
@@ -276,11 +316,13 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
         ? control.signers.minimumSigners <= 1
           ? `A signer list is present, but ${control.signers.unilateralSigners.length || 1} signer reaches the quorum of ${control.signers.quorum} alone. This is a single-key account wearing a committee's clothes.`
           : `${control.signers.minimumSigners} signers must agree to reach the quorum of ${control.signers.quorum}, derived from summed weights rather than a headcount.`
-        : control.regularKey
-          ? `No signer list. The master key is ${control.masterKeyEnabled ? "enabled" : "disabled"} and a regular key is set, so ${control.regularKey} signs for this issuer on its own.`
-          : control.masterKeyEnabled
-            ? "No signer list and no regular key, and the master key is enabled. One key signs for this issuer."
-            : "The master key is disabled, no regular key is set and no signer list is present, so the account cannot currently be signed for at all.",
+        : blackholed
+          ? `The master key is disabled and the regular key is set to ${control.regularKey}, an address whose private key does not exist. The account is blackholed: it can never sign another transaction, so no party can act on this issuance.`
+          : regularKeyCanSign(control.regularKey)
+            ? `No signer list. The master key is ${control.masterKeyEnabled ? "enabled" : "disabled"} and a regular key is set, so ${control.regularKey} signs for this issuer on its own.`
+            : control.masterKeyEnabled
+              ? `No signer list and no usable regular key, and the master key is enabled. One key signs for this issuer.`
+              : "The master key is disabled, no regular key is set and no signer list is present, so the account cannot currently be signed for at all.",
   });
 
   /* ── Cost of transacting ────────────────────────────────────────── */
