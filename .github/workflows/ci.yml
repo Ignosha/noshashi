@@ -81,6 +81,13 @@ jobs:
       - name: Typecheck Edge Functions
         run: npm run check:functions
 
+      # templates/hero-bloom.svg is generated output that is committed.
+      # A change to the generator that is pushed without its regenerated
+      # file leaves the two disagreeing, and the site ships the stale
+      # one — which is exactly how a mobile fix once landed inert.
+      - name: Hero bloom is regenerated
+        run: npm run check:bloom
+
       - name: Tests
         run: npm test
 
