@@ -599,6 +599,162 @@
     .tk{min-width:100px}
     .ticker{gap:12px 10px;padding:13px 15px}
   }
+
+  /* ══ Instrument hero ═══════════════════════════════════════════════
+   *
+   * A full-viewport opening screen: a faint measured grid, three
+   * labelled nodes wired together, and one action. Adapted from a
+   * reference composition rather than copied — four things in that
+   * reference could not come across, and each was replaced rather
+   * than dropped:
+   *
+   *   Its background was an MP4 on someone else's CloudFront bucket.
+   *   Hotlinking a third party's asset is fragile and not ours to
+   *   spend, and vercel.json's `default-src 'self'` would refuse it
+   *   outright. The cosmos canvas already here does the same job, is
+   *   ours, and already stops when the tab is hidden and holds still
+   *   under prefers-reduced-motion.
+   *
+   *   Its display face was Graphik LCG pulled from a font-piracy CDN.
+   *   Graphik is licensed commercially; `font-src 'self'` would refuse
+   *   it anyway. Space Grotesk is already the display face here and is
+   *   already self-hosted.
+   *
+   *   Its status strip showed a hard-coded Ethereum-style wallet on an
+   *   XRP Ledger product. Invented figures are the one thing this site
+   *   does not print, so the strip carries facts instead.
+   *
+   *   Its accent was an ice blue. Every other section of this page is
+   *   built on --brand, and a hero on a different blue reads as a
+   *   different site. The structure is the borrowed part; the palette
+   *   stays.
+   */
+  .hero-instrument{
+    position:relative;isolation:isolate;overflow:hidden;
+    width:100vw;margin-inline:calc(50% - 50vw);
+    min-height:max(560px, calc(100svh - 76px));
+    display:flex;flex-direction:column;
+    background:var(--ground);
+    --hi-gut:20px;
+  }
+  @media(min-width:768px){ .hero-instrument{--hi-gut:35px} }
+
+  .hero-instrument .cosmos{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+
+  /* ── The measured grid. Four verticals, two horizontals, eight
+   *    crossings. Percentages, so it is the same composition at every
+   *    width. ─────────────────────────────────────────────────────── */
+  .hi-grid{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .hi-v{position:absolute;top:0;height:100%;width:1px;background:var(--rule);opacity:.55;
+    transform-origin:top;animation:hiGridV 1.2s cubic-bezier(.16,1,.3,1) both}
+  .hi-h{position:absolute;left:0;width:100%;height:1px;background:var(--rule);opacity:.55;
+    transform-origin:left;animation:hiGridH 1.2s cubic-bezier(.16,1,.3,1) both}
+  .hi-x{position:absolute;animation:hiScale .7s cubic-bezier(.16,1,.3,1) both}
+  .hi-x::before,.hi-x::after{content:"";position:absolute;background:var(--faint);
+    transform:translate(-50%,-50%)}
+  .hi-x::before{width:10px;height:1px}
+  .hi-x::after{width:1px;height:10px}
+
+  /* ── Nodes: three empty squares, six connector segments. Decorative;
+   *    the readable text lives in .hi-label. Hidden below 768px, where
+   *    there is no room to place them without collision. ──────────── */
+  .hi-nodes{position:absolute;inset:0;z-index:2;pointer-events:none;display:none}
+  /* 1024, not 768. At tablet width the right-hand labels ran 8px past
+   * the viewport edge, and squeezing them in would have meant setting
+   * the diagram in type too small to read. It is the decoration, so it
+   * is what goes. */
+  @media(min-width:1024px){ .hi-nodes{display:block} }
+  .hi-sq{position:absolute;width:80px;height:80px;border:1px solid var(--muted);
+    animation:hiScale .7s cubic-bezier(.16,1,.3,1) both}
+  @media(min-width:1024px){ .hi-sq{width:100px;height:100px} }
+  /* The CONTROL node sits in the band the info card claims once the
+   * card's copy wraps to four lines, which it does from 1024 down to
+   * about 1280. Below 1280 that square is the thing that goes; its
+   * label is real text and stays. */
+  .hi-n2{display:none}
+  @media(min-width:1280px){ .hi-n2{display:block} }
+  .hi-wire{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
+    animation:hiFade .8s cubic-bezier(.16,1,.3,1) both}
+  .hi-wire line{stroke:var(--rule);stroke-width:1}
+
+  .hi-label{position:absolute;z-index:3;display:none}
+  @media(min-width:1024px){ .hi-label{display:block} }
+  .hi-label .t{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+    color:var(--ink);white-space:nowrap}
+  .hi-label p{margin-top:4px;font-size:11px;line-height:1.35;color:var(--muted)}
+
+  /* ── Foreground: status strip, headline, bottom row. ───────────── */
+  .hi-face{position:relative;z-index:4;display:flex;flex-direction:column;flex:1;
+    padding:var(--hi-gut);gap:20px}
+
+  .hi-status{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    animation:hiRight .8s cubic-bezier(.16,1,.3,1) both}
+  .hi-status .s{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.06em;
+    color:var(--muted);display:inline-flex;align-items:center;gap:7px}
+  .hi-status .s b{font-weight:400;color:var(--ink)}
+  .hi-status .live{color:var(--go)}
+  .hi-status .chip{font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    background:var(--brand);color:#fff;border-radius:var(--r);padding:2px 6px;letter-spacing:.04em}
+  .hi-status .sep{margin-left:8px}
+
+  .hero-instrument h1{
+    font-size:clamp(30px,5.2vw,62px);line-height:1.04;letter-spacing:-.03em;
+    max-width:19ch;margin-top:auto;
+    animation:hiUp .9s cubic-bezier(.16,1,.3,1) both;animation-delay:.12s}
+
+  .hi-bottom{display:flex;flex-direction:column;align-items:flex-start;gap:20px;margin-top:auto}
+  @media(min-width:768px){ .hi-bottom{flex-direction:row;align-items:flex-end;justify-content:space-between;gap:0} }
+
+  .hi-cta{display:inline-flex;align-items:center;gap:10px;background:var(--brand);color:#fff;
+    border:1px solid var(--brand);border-radius:var(--r);padding:10px 16px;text-decoration:none;
+    font-size:13px;letter-spacing:.02em;
+    animation:hiUp .9s cubic-bezier(.16,1,.3,1) both;animation-delay:.5s;
+    transition:filter .15s,transform .15s}
+  @media(min-width:768px){ .hi-cta{padding:12px 20px} }
+  .hi-cta:hover,.hi-cta:focus-visible{filter:brightness(1.1);transform:translateY(-1px)}
+  .hi-cta .star{font-size:15px;line-height:1}
+
+  .hi-card{position:relative;max-width:300px;display:none;
+    animation:hiRight .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.62s}
+  @media(min-width:640px){ .hi-card{display:block} }
+  .hi-card .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.1em;background:var(--brand);color:#fff;padding:2px 6px;margin-bottom:10px}
+  .hi-card .body{position:relative;padding:20px}
+  /* The chamfer is drawn rather than bordered: a corner-cut cannot be
+   * expressed with border-radius, and a clip-path would take the text
+   * with it. */
+  .hi-card .edge{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .hi-card .edge polygon{fill:none;stroke:var(--brand);stroke-width:1}
+  .hi-card p{position:relative;font-size:13px;line-height:1.45;color:var(--muted);margin-bottom:16px}
+  .hi-card a{position:relative;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    letter-spacing:.06em;color:var(--brand);text-decoration:none}
+  .hi-card a:hover,.hi-card a:focus-visible{text-decoration:underline}
+
+  @keyframes hiUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  @keyframes hiFade{from{opacity:0}to{opacity:1}}
+  @keyframes hiRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+  @keyframes hiScale{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+  @keyframes hiGridV{from{opacity:0;transform:scaleY(0)}to{opacity:.55;transform:none}}
+  @keyframes hiGridH{from{opacity:0;transform:scaleX(0)}to{opacity:.55;transform:none}}
+
+  /*
+   * The entrance is choreography, not information. Under
+   * prefers-reduced-motion everything is simply present — same layout,
+   * same opacities, no travel. Written as `animation:none` on the
+   * whole subtree so a rule added later cannot quietly reintroduce
+   * motion here.
+   */
+  @media(prefers-reduced-motion:reduce){
+    .hero-instrument *{animation:none !important}
+    .hi-v,.hi-h{opacity:.55}
+  }
+
+  @media(max-width:767px){
+    .hero-instrument{min-height:auto;padding-block:16px}
+    .hero-instrument h1{margin-top:28px}
+    .hi-bottom{margin-top:32px}
+  }
+
 </style>
 </head>
 <body>
@@ -643,128 +799,145 @@
 </header>
 
 <main class="shell">
-  <section class="hero">
-    <!--
-      Instrument field. Four static plates from board section 07, layered.
-      No animation loop, no parallax, nothing that competes with the
-      ticker directly beneath it. Opacities are set per plate and none
-      exceeds 8%.
-    -->
-    <!--
-      The hero sky. Confined to this section: the loop runs only while
-      the hero is on screen, stops when the tab is hidden, and holds
-      still under prefers-reduced-motion. Nothing below this section
-      has moving pixels behind it. See site/assets/cosmos.js.
-    -->
+  <!--
+    Instrument hero.
+
+    One screen: what this reads, what it answers with, and one action.
+    The architecture — fixed gutter, measured grid, three wired nodes,
+    a bottom row of action plus a chamfered note — is adapted from a
+    reference composition. Everything IN it is this project's own.
+
+    Four substitutions, each recorded in the CSS above rather than
+    made quietly: no third-party CloudFront video (CSP would refuse
+    it, and it is not ours), no Graphik from a font-piracy CDN
+    (licensed commercially, and `font-src 'self'` would refuse it), no
+    invented wallet address (this site does not print figures it did
+    not read), and --brand rather than a borrowed accent.
+
+    There is no nav in here. The page already has a real <header>
+    above with the theme toggle, the i18n hooks and the responsive
+    collapse; a second nav inside the hero would be a duplicate that
+    drifts.
+
+    Every string below keeps the data-i18n key it already had, so the
+    translations in site/data/i18n continue to resolve. The mission,
+    the badges, the headline and the CTA are the existing copy, moved
+    rather than rewritten.
+  -->
+  <section class="hero-instrument">
     <canvas class="cosmos" aria-hidden="true"></canvas>
 
-    <div class="field" aria-hidden="true">
-      <!-- Concentric orbital system, bleeding off the right edge. -->
-      <svg class="orbit" style="right:-8%;top:-6%;width:620px;height:620px" viewBox="0 0 240 240">
-        <g stroke="currentColor" stroke-width=".6" fill="none">
-          <ellipse cx="120" cy="120" rx="34" ry="46"/><ellipse cx="120" cy="120" rx="58" ry="76"/>
-          <ellipse cx="120" cy="120" rx="80" ry="102"/><ellipse cx="120" cy="120" rx="100" ry="126" transform="rotate(-14 120 120)"/>
-        </g>
-        <circle cx="120" cy="120" r="7" fill="currentColor"/><circle cx="120" cy="74" r="3" fill="currentColor"/>
-        <circle cx="120" cy="178" r="2.6" fill="currentColor"/><circle cx="62" cy="120" r="2" fill="currentColor"/>
-        <circle cx="178" cy="120" r="2" fill="currentColor"/>
-      </svg>
-
-      <!-- Dot grid. The plane the orbits sit over. -->
-      <svg class="plate-grid" style="left:-4%;top:8%;width:540px;height:420px;opacity:.10" viewBox="0 0 540 420">
-        <defs>
-          <pattern id="fld-dots" width="26" height="26" patternUnits="userSpaceOnUse">
-            <circle cx="1.4" cy="1.4" r="1.4" fill="currentColor"/>
-          </pattern>
-          <linearGradient id="fld-fade" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#fff" stop-opacity=".85"/>
-            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-          </linearGradient>
-          <mask id="fld-mask"><rect width="540" height="420" fill="url(#fld-fade)"/></mask>
-        </defs>
-        <rect width="540" height="420" fill="url(#fld-dots)" mask="url(#fld-mask)"/>
-      </svg>
-
-      <!-- Tilted ellipse carrying bodies on the path. -->
-      <svg style="right:14%;bottom:-16%;width:460px;height:300px;opacity:.07" viewBox="0 0 460 300">
-        <g transform="rotate(-18 230 150)">
-          <ellipse cx="230" cy="150" rx="215" ry="74" fill="none" stroke="currentColor" stroke-width=".8"/>
-          <ellipse cx="230" cy="150" rx="150" ry="50" fill="none" stroke="currentColor" stroke-width=".6"/>
-          <circle cx="445" cy="150" r="4" fill="currentColor"/>
-          <circle cx="126" cy="112" r="2.6" fill="currentColor"/>
-          <circle cx="330" cy="196" r="2" fill="currentColor"/>
-        </g>
-      </svg>
-
-      <!-- Diagonal hatch, closing the lower left. -->
-      <svg style="left:2%;bottom:-8%;width:300px;height:220px;opacity:.06" viewBox="0 0 300 220">
-        <defs>
-          <pattern id="fld-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-            <line x1="0" y1="0" x2="0" y2="9" stroke="currentColor" stroke-width=".9"/>
-          </pattern>
-        </defs>
-        <rect width="300" height="220" fill="url(#fld-hatch)"/>
-      </svg>
+    <div class="hi-grid" aria-hidden="true">
+      <span class="hi-v" style="left:12.6%;animation-delay:.30s"></span>
+      <span class="hi-v" style="left:37.5%;animation-delay:.40s"></span>
+      <span class="hi-v" style="left:61.9%;animation-delay:.50s"></span>
+      <span class="hi-v" style="left:86.2%;animation-delay:.60s"></span>
+      <span class="hi-h" style="top:32.7%;animation-delay:.50s"></span>
+      <span class="hi-h" style="top:71.4%;animation-delay:.65s"></span>
+      <span class="hi-x" style="top:32.7%;left:12.6%;animation-delay:.70s"></span>
+      <span class="hi-x" style="top:32.7%;left:37.5%;animation-delay:.76s"></span>
+      <span class="hi-x" style="top:32.7%;left:61.9%;animation-delay:.82s"></span>
+      <span class="hi-x" style="top:32.7%;left:86.2%;animation-delay:.88s"></span>
+      <span class="hi-x" style="top:71.4%;left:12.6%;animation-delay:.94s"></span>
+      <span class="hi-x" style="top:71.4%;left:37.5%;animation-delay:1.00s"></span>
+      <span class="hi-x" style="top:71.4%;left:61.9%;animation-delay:1.06s"></span>
+      <span class="hi-x" style="top:71.4%;left:86.2%;animation-delay:1.12s"></span>
     </div>
-
 
     <!--
-      The name and the mission, before any claim is made. Both are taken
-      verbatim from PRODUCT.md rather than written for the page, so the
-      site and the product truth cannot drift apart.
+      The three nodes are INPUT, OUTPUT and CONTROL — the same three
+      the operating brief below this hero already states, so the
+      screen and the brief cannot drift apart. Squares and wires are
+      decorative and hidden from assistive technology; the labels are
+      real text and are not.
     -->
-    <div class="lockup">
-      <div class="lockup-brand">
-      <div class="lockup-mark" aria-hidden="true">
-        <span class="lockup-ring"></span>
-        <span class="lockup-ring"></span>
-        <span class="lockup-ring"></span>
-        <svg class="mark" viewBox="0 0 180 180" fill="none" aria-hidden="true">
-          <mask id="lockup-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
-            <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
-            <path d="M95 99C91 80 94 64 103 50 114 59 121 70 123 83 116 91 106 97 95 99Z" fill="#000"/>
-            <circle cx="129" cy="63" r="5" fill="#000"/>
-          </mask>
-          <g stroke="currentColor" stroke-width="7" stroke-linecap="round">
-            <path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/>
-          </g>
-          <circle cx="151" cy="69" r="7" fill="currentColor"/>
-          <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="currentColor" mask="url(#lockup-mask)"/>
-          <path d="M92 111 63 132C60 116 66 103 78 93Z" fill="currentColor"/>
-          <path d="M111 91 130 118C114 119 101 113 93 103Z" fill="currentColor"/>
-          <path d="M82 121 67 150 94 132Z" fill="currentColor"/>
-          <path d="M73 143 61 164 84 151Z" fill="currentColor"/>
-        </svg>
-      </div>
-      <div class="lockup-word">
-        <h2>NOSHASHI</h2>
-        <span class="tagline" data-i18n="hero.tagline">Analyze · Discover · Navigate</span>
-      </div>
-      </div>
+    <div class="hi-nodes" aria-hidden="true">
+      <span class="hi-sq" style="top:26%;left:72%;animation-delay:1.05s"></span>
+      <span class="hi-sq hi-n2" style="top:54%;left:64%;animation-delay:1.25s"></span>
+      <span class="hi-sq" style="top:62%;left:44%;animation-delay:1.45s"></span>
 
-      <p class="mission" data-i18n="hero.mission">
-        A <strong>zero-trust intelligence workstation for the XRP Ledger</strong> — compliance
-        adjudication and market intelligence read from one validated ledger state, in the same
-        second. Every other tool on this chain gives you one half.
-      </p>
+      <svg class="hi-wire" style="animation-delay:.84s"><line x1="66%" y1="19%" x2="70%" y2="19%"/></svg>
+      <svg class="hi-wire" style="animation-delay:.98s"><line x1="70%" y1="19%" x2="72%" y2="26%"/></svg>
+      <svg class="hi-wire hi-n2" style="animation-delay:1.05s"><line x1="80%" y1="49%" x2="70%" y2="49%"/></svg>
+      <svg class="hi-wire hi-n2" style="animation-delay:1.19s"><line x1="70%" y1="49%" x2="64%" y2="54%"/></svg>
+      <svg class="hi-wire" style="animation-delay:1.26s"><line x1="36%" y1="74%" x2="40%" y2="74%"/></svg>
+      <svg class="hi-wire" style="animation-delay:1.40s"><line x1="40%" y1="74%" x2="44%" y2="62%"/></svg>
     </div>
 
-    <span class="badge"><span class="dot"></span><span data-i18n="hero.badge.live">Live on XRPL Mainnet · no testnet path exists</span></span>
-    <span class="badge" style="margin-left:8px"><span class="dot hold"></span><span data-i18n="hero.badge.beta">Beta channel</span> · <!--SLOT:VERSION--> · <span data-i18n="hero.badge.unsigned">unsigned builds</span></span>
-    <h1 data-i18n="hero.h1">Am I allowed to move this — and could I actually get out of it?</h1>
-    <p class="sub">
-      Compliance tooling reads account flags and never opens the order book. Market
-      terminals read the book and never check the flags. NOSHASHI answers both from the
-      same validated ledger state, in the same second, and returns
-      <span class="verdicts"><span class="go">GO</span>/<span class="hold">HOLD</span>/<span class="nogo">NO-GO</span></span>
-      with the exact rule that decided it.
-    </p>
-    <div class="cta">
-      <a class="btn" href="#download"><span data-i18n="hero.cta.download">Download the beta</span></a>
-      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="hero.cta.talk">Talk to us</span></a>
-      <a class="btn ghost" href="/guide/"><span data-i18n="hero.cta.guide">New to XRP? Start here</span></a>
+    <div class="hi-label" style="top:16%;left:60%;max-width:180px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.77s">
+      <span class="t">[ INPUT ]</span>
+      <p>Flags, trust lines, credentials, domains, book depth and amendments.</p>
     </div>
-    <p class="micro" data-i18n="hero.micro">Free tier · no account, anywhere on this site · nothing is ever signed</p>
+    <div class="hi-label" style="top:72%;left:30%;max-width:180px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.98s">
+      <span class="t">[ OUTPUT ]</span>
+      <p>The exact rule, evidence and timestamp behind the answer.</p>
+    </div>
+    <div class="hi-label" style="top:46%;left:80%;max-width:190px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:1.19s">
+      <span class="t">[ CONTROL ]</span>
+      <p>Read-only by design. No custody, key storage or broadcast path.</p>
+    </div>
+
+    <div class="hi-face">
+      <!--
+        The status strip. Its reference showed a hard-coded wallet and
+        a fake [ CONNECTED ]; these are facts instead — the network is
+        named, the build number is the real one substituted at deploy,
+        and the tagline is the existing translated string.
+      -->
+      <div class="hi-status">
+        <span class="s">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.4" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M1.6 8h12.8M8 1.6c3.4 3.6 3.4 9.2 0 12.8M8 1.6C4.6 5.2 4.6 10.8 8 14.4"
+                  stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+          <b data-i18n="hero.badge.live">Live on XRPL Mainnet · no testnet path exists</b>
+        </span>
+        <span class="s live">[ LIVE ]</span>
+        <span class="s sep">BUILD:</span>
+        <span class="chip"><!--SLOT:VERSION--></span>
+        <span class="s" data-i18n="hero.tagline">Analyze · Discover · Navigate</span>
+      </div>
+
+      <h1 data-i18n="hero.h1">Am I allowed to move this — and could I actually get out of it?</h1>
+
+      <div class="hi-bottom">
+        <a class="hi-cta" href="#download">
+          <span class="star" aria-hidden="true">&#10022;</span>
+          <span data-i18n="hero.cta.download">Download the beta</span>
+        </a>
+
+        <div class="hi-card">
+          <span class="tag" data-i18n="hero.micro.short">NOTHING IS EVER SIGNED</span>
+          <div class="body">
+            <!--
+              viewBox matches the card's natural size so the chamfer is
+              not distorted; preserveAspectRatio="none" plus a
+              non-scaling stroke holds it at 1px while it stretches.
+            -->
+            <svg class="edge" viewBox="0 0 300 172" preserveAspectRatio="none" aria-hidden="true">
+              <polygon points="0.5,0.5 299.5,0.5 299.5,171.5 30,171.5 0.5,141.5"
+                       vector-effect="non-scaling-stroke"/>
+            </svg>
+            <p data-i18n="hero.mission">
+              A zero-trust intelligence workstation for the XRP Ledger — compliance
+              adjudication and market intelligence read from one validated ledger state,
+              in the same second.
+            </p>
+            <a href="/certificate/">READ_AN_AUTHORITY_CERTIFICATE &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--
+    Everything the old hero carried below the fold continues here,
+    unchanged: the operating brief, the decision loop and the ticker.
+    The redesign replaced the opening screen, not the content under it.
+  -->
+  <section class="hero hero-continued">
+
     <div class="hero-brief" aria-label="Institutional operating brief">
       <div class="hero-brief-cell">
         <span class="label">THE INSTITUTIONAL QUESTION</span>
