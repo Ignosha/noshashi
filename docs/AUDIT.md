@@ -143,12 +143,41 @@ cover each state.
 **Still open:** nothing supplies a register yet. That is an operator
 address book, and it belongs with G5.
 
-### G4 — Policies are not versioned  (§17, §58)
+### G4 — Policies are not versioned  (§17, §58)  — AUTHORITY DONE
 
-One policy set, compiled in. §17 requires named, versioned, authored
-policies, and §58 requires that historical analyses stay interpretable
-after the algorithm changes. Today a policy change silently reinterprets
-every past receipt.
+One policy set, compiled in. §58 requires that a historical analysis
+stay interpretable after the algorithm changes; before this, a rule
+change silently reinterpreted every past reading.
+
+**Done for the authority rule set.** `AUTHORITY_RULES_VERSION` is in
+the digest scope in all three runtimes and published on the
+certificate, for the same reason `source` is: a verifier recomputes
+from the body, so a bound field the issuer withholds makes the
+certificate unverifiable. The verb requires `rules_version` rather
+than defaulting it, so a certificate issued under older rules cannot
+verify as though issued under the current ones. The public page prints
+it and its explainer names it.
+
+**The version is enforced, not remembered.** A constant a human has to
+bump is a comment, not a control.
+`authority-rules-version.test.ts` runs the rules over a 19-surface
+battery aimed at each check in both directions, hashes the
+[id, severity, passed] outcomes, and fails when that fingerprint moves
+while the version does not. Verified by silently moving
+HHI_CONCENTRATED 2500 → 2400: the lock fails with the instruction to
+bump and re-record. It fingerprints OUTCOMES, not source text —
+hashing the file would fire on a reworded comment and stay silent on a
+threshold reached through a renamed constant. A second test asserts
+the battery emits all seven check ids, so a rule cannot be added
+outside the lock's reach.
+
+**Still open — settlement.** `receiptDigest`'s body is frozen (see §6),
+so a policy version cannot be added to it without breaking every
+stored settlement receipt. That needs either a versioned second digest
+beside the frozen one, or a `policy_version` carried next to the
+receipt rather than inside it — a contract change, not an addition.
+§17's named, authored, stored policy records also remain unbuilt and
+belong with G5's schema.
 
 ### G5 — No organisations, roles or audit log  (§26, §27)  — SCHEMA DONE
 
