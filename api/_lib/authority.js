@@ -350,7 +350,26 @@ async function readIssuanceSupply(
     };
   });
 
-  return { issuer, currencies, linesWalked, truncated, ledgerIndex };
+  return {
+    issuer,
+    currencies,
+    linesWalked,
+    truncated,
+    ledgerIndex,
+    // Why the walk ended, and how far it got. Coverage alone cannot
+    // distinguish "we read every line there is and they only account
+    // for 9% of the obligations" from "we ran out of pages" — and those
+    // demand completely different responses.
+    pages,
+    stoppedBecause: !marker
+      ? "no_more_lines"
+      : pages >= maxPages
+        ? "page_cap"
+        : Date.now() >= deadline
+          ? "time_budget"
+          : "page_failed",
+    elapsedMs: Date.now() - (deadline - budgetMs),
+  };
 }
 
 /** Read everything the certificate needs, at one ledger. */
