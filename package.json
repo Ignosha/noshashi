@@ -20,7 +20,7 @@
     "tauri:demo": "tauri build --config src-tauri/tauri.demo.conf.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:functions": "deno check supabase/functions/noshashi-verify/index.ts"
+    "check:functions": "cd supabase/functions && deno check */index.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",

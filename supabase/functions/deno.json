@@ -1,0 +1,23 @@
+{
+  "//": [
+    "Deno configuration for the Edge Functions, and the reason it is HERE",
+    "rather than at the repository root.",
+    "",
+    "`nodeModulesDir: auto` lets Deno resolve the npm packages the jsr",
+    "edge-runtime types pull in transitively (npm:openai, among others).",
+    "Without it `deno check` fails on resolution rather than on anything",
+    "about our code.",
+    "",
+    "But Deno creates that node_modules next to THIS file, and that",
+    "placement is the whole point. Run from the repository root, Deno",
+    "rewrites the root node_modules into its own layout and breaks the npm",
+    "toolchain sharing it — vitest starts failing with",
+    "ERR_PACKAGE_PATH_NOT_EXPORTED because it resolves vite through",
+    "node_modules/.deno. In CI that lands between the typecheck and the",
+    "test step and takes the whole build red; locally it breaks the",
+    "contributor's checkout with no clue as to why.",
+    "",
+    "Scoped here, the two dependency trees never touch."
+  ],
+  "nodeModulesDir": "auto"
+}

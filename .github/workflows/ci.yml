@@ -44,6 +44,43 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      # The Edge Functions are Deno, and nothing else in this pipeline
+      # looks at them. tsconfig.json includes only `src`, so `npx tsc
+      # --noEmit` above walks straight past supabase/functions — which
+      # meant those three files were compiled by NOTHING between being
+      # written and being deployed to production.
+      #
+      # That is not hypothetical. noshashi-verify shipped a call to
+      # timingSafeEqual, a helper that exists in the Stripe webhook and
+      # not in that file, and it reached main. Every request to the verb
+      # it guards would have thrown a ReferenceError. `deno check` finds
+      # it as TS2304 in seconds.
+      #
+      # Deno rather than tsc because Deno is what actually runs these
+      # files: it resolves npm: and jsr: specifiers and knows the Deno
+      # global, so there is no error output to filter and no risk of a
+      # filter hiding a real fault.
+      #
+      # The check runs from supabase/functions, against the deno.json
+      # there, and that is load-bearing rather than tidiness. Deno needs
+      # nodeModulesDir to resolve the npm packages the jsr edge-runtime
+      # types pull in transitively, and it creates that node_modules
+      # beside its config. Run from the repository root it rewrites the
+      # ROOT node_modules into Deno's layout and breaks the npm
+      # toolchain sharing it — vitest then dies with
+      # ERR_PACKAGE_PATH_NOT_EXPORTED, which is to say this step would
+      # have taken the Tests step below red on its first run. Scoped to
+      # that directory, the two dependency trees never meet.
+      #
+      # The glob is deliberate: a fourth function gets checked the day
+      # it is added, with nobody having to remember this file.
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Typecheck Edge Functions
+        run: npm run check:functions
+
       - name: Tests
         run: npm test
 
