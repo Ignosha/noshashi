@@ -281,24 +281,75 @@ export function evaluatePolicy(input: {
   };
 }
 
-/** Canonical JSON → SHA-256 hex. The receipt's tamper-evident digest. */
-export async function receiptDigest(
-  body: Omit<PolicyReceipt, "digest" | "latencyMs">
-): Promise<string> {
-  const canonical = JSON.stringify({
-    verdict: body.verdict,
-    domainId: body.domainId,
-    subject: body.subject,
-    amountXrp: body.amountXrp,
-    evaluatedAt: body.evaluatedAt,
-    checks: body.checks.map((check) => [check.id, check.passed]),
-  });
+/** The single hash implementation. Canonical string in, receipt hex out. */
+async function sha256Hex(canonical: string): Promise<string> {
   const bytes = new TextEncoder().encode(canonical);
   const hash = await crypto.subtle.digest("SHA-256", bytes);
   return Array.from(new Uint8Array(hash))
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("")
     .toUpperCase();
+}
+
+/**
+ * Canonical JSON → SHA-256 hex. The receipt's tamper-evident digest.
+ *
+ * THIS BODY IS FROZEN. Every settlement receipt ever issued — including
+ * the ten thousand a Pro desk keeps on disk — was digested over exactly
+ * these fields in exactly this order. DESIGN.md's first principle is
+ * that identical inputs produce an identical digest; re-ordering a key
+ * or adding a field here would silently stop every stored receipt from
+ * re-verifying, which is the one failure this product cannot have.
+ *
+ * New receipt kinds get `digestOf` below rather than a change here.
+ */
+export async function receiptDigest(
+  body: Omit<PolicyReceipt, "digest" | "latencyMs">
+): Promise<string> {
+  return sha256Hex(
+    JSON.stringify({
+      verdict: body.verdict,
+      domainId: body.domainId,
+      subject: body.subject,
+      amountXrp: body.amountXrp,
+      evaluatedAt: body.evaluatedAt,
+      checks: body.checks.map((check) => [check.id, check.passed]),
+    })
+  );
+}
+
+/**
+ * The canonical form for every receipt kind after settlement.
+ *
+ * Settlement keeps its own frozen body above for compatibility; anything
+ * added from here on shares this one, so the product does not grow a
+ * third, fourth and fifth canonicalisation as it grows receipt types.
+ *
+ * `kind` is inside the hashed body rather than beside it, so an
+ * authority certificate and some later receipt over an identical check
+ * list cannot produce the same digest. `scope` keys are sorted, so a
+ * caller cannot change the digest by writing the same fields in a
+ * different order.
+ */
+export async function digestOf(input: {
+  kind: string;
+  subject: string;
+  /** Whatever else identifies this evaluation: currency, ledger index. */
+  scope: Record<string, string | number>;
+  checks: Array<Pick<PolicyCheck, "id" | "passed">>;
+  evaluatedAt: string;
+}): Promise<string> {
+  return sha256Hex(
+    JSON.stringify({
+      kind: input.kind,
+      subject: input.subject,
+      scope: Object.keys(input.scope)
+        .sort()
+        .map((key) => [key, input.scope[key]]),
+      evaluatedAt: input.evaluatedAt,
+      checks: input.checks.map((check) => [check.id, check.passed]),
+    })
+  );
 }
 
 /** Full evaluation with timing and digest — what the UI actually calls. */
