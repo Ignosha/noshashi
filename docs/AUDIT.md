@@ -150,11 +150,50 @@ policies, and §58 requires that historical analyses stay interpretable
 after the algorithm changes. Today a policy change silently reinterprets
 every past receipt.
 
-### G5 — No organisations, roles or audit log  (§26, §27)
+### G5 — No organisations, roles or audit log  (§26, §27)  — SCHEMA DONE
 
-There is authentication and there are entitlements, but no
-Organization → Workspace → Member → Role model and no audit log table.
-This is the largest single piece of unbuilt work in the directive.
+There was authentication and entitlements, but no
+Organization → Member → Role model and no audit log.
+
+**Timing.** Every table in `noshashi` is empty except one row in
+`portfolio_wallets`. Re-parenting billing and evidence onto an
+organization is a schema addition today and a backfill with a
+dual-read path once there are customers. This was the cheapest this
+change will ever be, and the window closes at first customer.
+
+**Done** — `supabase/migrations/20260920190000_organizations_roles_audit.sql`:
+
+- `organizations`, a `member_role` enum of the seven roles §26 names,
+  and `organization_members`.
+- `organization_id` on entitlements, api_keys, verification_events,
+  receipts, portfolios and alerts. **Nullable deliberately**: the
+  deployed `noshashi-verify` inserts verification_events without one,
+  so NOT NULL would have failed every insert the moment it landed.
+- Evidence uses ON DELETE SET NULL, not CASCADE. Deleting an
+  organization must not erase the record of adjudications it made.
+- `audit_log`, append-only, enforced twice: UPDATE/DELETE/TRUNCATE
+  revoked from every role (the real control, because `service_role`
+  bypasses RLS) and a trigger that refuses them regardless of grant
+  (which catches a superuser, or a later migration re-granting by
+  accident).
+- RLS: members read their own organizations and roster; owners/admins
+  write; the log is readable only by owner, admin, compliance and risk.
+
+**Verified against a real Postgres 16**, not by reading: a throwaway
+cluster with a harness mirroring the live schema, `service_role` given
+BYPASSRLS as it has in production. Append succeeds; UPDATE and DELETE
+are refused for `service_role` and for a superuser; a non-member sees
+zero organizations and zero audit rows; an owner sees both. Applying
+the file twice was what caught it not being idempotent — Postgres has
+no CREATE POLICY IF NOT EXISTS, so it looked re-runnable and failed
+halfway.
+
+**Still open:** nothing writes to the audit log yet, no organization
+bootstrap path exists, and the nullable `organization_id` columns are
+not yet populated by any writer. `accounts.organization` (free text)
+is left in place rather than dropped — a dropped column is the one
+thing here a later migration cannot undo. The migration is NOT applied
+to production; it is committed for review.
 
 ## 4. What is already correct, and should not be "fixed"
 
