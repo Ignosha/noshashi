@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { VERDICT_STAT_TONE, VERDICT_TEXT_CLASS } from "@/lib/policy";
 import { SceneHeader } from "./SceneHeader";
 import { Panel, StatCell } from "@/components/nova/Panel";
 import { EmptyState } from "@/components/nova/EmptyState";
@@ -135,13 +136,7 @@ function AuthorityBody() {
                   ? `${failing} advisory`
                   : "nothing outstanding"
             }
-            tone={
-              certificate.verdict === "no-go"
-                ? "no-go"
-                : certificate.verdict === "hold"
-                  ? "hold"
-                  : "default"
-            }
+            tone={VERDICT_STAT_TONE[certificate.verdict]}
           />
           <StatCell
             label="CHECKS PASSED"
@@ -277,11 +272,10 @@ function AuthorityBody() {
                 <p
                   className={cn(
                     "mono-font text-[10px] tracking-[0.18em]",
-                    certificate.verdict === "no-go"
-                      ? "text-no-go"
-                      : certificate.verdict === "hold"
-                        ? "text-hold"
-                        : "text-go"
+                    // Was a ternary whose final branch was "text-go", so a
+                    // certificate that established nothing rendered its
+                    // NOT ESTABLISHED title in the pass colour.
+                    VERDICT_TEXT_CLASS[certificate.verdict]
                   )}
                 >
                   {verdict?.title ?? certificate.verdict.toUpperCase()}

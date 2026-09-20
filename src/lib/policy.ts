@@ -369,6 +369,58 @@ export async function runPolicy(input: {
   };
 }
 
+/*
+ * Presentation maps for a verdict.
+ *
+ * These exist because the alternative — an inline
+ * `v === "no-go" ? … : v === "hold" ? … : …` — cannot be checked for
+ * exhaustiveness by the compiler, so its final branch silently absorbs
+ * every verdict added later. When `insufficient-data` arrived, four
+ * such ternaries were already in the app and they disagreed with each
+ * other: two rendered it as GO (a false clearance on a certificate
+ * that established nothing) and one as NO-GO (a false allegation).
+ * The Record<Status, …> maps in the same files were all caught by tsc
+ * immediately. The difference is only that these are indexed rather
+ * than branched, so use them and let the type system do the work.
+ */
+export const VERDICT_TONE: Record<Status, "go" | "hold" | "no-go" | "default"> = {
+  go: "go",
+  hold: "hold",
+  "no-go": "no-go",
+  // Neutral, never a status tone: DESIGN.md reserves those for verdicts
+  // and this is a statement about the evidence, not about the subject.
+  "insufficient-data": "default",
+};
+
+/**
+ * Tone for components that emphasise only a problem — StatCell has no
+ * "go", by design: a pass needs no colour, and spending one on it
+ * would leave nothing to distinguish the rows that matter. A verdict
+ * that establishes nothing is unemphasised for the same reason.
+ */
+export const VERDICT_STAT_TONE: Record<Status, "default" | "hold" | "no-go"> = {
+  go: "default",
+  hold: "hold",
+  "no-go": "no-go",
+  "insufficient-data": "default",
+};
+
+/** Foreground colour for a verdict. */
+export const VERDICT_TEXT_CLASS: Record<Status, string> = {
+  go: "text-go",
+  hold: "text-hold",
+  "no-go": "text-no-go",
+  "insufficient-data": "text-muted-foreground",
+};
+
+/** Fill for a dot or chip standing in for a verdict. */
+export const VERDICT_DOT_CLASS: Record<Status, string> = {
+  go: "bg-go",
+  hold: "bg-hold",
+  "no-go": "bg-no-go",
+  "insufficient-data": "bg-muted-foreground",
+};
+
 export const VERDICT_COPY: Record<Status, { title: string; blurb: string }> = {
   go: {
     title: "GO",

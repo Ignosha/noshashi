@@ -26,7 +26,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatUptime, shortAddress } from "@/lib/xrpl/client";
 import { timeAgo, truncateMiddle } from "@/lib/format";
-import { DOMAIN_REGISTRY, evaluatePolicy, reserveRequirementXrp } from "@/lib/policy";
+import {
+  DOMAIN_REGISTRY,
+  evaluatePolicy,
+  reserveRequirementXrp,
+  VERDICT_DOT_CLASS,
+  VERDICT_TONE,
+} from "@/lib/policy";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import type { Status } from "@/lib/xrpl/types";
 import { cn } from "@/lib/utils";
@@ -335,7 +341,7 @@ export function MissionControlScene({
                         100
                   }
                   label="POLICY"
-                  tone={gate.verdict === "no-go" ? "no-go" : gate.verdict === "hold" ? "hold" : "go"}
+                  tone={VERDICT_TONE[gate.verdict]}
                 />
               </div>
 
@@ -508,11 +514,10 @@ export function MissionControlScene({
                 <span
                   className={cn(
                     "absolute -bottom-px -right-px h-1.5 w-1.5",
-                    gate.verdict === "go"
-                      ? "bg-go"
-                      : gate.verdict === "hold"
-                        ? "bg-hold"
-                        : "bg-no-go"
+                    // The sibling ternary above defaulted to "go" and this
+                    // one to "bg-no-go" — the same unknown verdict shown as
+                    // a pass in one place and a failure in the other.
+                    VERDICT_DOT_CLASS[gate.verdict]
                   )}
                 />
               </div>
