@@ -1,6 +1,10 @@
 /*
  * TEMPORARY. Delete before this PR leaves draft.
  *
+ * Named without a leading underscore on purpose: Vercel treats
+ * api/_* as private helper modules rather than routes, which is why
+ * api/_lib works, and why the first version of this returned 404.
+ *
  * This sandbox cannot reach any indexer — the egress allowlist covers
  * GitHub, npm and the MCP servers and nothing else — so the only way
  * to learn what these APIs actually return is to ask them from
