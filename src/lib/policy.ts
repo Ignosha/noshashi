@@ -382,4 +382,9 @@ export const VERDICT_COPY: Record<Status, { title: string; blurb: string }> = {
     title: "NO-GO",
     blurb: "A blocking rule failed. Settlement is refused by the compliance layer.",
   },
+  "insufficient-data": {
+    title: "INSUFFICIENT DATA",
+    blurb:
+      "A rule could not be evaluated because the evidence it needs could not be read. This is not a pass, a failure or a soft refusal — it is the absence of an answer, and it says nothing about the subject.",
+  },
 };

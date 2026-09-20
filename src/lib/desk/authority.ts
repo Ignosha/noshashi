@@ -458,11 +458,42 @@ export const AUTHORITY_VERDICT_COPY: Record<Status, { title: string; blurb: stri
     blurb:
       "A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control.",
   },
+  "insufficient-data": {
+    title: "NOT ESTABLISHED",
+    blurb:
+      "A source needed to reach a conclusion could not be read at this ledger, and no blocking finding was established without it. This is a statement about the reading, not about the issuer: it is not a clearance, and it is not an allegation.",
+  },
 };
 
-/** Blocking failure → NO-GO; advisory failure → HOLD; otherwise GO. */
-export function verdictFor(checks: PolicyCheck[]): Status {
+/**
+ * Blocking failure → NO-GO; a source that would not read → INSUFFICIENT
+ * DATA; advisory failure → HOLD; otherwise GO.
+ *
+ * The precedence is the whole point, and NO-GO deliberately outranks
+ * INSUFFICIENT DATA. If the control surface read cleanly and shows the
+ * issuer can freeze, that finding is established and stays established
+ * whether or not some other source also failed. Letting a failed read
+ * downgrade a real finding to "not established" would hide exactly the
+ * thing a holder needs to know, and would hand anyone who can break one
+ * of our reads a way to suppress a NO-GO.
+ *
+ * INSUFFICIENT DATA outranks HOLD for the opposite reason. A HOLD is a
+ * conclusion, and with a source missing there is not enough to conclude
+ * — the failed advisory check is still listed, so nothing is hidden by
+ * summarising the reading as incomplete rather than as a soft refusal.
+ *
+ * `unreadable` means a source THREW. It is not the same as the
+ * concentration checks abstaining because no supply walk was requested:
+ * that is a deliberate scope choice by the caller, it is already stated
+ * in the checks, and it must not turn every flags-only certificate into
+ * INSUFFICIENT DATA.
+ */
+export function verdictFor(
+  checks: PolicyCheck[],
+  options: { unreadable?: string[] } = {}
+): Status {
   if (checks.some((c) => c.severity === "block" && !c.passed)) return "no-go";
+  if ((options.unreadable?.length ?? 0) > 0) return "insufficient-data";
   if (checks.some((c) => !c.passed)) return "hold";
   return "go";
 }
@@ -481,7 +512,7 @@ export async function certificateFrom(
   surface: AuthoritySurface
 ): Promise<AuthorityCertificate> {
   const checks = authorityChecks(surface);
-  const verdict = verdictFor(checks);
+  const verdict = verdictFor(checks, { unreadable: surface.unreadable });
   const currency = primaryCurrency(surface.issuance)?.currency;
   const evaluatedAt = surface.readAt;
 

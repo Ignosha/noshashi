@@ -678,6 +678,58 @@ describe("hex currency codes are decoded for display only", () => {
     );
   });
 
+  it("says INSUFFICIENT DATA when a source would not read", async () => {
+    // A source threw. Nothing blocking was established without it, so
+    // there is no honest verdict to give — and "hold" would be a
+    // conclusion we did not reach.
+    const cert = await certificateFrom(
+      surface({ unreadable: ["posture: node refused"] })
+    );
+    expect(cert.verdict).toBe("insufficient-data");
+  });
+
+  it("keeps NO-GO when a source failed AND a blocking check failed", async () => {
+    // The precedence that matters most. The control surface read
+    // cleanly and shows one key can sign for the issuer; that finding
+    // is established and must survive an unrelated source failing.
+    // If a failed read could downgrade this to "not established",
+    // anyone able to break one of our reads could suppress a NO-GO.
+    const controlled = surface({
+      control: control({
+        masterKeyEnabled: true,
+        signers: {
+          present: false,
+          quorum: 0,
+          signers: [],
+          totalWeight: 0,
+          minimumSigners: 0,
+          unilateralSigners: [],
+        },
+      }),
+      unreadable: ["issuance: indexer refused"],
+    });
+    const cert = await certificateFrom(controlled);
+    expect(cert.checks.some((c) => c.severity === "block" && !c.passed)).toBe(true);
+    expect(cert.verdict).toBe("no-go");
+  });
+
+  it("does not call a flags-only certificate INSUFFICIENT DATA", async () => {
+    // Regression guard. The concentration checks abstain whenever no
+    // supply walk was requested, which is the DEFAULT. Treating that
+    // abstention as missing evidence would turn almost every
+    // certificate into INSUFFICIENT DATA and make the state useless.
+    const cert = await certificateFrom(surface({ issuance: null, unreadable: [] }));
+    expect(cert.verdict).not.toBe("insufficient-data");
+  });
+
+  it("digests INSUFFICIENT DATA apart from HOLD", async () => {
+    // verdict is inside the digest scope, so the two must not collide.
+    const unread = await certificateFrom(surface({ unreadable: ["posture: timeout"] }));
+    const read = await certificateFrom(surface({ unreadable: [] }));
+    expect(unread.verdict).toBe("insufficient-data");
+    expect(unread.digest).not.toBe(read.digest);
+  });
+
   it("digests indexer and ledger provenance differently", async () => {
     // The point of putting `source` in the digest scope. These two
     // surfaces are identical in every respect the checks can see — same

@@ -731,8 +731,16 @@ export function authorityChecks(surface) {
   return checks;
 }
 
-export function verdictFor(checks) {
+/*
+ * Mirrors src/lib/desk/authority.ts. NO-GO outranks INSUFFICIENT DATA
+ * so a failed read cannot suppress an established blocking finding;
+ * INSUFFICIENT DATA outranks HOLD because with a source missing there
+ * is not enough to conclude. `unreadable` means a source threw — not
+ * that a supply walk was simply not requested.
+ */
+export function verdictFor(checks, options = {}) {
   if (checks.some((c) => c.severity === "block" && !c.passed)) return "no-go";
+  if ((options.unreadable?.length ?? 0) > 0) return "insufficient-data";
   if (checks.some((c) => !c.passed)) return "hold";
   return "go";
 }
@@ -755,7 +763,7 @@ export async function digestOf({ kind, subject, scope, checks, evaluatedAt }) {
 
 export async function certificateFrom(surface) {
   const checks = authorityChecks(surface);
-  const verdict = verdictFor(checks);
+  const verdict = verdictFor(checks, { unreadable: surface.unreadable });
   const currency = primaryCurrency(surface.issuance)?.currency;
   const evaluatedAt = surface.readAt;
 

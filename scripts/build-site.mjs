@@ -674,6 +674,9 @@ async function buildCertificate() {
 .cert-verdict p{color:var(--muted);font-size:13.5px;line-height:1.62;max-width:72ch}
 .cert-verdict.go{border-left:3px solid var(--go)} .cert-verdict.go .tag{color:var(--go)}
 .cert-verdict.hold{border-left:3px solid var(--hold)} .cert-verdict.hold .tag{color:var(--hold)}
+/* Neutral rule, not a status colour: "not established" is a statement
+   about the reading, not a finding about the issuer. */
+.cert-verdict.unknown{border-left:3px solid var(--muted)} .cert-verdict.unknown .tag{color:var(--muted)}
 .cert-verdict.nogo{border-left:3px solid var(--nogo)} .cert-verdict.nogo .tag{color:var(--nogo)}
 .cert-meta{font:10.5px "IBM Plex Mono",monospace;color:var(--faint);
   font-variant-numeric:tabular-nums;margin-top:12px;word-break:break-all;line-height:1.7}
@@ -714,7 +717,9 @@ async function buildCertificate() {
     "hold":{cls:"hold",tag:"Authority retained, constrained",
       text:"No single party can act alone, but the issuer has kept powers that bear on a holder — a freeze it has not surrendered, a fee it sets, or a supply too concentrated or too unreadable to call dispersed."},
     "no-go":{cls:"nogo",tag:"Unilateral authority present",
-      text:"A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control."}
+      text:"A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control."},
+    "insufficient-data":{cls:"unknown",tag:"Not established",
+      text:"A source needed to reach a conclusion could not be read at this ledger, and no blocking finding was established without it. This is a statement about the reading, not about the issuer: it is not a clearance, and it is not an allegation."}
   };
 
   /* Provenance of the holder distribution. Printed because it is
@@ -729,7 +734,14 @@ async function buildCertificate() {
   };
 
   function render(cert){
-    var copy=COPY[cert.verdict]||COPY["no-go"];
+    /* An unrecognised verdict falls back to "not established", NEVER to
+       no-go. The previous fallback was COPY["no-go"], which meant any
+       verdict this page did not know about — including insufficient-data
+       the moment it was added — rendered on a PUBLIC page as "unilateral
+       authority present" about a real, named issuer. Defaulting an
+       unknown to the most damaging reading is the wrong direction to
+       fail, and it is a false allegation rather than a display bug. */
+    var copy=COPY[cert.verdict]||COPY["insufficient-data"];
     var html='<div class="cert-verdict '+copy.cls+'">'+
       '<p class="tag">'+esc(copy.tag)+'</p>'+
       '<h2>'+esc(cert.issuer)+'</h2>'+

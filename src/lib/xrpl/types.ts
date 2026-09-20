@@ -1,4 +1,19 @@
-export type Status = "go" | "hold" | "no-go";
+/**
+ * A decision-support outcome.
+ *
+ * `insufficient-data` is not a softer `hold`. It is the answer when the
+ * evidence needed to reach a conclusion could not be read at all, and
+ * it exists because conflating "checked, and concerning" with "could
+ * not check" is the exact failure the product cannot have: one is a
+ * finding about the subject, the other is a statement about us.
+ *
+ * The directive also names WATCH. It is deliberately absent: nothing in
+ * the codebase currently produces a signal that distinguishes WATCH
+ * from HOLD, and adding a verdict no evaluation can return would be a
+ * control that does nothing. It arrives with historical monitoring,
+ * which is what supplies the trend a WATCH would rest on.
+ */
+export type Status = "go" | "hold" | "no-go" | "insufficient-data";
 
 export type LedgerInfo = {
   ledgerIndex: number;
