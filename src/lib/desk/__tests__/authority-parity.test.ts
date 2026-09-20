@@ -240,10 +240,34 @@ const CASES: Array<{ name: string; surface: AuthoritySurface }> = [
     }),
   },
   { name: "supply not walked", surface: surface({ issuance: null }) },
+  {
+    name: "supply walk failed",
+    surface: surface({ issuance: null, unreadable: ["issuance: rippled replied 503"] }),
+  },
   { name: "no outstanding obligations", surface: surface({ issuance: issuance([]) }) },
   {
     name: "coverage below the floor",
     surface: surface({ issuance: issuance([currency({ coverage: 0.41, observedHeld: 410_000 })]) }),
+  },
+  {
+    name: "indexer-sourced distribution",
+    surface: surface({
+      issuance: {
+        ...issuance([currency({ hhi: 702, holders: 67_339, topHolderPct: 14.1 })]),
+        source: "indexer",
+        sourceName: "xrpscan.com",
+      },
+    }),
+  },
+  {
+    name: "indexer-sourced and concentrated",
+    surface: surface({
+      issuance: {
+        ...issuance([currency({ hhi: 7400, topHolderPct: 81.2 })]),
+        source: "indexer",
+        sourceName: "xrpscan.com",
+      },
+    }),
   },
   {
     name: "supply concentrated",

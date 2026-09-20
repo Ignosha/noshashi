@@ -95,6 +95,19 @@ export type CurrencySurveillance = {
 
 export type IssuanceReport = {
   issuer: string;
+  /**
+   * Where the holder balances came from.
+   *
+   * The console always walks the ledger, so it always sets "ledger".
+   * The public endpoint may use a reconciled indexer instead, because
+   * the ledger cannot produce a distribution for a large issuer inside
+   * a web request. Optional so existing constructions stay valid, and
+   * absent is read as "ledger" — the conservative default, since it is
+   * the claim that asserts less about third parties.
+   */
+  source?: "ledger" | "indexer";
+  /** Which indexer, when one was used. Named in the finding itself. */
+  sourceName?: string;
   domain?: string;
   currencies: CurrencySurveillance[];
   linesWalked: number;

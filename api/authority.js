@@ -18,7 +18,7 @@
  * function open.
  */
 
-import { certifyAuthority, ADDRESS_RE } from "./_lib/authority.js";
+import { readAuthoritySurface, certificateFrom, ADDRESS_RE } from "./_lib/authority.js";
 import { cacheHeaders } from "./_lib/html.js";
 
 export default async function handler(req, res) {
@@ -47,7 +47,8 @@ export default async function handler(req, res) {
   const walkSupply = req.query?.walk === "1" || req.query?.walk === "true";
 
   try {
-    const certificate = await certifyAuthority(issuer, { walkSupply });
+    const surface = await readAuthoritySurface(issuer, { walkSupply });
+    const certificate = await certificateFrom(surface);
 
     // A certificate is a claim about one ledger, so a cached copy is
     // only as good as the ledger it names — which the body states. Five
@@ -55,6 +56,29 @@ export default async function handler(req, res) {
     cacheHeaders(res, 300, 3600);
     return res.status(200).json({
       ...certificate,
+      // Outside the digest deliberately: this describes how the reading
+      // was taken, not what was read, and it changes between two runs
+      // that produce the identical certificate. It is here because a
+      // coverage figure on its own does not say whether the walk ended
+      // early or simply ran out of holders to count.
+      // A read that failed is never silent here. Without this the only
+      // trace of a broken walk was a check that said "not walked".
+      unreadable: surface.unreadable.length > 0 ? surface.unreadable : undefined,
+      walk: surface.issuance
+        ? {
+            source: surface.issuance.source ?? "ledger",
+            source_name: surface.issuance.sourceName,
+            reconciled_against_ledger: surface.issuance.reconciledAgainstLedger ?? false,
+            pages: surface.issuance.pages,
+            lines_walked: surface.issuance.linesWalked,
+            truncated: surface.issuance.truncated,
+            stopped_because: surface.issuance.stoppedBecause,
+            elapsed_ms: surface.issuance.elapsedMs,
+            // Present only when the indexer was tried and refused, so
+            // a fallback to the slow path is never mysterious.
+            indexer_refused: surface.issuance.indexerRefused,
+          }
+        : null,
       disclaimer:
         "Ledger facts about authority retained by this issuer at the stated ledger index. " +
         "Not a score, and not a determination that any asset is or is not decentralised, " +

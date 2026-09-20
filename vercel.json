@@ -4,6 +4,11 @@
   "installCommand": "",
   "buildCommand": "node scripts/build-site.mjs",
   "outputDirectory": "site",
+  "functions": {
+    "api/authority.js": {
+      "maxDuration": 60
+    }
+  },
   "redirects": [
     {
       "source": "/login",

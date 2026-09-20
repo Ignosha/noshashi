@@ -23,6 +23,7 @@
  */
 
 import { fetchWithTimeout } from "./html.js";
+import { readDistribution } from "./indexer.js";
 
 /**
  * Public rippled HTTP endpoints, tried in order.
@@ -38,6 +39,38 @@ const RIPPLE_HTTP = [
 
 /** Inherited from issuance.ts. Below this, concentration abstains. */
 const COVERAGE_FLOOR = 0.95;
+
+/**
+ * How far the holder walk goes, and why it is bounded twice.
+ *
+ * MAX_PAGES matches src/lib/desk/issuance.ts deliberately. It was 12
+ * here against the console's 250, so the free endpoint measured
+ * concentration over roughly a fiftieth of what the product measured —
+ * and RLUSD came back at 8.7% coverage, abstaining every time. An
+ * abstention is honest, but an endpoint that can only ever abstain is
+ * not measuring anything.
+ *
+ * The page size asked for is NOT the page size returned: public
+ * clusters cap `account_lines` at 200 rows however large a `limit` is
+ * sent (measured against mainnet on 2026-08-27, and the reason the
+ * comment in issuance.ts exists). So the real ceiling is MAX_PAGES x
+ * 200, not x PAGE_SIZE, and any arithmetic that uses PAGE_SIZE to
+ * predict depth is wrong by half.
+ *
+ * WALK_BUDGET_MS is the bound that actually fires. The console runs
+ * over a WebSocket with a person watching a progress count and no
+ * platform deadline; this runs in a Vercel function that is killed at
+ * maxDuration, and a killed function returns nothing at all — not a
+ * partial reading, not an abstention, just a 504. The budget stops the
+ * walk early enough to always return the honest partial answer, which
+ * for a big issuer is coverage below the floor and therefore an
+ * abstention. Pages are sequential by construction, because each one
+ * needs the previous page's marker, so this cannot be parallelised
+ * away.
+ */
+const MAX_PAGES = 250;
+const PAGE_SIZE = 400;
+const WALK_BUDGET_MS = 25_000;
 /**
  * Addresses whose private key provably does not exist.
  *
@@ -234,7 +267,11 @@ async function readPosture(issuer) {
  * concentration check then abstains instead of reporting a number about
  * the holders that happened to fit in the pages read.
  */
-async function readIssuanceSupply(issuer, { maxPages = 12, pageLimit = 400 } = {}) {
+async function readIssuanceSupply(
+  issuer,
+  { maxPages = MAX_PAGES, pageLimit = PAGE_SIZE, budgetMs = WALK_BUDGET_MS } = {}
+) {
+  const deadline = Date.now() + budgetMs;
   const balances = await rippleRpc("gateway_balances", {
     account: issuer,
     ledger_index: "validated",
@@ -256,6 +293,7 @@ async function readIssuanceSupply(issuer, { maxPages = 12, pageLimit = 400 } = {
   let pages = 0;
   let linesWalked = 0;
   let truncated = false;
+  let floorUnreachable = false;
   let ledgerIndex = 0;
 
   do {
@@ -285,6 +323,59 @@ async function readIssuanceSupply(issuer, { maxPages = 12, pageLimit = 400 } = {
       truncated = true;
       break;
     }
+    // Out of time. Reported exactly like the page cap: the walk is
+    // short, coverage will say how short, and the concentration check
+    // abstains on it. Stopping here is what makes the difference
+    // between a partial answer and a 504 with no answer at all.
+    if (marker && Date.now() >= deadline) {
+      truncated = true;
+      break;
+    }
+
+    /*
+     * Give up early when the floor is out of reach.
+     *
+     * Measured against RLUSD on mainnet: 400 lines a page, ~750ms a
+     * page, and 13,600 lines covering 8.8% of obligations — so roughly
+     * 155,000 trust lines, and about nine minutes of sequential
+     * requests to clear the 95% floor. No serverless function has nine
+     * minutes, and the console's own 250-page cap tops out near 64% on
+     * that issuer, so the honest answer for an issuance of that size is
+     * an abstention no matter how long anyone waits.
+     *
+     * Without this the endpoint spent the entire 25-second budget
+     * arriving at the abstention it could have reached in two, burning
+     * the time and the public nodes' patience to produce the identical
+     * result. Raising the page cap made that worse rather than better,
+     * which is the opposite of what raising it was for.
+     *
+     * The projection is deliberately crude and deliberately generous:
+     * extrapolate the pages needed at the rate observed so far, and
+     * stop only when that exceeds what the cap or the clock could ever
+     * allow. Holders are not ordered by balance, so a late whale can
+     * lift coverage sharply — hence the 4x headroom before concluding
+     * it is hopeless, and hence never stopping in the first few pages
+     * where the rate is still noise.
+     */
+    if (marker && pages >= 5) {
+      const seen = Object.entries(held).reduce(
+        (sum, [currency, amounts]) =>
+          sum + amounts.reduce((a, b) => a + b, 0) / (outstanding[currency] || Infinity),
+        0
+      );
+      const coverageSoFar = seen / Object.keys(outstanding).length;
+      if (coverageSoFar > 0) {
+        const pagesNeeded = (pages / coverageSoFar) * COVERAGE_FLOOR;
+        const msPerPage = (Date.now() - (deadline - budgetMs)) / pages;
+        const reachable =
+          pagesNeeded <= maxPages * 4 && pagesNeeded * msPerPage <= budgetMs * 4;
+        if (!reachable) {
+          truncated = true;
+          floorUnreachable = true;
+          break;
+        }
+      }
+    }
   } while (marker);
 
   const currencies = Object.entries(outstanding).map(([currency, total]) => {
@@ -306,7 +397,90 @@ async function readIssuanceSupply(issuer, { maxPages = 12, pageLimit = 400 } = {
     };
   });
 
-  return { issuer, currencies, linesWalked, truncated, ledgerIndex };
+  return {
+    issuer,
+    currencies,
+    linesWalked,
+    truncated,
+    ledgerIndex,
+    // Why the walk ended, and how far it got. Coverage alone cannot
+    // distinguish "we read every line there is and they only account
+    // for 9% of the obligations" from "we ran out of pages" — and those
+    // demand completely different responses.
+    // The slow path, and it says so. Both readers set this, so nothing
+    // downstream has to infer provenance from which fields are present.
+    source: "ledger",
+    sourceName: "xrplcluster.com",
+    reconciledAgainstLedger: true,
+    pages,
+    stoppedBecause: !marker
+      ? "no_more_lines"
+      : floorUnreachable
+        ? "floor_unreachable"
+        : pages >= maxPages
+          ? "page_cap"
+          : Date.now() >= deadline
+            ? "time_budget"
+            : "page_failed",
+    elapsedMs: Date.now() - (deadline - budgetMs),
+  };
+}
+
+/**
+ * Supply distribution, by whichever route can actually produce one.
+ *
+ * The indexer answers in about four seconds where the ledger walk
+ * needs nine minutes, so it is tried first — but only ever as a
+ * reconciled reading. `readDistribution` refuses its own answer when
+ * the indexer's total disagrees with the ledger's obligations, and a
+ * refusal arrives here as a throw.
+ *
+ * The walk remains the fallback and is not deprecated. It is the
+ * reading that depends on nobody, and it is what still works when
+ * XRPScan is down, rate-limits us, changes its shape, or starts
+ * disagreeing with the ledger. An issuer small enough for the walk to
+ * finish gets a fully ledger-derived figure from it.
+ *
+ * Whichever route answers, the result carries `source`, and every
+ * finding printed from it says which.
+ */
+async function readSupply(issuer) {
+  // The ledger's own obligations, first and always. This is the figure
+  // the indexer is measured against, so it cannot come from the
+  // indexer.
+  const balances = await rippleRpc("gateway_balances", {
+    account: issuer,
+    ledger_index: "validated",
+  });
+  const outstanding = {};
+  for (const [currency, value] of Object.entries(balances.obligations ?? {})) {
+    const n = Number(value);
+    if (Number.isFinite(n) && n > 0) outstanding[currency] = n;
+  }
+  if (Object.keys(outstanding).length === 0) {
+    return {
+      issuer,
+      currencies: [],
+      linesWalked: 0,
+      truncated: false,
+      source: "ledger",
+      sourceName: "xrplcluster.com",
+      reconciledAgainstLedger: true,
+      ledgerIndex: Number(balances.ledger_index ?? 0),
+    };
+  }
+
+  try {
+    const distribution = await readDistribution(issuer, outstanding);
+    return { ...distribution, ledgerIndex: Number(balances.ledger_index ?? 0) };
+  } catch (error) {
+    // Not fatal, and not silent: the reason the indexer was refused
+    // rides along on the walk's result, so a caller can see the fast
+    // path was tried and why it was not used.
+    const indexerRefused = error?.message ?? String(error);
+    const walked = await readIssuanceSupply(issuer);
+    return { ...walked, indexerRefused };
+  }
 }
 
 /** Read everything the certificate needs, at one ledger. */
@@ -323,7 +497,7 @@ export async function readAuthoritySurface(issuer, { walkSupply = false } = {}) 
       return null;
     }),
     walkSupply
-      ? readIssuanceSupply(issuer).catch((error) => {
+      ? readSupply(issuer).catch((error) => {
           unreadable.push(`issuance: ${error?.message ?? String(error)}`);
           return null;
         })
@@ -479,14 +653,28 @@ export function authorityChecks(surface) {
   }
 
   const currency = primaryCurrency(surface.issuance);
+  /*
+   * "Not walked" and "walked, and the read failed" are different
+   * findings and used to print the same sentence.
+   *
+   * The walk is optional, so a null issuance legitimately means the
+   * caller did not ask for one. But readAuthoritySurface also catches a
+   * failed walk into `unreadable` and returns null — so a caller who
+   * DID ask, and whose read then broke, was told the supply "was not
+   * walked for this certificate", as though that had been their
+   * choice. Same shape as the posture bug above: a failure wearing the
+   * clothes of a benign state.
+   */
+  const walkFailed = surface.unreadable.find((entry) => entry.startsWith("issuance:"));
   if (!surface.issuance) {
     checks.push({
       id: "SUPPLY_CONCENTRATION",
       label: "Supply concentration",
       severity: "warn",
       passed: false,
-      detail:
-        "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass.",
+      detail: walkFailed
+        ? `The holder walk was requested and could not be completed (${walkFailed.replace(/^issuance:\s*/, "")}), so no concentration finding is made. This is a failed read, not an abstention and not a pass.`
+        : "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass.",
     });
   } else if (!currency) {
     checks.push({
@@ -506,14 +694,37 @@ export function authorityChecks(surface) {
     });
   } else {
     const concentrated = currency.hhi >= HHI_CONCENTRATED;
+    /*
+     * Provenance is part of the finding, not a footnote.
+     *
+     * Every other check on this certificate is read from validated
+     * ledger state and can be re-derived by anyone with a node. A
+     * concentration figure may instead come from an indexer, because
+     * the ledger cannot produce one for a large issuer inside a web
+     * request. That is a materially weaker kind of statement, and a
+     * reader is entitled to know which one they are holding — so the
+     * source is named in the finding itself, where it cannot be
+     * separated from the number it qualifies.
+     *
+     * Reconciliation is stated with the same care. Agreeing with the
+     * ledger on the TOTAL proves nothing material is missing or
+     * invented; it does not prove each line is attributed to the right
+     * account. Claiming more than that would be the exact overreach
+     * this module exists to avoid.
+     */
+    const provenance =
+      surface.issuance.source === "indexer"
+        ? ` Holder balances are from ${surface.issuance.sourceName}, not read from the ledger directly; their total was reconciled against the ledger's own obligations to within ${Math.abs(currency.coverage - 1) * 100 < 0.01 ? "0.01" : (Math.abs(currency.coverage - 1) * 100).toFixed(2)}%, which establishes that none are missing or invented but not that each is attributed correctly.`
+        : " Holder balances were read from validated ledger state.";
     checks.push({
       id: "SUPPLY_CONCENTRATION",
       label: `${decodeCurrency(currency.currency)} supply not concentrated`,
       severity: "warn",
       passed: !concentrated,
-      detail: concentrated
-        ? `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${currency.topHolderPct.toFixed(1)}% and the top five carry ${currency.topFivePct.toFixed(1)}%.`
-        : `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage, below the ${HHI_CONCENTRATED} threshold.`,
+      detail:
+        (concentrated
+          ? `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${currency.topHolderPct.toFixed(1)}% and the top five carry ${currency.topFivePct.toFixed(1)}%.`
+          : `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage, below the ${HHI_CONCENTRATED} threshold.`) + provenance,
     });
   }
 

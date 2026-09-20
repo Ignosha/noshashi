@@ -338,14 +338,28 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
 
   /* ── Supply concentration ───────────────────────────────────────── */
   const currency = primaryCurrency(surface.issuance);
+  /*
+   * "Not walked" and "walked, and the read failed" are different
+   * findings and used to print the same sentence.
+   *
+   * The walk is optional, so a null issuance legitimately means the
+   * caller did not ask for one. But readAuthoritySurface also catches a
+   * failed walk into `unreadable` and returns null — so a caller who
+   * DID ask, and whose read then broke, was told the supply "was not
+   * walked for this certificate", as though that had been their
+   * choice. Same shape as the posture bug above: a failure wearing the
+   * clothes of a benign state.
+   */
+  const walkFailed = surface.unreadable.find((entry) => entry.startsWith("issuance:"));
   if (!surface.issuance) {
     checks.push({
       id: "SUPPLY_CONCENTRATION",
       label: "Supply concentration",
       severity: "warn",
       passed: false,
-      detail:
-        "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass.",
+      detail: walkFailed
+        ? `The holder walk was requested and could not be completed (${walkFailed.replace(/^issuance:\s*/, "")}), so no concentration finding is made. This is a failed read, not an abstention and not a pass.`
+        : "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass.",
     });
   } else if (!currency) {
     checks.push({
@@ -368,14 +382,37 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
     });
   } else {
     const concentrated = currency.hhi >= HHI_CONCENTRATED;
+    /*
+     * Provenance is part of the finding, not a footnote.
+     *
+     * Every other check on this certificate is read from validated
+     * ledger state and can be re-derived by anyone with a node. A
+     * concentration figure may instead come from an indexer, because
+     * the ledger cannot produce one for a large issuer inside a web
+     * request. That is a materially weaker kind of statement, and a
+     * reader is entitled to know which one they are holding — so the
+     * source is named in the finding itself, where it cannot be
+     * separated from the number it qualifies.
+     *
+     * Reconciliation is stated with the same care. Agreeing with the
+     * ledger on the TOTAL proves nothing material is missing or
+     * invented; it does not prove each line is attributed to the right
+     * account. Claiming more than that would be the exact overreach
+     * this module exists to avoid.
+     */
+    const provenance =
+      surface.issuance.source === "indexer"
+        ? ` Holder balances are from ${surface.issuance.sourceName}, not read from the ledger directly; their total was reconciled against the ledger's own obligations to within ${Math.abs(currency.coverage - 1) * 100 < 0.01 ? "0.01" : (Math.abs(currency.coverage - 1) * 100).toFixed(2)}%, which establishes that none are missing or invented but not that each is attributed correctly.`
+        : " Holder balances were read from validated ledger state.";
     checks.push({
       id: "SUPPLY_CONCENTRATION",
       label: `${decodeCurrency(currency.currency)} supply not concentrated`,
       severity: "warn",
       passed: !concentrated,
-      detail: concentrated
-        ? `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${currency.topHolderPct.toFixed(1)}% and the top five carry ${currency.topFivePct.toFixed(1)}%.`
-        : `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage, below the ${HHI_CONCENTRATED} threshold.`,
+      detail:
+        (concentrated
+          ? `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${currency.topHolderPct.toFixed(1)}% and the top five carry ${currency.topFivePct.toFixed(1)}%.`
+          : `HHI ${Math.round(currency.hhi)} over ${currency.holders} holders at ${(currency.coverage * 100).toFixed(1)}% coverage, below the ${HHI_CONCENTRATED} threshold.`) + provenance,
     });
   }
 

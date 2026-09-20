@@ -329,6 +329,109 @@ describe("a regular key is a single key", () => {
 });
 
 /**
+ * Where a number came from is part of the number.
+ *
+ * Every other check on a certificate is read from validated ledger
+ * state and can be re-derived by anyone with a node. Concentration may
+ * instead come from an indexer, because the ledger cannot produce a
+ * distribution for a large issuer inside a web request — RLUSD has
+ * ~98,000 trust lines and the walk needs about nine minutes.
+ *
+ * That is a materially weaker kind of statement, and on a document
+ * whose entire value is that it was read from the ledger, letting it
+ * pass unlabelled would hollow out the claim. So the source is named
+ * in the finding itself, where it cannot be separated from the figure
+ * it qualifies.
+ */
+describe("a concentration figure says where it came from", () => {
+  it("names the indexer, and what reconciliation does and does not prove", () => {
+    const s = surface({
+      issuance: {
+        ...issuance([currency({ hhi: 702, holders: 67_339, topHolderPct: 14.1 })]),
+        source: "indexer",
+        sourceName: "xrpscan.com",
+      },
+    });
+    const detail = byId(s, "SUPPLY_CONCENTRATION").detail;
+    expect(detail).toContain("xrpscan.com");
+    expect(detail).toContain("not read from the ledger directly");
+    expect(detail).toContain("reconciled");
+    // The limit of the claim is stated, not implied.
+    expect(detail).toContain("not that each is attributed correctly");
+  });
+
+  it("says so plainly when the ledger was read directly", () => {
+    const detail = byId(surface(), "SUPPLY_CONCENTRATION").detail;
+    expect(detail).toContain("read from validated ledger state");
+    expect(detail).not.toContain("xrpscan");
+  });
+
+  it("treats an absent source as the ledger, the claim that asserts less", () => {
+    // Existing constructions predate the field. Defaulting to
+    // "indexer" would have them assert a third party they never used.
+    const s = surface({ issuance: issuance([currency()]) });
+    expect(byId(s, "SUPPLY_CONCENTRATION").detail).toContain("validated ledger state");
+  });
+
+  it("labels a concentrated finding too, not just a clean one", () => {
+    const s = surface({
+      issuance: {
+        ...issuance([currency({ hhi: 7400, topHolderPct: 81.2, topFivePct: 100 })]),
+        source: "indexer",
+        sourceName: "xrpscan.com",
+      },
+    });
+    const check = byId(s, "SUPPLY_CONCENTRATION");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("xrpscan.com");
+  });
+});
+
+/**
+ * A walk that broke is not a walk nobody asked for.
+ *
+ * The supply walk is optional, so a null issuance legitimately means
+ * the caller declined it. But readAuthoritySurface also catches a
+ * FAILED walk into `unreadable` and returns null, so both arrived at
+ * the same sentence: "Supply was not walked for this certificate."
+ *
+ * Live mainnet showed why that matters. SOLO was certified with
+ * walk=1 explicitly requested, the walk failed, and the certificate
+ * reported it as not walked — indistinguishable from the caller
+ * having chosen to skip it. The endpoint gave no other trace, so a
+ * broken read looked like a configuration choice.
+ */
+describe("a failed supply walk says so", () => {
+  it("reports a caught walk failure as a failed read", () => {
+    const s = surface({
+      issuance: null,
+      unreadable: ["issuance: rippled replied 503"],
+    });
+    const check = byId(s, "SUPPLY_CONCENTRATION");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("could not be completed");
+    expect(check.detail).toContain("rippled replied 503");
+    expect(check.detail).toContain("failed read");
+  });
+
+  it("still reports a skipped walk as an abstention", () => {
+    const check = byId(surface({ issuance: null, unreadable: [] }), "SUPPLY_CONCENTRATION");
+    expect(check.detail).toContain("was not walked");
+    expect(check.detail).toContain("abstention, not a pass");
+  });
+
+  it("does not mistake an unrelated failure for a walk failure", () => {
+    // A posture or control failure short-circuits earlier, so the only
+    // way to reach this branch is an entry that is genuinely the walk's.
+    const check = byId(
+      surface({ issuance: null, unreadable: ["control: something else"] }),
+      "SUPPLY_CONCENTRATION"
+    );
+    expect(check.detail).toContain("was not walked");
+  });
+});
+
+/**
  * A blackholed account is the strongest surrender, not the weakest.
  *
  * Setting the regular key to an address whose private key does not
