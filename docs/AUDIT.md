@@ -87,12 +87,25 @@ signal that separates WATCH from HOLD, and a verdict no evaluation can
 return would be a control that does nothing (§83). It belongs with
 historical monitoring, which supplies the trend a WATCH rests on.
 
-### G2 — No data-freshness state machine  (§24, §65)
+### G2 — No data-freshness state machine  (§24, §65)  — CLOSED
 
-`src/lib/live.ts` has no `LIVE / RECENT / CACHED / DELAYED / STALE /
-UNAVAILABLE` vocabulary. Individual call sites reason about staleness ad
-hoc. §65 forbids showing `LIVE` unless verified; there is currently no
-single place that decides what "verified" means.
+`src/lib/live.ts` had no `LIVE / RECENT / CACHED / DELAYED / STALE /
+UNAVAILABLE` vocabulary. It had `stalenessLabel`, which renders prose
+("4m ago") and leaves each scene its own private threshold. Prose
+cannot be reasoned about or tested.
+
+**Done:** `freshnessOf` classifies a reading against **the scene's own
+refresh interval**, not a fixed number of seconds — a 4-second book and
+a 5-minute panel do not agree on what "live" means, and one global
+threshold would be wrong for both. `isLive` is the single predicate, so
+§65 is enforced in one place. A failed attempt can never report `live`
+however young the reading, and a paused loop reports `cached`, never
+`live`. A paused reading still expires to `stale` rather than being
+held indefinitely. Wired into NetworkScene, whose cadence now feeds
+both the loop and the thresholds from one constant. 10 tests.
+
+**Still open:** only NetworkScene consumes it. The other scenes using
+`useLiveRefresh` still render prose alone.
 
 ### G3 — Counterparty attribution has no confidence states  (§14, §66)
 

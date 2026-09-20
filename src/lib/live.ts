@@ -180,3 +180,90 @@ export function stalenessLabel(lastRunAt: number | null, now = Date.now()): stri
   const hours = Math.round(minutes / 60);
   return `${hours}h ago`;
 }
+
+/**
+ * How much a reading can be trusted right now.
+ *
+ * §24 of the product directive requires that every live-data screen
+ * expose freshness, and §65 forbids showing LIVE unless the condition
+ * has actually been verified. Before this there was only
+ * `stalenessLabel`, which renders prose — "4m ago" — and leaves each
+ * scene to decide for itself what that means. Prose cannot be reasoned
+ * about, cannot be tested, and gave every caller its own private
+ * threshold for when a figure stops being current.
+ *
+ * Freshness is relative to the scene's own refresh interval, not to a
+ * fixed number of seconds. A book refreshing every four seconds and a
+ * network panel refreshing every five minutes do not agree on what
+ * "live" means, and a single global threshold would either call the
+ * slow one permanently stale or the fast one live long after it died.
+ */
+export type Freshness =
+  | "live"
+  | "recent"
+  | "cached"
+  | "delayed"
+  | "stale"
+  | "unavailable";
+
+/**
+ * A read takes time, so a reading is briefly older than the interval
+ * through no fault of the loop. Without the grace the label would
+ * flicker between live and recent on every successful cycle.
+ */
+const ON_TIME_GRACE = 1.25;
+
+export function freshnessOf(input: {
+  lastRunAt: number | null;
+  intervalMs: number;
+  /** The loop is deliberately not scheduling — hidden, or switched off. */
+  paused?: boolean;
+  /** The most recent attempt threw. */
+  failed?: boolean;
+  now?: number;
+}): Freshness {
+  const { lastRunAt, intervalMs, paused = false, failed = false } = input;
+  const now = input.now ?? Date.now();
+
+  // Nothing has been read. A paused scene that never read is still
+  // unavailable, not "cached" — there is no reading to be holding.
+  if (lastRunAt === null) return "unavailable";
+
+  const intervals = (now - lastRunAt) / Math.max(1, intervalMs);
+
+  // A failed attempt means the figure on screen is no longer being
+  // maintained, so it can never be reported as live or recent however
+  // young it is. That is the §65 direction: when the condition cannot
+  // be verified, say something weaker, not something reassuring.
+  if (failed) return intervals <= 2 ? "delayed" : "stale";
+
+  // Paused is held on purpose, which is a different claim from behind.
+  // It still expires: a figure kept for hours is stale whatever the
+  // reason it stopped refreshing.
+  if (paused) return intervals > 6 ? "stale" : "cached";
+
+  if (intervals <= ON_TIME_GRACE) return "live";
+  if (intervals <= 2) return "recent";
+  if (intervals <= 6) return "delayed";
+  return "stale";
+}
+
+/** Caption for a freshness state. Deliberately not colour. */
+export const FRESHNESS_LABEL: Record<Freshness, string> = {
+  live: "LIVE",
+  recent: "RECENT",
+  cached: "CACHED",
+  delayed: "DELAYED",
+  stale: "STALE",
+  unavailable: "UNAVAILABLE",
+};
+
+/**
+ * Whether a state may be presented as currently updating.
+ *
+ * One predicate, so "is this live?" is answered in exactly one place
+ * rather than re-derived by each scene that wants to light something up.
+ */
+export function isLive(freshness: Freshness): boolean {
+  return freshness === "live";
+}

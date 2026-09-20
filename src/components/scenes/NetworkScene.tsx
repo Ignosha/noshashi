@@ -6,7 +6,10 @@ import { PatternField } from "@/components/nova/brand/BrandPattern";
 import { NovaSat } from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
 import { readSync, syncFindings, type SyncReport } from "@/lib/net/sync";
-import { useLiveRefresh, stalenessLabel } from "@/lib/live";
+import { useLiveRefresh, stalenessLabel, freshnessOf, FRESHNESS_LABEL } from "@/lib/live";
+
+/** Feeds both the refresh loop and the freshness thresholds. */
+const REFRESH_MS = 30_000;
 import { cn } from "@/lib/utils";
 
 /**
@@ -43,8 +46,17 @@ export function NetworkScene() {
    * or the machine is offline, and reads immediately on return.
    */
   const { lastRunAt, running, paused, refresh } = useLiveRefresh(read, {
-    intervalMs: 30_000,
+    intervalMs: REFRESH_MS,
   });
+
+  /*
+   * The freshness STATE, not just the prose. `stalenessLabel` says "4m
+   * ago"; this says whether a reading at that age, on this scene's own
+   * cadence, may still be called live. The rule lives in one tested
+   * place rather than in each scene's head — and it is what stops the
+   * caption claiming liveness while the loop is paused.
+   */
+  const freshness = freshnessOf({ lastRunAt, intervalMs: REFRESH_MS, paused });
 
   const findings = report ? syncFindings(report) : [];
 
@@ -177,8 +189,8 @@ export function NetworkScene() {
             */}
             <p className="mono-font mt-2 text-[9px] leading-relaxed text-faint">
               {paused
-                ? "AUTO-REFRESH PAUSED · WINDOW HIDDEN OR OFFLINE"
-                : `AUTO-REFRESH EVERY 30s${
+                ? `${FRESHNESS_LABEL[freshness]} · AUTO-REFRESH PAUSED · WINDOW HIDDEN OR OFFLINE`
+                : `${FRESHNESS_LABEL[freshness]} · AUTO-REFRESH EVERY 30s${
                     stalenessLabel(lastRunAt) ? ` · READ ${stalenessLabel(lastRunAt)}` : ""
                   }`}
             </p>
