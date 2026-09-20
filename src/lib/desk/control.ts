@@ -38,6 +38,17 @@ export type SignerEntry = {
 
 export type SignerPosture = {
   present: boolean;
+  /**
+   * Set when the signer list could not be read, rather than read and
+   * found absent.
+   *
+   * `present: false` has to mean "this account has no signer list", not
+   * "we did not manage to look". The request is tolerated so a single
+   * failed object read does not lose the whole control surface, but the
+   * failure has to survive into the result — otherwise a timeout reads
+   * as an account with no committee, which is the reassuring answer.
+   */
+  unreadable?: string;
   quorum: number;
   signers: SignerEntry[];
   /** Sum of every signer's weight. */
@@ -62,6 +73,21 @@ export type ControlSurface = {
   address: string;
   /** True while the master key can still sign on its own. */
   masterKeyEnabled: boolean;
+  /**
+   * The account's regular key, when one is set.
+   *
+   * The THIRD way to sign for an XRPL account, after the master key and
+   * a signer list, and the one that is easiest to miss because it is a
+   * plain field on the account rather than an object hanging off it.
+   *
+   * Missing it inverts the most important reading this module makes.
+   * "Master key disabled, no signer list" sounds like an account nobody
+   * can touch, and read on its own it says the account is inert — but
+   * an actively-used issuer in that state is the ordinary result of
+   * rotating to a regular key, and that key signs alone. RLUSD's issuer
+   * reads exactly this way on mainnet.
+   */
+  regularKey?: string;
   signers: SignerPosture;
   ownerCount: number;
   /** XRP immobilised by the base reserve plus every owned object. */
@@ -110,7 +136,9 @@ export async function readControlSurface(address: string): Promise<ControlSurfac
       type: "signer_list",
       ledger_index: "validated",
       limit: 10,
-    }).catch(() => ({}) as Record<string, any>),
+    }).catch((error: unknown) => ({
+      __unreadable: error instanceof Error ? error.message : String(error),
+    }) as Record<string, any>),
     rpc("account_objects", {
       account: address,
       type: "escrow",
@@ -159,8 +187,10 @@ export async function readControlSurface(address: string): Promise<ControlSurfac
   return {
     address,
     masterKeyEnabled: (flags & LSF_DISABLE_MASTER) === 0,
+    regularKey: data.RegularKey ? String(data.RegularKey) : undefined,
     signers: {
       present: entries.length > 0,
+      unreadable: signerRes.__unreadable ? String(signerRes.__unreadable) : undefined,
       quorum,
       signers: entries,
       totalWeight,

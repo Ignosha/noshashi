@@ -226,25 +226,47 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
   });
 
   /* ── Unilateral control of the issuer account ───────────────────── */
-  // The decisive question, and the one a flag alone cannot answer: a
-  // signer list looks like shared control until you notice one member
-  // carries the quorum by themselves.
+  /*
+   * Three ways to sign for an XRPL account, and all three have to be
+   * read before anything can be said about unilateral control:
+   *
+   *   a signer list   quorum against SUMMED WEIGHTS, not a headcount
+   *   a regular key   one key, signing alone, set as a plain field
+   *   the master key  one key, signing alone, unless disabled
+   *
+   * Reading only the first and the last produced the worst possible
+   * answer on live mainnet data. RLUSD's issuer has the master key
+   * disabled and no signer list, so the check concluded the account
+   * "cannot currently be signed for at all" and PASSED — an issuance
+   * being actively minted, reported as controlled by nobody. It has a
+   * regular key. That key signs alone.
+   *
+   * A genuinely unsignable account does exist and still passes, but it
+   * now means all three are absent rather than two.
+   */
+  const signersUnreadable = Boolean(control.signers.unreadable);
   const unilateral = control.signers.present
     ? control.signers.minimumSigners <= 1
-    : control.masterKeyEnabled;
+    : Boolean(control.regularKey) || control.masterKeyEnabled;
 
   checks.push({
     id: "NO_UNILATERAL_SIGNER",
     label: "No single key controls the issuer",
     severity: "block",
-    passed: !unilateral,
-    detail: control.signers.present
-      ? control.signers.minimumSigners <= 1
-        ? `A signer list is present, but ${control.signers.unilateralSigners.length || 1} signer reaches the quorum of ${control.signers.quorum} alone. This is a single-key account wearing a committee's clothes.`
-        : `${control.signers.minimumSigners} signers must agree to reach the quorum of ${control.signers.quorum}, derived from summed weights rather than a headcount.`
-      : control.masterKeyEnabled
-        ? "No signer list, and the master key is enabled. One key signs for this issuer."
-        : "The master key is disabled and no signer list is present, so the account cannot currently be signed for at all.",
+    // A signer list that could not be read cannot be ruled out, and an
+    // unverifiable absence must not read as an absence.
+    passed: !unilateral && !signersUnreadable,
+    detail: signersUnreadable
+      ? `The signer list could not be read (${control.signers.unreadable}), so it cannot be established whether a committee controls this account or one key does. This is an unknown, not a pass.`
+      : control.signers.present
+        ? control.signers.minimumSigners <= 1
+          ? `A signer list is present, but ${control.signers.unilateralSigners.length || 1} signer reaches the quorum of ${control.signers.quorum} alone. This is a single-key account wearing a committee's clothes.`
+          : `${control.signers.minimumSigners} signers must agree to reach the quorum of ${control.signers.quorum}, derived from summed weights rather than a headcount.`
+        : control.regularKey
+          ? `No signer list. The master key is ${control.masterKeyEnabled ? "enabled" : "disabled"} and a regular key is set, so ${control.regularKey} signs for this issuer on its own.`
+          : control.masterKeyEnabled
+            ? "No signer list and no regular key, and the master key is enabled. One key signs for this issuer."
+            : "The master key is disabled, no regular key is set and no signer list is present, so the account cannot currently be signed for at all.",
   });
 
   /* ── Cost of transacting ────────────────────────────────────────── */

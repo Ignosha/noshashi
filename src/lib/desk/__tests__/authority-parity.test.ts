@@ -164,6 +164,44 @@ const CASES: Array<{ name: string; surface: AuthoritySurface }> = [
     }),
   },
   {
+    name: "regular key set, master disabled",
+    surface: surface({
+      control: control({
+        masterKeyEnabled: false,
+        regularKey: "rHotKeySigner",
+        signers: {
+          present: false, quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    }),
+  },
+  {
+    name: "regular key set, master also enabled",
+    surface: surface({
+      control: control({
+        masterKeyEnabled: true,
+        regularKey: "rHotKeySigner",
+        signers: {
+          present: false, quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    }),
+  },
+  {
+    name: "signer list unreadable",
+    surface: surface({
+      control: control({
+        masterKeyEnabled: false,
+        signers: {
+          present: false, unreadable: "connect ETIMEDOUT", quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    }),
+  },
+  {
     name: "account cannot be signed for at all",
     surface: surface({
       control: control({

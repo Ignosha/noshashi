@@ -273,6 +273,101 @@ describe("the certificate digest", () => {
 });
 
 /**
+ * A regular key signs alone, and nothing else on the account says so.
+ *
+ * There are three ways to sign for an XRPL account and only two are
+ * obvious. The regular key is a plain field on the account root rather
+ * than an object hanging off it, so a reader looking for "a signer
+ * list, or the master key" misses it entirely — and what it misses is
+ * an account controlled by exactly one key.
+ *
+ * Live mainnet proved the cost. RLUSD's issuer has the master key
+ * disabled and no signer list, so the check reported that the account
+ * "cannot currently be signed for at all" and passed it. An issuance
+ * being actively minted was certified as controlled by nobody.
+ */
+describe("a regular key is a single key", () => {
+  const noList = {
+    present: false, quorum: 0, signers: [],
+    totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+  };
+
+  it("fails when a regular key is set and the master key is disabled", () => {
+    const s = surface({
+      control: control({ masterKeyEnabled: false, regularKey: "rHotKey", signers: noList }),
+    });
+    const check = byId(s, "NO_UNILATERAL_SIGNER");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("rHotKey");
+    expect(verdictFor(authorityChecks(s))).toBe("no-go");
+  });
+
+  it("fails when a regular key is set and the master key is also enabled", () => {
+    const s = surface({
+      control: control({ masterKeyEnabled: true, regularKey: "rHotKey", signers: noList }),
+    });
+    expect(byId(s, "NO_UNILATERAL_SIGNER").passed).toBe(false);
+  });
+
+  it("still passes an account that genuinely cannot be signed for", () => {
+    // All three absent. This is the only shape that earns the pass.
+    const s = surface({
+      control: control({ masterKeyEnabled: false, regularKey: undefined, signers: noList }),
+    });
+    const check = byId(s, "NO_UNILATERAL_SIGNER");
+    expect(check.passed).toBe(true);
+    expect(check.detail).toContain("no regular key is set");
+  });
+
+  it("does not let a regular key override a real quorum", () => {
+    // A signer list is the authority when one exists; the regular key
+    // cannot bypass it.
+    const s = surface({ control: control({ regularKey: "rHotKey" }) });
+    expect(byId(s, "NO_UNILATERAL_SIGNER").passed).toBe(true);
+  });
+});
+
+/**
+ * A signer list nobody could read is not a signer list nobody has.
+ *
+ * Same in-band-failure shape as the posture read below: the request is
+ * tolerated so one failed object read does not lose the whole control
+ * surface, and the tolerance used to turn a timeout into "no committee
+ * here" — the reassuring answer.
+ */
+describe("an unreadable signer list is an unknown, not an absence", () => {
+  it("fails the blocking check when the list could not be read", () => {
+    const s = surface({
+      control: control({
+        masterKeyEnabled: false,
+        signers: {
+          present: false, unreadable: "connect ETIMEDOUT", quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    });
+    const check = byId(s, "NO_UNILATERAL_SIGNER");
+    expect(check.passed).toBe(false);
+    expect(check.detail).toContain("could not be read");
+    expect(check.detail).toContain("not a pass");
+  });
+
+  it("fails even when everything else about the account looks settled", () => {
+    const s = surface({
+      control: control({
+        masterKeyEnabled: false,
+        regularKey: undefined,
+        signers: {
+          present: false, unreadable: "no node answered", quorum: 0, signers: [],
+          totalWeight: 0, minimumSigners: 0, unilateralSigners: [],
+        },
+      }),
+    });
+    expect(verdictFor(authorityChecks(s))).toBe("no-go");
+  });
+});
+
+/**
  * A read that failed is not a reading of "no".
  *
  * fetchIssuerPosture does not reject when it cannot reach the ledger.
