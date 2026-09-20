@@ -101,11 +101,15 @@ footer{border-top:1px solid var(--rule);padding:36px 0;margin-top:24px}
 .foot-links a{font-size:12px;color:var(--muted);text-decoration:none}
 .foot-links a:hover{color:var(--ink)}
 
-@media (max-width:1100px){ .nav-links a.optional{display:none} }
+/* 1180, from measurement. At 1100 the optional links were still shown
+   between 1101 and 1180 and did not fit: /contact/ and /news/ overflowed
+   by up to 65px across 1110–1170. 1180 is the first width where they fit
+   with the optional links present. */
+@media (max-width:1180px){ .nav-links a.optional{display:none} }
 @media (max-width:900px){
   .g2,.g3{grid-template-columns:1fr}
   main{padding:40px 0 16px}
 }
 /* Must match the menu breakpoint in modules.css — see the note there. */
-@media (max-width:760px){ .nav-links a:not(.btn){display:none} }
+@media (max-width:920px){ .nav-links a:not(.btn){display:none} }
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }

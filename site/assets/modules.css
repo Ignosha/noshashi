@@ -515,17 +515,21 @@ canvas.cosmos{position:absolute;inset:0 0 auto 0;width:100%;height:min(100%,920p
 .nav-panel-foot a:last-child{background:var(--brand);border-color:var(--brand);color:#fff}
 
 /*
- * 760px, not 820px.
+ * 920px, and this number is measured rather than reasoned.
  *
- * The original stylesheet hid the nav links at 820 and showed nothing in
- * their place, so the number was never load-bearing — below it there was
- * simply no navigation. Turning that into a menu made 820 visible for
- * the first time, and a laptop with a half-width window sits right on
- * it: a desktop browser was getting a hamburger while there was still
- * room for the real links. The links now survive to 760, where they
- * genuinely stop fitting.
+ * It was 820, then 760, each chosen to keep real links on screen as
+ * long as they fit — the right instinct. But "where they genuinely
+ * stop fitting" was never measured, and the nav has since grown. It
+ * did not fit at 760: every page except the home page overflowed
+ * across 770–910px, by up to 141px, which is a horizontal scrollbar on
+ * a tablet and a header running off the side of the screen.
+ *
+ * Swept 1250→700 in 10px steps on /contact/: the overflow band ends at
+ * 910, so 920 is the first width where the links actually fit. If the
+ * nav gains another item, this number moves again — re-run the sweep,
+ * do not guess. The paired min-width below must stay at 921.
  */
-@media (max-width:760px){
+@media (max-width:920px){
   .nav-menu-btn{display:inline-flex}
   /* Only once the menu is actually present — see nav.js. */
   .nav-links.has-menu .btn{display:none}
@@ -534,7 +538,7 @@ canvas.cosmos{position:absolute;inset:0 0 auto 0;width:100%;height:min(100%,920p
   header{position:sticky}
   .nav{position:relative}
 }
-@media (min-width:761px){
+@media (min-width:921px){
   .nav-panel{display:none}
 }
 @media (prefers-reduced-motion:reduce){

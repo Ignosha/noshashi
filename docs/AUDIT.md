@@ -275,11 +275,43 @@ already issued.
   indexers are all egress-blocked. Live validation goes through Vercel
   preview deploys; nothing here can be confirmed by calling it directly.
 
-## 7. Not verified from here
+## 7. Verification status
 
-Stated so no one mistakes absence of a finding for a clean result:
+### Since closed
+
+- **`cargo check` and `cargo clippy -D warnings` both pass** on
+  `src-tauri`. The Rust shell is no longer audited by reading alone.
+  They needed GTK and WebKit system libraries, which this sandbox did
+  not have; installing `libgtk-3-dev`, `libwebkit2gtk-4.1-dev`,
+  `libsoup-3.0-dev` and `librsvg2-dev` is what made the check possible.
+  Anyone repeating it on a bare Linux box needs the same.
+- **`Cargo.lock` was incomplete for Linux.** `cargo check --locked`
+  failed against the committed lockfile: it had to resolve 74 crates
+  that were not in it, so a Linux build was silently re-resolving
+  dependencies — exactly what a lockfile exists to prevent, and a
+  reproducibility hole in the desktop shell. The completed lockfile is
+  committed. The change is purely additive: 74 added, no version of any
+  existing crate changed (three entries only move position in the file).
+  `cargo check --locked` now passes.
+- **`npm audit` is recorded.** Production dependencies: **0
+  vulnerabilities**. Full tree including dev: 2 (1 high, 1 moderate),
+  both in the Vite dev server and its bundled esbuild — a path
+  traversal in optimized-deps `.map` handling, a `server.fs.deny`
+  bypass on Windows alternate paths, and esbuild allowing any site to
+  request from the dev server. **Neither ships**: they affect
+  `npm run dev`, not the built artifact, which is why the production
+  gate in CI reads clean.
+
+  They are NOT fixed here. `npm audit fix` cannot resolve them; only
+  `--force` can, and that is a major Vite 5 → 7 upgrade. A major build
+  tool bump to close a non-shipping dev-server issue deserves its own
+  change and its own testing, not a quiet ride alongside unrelated
+  work. It is real, it is bounded to developer machines, and it is
+  written down here rather than left implied by a passing CI gate.
+
+### Still not verified
 
 - No end-to-end HTTP test of any deployed endpoint (egress blocked).
-- `cargo` was not run; the Rust shell is audited by reading only.
-- `npm audit` results are not recorded in this document.
+  `supabase.co`, the XRPL hosts and the indexers are all refused by the
+  sandbox proxy, so nothing here is confirmed by calling it.
 - No load, latency or performance measurement was taken.
