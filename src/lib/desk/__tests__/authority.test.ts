@@ -273,6 +273,59 @@ describe("the certificate digest", () => {
 });
 
 /**
+ * A read that failed is not a reading of "no".
+ *
+ * fetchIssuerPosture does not reject when it cannot reach the ledger.
+ * It resolves with `unreadable` set and every flag false, and three of
+ * those falses are passes — globalFreeze on a BLOCKING check, plus
+ * requireAuth and the transfer fee. So an issuer nobody could read
+ * scored better than most issuers that were read, which is the exact
+ * failure this module exists to prevent.
+ *
+ * The surfaces below are the ones certificateFrom accepts from outside:
+ * captured for offline re-certification, or assembled server-side.
+ * Neither can be trusted to have normalised anything first.
+ */
+describe("an unreadable posture never reads as a clean one", () => {
+  it("refuses to certify when the posture carries a read failure", () => {
+    const s = surface({
+      posture: posture({
+        unreadable: "connect ETIMEDOUT",
+        noFreeze: false,
+        globalFreeze: false,
+        requireAuth: false,
+      }),
+    });
+    const checks = authorityChecks(s);
+    expect(checks).toHaveLength(1);
+    expect(checks[0].id).toBe("AUTHORITY_READABLE");
+    expect(checks[0].passed).toBe(false);
+    expect(verdictFor(checks)).toBe("no-go");
+  });
+
+  it("says what failed, even when the surface did not record it", () => {
+    const s = surface({
+      posture: posture({ unreadable: "connect ETIMEDOUT" }),
+      unreadable: [],
+    });
+    expect(authorityChecks(s)[0].detail).toContain("connect ETIMEDOUT");
+  });
+
+  it("does not emit the flag checks that a defaulted posture would pass", () => {
+    const ids = authorityChecks(
+      surface({ posture: posture({ unreadable: "no node answered" }) })
+    ).map((c) => c.id);
+    expect(ids).not.toContain("NOT_GLOBALLY_FROZEN");
+    expect(ids).not.toContain("OPEN_HOLDING");
+    expect(ids).not.toContain("SUPPLY_CONCENTRATION");
+  });
+
+  it("still certifies normally when unreadable is absent", () => {
+    expect(verdictFor(authorityChecks(surface()))).toBe("go");
+  });
+});
+
+/**
  * The settlement digest is frozen by contract.
  *
  * Pinned to a literal rather than compared against a re-computation,

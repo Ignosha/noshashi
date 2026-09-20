@@ -569,11 +569,241 @@ async function buildContact() {
   }));
 }
 
+/* ── /certificate/ ────────────────────────────────────────────────── */
+/*
+ * The free authority certificate.
+ *
+ * This page is the argument, not a demo of the product. The CLARITY Act
+ * turns on whether control over a network is dispersed, and the debate
+ * over it runs almost entirely on assertion, because there has been no
+ * ordinary way for a non-specialist to check what authority an issuer
+ * has actually kept. A staffer, a journalist or a holder can answer
+ * that here in one field and no account.
+ *
+ * It is free on purpose, and the boundary is drawn on purpose too. One
+ * issuer per request, nothing stored, nothing watched, nothing
+ * exported. Monitoring an issuer over time, keeping the receipts and
+ * getting told the moment a flag changes are the product. Establishing
+ * a fact that is already public is not something to charge for.
+ *
+ * Two things this page must never be allowed to imply, and the copy is
+ * built around both: it is not a score, and it is not a legal finding.
+ */
+async function buildCertificate() {
+  const body = `<div class="page-head">
+  <p class="eyebrow">Free · no account</p>
+  <h1>What can the issuer still do to it?</h1>
+  <p>Enter an XRP Ledger issuing account. NOSHASHI reads validated ledger state and reports
+     the authority that issuer has kept over the asset it issues — whether it can freeze you,
+     whether it gave that power up for good, whether one key signs for it, and how
+     concentrated the supply is.</p>
+</div>
+
+<section>
+  <form class="cert-form" id="cert-form" novalidate>
+    <div class="form-field">
+      <label for="issuer">Issuing account</label>
+      <input id="issuer" name="issuer" type="text" spellcheck="false" autocomplete="off"
+             placeholder="r…" maxlength="40" required>
+    </div>
+    <div class="cert-actions">
+      <button class="btn" type="submit" id="cert-run">Read the ledger</button>
+      <label class="cert-walk">
+        <input type="checkbox" id="cert-walk" checked>
+        <span>Walk holder lines <em>slower, measures concentration</em></span>
+      </label>
+    </div>
+    <p class="form-status" id="cert-status" role="status" aria-live="polite"></p>
+  </form>
+
+  <div id="cert-out" hidden></div>
+
+  <div class="grid g2" style="margin-top:34px">
+    <div class="panel">
+      <p class="num">WHAT THIS IS NOT</p>
+      <p><strong>It is not a score.</strong> There is no number out of a hundred and no grade.
+         Seven questions are answered separately and left separate, because a composite invites
+         an argument about the composite instead of about the facts underneath it.</p>
+      <p style="margin-top:12px"><strong>It is not a legal finding.</strong> Whether a digital
+         asset is “decentralised”, or is a security, is a determination for the SEC and the CFTC
+         applying statutory criteria. This reports ledger facts that bear on that question. It
+         does not answer it, and nothing here should be quoted as though it did.</p>
+    </div>
+    <div class="panel">
+      <p class="num">WHEN IT REFUSES TO ANSWER</p>
+      <p>If a read fails, the certificate says so and fails — it never returns a clean result
+         because a request timed out. If the holder walk covers less than 95% of outstanding
+         supply, no concentration figure is reported at all, high or low, because a share
+         measured over two fifths of a supply describes the holders that were seen rather than
+         the issuance.</p>
+      <p style="margin-top:12px">An abstention is printed as an abstention. It is never
+         printed as a pass.</p>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <p class="num">THE DIGEST</p>
+    <p>Every certificate carries a SHA-256 digest over the verdict, the issuer, the currency it
+       was scoped to, <strong>the ledger index</strong> and every check with its result. The
+       ledger index is inside the digest deliberately: the same issuer at a later ledger is a
+       different assertion and does not share this one. Keep the digest and the reading can be
+       shown to be the reading that was taken, months later, by anyone holding it.</p>
+  </div>
+</section>`;
+
+  const head = `<style>
+.cert-form{display:grid;gap:14px;max-width:620px;margin-bottom:26px}
+.cert-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.cert-walk{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);cursor:pointer}
+.cert-walk em{display:block;font-style:normal;font-size:11px;color:var(--faint)}
+.cert-verdict{border:1px solid var(--rule);border-radius:var(--r);padding:22px 24px;margin-bottom:14px}
+.cert-verdict .tag{font:10px "IBM Plex Mono",monospace;letter-spacing:.2em;text-transform:uppercase}
+.cert-verdict h2{font-size:20px;margin:8px 0 8px;letter-spacing:-.02em;
+  font-family:"IBM Plex Mono",monospace;overflow-wrap:anywhere}
+.cert-verdict p{color:var(--muted);font-size:13.5px;line-height:1.62;max-width:72ch}
+.cert-verdict.go{border-left:3px solid var(--go)} .cert-verdict.go .tag{color:var(--go)}
+.cert-verdict.hold{border-left:3px solid var(--hold)} .cert-verdict.hold .tag{color:var(--hold)}
+.cert-verdict.nogo{border-left:3px solid var(--nogo)} .cert-verdict.nogo .tag{color:var(--nogo)}
+.cert-meta{font:10.5px "IBM Plex Mono",monospace;color:var(--faint);
+  font-variant-numeric:tabular-nums;margin-top:12px;word-break:break-all;line-height:1.7}
+.cert-checks{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:var(--r);overflow:hidden}
+.cert-check{background:var(--surface);padding:16px 20px;display:grid;
+  grid-template-columns:72px 1fr;gap:4px 14px;align-items:start}
+.cert-check .mark{font:10px "IBM Plex Mono",monospace;letter-spacing:.14em;padding-top:2px}
+.cert-check .mark.pass{color:var(--go)} .cert-check .mark.warn{color:var(--hold)}
+.cert-check .mark.block{color:var(--nogo)}
+.cert-check h3{font-size:13.5px;margin:0;letter-spacing:-.01em}
+.cert-check p{grid-column:2;color:var(--muted);font-size:12.5px;line-height:1.6;margin:0;max-width:78ch}
+.cert-check code{grid-column:2;font-size:10px;color:var(--faint);letter-spacing:.1em}
+@media(max-width:560px){.cert-check{grid-template-columns:1fr}
+  .cert-check p,.cert-check code{grid-column:1}}
+</style>`;
+
+  const script = `<script>
+(function(){
+  var form=document.getElementById("cert-form");
+  if(!form)return;
+  var status=document.getElementById("cert-status");
+  var out=document.getElementById("cert-out");
+  var button=document.getElementById("cert-run");
+  var walk=document.getElementById("cert-walk");
+  var input=document.getElementById("issuer");
+
+  function say(text,tone){status.textContent=text;status.setAttribute("data-tone",tone||"");}
+  function esc(v){return String(v).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+  /* Wording mirrors AUTHORITY_VERDICT_COPY in src/lib/desk/authority.ts.
+     The console and this page must not describe the same verdict two
+     different ways. */
+  var COPY={
+    "go":{cls:"go",tag:"No unilateral authority found",
+      text:"On the checks run, no single party was found able to freeze, gate or unilaterally sign for this issuance at this ledger. This describes the authority observed, not the conduct of whoever holds it."},
+    "hold":{cls:"hold",tag:"Authority retained, constrained",
+      text:"No single party can act alone, but the issuer has kept powers that bear on a holder — a freeze it has not surrendered, a fee it sets, or a supply too concentrated or too unreadable to call dispersed."},
+    "no-go":{cls:"nogo",tag:"Unilateral authority present",
+      text:"A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control."}
+  };
+
+  function render(cert){
+    var copy=COPY[cert.verdict]||COPY["no-go"];
+    var html='<div class="cert-verdict '+copy.cls+'">'+
+      '<p class="tag">'+esc(copy.tag)+'</p>'+
+      '<h2>'+esc(cert.issuer)+'</h2>'+
+      '<p>'+esc(copy.text)+'</p>'+
+      '<p class="cert-meta">LEDGER '+esc(String(cert.ledgerIndex))+
+        (cert.currency?' · '+esc(cert.currency):'')+
+        ' · READ '+esc(new Date(cert.evaluatedAt).toLocaleString())+
+        '<br>DIGEST '+esc(cert.digest)+'</p>'+
+      '</div><div class="cert-checks">';
+
+    for(var i=0;i<cert.checks.length;i++){
+      var c=cert.checks[i];
+      /* CLEAR / FINDING, not YES / NO.
+         YES-NO was read against the check's own label and inverted it:
+         "Freeze permanently surrendered" with the flag NOT set is a
+         failed check, and it printed YES — telling a reader the issuer
+         had given up a power it had kept. It also had no truthful
+         answer for an abstention, where the honest report is that
+         nothing was measured, which is neither yes nor no. */
+      var mark=c.passed?"pass":(c.severity==="block"?"block":"warn");
+      var word=c.passed?"CLEAR":"FINDING";
+      html+='<div class="cert-check">'+
+        '<span class="mark '+mark+'">'+word+'</span>'+
+        '<h3>'+esc(c.label)+'</h3>'+
+        '<p>'+esc(c.detail)+'</p>'+
+        '<code>'+esc(c.id)+'</code>'+
+      '</div>';
+    }
+    out.innerHTML=html+'</div>';
+    out.hidden=false;
+  }
+
+  form.addEventListener("submit",function(event){
+    event.preventDefault();
+    var issuer=(input.value||"").trim();
+    if(!issuer){say("Enter an issuing account.","bad");return;}
+    if(!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(issuer)){
+      say("That is not an XRP Ledger classic address. They begin with r.","bad");return;
+    }
+
+    button.disabled=true;
+    out.hidden=true;
+    say(walk.checked?"Reading ledger state and walking holder lines…":"Reading ledger state…","busy");
+
+    fetch("/api/authority?issuer="+encodeURIComponent(issuer)+(walk.checked?"&walk=1":""))
+      .then(function(r){return r.json().then(function(b){return {ok:r.ok,body:b};});})
+      .then(function(result){
+        if(!result.ok){say(result.body.error||"That could not be read.","bad");return;}
+        say("");
+        render(result.body);
+      })
+      .catch(function(){say("Could not reach the server. Try again shortly.","bad");})
+      .finally(function(){button.disabled=false;});
+  });
+
+  /* Deep link: /certificate/?issuer=r… runs on load, so a certificate
+     can be linked to in an article or a memo rather than described. */
+  try{
+    var wanted=new URLSearchParams(location.search).get("issuer");
+    if(wanted){input.value=wanted;form.requestSubmit?form.requestSubmit():form.dispatchEvent(new Event("submit",{cancelable:true}));}
+  }catch(e){}
+})();
+</script>`;
+
+  await write("certificate/index.html", renderPage({
+    title: "Authority certificate — what an XRPL issuer can still do to your asset",
+    description:
+      "Free, no account. Read from validated XRP Ledger state whether an issuer can freeze you, "
+      + "has surrendered that power, requires permission to hold, is controlled by one key, "
+      + "charges a transfer fee, and how concentrated its supply is. Not a score, not a legal finding.",
+    path: "/certificate/",
+    body,
+    head,
+    structured: [
+      breadcrumb("Authority certificate", "/certificate/"),
+      {
+        "@type": "WebApplication",
+        name: "NOSHASHI authority certificate",
+        applicationCategory: "FinanceApplication",
+        url: `${ORIGIN}/certificate/`,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      },
+    ],
+    scripts: script,
+  }));
+}
+
 /* ── sitemap ──────────────────────────────────────────────────────── */
 async function buildSitemap() {
   const pages = [
     ["/", "daily", "1.0"],
     ["/news/", "hourly", "0.9"],
+    // High priority deliberately: this is the page the product is
+    // argued from, and the only one that answers a question for
+    // somebody who will never install anything.
+    ["/certificate/", "weekly", "0.9"],
     ["/pricing/", "monthly", "0.9"],
     ["/progress/", "weekly", "0.8"],
     ["/status/", "daily", "0.8"],
@@ -654,6 +884,7 @@ async function main() {
   await buildStatus({ feed, status });
   await buildProgress({ feed, release, releases });
   await buildContact();
+  await buildCertificate();
   await buildSitemap();
   await buildRobots();
 

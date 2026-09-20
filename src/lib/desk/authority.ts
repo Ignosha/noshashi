@@ -90,7 +90,7 @@ export async function readAuthoritySurface(
 ): Promise<AuthoritySurface> {
   const unreadable: string[] = [];
 
-  const [control, posture, issuance] = await Promise.all([
+  const [control, rawPosture, issuance] = await Promise.all([
     readControlSurface(issuer).catch((error: unknown) => {
       unreadable.push(`control: ${error instanceof Error ? error.message : String(error)}`);
       return null;
@@ -108,6 +108,25 @@ export async function readAuthoritySurface(
         })
       : Promise.resolve(null),
   ]);
+
+  /**
+   * fetchIssuerPosture NEVER REJECTS. It catches its own failure and
+   * returns a posture object with `unreadable` set and every flag
+   * false — which is why the .catch() above cannot be relied on and
+   * this check exists.
+   *
+   * Left unhandled, a posture that failed to read produced
+   * globalFreeze: false and requireAuth: false, and both of those are
+   * PASSES — one of them on a blocking check. An issuer nobody could
+   * read would have been certified as not frozen and openly holdable,
+   * which is the precise failure this module claims to rule out: a
+   * certificate that looks clean because a request did not come back.
+   * An absent reading is not a negative reading.
+   */
+  const posture = rawPosture?.unreadable ? null : rawPosture;
+  if (rawPosture?.unreadable) {
+    unreadable.push(`posture: ${rawPosture.unreadable}`);
+  }
 
   return {
     issuer,
@@ -137,14 +156,35 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
   const { control, posture } = surface;
 
   /* ── Could the issuer be read at all? ───────────────────────────── */
-  if (!posture || !control) {
+  /*
+   * `posture.unreadable` is tested here as well as in
+   * readAuthoritySurface, and the duplication is deliberate.
+   *
+   * fetchIssuerPosture reports its own failure in-band: it resolves with
+   * every flag false and `unreadable` set, rather than rejecting. A
+   * surface carrying that object is not a surface with a posture, it is
+   * a surface with a record of a failed read — and the flags on it are
+   * defaults, not findings. Reading them as findings certifies an issuer
+   * nobody could reach as un-frozen and openly holdable.
+   *
+   * readAuthoritySurface already normalises this to null, so on the live
+   * path the branch below never sees it. The guard is here because
+   * certificateFrom is exported for surfaces this module did not build:
+   * one captured for offline re-certification, or one assembled
+   * server-side. Those callers cannot be relied on to have normalised
+   * anything, and the check that matters must hold wherever the surface
+   * came from.
+   */
+  if (!posture || posture.unreadable || !control) {
     checks.push({
       id: "AUTHORITY_READABLE",
       label: "Issuer state readable",
       severity: "block",
       passed: false,
       detail:
-        surface.unreadable.join("; ") ||
+        [...surface.unreadable, posture?.unreadable ? `posture: ${posture.unreadable}` : ""]
+          .filter(Boolean)
+          .join("; ") ||
         "The issuer account could not be read from validated state, so no authority claim can be made about it.",
     });
     return checks;
@@ -263,6 +303,37 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
 
   return checks;
 }
+
+/**
+ * What each verdict means for a certificate.
+ *
+ * Separate from VERDICT_COPY in policy.ts, which says things like
+ * "cleared to broadcast" — true of a settlement and meaningless about
+ * an issuer. Reusing it would have put settlement language on a
+ * document that makes no claim about any transaction.
+ *
+ * The wording is about retained authority and nothing else. None of it
+ * says safe, compliant, decentralised or sound, because the certificate
+ * does not establish any of those and a reader in a hurry will quote
+ * whatever the headline says.
+ */
+export const AUTHORITY_VERDICT_COPY: Record<Status, { title: string; blurb: string }> = {
+  go: {
+    title: "NO UNILATERAL AUTHORITY FOUND",
+    blurb:
+      "On the checks run, no single party was found able to freeze, gate or unilaterally sign for this issuance at this ledger. This describes the authority observed, not the conduct of whoever holds it.",
+  },
+  hold: {
+    title: "AUTHORITY RETAINED, CONSTRAINED",
+    blurb:
+      "No single party can act alone, but the issuer has kept powers that bear on a holder — a freeze it has not surrendered, a fee it sets, or a supply too concentrated or too unreadable to call dispersed.",
+  },
+  "no-go": {
+    title: "UNILATERAL AUTHORITY PRESENT",
+    blurb:
+      "A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control.",
+  },
+};
 
 /** Blocking failure → NO-GO; advisory failure → HOLD; otherwise GO. */
 export function verdictFor(checks: PolicyCheck[]): Status {

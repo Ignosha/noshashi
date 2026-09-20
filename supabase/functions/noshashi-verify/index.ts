@@ -65,6 +65,13 @@ const ADDRESS_RE = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const MAX_BODY_BYTES = 4096;
 
 /**
+ * Certificates are bigger than settlement requests — seven checks with
+ * their detail strings — so they get their own ceiling rather than
+ * being squeezed under one sized for a three-field body.
+ */
+const MAX_CERTIFICATE_BYTES = 16_384;
+
+/**
  * Published rate limits, by entitlement tier.
  *
  * Two windows per tier because one number cannot describe both a burst
@@ -745,6 +752,31 @@ async function handle(request: Request, requestId: string): Promise<Response> {
     );
   }
 
+  /*
+   * Verbs are addressed by path. The bare function path is settlement
+   * adjudication and always has been, so it stays exactly where it is —
+   * every integration already points at it.
+   */
+  const verb = new URL(request.url).pathname
+    .replace(/^\/+|\/+$/g, "")
+    .split("/")
+    .slice(1)
+    .join("/");
+
+  if (verb === "authority/check") {
+    return await checkAuthorityCertificate(request, requestId);
+  }
+  if (verb) {
+    return json(
+      404,
+      {
+        error: "unknown_verb",
+        message: `No verb "${verb}". Known: the bare path (settlement adjudication) and authority/check.`,
+      },
+      requestId
+    );
+  }
+
   if (method === "GET") {
     return json(
       200,
@@ -754,6 +786,11 @@ async function handle(request: Request, requestId: string): Promise<Response> {
           "POST JSON { subject, domain, amount_xrp } with Authorization: Bearer nsh_live_…",
         domains: DOMAIN_REGISTRY.map((domain) => domain.code),
         idempotency: "Send Idempotency-Key to make a retry replay rather than re-charge.",
+        verbs: {
+          "": "POST — adjudicate a settlement. Authenticated, one credit.",
+          "authority/check":
+            "POST — re-derive an authority certificate's digest from its own body. Free, unauthenticated, reads nothing.",
+        },
         published_limits: TIER_LIMITS,
       },
       requestId
@@ -1179,3 +1216,213 @@ async function replayStoredReceipt(
   });
 }
 
+
+
+/* ------------------------------------------------------------------ */
+/* Authority certificate — checking one, after the fact                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Canonical form for an authority certificate's digest.
+ *
+ * Byte-for-byte `digestOf` in src/lib/policy.ts and in
+ * api/_lib/authority.js. Three copies exist because three runtimes do:
+ * the console (Vite/TypeScript), the public endpoint (Node on Vercel)
+ * and this function (Deno). None of them can import from the others.
+ *
+ * The scope keys are SORTED before hashing. That is what lets a caller
+ * reconstruct a body from a printed certificate without having to know
+ * which order the fields happened to be written in.
+ *
+ * supabase/functions/__tests__/authority-digest-parity.test.ts compares
+ * this expression against the TypeScript one as source text, because a
+ * Deno module cannot be imported into the Vite test suite. If the two
+ * drift, a certificate issued by the console stops verifying here —
+ * which makes the digest worthless precisely when someone is trying to
+ * rely on it.
+ */
+async function authorityDigest(input: {
+  kind: string;
+  subject: string;
+  scope: Record<string, string | number>;
+  checks: Array<{ id: string; passed: boolean }>;
+  evaluatedAt: string;
+}): Promise<string> {
+  const canonical = JSON.stringify({
+    kind: input.kind,
+    subject: input.subject,
+    scope: Object.keys(input.scope).sort().map((key) => [key, input.scope[key]]),
+    evaluatedAt: input.evaluatedAt,
+    checks: input.checks.map((check) => [check.id, check.passed]),
+  });
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical));
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+}
+
+/**
+ * POST /noshashi-verify/authority/check
+ *
+ * Takes a certificate and answers one question: is this digest the
+ * digest of these facts?
+ *
+ * Free, unauthenticated, and it reads nothing — not the ledger, not the
+ * database. That is not generosity, it is what the verb IS. Checking a
+ * digest is recomputing a hash over a body the caller already holds;
+ * there is no cost to meter and nothing to look up. Putting it behind a
+ * key would mean a certificate could only be checked by someone who had
+ * bought the thing that issued it, which would make it unfalsifiable in
+ * exactly the audience it is meant to convince.
+ *
+ * Two things it deliberately does NOT do:
+ *
+ *   It does not re-read the ledger. The answer is about internal
+ *   consistency — whether this body was altered after it was digested.
+ *   An issuer's flags at ledger 84,112,907 do not change, so re-reading
+ *   would answer a different and less useful question, and would let a
+ *   node outage turn an intact certificate into a failure.
+ *
+ *   It does not vouch for provenance. A matching digest proves the body
+ *   is internally consistent, not that NOSHASHI issued it — anyone can
+ *   hash a body they invented. The response says so in as many words,
+ *   because a bare "valid: true" would be read as an endorsement of
+ *   facts this function never checked.
+ */
+async function checkAuthorityCertificate(
+  request: Request,
+  requestId: string
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return json(
+      405,
+      { error: "method_not_allowed", message: "POST a certificate body to check it." },
+      requestId,
+      { Allow: "POST" }
+    );
+  }
+
+  const declaredLength = Number(request.headers.get("content-length") ?? Number.NaN);
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_CERTIFICATE_BYTES) {
+    return json(
+      413,
+      { error: "payload_too_large", message: `Body must be under ${MAX_CERTIFICATE_BYTES} bytes.` },
+      requestId
+    );
+  }
+  const raw = await request.text();
+  if (new TextEncoder().encode(raw).length > MAX_CERTIFICATE_BYTES) {
+    return json(
+      413,
+      { error: "payload_too_large", message: `Body must be under ${MAX_CERTIFICATE_BYTES} bytes.` },
+      requestId
+    );
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return json(400, { error: "invalid_json", message: "Body must be JSON." }, requestId);
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    return json(400, { error: "invalid_json", message: "Body must be a JSON object." }, requestId);
+  }
+
+  const body = parsed as Record<string, unknown>;
+  const issuer = typeof body.issuer === "string" ? body.issuer.trim() : "";
+  const verdict = typeof body.verdict === "string" ? body.verdict : "";
+  const claimed = (typeof body.digest === "string" ? body.digest : "").trim().toUpperCase();
+  const evaluatedAt = typeof body.evaluated_at === "string"
+    ? body.evaluated_at
+    : typeof body.evaluatedAt === "string"
+      ? body.evaluatedAt
+      : "";
+  const ledgerIndex = Number(body.ledger_index ?? body.ledgerIndex);
+  const currency = typeof body.currency === "string" ? body.currency : "";
+  const checks = Array.isArray(body.checks) ? body.checks : null;
+
+  const missing: string[] = [];
+  if (!issuer) missing.push("issuer");
+  if (!verdict) missing.push("verdict");
+  if (!claimed) missing.push("digest");
+  if (!evaluatedAt) missing.push("evaluated_at");
+  if (!Number.isFinite(ledgerIndex)) missing.push("ledger_index");
+  if (!checks) missing.push("checks");
+  if (missing.length > 0) {
+    return json(
+      400,
+      {
+        error: "incomplete_certificate",
+        message: `A certificate needs ${missing.join(", ")}. Send the body exactly as it was issued.`,
+      },
+      requestId
+    );
+  }
+
+  if (!/^[0-9A-F]{64}$/.test(claimed)) {
+    return json(
+      400,
+      { error: "invalid_digest", message: "digest must be 64 hexadecimal characters." },
+      requestId
+    );
+  }
+
+  // Only the id and the result are hashed, so a body whose check entries
+  // are malformed is rejected rather than silently digesting undefined.
+  const normalised: Array<{ id: string; passed: boolean }> = [];
+  for (const entry of checks!) {
+    if (typeof entry !== "object" || entry === null) {
+      return json(
+        400,
+        { error: "invalid_checks", message: "Every entry in checks must be an object." },
+        requestId
+      );
+    }
+    const check = entry as Record<string, unknown>;
+    if (typeof check.id !== "string" || typeof check.passed !== "boolean") {
+      return json(
+        400,
+        {
+          error: "invalid_checks",
+          message: "Every check needs a string id and a boolean passed.",
+        },
+        requestId
+      );
+    }
+    normalised.push({ id: check.id, passed: check.passed });
+  }
+
+  const recomputed = await authorityDigest({
+    kind: "authority",
+    subject: issuer,
+    scope: { currency, ledgerIndex, verdict },
+    checks: normalised,
+    evaluatedAt,
+  });
+
+  const matches = timingSafeEqual(recomputed, claimed);
+
+  return json(
+    200,
+    {
+      matches,
+      issuer,
+      verdict,
+      ledger_index: ledgerIndex,
+      evaluated_at: evaluatedAt,
+      digest_claimed: claimed,
+      digest_recomputed: recomputed,
+      checks_digested: normalised.length,
+      means: matches
+        ? "The digest is the digest of these facts, so this body is unaltered since it was digested. "
+          + "It does not establish who issued it — anyone can hash a body they wrote — and it makes no "
+          + "claim that the ledger still reads this way, only that it was read this way at the stated ledger index."
+        : "The digest does not match these facts. Either the body was altered after it was digested, "
+          + "or the digest belongs to a different reading. A certificate for the same issuer at a "
+          + "different ledger index has a different digest by design.",
+    },
+    requestId
+  );
+}
