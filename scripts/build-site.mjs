@@ -650,10 +650,15 @@ async function buildCertificate() {
   <div class="panel" style="margin-top:14px">
     <p class="num">THE DIGEST</p>
     <p>Every certificate carries a SHA-256 digest over the verdict, the issuer, the currency it
-       was scoped to, <strong>the ledger index</strong> and every check with its result. The
+       was scoped to, <strong>the ledger index</strong>, <strong>where the holder distribution
+       was read from</strong> and every check with its result. The
        ledger index is inside the digest deliberately: the same issuer at a later ledger is a
        different assertion and does not share this one. Keep the digest and the reading can be
        shown to be the reading that was taken, months later, by anyone holding it.</p>
+    <p style="margin-top:12px">The source is in there for the same reason. A distribution read
+       from the ledger and one taken from an indexer and reconciled against the ledger's
+       obligations are not the same evidence, and a certificate resting on the second must not
+       be able to carry the digest of one resting on the first.</p>
   </div>
 </section>`;
 
@@ -712,6 +717,17 @@ async function buildCertificate() {
       text:"A single party can act on this issuance without anyone's agreement, or the issuance could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control."}
   };
 
+  /* Provenance of the holder distribution. Printed because it is
+     inside the digest: a reader recomputing the digest from what is on
+     this page needs every field it binds, and because "read from the
+     ledger" and "taken from an indexer and reconciled" are not the
+     same evidence. */
+  var SOURCE_LABEL={
+    ledger:'DISTRIBUTION READ FROM LEDGER',
+    indexer:'DISTRIBUTION FROM RECONCILED INDEXER',
+    none:'DISTRIBUTION NOT READ'
+  };
+
   function render(cert){
     var copy=COPY[cert.verdict]||COPY["no-go"];
     var html='<div class="cert-verdict '+copy.cls+'">'+
@@ -721,6 +737,7 @@ async function buildCertificate() {
       '<p class="cert-meta">LEDGER '+esc(String(cert.ledgerIndex))+
         (cert.currencyLabel?' · '+esc(cert.currencyLabel):'')+
         ' · READ '+esc(new Date(cert.evaluatedAt).toLocaleString())+
+        ' · '+esc(SOURCE_LABEL[cert.source]||'DISTRIBUTION UNSTATED')+
         '<br>DIGEST '+esc(cert.digest)+'</p>'+
       '</div><div class="cert-checks">';
 

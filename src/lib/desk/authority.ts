@@ -83,6 +83,16 @@ export type AuthorityCertificate = {
   digest: string;
   ledgerIndex: number;
   evaluatedAt: string;
+  /**
+   * Where the holder distribution came from: read from the ledger,
+   * from a reconciled third-party indexer, or not read at all.
+   *
+   * Published because it is inside the digest. A verifier recomputes
+   * the digest from the certificate body, so every field the digest
+   * binds has to travel with it — a field the issuer keeps to itself
+   * makes the certificate unverifiable.
+   */
+  source: "ledger" | "indexer" | "none";
 };
 
 /**
@@ -482,7 +492,21 @@ export async function certificateFrom(
     // claim about one ledger, not about an issuer in general. The same
     // issuer at a later ledger is a different assertion and must not
     // share a digest with this one.
-    scope: { currency: currency ?? "", ledgerIndex: surface.ledgerIndex, verdict },
+    // `source` is in the scope because the concentration figures can
+    // come from the ledger directly or from a third-party indexer
+    // reconciled against it, and those are not the same evidence. The
+    // finding names the source in its prose, but digestOf hashes only
+    // [id, passed] per check — prose is not covered. Without this key
+    // an indexer-derived certificate and a ledger-walked one over the
+    // same issuer and ledger share a digest, which would let the
+    // weaker evidence inherit the stronger one's attestation.
+    // "none" when supply was not read at all and the checks abstain.
+    scope: {
+      currency: currency ?? "",
+      ledgerIndex: surface.ledgerIndex,
+      verdict,
+      source: surface.issuance?.source ?? "none",
+    },
     checks,
     evaluatedAt,
   });
@@ -496,5 +520,6 @@ export async function certificateFrom(
     digest,
     ledgerIndex: surface.ledgerIndex,
     evaluatedAt,
+    source: surface.issuance?.source ?? "none",
   };
 }

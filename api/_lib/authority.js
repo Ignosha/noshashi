@@ -762,7 +762,16 @@ export async function certificateFrom(surface) {
   const digest = await digestOf({
     kind: "authority",
     subject: surface.issuer,
-    scope: { currency: currency ?? "", ledgerIndex: surface.ledgerIndex, verdict },
+    // Mirrors src/lib/desk/authority.ts. `source` is in the scope so an
+    // indexer-derived certificate cannot share a digest with one walked
+    // from the ledger: digestOf hashes [id, passed] per check, not the
+    // prose where the source is named. "none" when supply was not read.
+    scope: {
+      currency: currency ?? "",
+      ledgerIndex: surface.ledgerIndex,
+      verdict,
+      source: surface.issuance?.source ?? "none",
+    },
     checks,
     evaluatedAt,
   });
@@ -776,6 +785,10 @@ export async function certificateFrom(surface) {
     digest,
     ledgerIndex: surface.ledgerIndex,
     evaluatedAt,
+    // Published because it is inside the digest: a verifier recomputes
+    // from the certificate body, so a field the digest binds has to
+    // travel with it or the certificate cannot be verified at all.
+    source: surface.issuance?.source ?? "none",
   };
 }
 

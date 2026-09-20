@@ -666,11 +666,55 @@ describe("hex currency codes are decoded for display only", () => {
       await digestOf({
         kind: "authority",
         subject: s.issuer,
-        scope: { currency: RLUSD_HEX, ledgerIndex: s.ledgerIndex, verdict: cert.verdict },
+        scope: {
+          currency: RLUSD_HEX,
+          ledgerIndex: s.ledgerIndex,
+          verdict: cert.verdict,
+          source: cert.source,
+        },
         checks: authorityChecks(s),
         evaluatedAt: s.readAt,
       })
     );
+  });
+
+  it("digests indexer and ledger provenance differently", async () => {
+    // The point of putting `source` in the digest scope. These two
+    // surfaces are identical in every respect the checks can see — same
+    // issuer, same ledger, same currency, same holders, same verdict —
+    // and differ only in where the holder distribution was read from.
+    //
+    // A ledger walk is read directly from the validated ledger. An
+    // indexer's figures come from a third party and are only reconciled
+    // against the ledger's obligations to within a tolerance. Those are
+    // not the same evidence, so they must not share an attestation: a
+    // shared digest would let the weaker one inherit the stronger one's
+    // signature. digestOf hashes [id, passed] per check and not the
+    // prose where the source is named, so the scope is the only place
+    // this distinction can live.
+    const walked = await certificateFrom(
+      surface({ issuance: { ...issuance(), source: "ledger" } })
+    );
+    const indexed = await certificateFrom(
+      surface({ issuance: { ...issuance(), source: "indexer" } })
+    );
+
+    expect(walked.verdict).toBe(indexed.verdict);
+    expect(walked.source).toBe("ledger");
+    expect(indexed.source).toBe("indexer");
+    expect(walked.digest).not.toBe(indexed.digest);
+  });
+
+  it("digests an unread distribution as its own provenance", async () => {
+    // Abstaining is a third state, and must not collide with either
+    // real source.
+    const none = await certificateFrom(surface({ issuance: null }));
+    expect(none.source).toBe("none");
+
+    const walked = await certificateFrom(
+      surface({ issuance: { ...issuance(), source: "ledger" } })
+    );
+    expect(none.digest).not.toBe(walked.digest);
   });
 
   it("leaves a three-character code alone", async () => {

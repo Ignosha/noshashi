@@ -1345,6 +1345,10 @@ async function checkAuthorityCertificate(
   const ledgerIndex = Number(body.ledger_index ?? body.ledgerIndex);
   const currency = typeof body.currency === "string" ? body.currency : "";
   const checks = Array.isArray(body.checks) ? body.checks : null;
+  // Inside the digest, so it must be supplied rather than defaulted:
+  // guessing it would turn "you omitted a field" into a digest
+  // mismatch, which reads as tampering and is a much worse answer.
+  const source = typeof body.source === "string" ? body.source : "";
 
   const missing: string[] = [];
   if (!issuer) missing.push("issuer");
@@ -1353,12 +1357,24 @@ async function checkAuthorityCertificate(
   if (!evaluatedAt) missing.push("evaluated_at");
   if (!Number.isFinite(ledgerIndex)) missing.push("ledger_index");
   if (!checks) missing.push("checks");
+  if (!source) missing.push("source");
   if (missing.length > 0) {
     return json(
       400,
       {
         error: "incomplete_certificate",
         message: `A certificate needs ${missing.join(", ")}. Send the body exactly as it was issued.`,
+      },
+      requestId
+    );
+  }
+
+  if (source !== "ledger" && source !== "indexer" && source !== "none") {
+    return json(
+      400,
+      {
+        error: "invalid_source",
+        message: 'source must be one of "ledger", "indexer" or "none".',
       },
       requestId
     );
@@ -1400,7 +1416,7 @@ async function checkAuthorityCertificate(
   const recomputed = await authorityDigest({
     kind: "authority",
     subject: issuer,
-    scope: { currency, ledgerIndex, verdict },
+    scope: { currency, ledgerIndex, verdict, source },
     checks: normalised,
     evaluatedAt,
   });
