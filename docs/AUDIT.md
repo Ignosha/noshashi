@@ -217,9 +217,27 @@ the file twice was what caught it not being idempotent — Postgres has
 no CREATE POLICY IF NOT EXISTS, so it looked re-runnable and failed
 halfway.
 
-**Still open:** nothing writes to the audit log yet, no organization
-bootstrap path exists, and the nullable `organization_id` columns are
-not yet populated by any writer. `accounts.organization` (free text)
+**Applied to production**, verified against the live catalogue: three
+tables, `organization_id` nullable on all six re-parented tables, the
+existing rows untouched. The grant table shows why append-only needs
+two layers — `authenticated` SELECT, `service_role` INSERT+SELECT,
+`postgres` everything, because an owner's privileges cannot be
+revoked. The owner is exactly the case the trigger covers.
+
+**The audit log is written by the database, not the application.** API
+keys are created client-side as `authenticated`, which has no INSERT
+on `audit_log` by design: a client that can write its own audit trail
+does not have one. So `api_key.created`, `api_key.revoked`,
+`member.added`, `member.role_changed` and `member.removed` are written
+by SECURITY DEFINER triggers. They cannot be skipped by a caller,
+forged by a client, or forgotten by a future code path. `key_hash` is
+never logged, and `last_used_at` churn is filtered out so real events
+are not buried under API traffic.
+
+**Still open:** no organization bootstrap path, and no writer populates
+`organization_id` on the re-parented tables — so audit rows currently
+carry a null organization, which the read policy treats as invisible
+to everyone but `service_role`. That resolves itself once orgs exist. `accounts.organization` (free text)
 is left in place rather than dropped — a dropped column is the one
 thing here a later migration cannot undo. The migration is NOT applied
 to production; it is committed for review.
