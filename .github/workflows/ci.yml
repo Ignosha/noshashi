@@ -94,6 +94,24 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Install institutional console dependencies
+        working-directory: frontend
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck institutional console
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Build institutional console
+        working-directory: frontend
+        run: npm run build
+
+      - name: Build public website
+        run: npm run site:build
+
+      - name: Compile FastAPI backend
+        run: python3 -m compileall -q backend/app
+
       - name: Audit production dependencies
         # Only what ships. The dev toolchain carries known vite/esbuild
         # dev-server advisories that cannot reach a built artefact, and

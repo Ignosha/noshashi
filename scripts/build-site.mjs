@@ -783,6 +783,7 @@ async function buildCertificate() {
         '<code>'+esc(c.id)+'</code>'+
       '</div>';
     }
+
     out.innerHTML=html+'</div>';
     out.hidden=false;
   }
@@ -842,6 +843,34 @@ async function buildCertificate() {
   }));
 }
 
+/* ── institutional product pages ─────────────────────────────────── */
+const PRODUCT_PAGES = [
+  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth.</p></div><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a></p></div></div>`],
+  ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build your institutional XRPL intelligence layer with NOSHASHI.", "Connect validated XRPL data, intelligence, monitoring, evidence and policy infrastructure to your own systems.", `<div class="grid g2"><div class="panel"><p class="eyebrow">DATA</p><h2>Machine-readable intelligence.</h2><p>APIs, event feeds, webhooks, bulk exports and custom schemas.</p></div><div class="panel"><p class="eyebrow">CAPACITY</p><h2>Contracted high-volume access.</h2><p>Capacity, retention and delivery are based on deployment requirements and commercial scope.</p></div><div class="panel"><p class="eyebrow">REVIEW</p><h2>Request architecture review.</h2><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></div>`],
+  ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.", `<div class="panel"><p class="eyebrow">REFERENCE</p><h2>API endpoint families</h2><ul><li><code>/api/v1/institutional/overview</code></li><li><code>/api/v1/institutional/assets</code></li><li><code>/api/v1/institutional/evidence</code></li><li><code>/api/v1/institutional/policies/check</code></li><li><code>/api/v1/institutional/monitoring/events</code></li></ul></div>`],
+];
+
+async function buildPricingEnhancement() {
+  const file = path.join(SITE, "pricing/index.html");
+  let html = await readFile(file, "utf8");
+  const marker = "<!-- NOSHASHI-INSTITUTIONAL-PRICING -->";
+  if (html.includes(marker)) return;
+  const section = `${marker}<section class="section"><div class="section-head"><p class="eyebrow">INSTITUTIONAL PRODUCT HIERARCHY</p><h2>Enterprise customers use NOSHASHI. Strategic customers build with NOSHASHI.</h2><p>These contracted layers extend the existing Free, Pro and Institutional offerings with explicit infrastructure scope.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">ENTERPRISE</p><h3>$10,000 / month · $120,000 / year</h3><p>Asset passports, deterministic policy evaluation, adjudication, monitoring, evidence, audit and institutional API.</p><p><a class="btn" href="/enterprise/">Explore Enterprise</a></p></div><div class="panel"><p class="eyebrow">STRATEGIC INFRASTRUCTURE</p><h3>$20,850 / month · $250,000 / year</h3><p>High-volume APIs, event feeds, custom schemas, data delivery, integration support and architecture review.</p><p><a class="btn" href="/strategic-infrastructure/">Build with NOSHASHI</a></p></div></div></section>`;
+  html = html.replace("</main>", `${section}</main>`);
+  await write("pricing/index.html", html);
+}
+
+async function buildProductPage([path, current, eyebrow, title, intro, content]) {
+  await write(`${path}/index.html`, renderPage({
+    title: `${title} · NOSHASHI`,
+    description: intro,
+    path: `/${path}/`,
+    current,
+    body: `<div class="page-head"><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p>${intro}</p></div>${content}`,
+    structured: [breadcrumb(eyebrow, `/${path}/`)],
+  }));
+}
+
 /* ── sitemap ──────────────────────────────────────────────────────── */
 async function buildSitemap() {
   const pages = [
@@ -852,6 +881,9 @@ async function buildSitemap() {
     // somebody who will never install anything.
     ["/certificate/", "weekly", "0.9"],
     ["/pricing/", "monthly", "0.9"],
+    ["/enterprise/", "monthly", "0.9"],
+    ["/strategic-infrastructure/", "monthly", "0.9"],
+    ["/developers/", "monthly", "0.8"],
     ["/progress/", "weekly", "0.8"],
     ["/status/", "daily", "0.8"],
     ["/guide/", "monthly", "0.8"],
@@ -932,6 +964,8 @@ async function main() {
   await buildProgress({ feed, release, releases });
   await buildContact();
   await buildCertificate();
+  await buildPricingEnhancement();
+  for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildSitemap();
   await buildRobots();
 

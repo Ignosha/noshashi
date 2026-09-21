@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Programmable institutional intelligence. · NOSHASHI</title>
+<meta name="description" content="Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.">
+<link rel="canonical" href="https://www.noshashi.app/developers/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/developers/">
+<meta property="og:title" content="Programmable institutional intelligence. · NOSHASHI">
+<meta property="og:description" content="Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Programmable institutional intelligence. · NOSHASHI">
+<meta name="twitter:description" content="Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"DEVELOPER PORTAL","item":"https://www.noshashi.app/developers/"}]}]}</script>
+
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><svg viewBox="0 0 180 180" width="24" height="24" fill="none" aria-hidden="true">
+<mask id="nm" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
+<path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
+<path d="M95 99C91 80 94 64 103 50 114 59 121 70 123 83 116 91 106 97 95 99Z" fill="#000"/>
+<circle cx="129" cy="63" r="5" fill="#000"/></mask>
+<g stroke="currentColor" stroke-width="7" stroke-linecap="round">
+<path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/></g>
+<circle cx="151" cy="69" r="7" fill="currentColor"/>
+<path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="currentColor" mask="url(#nm)"/>
+<path d="M92 111 63 132C60 116 66 103 78 93Z" fill="currentColor"/>
+<path d="M111 91 130 118C114 119 101 113 93 103Z" fill="currentColor"/>
+<path d="M82 121 67 150 94 132Z" fill="currentColor"/>
+<path d="M73 143 61 164 84 151Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/#public">Free tools</a>
+      <a class="nav-link" href="/news/">Newsroom</a>
+      <a class="nav-link" href="/progress/">Progress</a>
+      <a class="nav-link optional" href="/status/">Status</a>
+      <a class="nav-link optional" href="/research/">Findings</a>
+      <a class="nav-link optional" href="/guide/">XRP guide</a>
+      <a class="nav-link optional" href="/enterprise/">Enterprise</a>
+      <a class="nav-link optional" href="/strategic-infrastructure/">Infrastructure</a>
+      <a class="nav-link" href="/#download">Download</a>
+      <a class="nav-link" href="/pricing/">Pricing</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/">Contact</a>
+      <a class="btn" href="/#download">Download beta</a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head"><p class="eyebrow">DEVELOPER PORTAL</p><h1>Programmable institutional intelligence.</h1><p>Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.</p></div><div class="panel"><p class="eyebrow">REFERENCE</p><h2>API endpoint families</h2><ul><li><code>/api/v1/institutional/overview</code></li><li><code>/api/v1/institutional/assets</code></li><li><code>/api/v1/institutional/evidence</code></li><li><code>/api/v1/institutional/policies/check</code></li><li><code>/api/v1/institutional/monitoring/events</code></li></ul></div>
+</main>
+<footer>
+  <div class="shell foot">
+    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
+    <div class="foot-links">
+      <a href="/contact/">Contact</a>
+      <a href="/certificate/">Authority certificate</a>
+      <a href="/news/">Newsroom</a>
+      <a href="/progress/">Progress</a>
+      <a href="/status/">Status</a>
+      <a href="/research/">Findings</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/enterprise/">Enterprise</a>
+      <a href="/strategic-infrastructure/">Strategic infrastructure</a>
+      <a href="/developers/">Developers</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="https://github.com/Ignosha/noshashi">GitHub</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script>
+(function(){
+  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
+  if(!button)return;
+  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
+    if(label)label.textContent=light?"DARK":"LIGHT";
+    button.setAttribute("aria-label",light?"Switch to dark mode":"Switch to light mode");}
+  sync();
+  button.addEventListener("click",function(){
+    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
+    sync();});
+})();
+</script>
+
+</body>
+</html>

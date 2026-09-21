@@ -50,6 +50,8 @@ export const NAV = [
   { href: "/status/", label: "Status", key: "status", optional: true },
   { href: "/research/", label: "Findings", optional: true },
   { href: "/guide/", label: "XRP guide", optional: true },
+  { href: "/enterprise/", label: "Enterprise", optional: true },
+  { href: "/strategic-infrastructure/", label: "Infrastructure", optional: true },
   { href: "/#download", label: "Download" },
   { href: "/pricing/", label: "Pricing" },
 ];
@@ -67,6 +69,9 @@ export const FOOTER_LINKS = [
   { href: "/research/", label: "Findings" },
   { href: "/guide/", label: "Plain-language guide" },
   { href: "/pricing/", label: "Pricing" },
+  { href: "/enterprise/", label: "Enterprise" },
+  { href: "/strategic-infrastructure/", label: "Strategic infrastructure" },
+  { href: "/developers/", label: "Developers" },
   { href: "/legal/", label: "Legal & accessibility" },
   { href: "https://github.com/Ignosha/noshashi", label: "GitHub" },
 ];
