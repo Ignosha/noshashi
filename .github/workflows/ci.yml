@@ -76,7 +76,7 @@ jobs:
       # it is added, with nobody having to remember this file.
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.x
+          deno-version: v2.5.6
 
       - name: Typecheck Edge Functions
         run: npm run check:functions

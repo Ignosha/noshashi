@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.noshashi.app/</loc><lastmod>2026-09-19</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://www.noshashi.app/news/</loc><lastmod>2026-09-19</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.noshashi.app/pricing/</loc><lastmod>2026-09-19</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.noshashi.app/progress/</loc><lastmod>2026-09-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.noshashi.app/status/</loc><lastmod>2026-09-19</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.noshashi.app/guide/</loc><lastmod>2026-09-19</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.noshashi.app/research/</loc><lastmod>2026-09-19</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.noshashi.app/contact/</loc><lastmod>2026-09-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.noshashi.app/legal/</loc><lastmod>2026-09-19</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://www.noshashi.app/downloads/xrpl-edge-pack/</loc><lastmod>2026-09-19</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://www.noshashi.app/docs/NOSHASHI_XRPL_Edge_Lab_Brief.pdf</loc><lastmod>2026-09-19</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.noshashi.app/</loc><lastmod>2026-09-21</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.noshashi.app/news/</loc><lastmod>2026-09-21</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.noshashi.app/certificate/</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.noshashi.app/pricing/</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.noshashi.app/progress/</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.noshashi.app/status/</loc><lastmod>2026-09-21</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.noshashi.app/guide/</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.noshashi.app/research/</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.noshashi.app/contact/</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/legal/</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.noshashi.app/downloads/xrpl-edge-pack/</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.noshashi.app/docs/NOSHASHI_XRPL_Edge_Lab_Brief.pdf</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>

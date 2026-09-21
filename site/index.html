@@ -32,7 +32,7 @@
     --brand:#3A82F6; --tele:#00E0C6;
     --go:#35D49A; --hold:#F5B942; --nogo:#FF5F6D;
     --shell:min(1180px, 92vw);
-    --r:10px;
+    --r:3px;
   }
   html[data-theme="light"]{
     --ground:#F4F7FA; --surface:#FFFFFF; --elevated:#E8EEF5;
@@ -222,12 +222,12 @@
     font:11px "IBM Plex Mono",monospace;cursor:pointer;white-space:nowrap}
   .theme-toggle:hover,.theme-toggle:focus-visible{color:var(--ink);border-color:var(--brand)}
 
-  .hero{padding:72px 0 76px;position:relative}
+  .hero{padding:44px 0 44px;position:relative}
   .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);
     background:var(--surface);border-radius:999px;padding:5px 13px;font-size:11px;color:var(--muted)}
   .dot{width:6px;height:6px;border-radius:50%;background:var(--go)}
-  .hero h1{font-size:clamp(38px,6vw,68px);margin:26px 0 0;letter-spacing:-.035em;max-width:15ch}
-  .hero .sub{font-size:clamp(15px,1.7vw,19px);color:var(--muted);max-width:62ch;margin:24px 0 0;line-height:1.62}
+  .hero h1{font-size:clamp(30px,3.6vw,46px);margin:18px 0 0;letter-spacing:-.03em;max-width:22ch}
+  .hero .sub{font-size:clamp(14px,1.3vw,16px);color:var(--muted);max-width:74ch;margin:16px 0 0;line-height:1.6}
   .cta{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap}
   .micro{font-size:11px;color:var(--faint);margin-top:20px}
   .verdicts{display:inline-flex;gap:4px;font-weight:700}
@@ -257,7 +257,7 @@
 
   /* The header is sticky, so an anchor jump would land the heading
      underneath it without this. */
-  .ticker{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;
+  .ticker{display:flex;flex-wrap:wrap;gap:1px;margin-top:18px;
     border:1px solid var(--rule);background:var(--surface);border-radius:var(--r);padding:14px 18px}
   .tk{display:flex;flex-direction:column;gap:3px;min-width:132px;flex:1}
   .tk b{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;color:var(--ink);
@@ -301,22 +301,43 @@
   @media (max-width:900px){.operator-brief{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:560px){.operator-brief{grid-template-columns:1fr}}
 
-  section{padding:80px 0;position:relative;scroll-margin-top:72px}
-  .kicker-block{margin-bottom:36px;max-width:66ch}
-  .kicker-block h2{font-size:clamp(24px,3vw,34px);margin-top:10px}
+  section{padding:52px 0;position:relative;scroll-margin-top:72px}
+  .kicker-block{margin-bottom:24px;max-width:70ch}
+  .kicker-block h2{font-size:clamp(21px,2.5vw,29px);margin-top:9px}
+  /* The index is a coordinate, not a caption: it takes the brand so a
+     reader can navigate by number the way a spec document is read. */
+  .kicker-block .eyebrow{color:var(--brand)}
+  .kicker-block p{font-size:14px}
   .kicker-block p{color:var(--muted);margin-top:14px;font-size:15px}
 
-  .grid{display:grid;gap:14px}
+  /* One panel, divided — not a scatter of cards.
+     The 1px gap over a --rule ground draws every divider, so the cells
+     share hairlines the way a real instrument's faces do, and a grid
+     that does not divide evenly leaves a cell rather than a hole. */
+  .grid{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+    border-radius:var(--r);overflow:hidden}
   .g3{grid-template-columns:repeat(3,1fr)}
   .g2{grid-template-columns:repeat(2,1fr)}
-  .panel{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:26px}
-  .panel h3{font-size:16px;margin-bottom:10px}
-  .panel p{color:var(--muted);font-size:13.5px;line-height:1.62}
-  .num{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint);letter-spacing:.18em;margin-bottom:14px}
+  /* Close the rectangle.
+     Five cards in three columns left a sixth cell with nothing in it.
+     As separate floating cards that was a gap you read past; as cells of
+     one panel it is a hole in the instrument, and it shows the divider
+     colour rather than a face. Rather than pad the markup with an empty
+     div, the final cell widens to take the rest of its row, so any count
+     fills its grid exactly. */
+  .g3 > .panel:last-child:nth-child(3n+1){grid-column:span 3}
+  .g3 > .panel:last-child:nth-child(3n+2){grid-column:span 2}
+  .g2 > .panel:last-child:nth-child(odd){grid-column:span 2}
+  .panel{background:var(--surface);border:0;border-radius:0;padding:20px 18px}
+  .panel h3{font-size:15px;margin-bottom:8px}
+  .panel p{color:var(--muted);font-size:13px;line-height:1.56}
+  .num{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--brand);
+    letter-spacing:.18em;margin-bottom:11px}
 
 
   /* Download */
-  .panel.dl{position:relative;overflow:hidden}
+  .panel.dl{position:relative;overflow:hidden;border:1px solid var(--rule);
+    border-radius:var(--r);padding:24px}
   .panel.dl .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--brand)}
   .verify{margin-top:22px;border-top:1px solid var(--rule);padding-top:16px;display:grid;gap:10px}
   .verify div{display:grid;gap:4px}
@@ -578,6 +599,198 @@
     .tk{min-width:100px}
     .ticker{gap:12px 10px;padding:13px 15px}
   }
+
+  /* ══ Instrument hero ═══════════════════════════════════════════════
+   *
+   * A full-viewport opening screen: a faint measured grid, three
+   * labelled nodes wired together, and one action. Adapted from a
+   * reference composition rather than copied — four things in that
+   * reference could not come across, and each was replaced rather
+   * than dropped:
+   *
+   *   Its background was an MP4 on someone else's CloudFront bucket.
+   *   Hotlinking a third party's asset is fragile and not ours to
+   *   spend, and vercel.json's `default-src 'self'` would refuse it
+   *   outright. The cosmos canvas already here does the same job, is
+   *   ours, and already stops when the tab is hidden and holds still
+   *   under prefers-reduced-motion.
+   *
+   *   Its display face was Graphik LCG pulled from a font-piracy CDN.
+   *   Graphik is licensed commercially; `font-src 'self'` would refuse
+   *   it anyway. Space Grotesk is already the display face here and is
+   *   already self-hosted.
+   *
+   *   Its status strip showed a hard-coded Ethereum-style wallet on an
+   *   XRP Ledger product. Invented figures are the one thing this site
+   *   does not print, so the strip carries facts instead.
+   *
+   *   Its accent was an ice blue. Every other section of this page is
+   *   built on --brand, and a hero on a different blue reads as a
+   *   different site. The structure is the borrowed part; the palette
+   *   stays.
+   */
+  .hero-instrument{
+    position:relative;isolation:isolate;overflow:hidden;
+    width:100vw;margin-inline:calc(50% - 50vw);
+    /* Full-height only from 1024 up. Below that the node cluster is
+     * hidden, and forcing 100svh left a dead band between the headline
+     * and the bottom row with nothing to put in it. A floor keeps the
+     * hero from collapsing onto the brief on a phone. */
+    min-height:max(440px, 64svh);
+    display:flex;flex-direction:column;
+    background:var(--ground);
+    --hi-gut:20px;
+  }
+  @media(min-width:768px){ .hero-instrument{--hi-gut:35px} }
+  @media(min-width:1024px){ .hero-instrument{min-height:max(560px, calc(100svh - 76px))} }
+
+  .hero-instrument .cosmos{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+
+  /* ── The bloom. Decoration, granted as a bounded exception in
+   *    DESIGN.md; see the "marketing hero" section there for the terms.
+   *    Static: no loop, no frame cost, nothing to stop under reduced
+   *    motion. Generated by scripts/gen-hero-bloom.mjs. ───────────── */
+  .hi-bloom{position:absolute;top:2%;bottom:4%;left:26%;right:0;
+    width:auto;height:96%;z-index:1;pointer-events:none;
+    /* Weight rides the alpha of `color`, not `opacity`: every gradient
+     * stop is currentColor, and `opacity` here is already owned by the
+     * hiFade animation, whose `both` fill holds it at 1 and silently
+     * overrides any opacity declared on this element. */
+    color:rgb(187 216 255 / 1);
+    animation:hiFade 1.4s cubic-bezier(.16,1,.3,1) both;animation-delay:.35s}
+  /* On #F4F7FA a translucent white petal is invisible, so the light
+   * theme gets the brand hue at a lower weight instead. */
+  html[data-theme="light"] .hi-bloom{color:rgb(20 95 209 / .55)}
+  /* Below 1024 there is no node diagram for the bloom to sit behind,
+   * so it becomes the hero's backdrop instead: full bleed, and carried
+   * at a lower weight because here it is behind the headline itself
+   * rather than beside it. `slice` on the SVG is what makes this work
+   * — `meet` letterboxes the form to nothing in a narrow box. */
+  @media(max-width:1023px){
+    /* width:auto sizes an SVG from its own aspect ratio, which on a
+     * 390px phone made the element 538px wide and pushed it off the
+     * screen. An explicit width is what makes left/right bind. */
+    .hi-bloom{left:0;right:0;top:0;bottom:0;width:100%;height:100%;
+      color:rgb(187 216 255 / .58)}
+    html[data-theme="light"] .hi-bloom{color:rgb(20 95 209 / .34)}
+  }
+
+  /* ── The measured grid. Four verticals, two horizontals, eight
+   *    crossings. Percentages, so it is the same composition at every
+   *    width. ─────────────────────────────────────────────────────── */
+  .hi-grid{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .hi-v{position:absolute;top:0;height:100%;width:1px;background:var(--rule);opacity:.55;
+    transform-origin:top;animation:hiGridV 1.2s cubic-bezier(.16,1,.3,1) both}
+  .hi-h{position:absolute;left:0;width:100%;height:1px;background:var(--rule);opacity:.55;
+    transform-origin:left;animation:hiGridH 1.2s cubic-bezier(.16,1,.3,1) both}
+  .hi-x{position:absolute;animation:hiScale .7s cubic-bezier(.16,1,.3,1) both}
+  .hi-x::before,.hi-x::after{content:"";position:absolute;background:var(--faint);
+    transform:translate(-50%,-50%)}
+  .hi-x::before{width:10px;height:1px}
+  .hi-x::after{width:1px;height:10px}
+
+  /* ── Nodes: three empty squares, six connector segments. Decorative;
+   *    the readable text lives in .hi-label. Hidden below 768px, where
+   *    there is no room to place them without collision. ──────────── */
+  .hi-nodes{position:absolute;inset:0;z-index:2;pointer-events:none;display:none}
+  /* 1024, not 768. At tablet width the right-hand labels ran 8px past
+   * the viewport edge, and squeezing them in would have meant setting
+   * the diagram in type too small to read. It is the decoration, so it
+   * is what goes. */
+  @media(min-width:1024px){ .hi-nodes{display:block} }
+  .hi-sq{position:absolute;width:56px;height:56px;border:1px solid var(--muted);
+    animation:hiScale .7s cubic-bezier(.16,1,.3,1) both}
+  @media(min-width:1024px){ .hi-sq{width:68px;height:68px} }
+  /* The CONTROL node sits in the band the info card claims once the
+   * card's copy wraps to four lines, which it does from 1024 down to
+   * about 1280. Below 1280 that square is the thing that goes; its
+   * label is real text and stays. */
+  .hi-n2{display:none}
+  @media(min-width:1280px){ .hi-n2{display:block} }
+  .hi-wire{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
+    animation:hiFade .8s cubic-bezier(.16,1,.3,1) both}
+  .hi-wire line{stroke:var(--rule);stroke-width:1}
+
+  .hi-label{position:absolute;z-index:3;display:none}
+  @media(min-width:1024px){ .hi-label{display:block} }
+  .hi-label .t{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+    color:var(--ink);white-space:nowrap}
+  .hi-label p{margin-top:4px;font-size:10px;line-height:1.4;color:var(--muted)}
+
+  /* ── Foreground: status strip, headline, bottom row. ───────────── */
+  .hi-face{position:relative;z-index:4;display:flex;flex-direction:column;flex:1;
+    padding:var(--hi-gut);gap:20px;width:100%;max-width:1280px;margin-inline:auto}
+
+  .hi-status{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    animation:hiRight .8s cubic-bezier(.16,1,.3,1) both}
+  .hi-status .s{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.06em;
+    color:var(--muted);display:inline-flex;align-items:center;gap:7px}
+  .hi-status .s b{font-weight:400;color:var(--ink)}
+  .hi-status .live{color:var(--go)}
+  .hi-status .chip{font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    background:var(--brand);color:#fff;border-radius:var(--r);padding:2px 6px;letter-spacing:.04em}
+  .hi-status .sep{margin-left:8px}
+
+  .hero-instrument h1{
+    font-size:clamp(30px,5.2vw,62px);line-height:1.04;letter-spacing:-.03em;
+    max-width:19ch;margin-top:auto;
+    animation:hiUp .9s cubic-bezier(.16,1,.3,1) both;animation-delay:.12s}
+
+  .hi-bottom{display:flex;flex-direction:column;align-items:flex-start;gap:20px;margin-top:auto}
+  @media(min-width:768px){ .hi-bottom{flex-direction:row;align-items:flex-end;justify-content:space-between;gap:0} }
+
+  .hi-cta{display:inline-flex;align-items:center;gap:10px;background:var(--brand);color:#fff;
+    border:1px solid var(--brand);border-radius:var(--r);padding:10px 16px;text-decoration:none;
+    font-size:13px;letter-spacing:.02em;
+    animation:hiUp .9s cubic-bezier(.16,1,.3,1) both;animation-delay:.5s;
+    transition:filter .15s,transform .15s}
+  @media(min-width:768px){ .hi-cta{padding:12px 20px} }
+  .hi-cta:hover,.hi-cta:focus-visible{filter:brightness(1.1);transform:translateY(-1px)}
+  .hi-cta .star{font-size:15px;line-height:1}
+
+  .hi-card{position:relative;max-width:300px;display:none;
+    animation:hiRight .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.62s}
+  @media(min-width:640px){ .hi-card{display:block} }
+  .hi-card .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.1em;background:var(--brand);color:#fff;padding:2px 6px;margin-bottom:10px}
+  .hi-card .body{position:relative;padding:20px}
+  /* The chamfer is drawn rather than bordered: a corner-cut cannot be
+   * expressed with border-radius, and a clip-path would take the text
+   * with it. */
+  .hi-card .edge{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .hi-card .edge polygon{fill:none;stroke:var(--brand);stroke-width:1}
+  .hi-card p{position:relative;font-size:13px;line-height:1.45;color:var(--muted);margin-bottom:16px}
+  .hi-card a{position:relative;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    letter-spacing:.06em;color:var(--brand);text-decoration:none}
+  .hi-card a:hover,.hi-card a:focus-visible{text-decoration:underline}
+
+  @keyframes hiUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  @keyframes hiFade{from{opacity:0}to{opacity:1}}
+  @keyframes hiRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+  @keyframes hiScale{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+  @keyframes hiGridV{from{opacity:0;transform:scaleY(0)}to{opacity:.55;transform:none}}
+  @keyframes hiGridH{from{opacity:0;transform:scaleX(0)}to{opacity:.55;transform:none}}
+
+  /*
+   * The entrance is choreography, not information. Under
+   * prefers-reduced-motion everything is simply present — same layout,
+   * same opacities, no travel. Written as `animation:none` on the
+   * whole subtree so a rule added later cannot quietly reintroduce
+   * motion here.
+   */
+  @media(prefers-reduced-motion:reduce){
+    .hero-instrument *{animation:none !important}
+    .hi-v,.hi-h{opacity:.55}
+  }
+
+  @media(max-width:767px){
+    /* Content-driven on a phone. A floor here only ever produced a
+     * band of nothing under the CTA — measured, not assumed. */
+    .hero-instrument{min-height:auto;padding-block:16px}
+    .hero-instrument h1{margin-top:28px}
+    .hi-bottom{margin-top:32px}
+  }
+
 </style>
 </head>
 <body>
@@ -622,128 +835,167 @@
 </header>
 
 <main class="shell">
-  <section class="hero">
-    <!--
-      Instrument field. Four static plates from board section 07, layered.
-      No animation loop, no parallax, nothing that competes with the
-      ticker directly beneath it. Opacities are set per plate and none
-      exceeds 8%.
-    -->
-    <!--
-      The hero sky. Confined to this section: the loop runs only while
-      the hero is on screen, stops when the tab is hidden, and holds
-      still under prefers-reduced-motion. Nothing below this section
-      has moving pixels behind it. See site/assets/cosmos.js.
-    -->
+  <!--
+    Instrument hero.
+
+    One screen: what this reads, what it answers with, and one action.
+    The architecture — fixed gutter, measured grid, three wired nodes,
+    a bottom row of action plus a chamfered note — is adapted from a
+    reference composition. Everything IN it is this project's own.
+
+    Four substitutions, each recorded in the CSS above rather than
+    made quietly: no third-party CloudFront video (CSP would refuse
+    it, and it is not ours), no Graphik from a font-piracy CDN
+    (licensed commercially, and `font-src 'self'` would refuse it), no
+    invented wallet address (this site does not print figures it did
+    not read), and --brand rather than a borrowed accent.
+
+    There is no nav in here. The page already has a real <header>
+    above with the theme toggle, the i18n hooks and the responsive
+    collapse; a second nav inside the hero would be a duplicate that
+    drifts.
+
+    Every string below keeps the data-i18n key it already had, so the
+    translations in site/data/i18n continue to resolve. The mission,
+    the badges, the headline and the CTA are the existing copy, moved
+    rather than rewritten.
+  -->
+  <section class="hero-instrument">
     <canvas class="cosmos" aria-hidden="true"></canvas>
+    <svg class="hi-bloom" viewBox="0 0 1000 760" fill="none"
+     xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
+     preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- IDs are prefixed per DESIGN.md: two inline marks on one page
+         must not be able to collide on a gradient id. -->
+    <radialGradient id="hb-petal" cx="50%" cy="86%" r="74%">
+      <stop offset="0%" stop-color="currentColor" stop-opacity=".44"/>
+      <stop offset="46%" stop-color="currentColor" stop-opacity=".21"/>
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="hb-core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="currentColor" stop-opacity=".60"/>
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g class="hb-filaments"><path d="M362.43 234.01 C422.96 305.09 153.77 364.32 285.6 404.6 S220.35 451.99 238.51 470.95" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.68" stroke-linecap="round"/><path d="M748.77 409.05 C679.09 485.15 853.83 548.57 753.42 591.7 S777.17 642.44 756.27 662.73" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.78" stroke-linecap="round"/><path d="M390.81 309.22 C527.15 379.77 171.31 438.56 373.06 478.54 S321.28 525.58 362.19 544.39" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="1.02" stroke-linecap="round"/><path d="M340.57 307.94 C364.27 379.08 418.49 438.36 409.46 478.67 S444.57 526.09 451.68 545.06" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.57" stroke-linecap="round"/><path d="M426.09 176.68 C346.63 278.04 445.08 362.51 368.89 419.95 S357.67 487.53 333.83 514.56" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.54" stroke-linecap="round"/><path d="M300.93 295.3 C268.12 367.03 393.71 426.8 329.98 467.44 S357.62 515.26 347.78 534.39" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="1.03" stroke-linecap="round"/><path d="M511.26 184.87 C569.73 279.04 328.21 357.52 448.52 410.88 S392.52 473.66 410.06 498.77" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.87" stroke-linecap="round"/><path d="M379.3 190.21 C431.95 298.49 250.4 388.71 345.09 450.07 S308.32 522.25 324.12 551.13" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.74" stroke-linecap="round"/><path d="M477.01 377.99 C371.33 438.09 747.69 488.17 553.11 522.23 S631.45 562.29 599.75 578.32" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="1.2" stroke-linecap="round"/><path d="M730.8 332.28 C787.95 410.81 458.64 476.24 611.67 520.74 S521.51 573.09 538.66 594.03" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.52" stroke-linecap="round"/><path d="M424.45 261.12 C443.37 367.05 180.07 455.32 289.36 515.35 S200.88 585.96 206.56 614.21" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="1.08" stroke-linecap="round"/><path d="M757.85 408.02 C701.21 490.33 892.29 558.92 792.03 605.57 S829.98 660.44 812.98 682.39" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="1.13" stroke-linecap="round"/><path d="M560.86 168.52 C592.76 240.96 640.41 301.33 637.87 342.38 S675.5 390.68 685.07 410" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="1.48" stroke-linecap="round"/><path d="M420.12 267.82 C288.16 340.25 464.43 400.6 333.05 441.64 S319.28 489.92 279.69 509.23" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.53" stroke-linecap="round"/><path d="M434.33 247.05 C307.35 354.35 384.33 443.76 293.11 504.56 S244.65 576.09 206.56 604.7" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.7" stroke-linecap="round"/><path d="M308.73 333.51 C275.87 401.93 253.56 458.95 246 497.72 S217.41 543.34 207.55 561.58" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.72" stroke-linecap="round"/><path d="M539.57 382.2 C563.15 436.56 546.61 481.86 564.4 512.67 S572.54 548.91 579.61 563.4" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="1.05" stroke-linecap="round"/><path d="M415.77 334.26 C500.68 421.05 365.28 493.38 458.16 542.56 S458.67 600.42 484.14 623.56" fill="none" stroke="currentColor" stroke-opacity=".17" stroke-width="0.64" stroke-linecap="round"/></g>
+<g transform="translate(660 225) scale(1.28)" opacity="0.95"><g transform="rotate(4.58) scale(0.97)" opacity="0.55"><path d="M0 0 C48.92 -40.2 49.17 -133.29 6.12 -211.58 C-33.5 -129.06 -46.47 -46.55 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.93"/><path d="M0 -8.46 C1.71 -71.94 5.51 -139.64 5.51 -196.77" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.72"/><path d="M0 -8.46 C14.38 -71.94 23.61 -139.64 5.51 -196.77" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.62"/><path d="M0 -8.46 C-13.01 -71.94 -15.53 -139.64 5.51 -196.77" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.62"/></g><g transform="rotate(87.49) scale(0.96)" opacity="0.48"><path d="M0 0 C44.29 -35.26 34.03 -116.9 -4.94 -185.56 C-40.82 -113.19 -42.08 -40.82 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.94"/><path d="M0 -7.42 C1.55 -63.09 -0.26 -122.47 -4.45 -172.57" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.73"/><path d="M0 -7.42 C13.02 -63.09 16.13 -122.47 -4.45 -172.57" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/><path d="M0 -7.42 C-11.78 -63.09 -19.3 -122.47 -4.45 -172.57" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/></g><g transform="rotate(143.49) scale(1.04)" opacity="0.54"><path d="M0 0 C62.12 -40.84 80.5 -135.42 25.83 -214.95 C-24.48 -131.12 -59.01 -47.29 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.86"/><path d="M0 -8.6 C2.17 -73.08 16.02 -141.87 23.25 -199.9" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.67"/><path d="M0 -8.6 C18.26 -73.08 39.01 -141.87 23.25 -199.9" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/><path d="M0 -8.6 C-16.52 -73.08 -10.69 -141.87 23.25 -199.9" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/></g><g transform="rotate(221.59) scale(1.02)" opacity="0.53"><path d="M0 0 C45.86 -35.01 56.58 -116.08 16.22 -184.26 C-20.92 -112.4 -43.57 -40.54 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.89"/><path d="M0 -7.37 C1.61 -62.65 10.41 -121.61 14.6 -171.36" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.69"/><path d="M0 -7.37 C13.48 -62.65 27.37 -121.61 14.6 -171.36" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.59"/><path d="M0 -7.37 C-12.2 -62.65 -9.32 -121.61 14.6 -171.36" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.59"/></g><g transform="rotate(287.01) scale(1.05)" opacity="0.49"><path d="M0 0 C58.01 -37.51 74.34 -124.37 23.29 -197.41 C-23.7 -120.42 -55.11 -43.43 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.86"/><path d="M0 -7.9 C2.03 -67.12 14.55 -130.29 20.96 -183.59" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.67"/><path d="M0 -7.9 C17.05 -67.12 36.01 -130.29 20.96 -183.59" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/><path d="M0 -7.9 C-15.43 -67.12 -10.4 -130.29 20.96 -183.59" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/></g><g transform="rotate(37.19) scale(0.91)" opacity="0.77"><path d="M0 0 C43.2 -26.2 32.13 -86.87 -5.88 -137.89 C-40.88 -84.11 -41.04 -30.34 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.99"/><path d="M0 -5.52 C1.51 -46.88 -0.78 -91.01 -5.3 -128.24" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.77"/><path d="M0 -5.52 C12.7 -46.88 15.2 -91.01 -5.3 -128.24" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.66"/><path d="M0 -5.52 C-11.49 -46.88 -19.36 -91.01 -5.3 -128.24" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.66"/></g><g transform="rotate(139.88) scale(0.95)" opacity="0.92"><path d="M0 0 C47.01 -27.2 55.8 -90.19 14.43 -143.15 C-23.65 -87.32 -44.66 -31.49 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.95"/><path d="M0 -5.73 C1.65 -48.67 9.57 -94.48 12.99 -133.13" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.74"/><path d="M0 -5.73 C13.82 -48.67 26.96 -94.48 12.99 -133.13" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/><path d="M0 -5.73 C-12.5 -48.67 -10.65 -94.48 12.99 -133.13" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/></g><g transform="rotate(221.53) scale(0.89)" opacity="0.89"><path d="M0 0 C34.42 -24.81 21.83 -82.28 -8.46 -130.6 C-36.34 -79.67 -32.7 -28.73 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="1.02"/><path d="M0 -5.22 C1.2 -44.41 -2.51 -86.2 -7.61 -121.46" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.79"/><path d="M0 -5.22 C10.12 -44.41 10.22 -86.2 -7.61 -121.46" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.68"/><path d="M0 -5.22 C-9.15 -44.41 -17.31 -86.2 -7.61 -121.46" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.68"/></g><g transform="rotate(317.35) scale(0.94)" opacity="0.87"><path d="M0 0 C44.87 -24.02 51.44 -79.64 11.96 -126.41 C-24.38 -77.11 -42.62 -27.81 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.96"/><path d="M0 -5.06 C1.57 -42.98 8.22 -83.43 10.76 -117.56" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.74"/><path d="M0 -5.06 C13.19 -42.98 24.82 -83.43 10.76 -117.56" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.64"/><path d="M0 -5.06 C-11.93 -42.98 -11.07 -83.43 10.76 -117.56" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.64"/></g><ellipse rx="19" ry="25" fill="url(#hb-core)"/><ellipse rx="7" ry="10" fill="currentColor" opacity=".30"/></g>
+<g transform="translate(372 432) scale(1.02)" opacity="0.8"><g transform="rotate(138.11) scale(1)" opacity="0.55"><path d="M0 0 C61.72 -30.5 50.03 -101.12 -4.29 -160.51 C-54.28 -97.91 -58.64 -35.31 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.9"/><path d="M0 -6.42 C2.16 -54.57 0.94 -105.94 -3.86 -149.28" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.7"/><path d="M0 -6.42 C18.15 -54.57 23.78 -105.94 -3.86 -149.28" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.6"/><path d="M0 -6.42 C-16.42 -54.57 -25.6 -105.94 -3.86 -149.28" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.6"/></g><g transform="rotate(206.62) scale(0.94)" opacity="0.46"><path d="M0 0 C52.46 -37.98 46.19 -125.92 0.03 -199.87 C-42.46 -121.92 -49.84 -43.97 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.95"/><path d="M0 -7.99 C1.84 -67.96 2.64 -131.91 0.03 -185.88" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.74"/><path d="M0 -7.99 C15.42 -67.96 22.05 -131.91 0.03 -185.88" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.64"/><path d="M0 -7.99 C-13.95 -67.96 -19.92 -131.91 0.03 -185.88" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.64"/></g><g transform="rotate(282.59) scale(1.06)" opacity="0.44"><path d="M0 0 C61.1 -36.14 28.14 -119.82 -25.63 -190.19 C-75.13 -116.01 -58.05 -41.84 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.85"/><path d="M0 -7.61 C2.14 -64.66 -9.76 -125.52 -23.07 -176.87" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.66"/><path d="M0 -7.61 C17.96 -64.66 12.85 -125.52 -23.07 -176.87" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/><path d="M0 -7.61 C-16.25 -64.66 -36.04 -125.52 -23.07 -176.87" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/></g><g transform="rotate(360.09) scale(0.95)" opacity="0.48"><path d="M0 0 C54.5 -30.22 47.48 -100.2 -0.48 -159.05 C-44.63 -97.02 -51.78 -34.99 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.94"/><path d="M0 -6.36 C1.91 -54.08 2.49 -104.97 -0.43 -147.91" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.73"/><path d="M0 -6.36 C16.02 -54.08 22.65 -104.97 -0.43 -147.91" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/><path d="M0 -6.36 C-14.5 -54.08 -20.95 -104.97 -0.43 -147.91" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/></g><g transform="rotate(424.53) scale(0.95)" opacity="0.51"><path d="M0 0 C46.89 -38.92 60.32 -129.05 19.05 -204.85 C-18.93 -124.96 -44.55 -45.07 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.95"/><path d="M0 -8.19 C1.64 -69.65 11.87 -135.2 17.15 -190.51" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.74"/><path d="M0 -8.19 C13.79 -69.65 29.22 -135.2 17.15 -190.51" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/><path d="M0 -8.19 C-12.47 -69.65 -8.29 -135.2 17.15 -190.51" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/></g><g transform="rotate(184.08) scale(0.96)" opacity="0.94"><path d="M0 0 C33.34 -26.26 16.93 -87.06 -12.4 -138.19 C-39.41 -84.3 -31.67 -30.4 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.94"/><path d="M0 -5.53 C1.17 -46.98 -4.53 -91.21 -11.16 -128.52" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.73"/><path d="M0 -5.53 C9.8 -46.98 7.8 -91.21 -11.16 -128.52" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/><path d="M0 -5.53 C-8.87 -46.98 -18.87 -91.21 -11.16 -128.52" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/></g><g transform="rotate(258.95) scale(0.89)" opacity="0.73"><path d="M0 0 C35.5 -22.17 34.88 -73.51 3.63 -116.68 C-25.12 -71.18 -33.73 -25.67 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="1.01"/><path d="M0 -4.67 C1.24 -39.67 3.59 -77.01 3.27 -108.51" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.78"/><path d="M0 -4.67 C10.44 -39.67 16.73 -77.01 3.27 -108.51" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.67"/><path d="M0 -4.67 C-9.44 -39.67 -11.67 -77.01 3.27 -108.51" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.67"/></g><g transform="rotate(356.85) scale(0.91)" opacity="0.85"><path d="M0 0 C42.62 -27.73 45.49 -91.95 7.99 -145.96 C-26.53 -89.03 -40.48 -32.11 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.99"/><path d="M0 -5.84 C1.49 -49.63 6.13 -96.33 7.19 -135.74" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.77"/><path d="M0 -5.84 C12.53 -49.63 21.9 -96.33 7.19 -135.74" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.66"/><path d="M0 -5.84 C-11.34 -49.63 -12.2 -96.33 7.19 -135.74" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.66"/></g><g transform="rotate(440.16) scale(0.9)" opacity="0.85"><path d="M0 0 C39.42 -27.49 20.83 -91.14 -13.85 -144.67 C-45.78 -88.25 -37.45 -31.83 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="1"/><path d="M0 -5.79 C1.38 -49.19 -4.96 -95.48 -12.47 -134.54" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.78"/><path d="M0 -5.79 C11.59 -49.19 9.63 -95.48 -12.47 -134.54" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.67"/><path d="M0 -5.79 C-10.49 -49.19 -21.9 -95.48 -12.47 -134.54" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.67"/></g><ellipse rx="19" ry="25" fill="url(#hb-core)"/><ellipse rx="7" ry="10" fill="currentColor" opacity=".30"/></g>
+<g transform="translate(214 610) scale(0.66)" opacity="0.66"><g transform="rotate(69.73) scale(1.03)" opacity="0.57"><path d="M0 0 C51.45 -36.8 26.81 -122.03 -18.47 -193.7 C-60.14 -118.16 -48.88 -42.61 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.87"/><path d="M0 -7.75 C1.8 -65.86 -6.66 -127.84 -16.62 -180.14" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.68"/><path d="M0 -7.75 C15.13 -65.86 12.37 -127.84 -16.62 -180.14" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.58"/><path d="M0 -7.75 C-13.69 -65.86 -28.79 -127.84 -16.62 -180.14" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.58"/></g><g transform="rotate(140.24) scale(1.01)" opacity="0.54"><path d="M0 0 C55.87 -31.83 28.83 -105.54 -20.34 -167.53 C-65.6 -102.19 -53.08 -36.86 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.89"/><path d="M0 -6.7 C1.96 -56.96 -7.38 -110.57 -18.31 -155.8" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.69"/><path d="M0 -6.7 C16.43 -56.96 13.3 -110.57 -18.31 -155.8" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.59"/><path d="M0 -6.7 C-14.86 -56.96 -31.4 -110.57 -18.31 -155.8" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.59"/></g><g transform="rotate(209.25) scale(1.06)" opacity="0.56"><path d="M0 0 C47.97 -34.81 49.17 -115.43 6.95 -183.23 C-31.91 -111.77 -45.57 -40.31 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.85"/><path d="M0 -7.33 C1.68 -62.3 5.87 -120.93 6.26 -170.4" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.66"/><path d="M0 -7.33 C14.1 -62.3 23.62 -120.93 6.26 -170.4" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/><path d="M0 -7.33 C-12.76 -62.3 -14.75 -120.93 6.26 -170.4" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/></g><g transform="rotate(271.55) scale(1.05)" opacity="0.57"><path d="M0 0 C55.8 -39.22 62.11 -130.06 13.01 -206.44 C-32.19 -125.93 -53.01 -45.42 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.86"/><path d="M0 -8.26 C1.95 -70.19 9.29 -136.25 11.71 -191.99" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.67"/><path d="M0 -8.26 C16.41 -70.19 29.94 -136.25 11.71 -191.99" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/><path d="M0 -8.26 C-14.84 -70.19 -14.7 -136.25 11.71 -191.99" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.57"/></g><g transform="rotate(346.19) scale(1.01)" opacity="0.49"><path d="M0 0 C58.31 -36.89 56.84 -122.32 5.52 -194.16 C-41.71 -118.44 -55.4 -42.72 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.89"/><path d="M0 -7.77 C2.04 -66.01 5.68 -128.15 4.97 -180.57" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.69"/><path d="M0 -7.77 C17.14 -66.01 27.25 -128.15 4.97 -180.57" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.6"/><path d="M0 -7.77 C-15.51 -66.01 -19.4 -128.15 4.97 -180.57" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.6"/></g><g transform="rotate(87.04) scale(0.95)" opacity="0.84"><path d="M0 0 C38.89 -24.67 50.45 -81.79 16.23 -129.82 C-15.27 -79.19 -36.94 -28.56 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.95"/><path d="M0 -5.19 C1.36 -44.14 10.06 -85.68 14.61 -120.74" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.74"/><path d="M0 -5.19 C11.43 -44.14 24.45 -85.68 14.61 -120.74" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/><path d="M0 -5.19 C-10.34 -44.14 -6.66 -85.68 14.61 -120.74" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.63"/></g><g transform="rotate(187.86) scale(0.93)" opacity="0.75"><path d="M0 0 C42.49 -26.48 50.08 -87.8 12.69 -139.37 C-21.73 -85.02 -40.37 -30.66 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.97"/><path d="M0 -5.57 C1.49 -47.39 8.47 -91.99 11.42 -129.62" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.76"/><path d="M0 -5.57 C12.49 -47.39 24.19 -91.99 11.42 -129.62" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.65"/><path d="M0 -5.57 C-11.3 -47.39 -9.8 -91.99 11.42 -129.62" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.65"/></g><g transform="rotate(282.26) scale(0.87)" opacity="0.88"><path d="M0 0 C34 -26.12 26.18 -86.6 -3.74 -137.46 C-31.27 -83.85 -32.3 -30.24 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="1.04"/><path d="M0 -5.5 C1.19 -46.74 -0.17 -90.72 -3.36 -127.84" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.81"/><path d="M0 -5.5 C10 -46.74 12.41 -90.72 -3.36 -127.84" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.69"/><path d="M0 -5.5 C-9.04 -46.74 -14.79 -90.72 -3.36 -127.84" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.69"/></g><g transform="rotate(372.79) scale(0.91)" opacity="0.78"><path d="M0 0 C33.86 -24.65 27.89 -81.75 -1.91 -129.76 C-29.33 -79.15 -32.16 -28.55 0 0 Z" fill="url(#hb-petal)" stroke="currentColor" stroke-opacity=".30" stroke-width="0.99"/><path d="M0 -5.19 C1.19 -44.12 0.74 -85.64 -1.72 -120.68" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="0.77"/><path d="M0 -5.19 C9.95 -44.12 13.27 -85.64 -1.72 -120.68" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.66"/><path d="M0 -5.19 C-9.01 -44.12 -13.82 -85.64 -1.72 -120.68" fill="none" stroke="currentColor" stroke-opacity=".11" stroke-width="0.66"/></g><ellipse rx="19" ry="25" fill="url(#hb-core)"/><ellipse rx="7" ry="10" fill="currentColor" opacity=".30"/></g>
+</svg>
 
-    <div class="field" aria-hidden="true">
-      <!-- Concentric orbital system, bleeding off the right edge. -->
-      <svg class="orbit" style="right:-8%;top:-6%;width:620px;height:620px" viewBox="0 0 240 240">
-        <g stroke="currentColor" stroke-width=".6" fill="none">
-          <ellipse cx="120" cy="120" rx="34" ry="46"/><ellipse cx="120" cy="120" rx="58" ry="76"/>
-          <ellipse cx="120" cy="120" rx="80" ry="102"/><ellipse cx="120" cy="120" rx="100" ry="126" transform="rotate(-14 120 120)"/>
-        </g>
-        <circle cx="120" cy="120" r="7" fill="currentColor"/><circle cx="120" cy="74" r="3" fill="currentColor"/>
-        <circle cx="120" cy="178" r="2.6" fill="currentColor"/><circle cx="62" cy="120" r="2" fill="currentColor"/>
-        <circle cx="178" cy="120" r="2" fill="currentColor"/>
-      </svg>
 
-      <!-- Dot grid. The plane the orbits sit over. -->
-      <svg class="plate-grid" style="left:-4%;top:8%;width:540px;height:420px;opacity:.10" viewBox="0 0 540 420">
-        <defs>
-          <pattern id="fld-dots" width="26" height="26" patternUnits="userSpaceOnUse">
-            <circle cx="1.4" cy="1.4" r="1.4" fill="currentColor"/>
-          </pattern>
-          <linearGradient id="fld-fade" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#fff" stop-opacity=".85"/>
-            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-          </linearGradient>
-          <mask id="fld-mask"><rect width="540" height="420" fill="url(#fld-fade)"/></mask>
-        </defs>
-        <rect width="540" height="420" fill="url(#fld-dots)" mask="url(#fld-mask)"/>
-      </svg>
-
-      <!-- Tilted ellipse carrying bodies on the path. -->
-      <svg style="right:14%;bottom:-16%;width:460px;height:300px;opacity:.07" viewBox="0 0 460 300">
-        <g transform="rotate(-18 230 150)">
-          <ellipse cx="230" cy="150" rx="215" ry="74" fill="none" stroke="currentColor" stroke-width=".8"/>
-          <ellipse cx="230" cy="150" rx="150" ry="50" fill="none" stroke="currentColor" stroke-width=".6"/>
-          <circle cx="445" cy="150" r="4" fill="currentColor"/>
-          <circle cx="126" cy="112" r="2.6" fill="currentColor"/>
-          <circle cx="330" cy="196" r="2" fill="currentColor"/>
-        </g>
-      </svg>
-
-      <!-- Diagonal hatch, closing the lower left. -->
-      <svg style="left:2%;bottom:-8%;width:300px;height:220px;opacity:.06" viewBox="0 0 300 220">
-        <defs>
-          <pattern id="fld-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-            <line x1="0" y1="0" x2="0" y2="9" stroke="currentColor" stroke-width=".9"/>
-          </pattern>
-        </defs>
-        <rect width="300" height="220" fill="url(#fld-hatch)"/>
-      </svg>
+    <div class="hi-grid" aria-hidden="true">
+      <span class="hi-v" style="left:12.6%;animation-delay:.30s"></span>
+      <span class="hi-v" style="left:37.5%;animation-delay:.40s"></span>
+      <span class="hi-v" style="left:61.9%;animation-delay:.50s"></span>
+      <span class="hi-v" style="left:86.2%;animation-delay:.60s"></span>
+      <span class="hi-h" style="top:32.7%;animation-delay:.50s"></span>
+      <span class="hi-h" style="top:71.4%;animation-delay:.65s"></span>
+      <span class="hi-x" style="top:32.7%;left:12.6%;animation-delay:.70s"></span>
+      <span class="hi-x" style="top:32.7%;left:37.5%;animation-delay:.76s"></span>
+      <span class="hi-x" style="top:32.7%;left:61.9%;animation-delay:.82s"></span>
+      <span class="hi-x" style="top:32.7%;left:86.2%;animation-delay:.88s"></span>
+      <span class="hi-x" style="top:71.4%;left:12.6%;animation-delay:.94s"></span>
+      <span class="hi-x" style="top:71.4%;left:37.5%;animation-delay:1.00s"></span>
+      <span class="hi-x" style="top:71.4%;left:61.9%;animation-delay:1.06s"></span>
+      <span class="hi-x" style="top:71.4%;left:86.2%;animation-delay:1.12s"></span>
     </div>
-
 
     <!--
-      The name and the mission, before any claim is made. Both are taken
-      verbatim from PRODUCT.md rather than written for the page, so the
-      site and the product truth cannot drift apart.
+      The three nodes are INPUT, OUTPUT and CONTROL — the same three
+      the operating brief below this hero already states, so the
+      screen and the brief cannot drift apart. Squares and wires are
+      decorative and hidden from assistive technology; the labels are
+      real text and are not.
     -->
-    <div class="lockup">
-      <div class="lockup-brand">
-      <div class="lockup-mark" aria-hidden="true">
-        <span class="lockup-ring"></span>
-        <span class="lockup-ring"></span>
-        <span class="lockup-ring"></span>
-        <svg class="mark" viewBox="0 0 180 180" fill="none" aria-hidden="true">
-          <mask id="lockup-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
-            <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
-            <path d="M95 99C91 80 94 64 103 50 114 59 121 70 123 83 116 91 106 97 95 99Z" fill="#000"/>
-            <circle cx="129" cy="63" r="5" fill="#000"/>
-          </mask>
-          <g stroke="currentColor" stroke-width="7" stroke-linecap="round">
-            <path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/>
-          </g>
-          <circle cx="151" cy="69" r="7" fill="currentColor"/>
-          <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="currentColor" mask="url(#lockup-mask)"/>
-          <path d="M92 111 63 132C60 116 66 103 78 93Z" fill="currentColor"/>
-          <path d="M111 91 130 118C114 119 101 113 93 103Z" fill="currentColor"/>
-          <path d="M82 121 67 150 94 132Z" fill="currentColor"/>
-          <path d="M73 143 61 164 84 151Z" fill="currentColor"/>
-        </svg>
-      </div>
-      <div class="lockup-word">
-        <h2>NOSHASHI</h2>
-        <span class="tagline" data-i18n="hero.tagline">Analyze · Discover · Navigate</span>
-      </div>
-      </div>
+    <div class="hi-nodes" aria-hidden="true">
+      <span class="hi-sq" style="top:26%;left:72%;animation-delay:1.05s"></span>
+      <span class="hi-sq hi-n2" style="top:54%;left:64%;animation-delay:1.25s"></span>
+      <span class="hi-sq" style="top:62%;left:44%;animation-delay:1.45s"></span>
 
-      <p class="mission" data-i18n="hero.mission">
-        A <strong>zero-trust intelligence workstation for the XRP Ledger</strong> — compliance
-        adjudication and market intelligence read from one validated ledger state, in the same
-        second. Every other tool on this chain gives you one half.
-      </p>
+      <svg class="hi-wire" style="animation-delay:.84s"><line x1="66%" y1="19%" x2="70%" y2="19%"/></svg>
+      <svg class="hi-wire" style="animation-delay:.98s"><line x1="70%" y1="19%" x2="72%" y2="26%"/></svg>
+      <svg class="hi-wire hi-n2" style="animation-delay:1.05s"><line x1="80%" y1="49%" x2="70%" y2="49%"/></svg>
+      <svg class="hi-wire hi-n2" style="animation-delay:1.19s"><line x1="70%" y1="49%" x2="64%" y2="54%"/></svg>
+      <svg class="hi-wire" style="animation-delay:1.26s"><line x1="36%" y1="74%" x2="40%" y2="74%"/></svg>
+      <svg class="hi-wire" style="animation-delay:1.40s"><line x1="40%" y1="74%" x2="44%" y2="62%"/></svg>
     </div>
 
-    <span class="badge"><span class="dot"></span><span data-i18n="hero.badge.live">Live on XRPL Mainnet · no testnet path exists</span></span>
-    <span class="badge" style="margin-left:8px"><span class="dot hold"></span><span data-i18n="hero.badge.beta">Beta channel</span> · v0.3.1 · <span data-i18n="hero.badge.unsigned">unsigned builds</span></span>
-    <h1 data-i18n="hero.h1">Am I allowed to move this — and could I actually get out of it?</h1>
-    <p class="sub">
-      Compliance tooling reads account flags and never opens the order book. Market
-      terminals read the book and never check the flags. NOSHASHI answers both from the
-      same validated ledger state, in the same second, and returns
-      <span class="verdicts"><span class="go">GO</span>/<span class="hold">HOLD</span>/<span class="nogo">NO-GO</span></span>
-      with the exact rule that decided it.
-    </p>
-    <div class="cta">
-      <a class="btn" href="#download"><span data-i18n="hero.cta.download">Download the beta</span></a>
-      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="hero.cta.talk">Talk to us</span></a>
-      <a class="btn ghost" href="/guide/"><span data-i18n="hero.cta.guide">New to XRP? Start here</span></a>
+    <div class="hi-label" style="top:16%;left:60%;max-width:165px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.77s">
+      <span class="t">[ INPUT ]</span>
+      <p>Flags, trust lines, credentials, domains, book depth and amendments.</p>
     </div>
-    <p class="micro" data-i18n="hero.micro">Free tier · no account, anywhere on this site · nothing is ever signed</p>
+    <div class="hi-label" style="top:72%;left:30%;max-width:165px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:.98s">
+      <span class="t">[ OUTPUT ]</span>
+      <p>The exact rule, evidence and timestamp behind the answer.</p>
+    </div>
+    <div class="hi-label" style="top:46%;left:80%;max-width:165px;animation:hiUp .8s cubic-bezier(.16,1,.3,1) both;animation-delay:1.19s">
+      <span class="t">[ CONTROL ]</span>
+      <p>Read-only by design. No custody, key storage or broadcast path.</p>
+    </div>
+
+    <div class="hi-face">
+      <!--
+        The status strip. Its reference showed a hard-coded wallet and
+        a fake [ CONNECTED ]; these are facts instead — the network is
+        named, the build number is the real one substituted at deploy,
+        and the tagline is the existing translated string.
+      -->
+      <div class="hi-status">
+        <span class="s">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.4" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M1.6 8h12.8M8 1.6c3.4 3.6 3.4 9.2 0 12.8M8 1.6C4.6 5.2 4.6 10.8 8 14.4"
+                  stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+          <b data-i18n="hero.badge.live">Live on XRPL Mainnet · no testnet path exists</b>
+        </span>
+        <span class="s live">[ LIVE ]</span>
+        <span class="s sep">BUILD:</span>
+        <span class="chip">v0.3.1</span>
+        <span class="s" data-i18n="hero.tagline">Analyze · Discover · Navigate</span>
+      </div>
+
+      <h1 data-i18n="hero.h1">Am I allowed to move this — and could I actually get out of it?</h1>
+
+      <div class="hi-bottom">
+        <a class="hi-cta" href="#download">
+          <span class="star" aria-hidden="true">&#10022;</span>
+          <span data-i18n="hero.cta.download">Download the beta</span>
+        </a>
+
+        <div class="hi-card">
+          <span class="tag" data-i18n="hero.micro.short">NOTHING IS EVER SIGNED</span>
+          <div class="body">
+            <!--
+              viewBox matches the card's natural size so the chamfer is
+              not distorted; preserveAspectRatio="none" plus a
+              non-scaling stroke holds it at 1px while it stretches.
+            -->
+            <svg class="edge" viewBox="0 0 300 172" preserveAspectRatio="none" aria-hidden="true">
+              <polygon points="0.5,0.5 299.5,0.5 299.5,171.5 30,171.5 0.5,141.5"
+                       vector-effect="non-scaling-stroke"/>
+            </svg>
+            <p data-i18n="hero.mission">
+              A zero-trust intelligence workstation for the XRP Ledger — compliance
+              adjudication and market intelligence read from one validated ledger state,
+              in the same second.
+            </p>
+            <a href="/certificate/">READ_AN_AUTHORITY_CERTIFICATE &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--
+    Everything the old hero carried below the fold continues here,
+    unchanged: the operating brief, the decision loop and the ticker.
+    The redesign replaced the opening screen, not the content under it.
+  -->
+  <section class="hero hero-continued">
+
     <div class="hero-brief" aria-label="Institutional operating brief">
       <div class="hero-brief-cell">
         <span class="label">THE INSTITUTIONAL QUESTION</span>
@@ -1367,10 +1619,10 @@
     <div class="xrp-top">
       <div class="xrp-quote">
         <span class="label">XRP / USD · SPOT</span>
-        <strong id="xrp-price">$1.44</strong>
+        <strong id="xrp-price">$1.50</strong>
         <span class="xrp-change" data-dir="up">
          <span aria-hidden="true">▲</span>
-         <span id="xrp-change">+8.84%</span> over 24h
+         <span id="xrp-change">+8.99%</span> over 24h
        </span>
       </div>
       <p class="chart-q">Where has XRP traded this week?</p>
@@ -1378,18 +1630,18 @@
 
     <figure class="chart" data-chart="xrp-price">
     <svg viewBox="0 0 1000 260" role="img" preserveAspectRatio="xMidYMid meet"
-         aria-label="XRP price in USD over the last seven days, from $1.370 to $1.437"
-         data-series="{&quot;t0&quot;:1789218000000,&quot;t&quot;:[0,3600000,7200000,10800000,14400000,18000000,21600000,25200000,28800000,32400000,36000000,39600000,43200000,46800000,50400000,54000000,57600000,61200000,64800000,68400000,72000000,75600000,79200000,82800000,86400000,90000000,93600000,97200000,100800000,104400000,108000000,111600000,115200000,118800000,122400000,126000000,129600000,133200000,136800000,140400000,144000000,147600000,151200000,154800000,158400000,162000000,165600000,169200000,172800000,176400000,180000000,183600000,187200000,190800000,194400000,198000000,201600000,205200000,208800000,212400000,216000000,219600000,223200000,226800000,230400000,234000000,237600000,241200000,244800000,248400000,252000000,255600000,259200000,262800000,266400000,270000000,273600000,277200000,280800000,284400000,288000000,291600000,295200000,298800000,302400000,306000000,309600000,313200000,316800000,320400000,324000000,327600000,331200000,334800000,338400000,342000000,345600000,349200000,352800000,356400000,360000000,363600000,367200000,370800000,374400000,378000000,381600000,385200000,388800000,392400000,396000000,399600000,403200000,406800000,410400000,414000000,417600000,421200000,424800000,428400000,432000000,435600000,439200000,442800000,446400000,450000000,453600000,457200000,460800000,464400000,468000000,471600000,475200000,478800000,482400000,486000000,489600000,493200000,496800000,500400000,504000000,507600000,511200000,514800000,518400000,522000000,525600000,529200000,532800000,536400000,540000000,543600000,547200000,550800000,554400000,558000000,561600000,565200000,568800000,572400000,576000000,579600000,583200000,586800000,590400000,594000000,597600000,601200000,604960000],&quot;v&quot;:[1.370041,1.367809,1.369799,1.372546,1.369679,1.366439,1.36337,1.362645,1.364265,1.362762,1.363168,1.366232,1.367249,1.367722,1.367828,1.363357,1.363939,1.367763,1.360486,1.357564,1.347851,1.344206,1.340114,1.342812,1.340039,1.341817,1.350336,1.343359,1.350841,1.355264,1.358089,1.354747,1.360801,1.355728,1.336986,1.341588,1.346536,1.350363,1.369828,1.371993,1.376576,1.379786,1.385883,1.389991,1.38474,1.402382,1.396744,1.397649,1.394222,1.394472,1.398961,1.403098,1.4188,1.434451,1.47735,1.463505,1.463134,1.442973,1.435371,1.423178,1.419297,1.422325,1.42326,1.415207,1.413587,1.408474,1.399326,1.393435,1.396202,1.402294,1.402332,1.40063,1.417449,1.414229,1.386212,1.389135,1.387336,1.404977,1.325668,1.29628,1.293184,1.27642,1.288424,1.28328,1.286533,1.274793,1.288539,1.296568,1.30109,1.296164,1.296727,1.28427,1.283894,1.290669,1.288005,1.295212,1.282083,1.274505,1.265502,1.266145,1.267637,1.263047,1.284336,1.300957,1.30167,1.292295,1.285506,1.298304,1.294177,1.299608,1.29912,1.301747,1.298808,1.294416,1.30005,1.300803,1.3027,1.299075,1.294514,1.297667,1.30422,1.30301,1.299829,1.306603,1.30387,1.299928,1.29456,1.294781,1.297689,1.290162,1.294916,1.295449,1.299563,1.303811,1.304801,1.324556,1.323618,1.317047,1.320341,1.32751,1.335428,1.333573,1.330379,1.322639,1.322822,1.360524,1.398538,1.384816,1.380111,1.389175,1.386151,1.40987,1.402761,1.401325,1.398243,1.396,1.408693,1.411924,1.412689,1.417889,1.414553,1.427079,1.42143,1.410431,1.414522,1.41237,1.417899,1.433925,1.436612],&quot;box&quot;:[8,938,14,234],&quot;range&quot;:[1.2459031474301492,1.4944942919033406],&quot;w&quot;:1000,&quot;h&quot;:260}">
+         aria-label="XRP price in USD over the last seven days, from $1.399 to $1.505"
+         data-series="{&quot;t0&quot;:1789398000000,&quot;t&quot;:[0,3600000,7200000,10800000,14400000,18000000,21600000,25200000,28800000,32400000,36000000,39600000,43200000,46800000,50400000,54000000,57600000,61200000,64800000,68400000,72000000,75600000,79200000,82800000,86400000,90000000,93600000,97200000,100800000,104400000,108000000,111600000,115200000,118800000,122400000,126000000,129600000,133200000,136800000,140400000,144000000,147600000,151200000,154800000,158400000,162000000,165600000,169200000,172800000,176400000,180000000,183600000,187200000,190800000,194400000,198000000,201600000,205200000,208800000,212400000,216000000,219600000,223200000,226800000,230400000,234000000,237600000,241200000,244800000,248400000,252000000,255600000,259200000,262800000,266400000,270000000,273600000,277200000,280800000,284400000,288000000,291600000,295200000,298800000,302400000,306000000,309600000,313200000,316800000,320400000,324000000,327600000,331200000,334800000,338400000,342000000,345600000,349200000,352800000,356400000,360000000,363600000,367200000,370800000,374400000,378000000,381600000,385200000,388800000,392400000,396000000,399600000,403200000,406800000,410400000,414000000,417600000,421200000,424800000,428400000,432000000,435600000,439200000,442800000,446400000,450000000,453600000,457200000,460800000,464400000,468000000,471600000,475200000,478800000,482400000,486000000,489600000,493200000,496800000,500400000,504000000,507600000,511200000,514800000,518400000,522000000,525600000,529200000,532800000,536400000,540000000,543600000,547200000,550800000,554400000,558000000,561600000,565200000,568800000,572400000,576000000,579600000,583200000,586800000,590400000,594000000,597600000,601200000,604300000],&quot;v&quot;:[1.398961,1.403098,1.4188,1.434451,1.47735,1.463505,1.463134,1.442973,1.435371,1.423178,1.419297,1.422325,1.42326,1.415207,1.413587,1.408474,1.399326,1.393435,1.396202,1.402294,1.402332,1.40063,1.417449,1.414229,1.386212,1.389135,1.387336,1.404977,1.325668,1.29628,1.293184,1.27642,1.288424,1.28328,1.286533,1.274793,1.288539,1.296568,1.30109,1.296164,1.296727,1.28427,1.283894,1.290669,1.288005,1.295212,1.282083,1.274505,1.265502,1.266145,1.267637,1.263047,1.284336,1.300957,1.30167,1.292295,1.285506,1.298304,1.294177,1.299608,1.29912,1.301747,1.298808,1.294416,1.30005,1.300803,1.3027,1.299075,1.294514,1.297667,1.30422,1.30301,1.299829,1.306603,1.30387,1.299928,1.29456,1.294781,1.297689,1.290162,1.294916,1.295449,1.299563,1.303811,1.304801,1.324556,1.323618,1.317047,1.320341,1.32751,1.335428,1.333573,1.330379,1.322639,1.322822,1.360524,1.398538,1.384816,1.380111,1.389175,1.386151,1.40987,1.402761,1.401325,1.398243,1.396,1.408693,1.411924,1.412689,1.417889,1.414553,1.427079,1.42143,1.410431,1.414522,1.41237,1.417899,1.433925,1.432157,1.437103,1.438434,1.430475,1.434329,1.426941,1.429379,1.426982,1.428201,1.409267,1.416023,1.409959,1.405827,1.399621,1.369369,1.382219,1.380437,1.381801,1.380916,1.379202,1.376607,1.383128,1.375629,1.379698,1.379324,1.376877,1.378632,1.389819,1.409729,1.402199,1.404015,1.408843,1.406004,1.401244,1.409472,1.410232,1.425607,1.40771,1.415322,1.422328,1.418902,1.429555,1.435737,1.438748,1.475071,1.473298,1.488768,1.485759,1.486934,1.489427,1.504761],&quot;box&quot;:[8,938,14,234],&quot;range&quot;:[1.2437102721551725,1.5240981081155254],&quot;w&quot;:1000,&quot;h&quot;:260}">
       <defs>
         <linearGradient id="xrp-price-fill" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="var(--brand)" stop-opacity=".26"/>
           <stop offset="100%" stop-color="var(--brand)" stop-opacity="0"/>
         </linearGradient>
       </defs>
-      <line class="grid" x1="8" x2="938" y1="234.00" y2="234.00"/><text class="axis" x="946" y="237.50">$1.246</text><line class="grid" x1="8" x2="938" y1="179.00" y2="179.00"/><text class="axis" x="946" y="182.50">$1.308</text><line class="grid" x1="8" x2="938" y1="124.00" y2="124.00"/><text class="axis" x="946" y="127.50">$1.370</text><line class="grid" x1="8" x2="938" y1="69.00" y2="69.00"/><text class="axis" x="946" y="72.50">$1.432</text><line class="grid" x1="8" x2="938" y1="14.00" y2="14.00"/><text class="axis" x="946" y="17.50">$1.494</text>
-      <path class="area" d="M8.00 124.14 L13.54 126.11 L19.07 124.35 L24.61 121.92 L30.14 124.46 L35.68 127.33 L41.21 130.04 L46.75 130.69 L52.29 129.25 L57.82 130.58 L63.36 130.22 L68.89 127.51 L74.43 126.61 L79.96 126.19 L85.50 126.10 L91.04 130.05 L96.57 129.54 L102.11 126.16 L107.64 132.60 L113.18 135.18 L118.71 143.78 L124.25 147.00 L129.79 150.62 L135.32 148.24 L140.86 150.69 L146.39 149.12 L151.93 141.58 L157.46 147.75 L163.00 141.13 L168.54 137.22 L174.07 134.72 L179.61 137.67 L185.14 132.32 L190.68 136.81 L196.21 153.39 L201.75 149.32 L207.29 144.94 L212.82 141.55 L218.36 124.33 L223.89 122.41 L229.43 118.36 L234.96 115.52 L240.50 110.12 L246.04 106.48 L251.57 111.13 L257.11 95.52 L262.64 100.51 L268.18 99.71 L273.71 102.74 L279.25 102.52 L284.79 98.55 L290.32 94.88 L295.86 80.99 L301.39 67.14 L306.93 29.17 L312.46 41.43 L318.00 41.75 L323.54 59.60 L329.07 66.32 L334.61 77.11 L340.14 80.55 L345.68 77.87 L351.21 77.04 L356.75 84.17 L362.29 85.60 L367.82 90.13 L373.36 98.22 L378.89 103.44 L384.43 100.99 L389.96 95.60 L395.50 95.56 L401.04 97.07 L406.57 82.18 L412.11 85.03 L417.64 109.83 L423.18 107.24 L428.71 108.83 L434.25 93.22 L439.79 163.41 L445.32 189.42 L450.86 192.16 L456.39 206.99 L461.93 196.37 L467.46 200.92 L473.00 198.04 L478.54 208.43 L484.07 196.27 L489.61 189.16 L495.14 185.16 L500.68 189.52 L506.21 189.02 L511.75 200.05 L517.29 200.38 L522.82 194.38 L528.36 196.74 L533.89 190.36 L539.43 201.98 L544.96 208.69 L550.50 216.66 L556.04 216.09 L561.57 214.77 L567.11 218.83 L572.64 199.99 L578.18 185.28 L583.71 184.65 L589.25 192.94 L594.79 198.95 L600.32 187.63 L605.86 191.28 L611.39 186.47 L616.93 186.90 L622.46 184.58 L628.00 187.18 L633.54 191.07 L639.07 186.08 L644.61 185.41 L650.14 183.74 L655.68 186.94 L661.21 190.98 L666.75 188.19 L672.29 182.39 L677.82 183.46 L683.36 186.28 L688.89 180.28 L694.43 182.70 L699.96 186.19 L705.50 190.94 L711.04 190.74 L716.57 188.17 L722.11 194.83 L727.64 190.62 L733.18 190.15 L738.71 186.51 L744.25 182.75 L749.79 181.88 L755.32 164.39 L760.86 165.22 L766.39 171.04 L771.93 168.12 L777.46 161.78 L783.00 154.77 L788.54 156.41 L794.07 159.24 L799.61 166.09 L805.14 165.93 L810.68 132.56 L816.21 98.92 L821.75 111.06 L827.29 115.23 L832.82 107.21 L838.36 109.88 L843.89 88.89 L849.43 95.18 L854.96 96.45 L860.50 99.18 L866.04 101.17 L871.57 89.93 L877.11 87.07 L882.64 86.40 L888.18 81.79 L893.71 84.75 L899.25 73.66 L904.79 78.66 L910.32 88.40 L915.86 84.77 L921.39 86.68 L926.93 81.79 L932.46 67.60 L938.00 65.23 L938.00 234 L8.00 234 Z" fill="url(#xrp-price-fill)"/>
-      <path class="trace" d="M8.00 124.14 L13.54 126.11 L19.07 124.35 L24.61 121.92 L30.14 124.46 L35.68 127.33 L41.21 130.04 L46.75 130.69 L52.29 129.25 L57.82 130.58 L63.36 130.22 L68.89 127.51 L74.43 126.61 L79.96 126.19 L85.50 126.10 L91.04 130.05 L96.57 129.54 L102.11 126.16 L107.64 132.60 L113.18 135.18 L118.71 143.78 L124.25 147.00 L129.79 150.62 L135.32 148.24 L140.86 150.69 L146.39 149.12 L151.93 141.58 L157.46 147.75 L163.00 141.13 L168.54 137.22 L174.07 134.72 L179.61 137.67 L185.14 132.32 L190.68 136.81 L196.21 153.39 L201.75 149.32 L207.29 144.94 L212.82 141.55 L218.36 124.33 L223.89 122.41 L229.43 118.36 L234.96 115.52 L240.50 110.12 L246.04 106.48 L251.57 111.13 L257.11 95.52 L262.64 100.51 L268.18 99.71 L273.71 102.74 L279.25 102.52 L284.79 98.55 L290.32 94.88 L295.86 80.99 L301.39 67.14 L306.93 29.17 L312.46 41.43 L318.00 41.75 L323.54 59.60 L329.07 66.32 L334.61 77.11 L340.14 80.55 L345.68 77.87 L351.21 77.04 L356.75 84.17 L362.29 85.60 L367.82 90.13 L373.36 98.22 L378.89 103.44 L384.43 100.99 L389.96 95.60 L395.50 95.56 L401.04 97.07 L406.57 82.18 L412.11 85.03 L417.64 109.83 L423.18 107.24 L428.71 108.83 L434.25 93.22 L439.79 163.41 L445.32 189.42 L450.86 192.16 L456.39 206.99 L461.93 196.37 L467.46 200.92 L473.00 198.04 L478.54 208.43 L484.07 196.27 L489.61 189.16 L495.14 185.16 L500.68 189.52 L506.21 189.02 L511.75 200.05 L517.29 200.38 L522.82 194.38 L528.36 196.74 L533.89 190.36 L539.43 201.98 L544.96 208.69 L550.50 216.66 L556.04 216.09 L561.57 214.77 L567.11 218.83 L572.64 199.99 L578.18 185.28 L583.71 184.65 L589.25 192.94 L594.79 198.95 L600.32 187.63 L605.86 191.28 L611.39 186.47 L616.93 186.90 L622.46 184.58 L628.00 187.18 L633.54 191.07 L639.07 186.08 L644.61 185.41 L650.14 183.74 L655.68 186.94 L661.21 190.98 L666.75 188.19 L672.29 182.39 L677.82 183.46 L683.36 186.28 L688.89 180.28 L694.43 182.70 L699.96 186.19 L705.50 190.94 L711.04 190.74 L716.57 188.17 L722.11 194.83 L727.64 190.62 L733.18 190.15 L738.71 186.51 L744.25 182.75 L749.79 181.88 L755.32 164.39 L760.86 165.22 L766.39 171.04 L771.93 168.12 L777.46 161.78 L783.00 154.77 L788.54 156.41 L794.07 159.24 L799.61 166.09 L805.14 165.93 L810.68 132.56 L816.21 98.92 L821.75 111.06 L827.29 115.23 L832.82 107.21 L838.36 109.88 L843.89 88.89 L849.43 95.18 L854.96 96.45 L860.50 99.18 L866.04 101.17 L871.57 89.93 L877.11 87.07 L882.64 86.40 L888.18 81.79 L893.71 84.75 L899.25 73.66 L904.79 78.66 L910.32 88.40 L915.86 84.77 L921.39 86.68 L926.93 81.79 L932.46 67.60 L938.00 65.23"/>
-      <text class="axis" x="8.00" y="252" text-anchor="middle">09/12</text><text class="axis" x="140.86" y="252" text-anchor="middle">09/13</text><text class="axis" x="273.71" y="252" text-anchor="middle">09/14</text><text class="axis" x="406.57" y="252" text-anchor="middle">09/15</text><text class="axis" x="539.43" y="252" text-anchor="middle">09/16</text><text class="axis" x="672.29" y="252" text-anchor="middle">09/17</text><text class="axis" x="805.14" y="252" text-anchor="middle">09/18</text>
+      <line class="grid" x1="8" x2="938" y1="234.00" y2="234.00"/><text class="axis" x="946" y="237.50">$1.244</text><line class="grid" x1="8" x2="938" y1="179.00" y2="179.00"/><text class="axis" x="946" y="182.50">$1.314</text><line class="grid" x1="8" x2="938" y1="124.00" y2="124.00"/><text class="axis" x="946" y="127.50">$1.384</text><line class="grid" x1="8" x2="938" y1="69.00" y2="69.00"/><text class="axis" x="946" y="72.50">$1.454</text><line class="grid" x1="8" x2="938" y1="14.00" y2="14.00"/><text class="axis" x="946" y="17.50">$1.524</text>
+      <path class="area" d="M8.00 112.19 L13.54 108.94 L19.07 96.62 L24.61 84.34 L30.14 50.68 L35.68 61.54 L41.21 61.83 L46.75 77.65 L52.29 83.62 L57.82 93.18 L63.36 96.23 L68.89 93.85 L74.43 93.12 L79.96 99.44 L85.50 100.71 L91.04 104.72 L96.57 111.90 L102.11 116.52 L107.64 114.35 L113.18 109.57 L118.71 109.54 L124.25 110.88 L129.79 97.68 L135.32 100.21 L140.86 122.19 L146.39 119.90 L151.93 121.31 L157.46 107.47 L163.00 169.69 L168.54 192.75 L174.07 195.18 L179.61 208.34 L185.14 198.92 L190.68 202.95 L196.21 200.40 L201.75 209.61 L207.29 198.83 L212.82 192.53 L218.36 188.98 L223.89 192.84 L229.43 192.40 L234.96 202.18 L240.50 202.47 L246.04 197.15 L251.57 199.24 L257.11 193.59 L262.64 203.89 L268.18 209.84 L273.71 216.90 L279.25 216.40 L284.79 215.23 L290.32 218.83 L295.86 202.12 L301.39 189.08 L306.93 188.52 L312.46 195.88 L318.00 201.21 L323.54 191.16 L329.07 194.40 L334.61 190.14 L340.14 190.52 L345.68 188.46 L351.21 190.77 L356.75 194.21 L362.29 189.79 L367.82 189.20 L373.36 187.72 L378.89 190.56 L384.43 194.14 L389.96 191.66 L395.50 186.52 L401.04 187.47 L406.57 189.97 L412.11 184.65 L417.64 186.80 L423.18 189.89 L428.71 194.10 L434.25 193.93 L439.79 191.65 L445.32 197.55 L450.86 193.82 L456.39 193.40 L461.93 190.18 L467.46 186.84 L473.00 186.07 L478.54 170.57 L484.07 171.30 L489.61 176.46 L495.14 173.87 L500.68 168.25 L506.21 162.04 L511.75 163.49 L517.29 166.00 L522.82 172.07 L528.36 171.93 L533.89 142.35 L539.43 112.52 L544.96 123.28 L550.50 126.98 L556.04 119.86 L561.57 122.24 L567.11 103.63 L572.64 109.20 L578.18 110.33 L583.71 112.75 L589.25 114.51 L594.79 104.55 L600.32 102.02 L605.86 101.41 L611.39 97.33 L616.93 99.95 L622.46 90.12 L628.00 94.56 L633.54 103.19 L639.07 99.98 L644.61 101.67 L650.14 97.33 L655.68 84.75 L661.21 86.14 L666.75 82.26 L672.29 81.21 L677.82 87.46 L683.36 84.44 L688.89 90.23 L694.43 88.32 L699.96 90.20 L705.50 89.24 L711.04 104.10 L716.57 98.80 L722.11 103.56 L727.64 106.80 L733.18 111.67 L738.71 135.40 L744.25 125.32 L749.79 126.72 L755.32 125.65 L760.86 126.34 L766.39 127.69 L771.93 129.73 L777.46 124.61 L783.00 130.49 L788.54 127.30 L794.07 127.59 L799.61 129.51 L805.14 128.14 L810.68 119.36 L816.21 103.74 L821.75 109.65 L827.29 108.22 L832.82 104.43 L838.36 106.66 L843.89 110.39 L849.43 103.94 L854.96 103.34 L860.50 91.28 L866.04 105.32 L871.57 99.35 L877.11 93.85 L882.64 96.54 L888.18 88.18 L893.71 83.33 L899.25 80.97 L904.79 52.47 L910.32 53.86 L915.86 41.72 L921.39 44.08 L926.93 43.16 L932.46 41.20 L938.00 29.17 L938.00 234 L8.00 234 Z" fill="url(#xrp-price-fill)"/>
+      <path class="trace" d="M8.00 112.19 L13.54 108.94 L19.07 96.62 L24.61 84.34 L30.14 50.68 L35.68 61.54 L41.21 61.83 L46.75 77.65 L52.29 83.62 L57.82 93.18 L63.36 96.23 L68.89 93.85 L74.43 93.12 L79.96 99.44 L85.50 100.71 L91.04 104.72 L96.57 111.90 L102.11 116.52 L107.64 114.35 L113.18 109.57 L118.71 109.54 L124.25 110.88 L129.79 97.68 L135.32 100.21 L140.86 122.19 L146.39 119.90 L151.93 121.31 L157.46 107.47 L163.00 169.69 L168.54 192.75 L174.07 195.18 L179.61 208.34 L185.14 198.92 L190.68 202.95 L196.21 200.40 L201.75 209.61 L207.29 198.83 L212.82 192.53 L218.36 188.98 L223.89 192.84 L229.43 192.40 L234.96 202.18 L240.50 202.47 L246.04 197.15 L251.57 199.24 L257.11 193.59 L262.64 203.89 L268.18 209.84 L273.71 216.90 L279.25 216.40 L284.79 215.23 L290.32 218.83 L295.86 202.12 L301.39 189.08 L306.93 188.52 L312.46 195.88 L318.00 201.21 L323.54 191.16 L329.07 194.40 L334.61 190.14 L340.14 190.52 L345.68 188.46 L351.21 190.77 L356.75 194.21 L362.29 189.79 L367.82 189.20 L373.36 187.72 L378.89 190.56 L384.43 194.14 L389.96 191.66 L395.50 186.52 L401.04 187.47 L406.57 189.97 L412.11 184.65 L417.64 186.80 L423.18 189.89 L428.71 194.10 L434.25 193.93 L439.79 191.65 L445.32 197.55 L450.86 193.82 L456.39 193.40 L461.93 190.18 L467.46 186.84 L473.00 186.07 L478.54 170.57 L484.07 171.30 L489.61 176.46 L495.14 173.87 L500.68 168.25 L506.21 162.04 L511.75 163.49 L517.29 166.00 L522.82 172.07 L528.36 171.93 L533.89 142.35 L539.43 112.52 L544.96 123.28 L550.50 126.98 L556.04 119.86 L561.57 122.24 L567.11 103.63 L572.64 109.20 L578.18 110.33 L583.71 112.75 L589.25 114.51 L594.79 104.55 L600.32 102.02 L605.86 101.41 L611.39 97.33 L616.93 99.95 L622.46 90.12 L628.00 94.56 L633.54 103.19 L639.07 99.98 L644.61 101.67 L650.14 97.33 L655.68 84.75 L661.21 86.14 L666.75 82.26 L672.29 81.21 L677.82 87.46 L683.36 84.44 L688.89 90.23 L694.43 88.32 L699.96 90.20 L705.50 89.24 L711.04 104.10 L716.57 98.80 L722.11 103.56 L727.64 106.80 L733.18 111.67 L738.71 135.40 L744.25 125.32 L749.79 126.72 L755.32 125.65 L760.86 126.34 L766.39 127.69 L771.93 129.73 L777.46 124.61 L783.00 130.49 L788.54 127.30 L794.07 127.59 L799.61 129.51 L805.14 128.14 L810.68 119.36 L816.21 103.74 L821.75 109.65 L827.29 108.22 L832.82 104.43 L838.36 106.66 L843.89 110.39 L849.43 103.94 L854.96 103.34 L860.50 91.28 L866.04 105.32 L871.57 99.35 L877.11 93.85 L882.64 96.54 L888.18 88.18 L893.71 83.33 L899.25 80.97 L904.79 52.47 L910.32 53.86 L915.86 41.72 L921.39 44.08 L926.93 43.16 L932.46 41.20 L938.00 29.17"/>
+      <text class="axis" x="8.00" y="252" text-anchor="middle">09/14</text><text class="axis" x="140.86" y="252" text-anchor="middle">09/15</text><text class="axis" x="273.71" y="252" text-anchor="middle">09/16</text><text class="axis" x="406.57" y="252" text-anchor="middle">09/17</text><text class="axis" x="539.43" y="252" text-anchor="middle">09/18</text><text class="axis" x="672.29" y="252" text-anchor="middle">09/19</text><text class="axis" x="805.14" y="252" text-anchor="middle">09/20</text>
       <g class="cross" hidden>
         <line class="cross-x" y1="14" y2="234"/>
         <circle class="cross-dot" r="3.5"/>
@@ -1402,7 +1654,7 @@
     <svg viewBox="0 0 1000 90" role="img" preserveAspectRatio="xMidYMid meet"
          aria-label="Reported 24-hour trading volume over the last seven days, peaking at $6.0B">
       <line class="grid" x1="8" x2="938" y1="74" y2="74"/>
-      <g class="bars"><rect x="9.05" y="49.85" width="3.41" height="24.15"/><rect x="14.55" y="52.71" width="3.41" height="21.29"/><rect x="20.05" y="56.21" width="3.41" height="17.79"/><rect x="25.55" y="58.07" width="3.41" height="15.93"/><rect x="31.06" y="59.04" width="3.41" height="14.96"/><rect x="36.56" y="59.59" width="3.41" height="14.41"/><rect x="42.06" y="60.70" width="3.41" height="13.30"/><rect x="47.57" y="61.27" width="3.41" height="12.73"/><rect x="53.07" y="61.92" width="3.41" height="12.08"/><rect x="58.57" y="62.29" width="3.41" height="11.71"/><rect x="64.08" y="62.86" width="3.41" height="11.14"/><rect x="69.58" y="63.05" width="3.41" height="10.95"/><rect x="75.08" y="63.11" width="3.41" height="10.89"/><rect x="80.58" y="63.14" width="3.41" height="10.86"/><rect x="86.09" y="63.24" width="3.41" height="10.76"/><rect x="91.59" y="63.35" width="3.41" height="10.65"/><rect x="97.09" y="63.52" width="3.41" height="10.48"/><rect x="102.60" y="63.63" width="3.41" height="10.37"/><rect x="108.10" y="63.93" width="3.41" height="10.07"/><rect x="113.60" y="63.96" width="3.41" height="10.04"/><rect x="119.10" y="63.91" width="3.41" height="10.09"/><rect x="124.61" y="63.62" width="3.41" height="10.38"/><rect x="130.11" y="63.77" width="3.41" height="10.23"/><rect x="135.61" y="63.72" width="3.41" height="10.28"/><rect x="141.12" y="63.62" width="3.41" height="10.38"/><rect x="146.62" y="63.69" width="3.41" height="10.31"/><rect x="152.12" y="63.33" width="3.41" height="10.67"/><rect x="157.63" y="63.65" width="3.41" height="10.35"/><rect x="163.13" y="63.58" width="3.41" height="10.42"/><rect x="168.63" y="63.61" width="3.41" height="10.39"/><rect x="174.13" y="63.66" width="3.41" height="10.34"/><rect x="179.64" y="63.61" width="3.41" height="10.39"/><rect x="185.14" y="63.42" width="3.41" height="10.58"/><rect x="190.64" y="63.18" width="3.41" height="10.82"/><rect x="196.15" y="62.42" width="3.41" height="11.58"/><rect x="201.65" y="61.86" width="3.41" height="12.14"/><rect x="207.15" y="61.26" width="3.41" height="12.74"/><rect x="212.66" y="60.84" width="3.41" height="13.16"/><rect x="218.16" y="59.83" width="3.41" height="14.17"/><rect x="223.66" y="59.08" width="3.41" height="14.92"/><rect x="229.16" y="58.19" width="3.41" height="15.81"/><rect x="234.67" y="57.63" width="3.41" height="16.37"/><rect x="240.17" y="56.63" width="3.41" height="17.37"/><rect x="245.67" y="55.97" width="3.41" height="18.03"/><rect x="251.18" y="55.33" width="3.41" height="18.67"/><rect x="256.68" y="53.93" width="3.41" height="20.07"/><rect x="262.18" y="52.92" width="3.41" height="21.08"/><rect x="267.68" y="51.89" width="3.41" height="22.11"/><rect x="273.19" y="51.10" width="3.41" height="22.90"/><rect x="278.69" y="49.61" width="3.41" height="24.39"/><rect x="284.19" y="48.54" width="3.41" height="25.46"/><rect x="289.70" y="47.04" width="3.41" height="26.96"/><rect x="295.20" y="45.25" width="3.41" height="28.75"/><rect x="300.70" y="43.13" width="3.41" height="30.87"/><rect x="306.21" y="35.56" width="3.41" height="38.44"/><rect x="311.71" y="32.37" width="3.41" height="41.63"/><rect x="317.21" y="28.54" width="3.41" height="45.46"/><rect x="322.71" y="26.77" width="3.41" height="47.23"/><rect x="328.22" y="26.94" width="3.41" height="47.06"/><rect x="333.72" y="26.49" width="3.41" height="47.51"/><rect x="339.22" y="29.79" width="3.41" height="44.21"/><rect x="344.73" y="26.08" width="3.41" height="47.92"/><rect x="350.23" y="26.35" width="3.41" height="47.65"/><rect x="355.73" y="30.08" width="3.41" height="43.92"/><rect x="361.23" y="27.59" width="3.41" height="46.41"/><rect x="366.74" y="26.50" width="3.41" height="47.50"/><rect x="372.24" y="26.63" width="3.41" height="47.37"/><rect x="377.74" y="26.69" width="3.41" height="47.31"/><rect x="383.25" y="26.73" width="3.41" height="47.27"/><rect x="388.75" y="27.50" width="3.41" height="46.50"/><rect x="394.25" y="28.26" width="3.41" height="45.74"/><rect x="399.76" y="31.12" width="3.41" height="42.88"/><rect x="405.26" y="27.95" width="3.41" height="46.05"/><rect x="410.76" y="24.55" width="3.41" height="49.45"/><rect x="416.26" y="23.35" width="3.41" height="50.65"/><rect x="421.77" y="24.00" width="3.41" height="50.00"/><rect x="427.27" y="20.75" width="3.41" height="53.25"/><rect x="432.77" y="20.31" width="3.41" height="53.69"/><rect x="438.28" y="14.50" width="3.41" height="59.50"/><rect x="443.78" y="11.94" width="3.41" height="62.06"/><rect x="449.28" y="10.66" width="3.41" height="63.34"/><rect x="454.79" y="11.71" width="3.41" height="62.29"/><rect x="460.29" y="11.14" width="3.41" height="62.86"/><rect x="465.79" y="11.05" width="3.41" height="62.95"/><rect x="471.29" y="10.42" width="3.41" height="63.58"/><rect x="476.80" y="10.49" width="3.41" height="63.51"/><rect x="482.30" y="9.50" width="3.41" height="64.50"/><rect x="487.80" y="8.91" width="3.41" height="65.09"/><rect x="493.31" y="8.00" width="3.41" height="66.00"/><rect x="498.81" y="8.19" width="3.41" height="65.81"/><rect x="504.31" y="8.29" width="3.41" height="65.71"/><rect x="509.81" y="9.13" width="3.41" height="64.87"/><rect x="515.32" y="8.97" width="3.41" height="65.03"/><rect x="520.82" y="8.87" width="3.41" height="65.13"/><rect x="526.32" y="8.92" width="3.41" height="65.08"/><rect x="531.83" y="8.44" width="3.41" height="65.56"/><rect x="537.33" y="9.93" width="3.41" height="64.07"/><rect x="542.83" y="13.84" width="3.41" height="60.16"/><rect x="548.34" y="15.91" width="3.41" height="58.09"/><rect x="553.84" y="16.31" width="3.41" height="57.69"/><rect x="559.34" y="16.52" width="3.41" height="57.48"/><rect x="564.84" y="16.93" width="3.41" height="57.07"/><rect x="570.35" y="22.40" width="3.41" height="51.60"/><rect x="575.85" y="26.09" width="3.41" height="47.91"/><rect x="581.35" y="28.79" width="3.41" height="45.21"/><rect x="586.86" y="30.48" width="3.41" height="43.52"/><rect x="592.36" y="31.27" width="3.41" height="42.73"/><rect x="597.86" y="31.15" width="3.41" height="42.85"/><rect x="603.37" y="31.70" width="3.41" height="42.30"/><rect x="608.87" y="31.63" width="3.41" height="42.37"/><rect x="614.37" y="31.91" width="3.41" height="42.09"/><rect x="619.87" y="32.40" width="3.41" height="41.60"/><rect x="625.38" y="35.32" width="3.41" height="38.68"/><rect x="630.88" y="33.90" width="3.41" height="40.10"/><rect x="636.38" y="33.87" width="3.41" height="40.13"/><rect x="641.89" y="33.83" width="3.41" height="40.17"/><rect x="647.39" y="34.14" width="3.41" height="39.86"/><rect x="652.89" y="33.94" width="3.41" height="40.06"/><rect x="658.39" y="33.96" width="3.41" height="40.04"/><rect x="663.90" y="34.10" width="3.41" height="39.90"/><rect x="669.40" y="33.39" width="3.41" height="40.61"/><rect x="674.90" y="33.72" width="3.41" height="40.28"/><rect x="680.41" y="33.90" width="3.41" height="40.10"/><rect x="685.91" y="34.28" width="3.41" height="39.72"/><rect x="691.41" y="34.28" width="3.41" height="39.72"/><rect x="696.92" y="36.51" width="3.41" height="37.49"/><rect x="702.42" y="41.97" width="3.41" height="32.03"/><rect x="707.92" y="44.01" width="3.41" height="29.99"/><rect x="713.42" y="45.94" width="3.41" height="28.06"/><rect x="718.93" y="46.59" width="3.41" height="27.41"/><rect x="724.43" y="47.68" width="3.41" height="26.32"/><rect x="729.93" y="48.32" width="3.41" height="25.68"/><rect x="735.44" y="47.49" width="3.41" height="26.51"/><rect x="740.94" y="48.18" width="3.41" height="25.82"/><rect x="746.44" y="48.17" width="3.41" height="25.83"/><rect x="751.94" y="46.40" width="3.41" height="27.60"/><rect x="757.45" y="47.13" width="3.41" height="26.87"/><rect x="762.95" y="45.34" width="3.41" height="28.66"/><rect x="768.45" y="44.77" width="3.41" height="29.23"/><rect x="773.96" y="45.13" width="3.41" height="28.87"/><rect x="779.46" y="44.85" width="3.41" height="29.15"/><rect x="784.96" y="44.15" width="3.41" height="29.85"/><rect x="790.47" y="42.67" width="3.41" height="31.33"/><rect x="795.97" y="43.93" width="3.41" height="30.07"/><rect x="801.47" y="44.16" width="3.41" height="29.84"/><rect x="806.97" y="41.33" width="3.41" height="32.67"/><rect x="812.48" y="37.36" width="3.41" height="36.64"/><rect x="817.98" y="34.80" width="3.41" height="39.20"/><rect x="823.48" y="34.27" width="3.41" height="39.73"/><rect x="828.99" y="32.76" width="3.41" height="41.24"/><rect x="834.49" y="32.48" width="3.41" height="41.52"/><rect x="839.99" y="29.86" width="3.41" height="44.14"/><rect x="845.50" y="28.39" width="3.41" height="45.61"/><rect x="851.00" y="27.81" width="3.41" height="46.19"/><rect x="856.50" y="27.84" width="3.41" height="46.16"/><rect x="862.00" y="27.82" width="3.41" height="46.18"/><rect x="867.51" y="25.91" width="3.41" height="48.09"/><rect x="873.01" y="25.16" width="3.41" height="48.84"/><rect x="878.51" y="24.52" width="3.41" height="49.48"/><rect x="884.02" y="24.92" width="3.41" height="49.08"/><rect x="889.52" y="28.10" width="3.41" height="45.90"/><rect x="895.02" y="24.13" width="3.41" height="49.87"/><rect x="900.52" y="24.31" width="3.41" height="49.69"/><rect x="906.03" y="25.32" width="3.41" height="48.68"/><rect x="911.53" y="25.81" width="3.41" height="48.19"/><rect x="917.03" y="26.54" width="3.41" height="47.46"/><rect x="922.54" y="26.59" width="3.41" height="47.41"/><rect x="928.04" y="26.31" width="3.41" height="47.69"/><rect x="933.54" y="26.03" width="3.41" height="47.97"/></g>
+      <g class="bars"><rect x="9.05" y="48.54" width="3.41" height="25.46"/><rect x="14.55" y="47.04" width="3.41" height="26.96"/><rect x="20.05" y="45.25" width="3.41" height="28.75"/><rect x="25.55" y="43.13" width="3.41" height="30.87"/><rect x="31.06" y="35.56" width="3.41" height="38.44"/><rect x="36.56" y="32.37" width="3.41" height="41.63"/><rect x="42.06" y="28.54" width="3.41" height="45.46"/><rect x="47.57" y="26.77" width="3.41" height="47.23"/><rect x="53.07" y="26.94" width="3.41" height="47.06"/><rect x="58.57" y="26.49" width="3.41" height="47.51"/><rect x="64.08" y="29.79" width="3.41" height="44.21"/><rect x="69.58" y="26.08" width="3.41" height="47.92"/><rect x="75.08" y="26.35" width="3.41" height="47.65"/><rect x="80.58" y="30.08" width="3.41" height="43.92"/><rect x="86.09" y="27.59" width="3.41" height="46.41"/><rect x="91.59" y="26.50" width="3.41" height="47.50"/><rect x="97.09" y="26.63" width="3.41" height="47.37"/><rect x="102.60" y="26.69" width="3.41" height="47.31"/><rect x="108.10" y="26.73" width="3.41" height="47.27"/><rect x="113.60" y="27.50" width="3.41" height="46.50"/><rect x="119.10" y="28.26" width="3.41" height="45.74"/><rect x="124.61" y="31.12" width="3.41" height="42.88"/><rect x="130.11" y="27.95" width="3.41" height="46.05"/><rect x="135.61" y="24.55" width="3.41" height="49.45"/><rect x="141.12" y="23.35" width="3.41" height="50.65"/><rect x="146.62" y="24.00" width="3.41" height="50.00"/><rect x="152.12" y="20.75" width="3.41" height="53.25"/><rect x="157.63" y="20.31" width="3.41" height="53.69"/><rect x="163.13" y="14.50" width="3.41" height="59.50"/><rect x="168.63" y="11.94" width="3.41" height="62.06"/><rect x="174.13" y="10.66" width="3.41" height="63.34"/><rect x="179.64" y="11.71" width="3.41" height="62.29"/><rect x="185.14" y="11.14" width="3.41" height="62.86"/><rect x="190.64" y="11.05" width="3.41" height="62.95"/><rect x="196.15" y="10.42" width="3.41" height="63.58"/><rect x="201.65" y="10.49" width="3.41" height="63.51"/><rect x="207.15" y="9.50" width="3.41" height="64.50"/><rect x="212.66" y="8.91" width="3.41" height="65.09"/><rect x="218.16" y="8.00" width="3.41" height="66.00"/><rect x="223.66" y="8.19" width="3.41" height="65.81"/><rect x="229.16" y="8.29" width="3.41" height="65.71"/><rect x="234.67" y="9.13" width="3.41" height="64.87"/><rect x="240.17" y="8.97" width="3.41" height="65.03"/><rect x="245.67" y="8.87" width="3.41" height="65.13"/><rect x="251.18" y="8.92" width="3.41" height="65.08"/><rect x="256.68" y="8.44" width="3.41" height="65.56"/><rect x="262.18" y="9.93" width="3.41" height="64.07"/><rect x="267.68" y="13.84" width="3.41" height="60.16"/><rect x="273.19" y="15.91" width="3.41" height="58.09"/><rect x="278.69" y="16.31" width="3.41" height="57.69"/><rect x="284.19" y="16.52" width="3.41" height="57.48"/><rect x="289.70" y="16.93" width="3.41" height="57.07"/><rect x="295.20" y="22.40" width="3.41" height="51.60"/><rect x="300.70" y="26.09" width="3.41" height="47.91"/><rect x="306.21" y="28.79" width="3.41" height="45.21"/><rect x="311.71" y="30.48" width="3.41" height="43.52"/><rect x="317.21" y="31.27" width="3.41" height="42.73"/><rect x="322.71" y="31.15" width="3.41" height="42.85"/><rect x="328.22" y="31.70" width="3.41" height="42.30"/><rect x="333.72" y="31.63" width="3.41" height="42.37"/><rect x="339.22" y="31.91" width="3.41" height="42.09"/><rect x="344.73" y="32.40" width="3.41" height="41.60"/><rect x="350.23" y="35.32" width="3.41" height="38.68"/><rect x="355.73" y="33.90" width="3.41" height="40.10"/><rect x="361.23" y="33.87" width="3.41" height="40.13"/><rect x="366.74" y="33.83" width="3.41" height="40.17"/><rect x="372.24" y="34.14" width="3.41" height="39.86"/><rect x="377.74" y="33.94" width="3.41" height="40.06"/><rect x="383.25" y="33.96" width="3.41" height="40.04"/><rect x="388.75" y="34.10" width="3.41" height="39.90"/><rect x="394.25" y="33.39" width="3.41" height="40.61"/><rect x="399.76" y="33.72" width="3.41" height="40.28"/><rect x="405.26" y="33.90" width="3.41" height="40.10"/><rect x="410.76" y="34.28" width="3.41" height="39.72"/><rect x="416.26" y="34.28" width="3.41" height="39.72"/><rect x="421.77" y="36.51" width="3.41" height="37.49"/><rect x="427.27" y="41.97" width="3.41" height="32.03"/><rect x="432.77" y="44.01" width="3.41" height="29.99"/><rect x="438.28" y="45.94" width="3.41" height="28.06"/><rect x="443.78" y="46.59" width="3.41" height="27.41"/><rect x="449.28" y="47.68" width="3.41" height="26.32"/><rect x="454.79" y="48.32" width="3.41" height="25.68"/><rect x="460.29" y="47.49" width="3.41" height="26.51"/><rect x="465.79" y="48.18" width="3.41" height="25.82"/><rect x="471.29" y="48.17" width="3.41" height="25.83"/><rect x="476.80" y="46.40" width="3.41" height="27.60"/><rect x="482.30" y="47.13" width="3.41" height="26.87"/><rect x="487.80" y="45.34" width="3.41" height="28.66"/><rect x="493.31" y="44.77" width="3.41" height="29.23"/><rect x="498.81" y="45.13" width="3.41" height="28.87"/><rect x="504.31" y="44.85" width="3.41" height="29.15"/><rect x="509.81" y="44.15" width="3.41" height="29.85"/><rect x="515.32" y="42.67" width="3.41" height="31.33"/><rect x="520.82" y="43.93" width="3.41" height="30.07"/><rect x="526.32" y="44.16" width="3.41" height="29.84"/><rect x="531.83" y="41.33" width="3.41" height="32.67"/><rect x="537.33" y="37.36" width="3.41" height="36.64"/><rect x="542.83" y="34.80" width="3.41" height="39.20"/><rect x="548.34" y="34.27" width="3.41" height="39.73"/><rect x="553.84" y="32.76" width="3.41" height="41.24"/><rect x="559.34" y="32.48" width="3.41" height="41.52"/><rect x="564.84" y="29.86" width="3.41" height="44.14"/><rect x="570.35" y="28.39" width="3.41" height="45.61"/><rect x="575.85" y="27.81" width="3.41" height="46.19"/><rect x="581.35" y="27.84" width="3.41" height="46.16"/><rect x="586.86" y="27.82" width="3.41" height="46.18"/><rect x="592.36" y="25.91" width="3.41" height="48.09"/><rect x="597.86" y="25.16" width="3.41" height="48.84"/><rect x="603.37" y="24.52" width="3.41" height="49.48"/><rect x="608.87" y="24.92" width="3.41" height="49.08"/><rect x="614.37" y="28.10" width="3.41" height="45.90"/><rect x="619.87" y="24.13" width="3.41" height="49.87"/><rect x="625.38" y="24.31" width="3.41" height="49.69"/><rect x="630.88" y="25.32" width="3.41" height="48.68"/><rect x="636.38" y="25.81" width="3.41" height="48.19"/><rect x="641.89" y="26.54" width="3.41" height="47.46"/><rect x="647.39" y="26.59" width="3.41" height="47.41"/><rect x="652.89" y="26.31" width="3.41" height="47.69"/><rect x="658.39" y="26.05" width="3.41" height="47.95"/><rect x="663.90" y="26.99" width="3.41" height="47.01"/><rect x="669.40" y="29.58" width="3.41" height="44.42"/><rect x="674.90" y="34.88" width="3.41" height="39.12"/><rect x="680.41" y="33.23" width="3.41" height="40.77"/><rect x="685.91" y="34.05" width="3.41" height="39.95"/><rect x="691.41" y="36.38" width="3.41" height="37.62"/><rect x="696.92" y="35.35" width="3.41" height="38.65"/><rect x="702.42" y="36.61" width="3.41" height="37.39"/><rect x="707.92" y="36.85" width="3.41" height="37.15"/><rect x="713.42" y="36.58" width="3.41" height="37.42"/><rect x="718.93" y="36.88" width="3.41" height="37.12"/><rect x="724.43" y="40.05" width="3.41" height="33.95"/><rect x="729.93" y="38.88" width="3.41" height="35.12"/><rect x="735.44" y="40.90" width="3.41" height="33.10"/><rect x="740.94" y="40.36" width="3.41" height="33.64"/><rect x="746.44" y="40.89" width="3.41" height="33.11"/><rect x="751.94" y="42.29" width="3.41" height="31.71"/><rect x="757.45" y="42.81" width="3.41" height="31.19"/><rect x="762.95" y="43.34" width="3.41" height="30.66"/><rect x="768.45" y="43.71" width="3.41" height="30.29"/><rect x="773.96" y="41.53" width="3.41" height="32.47"/><rect x="779.46" y="41.89" width="3.41" height="32.11"/><rect x="784.96" y="44.31" width="3.41" height="29.69"/><rect x="790.47" y="45.12" width="3.41" height="28.88"/><rect x="795.97" y="46.85" width="3.41" height="27.15"/><rect x="801.47" y="47.10" width="3.41" height="26.90"/><rect x="806.97" y="47.10" width="3.41" height="26.90"/><rect x="812.48" y="45.94" width="3.41" height="28.06"/><rect x="817.98" y="46.34" width="3.41" height="27.66"/><rect x="823.48" y="46.84" width="3.41" height="27.16"/><rect x="828.99" y="47.17" width="3.41" height="26.83"/><rect x="834.49" y="48.47" width="3.41" height="25.53"/><rect x="839.99" y="47.95" width="3.41" height="26.05"/><rect x="845.50" y="48.33" width="3.41" height="25.67"/><rect x="851.00" y="47.96" width="3.41" height="26.04"/><rect x="856.50" y="46.12" width="3.41" height="27.88"/><rect x="862.00" y="45.21" width="3.41" height="28.79"/><rect x="867.51" y="47.56" width="3.41" height="26.44"/><rect x="873.01" y="46.83" width="3.41" height="27.17"/><rect x="878.51" y="46.59" width="3.41" height="27.41"/><rect x="884.02" y="45.78" width="3.41" height="28.22"/><rect x="889.52" y="45.92" width="3.41" height="28.08"/><rect x="895.02" y="43.17" width="3.41" height="30.83"/><rect x="900.52" y="38.13" width="3.41" height="35.87"/><rect x="906.03" y="35.52" width="3.41" height="38.48"/><rect x="911.53" y="32.60" width="3.41" height="41.40"/><rect x="917.03" y="31.04" width="3.41" height="42.96"/><rect x="922.54" y="29.62" width="3.41" height="44.38"/><rect x="928.04" y="26.17" width="3.41" height="47.83"/><rect x="933.54" y="24.55" width="3.41" height="49.45"/></g>
       <text class="axis" x="946" y="18">$6.0B</text>
       <text class="axis" x="946" y="77">$0</text>
     </svg>
@@ -1410,11 +1662,11 @@
   </div>
 
   <div class="rail bare">
-    <div><span class="label">MARKET CAP</span><strong>$90.13B</strong>
+    <div><span class="label">MARKET CAP</span><strong>$94.63B</strong>
       <small>Reported across tracked venues.</small></div>
-    <div><span class="label">24H VOLUME</span><strong>$4.09B</strong>
+    <div><span class="label">24H VOLUME</span><strong>$4.52B</strong>
       <small>Reported, not fillable. The book is the fillable number.</small></div>
-    <div><span class="label">VALIDATED LEDGER</span><strong>107,092,214</strong>
+    <div><span class="label">VALIDATED LEDGER</span><strong>107,138,823</strong>
       <small>Read from xrplcluster.com.</small></div>
     <div><span class="label">BASE FEE</span><strong>0.00001 XRP</strong><small>38 peers on that node.</small></div>
   </div>
@@ -1432,36 +1684,36 @@
       <div class="console-body flush">
         <div class="feed bare" id="news-feed">
     <article class="feed-item">
-      <span class="feed-meta"><span class="src">altcoinbuzz.io</span><time datetime="2026-09-19T12:29:24.000Z">36m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiigFBVV95cUxPSk9Rc09IRmJsR1dBTWVNd1VXdm1EejlONzlMY2doTFNyS2FHM0ZneFZKZ21LbjZFeXVpd3hfNDgyUENobGRaU2FEUTllbUNudHp2el9BU2R3b0N5bEh3ZW9WUXlkdnpEY0dtR3lZcjZKNTBCSEVHeFEwRnJPY0lGZWJiRFNfTVBGSEE?oc=5" rel="noopener nofollow" target="_blank">XRP short squeeze: $2.02M of shorts wiped in one hour, 851% imbalance</a>
+      <span class="feed-meta"><span class="src">Benzinga</span><time datetime="2026-09-21T14:48:43.000Z">5m ago</time></span>
+      <a class="headline" href="https://news.google.com/rss/articles/CBMiwwFBVV95cUxOTWpVU2FPMVJqbU10dlIzNDFvdnpid3I5VVBFSjdpTmJsUEpOb3NTRXc4RFRrSFo5RmY5YnkzZDY1djl6WDh1MkpnSkxEX3l2U1hyNnRGbmwwNkNKR3lrb0RiUkhPQmRzTllhT3VJV1V1UXdCRGpJendoYVZOcXBybWtOT0pnSGZ2TklPSVVjaGluQWVLOGpmRF9ENVRXaGFWUDJvYXZybEJvelRLVmFKdi1Mbm5DT3A3ZUlCcExHZ3h6VXc?oc=5" rel="noopener nofollow" target="_blank">Bitcoin, Ethereum, XRP Surge as $400 Million in Shorts Get Liquidated</a>
     </article>
     <article class="feed-item">
-      <span class="feed-meta"><span class="src">Cointribune</span><time datetime="2026-09-19T12:05:00.000Z">1h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxNOFdCYVc5cXpDUlJWd25uLWd6NXRneVAxOGlnVnRlN1RaZUlzLUlmUnUtX3g3bWNPQnFYUWZ4dmdyRzQ4anZKWVpiZ3QxWmc1WEdQOUItR0RLeDRnaVhmQ1pWU0RLYnA5cklkWlhKeTEzZUx5V3NYME05eWNodl9SV0FIa0VRQ0dOLUh3?oc=5" rel="noopener nofollow" target="_blank">XRP Approaches A Golden Cross After A Sharp Rebound</a>
+      <span class="feed-meta"><span class="src">TechBullion</span><time datetime="2026-09-21T14:47:33.000Z">6m ago</time></span>
+      <a class="headline" href="https://news.google.com/rss/articles/CBMivAFBVV95cUxOY1ltU2RjMVZCMkE5YUtEOWFXd0hXODRORWd6emlyV29WN2VnZm82Yl9pRzZjVDZpd1Qyb0dSUjZ2aUQ4dXVVZmhTOXB2c3FRbUR5VnhvQ3Qxa0RjMW1uNWtrUnBmVnNsLWxjVkZvTmRka2ppTHRCcDJtaVdmU1BzT29jVE1HdENyeWh6RWc5ejNnZ2Fldnh2N2hHajQydElGWUl0aWg1QlBXUEZzZ0dENkFKY0hBV09fYXZkTg?oc=5" rel="noopener nofollow" target="_blank">XRP Price Prediction Shifts After Stripe AI Deal as Remittix Targets the Global Payments Market</a>
     </article>
     <article class="feed-item">
-      <span class="feed-meta"><span class="src">Robinhood</span><time datetime="2026-09-19T12:04:33.000Z">1h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMirgFBVV95cUxOOUZWZWg5SHdqNjNJR3Qzd05fbzhRNVNvTHhYYlIxYTFUWllrMUI1QW1US1JWS2NTaFFjaGVsVklpQk5qSEk2VWFPZ2lKQkQyNkJUWXM3eXJWUjNuMkFkRC1oYzdzTkZ2Vmp5SXlMc0pPanM3cHlnREU4SU12MEJEUzExX0txSEY2eGJKWUpITGc3MXlGV0I3TUNKQVpxUDlZNFVack5oWTRoZE9xZWc?oc=5" rel="noopener nofollow" target="_blank">XRP price at Sep 19, 2026 at 9am EDT Crypto Prediction Market</a>
+      <span class="feed-meta"><span class="src">TechStock²</span><time datetime="2026-09-21T14:46:17.000Z">8m ago</time></span>
+      <a class="headline" href="https://news.google.com/rss/articles/CBMikgFBVV95cUxQODQ2WjZnRVl3dURuRl9keERZUGJCYkY4Ml9ZNlI5eXJjQld6RmxGbXJVSlduOXo2R3liWHBTYmpKNWVFaGM2MXVxUllrb182UmlsN3BJT1phNV8xOXBBWkRNWkx3bWYxMDRYNHFLZGx6RjU0MG1RZjRtLWtMZHNMcTIzSnlMWjFaM3I4dXlNYm5odw?oc=5" rel="noopener nofollow" target="_blank">XRP Price Jumps 8%, but Bitwise’s SEC Filing Is Not a New ETF Approval</a>
     </article>
     <article class="feed-item">
-      <span class="feed-meta"><span class="src">finbold.com</span><time datetime="2026-09-19T11:26:30.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMib0FVX3lxTE9seENvZnNlc1R5V0pRdUpXcVhoSjR5MVE4V1dfTDZBNExzcV9QZFh0NFpWYWRobnV4VEFrbnRRSDhPaW9JU19VN3FMajBCTnkxUF9ha1lMX3JXVVQ2dXZLTUh1UVBfRWpYOG5zdkU2aw?oc=5" rel="noopener nofollow" target="_blank">Here’s XRP’s path to $2, according to analyst</a>
+      <span class="feed-meta"><span class="src">StreetInsider</span><time datetime="2026-09-21T14:30:30.000Z">23m ago</time></span>
+      <a class="headline" href="https://news.google.com/rss/articles/CBMi8AFBVV95cUxPTWNrQ2pPV2ZHVExyampzTnNmejhMMTB6aUpKeUlCQ1NTTVFySHVkZUlLZDZObkcwMzJyal85Q0piQUtsNmJJT3dmUHp3U29YY3IzcEx3RDd0NURmeGxSSU1mX0Iwcjc3SDZMMG9KbkZ4LTl4MDZtVzlBR1VSdy05OC12SW1zYnhUX21GWGNXVWliRl8xd0pwcnZnTzIyRHhhT0V2cFYtem1sckVlcVU4SmJHMGlFYVdzcFd1WFhIRGhEQThhb0JyX3J6ME1SaEJoOTk2ZkJmalJkRm9ZSW54Wk54TUpNOVdXLTQ3S3BUYWE?oc=5" rel="noopener nofollow" target="_blank">Crypto Update: Remittix Builds Momentum in Global Payments While XRP Price Prediction Targets $8</a>
     </article>
     <article class="feed-item">
-      <span class="feed-meta"><span class="src">StreetInsider</span><time datetime="2026-09-19T11:06:55.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiigJBVV95cUxPRTlqY1M1ekhjSGVKU3E3SVgxa0Q3ZWpnVXE0ZU5jUXpYNFhtVmNpclh2Q2ZaQlRqT0lSWkpfcExHaTBoOG5JU1Jub2NlaDR6MDNiTzI0TEZ0eXk1LURVYXlJLUxMT2xTTkJyVVljWTJ5SmRwZG1zUGdXS2R2OGdqeV9vSjlqMWRKS2J4bFhtdXdrbUZTaFhQWFBvaklZTjBSQmhrUnk2aElWdmVyLTZHUXUyRHpjbzVDb25FUjAxRlQ1U29PWVExcFJnMGcwckxNQjIyTlRrdTlsNE1ZRENxeFM4X3A4SnJTaDA2eDFGTktsM1hNdUk2bzFIak0wNnVxZTh3YUU3bnlKdw?oc=5" rel="noopener nofollow" target="_blank">XRP vs. Ethereum Price Prediction: Claude Turns Bullish on 2026’s Best Crypto to Explode with 1,900% ROI</a>
+      <span class="feed-meta"><span class="src">PR Newswire</span><time datetime="2026-09-21T14:27:00.000Z">27m ago</time></span>
+      <a class="headline" href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxQLUtJN2ZFbWUzSDc1VkNWc0JEa196ejAtM0hLWDlManYzZ2Z0blluQm5YU0JkTGg0TTNiNjlQVEVQdG95d3o4YmcyMEN6N1BHbzRrVHhmdmUyYU1PR0xDSTdVVU9pLU94TVlSR2Q0VDIzYkdSd0NaSmJFVEFKTC0tRFdESlIyMERYWUc0OFRJbUcydHZIazRrOG5fcGJya3FYa1JrT3dqaV9OdjIwdTVWVGt6ZXJnelJSbG1aQTlnSmhHVDhXalhLejY4R3VubERKWVpMWGZvNm5XRVUxRnhBUw?oc=5" rel="noopener nofollow" target="_blank">Bybit Renews RLUSD Hold &amp; Earn Phase 3 with Zero-Fee Spot Trading and 800,000 XRP Rewards</a>
     </article>
     <article class="feed-item">
-      <span class="feed-meta"><span class="src">Fox News</span><time datetime="2026-09-19T11:00:02.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxOaFgzWEE0Y1J5OXVfOHlZcjRYQ2F4MzBfbDlYMXh6UW02WlhCRHN3NXphazI2TEtyWGxsa2w5N2FNZzhaNnJDYmtGalpteDVCSVBKbktCVEdzSXRlQjRLYXBKUFY3V09aUm9rT1dJZ1lMYUw0UXJsUnRJd0pCNFRCV1pJX1FvQmk4NFNNSGpVMEY0VmtudF9lc2Y4aWVKRmdWZjhtbjdpZXhlX2V1Z0x3S2xJNUVCTDdkcXlHU2lBY9IBxAFBVV95cUxOOHA2bVBfS2J5RV96Uy1yemhpQXhlUDRNR1NoMTI1YVozWGJpQzNSZnJjVXRndmlFN040NzZ6MkVXek1NWktwb1NiNGs4Zkp0VjBFcXpfS2JtTXMtYWZsZURLN1B1a0Y2YThQWXpBTjdCc1VHQ0lqMDRLVTQyZy1tSGYyMDhqVU5LMC1jam5oZUUtbWNkRk1wUmtKSFdGN29UN3JnSU5fRlZKbjFVdkVnOHBtSjFyUkkxLUdBdzBnZ1BqUVNY?oc=5" rel="noopener nofollow" target="_blank">Gabby Petito&#39;s mother urges public &#39;ripple effect&#39; to help find the missing 5 years after daughter&#39;s murder</a>
+      <span class="feed-meta"><span class="src">CryptoRank</span><time datetime="2026-09-21T14:25:11.000Z">29m ago</time></span>
+      <a class="headline" href="https://news.google.com/rss/articles/CBMiowFBVV95cUxQX0hsZVRBX0wxU0kyeHpFTzJRNHZPbjh6dHFwQ1YyLWxqejVidkxGQVdNWElmZXFiRE5xRTFvUlRTWkJKSEZubmJaWUNEb2ZBbTlSWXVCaVhLeUxLU1psUlNpZmZtanRnaElST3JyODFxV1AxYU5FRUlKenhMMnU5TUM4VkJwUkhkS3YzVDhReVVfNS1McUEtdGdZZ2sxSzdueEhJ?oc=5" rel="noopener nofollow" target="_blank">Why Is the Crypto Market Up Today? Bitcoin, ETH, XRP and SOL Surge</a>
     </article>
     <article class="feed-item">
-      <span class="feed-meta"><span class="src">Pluang</span><time datetime="2026-09-19T10:33:24.000Z">3h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMingFBVV95cUxOdHcyaks3VS1JU2thMFNlY1NNcVBfUnZTdDVPQlY2SkdHdndybW90N3R6Q05ocXFkQkxfSXhiY0p0Zlh0RmFsRzJYNmJ0VzdFUFJmRDg0MlZBSzAwTS1mNG80MXZCSmd1Z3A4WWl6YllsUXNIcktvbW1MUGJxQVlsSmc0eXBqRFVhVldaeDY2WFVBTGZJSkZLOVJxaUZtQQ?oc=5" rel="noopener nofollow" target="_blank">Hyperliquid whale buys 450,000 XRP at $1.44, si...</a>
+      <span class="feed-meta"><span class="src">Pluang</span><time datetime="2026-09-21T14:23:50.000Z">30m ago</time></span>
+      <a class="headline" href="https://news.google.com/rss/articles/CBMigwFBVV95cUxOOEdYckpuU1dkV2dDNUdrNTJRM1R1Z0IxMk9sM1lKMkJpb3Y4dG9laERKbDdsc1FXcG9JMDY1VC02TDBZTWVMX21TUmFmaks3S1N0V3YxdjdTTU9VdkZ0RGVDUV9ZNTM5QmtkNG4tdWQwMENWYjBzTlEzXzBNcHpRNVVsVQ?oc=5" rel="noopener nofollow" target="_blank">Absa launches Ripple-powered digital asset cust...</a>
     </article>
     <article class="feed-item">
-      <span class="feed-meta"><span class="src">Pluang</span><time datetime="2026-09-19T10:24:58.000Z">3h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMilgFBVV95cUxOR0Mtc1NHZXZ1aC1STUo0OEZ5MXd6akNaamxqT0NiUzQwS3RCUVRKazJicFk5SHlpTFFOQkZnMG16aVdpQUxzS1Y2TXRUeko1TGpkQVNob2NCaVBwVE9wNWpsWGQzMUE5eERiRDFXR2JqZlpOakdtTjRRY05fWG1tcnJlSkhRenV6UEo2dk12LWNrUUMzalE?oc=5" rel="noopener nofollow" target="_blank">XRP jumps 7% to $1.41 amid $8M short squeeze an...</a>
+      <span class="feed-meta"><span class="src">StealthEX</span><time datetime="2026-09-21T14:14:04.000Z">40m ago</time></span>
+      <a class="headline" href="https://news.google.com/rss/articles/CBMihAFBVV95cUxNbFNYSVRoQTlVSVBYYms2Mk5kOUlLdFUyMks1dFdXUmJKMllhNTdvLVNzMHlHY05Lb0xjWEZaX09sQXViUHhTUEdNSTYyY1gyVkg4OGkxblp6MFA4SUVDVktrcEJSdWNWRFp2NUkyVlJtX1kyaHZpWVhtZnE0bnVueEFHNkQ?oc=5" rel="noopener nofollow" target="_blank">Crypto News: Bitcoin ETFs, Zcash, XRP, MetaMask Updates</a>
     </article>
   </div>
   <p class="feed-note" id="news-note">
@@ -1675,8 +1927,8 @@ certutil -hashfile NOSHASHI_0.3.1_x64-setup.exe SHA256   # Windows</pre>
     </div>
 
     <div class="clockbar" id="mission-clock" data-epoch="2026-08-29T00:00:00Z">
-    <div><span class="label">UTC</span><span class="value live" id="clock-utc">13:05:02</span></div>
-    <div><span class="label">MISSION ELAPSED</span><span class="value" id="clock-met">T+21d</span></div>
+    <div><span class="label">UTC</span><span class="value live" id="clock-utc">14:53:58</span></div>
+    <div><span class="label">MISSION ELAPSED</span><span class="value" id="clock-met">T+23d</span></div>
     <div><span class="label">SINCE FIRST RELEASE</span><span class="value">2026-08-29</span></div>
   </div>
 
