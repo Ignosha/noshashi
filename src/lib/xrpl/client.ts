@@ -131,32 +131,25 @@ export async function fetchAccount(address: string): Promise<AccountInfo> {
 export async function fetchWalletCredentials(
   address: string
 ): Promise<CredentialRecord[]> {
-  try {
-    const result = await rpc("account_objects", {
-      account: address,
-      ledger_index: "validated",
-      type: "credential",
-      limit: 100,
-    });
-    const records = (result.account_objects ?? []) as Array<Record<string, any>>;
-    return records.map((record) => ({
-      subject: String(record.Subject ?? ""),
-      issuer: String(record.Issuer ?? ""),
-      credentialType:
-        decodeHexDomain(String(record.CredentialType ?? "")) ??
-        String(record.CredentialType ?? "UNKNOWN"),
-      // XLS-70 marks acceptance with the lsfAccepted flag (0x00010000).
-      accepted: (Number(record.Flags ?? 0) & 0x00010000) !== 0,
-      revoked: Boolean(record.Revoked ?? false),
-      uri: record.URI ? decodeHexDomain(String(record.URI)) : undefined,
-      expiration: record.Expiration ? Number(record.Expiration) : undefined,
-    }));
-  } catch (error) {
-    // Nodes that have not enabled the Credentials amendment reject the
-    // object type outright; an empty registry is the honest answer.
-    if (error instanceof XrplError) return [];
-    throw error;
-  }
+  const result = await rpc("account_objects", {
+    account: address,
+    ledger_index: "validated",
+    type: "credential",
+    limit: 100,
+  });
+  const records = (result.account_objects ?? []) as Array<Record<string, any>>;
+  return records.map((record) => ({
+    subject: String(record.Subject ?? ""),
+    issuer: String(record.Issuer ?? ""),
+    credentialType:
+      decodeHexDomain(String(record.CredentialType ?? "")) ??
+      String(record.CredentialType ?? "UNKNOWN"),
+    // XLS-70 marks acceptance with the lsfAccepted flag (0x00010000).
+    accepted: (Number(record.Flags ?? 0) & 0x00010000) !== 0,
+    revoked: Boolean(record.Revoked ?? false),
+    uri: record.URI ? decodeHexDomain(String(record.URI)) : undefined,
+    expiration: record.Expiration ? Number(record.Expiration) : undefined,
+  }));
 }
 
 /** Recent wallet activity, shaped for the audit trail. */

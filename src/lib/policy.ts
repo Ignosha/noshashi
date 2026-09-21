@@ -167,8 +167,9 @@ export function evaluatePolicy(input: {
   credentials: CredentialRecord[];
   domain: PermissionedDomain;
   amountXrp: number;
+  evidenceUnavailable?: string[];
 }): Omit<PolicyReceipt, "digest" | "latencyMs"> {
-  const { account, credentials, domain, amountXrp } = input;
+  const { account, credentials, domain, amountXrp, evidenceUnavailable = [] } = input;
   const held = heldCredentialTypes(credentials);
   const balance = account ? Number(account.balanceXrp) : 0;
   const reserve = reserveRequirementXrp(account?.ownerCount ?? 0);
@@ -267,9 +268,25 @@ export function evaluatePolicy(input: {
       : "No Domain field set on the account — attestation strengthens the audit trail.",
   });
 
+  for (const source of evidenceUnavailable) {
+    checks.push({
+      id: `EVIDENCE_${source.toUpperCase().replace(/[^A-Z0-9]+/g, "_")}`,
+      label: `${source} evidence available`,
+      severity: "warn",
+      passed: false,
+      detail: `The ${source} source could not be read from the validated ledger. No conclusion is asserted for this source.`,
+    });
+  }
+
   const blocked = checks.some((check) => check.severity === "block" && !check.passed);
   const warned = checks.some((check) => check.severity === "warn" && !check.passed);
-  const verdict: Status = blocked ? "no-go" : warned ? "hold" : "go";
+  const verdict: Status = blocked
+    ? "no-go"
+    : evidenceUnavailable.length > 0
+      ? "insufficient-data"
+      : warned
+        ? "hold"
+        : "go";
 
   return {
     verdict,
@@ -358,6 +375,7 @@ export async function runPolicy(input: {
   credentials: CredentialRecord[];
   domain: PermissionedDomain;
   amountXrp: number;
+  evidenceUnavailable?: string[];
 }): Promise<PolicyReceipt> {
   const started = performance.now();
   const body = evaluatePolicy(input);

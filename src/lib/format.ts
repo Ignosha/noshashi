@@ -45,7 +45,13 @@ export function truncateMiddle(value: string, head = 8, tail = 6): string {
 /** Escape a cell for CSV export (audit trail download). */
 export function csvCell(value: unknown): string {
   const text = String(value ?? "");
-  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  // Spreadsheet applications interpret these leading characters as formulas.
+  // Prefixing a single quote keeps exported evidence textual when opened in
+  // Excel or similar tools, without changing the displayed cell value.
+  const safeText = /^[=+\-@]/.test(text) ? `'${text}` : text;
+  return /[",\n]/.test(safeText)
+    ? `"${safeText.replace(/"/g, '""')}"`
+    : safeText;
 }
 
 export function toCsv(rows: Array<Record<string, unknown>>): string {

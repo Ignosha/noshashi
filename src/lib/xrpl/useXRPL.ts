@@ -89,6 +89,8 @@ export function useXRPL(address: string) {
   const [connected, setConnected] = useState(false);
   const [ledgerError, setLedgerError] = useState<string | null>(null);
   const [accountError, setAccountError] = useState<string | null>(null);
+  const [credentialError, setCredentialError] = useState<string | null>(null);
+  const [activityError, setActivityError] = useState<string | null>(null);
   const [loadingAccount, setLoadingAccount] = useState(false);
   const [events, setEvents] = useState<LiveEvent[]>([]);
   const [history, setHistory] = useState<LedgerTick[]>([]);
@@ -142,12 +144,28 @@ export function useXRPL(address: string) {
         );
       }
 
-      setCredentials(
-        credentialResult.status === "fulfilled" ? credentialResult.value : []
-      );
-      setTransactions(
-        activityResult.status === "fulfilled" ? activityResult.value : []
-      );
+      if (credentialResult.status === "fulfilled") {
+        setCredentials(credentialResult.value);
+        setCredentialError(null);
+      } else {
+        setCredentials([]);
+        setCredentialError(
+          credentialResult.reason instanceof Error
+            ? credentialResult.reason.message
+            : "Unable to read credential objects"
+        );
+      }
+      if (activityResult.status === "fulfilled") {
+        setTransactions(activityResult.value);
+        setActivityError(null);
+      } else {
+        setTransactions([]);
+        setActivityError(
+          activityResult.reason instanceof Error
+            ? activityResult.reason.message
+            : "Unable to read account activity"
+        );
+      }
     } finally {
       setLoadingAccount(false);
     }
@@ -232,6 +250,8 @@ export function useXRPL(address: string) {
     connected,
     ledgerError,
     accountError,
+    credentialError,
+    activityError,
     loadingAccount,
     events,
     history,
