@@ -1,0 +1,14 @@
+import Link from 'next/link'
+import ArchitectureDiagram from '@/components/institutional/ArchitectureDiagram'
+
+const capabilities = ['Validated ledger observations', 'Asset, issuer, trust-line, domain, and control data', 'Counterparty relationships and exposure', 'Order-book, AMM, executable-depth, and slippage data', 'Policy evaluations, adjudications, evidence, and historical events', 'REST APIs, webhooks, event feeds, bulk exports, and custom schemas']
+
+export default function StrategicInfrastructurePage() {
+  return <div className="marketing-shell">
+    <section className="marketing-hero"><p className="section-label">NOSHASHI STRATEGIC INFRASTRUCTURE</p><h1 className="marketing-title">Build your institutional XRPL intelligence layer with NOSHASHI.</h1><p className="marketing-copy">Enterprise-grade XRPL data, intelligence, monitoring, evidence, and policy infrastructure delivered through APIs, event feeds, and dedicated environments where supported.</p><div className="cta-row"><Link href="#architecture-review" className="btn-primary">Build With NOSHASHI</Link><Link href="#architecture-review" className="btn-secondary">Request Architecture Review</Link></div></section>
+    <section className="panel"><div className="panel-header"><div><p className="section-label">DATA INFRASTRUCTURE</p><h2>Machine-readable intelligence for customer infrastructure.</h2></div></div><div className="passport-grid">{capabilities.map((capability) => <div className="passport-card" key={capability}><div className="passport-kicker">DATA LAYER</div><ul><li>{capability}</li></ul></div>)}</div></section>
+    <section className="panel"><div className="panel-header"><div><p className="section-label">ARCHITECTURE</p><h2>XRPL to customer systems</h2></div></div><ArchitectureDiagram /></section>
+    <section className="page-grid"><div className="panel"><p className="section-label">CONTRACTED CAPACITY</p><h2>High-volume access without an artificial public quota.</h2><p className="hero-copy">Capacity, burst limits, retention, data delivery, and dedicated resources are based on deployment requirements and commercial scope.</p></div><div className="panel"><p className="section-label">INTEGRATIONS</p><h2>Connect risk, compliance, custody, trading, and data systems.</h2><p className="hero-copy">Use the integration framework for customer APIs, data warehouses, monitoring platforms, and embedded or white-label delivery when contracted.</p></div></section>
+    <section className="panel" id="architecture-review"><p className="section-label">ARCHITECTURE REVIEW</p><h2>Plan an institutional data layer.</h2><p className="hero-copy">Request an architecture review for source coverage, schema, event delivery, deployment options, and integration boundaries. Specific availability is subject to technical and commercial review.</p><Link href="mailto:partnerships@noshashi.app" className="btn-primary">Contact Infrastructure Team</Link></section>
+  </div>
+}

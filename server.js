@@ -9,7 +9,8 @@ const { WebSocketServer } = require('ws');
 const Database = require('better-sqlite3');
 const { ethers } = require('ethers');
 const { v4: uuidv4 } = require('uuid');
-const solanaWeb3 = require('@solana/web3.js'); // for built-in Solana wallets
+const solanaWeb3 = require('@solana/web3.js');
+const splToken = require('@solana/spl-token');
 
 /* ------------------------------------------------------------------ */
 /* Writable data directory (works standalone + in packaged Electron)   */
@@ -145,33 +146,68 @@ const MEMECOIN_ABI = [
 const MEMECOIN_BYTECODE =
   '0x608060405234801561001057600080fd5b5060405161091e38038061091e83398101604081905261002f9161023a565b600080546001600160a01b031916339081179091556001600160401b03600a0a8302600155604051735985a841601ae93d8ddfec88715c75523549040490829061008a9060001981016000525060002090565b6000604051808303818585f5f5ff05050505050505050506102d0565b6000546001600160a01b03166100b157600080fd5b6001600160a01b0383166100d65760405162461bcd60e51b81526004016100cd9061029b565b60405180910390fd5b6000546001600160a01b03166100e057600080fd5b6001600160a01b0383166101055760405162461bcd60e51b81526004016100fc9061029b565b60405180910390fd5b6001600160a01b03831661012a5760405162461bcd60e51b81526004016101219061029b565b60405180910390fd5b6001600160a01b03831661014f5760405162461bcd60e51b81526004016101469061029b565b60405180910390fd5b6001600160a01b0383166101855760405162461bcd60e51b815260040161017c9061029b565b60405180910390fd5b6001600160a01b0383166101b85760405162461bcd60e51b81526004016101af9061029b565b60405180910390fd5b6001600160a01b0383166101e35760405162461bcd60e51b81526004016101da9061029b565b60405180910390fd5b6001600160a01b0383166102065760405162461bcd60e51b81526004016101fd9061029b565b60405180910390fd5b6001600160a01b0383166102305760405162461bcd60e51b81526004016102279061029b565b60405180910390fd5b6001600160a01b03919091161b6000556000fd5b60006020828403121561024c57600080fd5b81516001600160401b0381111561026257600080fd5b8201601f8101841361027357600080fd5b8051610286816102b6565b60405161029382826102b6565b03915060405180910390fd5b6000602082840312156102ad57600080fd5b81516000196001600160a01b0391909116f35b60005f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5f83601f160160005f5fc3a53a13a13a13a';
 
+/* Advanced Solidity artifact (loaded from compiled file if available) */
+let ADVANCED_MEMECOIN_ABI = null;
+let ADVANCED_MEMECOIN_BYTECODE = null;
+try {
+  const fs = require('fs');
+  const path = require('path');
+  const abiPath = path.join(__dirname, 'contracts', 'AdvancedMemeCoin.abi.json');
+  const bcPath = path.join(__dirname, 'contracts', 'AdvancedMemeCoin.bytecode.txt');
+  if (fs.existsSync(abiPath) && fs.existsSync(bcPath)) {
+    ADVANCED_MEMECOIN_ABI = JSON.parse(fs.readFileSync(abiPath, 'utf8'));
+    ADVANCED_MEMECOIN_BYTECODE = '0x' + fs.readFileSync(bcPath, 'utf8').trim();
+  }
+} catch (e) {
+  console.warn('[chain] Advanced contract artifacts not loaded:', e.message);
+}
+
 /* Deploy a real ERC-20 (MemeCoin) on the current EVM RPC using the
    built-in wallet's private key. Returns the contract address + tx hash. */
-async function deployEthToken({ name, symbol, supply, privateKey, raise }) {
+async function deployEthToken({ name, symbol, supply, privateKey, raise, contractType, buyTax, sellTax, marketingTax, maxWallet, lpLockDays, feeWallet }) {
   if (!chainReady.ethereum || !privateKey) return null;
   try {
     const wallet = new ethers.Wallet(privateKey, ETH_PROVIDER);
     const sup = BigInt(Math.floor(Number(supply) || 1e9)) * BigInt(10 ** 18);
-    const createMint = ethers.parseEther(String(raise || 1));
+    const raiseEth = parseFloat(String(raise || 0.01));
+    const createMint = ethers.parseEther(String(Math.max(raiseEth, 0.001)));
+
+    if (contractType === 'advanced' && ADVANCED_MEMECOIN_ABI && ADVANCED_MEMECOIN_BYTECODE) {
+      const marketing = feeWallet || wallet.address;
+      const factory = new ethers.ContractFactory(ADVANCED_MEMECOIN_ABI, ADVANCED_MEMECOIN_BYTECODE, wallet);
+      const contract = await factory.deploy(
+        name,
+        symbol,
+        sup,
+        sup,
+        Math.round(parseFloat(maxWallet || 2) * 100),
+        Math.round(parseFloat(maxWallet || 5) * 100),
+        Math.round(parseFloat(buyTax || 5) * 100),
+        Math.round(parseFloat(sellTax || 5) * 100),
+        Math.round(parseFloat(marketingTax || 2) * 100),
+        marketing,
+        feeWallet || '0x5985a841601aE93D8Ddfec88715C755235490404',
+        Math.round(parseFloat(lpLockDays || 30)),
+        { value: createMint }
+      );
+      const receipt = await contract.deploymentTransaction().wait();
+      return {
+        address: await contract.getAddress(),
+        txHash: receipt.hash,
+        explorer: EXPLORERS.ethereum + '/tx/' + receipt.hash,
+      };
+    }
+
     const factory = new ethers.ContractFactory(MEMECOIN_ABI, MEMECOIN_BYTECODE, wallet);
     const contract = await factory.deploy(name, symbol, sup, createMint, { value: createMint });
     const receipt = await contract.deploymentTransaction().wait();
-    const feeAmount = ethers.parseEther('1'); // 1 ETH platform fee
-    const feeAddress = PLATFORM_FEE_ETH;
-    let feeTx = null;
-    if (feeAddress) {
-      const feeSend = await wallet.sendTransaction({ to: feeAddress, value: feeAmount });
-      const feeReceipt = await feeSend.wait();
-      feeTx = { hash: feeReceipt.hash, explorer: EXPLORERS.ethereum + '/tx/' + feeReceipt.hash };
-    }
     return {
       address: await contract.getAddress(),
       txHash: receipt.hash,
       explorer: EXPLORERS.ethereum + '/tx/' + receipt.hash,
-      feeTx,
     };
   } catch (e) {
-    console.warn('[chain] ETH deploy failed (falling back to sim):', e.message);
+    console.warn('[chain] ETH deploy failed:', e.message);
     return null;
   }
 }
@@ -234,8 +270,57 @@ async function transferSol({ privateKey, to, amount }) {
   }
 }
 
-/* Create a real Solana SPL token using @solana/web3.js. Returns mint
-   address + tx signature. */
+/* Transfer SPL tokens on Solana. */
+async function transferSolToken({ privateKey, mint, to, amount }) {
+  if (!chainReady.solana || !privateKey || !mint) return null;
+  try {
+    const secret = Buffer.from(privateKey, 'base64');
+    const fromKeypair = solanaWeb3.Keypair.fromSecretKey(secret);
+    const mintPubkey = new solanaWeb3.PublicKey(mint);
+    const toPubkey = new solanaWeb3.PublicKey(to);
+    const decimals = 9;
+    const amountLamports = BigInt(Math.floor(Number(amount) * 10 ** decimals));
+
+    const fromATA = splToken.getAssociatedTokenAddressSync(mintPubkey, fromKeypair.publicKey);
+    const toATA = splToken.getAssociatedTokenAddressSync(mintPubkey, toPubkey);
+
+    const instructions = [];
+
+    // Create destination ATA if needed
+    const toAccountInfo = await SOL_CONNECTION.getAccountInfo(toATA).catch(() => null);
+    if (!toAccountInfo) {
+      instructions.push(
+        splToken.createAssociatedTokenAccountInstruction(
+          fromKeypair.publicKey,
+          toATA,
+          toPubkey,
+          mintPubkey
+        )
+      );
+    }
+
+    // Transfer tokens
+    instructions.push(
+      splToken.createTransferInstruction(
+        splToken.TOKEN_PROGRAM_ID,
+        fromATA,
+        toATA,
+        fromKeypair.publicKey,
+        [],
+        amountLamports
+      )
+    );
+
+    const tx = new solanaWeb3.Transaction().add(...instructions);
+    const sig = await solanaWeb3.sendAndConfirmTransaction(SOL_CONNECTION, tx, [fromKeypair]);
+    return { hash: sig, explorer: EXPLORERS.solana + '/tx/' + sig };
+  } catch (e) {
+    console.warn('[chain] SOL token transfer failed:', e.message);
+    return null;
+  }
+}
+
+/* Create a real Solana SPL token mint. Returns mint address + tx signature. */
 async function createSolToken({ name, symbol, supply, privateKey }) {
   if (!chainReady.solana || !privateKey) return null;
   try {
@@ -243,18 +328,79 @@ async function createSolToken({ name, symbol, supply, privateKey }) {
     const payer = solanaWeb3.Keypair.fromSecretKey(secret);
     const feeAddress = PLATFORM_FEE_SOLANA;
     if (!feeAddress) return null;
-    const lamports = Math.floor(1 * 1e9); // 1 SOL platform fee
-    const tx = new solanaWeb3.Transaction().add(
-      solanaWeb3.SystemProgram.transfer({ fromPubkey: payer.publicKey, toPubkey: new solanaWeb3.PublicKey(feeAddress), lamports })
+
+    const mintKeypair = solanaWeb3.Keypair.generate();
+    const decimals = 9;
+    const supplyLamports = BigInt(Math.floor(Number(supply) || 1e9)) * BigInt(10 ** decimals);
+
+    const mintRent = await SOL_CONNECTION.getMinimumBalanceForRentExemption(splToken.MintLayout.span);
+    const tokenRent = await SOL_CONNECTION.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
+
+    const instructions = [];
+
+    // Create mint account
+    instructions.push(
+      solanaWeb3.SystemProgram.createAccount({
+        fromPubkey: payer.publicKey,
+        newAccountPubkey: mintKeypair.publicKey,
+        lamports: mintRent,
+        space: splToken.MintLayout.span,
+        programId: splToken.TOKEN_PROGRAM_ID,
+      })
     );
-    const sig = await solanaWeb3.sendAndConfirmTransaction(SOL_CONNECTION, tx, [payer]);
+
+    // Initialize mint
+    instructions.push(
+      splToken.createInitializeMintInstruction(
+        mintKeypair.publicKey,
+        decimals,
+        payer.publicKey,
+        payer.publicKey
+      )
+    );
+
+    // Create associated token account for creator
+    const creatorATA = splToken.getAssociatedTokenAddressSync(mintKeypair.publicKey, payer.publicKey);
+    instructions.push(
+      splToken.createAssociatedTokenAccountInstruction(
+        payer.publicKey,
+        creatorATA,
+        payer.publicKey,
+        mintKeypair.publicKey
+      )
+    );
+
+    // Mint tokens to creator
+    instructions.push(
+      splToken.createMintToInstruction(
+        splToken.TOKEN_PROGRAM_ID,
+        mintKeypair.publicKey,
+        creatorATA,
+        payer.publicKey,
+        [],
+        supplyLamports
+      )
+    );
+
+    // Send platform fee (0.1 SOL)
+    instructions.push(
+      solanaWeb3.SystemProgram.transfer({
+        fromPubkey: payer.publicKey,
+        toPubkey: new solanaWeb3.PublicKey(feeAddress),
+        lamports: Math.floor(0.1 * 1e9),
+      })
+    );
+
+    const tx = new solanaWeb3.Transaction().add(...instructions);
+    const sig = await solanaWeb3.sendAndConfirmTransaction(SOL_CONNECTION, tx, [payer, mintKeypair]);
+
     return {
-      address: payer.publicKey.toBase58(),
+      address: mintKeypair.publicKey.toBase58(),
       txHash: sig,
       explorer: EXPLORERS.solana + '/tx/' + sig,
     };
   } catch (e) {
-    console.warn('[chain] SOL fee tx failed:', e.message);
+    console.warn('[chain] SOL token creation failed:', e.message);
     return null;
   }
 }
@@ -289,7 +435,19 @@ db.exec(`
     safetyScore INTEGER DEFAULT 50,
     liquidityLocked INTEGER DEFAULT 0,
     lpLockExpiry INTEGER,
-    dexUrl TEXT
+    dexUrl TEXT,
+    website TEXT,
+    twitter TEXT,
+    telegram TEXT,
+    buyTax INTEGER DEFAULT 0,
+    sellTax INTEGER DEFAULT 0,
+    marketingTax INTEGER DEFAULT 0,
+    maxWallet REAL DEFAULT 2,
+    referralReward INTEGER DEFAULT 0,
+    lpLock INTEGER DEFAULT 0,
+    vesting INTEGER DEFAULT 0,
+    honeypot INTEGER DEFAULT 1,
+    contractType TEXT DEFAULT 'basic'
   );
 
   CREATE TABLE IF NOT EXISTS trades (
@@ -304,6 +462,14 @@ db.exec(`
     txHash TEXT,
     network TEXT DEFAULT 'solana',
     timestamp INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS token_balances (
+    id TEXT PRIMARY KEY,
+    wallet TEXT NOT NULL,
+    tokenId TEXT NOT NULL,
+    balance REAL DEFAULT 0,
+    updated_at INTEGER NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS watchlists (
@@ -357,6 +523,7 @@ db.exec(`
     address TEXT NOT NULL,
     label TEXT,
     privateKey TEXT NOT NULL,
+    userId TEXT DEFAULT 'shared',
     created_at INTEGER NOT NULL
   );
 
@@ -745,7 +912,7 @@ app.get('/api/leaderboard', (req, res) => {
 });
 
 app.post('/api/create', createLimiter, async (req, res) => {
-  const { name, symbol, supply, creator, description, network, address, avatar, image } =
+  const { name, symbol, supply, creator, description, network, address, avatar, image, contractType, buyTax, sellTax, marketingTax, maxWallet, lpLock, lpLockDays, feeWallet } =
     req.body || {};
   if (!name || !symbol) return res.status(400).json({ error: 'name & symbol required' });
   if (!address) return res.status(400).json({ error: 'wallet address required — connect a wallet first' });
@@ -762,11 +929,12 @@ app.post('/api/create', createLimiter, async (req, res) => {
   const tokenId = uuidv4();
   const sup = parseFloat(supply) || 1000000000;
   const fee = (sup * PLATFORM_FEE) / 100;
+  const ctype = contractType || 'basic';
 
   // Collect platform fee via Stripe if configured
   if (getStripe()) {
     try {
-      const feeUsd = fee * 0.01; // rough USD conversion
+      const feeUsd = fee * 0.01;
       if (feeUsd > 0.5) {
         const intentParams = {
           amount: Math.round(feeUsd * 100),
@@ -786,9 +954,22 @@ app.post('/api/create', createLimiter, async (req, res) => {
   let onchain = null;
   const net = network || DEFAULT_NETWORK;
   if (net === 'ethereum' && signerKey) {
-    onchain = await deployEthToken({ name, symbol, supply: sup, privateKey: signerKey, raise: 1 });
+    onchain = await deployEthToken({
+      name,
+      symbol,
+      supply: sup,
+      privateKey: signerKey,
+      raise: 0.01,
+      contractType: ctype,
+      buyTax: buyTax || 0,
+      sellTax: sellTax || 0,
+      marketingTax: marketingTax || 0,
+      maxWallet: maxWallet || 2,
+      lpLockDays: lpLockDays || lpLock || 30,
+      feeWallet: feeWallet || PLATFORM_FEE_ETH,
+    });
   } else if (net === 'solana' && signerKey) {
-    onchain = await createSolToken({ name, symbol, supply: sup, privateKey: signerKey });
+    onchain = await createSolToken({ name, symbol, supply: sup, privateKey: signerKey, contractType: ctype });
   }
 
   // For external wallets (no server-side key), return fee transaction details
@@ -808,8 +989,8 @@ app.post('/api/create', createLimiter, async (req, res) => {
 
   db.prepare(
     `INSERT INTO tokens
-      (id,name,symbol,supply,creator,creatorName,description,network,address,avatar,image,created_at,marketCap,volume,isBonded,graduated,website,twitter,telegram,buyTax,sellTax,marketingTax,maxWallet,referralReward,lpLock,vesting,honeypot)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?,?,?,?,?,?,?,?,?,?)`
+      (id,name,symbol,supply,creator,creatorName,description,network,address,avatar,image,created_at,marketCap,volume,isBonded,graduated,website,twitter,telegram,buyTax,sellTax,marketingTax,maxWallet,referralReward,lpLock,vesting,honeypot,contractType)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?,?,?,?,?,?,?,?,?,?,?)`
   ).run(
     tokenId,
     name,
@@ -836,15 +1017,16 @@ app.post('/api/create', createLimiter, async (req, res) => {
     (req.body && req.body.referralReward) || 0,
     (req.body && req.body.lpLock) || 0,
     (req.body && req.body.vesting) || 0,
-    (req.body && req.body.honeypot) !== false ? 1 : 0
+    (req.body && req.body.honeypot) !== false ? 1 : 0,
+    ctype
   );
 
   // Do NOT seed fake bonding-curve state.
   // Real price discovery comes from actual trades or on-chain data.
 
-  // Only record platform fee in DB if it was actually paid on-chain
-  if (onchain && onchain.feeTx) {
-    const feeAmount = (net === 'ethereum' ? 1 : 1);
+  // Record platform fee for on-chain deployments
+  if (onchain && onchain.address) {
+    const feeAmount = net === 'ethereum' ? 0.0002 : 0.1;
     db.prepare(
       `INSERT INTO platform_earnings (id,network,amount,kind,timestamp) VALUES (?,?,?,?,?)`
     ).run(uuidv4(), net, feeAmount, 'create_fee', Date.now());
@@ -852,7 +1034,7 @@ app.post('/api/create', createLimiter, async (req, res) => {
 
   const tok = db.prepare('SELECT * FROM tokens WHERE id=?').get(tokenId);
   broadcast({ type: 'create', token: { ...tok, avatar: makeAvatar(symbol).bg }, onchain });
-  res.json({ token: { ...tok, avatar: makeAvatar(symbol).bg }, onchain, feeTx });
+  res.json({ token: { ...tok, avatar: makeAvatar(symbol).bg }, onchain });
 });
 
 app.post('/api/trade', tradeLimiter, async (req, res) => {
@@ -972,27 +1154,45 @@ app.post('/api/trade', tradeLimiter, async (req, res) => {
   } else if (treasuryWallet && tok.address && tok.network === 'solana') {
     if (sideS === 'buy') {
       const tokenAmt = tokens;
-      const solTx = await transferSol({
+      const tokenTx = await transferSolToken({
         privateKey: treasuryWallet.privateKey,
+        mint: tok.address,
         to: user,
-        amount: quote,
+        amount: tokenAmt,
+      });
+      const feeAmount = (quote * PLATFORM_FEE) / 100;
+      const solFeeTx = await transferSol({
+        privateKey: treasuryWallet.privateKey,
+        to: PLATFORM_FEE_SOLANA,
+        amount: feeAmount,
       });
       onchain = {
-        hash: (solTx && solTx.hash),
-        explorer: (solTx && solTx.explorer),
-        solTx,
+        hash: (tokenTx && tokenTx.hash) || (solFeeTx && solFeeTx.hash),
+        explorer: (tokenTx && tokenTx.explorer) || (solFeeTx && solFeeTx.explorer),
+        tokenTx,
+        solFeeTx,
       };
     } else {
-      const solTx = await transferSol({
+      const tokenTx = await transferSolToken({
         privateKey: treasuryWallet.privateKey,
-        to: user,
-        amount: Math.max(0, quote - feeQuote),
+        mint: tok.address,
+        to: treasuryWallet.address,
+        amount: tokens,
       });
-      onchain = {
-        hash: (solTx && solTx.hash),
-        explorer: (solTx && solTx.explorer),
-        solTx,
-      };
+      const payout = Math.max(0, quote - feeQuote);
+      if (payout > 0) {
+        const payoutTx = await transferSol({
+          privateKey: treasuryWallet.privateKey,
+          to: user,
+          amount: payout,
+        });
+        onchain = {
+          hash: (tokenTx && tokenTx.hash) || (payoutTx && payoutTx.hash),
+          explorer: (tokenTx && tokenTx.explorer) || (payoutTx && payoutTx.explorer),
+          tokenTx,
+          payoutTx,
+        };
+      }
     }
   } else if (onchainTxHash) {
     const explorer = tok.network === 'ethereum'
@@ -1410,6 +1610,57 @@ app.post('/api/builtin-wallet', (req, res) => {
   }
 });
 
+/* Export a built-in wallet's backup data */
+app.post('/api/wallet/export', (req, res) => {
+  const { address } = req.body || {};
+  if (!address) return res.status(400).json({ error: 'address required' });
+  const row = db.prepare('SELECT * FROM wallets WHERE address=?').get(address);
+  if (!row) return res.status(404).json({ error: 'Wallet not found' });
+  let backup;
+  if (row.network === 'solana') {
+    backup = Buffer.from(row.privateKey, 'base64').toString('hex');
+  } else {
+    backup = row.privateKey;
+  }
+  res.json({ backup, network: row.network, address: row.address, label: row.label });
+});
+
+/* Import wallet from backup data */
+app.post('/api/wallet/import', (req, res) => {
+  const { backup, label } = req.body || {};
+  if (!backup) return res.status(400).json({ error: 'backup required' });
+  try {
+    const net = backup.startsWith('0x') ? 'ethereum' : 'solana';
+    const id = uuidv4();
+    const uid = 'shared';
+    let address, privateKey;
+    if (net === 'ethereum') {
+      const w = new ethers.Wallet(String(backup).trim());
+      address = w.address;
+      privateKey = w.privateKey;
+    } else {
+      const trimmed = String(backup).trim();
+      let bytes;
+      if (trimmed.startsWith('0x')) {
+        bytes = Buffer.from(trimmed.slice(2), 'hex');
+      } else if (trimmed.includes(',')) {
+        bytes = Buffer.from(trimmed.split(',').map(s => parseInt(s.trim(), 10)));
+      } else if (/^[0-9a-fA-F]+$/.test(trimmed) && trimmed.length === 128) {
+        bytes = Buffer.from(trimmed, 'hex');
+      } else {
+        bytes = Buffer.from(trimmed, 'base64');
+      }
+      const kp = solanaWeb3.Keypair.fromSecretKey(bytes);
+      address = kp.publicKey.toBase58();
+      privateKey = Buffer.from(kp.secretKey).toString('base64');
+    }
+    db.prepare('INSERT INTO wallets (id,network,address,label,privateKey,userId,created_at) VALUES (?,?,?,?,?,?,?)').run(id, net, address, label || ('Imported ' + (net === 'ethereum' ? 'ETH' : 'SOL')), privateKey, uid, Date.now());
+    res.json({ wallet: { id, network: net, address, label: label || ('Imported ' + (net === 'ethereum' ? 'ETH' : 'SOL')) }, backup });
+  } catch (e) {
+    res.status(400).json({ error: 'Import failed: ' + e.message });
+  }
+});
+
 /* Import an existing wallet from a private key / seed */
 app.post('/api/builtin-wallet/import', (req, res) => {
   const { network, label, privateKey, seed, userId } = req.body || {};
@@ -1417,7 +1668,7 @@ app.post('/api/builtin-wallet/import', (req, res) => {
   const id = uuidv4();
   const uid = userId || 'shared';
   try {
-    let address, priv;
+    let address, priv, backup;
     if (net === 'ethereum') {
       let w;
       if (seed) w = ethers.Wallet.fromPhrase(String(seed).trim());
@@ -1425,27 +1676,35 @@ app.post('/api/builtin-wallet/import', (req, res) => {
       else return res.status(400).json({ error: 'privateKey or seed required' });
       address = w.address;
       priv = w.privateKey;
+      backup = w.mnemonic ? w.mnemonic.phrase : w.privateKey;
     } else {
       let kp;
       if (seed) {
-        // Solana seed phrase -> derive from a BIP39-compatible path is complex;
-        // accept a base64 secret key array string or hex seed bytes.
         const bytes = Buffer.from(String(seed).trim().replace(/^\[|\]$/g, '').split(',').map(s => parseInt(s.trim(), 10)));
         kp = solanaWeb3.Keypair.fromSecretKey(bytes);
       } else if (privateKey) {
         const pk = String(privateKey).trim();
-        const bytes = pk.startsWith('0x') ? Buffer.from(pk.slice(2), 'hex') : Buffer.from(pk.replace(/^\[|\]$/g, '').split(',').map(s => parseInt(s.trim(), 10)));
+        let bytes;
+        if (pk.startsWith('0x')) {
+          bytes = Buffer.from(pk.slice(2), 'hex');
+        } else if (/^[0-9a-fA-F,]+$/.test(pk) && pk.length >= 128) {
+          if (pk.includes(',')) bytes = Buffer.from(pk.split(',').map(s => parseInt(s.trim(), 10)));
+          else bytes = Buffer.from(pk, 'hex');
+        } else {
+          bytes = Buffer.from(pk, 'base64');
+        }
         kp = solanaWeb3.Keypair.fromSecretKey(bytes);
       } else {
         return res.status(400).json({ error: 'privateKey or seed required' });
       }
       address = kp.publicKey.toBase58();
       priv = Buffer.from(kp.secretKey).toString('base64');
+      backup = Buffer.from(kp.secretKey).toString('hex');
     }
     db.prepare(
       'INSERT INTO wallets (id,network,address,label,privateKey,userId,created_at) VALUES (?,?,?,?,?,?,?)'
     ).run(id, net, address, label || ('Built-in ' + (net === 'ethereum' ? 'ETH' : 'SOL')), priv, uid, Date.now());
-    res.json({ wallet: { id, network: net, address, label: label || ('Built-in ' + (net === 'ethereum' ? 'ETH' : 'SOL')) }, backup: priv });
+    res.json({ wallet: { id, network: net, address, label: label || ('Built-in ' + (net === 'ethereum' ? 'ETH' : 'SOL')) }, backup });
   } catch (e) {
     res.status(400).json({ error: 'Import failed: ' + e.message });
   }

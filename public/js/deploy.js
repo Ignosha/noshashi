@@ -9,7 +9,8 @@
         crWebsite = $('#crWebsite'), crTwitter = $('#crTwitter'), crTelegram = $('#crTelegram'),
         crBuyTax = $('#crBuyTax'), crSellTax = $('#crSellTax'), crMktTax = $('#crMktTax'),
         crMaxWallet = $('#crMaxWallet'), crRefReward = $('#crRefReward'),
-        crLPLock = $('#crLPLock'), crVesting = $('#crVesting'), crHoneypot = $('#crHoneypot');
+        crLPLock = $('#crLPLock'), crVesting = $('#crVesting'), crHoneypot = $('#crHoneypot'),
+        crContractType = $('#crContractType');
   let tokenImage = null; // base64 data URL of uploaded image
 
   // image upload (accepts gif/heic/png/jpg/webp/svg/any)
@@ -124,6 +125,7 @@ contract ${s.replace(/[^A-Za-z0-9_]/g,'_') || 'MemeCoin'} {
       lpLock: crLPLock ? parseInt(crLPLock.value) || 0 : 0,
       vesting: crVesting ? parseInt(crVesting.value) || 0 : 0,
       honeypot: crHoneypot ? parseInt(crHoneypot.value) : 1,
+      contractType: (crContractType && crContractType.value) || 'basic',
     };
 
     try {

@@ -102,6 +102,7 @@
       <div class="wallet-box" id="walletBox">
         <img id="walletProfilePic" src="" alt="" style="width:24px;height:24px;border-radius:50%;border:2px solid var(--cyan);display:none;margin-right:6px;object-fit:cover;" />
         <span class="pixel small" id="walletAddress">⛓ Connect</span>
+        <span class="pixel tiny" id="walletBalance" style="margin-left:8px;color:var(--yellow)"></span>
       </div>
       <span class="network-badge" id="networkBadge">⬢ SOLANA MAINNET</span>
       <button class="pixel tiny" id="toggleNetwork" style="background:var(--panel);border:2px solid var(--cyan);color:var(--cyan);padding:6px 10px;cursor:pointer;font-size:9px">⟲ SWAP</button>
@@ -177,6 +178,10 @@
           <div class="stat-block holo-active">
             <span class="pixel tiny dim">GRADUATED</span>
             <span class="pixel lg glow-green stat-counter" id="statGraduated">0</span>
+          </div>
+          <div class="stat-block holo-active" id="walletBalanceBlock" style="display:none">
+            <span class="pixel tiny dim">WALLET BALANCE</span>
+            <span class="pixel lg glow-yellow stat-counter" id="statWalletBalance">--</span>
           </div>
         </div>
       </div>
@@ -356,6 +361,11 @@
             <textarea id="crDesc" class="pixel-input" rows="3" placeholder="The force is strong with this meme"></textarea>
             <label class="pixel small">SUPPLY</label>
             <input id="crSupply" class="pixel-input" type="number" value="1000000000" />
+            <label class="pixel small">CONTRACT TYPE</label>
+            <select id="crContractType" class="pixel-input">
+              <option value="basic">Basic (simple ERC-20 / SPL)</option>
+              <option value="advanced">Advanced (taxes, anti-bot, reflections)</option>
+            </select>
             <label class="pixel small">TOKEN IMAGE (PNG / JPG / GIF / HEIC / WEBP / SVG)</label>
             <input id="crImage" class="pixel-input" type="file" accept="image/*,.gif,.heic,.heif,.png,.jpg,.jpeg,.webp,.svg,.bmp,.avif" />
             <div class="tok-upload" id="crImagePreview"><span class="pixel tiny dim">NO IMAGE SELECTED</span></div>

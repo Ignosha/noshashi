@@ -1,34 +1,117 @@
 version: '3.8'
 
 services:
-  ignoshashi:
-    build: .
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - POLYGON_API_KEY=${POLYGON_API_KEY}
+      - ALPACA_API_KEY=${ALPACA_API_KEY}
+      - ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY}
+      - QUANTPAD_API_KEY=${QUANTPAD_API_KEY}
+      - APIFY_TOKEN=${APIFY_TOKEN}
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - DATABASE_URL=postgresql://ignoshashi:ignoshashi_pass@postgres:5432/ignoshashi
+      - REDIS_URL=redis://redis:6379/0
+      - ALLOWED_ORIGINS=http://localhost:3000,https://ignoshashi.com
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./data:/data
-      - ./backups:/backups
     environment:
-      - NODE_ENV=production
-      - CHAIN_ENV=mainnet
-      - ENABLE_REAL_CHAIN=true
-      - PLATFORM_FEE_PERCENT=2
-      - PLATFORM_FEE_ETH=${PLATFORM_FEE_ETH}
-      - PLATFORM_FEE_SOLANA=${PLATFORM_FEE_SOLANA}
-      - DEFAULT_NETWORK=solana
-      - ALLOWED_ORIGIN=${ALLOWED_ORIGIN:-*}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); })"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-
-  # Optional: Backup service
-  backup:
-    image: alpine:latest
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
     volumes:
-      - ./data:/data:ro
-      - ./backups:/backups
-    command: sh -c "while true; do cp /data/ignoshashi.db /backups/ignoshashi_$$(date +%F_%H%M).db; sleep 3600; done"
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
     restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=ignoshashi
+      - POSTGRES_PASSWORD=ignoshashi_pass
+      - POSTGRES_DB=ignoshashi
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ignoshashi"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A app.celery worker --loglevel=info
+    environment:
+      - POLYGON_API_KEY=${POLYGON_API_KEY}
+      - ALPACA_API_KEY=${ALPACA_API_KEY}
+      - ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY}
+      - QUANTPAD_API_KEY=${QUANTPAD_API_KEY}
+      - APIFY_TOKEN=${APIFY_TOKEN}
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - DATABASE_URL=postgresql://ignoshashi:ignoshashi_pass@postgres:5432/ignoshashi
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

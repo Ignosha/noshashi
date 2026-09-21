@@ -629,5 +629,6 @@
     showProfilePicModal,
     getProfilePic,
     setProfilePic,
+    fetchBalance,
   };
 })(window);

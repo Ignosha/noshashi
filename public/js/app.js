@@ -271,13 +271,65 @@
           picEl.style.display = 'none';
         }
       }
+      const balEl = document.getElementById('walletBalance');
+      const topBalEl = document.getElementById('statWalletBalance');
+      const block = document.getElementById('walletBalanceBlock');
+      if (balEl) balEl.textContent = '...';
+      if (STATE.builtinId && global.fetchBalance) {
+        global.fetchBalance(STATE.builtinId).then((r) => {
+          if (!r) {
+            if (balEl) balEl.textContent = '';
+            if (topBalEl) topBalEl.textContent = '--';
+            if (block) block.style.display = 'none';
+            return;
+          }
+          const txt = r.network === 'ethereum' ? (parseFloat(r.balanceEth || 0).toFixed(4) + ' ETH') : (parseFloat(r.balanceSol || 0).toFixed(4) + ' SOL');
+          if (balEl) balEl.textContent = txt;
+          if (topBalEl) topBalEl.textContent = txt;
+          if (block) block.style.display = '';
+        }).catch(() => {
+          if (balEl) balEl.textContent = '';
+          if (topBalEl) topBalEl.textContent = '--';
+          if (block) block.style.display = 'none';
+        });
+      } else {
+        if (balEl) balEl.textContent = '';
+        if (topBalEl) topBalEl.textContent = '--';
+        if (block) block.style.display = 'none';
+      }
     } else {
       walletBox.classList.remove('connected');
       $('#walletAddress').textContent = '⛓ Connect';
       const picEl = document.getElementById('walletProfilePic');
       if (picEl) picEl.style.display = 'none';
+      const balEl = document.getElementById('walletBalance');
+      const topBalEl = document.getElementById('statWalletBalance');
+      const block = document.getElementById('walletBalanceBlock');
+      if (balEl) balEl.textContent = '';
+      if (topBalEl) topBalEl.textContent = '--';
+      if (block) block.style.display = 'none';
     }
   };
+
+  setInterval(() => {
+    if (STATE.connected && STATE.wallet && STATE.builtinId && global.fetchBalance) {
+      global.fetchBalance(STATE.builtinId).then((r) => {
+        const balEl = document.getElementById('walletBalance');
+        const topBalEl = document.getElementById('statWalletBalance');
+        const block = document.getElementById('walletBalanceBlock');
+        if (!r) {
+          if (balEl) balEl.textContent = '';
+          if (topBalEl) topBalEl.textContent = '--';
+          if (block) block.style.display = 'none';
+          return;
+        }
+        const txt = r.network === 'ethereum' ? (parseFloat(r.balanceEth || 0).toFixed(4) + ' ETH') : (parseFloat(r.balanceSol || 0).toFixed(4) + ' SOL');
+        if (balEl) balEl.textContent = txt;
+        if (topBalEl) topBalEl.textContent = txt;
+        if (block) block.style.display = '';
+      }).catch(() => {});
+    }
+  }, 30000);
 
   /* ---------- Toast ---------- */
   global.toast = function (msg) {
