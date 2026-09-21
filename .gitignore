@@ -1,8 +1,8 @@
 node_modules/
-backend/data//
+backend/data/
 backend/**/__pycache__/
 frontend/.next/
-frontend/tsconfig.tsbuildinfo/
+frontend/tsconfig.tsbuildinfo
 dist/
 release/
 *.log
