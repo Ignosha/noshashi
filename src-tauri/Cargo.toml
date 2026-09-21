@@ -1,6 +1,6 @@
 [package]
 name = "noshashi"
-version = "0.4.1"
+version = "0.4.2"
 description = "NOSHASHI — autonomous compliance layer mission control"
 edition = "2021"
 rust-version = "1.77"
@@ -23,7 +23,7 @@ tauri-plugin-store = "2"
 # the downloaded bundle with the public key in tauri.conf.json, which is
 # what makes an unsigned, un-notarised application safe to update at all:
 # the release host is not trusted, the key is.
-tauri-plugin-updater = "2"
+tauri-plugin-updater = "=2.11.0"
 # Restarting into the installed version is the last step of an update.
 tauri-plugin-process = "2"
 serde = { version = "1", features = ["derive"] }
