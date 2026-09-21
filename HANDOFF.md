@@ -1,176 +1,82 @@
-# Handoff — `fix/compliance-api-keychain-and-updates`
+# Handoff — NOSHASHI master directive
 
-Working notes for picking this branch back up. **Disposable** — delete this file
-before merging; it is not product documentation.
+Updated 2026-09-21 · branch `claude/feature-pricing-recommendation-dp8xke` · PR #12 open (3 commits, clean)
 
-Written 2026-09-10. Branch head at the time: `0507981`, CI green.
+## Where this is
 
----
+Phase 1 is done — `docs/AUDIT.md` is a gap map, not a rebuild plan, because the product
+was already largely built. Its §3 is the live scoreboard for gaps G1–G5 and is kept
+current. Three defects found along the way were the product publishing claims that were
+not true (a false allegation on the public certificate page, a false clearance in the
+desktop app, a fabricated Travel Rule finding) — fixed and merged in #11. The schema for
+organizations, roles and an append-only audit log is **applied to production**.
 
-## Where things stand
+## Verified
 
-| | |
-|---|---|
-| Branch | `fix/compliance-api-keychain-and-updates` |
-| Commit | `0507981` — 20 files, +540 / −42 |
-| Base | `main` @ `a230443`, untouched |
-| CI | **passing** — run on the branch, conclusion `success` |
-| PR | not opened yet |
+Every line below was executed on `3382015`, not inferred:
 
-Open the PR here:
-<https://github.com/Ignosha/noshashi/compare/fix/compliance-api-keychain-and-updates?expand=1>
+- `npx tsc --noEmit` 0 errors · `npx vitest run` **504 tests, 25 files, all passing**
+- `npm run check:functions` (deno, 3 edge functions), `npm run check:bloom`
+  (generated-SVG drift guard), `npm run build`, `node scripts/build-site.mjs` — all exit 0
+- `npm audit` — **0 vulnerabilities** (Vite 5→7 closed the 2 dev-server CVEs)
+- `cd src-tauri && cargo check --locked` + `cargo clippy -- -D warnings` — exit 0 (needs
+  `libgtk-3-dev libwebkit2gtk-4.1-dev libsoup-3.0-dev librsvg2-dev`)
+- Nav overflow: 6 pages clean 320–1250px, swept in 10px steps; Vite 7 dev server
+  boots (299ms) and serves HTTP 200 with React refresh
+- Migrations applied to prod, verified against the live catalogue: 3 tables,
+  `organization_id` nullable on all 6 re-parented tables, rows untouched, 0 SECURITY
+  DEFINER functions without a pinned `search_path`
+- Audit triggers, 6 behavioural tests on a throwaway Postgres 16: `authenticated`
+  cannot write `audit_log` directly yet its key creation still records a row; no key
+  hash logged; `last_used_at` churn adds nothing; revocation and membership
+  add/change/remove recorded; migration idempotent
 
-### Verified
+## Open
 
-Run locally on Windows and again on the CI runner:
+In priority order.
 
-- `npm ci` — lockfile and manifest agree
-- `npx tsc --noEmit` — exit 0
-- `npm test` — 245 passed, 14 files
-- `npm run build` — ✓
-- `npm run build:demo` — ✓ (this could not run on Windows at all before)
-- `npm audit --omit=dev --audit-level=high` — 0 vulnerabilities
+1. **§18 per-check five-state result.** `PolicyCheck.passed` is a boolean hashed by
+   `digestOf` in all three runtimes. Converting it changes the digest contract a third
+   time and touches every check construction and consumer. Own PR.
+2. **Organization bootstrap.** Nothing creates an org or its first member, and no writer
+   populates `organization_id`; until then audit rows carry a null org, which the read
+   policy hides from everyone but `service_role`. Must be server-side — the roster
+   policies cannot authorise the first row.
+3. **Settlement policy versioning.** `receiptDigest`'s body is frozen, so a version
+   cannot go inside it — needs a second versioned digest beside it, or a
+   `policy_version` carried next to the receipt. Contract change.
+4. **Smoke-test the live verify endpoint.** Impossible from the sandbox
+   (`supabase.co` egress-blocked). Expect `""` and `"authority/check"` from
+   `curl -s https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify | jq .verbs`
+5. **PR #12's body is stale** — written before the Vite upgrade and migration work
+   landed on the same branch. Refresh before review.
+6. Pre-existing: `api_rate_windows` has RLS on with no policy (INFO); Supabase Auth
+   leaked-password protection is off (WARN).
 
-Two things checked end-to-end rather than assumed:
+## Rejected
 
-- the built bundle contains `0.2.2`, no `0.1.0`, and no unsubstituted
-  `__APP_VERSION__`
-- `dist/` and `dist-demo/` main chunks have different hashes, so the edition
-  split survived moving off the shell env prefix
+Dead ends already paid for. Do not re-derive these.
 
-### NOT verified — the one open risk
+- **A WATCH verdict.** Nothing in the codebase produces a signal separating it from
+  HOLD. A verdict no evaluation can return is a control that does nothing (§83). It
+  arrives with historical monitoring, which supplies the trend it would rest on.
+- **A counterparty confidence enum** (VERIFIED/ATTRIBUTED/PROBABLE/…), which the audit
+  predicted for G3. Wrong: NOSHASHI attributes nothing by design, so the enum would
+  have had no producer. The real defect was a fabricated Travel Rule finding.
+- **An application-level audit helper.** Impossible: keys are created client-side as
+  `authenticated`, which has no INSERT on `audit_log`, deliberately. Hence triggers.
+- **A phone hero height floor** of `max(440px, 64svh)`. Measured: it put 130px of
+  nothing under the CTA. The phone hero stays content-driven.
+- **`npm audit fix` without `--force`.** Cannot resolve the Vite CVEs at all.
+- **A live price ribbon as the hero centrepiece.** DESIGN.md bans "decorative data",
+  and a chart in the hero breaks the bound the starfield exception is granted under.
+  The decorative bloom was granted instead, as a documented second exception.
 
-**Nothing in `src-tauri/` has been compiled.** There was no Rust toolchain on the
-machine this was prepared on, and `ci.yml` never runs `cargo` — only
-`release.yml` does, and only on a tag. So the Rust changes would first be
-exercised during a release build, which is the worst possible moment to find a
-problem.
-
-Two files carry that risk:
-
-- `src-tauri/Cargo.toml` — `keyring` split into three per-target dependency
-  sections
-- `src-tauri/src/main.rs` — `tauri::Builder` chain converted to a `let mut`
-  binding, `export_text_file` validation rewritten, `open_external` Windows arm
-  changed, `updater_configured` command added
-
-Every identifier used was confirmed against upstream docs (keyring's
-`apple-native` / `windows-native` / `sync-secret-service` / `crypto-rust`;
-`updater:default`; `process:allow-restart`), so the risk is a compile error,
-not a wrong design. But it is unconfirmed.
-
-**Close it with:**
-
-```bash
-cd src-tauri
-cargo check
-```
-
-Needs rustup plus MSVC Build Tools on Windows. Consider adding a `cargo check`
-step to `ci.yml` permanently — a project shipping three desktop targets probably
-wants Rust in the PR gate, not only at release.
-
----
-
-## What the commit fixes
-
-Full prose is in `CHANGELOG.md` under **Unreleased**. Short version:
-
-1. **Compliance API refused every credentialed subject.** `CredentialType` is a
-   VL blob and arrives hex-encoded; the edge function compared
-   `4B59435F4C4556454C5F31` against `KYC_LEVEL_1`. Never matched — `no-go`
-   regardless of the ledger.
-2. **The same function invented ledger state.** rippled's HTTP JSON-RPC reports
-   command errors *inside* `result` with HTTP 200; only the WebSocket API puts
-   them at the top level, which is what the code tested. An unreadable account
-   became a zero-balance account and got adjudicated.
-3. **Windows and Linux stored no secrets.** `keyring` compiles no backend unless
-   a feature asks for one (0 default features) and falls back to an in-process
-   mock silently. Only `apple-native` was listed.
-4. **`open_external` command injection on Windows.** `cmd /C start` re-parses its
-   command line with rules Rust's quoting does not cover — a URL carrying `&`
-   ran what followed it.
-5. **`export_text_file` could escape Downloads on Windows.** `join` *replaces*
-   the base path for a drive-prefixed argument, so `C:audit.csv` survived the
-   last-segment split.
-6. **Version hard-coded at 0.1.0** in the About panel, footer, legal BUILD row
-   and both DMG scripts — at version 0.2.2. The release script therefore never
-   found the DMG it had just built and silently repackaged the `.app` every time.
-7. **`build:demo` was Windows-incompatible.** Now uses `--mode demo`.
-8. **Signed automatic updates added** — see below.
-
----
-
-## Automatic updates: the one manual step left
-
-The feature is fully wired but **inert by design**. It stays inert until a
-signing keypair exists, and the Settings panel says so rather than showing a
-button that cannot work. `src-tauri/src/main.rs` registers the updater plugin
-only when `plugins.updater.pubkey` is non-empty, because the plugin fails
-initialisation without a key and that failure takes the whole app down at
-launch.
-
-`docs/UPDATES.md` has the full procedure. Condensed:
+## Resume with
 
 ```bash
-npm run tauri signer generate -- -w ~/.tauri/noshashi.key
+git fetch origin && git checkout claude/feature-pricing-recommendation-dp8xke
+npm install
+node .claude/skills/ponytail/scripts/trail.mjs     # reconcile before trusting this file
+npx tsc --noEmit && npx vitest run && npm run build
 ```
-
-Then:
-
-1. paste the public key into `plugins.updater.pubkey` in
-   `src-tauri/tauri.conf.json`
-2. add `"createUpdaterArtifacts": true` to `bundle` in the same file
-3. add `includeUpdaterJson: true` to the `tauri-action` step in `release.yml`
-4. add repo secrets `TAURI_SIGNING_PRIVATE_KEY` and
-   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`
-
-Do 2 and 4 together — `createUpdaterArtifacts` without the secrets fails the
-bundle step.
-
-`tauri.demo.conf.json` needs no change: Tauri v2's `--config` is an RFC 7396
-merge patch, so it inherits `plugins.updater` from the base config. (Confirmed
-against the Tauri v2 docs.)
-
-**Test the refusal path, not just the happy path.** Re-sign `latest.json` with a
-*different* key, publish it, and check for updates: the download must fail and
-the app must stay put. A signature check that silently passes everything looks
-exactly like one that works.
-
----
-
-## Deliberately left alone
-
-Two real issues found during review that were out of scope for this commit:
-
-- **CSV formula injection** in the audit-trail export (`csvCell` in
-  `src/lib/format.ts`). A cell beginning `=`, `+`, `-` or `@` executes when the
-  export is opened in Excel. Prefixing those with a `'` is the usual fix.
-- **The edge function's rate limiter is per-instance and in-memory**
-  (`rateBuckets` in `supabase/functions/noshashi-verify/index.ts`). Its own
-  README already flags this; buckets also never get evicted.
-
----
-
-## Environment notes
-
-Prepared on a machine with no toolchain at all. Node 22.20.0 and MinGit 2.47.1
-were extracted as portable zips under `%TEMP%` (`%TEMP%\nodejs`,
-`%TEMP%\mingit`) — **these are temp and will be gone.** Install Node and Rust
-normally before resuming.
-
-A working clone was left at `%TEMP%\nsh-git` and a full patched tree at
-`~/Downloads/noshashi-patched`. Both are also disposable; the branch on the
-remote is the real artefact. `~/Downloads/noshashi-fixes.patch` and
-`noshashi-fixes.bundle` carry the same commit if either copy is needed again.
-
----
-
-## Resume checklist
-
-- [ ] `cargo check` in `src-tauri/` — the only unverified thing
-- [ ] Open the PR, review the diff (especially `main.rs` and `Cargo.toml`)
-- [ ] Consider adding `cargo check` to `ci.yml`
-- [ ] Generate the updater keypair and complete `docs/UPDATES.md` steps 1–4
-- [ ] Delete this file
-- [ ] Merge, then tag a release and confirm `latest.json` is attached
