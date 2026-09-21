@@ -1,0 +1,33 @@
+# Normalise every text file to LF, in the repository and in the working tree.
+#
+# Without this, Git for Windows checks files out as CRLF by default, and two
+# test files parse src/App.tsx with patterns like /\n  \{\n/ to find the SCENES
+# table. A CRLF checkout puts \r before every \n, those patterns match nothing,
+# and four tests fail claiming there are no gated scenes.
+#
+# The failure is invisible where it is usually looked for. CI runs on Linux and
+# checks out LF, so the suite is green on every push while being unrunnable for
+# anyone developing on Windows — the platform this application also ships to.
+# Pinning eol here means the working tree matches CI on every machine.
+* text=auto eol=lf
+
+# Shell scripts must be LF or they will not execute; the build scripts are
+# invoked directly by scripts/build-editions.sh.
+*.sh text eol=lf
+
+# Batch files are the one exception: cmd.exe requires CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Never touched, never diffed as text.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.icns binary
+*.pdf  binary
+*.zip  binary
+*.dmg  binary
+*.woff  binary
+*.woff2 binary

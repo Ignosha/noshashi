@@ -1,0 +1,511 @@
+# NOSHASHI
+
+> Market intelligence, reimagined.
+> Analyze · Discover · Navigate
+
+A zero-trust intelligence workstation for the XRP Ledger. It answers two
+questions about the same position, in the same second, from the same
+validated ledger state:
+
+1. **Am I allowed to move this?** — compliance adjudication
+2. **Could I actually get out of it?** — market and liquidity intelligence
+
+Every other tool on this chain answers one or the other. Holding both is the
+product.
+
+---
+
+## Quick start
+
+```bash
+npm install
+npm run tauri:dev
+```
+
+That opens the desktop app against **XRPL mainnet**. There is no testnet path
+in the build — see [Why no testnet](#why-there-is-no-testnet).
+
+Nothing is signed and no key is ever held, so there is nothing to lose by
+running it.
+
+---
+
+## Where this stands
+
+Last updated **2026-09-10**. Read this first if you are picking the project
+back up.
+
+### Deployed and verified
+
+| | State |
+|---|---|
+| Compliance API (`noshashi-verify`) | **Deployed.** `GET` returns the descriptor and published limits; an invalid key returns 401 with `X-Request-Id`, `no-store` and `nosniff` — not a 500 |
+| API hardening migration | **Applied** (by hand via the SQL editor) and recorded with `migration repair --status applied 20260910000000` |
+| Migration history | **Reconciled.** `supabase migration list` reports `local == remote` for all five versions, so plain `db push` works — no `--include-all` |
+| Pricing page | Written at `site/pricing/`, linked from the home page and the sitemap |
+| Redemption stress testing | Engine, tests and UI all in. `STRESS` tab in the Risk scene |
+
+### Open
+
+1. **Leaked-password protection is off.** Not settable from the CLI —
+   `config.toml` has no field for it, so `config push` cannot do it even in
+   principle. Dashboard only: Authentication → Sign In / Providers →
+   Password settings → "Prevent use of leaked passwords". Flagged as
+   outstanding in `20260828_harden_function_grants.sql` and still open.
+2. **The repo cannot rebuild the database from scratch.** Four migrations
+   were authored in the dashboard and never committed, so
+   `supabase/history/20260910_noshashi_schema_baseline.sql` is a
+   reconstruction written from memory rather than the bytes that built the
+   schema. `db pull` and `db dump` both need Docker, which is not installed;
+   `supabase/history/introspect_remote_schema.sql` is the no-Docker
+   substitute. Run it and reconcile.
+3. **Annual Stripe prices do not exist yet.** `annualPriceId` is `null` for
+   both paid tiers in `src/lib/billing/catalog.ts`. The pricing page quotes
+   $7,490 and $40,000; nothing can be bought at those numbers until the
+   prices are created.
+
+### ⚠️ Do not run `supabase config push`
+
+It would disable authentication email (Resend) and SMS (Twilio). A
+`config pull` skips six remote values it cannot complete without
+`smtp.pass` and `twilio.account_sid`, so local config says SMTP is absent
+and Twilio is off — and a push sends local. Detail and the fix in
+[`supabase/history/README.md`](supabase/history/README.md).
+
+### Commercial naming
+
+Customer-facing tiers are **Free**, **Pro** ($749/seat/mo) and
+**Institutional** ($4,000/mo). The plan *identifiers* stay `operator`,
+`desk` and `institution` — they are the `tier` check constraint on
+`noshashi.entitlements`, the value the Stripe webhook writes on checkout,
+and the value the Compliance API reads to pick a rate limit. Renaming a
+display name is a copy change; renaming an identifier is a migration plus
+two deploys that have to land together or every paying account loses its
+entitlements in the gap. The mapping lives in
+`src/lib/billing/catalog.ts`.
+
+### Go-to-market documents
+
+| File | What it is |
+|---|---|
+| [`docs/API.md`](docs/API.md) | Compliance API spec — auth, rate limits, idempotency, webhook schemas, every error code, Node and Python quickstarts. Endpoints not yet built are marked `NOT BUILT` |
+| [`docs/FEATURE_MATRIX.md`](docs/FEATURE_MATRIX.md) | Entitlements per tier, the `grants` reference table, and the deliberate omissions with reasons |
+| [`docs/SALES.md`](docs/SALES.md) | Cold outreach templates by segment, institutional one-pager, Product Hunt and Show HN copy, research-to-SEO pipeline |
+| [`docs/ONBOARDING.md`](docs/ONBOARDING.md) | Payment → API key → first call, three welcome emails, in-app checklist, docs tree |
+| [`docs/LAUNCH.md`](docs/LAUNCH.md) | Launch plan, gate-sequenced rather than dated |
+
+Legal drafts (ToS, Privacy, MSA, SLA, DPA) are **not** in the repo and are
+hard gates: Pro cannot take a card without ToS and Privacy, and
+Institutional cannot be invoiced without an entity, MSA, SLA and DPA.
+
+### Toolchain
+
+This machine has no system Git, Node, Supabase CLI or Deno. Portable copies
+live in `C:\Users\<user>\dev-tools\` (`git\cmd`, `node`, `supabase`,
+`deno`) and are on the user PATH. **An already-open terminal will not see
+them** — PowerShell reads PATH once at startup, so open a new one.
+
+---
+
+## The two editions
+
+NOSHASHI builds from one source tree into two artefacts that install side by
+side:
+
+| | Full | Demo |
+|---|---|---|
+| Product name | `NOSHASHI` | `NOSHASHI Demo` |
+| Bundle identifier | `com.noshashi.compliance` | `com.noshashi.compliance.demo` |
+| Frontend output | `dist/` | `dist-demo/` |
+| Paid capabilities | all | closed |
+| Billing | live Stripe | inert — links to pricing |
+| Live mainnet data | yes | **yes** |
+| Adjudication engine | full | **full** |
+| Receipts | real | **byte-identical** |
+
+```bash
+./scripts/build-editions.sh          # both, staged into ./release/
+./scripts/build-editions.sh full     # only the real product
+./scripts/build-editions.sh demo     # only the public early release
+```
+
+Use the script rather than calling Tauri directly. Tauri wipes
+`src-tauri/target/release/bundle/` before every bundle, so building the two
+back to back and collecting at the end silently loses whichever finished
+first. The script copies each artefact out immediately after its own build.
+
+The demo is deliberately **not** crippled where it matters. It reads the same
+mainnet, runs the same deterministic policy engine and produces the same
+receipts, because a demo that fakes its output teaches nothing about the
+product and contradicts everything this one claims.
+
+---
+
+## What it reads, and what it does not
+
+Everything below comes from validated mainnet state.
+
+| Module | Source | Status |
+|---|---|---|
+| Ledger state | `wss://xrplcluster.com` (+ s1/s2 failover) | live |
+| Account and flags | `account_info` · `account_lines` | live |
+| Credentials | XLS-70 objects | live |
+| Market data | XRPL DEX `book_offers` | live |
+| Liquidity | XLS-30 AMM `amm_info` | live |
+| On-chain supply | `gateway_balances` | live |
+| Issuer holder walk | `account_lines` paginated | live |
+| Signer lists and escrows | `account_objects` | live |
+| AMM governance | `amm_info` vote slots · auction slot | live |
+| Settlement forensics | `tx` · `meta.delivered_amount` | live |
+| Multi-node sync | `server_info` across 4 public nodes | live |
+| Macro | *no source in the build* | **not configured** |
+| Sentiment | *no source in the build* | **not configured** |
+
+Macro and sentiment appear in the interface as **NOT CONFIGURED** with a place
+for your own key. They are never rendered as live and never populated with a
+placeholder number.
+
+> This is load-bearing, not a caveat. NOSHASHI is sold on the claim that it
+> does not fabricate. An interface displaying a sentiment score it never
+> measured would falsify the product on the first screen a buyer sees.
+
+### The traps these tools are built around
+
+Each read module exists because a specific field lies if you take it at face
+value. They are handled explicitly and documented at the top of each module.
+
+| Trap | Where | What goes wrong if ignored |
+|---|---|---|
+| `delivered_amount` ≠ `Amount` | `lib/desk/settlement.ts` | A `tesSUCCESS` payment can deliver 0.4% of the stated amount. Crediting `Amount` over-credits by 250x. This is how exchanges get drained. |
+| Absent ≠ false | `lib/desk/issuance.ts` | A trust line carries `freeze`/`authorized` only when set. Reading absence as "not frozen" asserts a guarantee the ledger never made. |
+| Partial walk ≠ measurement | `lib/desk/issuance.ts` | Concentration over an incomplete holder set has no known direction of error. Coverage below 95% withholds the figure rather than caveating it. |
+| Quorum is weight, not count | `lib/desk/control.ts` | Five signers where one carries the quorum is a single-key account. The headline reports minimum signers required. |
+| One node ≠ the network | `lib/net/sync.ts` | `server_info` describes the node that answered. Four are queried and their disagreement is the reading. |
+| Not disclosed ≠ unknown | `lib/net/sync.ts` | `s1`/`s2.ripple.com` redact version and peer count by choice. Rendered as "not disclosed", never as a gap. |
+| Sequence is not a count | `lib/desk/provenance.ts` | Since DeletableAccounts a new account's `Sequence` is seeded to its creation ledger index. A live AMM account reads 92,835,117 and has sent zero transactions — the obvious reading is wrong by the whole number. |
+| Ripple epoch ≠ Unix epoch | `lib/desk/control.ts` | Escrow times count from 2000-01-01. Reading them as Unix time puts every release date thirty years early. |
+| `+0000` is not portable | `lib/desk/amm.ts` | `amm_info` returns an auction expiry with a `+0000` offset. V8 parses it and WKWebView historically does not — and Tauri renders in WKWebView on macOS, so it would pass in dev and fail in the shipped app. |
+| Quoted depth is not fillable depth | `lib/desk/book.ts` | An offer rests whether or not its owner still holds the asset. Measured on mainnet, 92.8% of one book's visible depth could not fill, and a single offer advertised 1,400,100 USD against a 22,273 balance. |
+| An NFT is a pointer | `lib/desk/nft.ts` | The issuer may keep the right to destroy the token (lsfBurnable) or rewrite what its URI points at (lsfMutable). Neither is shown by any marketplace, and both are encoded in the NFTokenID itself. |
+| A ticker is not a name | `lib/desk/claims.ts` | Any account may issue a token called USDT and the ledger draws them identically. Only the issuer identifies a token, so a claim's amount says nothing about what it is worth. |
+| `rpc` rejects, never returns `.error` | `lib/xrpl/client.ts` | `if (res.error)` is dead code. Inside a pagination walk, an uncaught rejection discards every page already gathered. |
+
+### Amendments are checked, not assumed
+
+XRPL ships features as amendments, and a feature exists in three states:
+**specified**, **implemented in rippled**, and **activated by validator
+majority**. Only the third one works — until then every transaction of that
+type is rejected by every validator on the network.
+
+`src/lib/xrpl/amendments.ts` reads the ledger's own amendments object and
+computes each amendment ID locally (SHA-512Half of the feature name), so no
+lookup table can drift. Anything not activated is not offered.
+
+Verified against mainnet on 2026-08-24 (rippled 3.3.0, 93 amendments active):
+
+- **Live:** Credentials (XLS-70), PermissionedDomains (XLS-80),
+  PermissionedDEX (XLS-81), DeepFreeze (XLS-77), TokenEscrow (XLS-85),
+  MPTokensV1, Clawback, AMMClawback, DID, PriceOracle
+- **Not activated:** SingleAssetVault (XLS-65), LendingProtocol (XLS-66),
+  ConfidentialMPT (XLS-96), DynamicMPT, Batch, PermissionDelegation
+
+`server_definitions` lists the *un*activated transaction types too, because
+rippled knows them. Checking that endpoint is how tooling ends up offering a
+lending product the network refuses.
+
+---
+
+## What NOSHASHI is not
+
+- **Not custody.** It cannot hold, sign or move an asset. There is no signing path in the build.
+- **Not a money transmitter.** It never touches fiat and never converts anything. It sells software.
+- **Not advice.** A GO verdict means the configured rules passed. It is not a representation that a transaction is lawful anywhere.
+- **Not a price oracle.** It reports the book as the ledger reports it.
+- **Not a trading terminal.** There is no order entry.
+
+### Why there is no testnet
+
+Compliance answers that were rehearsed against fake state are worth nothing.
+Every reading is mainnet or it is absent.
+
+---
+
+## The public website
+
+`noshashi.app` is a static site with a small serverless layer. It is
+**rendered on the server before it is served** — the newsroom, the XRP
+market panel, the mission log and the download section are all in the
+HTML a crawler receives, not assembled afterwards in the browser.
+
+### Generated versus hand-written
+
+This is the distinction that matters most when editing:
+
+| Path | Status |
+|---|---|
+| `templates/home.html` | **Source** for the landing page |
+| `site/index.html` | **Generated** — edits here are erased by the next build |
+| `site/news/`, `site/status/`, `site/progress/`, `site/contact/` | **Generated** from `scripts/build-site.mjs` |
+| `site/sitemap.xml` | **Generated** |
+| `site/pricing/`, `site/guide/`, `site/research/`, `site/legal/`, `site/downloads/` | Hand-written; edit in place |
+| `site/assets/`, `site/data/` | Hand-written |
+
+```bash
+npm run site:build    # render site/ from the templates and live sources
+npm run site:dev      # render, then preview on http://localhost:4321
+```
+
+The preview server applies the real `vercel.json` headers and redirects,
+so the Content-Security-Policy is exercised locally rather than first
+meeting a browser in production.
+
+`.claude/skills/omniroute` answers "which file owns this change" if the
+table above is not enough.
+
+### Where the live data comes from
+
+| Section | Source | Refresh |
+|---|---|---|
+| XRP price, 24h change, 7-day history | CoinGecko public API | Build time, then `/api/xrp-market` |
+| Validated ledger, base fee, peers | `xrplcluster.com` `server_info` | Build time, then `/api/xrp-market` |
+| Newsroom | Google News, Cointelegraph, CoinDesk RSS | Build time, then `/api/xrp-news` |
+| Mission log | `site/data/updates.json` + GitHub Releases API | Build time, then `/api/project-feed` |
+| Download links, sizes, SHA-256 | GitHub Releases API | Build time |
+
+No key is required for any of them. Every one degrades to an honest
+empty state rather than a stale or invented figure, and a failed fetch
+never fails the build.
+
+Because the rendered copy is only as fresh as the last deploy,
+`.github/workflows/refresh-site.yml` redeploys three times a day. It
+needs a `VERCEL_DEPLOY_HOOK_URL` secret and exits cleanly without one.
+
+### Serverless endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/create-checkout-session` | Stripe Checkout for Pro |
+| `GET /api/stripe-status` | Is checkout actually wired up? Reports the key's mode and whether the price exists, without revealing the key |
+| `POST /api/contact` | Enquiry delivery |
+| `GET /api/contact-status` | Which delivery channels are configured, and where mail lands |
+| `POST /api/support-chat` | Support console |
+| `GET /api/xrp-news`, `GET /api/xrp-market`, `GET /api/project-feed` | The live feeds as JSON |
+
+`api/_lib/` is shared code and is not routable — Vercel excludes
+underscore-prefixed paths. The site deploys with `installCommand: ""`,
+so **nothing under `api/` may take a dependency**; all of it is built on
+Node built-ins and `fetch`.
+
+### Receiving enquiries
+
+The contact form delivers to every channel that is configured, and says
+which succeeded. Set these in the Vercel project (never in the repo):
+
+| Variable | Effect |
+|---|---|
+| `RESEND_API_KEY` | Enables email delivery |
+| `CONTACT_TO` | Where enquiries land. Comma-separated for several recipients |
+| `CONTACT_FROM` | Sender; must be on a domain verified in Resend |
+| `CONTACT_WEBHOOK_URL` | Optional second copy to Slack, Zapier, Make or a sheet |
+
+Replies reach the sender directly — `reply_to` is set to their address,
+so answering the forwarded mail from an ordinary inbox is the whole
+workflow. There is no separate inbox to log into, deliberately: an
+enquiries database would be the only server-side state on this site and
+would carry a retention question for no gain.
+
+With nothing configured, `/api/contact` returns 503 and the page shows
+the direct address. It will not accept a message it cannot deliver.
+
+### Email
+
+Every email the site sends is rendered by `api/_lib/email.js` in the
+site's own design language — the same tokens, the same eyebrow labels,
+the same mission-log rails. Email's constraints are not the web's, and
+the renderer is built around them rather than against them: tables
+rather than flex (Outlook's Word engine is still a large share of
+institutional inboxes), inline styles (Gmail strips `<style>` in several
+contexts), an explicit background and colour on every cell (a client
+forcing its own theme would otherwise paint dark text on a dark ground),
+and web fonts named first with a system fallback, because they do not
+load in most clients.
+
+Three templates: `welcomeEmail` on subscribe, `updateEmail` for a
+product update, `enquiryEmail` for the copy of a contact-form message
+that reaches the team.
+
+### The update list
+
+Subscribers are stored in a **Resend Audience**, not a database. The
+site has no server-side state anywhere else, and a subscribers table
+would be the first — carrying a retention question, an export
+obligation and a breach surface — to store what Resend already stores,
+with unsubscribe handling included.
+
+| Variable | Effect |
+|---|---|
+| `RESEND_AUDIENCE_ID` | Enables `/api/subscribe`. Without it the endpoint returns 503 and says so |
+
+Sending an update:
+
+```bash
+# 1. Add the entry to site/data/updates.json and deploy
+# 2. Dry run — renders the email, sends nothing
+node scripts/send-update.mjs --headline "v0.4.0 is out"
+# 3. Send it
+node scripts/send-update.mjs --headline "v0.4.0 is out" --send
+```
+
+The body is built from the mission log, so **an email cannot announce
+something the site does not already say**. The dry run is the default
+because a broadcast cannot be recalled.
+
+### The support console
+
+`api/_lib/kb.js` is the single source for both the support console and
+the landing page's questions section.
+
+It answers in three tiers, falling through on any failure:
+
+| Tier | Requires | Notes |
+|---|---|---|
+| Claude | `ANTHROPIC_API_KEY` | Best phrasing and instruction-following |
+| Any OpenAI-compatible provider | `SUPPORT_LLM_BASE_URL`, `SUPPORT_LLM_API_KEY`, `SUPPORT_LLM_MODEL` | Groq, Cerebras, OpenRouter, Together, local Ollama or vLLM |
+| Retrieval | nothing | Always available, deterministic, no network |
+
+The knowledge base is the model's only permitted source, and the
+retrieval tier is what ships regardless — a model reply has to beat it.
+
+**The figure guard.** A system prompt telling a model not to invent a
+price is followed reliably by Claude and *mostly* by a 70B open-weight
+model, and "mostly" is not good enough on a site whose argument is that
+it does not invent figures. So the instruction is not trusted on its
+own: every money amount, percentage and version string in a model reply
+is checked against the knowledge base, and a reply carrying one that is
+not there is discarded and the deterministic answer sent instead. Prose
+is the model's job; figures are the knowledge base's.
+
+## Project layout
+
+```
+src/
+  lib/
+    policy.ts              deterministic GO/HOLD/NO-GO engine + receipt digest
+    xrpl/
+      link.ts              single persistent WebSocket, id-correlated, failover
+      client.ts            every mainnet read
+      amendments.ts        live capability detection
+    desk/
+      risk.ts              freeze rights, Travel Rule, HHI concentration
+      liquidity.ts         exit liquidity — the compliance × market join
+      stress.ts            portfolio redemption stress — CLOB+AMM routing,
+                           shared-book contention, priced freeze rights
+      apiKeys.ts           key issuance, terminal revocation, usage counts
+      settlement.ts        delivered vs requested — the partial-payment trap
+      provenance.ts        account age and funding source
+      control.ts           signer weights, quorum, reserve and escrow locks
+      amm.ts               AMM fee votes and the auction slot
+      issuance.ts          issuer-side holder concentration
+      watch.ts             issuer drift monitoring
+      ledger.ts            durable local adjudication record
+      rules.ts             operator-owned thresholds
+      offline.ts           captured-state adjudication
+      __tests__/           the findings logic, tested by mutation
+      book.ts              order book: quoted depth vs depth that can fill
+      nft.ts               NFT rights decoded from the token id, offline
+      claims.ts            unsolicited checks, with the claimed issuer verified
+    net/
+      sync.ts              four public nodes compared, disagreement as signal
+    agent/                 on-device analyst: providers, keyring, context
+    billing/               plan catalogue and entitlement resolution
+    nav/
+      handoff.tsx          carry a subject from one scene to the next
+    public/
+      counterparty.ts      the free public address check
+    edition.ts             full vs demo, resolved at build time
+  components/
+    nova/                  design system
+      brand/               logo + section-07 brand pattern
+    scenes/                one file per screen
+src-tauri/                 Rust: tray, keychain, integrity, file export
+scripts/
+  build-editions.sh        build and stage both artefacts
+  build-legal-page.mjs     generate site/legal/ from src/lib/legal.ts
+docs/
+  build_briefing.py        generate the 8-page briefing PDF
+  API.md                   Compliance API specification
+  FEATURE_MATRIX.md        entitlements per tier
+  SALES.md                 outreach, one-pager, launch copy
+  ONBOARDING.md            payment to first successful API call
+  LAUNCH.md                gate-sequenced launch plan
+supabase/
+  functions/
+    noshashi-verify/       the Compliance API — server-side twin of policy.ts
+  migrations/              pending only; five versions, history reconciled
+  history/                 applied schema records + why they are not migrations
+    introspect_remote_schema.sql   read the live schema back (no Docker needed)
+  verify_api_hardening.sql PRESENT/MISSING check for the hardening migration
+site/                      noshashi.app — deploy with `vercel deploy --prod`
+  pricing/                 tier cards, comparison table, FAQ
+```
+
+`PRODUCT.md` holds product truth. `DESIGN.md` holds the design system and the
+reasoning behind every deviation from the brand board.
+
+---
+
+## Security posture
+
+- **No key material.** The app never holds, derives or transmits a private key.
+- **OS keychain.** Secrets live in the system keychain, never in app storage.
+- **Zero egress by default.** The compliance agent runs on your machine.
+- **Strict CSP.** Every outbound host is named in `src-tauri/tauri.conf.json`.
+- **Row-level security.** Every Supabase table is scoped to its owning account, and entitlements are written only by the Stripe webhook using the service role.
+- **No card data.** Payments are handled entirely by Stripe.
+- **Binary integrity.** `verify_integrity` hashes the running executable so you can confirm it was not altered after download. Free on every tier — charging for the ability to verify we are not malicious would be perverse.
+
+Report anything you find to **security@noshashi.app**.
+
+---
+
+## Development
+
+```bash
+npm run dev            # frontend only, in a browser
+npm run tauri:dev      # the real desktop app
+npm run build          # typecheck + production frontend
+npm test               # 272 tests
+npx tsc --noEmit       # typecheck alone
+npm run check:functions               # type-check the Edge Function
+node scripts/build-legal-page.mjs     # regenerate site/legal/
+python3 docs/build_briefing.py out.pdf
+```
+
+`check:functions` exists because `tsconfig.json` includes only
+`["src", "vite.config.ts"]`, so **nothing in the normal build type-checks
+`supabase/functions/`**. When that was first run against the Compliance API
+it reported seven errors in a file that was about to be deployed. It needs
+`deno` on PATH.
+
+Deploying the API is two steps, in this order — the function reads
+`entitlements.rate_limit_per_second`, `api_keys.scopes` and
+`verification_events.receipt`, so a function deployed ahead of its schema
+returns 500 on every request:
+
+```bash
+supabase db push
+supabase functions deploy noshashi-verify
+```
+
+### House rules
+
+1. **Never fabricate.** No placeholder numbers, no invented reputation scores, no feature that depends on an unactivated amendment. If a source is missing, the interface says so.
+2. **Determinism is load-bearing.** `policy.ts` produces byte-stable receipt digests. Restyling must never change one — a changed digest invalidates every receipt ever issued.
+3. **Colour means status.** GO / HOLD / NO-GO own the palette's saturation. See `DESIGN.md`.
+4. **Measure, do not assume.** Contrast, book depth and amendment state are all checked against reality rather than asserted.
+
+---
+
+© 2026 NOSHASHI Labs · [noshashi.app](https://noshashi.app) ·
+[Legal & accessibility](https://noshashi.app/legal/) ·
+[New to XRP? Start here](https://noshashi.app/guide/)

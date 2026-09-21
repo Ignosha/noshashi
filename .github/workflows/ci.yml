@@ -1,0 +1,101 @@
+name: CI
+
+# Typecheck and tests on every push and pull request.
+#
+# The tests here are not about coverage. They assert the specific sentences
+# this product sells — that a tesSUCCESS payment delivering 0.4% is reported
+# as a shortfall, that concentration is withheld when the holder walk is too
+# thin to support it, that five signers where one carries quorum is reported
+# as one. A refactor can invert any of those while the build stays green,
+# which is precisely why the build is not the gate.
+#
+# Runs on one platform only. These are pure functions over hand-built
+# reports — no DOM, no network, no ledger — so a second runner would buy
+# nothing. Cross-platform coverage is the release workflow's job, and it
+# only matters there because Tauri links native webviews.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_call: # so release.yml can gate on this
+
+concurrency:
+  # A newer push supersedes an in-flight run on the same ref.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # The Edge Functions are Deno, and nothing else in this pipeline
+      # looks at them. tsconfig.json includes only `src`, so `npx tsc
+      # --noEmit` above walks straight past supabase/functions — which
+      # meant those three files were compiled by NOTHING between being
+      # written and being deployed to production.
+      #
+      # That is not hypothetical. noshashi-verify shipped a call to
+      # timingSafeEqual, a helper that exists in the Stripe webhook and
+      # not in that file, and it reached main. Every request to the verb
+      # it guards would have thrown a ReferenceError. `deno check` finds
+      # it as TS2304 in seconds.
+      #
+      # Deno rather than tsc because Deno is what actually runs these
+      # files: it resolves npm: and jsr: specifiers and knows the Deno
+      # global, so there is no error output to filter and no risk of a
+      # filter hiding a real fault.
+      #
+      # The check runs from supabase/functions, against the deno.json
+      # there, and that is load-bearing rather than tidiness. Deno needs
+      # nodeModulesDir to resolve the npm packages the jsr edge-runtime
+      # types pull in transitively, and it creates that node_modules
+      # beside its config. Run from the repository root it rewrites the
+      # ROOT node_modules into Deno's layout and breaks the npm
+      # toolchain sharing it — vitest then dies with
+      # ERR_PACKAGE_PATH_NOT_EXPORTED, which is to say this step would
+      # have taken the Tests step below red on its first run. Scoped to
+      # that directory, the two dependency trees never meet.
+      #
+      # The glob is deliberate: a fourth function gets checked the day
+      # it is added, with nobody having to remember this file.
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.5.6
+
+      - name: Typecheck Edge Functions
+        run: npm run check:functions
+
+      # templates/hero-bloom.svg is generated output that is committed.
+      # A change to the generator that is pushed without its regenerated
+      # file leaves the two disagreeing, and the site ships the stale
+      # one — which is exactly how a mobile fix once landed inert.
+      - name: Hero bloom is regenerated
+        run: npm run check:bloom
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Audit production dependencies
+        # Only what ships. The dev toolchain carries known vite/esbuild
+        # dev-server advisories that cannot reach a built artefact, and
+        # failing the build on them would train everyone to ignore this step.
+        run: npm audit --omit=dev --audit-level=high

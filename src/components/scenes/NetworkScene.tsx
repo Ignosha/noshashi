@@ -1,0 +1,246 @@
+import { useState, useCallback } from "react";
+import { SceneHeader } from "./SceneHeader";
+import { Panel, StatCell } from "@/components/nova/Panel";
+import { Signal } from "@/components/nova/Signal";
+import { PatternField } from "@/components/nova/brand/BrandPattern";
+import { NovaSat } from "@/components/nova/NovaIcon";
+import { Button } from "@/components/ui/button";
+import { readSync, syncFindings, type SyncReport } from "@/lib/net/sync";
+import { useLiveRefresh, stalenessLabel, freshnessOf, FRESHNESS_LABEL } from "@/lib/live";
+
+/** Feeds both the refresh loop and the freshness thresholds. */
+const REFRESH_MS = 30_000;
+import { cn } from "@/lib/utils";
+
+/**
+ * NetworkScene — free, ungated, and deliberately so.
+ *
+ * This is the one screen someone can use without an account, which makes it
+ * the argument for the rest. It also has to be the most honest, because a
+ * network status page is the easiest place in the product to assert
+ * something nobody measured: one node's `server_info` under a NETWORK
+ * heading is a claim about the whole ledger drawn from a single sample.
+ *
+ * So it queries four public nodes by name, shows what each one said, and
+ * treats their disagreement as the reading. Where an operator declines to
+ * publish a field, it says so rather than rendering a gap.
+ */
+export function NetworkScene() {
+  const [report, setReport] = useState<SyncReport | null>(null);
+
+  const read = useCallback(async () => {
+    setReport(await readSync());
+  }, []);
+
+  /**
+   * Re-read on an interval rather than only on mount.
+   *
+   * This is the scene an operator leaves open, so it is the one where a
+   * reading from half an hour ago set in the same type as a fresh one does
+   * the most damage — node disagreement is only a signal if it is current.
+   *
+   * Thirty seconds against four public nodes: slower than the roughly
+   * four-second close interval, so a spread that matters persists across at
+   * least one read, and slow enough to stay a polite guest on infrastructure
+   * nobody is paying for. The hook stops entirely while the window is hidden
+   * or the machine is offline, and reads immediately on return.
+   */
+  const { lastRunAt, running, paused, refresh } = useLiveRefresh(read, {
+    intervalMs: REFRESH_MS,
+  });
+
+  /*
+   * The freshness STATE, not just the prose. `stalenessLabel` says "4m
+   * ago"; this says whether a reading at that age, on this scene's own
+   * cadence, may still be called live. The rule lives in one tested
+   * place rather than in each scene's head — and it is what stops the
+   * caption claiming liveness while the loop is paused.
+   */
+  const freshness = freshnessOf({ lastRunAt, intervalMs: REFRESH_MS, paused });
+
+  const findings = report ? syncFindings(report) : [];
+
+  return (
+    <div className="flex h-full min-w-0 flex-col gap-3 p-4">
+      <SceneHeader
+        index="17"
+        kicker="PUBLIC · MULTI-NODE · NO ACCOUNT NEEDED"
+        title="LEDGER SYNC"
+        sub="What four public XRPL nodes each report, and where they disagree. Free to use."
+        status="go"
+        statusLabel="OPEN"
+      />
+
+      <div className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4">
+        {[
+          {
+            label: "NODES ANSWERING",
+            value: report ? `${report.reachableCount}/${report.nodes.length}` : "—",
+            tone:
+              report && report.reachableCount === 0
+                ? ("no-go" as const)
+                : report && report.reachableCount < report.nodes.length
+                  ? ("hold" as const)
+                  : ("default" as const),
+            caveat: "queried from this machine",
+          },
+          {
+            label: "LEDGER",
+            value: report?.leaderSeq ? report.leaderSeq.toLocaleString() : "—",
+            tone: "default" as const,
+            caveat: "furthest-ahead node",
+          },
+          {
+            label: "SPREAD",
+            value: typeof report?.spread === "number" ? String(report.spread) : "—",
+            tone:
+              typeof report?.spread === "number" && report.spread > 2
+                ? ("hold" as const)
+                : ("default" as const),
+            caveat: "ledgers between first and last",
+          },
+          {
+            label: "FEE PRESSURE",
+            value: report?.fee ? `${report.fee.pressure.toFixed(1)}x` : "—",
+            tone:
+              report?.fee && report.fee.pressure >= 10
+                ? ("no-go" as const)
+                : report?.fee && report.fee.pressure > 1
+                  ? ("hold" as const)
+                  : ("default" as const),
+            caveat: "of the reference fee",
+          },
+        ].map((stat) => (
+          <StatCell
+            key={stat.label}
+            label={stat.label}
+            value={stat.value}
+            caveat={stat.caveat}
+            tone={stat.tone}
+          />
+        ))}
+      </div>
+
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
+        <Panel
+          label="NODES"
+          className="min-h-0 lg:col-span-2"
+          bodyClassName="min-h-0 overflow-y-auto p-0"
+        >
+          {(report?.nodes ?? []).map((node) => (
+            <div key={node.url} className="border-b border-border/30 px-3.5 py-2.5">
+              <div className="flex items-baseline gap-2">
+                <span
+                  className={cn(
+                    "size-[6px] shrink-0 rounded-full",
+                    node.reachable ? "bg-go" : "bg-no-go"
+                  )}
+                />
+                <code className="text-[10.5px] text-muted-foreground">
+                  {node.url.replace("wss://", "")}
+                </code>
+                {node.reachable && (
+                  <span className="ml-auto font-mono text-[10px] tabular-nums text-faint">
+                    {node.roundTripMs?.toLocaleString()}ms
+                  </span>
+                )}
+              </div>
+              {node.reachable ? (
+                <>
+                  <p className="mono-font mt-1.5 text-[9px] tabular-nums text-faint">
+                    LEDGER {node.ledgerSeq?.toLocaleString() ?? "—"}
+                    {typeof node.ledgerAge === "number" && ` · ${node.ledgerAge}s OLD`}
+                    {typeof report?.leaderSeq === "number" &&
+                      typeof node.ledgerSeq === "number" &&
+                      report.leaderSeq - node.ledgerSeq > 0 &&
+                      ` · ${report.leaderSeq - node.ledgerSeq} BEHIND`}
+                  </p>
+                  <p className="mono-font mt-0.5 text-[9px] text-faint">
+                    {node.version ? (
+                      <>
+                        rippled {node.version}
+                        {node.serverState && ` · ${node.serverState}`}
+                        {typeof node.peers === "number" && ` · ${node.peers} peers`}
+                      </>
+                    ) : (
+                      <span className="italic">version not disclosed by operator</span>
+                    )}
+                  </p>
+                </>
+              ) : (
+                <p className="mono-font mt-1.5 text-[9px] text-no-go">
+                  {node.error ?? "no response"}
+                </p>
+              )}
+            </div>
+          ))}
+          <div className="px-3.5 py-2.5">
+            <p className="mono-font text-[9px] leading-relaxed text-faint">
+              Times span DNS, TLS and the WebSocket upgrade as measured from
+              this machine. They describe reachability from here, not the
+              node's own speed.
+            </p>
+            {/*
+              Say how old the reading is, and stop claiming liveness when it
+              is not live. DESIGN.md reserves the telemetry treatment for a
+              value updating right now; a paused window is not that, and a
+              caption that kept saying "live" while nothing polled would be
+              the same lie this scene exists to refuse.
+            */}
+            <p className="mono-font mt-2 text-[9px] leading-relaxed text-faint">
+              {paused
+                ? `${FRESHNESS_LABEL[freshness]} · AUTO-REFRESH PAUSED · WINDOW HIDDEN OR OFFLINE`
+                : `${FRESHNESS_LABEL[freshness]} · AUTO-REFRESH EVERY 30s${
+                    stalenessLabel(lastRunAt) ? ` · READ ${stalenessLabel(lastRunAt)}` : ""
+                  }`}
+            </p>
+            <Button
+              variant="outline"
+              className="mt-2.5 w-full"
+              onClick={() => void refresh()}
+              disabled={running}
+            >
+              {running ? "QUERYING NODES…" : "QUERY AGAIN"}
+            </Button>
+          </div>
+        </Panel>
+
+        <Panel
+          label="FINDINGS"
+          className="relative min-h-0 lg:col-span-3"
+          bodyClassName="min-h-0 overflow-y-auto p-0"
+        >
+          <PatternField variant="orbital" />
+          {!report ? (
+            <div className="flex h-full items-center justify-center p-8">
+              <p className="mono-font text-[10px] tracking-[0.2em] text-faint">
+                <NovaSat size={14} className="mr-2 inline" />
+                QUERYING PUBLIC NODES…
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="border-b border-border/50 px-4 py-3">
+                <p className="mono-font text-[9px] tabular-nums text-faint">
+                  READ {report.readAt.replace("T", " ").slice(0, 19)} UTC ·{" "}
+                  {report.nodes.length} ENDPOINTS QUERIED
+                </p>
+              </div>
+              {findings.map((f) => (
+                <Signal
+                  key={f.id}
+                  severity={f.severity}
+                  kicker={f.severity === "ok" ? "IN GOOD ORDER" : "OBSERVED"}
+                  headline={f.title}
+                  detail={f.detail}
+                  action={f.action}
+                  className="rounded-none border-b border-border/30"
+                />
+              ))}
+            </>
+          )}
+        </Panel>
+      </div>
+    </div>
+  );
+}

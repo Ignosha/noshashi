@@ -1,0 +1,23 @@
+[
+  {
+    "date": "2026-09-17T12:00:00Z",
+    "kind": "milestone",
+    "title": "Every download is now labelled BETA",
+    "body": "The desktop builds are pre-1.0 and unsigned while the release pipeline is hardened. The download section now says so on every artifact rather than only in the operator note underneath, so the channel is never read as stable by accident.",
+    "link": "/#download"
+  },
+  {
+    "date": "2026-09-17T11:30:00Z",
+    "kind": "note",
+    "title": "Public site rebuilt around live feeds",
+    "body": "The site now carries a live XRP newsroom, this mission log, a support console and a contact channel. Every page is rendered on the server before it is served, so the content is in the HTML a crawler receives rather than assembled afterwards in the browser.",
+    "link": "/status/"
+  },
+  {
+    "date": "2026-09-17T11:00:00Z",
+    "kind": "note",
+    "title": "Accounts and the hosted workspace were withdrawn from the site",
+    "body": "Sign-in and the hosted dashboard are gone. NOSHASHI runs on your machine and reads public ledger state; the website no longer asks anyone to create an account to evaluate it. Existing links redirect rather than breaking.",
+    "link": "/#download"
+  }
+]

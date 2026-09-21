@@ -1,0 +1,226 @@
+/* ─────────────────────────────────────────────────────────────────────
+   NOSHASHI — instrument layer
+   ─────────────────────────────────────────────────────────────────────
+   The vocabulary DESIGN.md already describes and the site had not yet
+   spent: "NASA instrumentation without sci-fi cosplay. Bloomberg
+   information density without visual clutter."
+
+   What this changes, and why each one is a decision rather than a
+   preference:
+
+   - Radius drops from 10px to 2px. A 10px radius is a consumer card.
+     An instrument has a machined edge. The corner tick marks below do
+     the work the radius was doing — they say "this is a bounded panel"
+     without saying "this is a friendly app".
+
+   - Density rises. The type scale is unchanged (DESIGN.md fixes it at
+     11/12/13/14/16/20/24/32/44) but the space between things is cut
+     roughly a third. The product sells the ability to read a lot of
+     measured state at once; a page with three sentences per screen
+     contradicts that before a word is read.
+
+   - Rules are hairlines and they are visible. An aerospace panel shows
+     its grid. Hiding the structure is a consumer-software instinct.
+
+   - Motion is near-absent by design. Emil Kowalski's question — should
+     this animate at all — answers "no" for almost everything here,
+     because DESIGN.md gives saturation and attention to status alone.
+     What remains is state feedback at 150ms, and one genuinely live
+     number.
+
+   Tokens are NOT redefined here. They come from core.css or the page's
+   own inline copy, both generated from the token table in DESIGN.md.
+   This file spends them; it does not invent them.
+   ───────────────────────────────────────────────────────────────── */
+
+:root{
+  /* Instrument geometry. Separate from --r so the soft radius can stay
+     wherever it is still wanted without this file fighting it. */
+  --tick: 7px;          /* arm length of a corner tick */
+  --hair: 1px;
+  --ri: 2px;            /* instrument radius — machined, not rounded */
+  --quick: 150ms;       /* state feedback; see motion note above */
+  --ease: cubic-bezier(.2,0,0,1);
+}
+
+/* ── Panel ────────────────────────────────────────────────────────────
+   A bounded region of the instrument. The corner ticks are drawn with
+   two gradients rather than four elements, so a panel costs no extra
+   DOM and the marks cannot drift out of alignment when it resizes. */
+.gauge{
+  position:relative;
+  background:var(--surface);
+  border:var(--hair) solid var(--rule);
+  border-radius:var(--ri);
+}
+.gauge::before,
+.gauge::after{
+  content:"";
+  position:absolute;
+  width:var(--tick); height:var(--tick);
+  pointer-events:none;
+  opacity:.85;
+}
+.gauge::before{
+  top:-1px; left:-1px;
+  border-top:var(--hair) solid var(--brand);
+  border-left:var(--hair) solid var(--brand);
+}
+.gauge::after{
+  bottom:-1px; right:-1px;
+  border-bottom:var(--hair) solid var(--brand);
+  border-right:var(--hair) solid var(--brand);
+}
+.gauge.tele::before,.gauge.tele::after{border-color:var(--tele)}
+.gauge.quiet::before,.gauge.quiet::after{border-color:var(--rule)}
+
+/* ── Bezel ────────────────────────────────────────────────────────────
+   The label strip across the head of a panel. Reads as an engraved
+   plate: mono, uppercase, wide tracking, sitting on its own rule. */
+.bezel{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:12px;
+  padding:9px 14px;
+  border-bottom:var(--hair) solid var(--rule);
+  background:color-mix(in srgb, var(--elevated) 55%, transparent);
+}
+.bezel .id{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--faint);
+}
+.bezel .name{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ── Telemetry rail ───────────────────────────────────────────────────
+   A row of live readouts. Every cell in here must be reading something
+   real. DESIGN.md is explicit that cyan means a value updating right
+   now, so a cell that has not resolved shows an em dash in --faint and
+   keeps its label — never a placeholder digit, never a spinner
+   pretending to be data. */
+/* The 1px gap over a --rule background draws the dividers, instead of
+   per-cell borders. It costs nothing and it is correct at every width:
+   when the rail wraps to 2x2 on a phone the row divider appears on its
+   own, which a border-right cannot do without knowing where the rows
+   broke. */
+.rail{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:var(--hair);
+  border:var(--hair) solid var(--rule);
+  border-radius:var(--ri);
+  background:var(--rule);
+  overflow:hidden;
+}
+.rail .cell{
+  padding:10px 14px;
+  background:var(--surface);
+  min-width:0;
+}
+.rail .k{
+  display:block;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:9.5px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--faint);
+  margin-bottom:5px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.rail .v{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:14px; font-variant-numeric:tabular-nums;
+  color:var(--ink);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+/* Live: the value is being updated from a source right now. */
+.rail .v.live{color:var(--tele)}
+/* Pending or unreachable. Honest absence, not a fake number. */
+.rail .v.void{color:var(--faint)}
+
+/* ── Section head ─────────────────────────────────────────────────────
+   Indexed like a document section, because that is how the audience
+   reads: procurement and compliance work through numbered clauses. */
+.shead{
+  display:flex; align-items:baseline; gap:14px;
+  border-bottom:var(--hair) solid var(--rule);
+  padding-bottom:10px; margin-bottom:22px;
+}
+.shead .ix{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10px; letter-spacing:.2em; color:var(--brand);
+  flex:none;
+}
+.shead h2{font-size:clamp(19px,2.2vw,25px);letter-spacing:-.02em;margin:0}
+
+/* ── Data list ────────────────────────────────────────────────────────
+   Feature rows as an instrument readout rather than a bulleted list: a
+   hairline between each, a mono marker, tight leading. Reads as spec
+   sheet, which is what it is. */
+.spec{list-style:none;margin:0;padding:0}
+/* The marker is absolutely positioned rather than a grid or flex child.
+   Both of those promote EVERY child of the <li> to a box of its own —
+   so a row like "<strong>Redemption stress testing</strong> — what the
+   whole book would realise" puts the <strong> in the text column and
+   the trailing text node into the next implicit cell, which is the
+   14px marker column. It renders one word per line. Absolute
+   positioning leaves the row's inline content in normal flow, where
+   mixed markup wraps the way prose is supposed to. */
+.spec li{
+  position:relative;
+  padding:7px 0 7px 22px;
+  border-top:var(--hair) solid color-mix(in srgb, var(--rule) 60%, transparent);
+  font-size:12.5px; line-height:1.5; color:var(--muted);
+}
+.spec li:first-child{border-top:0}
+.spec li::before{
+  content:"+";
+  position:absolute; left:0; top:7px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:11px; color:var(--go); line-height:1.5;
+}
+.spec li.key{color:var(--ink)}
+.spec li.key::before{content:"\25B8";color:var(--brand)}
+
+/* ── Figure ───────────────────────────────────────────────────────────
+   A price. Mono and tabular so that switching monthly/annual does not
+   change the column width — the same rule DESIGN.md sets for financial
+   columns, applied to the largest number on the page. */
+.fig{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-variant-numeric:tabular-nums;
+  font-size:31px; font-weight:500; letter-spacing:-.02em;
+  color:var(--ink); line-height:1.05;
+}
+.fig .unit{font-size:13px;color:var(--faint);letter-spacing:0}
+
+/* ── Controls ─────────────────────────────────────────────────────────
+   150ms, colour and border only. Nothing moves position: a control that
+   travels on hover is decoration, and decoration competes with status. */
+.ibtn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  padding:12px 16px;
+  border-radius:var(--ri);
+  border:var(--hair) solid var(--brand);
+  background:var(--brand);color:#fff;
+  cursor:pointer;text-decoration:none;
+  transition:background var(--quick) var(--ease),
+             border-color var(--quick) var(--ease),
+             color var(--quick) var(--ease);
+}
+.ibtn:hover{background:color-mix(in srgb,var(--brand) 84%,#fff)}
+.ibtn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.ibtn.ghost:hover{border-color:var(--brand);background:transparent}
+.ibtn.tele{background:var(--tele);border-color:var(--tele);color:#04231F}
+.ibtn.tele:hover{background:color-mix(in srgb,var(--tele) 84%,#fff)}
+.ibtn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+.gauge-focus{border-color:color-mix(in srgb,var(--brand) 50%,var(--rule))}
+
+@media (prefers-reduced-motion:reduce){
+  .ibtn{transition:none}
+}

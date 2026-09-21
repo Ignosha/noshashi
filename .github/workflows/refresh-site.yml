@@ -1,0 +1,47 @@
+name: Refresh site
+
+# The site is rendered at deploy time, which is what puts the newsroom,
+# the market panel and the mission log into the HTML a crawler receives.
+# The consequence is that the *rendered* copy is only as fresh as the
+# last deploy — visitors get live data from /api/*, but a crawler reads
+# what was rendered.
+#
+# This redeploys on a schedule so the rendered copy stays current too.
+# It is deliberately not frequent: the pages carry their own client-side
+# refresh, and a deploy every few hours is enough for the snapshot a
+# crawler sees.
+#
+# Requires a Vercel Deploy Hook in the repository secrets as
+# VERCEL_DEPLOY_HOOK_URL (Vercel → Project → Settings → Git → Deploy
+# Hooks). Without it the job exits cleanly rather than failing, so the
+# workflow is safe to merge before the secret exists.
+
+on:
+  schedule:
+    # 06:00, 12:00 and 18:00 UTC.
+    - cron: "0 6,12,18 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: refresh-site
+  cancel-in-progress: false
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger a Vercel deploy
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK_URL is not set — nothing to do."
+            echo "Add it under Settings → Secrets → Actions to enable scheduled refreshes."
+            exit 0
+          fi
+          code=$(curl -sS -o /tmp/hook.out -w '%{http_code}' -X POST "$HOOK")
+          echo "Deploy hook responded $code"
+          cat /tmp/hook.out
+          # A hook that has been deleted or rotated returns 4xx, and a
+          # silent failure here means the snapshot quietly goes stale.
+          [ "$code" -lt 400 ]

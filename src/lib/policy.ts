@@ -1,0 +1,460 @@
+import type { AccountInfo, CredentialRecord, Status } from "./xrpl/types";
+
+/**
+ * NOSHASHI policy engine — the deterministic core of the
+ * Autonomous Compliance Layer.
+ *
+ * Given a subject account, the credentials it holds on-ledger, and a
+ * destination Permissioned Domain (XLS-80), it produces a verdict —
+ * GO / HOLD / NO-GO — plus an itemised, explainable check list and a
+ * cryptographic receipt digest suitable for audit logging.
+ *
+ * Every rule is pure and synchronous so the same evaluation can run
+ * client-side for instant feedback and server-side for enforcement.
+ */
+
+export type CredentialType =
+  | "KYC_LEVEL_1"
+  | "KYC_LEVEL_2"
+  | "ACCREDITED_INVESTOR"
+  | "SANCTIONS_CLEARANCE"
+  | "PEP_SCREENING"
+  | "INSTITUTIONAL_CUSTODY";
+
+export type PermissionedDomain = {
+  id: string;
+  name: string;
+  code: string;
+  institution: string;
+  /** Credential types that must be held, accepted and unrevoked. */
+  requirements: CredentialType[];
+  /**
+   * Ceiling per settlement, in XRP.
+   *
+   * Zero does NOT mean uncapped — it means the domain is not settling, and
+   * TRANSFER_CEILING fails outright. Reading it the other way round would
+   * pass any size through a closed domain.
+   */
+  transferCeilingXrp: number;
+  /** Domains under governance review gate to HOLD rather than GO. */
+  governance: "active" | "review" | "suspended";
+  members: number;
+};
+
+export type PolicyCheck = {
+  /** Stable machine-readable rule id — appears in the audit trail. */
+  id: string;
+  label: string;
+  /** `fail` blocks outright, `warn` degrades a GO to a HOLD. */
+  severity: "block" | "warn";
+  passed: boolean;
+  /** Plain-language reason shown when the check does not pass. */
+  detail: string;
+};
+
+export type PolicyReceipt = {
+  verdict: Status;
+  domainId: string;
+  subject: string;
+  amountXrp: number;
+  checks: PolicyCheck[];
+  /** SHA-256 over the canonical receipt body. */
+  digest: string;
+  evaluatedAt: string;
+  latencyMs: number;
+};
+
+/**
+ * Reference domain registry.
+ *
+ * These are ILLUSTRATIVE FIXTURES, not real permissioned domains, and
+ * the operator names are deliberately generic: naming an actual firm
+ * here would assert a commercial relationship that does not exist. In
+ * production these rows are read from XLS-80 `PermissionedDomain`
+ * ledger objects, whose shape is identical.
+ */
+export const DOMAIN_REGISTRY: PermissionedDomain[] = [
+  {
+    id: "d-dex-us",
+    name: "US_REGULATED_DEX",
+    code: "DEX-US",
+    institution: "Reference Liquidity Pool",
+    requirements: ["KYC_LEVEL_1", "SANCTIONS_CLEARANCE"],
+    transferCeilingXrp: 250_000,
+    governance: "active",
+    members: 18_422,
+  },
+  {
+    id: "d-lend-inst",
+    name: "INSTITUTIONAL_LENDING",
+    code: "LEND-INST",
+    institution: "Reference Lending Desk",
+    requirements: ["ACCREDITED_INVESTOR", "SANCTIONS_CLEARANCE"],
+    transferCeilingXrp: 5_000_000,
+    governance: "active",
+    members: 4_093,
+  },
+  {
+    id: "d-token-pvt",
+    name: "PRIVATE_TOKEN_SALES",
+    code: "TOKEN-PVT",
+    institution: "Reference Issuance Agent",
+    requirements: ["ACCREDITED_INVESTOR", "PEP_SCREENING"],
+    transferCeilingXrp: 1_000_000,
+    governance: "review",
+    members: 1_207,
+  },
+  {
+    id: "d-mint-us",
+    name: "STABLECOIN_MINTING",
+    code: "MINT-US",
+    institution: "Reference Stablecoin Reserve",
+    requirements: [
+      "KYC_LEVEL_2",
+      "ACCREDITED_INVESTOR",
+      "SANCTIONS_CLEARANCE",
+      "INSTITUTIONAL_CUSTODY",
+    ],
+    transferCeilingXrp: 0,
+    governance: "suspended",
+    members: 77,
+  },
+  {
+    id: "d-custody",
+    name: "QUALIFIED_CUSTODY",
+    code: "CUST-Q",
+    institution: "Reference Qualified Custodian",
+    requirements: ["KYC_LEVEL_2", "INSTITUTIONAL_CUSTODY"],
+    transferCeilingXrp: 20_000_000,
+    governance: "active",
+    members: 312,
+  },
+  {
+    id: "d-retail",
+    name: "RETAIL_SETTLEMENT",
+    code: "RTL-OPEN",
+    institution: "Open Payments Rail",
+    requirements: ["KYC_LEVEL_1"],
+    transferCeilingXrp: 10_000,
+    governance: "active",
+    members: 96_540,
+  },
+];
+
+/** Credential types the subject currently holds in a usable state. */
+export function heldCredentialTypes(
+  credentials: CredentialRecord[]
+): Set<string> {
+  const held = new Set<string>();
+  for (const credential of credentials) {
+    if (credential.accepted && !credential.revoked) {
+      held.add(credential.credentialType.toUpperCase());
+    }
+  }
+  return held;
+}
+
+/** XRPL account reserve: 1 XRP base + 0.2 XRP per owned object. */
+export function reserveRequirementXrp(ownerCount: number): number {
+  return 1 + ownerCount * 0.2;
+}
+
+/**
+ * Run the full rule set. Pure — no I/O, no clock beyond the timestamp.
+ */
+export function evaluatePolicy(input: {
+  account: AccountInfo | null;
+  credentials: CredentialRecord[];
+  domain: PermissionedDomain;
+  amountXrp: number;
+  evidenceUnavailable?: string[];
+}): Omit<PolicyReceipt, "digest" | "latencyMs"> {
+  const { account, credentials, domain, amountXrp, evidenceUnavailable = [] } = input;
+  const held = heldCredentialTypes(credentials);
+  const balance = account ? Number(account.balanceXrp) : 0;
+  const reserve = reserveRequirementXrp(account?.ownerCount ?? 0);
+  const spendable = Math.max(0, balance - reserve);
+
+  const checks: PolicyCheck[] = [];
+
+  checks.push({
+    id: "ACCOUNT_ACTIVATED",
+    label: "Account activated on mainnet",
+    severity: "block",
+    passed: Boolean(account) && (account?.sequence ?? 0) >= 1,
+    // fetchAccount returns a real object with `unfunded: true` for a
+    // well-formed address that was never funded, so `account` being present
+    // is not the same as the account existing on-ledger. Saying "Account is
+    // funded" beside a failed check put a false statement in an audit
+    // receipt. The digest covers only [id, passed], so this wording is safe
+    // to correct without invalidating historical receipts.
+    detail: !account
+      ? "No validated account object found for this address."
+      : account.unfunded
+        ? "Address is well-formed but has never been funded on mainnet."
+        : "Account is funded and has a validated sequence number.",
+  });
+
+  for (const requirement of domain.requirements) {
+    checks.push({
+      id: `CREDENTIAL_${requirement}`,
+      label: `Holds ${requirement.replace(/_/g, " ").toLowerCase()}`,
+      severity: "block",
+      passed: held.has(requirement),
+      detail: held.has(requirement)
+        ? "Credential is accepted on-ledger and not revoked."
+        : `Domain ${domain.code} requires an accepted ${requirement} credential.`,
+    });
+  }
+
+  checks.push({
+    id: "RESERVE_SOLVENCY",
+    label: "Clears XRPL owner reserve",
+    severity: "block",
+    passed: balance >= reserve,
+    detail: `Reserve requirement is ${reserve.toFixed(1)} XRP for ${
+      account?.ownerCount ?? 0
+    } owned objects.`,
+  });
+
+  checks.push({
+    id: "SPENDABLE_BALANCE",
+    label: "Spendable balance covers transfer",
+    severity: "block",
+    passed: amountXrp <= spendable,
+    detail: `${spendable.toFixed(2)} XRP is spendable after reserve; transfer is ${amountXrp.toFixed(
+      2
+    )} XRP.`,
+  });
+
+  if (domain.transferCeilingXrp > 0) {
+    checks.push({
+      id: "TRANSFER_CEILING",
+      label: "Within domain transfer ceiling",
+      severity: "block",
+      passed: amountXrp <= domain.transferCeilingXrp,
+      detail: `${domain.code} caps single settlements at ${domain.transferCeilingXrp.toLocaleString()} XRP.`,
+    });
+  } else {
+    checks.push({
+      id: "TRANSFER_CEILING",
+      label: "Domain accepts settlements",
+      severity: "block",
+      passed: false,
+      detail: `${domain.code} has no active transfer ceiling — settlement is closed.`,
+    });
+  }
+
+  checks.push({
+    id: "DOMAIN_GOVERNANCE",
+    label: "Domain governance is active",
+    severity: domain.governance === "suspended" ? "block" : "warn",
+    passed: domain.governance === "active",
+    detail:
+      domain.governance === "active"
+        ? "Domain policy set is current and enforced."
+        : domain.governance === "review"
+          ? "Domain policy is under governance review — settlements are held for manual sign-off."
+          : "Domain is suspended by its issuer; no settlements are being enforced.",
+  });
+
+  checks.push({
+    id: "DOMAIN_ATTESTATION",
+    label: "Account publishes a domain attestation",
+    severity: "warn",
+    passed: Boolean(account?.domain),
+    detail: account?.domain
+      ? `Attested domain: ${account.domain}`
+      : "No Domain field set on the account — attestation strengthens the audit trail.",
+  });
+
+  for (const source of evidenceUnavailable) {
+    checks.push({
+      id: `EVIDENCE_${source.toUpperCase().replace(/[^A-Z0-9]+/g, "_")}`,
+      label: `${source} evidence available`,
+      severity: "warn",
+      passed: false,
+      detail: `The ${source} source could not be read from the validated ledger. No conclusion is asserted for this source.`,
+    });
+  }
+
+  const blocked = checks.some((check) => check.severity === "block" && !check.passed);
+  const warned = checks.some((check) => check.severity === "warn" && !check.passed);
+  const verdict: Status = blocked
+    ? "no-go"
+    : evidenceUnavailable.length > 0
+      ? "insufficient-data"
+      : warned
+        ? "hold"
+        : "go";
+
+  return {
+    verdict,
+    domainId: domain.id,
+    subject: account?.address ?? "unknown",
+    amountXrp,
+    checks,
+    evaluatedAt: new Date().toISOString(),
+  };
+}
+
+/** The single hash implementation. Canonical string in, receipt hex out. */
+async function sha256Hex(canonical: string): Promise<string> {
+  const bytes = new TextEncoder().encode(canonical);
+  const hash = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(hash))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+}
+
+/**
+ * Canonical JSON → SHA-256 hex. The receipt's tamper-evident digest.
+ *
+ * THIS BODY IS FROZEN. Every settlement receipt ever issued — including
+ * the ten thousand a Pro desk keeps on disk — was digested over exactly
+ * these fields in exactly this order. DESIGN.md's first principle is
+ * that identical inputs produce an identical digest; re-ordering a key
+ * or adding a field here would silently stop every stored receipt from
+ * re-verifying, which is the one failure this product cannot have.
+ *
+ * New receipt kinds get `digestOf` below rather than a change here.
+ */
+export async function receiptDigest(
+  body: Omit<PolicyReceipt, "digest" | "latencyMs">
+): Promise<string> {
+  return sha256Hex(
+    JSON.stringify({
+      verdict: body.verdict,
+      domainId: body.domainId,
+      subject: body.subject,
+      amountXrp: body.amountXrp,
+      evaluatedAt: body.evaluatedAt,
+      checks: body.checks.map((check) => [check.id, check.passed]),
+    })
+  );
+}
+
+/**
+ * The canonical form for every receipt kind after settlement.
+ *
+ * Settlement keeps its own frozen body above for compatibility; anything
+ * added from here on shares this one, so the product does not grow a
+ * third, fourth and fifth canonicalisation as it grows receipt types.
+ *
+ * `kind` is inside the hashed body rather than beside it, so an
+ * authority certificate and some later receipt over an identical check
+ * list cannot produce the same digest. `scope` keys are sorted, so a
+ * caller cannot change the digest by writing the same fields in a
+ * different order.
+ */
+export async function digestOf(input: {
+  kind: string;
+  subject: string;
+  /** Whatever else identifies this evaluation: currency, ledger index. */
+  scope: Record<string, string | number>;
+  checks: Array<Pick<PolicyCheck, "id" | "passed">>;
+  evaluatedAt: string;
+}): Promise<string> {
+  return sha256Hex(
+    JSON.stringify({
+      kind: input.kind,
+      subject: input.subject,
+      scope: Object.keys(input.scope)
+        .sort()
+        .map((key) => [key, input.scope[key]]),
+      evaluatedAt: input.evaluatedAt,
+      checks: input.checks.map((check) => [check.id, check.passed]),
+    })
+  );
+}
+
+/** Full evaluation with timing and digest — what the UI actually calls. */
+export async function runPolicy(input: {
+  account: AccountInfo | null;
+  credentials: CredentialRecord[];
+  domain: PermissionedDomain;
+  amountXrp: number;
+  evidenceUnavailable?: string[];
+}): Promise<PolicyReceipt> {
+  const started = performance.now();
+  const body = evaluatePolicy(input);
+  const digest = await receiptDigest(body);
+  return {
+    ...body,
+    digest,
+    latencyMs: Math.max(1, Math.round(performance.now() - started)),
+  };
+}
+
+/*
+ * Presentation maps for a verdict.
+ *
+ * These exist because the alternative — an inline
+ * `v === "no-go" ? … : v === "hold" ? … : …` — cannot be checked for
+ * exhaustiveness by the compiler, so its final branch silently absorbs
+ * every verdict added later. When `insufficient-data` arrived, four
+ * such ternaries were already in the app and they disagreed with each
+ * other: two rendered it as GO (a false clearance on a certificate
+ * that established nothing) and one as NO-GO (a false allegation).
+ * The Record<Status, …> maps in the same files were all caught by tsc
+ * immediately. The difference is only that these are indexed rather
+ * than branched, so use them and let the type system do the work.
+ */
+export const VERDICT_TONE: Record<Status, "go" | "hold" | "no-go" | "default"> = {
+  go: "go",
+  hold: "hold",
+  "no-go": "no-go",
+  // Neutral, never a status tone: DESIGN.md reserves those for verdicts
+  // and this is a statement about the evidence, not about the subject.
+  "insufficient-data": "default",
+};
+
+/**
+ * Tone for components that emphasise only a problem — StatCell has no
+ * "go", by design: a pass needs no colour, and spending one on it
+ * would leave nothing to distinguish the rows that matter. A verdict
+ * that establishes nothing is unemphasised for the same reason.
+ */
+export const VERDICT_STAT_TONE: Record<Status, "default" | "hold" | "no-go"> = {
+  go: "default",
+  hold: "hold",
+  "no-go": "no-go",
+  "insufficient-data": "default",
+};
+
+/** Foreground colour for a verdict. */
+export const VERDICT_TEXT_CLASS: Record<Status, string> = {
+  go: "text-go",
+  hold: "text-hold",
+  "no-go": "text-no-go",
+  "insufficient-data": "text-muted-foreground",
+};
+
+/** Fill for a dot or chip standing in for a verdict. */
+export const VERDICT_DOT_CLASS: Record<Status, string> = {
+  go: "bg-go",
+  hold: "bg-hold",
+  "no-go": "bg-no-go",
+  "insufficient-data": "bg-muted-foreground",
+};
+
+export const VERDICT_COPY: Record<Status, { title: string; blurb: string }> = {
+  go: {
+    title: "GO",
+    blurb: "Every blocking rule passed. Settlement is cleared to broadcast.",
+  },
+  hold: {
+    title: "HOLD",
+    blurb: "Blocking rules passed but an advisory rule failed. Manual sign-off required.",
+  },
+  "no-go": {
+    title: "NO-GO",
+    blurb: "A blocking rule failed. Settlement is refused by the compliance layer.",
+  },
+  "insufficient-data": {
+    title: "INSUFFICIENT DATA",
+    blurb:
+      "A rule could not be evaluated because the evidence it needs could not be read. This is not a pass, a failure or a soft refusal — it is the absence of an answer, and it says nothing about the subject.",
+  },
+};
