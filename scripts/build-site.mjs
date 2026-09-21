@@ -374,6 +374,7 @@ async function buildProgress({ feed, release, releases }) {
   </div></div>
   <div class="form-actions" style="margin-top:18px">
     <a class="btn ghost" href="/status/">Full mission log</a>
+    <a class="btn ghost" href="/docs/NOSHASHI_Implementation_Timeline.pdf">Implementation timeline (PDF)</a>
     <a class="btn ghost" href="https://github.com/Ignosha/noshashi/releases" rel="noopener">Releases on GitHub</a>
   </div>
 </section>
