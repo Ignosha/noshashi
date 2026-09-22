@@ -76,7 +76,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 
 <section>
   <div class="clockbar" id="mission-clock" data-epoch="2026-08-29T00:00:00Z">
-    <div><span class="label">UTC</span><span class="value live" id="clock-utc">12:47:29</span></div>
+    <div><span class="label">UTC</span><span class="value live" id="clock-utc">14:54:20</span></div>
     <div><span class="label">MISSION ELAPSED</span><span class="value" id="clock-met">T+24d</span></div>
     <div><span class="label">SINCE FIRST RELEASE</span><span class="value">2026-08-29</span></div>
   </div>
@@ -112,6 +112,15 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   </div>
   <div class="console"><div class="console-body">
     <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-09-22T14:40:56.000Z">2026-09-22</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>NOSHASHI v1.0.6</h3>
+      <p>Built from 5042553f8da3c940d8d72d366be5c8576a965d03 on ubuntu-22.04. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.6" rel="noopener">RELEASE NOTES →</a>
+    </article>
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
         <time datetime="2026-09-22T05:41:26.000Z">2026-09-22</time>
@@ -201,15 +210,6 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <h3>NOSHASHI v0.3.1</h3>
       <p>Built from 01f6d043e5681cea4443a7bf58ddfa8bda82bc00 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
       <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v0.3.1" rel="noopener">RELEASE NOTES →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-09-15T16:46:33.000Z">2026-09-15</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>NOSHASHI v0.3.0</h3>
-      <p>Built from d2df012ff9397db2e77304fef90a2303b0e5bbd6 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
-      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v0.3.0" rel="noopener">RELEASE NOTES →</a>
     </article>
   </div>
   </div></div>

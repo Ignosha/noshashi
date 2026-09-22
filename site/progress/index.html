@@ -74,7 +74,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 
 <section>
   <div class="rail">
-    <div><span class="label">CURRENT BUILD</span><strong>v1.0.5</strong><small>Beta channel, unsigned, built by CI.</small></div>
+    <div><span class="label">CURRENT BUILD</span><strong>v1.0.6</strong><small>Beta channel, unsigned, built by CI.</small></div>
     <div><span class="label">RELEASES SHIPPED</span><strong>8</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
     <div><span class="label">TESTS PASSING</span><strong>272</strong><small>On the logic that makes claims. Run with npm test.</small></div>
     <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>No sign-up exists. Nothing is held server-side.</small></div>
@@ -134,6 +134,15 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   </div>
   <div class="console"><div class="console-body">
     <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-09-22T14:40:56.000Z">2026-09-22</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>NOSHASHI v1.0.6</h3>
+      <p>Built from 5042553f8da3c940d8d72d366be5c8576a965d03 on ubuntu-22.04. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.6" rel="noopener">RELEASE NOTES →</a>
+    </article>
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
         <time datetime="2026-09-22T05:41:26.000Z">2026-09-22</time>
@@ -196,15 +205,6 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <h3>Every download is now labelled BETA</h3>
       <p>The desktop builds are pre-1.0 and unsigned while the release pipeline is hardened. The download section now says so on every artifact rather than only in the operator note underneath, so the channel is never read as stable by accident.</p>
       <a class="log-link" href="/#download">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="note">
-      <div class="log-meta">
-        <time datetime="2026-09-17T11:30:00.000Z">2026-09-17</time>
-        <span class="log-kind">NOTE</span>
-      </div>
-      <h3>Public site rebuilt around live feeds</h3>
-      <p>The site now carries a live XRP newsroom, this mission log, a support console and a contact channel. Every page is rendered on the server before it is served, so the content is in the HTML a crawler receives rather than assembled afterwards in the browser.</p>
-      <a class="log-link" href="/status/">OPEN →</a>
     </article>
   </div>
   </div></div>
