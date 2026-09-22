@@ -101,6 +101,8 @@ async function buildHome({ news, market, feed, status, release }) {
           { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
           { "@type": "Offer", name: "Pro", price: "749", priceCurrency: "USD" },
           { "@type": "Offer", name: "Institutional", price: "4000", priceCurrency: "USD" },
+          { "@type": "Offer", name: "Enterprise", price: "10000", priceCurrency: "USD" },
+          { "@type": "Offer", name: "Strategic Infrastructure", price: "20850", priceCurrency: "USD" },
         ],
         url: `${ORIGIN}/`,
       },
