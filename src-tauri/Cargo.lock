@@ -2410,7 +2410,7 @@ dependencies = [
 
 [[package]]
 name = "noshashi"
-version = "0.4.3"
+version = "1.0.3"
 dependencies = [
  "keyring",
  "serde",
