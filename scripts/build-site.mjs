@@ -855,6 +855,12 @@ async function buildPricingEnhancement() {
   let html = await readFile(file, "utf8");
   const marker = "<!-- NOSHASHI-TIER-COMPARISON -->";
   const css = `<style id="noshashi-tier-comparison">
+    .price{grid-template-columns:repeat(5,minmax(220px,1fr));overflow-x:auto;padding-bottom:8px}
+    .price .tier{min-width:220px}
+    .tier.enterprise{border-color:color-mix(in srgb,var(--tele) 55%,var(--rule))}
+    .tier.enterprise .name{color:var(--tele)}
+    .tier.strategic{border-color:color-mix(in srgb,#b69cff 55%,var(--rule))}
+    .tier.strategic .name{color:#b69cff}
     .tier-compare{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);overflow-x:auto;background:color-mix(in srgb,var(--surface) 55%,transparent)}
     .tier-compare table{min-width:1080px;width:100%;border-collapse:collapse;table-layout:fixed}
     .tier-compare th,.tier-compare td{padding:13px 12px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top;font-size:12px}
@@ -878,12 +884,57 @@ async function buildPricingEnhancement() {
     .tier-compare .tier-price small{display:block;margin-top:3px;color:var(--faint);font:10px "IBM Plex Mono",monospace;font-weight:400}
     .tier-compare .tier-link{display:inline-flex;margin-top:8px;color:inherit;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
     .tier-compare .tier-link:hover{color:var(--tele)}
+    @media(max-width:900px){.price{grid-template-columns:1fr;overflow-x:visible}.price .tier{min-width:0}}
     @media(max-width:760px){.tier-compare{margin-right:calc((100vw - var(--shell))/2 * -1);margin-left:calc((100vw - var(--shell))/2 * -1);padding-left:4vw;padding-right:4vw}.tier-compare th,.tier-compare td{padding:12px 10px}}
   </style>`;
   if (!html.includes("id=\"noshashi-tier-comparison\"")) html = html.replace("</style>", `${css}</style>`);
   // The committed pricing page is also the input to this enhancement. Remove
   // prior generated copies so repeated site builds remain idempotent.
   html = html.replace(/\s*<!-- NOSHASHI-TIER-COMPARISON -->[\s\S]*?(?=\s*<\/main>)/g, "");
+
+  const cards = `<!-- NOSHASHI-TIER-CARDS -->
+      <article class="tier enterprise gauge">
+        <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
+        <div class="body">
+          <p class="fig">$10,000</p>
+          <p class="per">per month · $120,000 / year</p>
+          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
+          <p class="role">Contracted · architecture and commercial review</p>
+          <ul class="spec">
+            <li>Everything in Institutional</li>
+            <li>Asset passports and issuer intelligence at institutional scope</li>
+            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
+            <li>Deterministic policy engine, adjudication and decision history</li>
+            <li>Evidence records, hashes, audit exports and review workflow</li>
+            <li>Institutional API, scoped keys and webhooks</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Architecture review and named implementation planning</li>
+          </ul>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+        </div>
+      </article>
+      <article class="tier strategic gauge">
+        <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
+        <div class="body">
+          <p class="fig">$20,850</p>
+          <p class="per">per month · $250,000 / year</p>
+          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
+          <p class="role">Contracted infrastructure · architecture review required</p>
+          <ul class="spec">
+            <li>Everything in Enterprise</li>
+            <li>High-volume API capacity and contracted burst limits</li>
+            <li>XRPL event feeds, webhooks and machine-readable delivery</li>
+            <li>Custom schemas, retention and bulk export design</li>
+            <li>Custom data integrations for risk, custody, trading and compliance</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Embedded or white-label delivery when contracted</li>
+            <li>Strategic architecture review and integration roadmap</li>
+          </ul>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+        </div>
+      </article>`;
+  html = html.replace(/\s*<!-- NOSHASHI-TIER-CARDS -->[\s\S]*?(?=\s*<section id="compare")/g, "");
+  html = html.replace(/(<article class="tier inst[\s\S]*?<\/article>)(\s*<\/div>\s*<\/section>)/, (_match, institutional, closing) => `${institutional}${cards}${closing}`);
 
   const section = `${marker}
   <section id="compare" class="tier-comparison">
