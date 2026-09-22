@@ -953,7 +953,12 @@ async function buildPricingEnhancement() {
           <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
         </div>
       </article>`;
-  html = html.replace(/\s*<!-- NOSHASHI-TIER-CARDS -->[\s\S]*?(?=\s*<section id="compare")/g, "");
+  // Remove generated Enterprise/Strategic blocks independently of the
+  // surrounding section so repeated builds cannot accumulate duplicates.
+  html = html
+    .replace(/\s*<!-- NOSHASHI-TIER-CARDS -->/g, "")
+    .replace(/\s*<article class="tier enterprise gauge">[\s\S]*?<\/article>/g, "")
+    .replace(/\s*<article class="tier strategic gauge">[\s\S]*?<\/article>/g, "");
   html = html.replace(/(<article class="tier inst[\s\S]*?<\/article>)(\s*<\/div>\s*<\/section>)/, (_match, institutional, closing) => `${institutional}${cards}${closing}`);
 
   let section = `${marker}
