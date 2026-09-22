@@ -412,12 +412,18 @@
   .measure td.before{color:var(--nogo)}
   .measure td.after{color:var(--go)}
 
-  .price{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+  .price{display:grid;gap:14px;grid-template-columns:repeat(5,minmax(0,1fr))}
   .tier{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;position:relative;overflow:hidden}
   .tier.focus{border-color:color-mix(in srgb,var(--brand) 45%,var(--rule))}
   .tier .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--rule)}
   .tier.focus .cap{background:var(--brand)}
   .tier.inst .cap{background:var(--tele)}
+  .tier.enterprise{border-color:color-mix(in srgb,var(--tele) 55%,var(--rule))}
+  .tier.enterprise .cap{background:var(--tele)}
+  .tier.enterprise .name{color:var(--tele)}
+  .tier.strategic{border-color:color-mix(in srgb,#b69cff 55%,var(--rule))}
+  .tier.strategic .cap{background:#b69cff}
+  .tier.strategic .name{color:#b69cff}
   .tier .name{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--muted)}
   .tier.focus .name{color:var(--brand)} .tier.inst .name{color:var(--tele)}
   .tier .amt{font-size:34px;font-weight:700;margin:18px 0 2px;letter-spacing:-.02em}
@@ -1809,6 +1815,38 @@
           <li>100,000 API verifications · published SLA</li>
         </ul>
         <a class="btn ghost block" href="/contact/?topic=institutions" style="margin-top:22px">Talk to us</a>
+      </div>
+      <div class="tier enterprise">
+        <span class="cap"></span>
+        <p class="name">ENTERPRISE</p>
+        <p class="amt">$10,000</p><p class="per">per month</p>
+        <p class="who">Institutional teams and regulated operations</p>
+        <ul>
+          <li>Everything in Institutional</li>
+          <li>Asset passports and issuer intelligence</li>
+          <li>Counterparty and liquidity intelligence</li>
+          <li>Policy engine, adjudication and decision history</li>
+          <li>Evidence records, audit exports and review workflow</li>
+          <li>Scoped API keys, webhooks and environment options</li>
+          <li>Architecture review and implementation planning</li>
+        </ul>
+        <a class="btn ghost block" href="/enterprise/" style="margin-top:22px">Explore Enterprise</a>
+      </div>
+      <div class="tier strategic">
+        <span class="cap"></span>
+        <p class="name">STRATEGIC INFRASTRUCTURE</p>
+        <p class="amt">$20,850</p><p class="per">per month</p>
+        <p class="who">Teams building their own XRPL intelligence layer</p>
+        <ul>
+          <li>Everything in Enterprise</li>
+          <li>High-volume API capacity and burst limits</li>
+          <li>XRPL event feeds and machine-readable delivery</li>
+          <li>Custom schemas, retention and bulk export design</li>
+          <li>Custom integrations and dedicated environment options</li>
+          <li>Embedded or white-label delivery when contracted</li>
+          <li>Strategic architecture review and roadmap</li>
+        </ul>
+        <a class="btn ghost block" href="/strategic-infrastructure/" style="margin-top:22px">Build with NOSHASHI</a>
       </div>
     </div>
     <div class="cta" style="margin-top:26px">
