@@ -44,16 +44,16 @@ export const MARK = `<svg viewBox="0 0 180 180" width="24" height="24" fill="non
 <path d="M73 143 61 164 84 151Z" fill="currentColor"/></svg>`;
 
 export const NAV = [
-  { href: "/#public", label: "Free tools" },
-  { href: "/news/", label: "Newsroom", key: "news" },
-  { href: "/progress/", label: "Progress", key: "progress" },
-  { href: "/status/", label: "Status", key: "status", optional: true },
-  { href: "/research/", label: "Findings", optional: true },
-  { href: "/guide/", label: "XRP guide", optional: true },
-  { href: "/enterprise/", label: "Enterprise", optional: true },
-  { href: "/strategic-infrastructure/", label: "Infrastructure", optional: true },
-  { href: "/#download", label: "Download" },
-  { href: "/pricing/", label: "Pricing" },
+  { href: "/#public", label: "Free tools", i18n: "nav.tools" },
+  { href: "/news/", label: "Newsroom", key: "news", i18n: "nav.news" },
+  { href: "/progress/", label: "Progress", key: "progress", i18n: "nav.progress" },
+  { href: "/status/", label: "Status", key: "status", i18n: "nav.status", optional: true },
+  { href: "/research/", label: "Findings", i18n: "nav.findings", optional: true },
+  { href: "/guide/", label: "XRP guide", i18n: "nav.guide", optional: true },
+  { href: "/enterprise/", label: "Enterprise", i18n: "nav.enterprise", optional: true },
+  { href: "/strategic-infrastructure/", label: "Infrastructure", i18n: "nav.infrastructure", optional: true },
+  { href: "/#download", label: "Download", i18n: "nav.download" },
+  { href: "/pricing/", label: "Pricing", i18n: "nav.pricing" },
 ];
 
 export const FOOTER_LINKS = [
@@ -82,7 +82,7 @@ export function renderHeader(current = "") {
     const active = item.key && item.key === current;
     return `<a class="nav-link${item.optional ? " optional" : ""}" href="${attrUrl(item.href)}"${
       active ? ' aria-current="page"' : ""
-    }>${esc(item.label)}</a>`;
+    }>${item.i18n ? `<span data-i18n="${item.i18n}">${esc(item.label)}</span>` : esc(item.label)}</a>`;
   }).join("\n      ");
 
   return `<header>
@@ -91,10 +91,10 @@ export function renderHeader(current = "") {
     <nav class="nav-links" aria-label="Primary">
       ${links}
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
-        <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
       </button>
-      <a class="btn ghost" href="/contact/">Contact</a>
-      <a class="btn" href="/#download">Download beta</a>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
     </nav>
   </div>
 </header>`;
@@ -131,8 +131,8 @@ export const THEME_TOGGLE = `<script>
   var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
   if(!button)return;
   function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
-    if(label)label.textContent=light?"DARK":"LIGHT";
-    button.setAttribute("aria-label",light?"Switch to dark mode":"Switch to light mode");}
+    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
+    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
   sync();
   button.addEventListener("click",function(){
     var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";

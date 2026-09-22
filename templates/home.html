@@ -99,7 +99,7 @@
    * introduced no hue, which is why it survived the earlier pass that
    * took out the blue and teal washes. It still read as a gradient
    * field on a large desktop display, which is the thing being
-   * objected to. The hero's depth now comes from the starfield and the
+   * objected to. The hero's depth now comes from the static floral plates and the
    * static orbital plates alone.
    */
 
@@ -625,9 +625,8 @@
    *   Its background was an MP4 on someone else's CloudFront bucket.
    *   Hotlinking a third party's asset is fragile and not ours to
    *   spend, and vercel.json's `default-src 'self'` would refuse it
-   *   outright. The cosmos canvas already here does the same job, is
-   *   ours, and already stops when the tab is hidden and holds still
-   *   under prefers-reduced-motion.
+   *   outright. The static bloom here does the same job in a more
+   *   restrained way and stays fully within the site's green palette.
    *
    *   Its display face was Graphik LCG pulled from a font-piracy CDN.
    *   Graphik is licensed commercially; `font-src 'self'` would refuse
@@ -658,8 +657,6 @@
   @media(min-width:768px){ .hero-instrument{--hi-gut:35px} }
   @media(min-width:1024px){ .hero-instrument{min-height:max(560px, calc(100svh - 76px))} }
 
-  .hero-instrument .cosmos{position:absolute;inset:0;width:100%;height:100%;z-index:0}
-
   /* ── The bloom. Decoration, granted as a bounded exception in
    *    DESIGN.md; see the "marketing hero" section there for the terms.
    *    Static: no loop, no frame cost, nothing to stop under reduced
@@ -670,11 +667,11 @@
      * stop is currentColor, and `opacity` here is already owned by the
      * hiFade animation, whose `both` fill holds it at 1 and silently
      * overrides any opacity declared on this element. */
-    color:rgb(187 216 255 / 1);
+    color:rgb(155 225 93 / .9);
     animation:hiFade 1.4s cubic-bezier(.16,1,.3,1) both;animation-delay:.35s}
   /* On #F4F7FA a translucent white petal is invisible, so the light
    * theme gets the brand hue at a lower weight instead. */
-  html[data-theme="light"] .hi-bloom{color:rgb(20 95 209 / .55)}
+  html[data-theme="light"] .hi-bloom{color:rgb(36 122 59 / .58)}
   /* Below 1024 there is no node diagram for the bloom to sit behind,
    * so it becomes the hero's backdrop instead: full bleed, and carried
    * at a lower weight because here it is behind the headline itself
@@ -685,8 +682,8 @@
      * 390px phone made the element 538px wide and pushed it off the
      * screen. An explicit width is what makes left/right bind. */
     .hi-bloom{left:0;right:0;top:0;bottom:0;width:100%;height:100%;
-      color:rgb(187 216 255 / .58)}
-    html[data-theme="light"] .hi-bloom{color:rgb(20 95 209 / .34)}
+      color:rgb(155 225 93 / .52)}
+    html[data-theme="light"] .hi-bloom{color:rgb(36 122 59 / .38)}
   }
 
   /* ── The measured grid. Four verticals, two horizontals, eight
@@ -840,7 +837,7 @@
       <a class="nav-link" href="#download"><span data-i18n="nav.download">Download</span></a>
       <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
-        <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
       </button>
       <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
       <a class="btn" href="#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
@@ -875,7 +872,6 @@
     rather than rewritten.
   -->
   <section class="hero-instrument">
-    <canvas class="cosmos" aria-hidden="true"></canvas>
     <!--SLOT:HEROBLOOM-->
 
     <div class="hi-grid" aria-hidden="true">
@@ -975,33 +971,33 @@
               adjudication and market intelligence read from one validated ledger state,
               in the same second.
             </p>
-            <a href="/certificate/">READ_AN_AUTHORITY_CERTIFICATE &rarr;</a>
+            <a href="/certificate/" data-i18n="hero.bloom.cta">READ AN AUTHORITY CERTIFICATE →</a>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="proof-strip" aria-label="NOSHASHI proof strip">
+  <section class="proof-strip" aria-label="NOSHASHI proof strip" data-i18n-aria-label="proof.aria" data-i18n-aria-label-en="NOSHASHI proof strip">
     <div class="proof-stat">
-      <span class="label">VALIDATED LEDGER</span>
-      <strong>XRPL mainnet</strong>
-      <small>same state going into every decision</small>
+      <span class="label" data-i18n="proof.ledger.label">VALIDATED LEDGER</span>
+      <strong data-i18n="proof.ledger.value">XRPL mainnet</strong>
+      <small data-i18n="proof.ledger.note">same state going into every decision</small>
     </div>
     <div class="proof-stat">
-      <span class="label">RULES</span>
-      <strong>GO · HOLD · NO-GO</strong>
-      <small>deterministic, replayable policy checks</small>
+      <span class="label" data-i18n="proof.rules.label">RULES</span>
+      <strong data-i18n="proof.rules.value">GO · HOLD · NO-GO</strong>
+      <small data-i18n="proof.rules.note">deterministic, replayable policy checks</small>
     </div>
     <div class="proof-stat">
-      <span class="label">RECEIPT</span>
-      <strong>SHA-256</strong>
-      <small>byte-stable evidence for review</small>
+      <span class="label" data-i18n="proof.receipt.label">RECEIPT</span>
+      <strong data-i18n="proof.receipt.value">SHA-256</strong>
+      <small data-i18n="proof.receipt.note">byte-stable evidence for review</small>
     </div>
     <div class="proof-stat">
-      <span class="label">CONTROL</span>
-      <strong>Read-only</strong>
-      <small>no custody, no keys, no broadcast path</small>
+      <span class="label" data-i18n="proof.control.label">CONTROL</span>
+      <strong data-i18n="proof.control.value">Read-only</strong>
+      <small data-i18n="proof.control.note">no custody, no keys, no broadcast path</small>
     </div>
   </section>
 
@@ -1992,7 +1988,6 @@
 </footer>
 </div>
 
-<script src="/assets/cosmos.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/i18n.js" defer></script>
 <script src="/assets/nav.js" defer></script>
@@ -2010,8 +2005,9 @@
   if (savedTheme === "light" || savedTheme === "dark") document.documentElement.setAttribute("data-theme", savedTheme);
   function updateThemeButton() {
     var light = document.documentElement.getAttribute("data-theme") === "light";
-    if (themeLabel) themeLabel.textContent = light ? "DARK" : "LIGHT";
-    if (themeToggle) themeToggle.setAttribute("aria-label", light ? "Switch to dark mode" : "Switch to light mode");
+    var map = window.__NOSHASHI_I18N || {};
+    if (themeLabel) themeLabel.textContent = map[light ? "theme.dark" : "theme.light"] || (light ? "DARK" : "LIGHT");
+    if (themeToggle) themeToggle.setAttribute("aria-label", map[light ? "theme.ariaDark" : "theme.ariaLight"] || (light ? "Switch to dark mode" : "Switch to light mode"));
   }
   updateThemeButton();
   if (themeToggle) themeToggle.addEventListener("click", function () {

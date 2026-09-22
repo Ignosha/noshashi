@@ -17,6 +17,13 @@
    core.css everywhere else.
    ───────────────────────────────────────────────────────────────── */
 
+.institutional-proof{position:relative}
+.institutional-proof .section-head{max-width:68ch}
+.proof-list{display:grid;gap:7px;margin:16px 0 0;padding:0;list-style:none}
+.proof-list li{position:relative;padding-left:16px;color:var(--muted);font-size:12px;line-height:1.5}
+.proof-list li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:5px;
+  border:1px solid var(--brand);border-radius:50%}
+
 /* ── Instrument header strip ────────────────────────────────────────
    A console has a title bar carrying its own state. One rule, one
    label, one reading — the same shape as .relay-console-head on the
@@ -369,23 +376,6 @@
    here may be reused behind a panel, a table, a chart or a number.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* The starfield canvas. Behind everything, including the existing
-   orbital plates, and inert to the pointer. */
-canvas.cosmos{position:absolute;inset:0 0 auto 0;width:100%;height:min(100%,920px);
-  pointer-events:none;z-index:-3;opacity:1;
-  transition:opacity .3s ease;
-  /* Fades out before the copy begins, so no star is ever behind a word
-     it has to compete with. */
-  -webkit-mask-image:radial-gradient(120% 92% at 50% 8%,#000 38%,rgba(0,0,0,.55) 66%,transparent 100%);
-  mask-image:radial-gradient(120% 92% at 50% 8%,#000 38%,rgba(0,0,0,.55) 66%,transparent 100%)}
-
-/* The blue and teal washes that used to sit here are removed. The hero
-   keeps the navy lift already defined on .hero::before in the page's own
-   stylesheet — one radial of the ground colour's lighter neighbour,
-   introducing no hue. Depth now comes from the starfield and the
-   existing orbital plates, which is enough; two tinted radials on top
-   of them was the "blue AI gradient" DESIGN.md bans, arrived at one
-   reasonable-looking step at a time. */
 
 /* ── Brand lockup ───────────────────────────────────────────────────
    The name, at the size a name should be, inside a live orbital
@@ -461,11 +451,6 @@ canvas.cosmos{position:absolute;inset:0 0 auto 0;width:100%;height:min(100%,920p
   .lockup-ring{animation:none}
 }
 
-/* The canvas is hidden on a phone along with the other bleed graphics:
-   at that width it is a battery cost for something a thumb covers. */
-@media (max-width:900px){
-  canvas.cosmos{display:none}
-}
 
 /* ── Mobile navigation ──────────────────────────────────────────────
    Below 820px the nav links are lifted into a panel of their own by

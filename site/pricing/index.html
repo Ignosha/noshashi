@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
 <title>Pricing — NOSHASHI</title>
 <meta name="description" content="Free for a single address. $749/month for a desk. $4,000/month for a regulated institution. Compliance state and exit liquidity read from the same validated ledger, in the same second.">
 <link rel="canonical" href="https://noshashi.app/pricing/">
@@ -25,10 +25,10 @@
      stylesheet, so these are duplicated deliberately; the tokens are the
      contract, and they must not drift. */
   :root{
-    --ground:#0B0F14; --surface:#11161D; --elevated:#1C2330;
-    --ink:#E6E8EB; --muted:#A3A8B3; --faint:#747C8B; --rule:#2A313C;
-    --brand:#3A82F6; --tele:#00E0C6;
-    --go:#35D49A; --hold:#F5B942; --nogo:#FF5F6D;
+    --ground:#08100B; --surface:#0E1911; --elevated:#15251A;
+    --ink:#E9F5E7; --muted:#A7B8A8; --faint:#718473; --rule:#263B2A;
+    --brand:#9BE15D; --tele:#55D98A;
+    --go:#9BE15D; --hold:#F5B942; --nogo:#FF5F6D;
     --shell:min(1180px, 92vw);
     --r:2px;
   }
@@ -195,7 +195,7 @@
     .tier-compare thead th:not(:first-child){border-left:1px solid var(--rule)}
     .tier-compare thead th:first-child{width:23%;color:var(--faint)}
     .tier-compare thead th:nth-child(4){color:var(--tele)}
-    .tier-compare thead th:nth-child(5){color:#b69cff}
+    .tier-compare thead th:nth-child(5){color:#9BE15D}
     .tier-compare tbody th{color:var(--muted);font-weight:500}
     .tier-compare tbody td{color:var(--ink);border-left:1px solid var(--rule)}
     .tier-compare tbody tr:last-child th,.tier-compare tbody tr:last-child td{border-bottom:0}
@@ -203,7 +203,7 @@
     .tier-compare .group th:not(:first-child){border-left:0}
     .tier-compare .yes{color:var(--go);font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare .contracted{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare .optional{color:#b69cff;font-family:"IBM Plex Mono",monospace;font-size:10px}
+    .tier-compare .optional{color:#9BE15D;font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare .no{color:var(--faint)}
     .tier-compare caption{caption-side:bottom;padding:12px;color:var(--faint);text-align:left;font-size:11px}
@@ -221,8 +221,8 @@
     <nav class="nav">
       <a class="brand" href="/">
         <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="10.2" fill="none" stroke="#3A82F6" stroke-width="1.4"/>
-          <circle cx="12" cy="12" r="3.1" fill="#3A82F6"/>
+          <circle cx="12" cy="12" r="10.2" fill="none" stroke="#9BE15D" stroke-width="1.4"/>
+          <circle cx="12" cy="12" r="3.1" fill="#9BE15D"/>
         </svg>
         <span>NOSHASHI</span>
       </a>
@@ -482,19 +482,219 @@
           </ul>
           <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
         </div>
+      </article><!-- NOSHASHI-TIER-CARDS -->
+      <article class="tier enterprise gauge">
+        <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
+        <div class="body">
+          <p class="fig">$10,000</p>
+          <p class="per">per month · $120,000 / year</p>
+          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
+          <p class="role">Contracted · architecture and commercial review</p>
+          <ul class="spec">
+            <li>Everything in Institutional</li>
+            <li>Asset passports and issuer intelligence at institutional scope</li>
+            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
+            <li>Deterministic policy engine, adjudication and decision history</li>
+            <li>Evidence records, hashes, audit exports and review workflow</li>
+            <li>Institutional API, scoped keys and webhooks</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Architecture review and named implementation planning</li>
+          </ul>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+        </div>
+      </article>
+      <article class="tier strategic gauge">
+        <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
+        <div class="body">
+          <p class="fig">$20,850</p>
+          <p class="per">per month · $250,000 / year</p>
+          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
+          <p class="role">Contracted infrastructure · architecture review required</p>
+          <ul class="spec">
+            <li>Everything in Enterprise</li>
+            <li>High-volume API capacity and contracted burst limits</li>
+            <li>XRPL event feeds, webhooks and machine-readable delivery</li>
+            <li>Custom schemas, retention and bulk export design</li>
+            <li>Custom data integrations for risk, custody, trading and compliance</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Embedded or white-label delivery when contracted</li>
+            <li>Strategic architecture review and integration roadmap</li>
+          </ul>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+        </div>
+      </article><!-- NOSHASHI-TIER-CARDS -->
+      <article class="tier enterprise gauge">
+        <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
+        <div class="body">
+          <p class="fig">$10,000</p>
+          <p class="per">per month · $120,000 / year</p>
+          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
+          <p class="role">Contracted · architecture and commercial review</p>
+          <ul class="spec">
+            <li>Everything in Institutional</li>
+            <li>Asset passports and issuer intelligence at institutional scope</li>
+            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
+            <li>Deterministic policy engine, adjudication and decision history</li>
+            <li>Evidence records, hashes, audit exports and review workflow</li>
+            <li>Institutional API, scoped keys and webhooks</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Architecture review and named implementation planning</li>
+          </ul>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+        </div>
+      </article>
+      <article class="tier strategic gauge">
+        <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
+        <div class="body">
+          <p class="fig">$20,850</p>
+          <p class="per">per month · $250,000 / year</p>
+          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
+          <p class="role">Contracted infrastructure · architecture review required</p>
+          <ul class="spec">
+            <li>Everything in Enterprise</li>
+            <li>High-volume API capacity and contracted burst limits</li>
+            <li>XRPL event feeds, webhooks and machine-readable delivery</li>
+            <li>Custom schemas, retention and bulk export design</li>
+            <li>Custom data integrations for risk, custody, trading and compliance</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Embedded or white-label delivery when contracted</li>
+            <li>Strategic architecture review and integration roadmap</li>
+          </ul>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+        </div>
+      </article><!-- NOSHASHI-TIER-CARDS -->
+      <article class="tier enterprise gauge">
+        <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
+        <div class="body">
+          <p class="fig">$10,000</p>
+          <p class="per">per month · $120,000 / year</p>
+          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
+          <p class="role">Contracted · architecture and commercial review</p>
+          <ul class="spec">
+            <li>Everything in Institutional</li>
+            <li>Asset passports and issuer intelligence at institutional scope</li>
+            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
+            <li>Deterministic policy engine, adjudication and decision history</li>
+            <li>Evidence records, hashes, audit exports and review workflow</li>
+            <li>Institutional API, scoped keys and webhooks</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Architecture review and named implementation planning</li>
+          </ul>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+        </div>
+      </article>
+      <article class="tier strategic gauge">
+        <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
+        <div class="body">
+          <p class="fig">$20,850</p>
+          <p class="per">per month · $250,000 / year</p>
+          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
+          <p class="role">Contracted infrastructure · architecture review required</p>
+          <ul class="spec">
+            <li>Everything in Enterprise</li>
+            <li>High-volume API capacity and contracted burst limits</li>
+            <li>XRPL event feeds, webhooks and machine-readable delivery</li>
+            <li>Custom schemas, retention and bulk export design</li>
+            <li>Custom data integrations for risk, custody, trading and compliance</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Embedded or white-label delivery when contracted</li>
+            <li>Strategic architecture review and integration roadmap</li>
+          </ul>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+        </div>
+      </article><!-- NOSHASHI-TIER-CARDS -->
+      <article class="tier enterprise gauge">
+        <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
+        <div class="body">
+          <p class="fig">$10,000</p>
+          <p class="per">per month · $120,000 / year</p>
+          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
+          <p class="role">Contracted · architecture and commercial review</p>
+          <ul class="spec">
+            <li>Everything in Institutional</li>
+            <li>Asset passports and issuer intelligence at institutional scope</li>
+            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
+            <li>Deterministic policy engine, adjudication and decision history</li>
+            <li>Evidence records, hashes, audit exports and review workflow</li>
+            <li>Institutional API, scoped keys and webhooks</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Architecture review and named implementation planning</li>
+          </ul>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+        </div>
+      </article>
+      <article class="tier strategic gauge">
+        <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
+        <div class="body">
+          <p class="fig">$20,850</p>
+          <p class="per">per month · $250,000 / year</p>
+          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
+          <p class="role">Contracted infrastructure · architecture review required</p>
+          <ul class="spec">
+            <li>Everything in Enterprise</li>
+            <li>High-volume API capacity and contracted burst limits</li>
+            <li>XRPL event feeds, webhooks and machine-readable delivery</li>
+            <li>Custom schemas, retention and bulk export design</li>
+            <li>Custom data integrations for risk, custody, trading and compliance</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Embedded or white-label delivery when contracted</li>
+            <li>Strategic architecture review and integration roadmap</li>
+          </ul>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+        </div>
+      </article><!-- NOSHASHI-TIER-CARDS -->
+      <article class="tier enterprise gauge">
+        <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
+        <div class="body">
+          <p class="fig">$10,000</p>
+          <p class="per">per month · $120,000 / year</p>
+          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
+          <p class="role">Contracted · architecture and commercial review</p>
+          <ul class="spec">
+            <li>Everything in Institutional</li>
+            <li>Asset passports and issuer intelligence at institutional scope</li>
+            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
+            <li>Deterministic policy engine, adjudication and decision history</li>
+            <li>Evidence records, hashes, audit exports and review workflow</li>
+            <li>Institutional API, scoped keys and webhooks</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Architecture review and named implementation planning</li>
+          </ul>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+        </div>
+      </article>
+      <article class="tier strategic gauge">
+        <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
+        <div class="body">
+          <p class="fig">$20,850</p>
+          <p class="per">per month · $250,000 / year</p>
+          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
+          <p class="role">Contracted infrastructure · architecture review required</p>
+          <ul class="spec">
+            <li>Everything in Enterprise</li>
+            <li>High-volume API capacity and contracted burst limits</li>
+            <li>XRPL event feeds, webhooks and machine-readable delivery</li>
+            <li>Custom schemas, retention and bulk export design</li>
+            <li>Custom data integrations for risk, custody, trading and compliance</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Embedded or white-label delivery when contracted</li>
+            <li>Strategic architecture review and integration roadmap</li>
+          </ul>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+        </div>
       </article>
 
     </div>
   </section><!-- NOSHASHI-TIER-COMPARISON -->
   <section id="compare" class="tier-comparison">
     <div class="kicker-block">
-      <p class="eyebrow">02 / Comparison</p>
-      <h2>Five operating layers. One evidence standard.</h2>
-      <p>Every row names the actual entitlement. Included, limited, contracted, optional and unavailable are intentionally different promises.</p>
+      <p class="eyebrow"><span data-i18n="pricing.comparison.eyebrow">02 / Comparison</span></p>
+      <h2><span data-i18n="pricing.comparison.title">Five operating layers. One evidence standard.</span></h2>
+      <p><span data-i18n="pricing.comparison.body">Every row names the actual entitlement. Included, limited, contracted, optional and unavailable are intentionally different promises.</span></p>
     </div>
     <div class="tier-compare">
       <table>
-        <caption>Commercial, intelligence and infrastructure entitlements. Contracted scope is confirmed during architecture review; no live integration or certification is implied.</caption>
+        <caption><span data-i18n="pricing.comparison.caption">Commercial, intelligence and infrastructure entitlements. Contracted scope is confirmed during architecture review; no live integration or certification is implied.</span></caption>
         <thead><tr><th scope="col">Capability</th><th scope="col">Free</th><th scope="col">Pro</th><th scope="col">Institutional</th><th scope="col">Enterprise</th><th scope="col">Strategic Infrastructure</th></tr></thead>
         <tbody>
           <tr class="group"><th scope="rowgroup" colspan="6">Commercial</th></tr>

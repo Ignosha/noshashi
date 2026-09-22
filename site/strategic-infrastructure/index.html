@@ -45,26 +45,26 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 <path d="M82 121 67 150 94 132Z" fill="currentColor"/>
 <path d="M73 143 61 164 84 151Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
     <nav class="nav-links" aria-label="Primary">
-      <a class="nav-link" href="/#public">Free tools</a>
-      <a class="nav-link" href="/news/">Newsroom</a>
-      <a class="nav-link" href="/progress/">Progress</a>
-      <a class="nav-link optional" href="/status/">Status</a>
-      <a class="nav-link optional" href="/research/">Findings</a>
-      <a class="nav-link optional" href="/guide/">XRP guide</a>
-      <a class="nav-link optional" href="/enterprise/">Enterprise</a>
-      <a class="nav-link optional" href="/strategic-infrastructure/">Infrastructure</a>
-      <a class="nav-link" href="/#download">Download</a>
-      <a class="nav-link" href="/pricing/">Pricing</a>
+      <a class="nav-link" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/news/"><span data-i18n="nav.news">Newsroom</span></a>
+      <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
+      <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
+      <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
+      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
+      <a class="nav-link optional" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
-        <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
       </button>
-      <a class="btn ghost" href="/contact/">Contact</a>
-      <a class="btn" href="/#download">Download beta</a>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
     </nav>
   </div>
 </header>
 <main class="shell">
-<div class="page-head"><p class="eyebrow">NOSHASHI STRATEGIC INFRASTRUCTURE</p><h1>Build your institutional XRPL intelligence layer with NOSHASHI.</h1><p>Connect validated XRPL data, intelligence, monitoring, evidence and policy infrastructure to your own systems.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">DATA</p><h2>Machine-readable intelligence.</h2><p>APIs, event feeds, webhooks, bulk exports and custom schemas.</p></div><div class="panel"><p class="eyebrow">CAPACITY</p><h2>Contracted high-volume access.</h2><p>Capacity, retention and delivery are based on deployment requirements and commercial scope.</p></div><div class="panel"><p class="eyebrow">REVIEW</p><h2>Request architecture review.</h2><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></div>
+<div class="page-head"><p class="eyebrow">NOSHASHI STRATEGIC INFRASTRUCTURE</p><h1>Build your institutional XRPL intelligence layer with NOSHASHI.</h1><p>Connect validated XRPL data, intelligence, monitoring, evidence and policy infrastructure to your own systems.</p></div><section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Delivery evidence</p><h2>Build on a source you can inspect.</h2><p>Strategic infrastructure connects validated XRPL observations to the systems your institution already governs. Delivery, retention and integration boundaries are explicit rather than implied.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">DATA</p><h2>Machine-readable intelligence.</h2><p>APIs, event feeds, webhooks, bulk exports and custom schemas.</p><ul class="proof-list"><li>Stable records for downstream controls</li><li>Evidence and timestamps travel with the result</li></ul></div><div class="panel"><p class="eyebrow">CAPACITY</p><h2>Contracted high-volume access.</h2><p>Capacity, retention and delivery are based on deployment requirements and commercial scope.</p><ul class="proof-list"><li>Architecture review before commitment</li><li>Scope documented against the integration</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">REVIEW</p><h2>Request architecture review.</h2><p>We will map data sources, operating boundaries and delivery requirements before proposing a contracted design.</p><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>
 </main>
 <footer>
   <div class="shell foot">
@@ -96,8 +96,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
   if(!button)return;
   function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
-    if(label)label.textContent=light?"DARK":"LIGHT";
-    button.setAttribute("aria-label",light?"Switch to dark mode":"Switch to light mode");}
+    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
+    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
   sync();
   button.addEventListener("click",function(){
     var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";

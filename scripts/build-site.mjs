@@ -847,8 +847,8 @@ async function buildCertificate() {
 
 /* ── institutional product pages ─────────────────────────────────── */
 const PRODUCT_PAGES = [
-  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth.</p></div><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a></p></div></div>`],
-  ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build your institutional XRPL intelligence layer with NOSHASHI.", "Connect validated XRPL data, intelligence, monitoring, evidence and policy infrastructure to your own systems.", `<div class="grid g2"><div class="panel"><p class="eyebrow">DATA</p><h2>Machine-readable intelligence.</h2><p>APIs, event feeds, webhooks, bulk exports and custom schemas.</p></div><div class="panel"><p class="eyebrow">CAPACITY</p><h2>Contracted high-volume access.</h2><p>Capacity, retention and delivery are based on deployment requirements and commercial scope.</p></div><div class="panel"><p class="eyebrow">REVIEW</p><h2>Request architecture review.</h2><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></div>`],
+  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Operating evidence</p><h2>Make every decision reviewable.</h2><p>Enterprise brings the same validated-ledger reading used in the public certificate into a governed workflow: the observation, policy result and adjudication remain connected.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p><ul class="proof-list"><li>Evidence attached to each policy result</li><li>Decision history suitable for second-line review</li></ul></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth, while teams retain the context required to act on them.</p><ul class="proof-list"><li>Validated state before interpretation</li><li>Exportable records for internal controls</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p>Architecture and commercial scope are confirmed before any contracted capability is promised.</p><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a></p></div></section>`],
+  ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build your institutional XRPL intelligence layer with NOSHASHI.", "Connect validated XRPL data, intelligence, monitoring, evidence and policy infrastructure to your own systems.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Delivery evidence</p><h2>Build on a source you can inspect.</h2><p>Strategic infrastructure connects validated XRPL observations to the systems your institution already governs. Delivery, retention and integration boundaries are explicit rather than implied.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">DATA</p><h2>Machine-readable intelligence.</h2><p>APIs, event feeds, webhooks, bulk exports and custom schemas.</p><ul class="proof-list"><li>Stable records for downstream controls</li><li>Evidence and timestamps travel with the result</li></ul></div><div class="panel"><p class="eyebrow">CAPACITY</p><h2>Contracted high-volume access.</h2><p>Capacity, retention and delivery are based on deployment requirements and commercial scope.</p><ul class="proof-list"><li>Architecture review before commitment</li><li>Scope documented against the integration</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">REVIEW</p><h2>Request architecture review.</h2><p>We will map data sources, operating boundaries and delivery requirements before proposing a contracted design.</p><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>`],
   ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.", `<div class="panel"><p class="eyebrow">REFERENCE</p><h2>API endpoint families</h2><ul><li><code>/api/v1/institutional/overview</code></li><li><code>/api/v1/institutional/assets</code></li><li><code>/api/v1/institutional/evidence</code></li><li><code>/api/v1/institutional/policies/check</code></li><li><code>/api/v1/institutional/monitoring/events</code></li></ul></div>`],
 ];
 
@@ -856,13 +856,31 @@ async function buildPricingEnhancement() {
   const file = path.join(SITE, "pricing/index.html");
   let html = await readFile(file, "utf8");
   const marker = "<!-- NOSHASHI-TIER-COMPARISON -->";
+  // Pricing predates the shared shell, so normalize its inline board before
+  // adding the comparison. Keeping this here makes the generated page safe
+  // even while the legacy committed page remains the enhancement input.
+  html = html
+    .replaceAll("#3A82F6", "#9BE15D")
+    .replaceAll("#00E0C6", "#55D98A")
+    .replaceAll("#35D49A", "#9BE15D")
+    .replaceAll("#0B0F14", "#08100B")
+    .replaceAll("#11161D", "#0E1911")
+    .replaceAll("#1C2330", "#15251A")
+    .replaceAll("#E6E8EB", "#E9F5E7")
+    .replaceAll("#A3A8B3", "#A7B8A8")
+    .replaceAll("#747C8B", "#718473")
+    .replaceAll("#2A313C", "#263B2A")
+    .replaceAll("#b69cff", "#9BE15D")
+    .replace('content="dark"', 'content="dark light"');
   const css = `<style id="noshashi-tier-comparison">
+    html[data-theme="light"]{--ground:#F2F8F0;--surface:#FFF;--elevated:#E5F0E2;--ink:#0B160D;--muted:#3F5843;--faint:#66806A;--rule:#C4D7C5;--brand:#247A3B;--tele:#168A55;--go:#247A3B}
+    .hero::before{content:"";position:absolute;inset:24px -8vw auto auto;width:220px;height:150px;opacity:.28;pointer-events:none;background:radial-gradient(ellipse at 68% 36%,color-mix(in srgb,var(--brand) 42%,transparent) 0 18%,transparent 19%),radial-gradient(ellipse at 42% 65%,color-mix(in srgb,var(--tele) 30%,transparent) 0 15%,transparent 16%),radial-gradient(ellipse at 78% 76%,color-mix(in srgb,var(--brand) 24%,transparent) 0 12%,transparent 13%);border:1px solid color-mix(in srgb,var(--brand) 32%,transparent);border-radius:58% 42% 64% 36%;transform:rotate(-12deg)}
     .price{grid-template-columns:repeat(5,minmax(220px,1fr));overflow-x:auto;padding-bottom:8px}
     .price .tier{min-width:220px}
     .tier.enterprise{border-color:color-mix(in srgb,var(--tele) 55%,var(--rule))}
     .tier.enterprise .name{color:var(--tele)}
-    .tier.strategic{border-color:color-mix(in srgb,#b69cff 55%,var(--rule))}
-    .tier.strategic .name{color:#b69cff}
+    .tier.strategic{border-color:color-mix(in srgb,var(--brand) 55%,var(--rule))}
+    .tier.strategic .name{color:var(--brand)}
     .tier-compare{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);overflow-x:auto;background:color-mix(in srgb,var(--surface) 55%,transparent)}
     .tier-compare table{min-width:1080px;width:100%;border-collapse:collapse;table-layout:fixed}
     .tier-compare th,.tier-compare td{padding:13px 12px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top;font-size:12px}
@@ -870,7 +888,7 @@ async function buildPricingEnhancement() {
     .tier-compare thead th:not(:first-child){border-left:1px solid var(--rule)}
     .tier-compare thead th:first-child{width:23%;color:var(--faint)}
     .tier-compare thead th:nth-child(4){color:var(--tele)}
-    .tier-compare thead th:nth-child(5){color:#b69cff}
+    .tier-compare thead th:nth-child(5){color:var(--brand)}
     .tier-compare tbody th{color:var(--muted);font-weight:500}
     .tier-compare tbody td{color:var(--ink);border-left:1px solid var(--rule)}
     .tier-compare tbody tr:last-child th,.tier-compare tbody tr:last-child td{border-bottom:0}
@@ -878,7 +896,7 @@ async function buildPricingEnhancement() {
     .tier-compare .group th:not(:first-child){border-left:0}
     .tier-compare .yes{color:var(--go);font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare .contracted{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare .optional{color:#b69cff;font-family:"IBM Plex Mono",monospace;font-size:10px}
+    .tier-compare .optional{color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare .no{color:var(--faint)}
     .tier-compare caption{caption-side:bottom;padding:12px;color:var(--faint);text-align:left;font-size:11px}
@@ -938,7 +956,7 @@ async function buildPricingEnhancement() {
   html = html.replace(/\s*<!-- NOSHASHI-TIER-CARDS -->[\s\S]*?(?=\s*<section id="compare")/g, "");
   html = html.replace(/(<article class="tier inst[\s\S]*?<\/article>)(\s*<\/div>\s*<\/section>)/, (_match, institutional, closing) => `${institutional}${cards}${closing}`);
 
-  const section = `${marker}
+  let section = `${marker}
   <section id="compare" class="tier-comparison">
     <div class="kicker-block">
       <p class="eyebrow">02 / Comparison</p>
@@ -977,6 +995,27 @@ async function buildPricingEnhancement() {
       </table>
     </div>
   </section>`;
+  const pricingTranslations = {
+    "02 / Comparison": "pricing.comparison.eyebrow",
+    "Five operating layers. One evidence standard.": "pricing.comparison.title",
+    "Every row names the actual entitlement. Included, limited, contracted, optional and unavailable are intentionally different promises.": "pricing.comparison.body",
+    "Commercial, intelligence and infrastructure entitlements. Contracted scope is confirmed during architecture review; no live integration or certification is implied.": "pricing.comparison.caption",
+    "ENTERPRISE": "pricing.enterprise.name",
+    "STRATEGIC INFRASTRUCTURE": "pricing.strategic.name",
+    "Explore Enterprise": "pricing.enterprise.cta",
+    "Build with NOSHASHI": "pricing.strategic.cta",
+    "Contracted · architecture and commercial review": "pricing.enterprise.role",
+    "Contracted infrastructure · architecture review required": "pricing.strategic.role",
+    "Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.": "pricing.enterprise.who",
+    "Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.": "pricing.strategic.who",
+    "Everything in Institutional": "pricing.enterprise.institutional",
+    "Everything in Enterprise": "pricing.strategic.enterprise",
+  };
+  for (const [text, key] of Object.entries(pricingTranslations)) {
+    section = section.replaceAll(`>${text}<`, `><span data-i18n="${key}">${text}</span><`);
+  }
+  // The tier names are inside bezel spans and are covered by the replacement
+  // above; comparison headings remain deliberately concise UI labels.
   const compareStart = html.indexOf('<section id="compare">');
   const stressStart = html.indexOf('<section id="stress">');
   if (compareStart >= 0 && stressStart > compareStart) html = html.slice(0, compareStart) + section + "\n\n  " + html.slice(stressStart);

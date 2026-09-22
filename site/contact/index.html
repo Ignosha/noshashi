@@ -45,19 +45,21 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 <path d="M82 121 67 150 94 132Z" fill="currentColor"/>
 <path d="M73 143 61 164 84 151Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
     <nav class="nav-links" aria-label="Primary">
-      <a class="nav-link" href="/#public">Free tools</a>
-      <a class="nav-link" href="/news/">Newsroom</a>
-      <a class="nav-link" href="/progress/">Progress</a>
-      <a class="nav-link optional" href="/status/">Status</a>
-      <a class="nav-link optional" href="/research/">Findings</a>
-      <a class="nav-link optional" href="/guide/">XRP guide</a>
-      <a class="nav-link" href="/#download">Download</a>
-      <a class="nav-link" href="/pricing/">Pricing</a>
+      <a class="nav-link" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/news/"><span data-i18n="nav.news">Newsroom</span></a>
+      <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
+      <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
+      <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
+      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
+      <a class="nav-link optional" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
-        <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
       </button>
-      <a class="btn ghost" href="/contact/">Contact</a>
-      <a class="btn" href="/#download">Download beta</a>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
     </nav>
   </div>
 </header>
@@ -168,6 +170,9 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="/research/">Findings</a>
       <a href="/guide/">Plain-language guide</a>
       <a href="/pricing/">Pricing</a>
+      <a href="/enterprise/">Enterprise</a>
+      <a href="/strategic-infrastructure/">Strategic infrastructure</a>
+      <a href="/developers/">Developers</a>
       <a href="/legal/">Legal &amp; accessibility</a>
       <a href="https://github.com/Ignosha/noshashi">GitHub</a>
     </div>
@@ -183,8 +188,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
   if(!button)return;
   function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
-    if(label)label.textContent=light?"DARK":"LIGHT";
-    button.setAttribute("aria-label",light?"Switch to dark mode":"Switch to light mode");}
+    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
+    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
   sync();
   button.addEventListener("click",function(){
     var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
