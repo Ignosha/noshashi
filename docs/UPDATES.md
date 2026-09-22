@@ -32,18 +32,13 @@ the product is sold on. Checking is automatic. Applying is deliberate.
 
 ## Turning it on
 
-**1. Generate the keypair.** Once, on a machine you control:
+**1. Generate the keypair.** Done. The keypair lives at
+`src-tauri/updater.key` (private) and the public key is already pasted into
+`src-tauri/tauri.conf.json`. The private key is also stored as the GitHub secret
+`TAURI_SIGNING_PRIVATE_KEY` with password `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`,
+so CI signs every release automatically.
 
-```bash
-npm run tauri signer generate -- -w ~/.tauri/noshashi.key
-```
-
-It prints a public key and writes the private key to that path. Keep the
-private key out of the repository — it is the only thing standing between your
-users and a forged update.
-
-**2. Paste the public key** into `src-tauri/tauri.conf.json`, and into
-`src-tauri/tauri.demo.conf.json` if the demo should update too:
+**2. Paste the public key** into `src-tauri/tauri.conf.json`:
 
 ```json
 "plugins": {
@@ -51,7 +46,7 @@ users and a forged update.
     "endpoints": [
       "https://github.com/Ignosha/noshashi/releases/latest/download/latest.json"
     ],
-    "pubkey": "PASTE_THE_PUBLIC_KEY_HERE"
+    "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE1RjE1OTVGODdFNUM1NUQKUldSZHhlV0hYMW54RmJocUZVM0lTelZmdDZSTU8zb1RoNnpESnA3S2JvdkdOazZJemtJTzVLcmYK"
   }
 }
 ```

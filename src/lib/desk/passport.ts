@@ -9,7 +9,7 @@ import {
   issuanceFindings,
 } from "@/lib/desk/issuance";
 import { signContent } from "@/lib/desk/ledger";
-import { saveTextFile } from "@/lib/export";
+import { saveTextFile, saveBinaryFile } from "@/lib/export";
 
 /* -----------------------------------------------------------------
    ASSET PASSPORT — a signed, portable record of an asset’s posture.
@@ -317,21 +317,134 @@ export function passportToCsv(passport: AssetPassport): string {
   return rows.join("\n");
 }
 
+function escapePdfText(text: string): string {
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)");
+}
+
+function pdfString(text: string): string {
+  const escaped = escapePdfText(text);
+  return `(${escaped})`;
+}
+
+export function passportToPdf(passport: AssetPassport): Uint8Array {
+  const objects: string[] = [];
+  const push = (obj: string) => objects.push(obj);
+
+  push("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj");
+  push("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj");
+
+  const contentLines: string[] = [];
+  contentLines.push("BT");
+  contentLines.push("/F1 14 Tf");
+  contentLines.push("72 740 Td");
+  contentLines.push(`(${escapePdfText("Asset Passport")}) Tj`);
+  contentLines.push("0 -20 Td");
+  contentLines.push("/F1 10 Tf");
+
+  const addLine = (label: string, value: string) => {
+    contentLines.push("0 -14 Td");
+    contentLines.push(`(${escapePdfText(label)} ) Tj`);
+    contentLines.push("0 -12 Td");
+    contentLines.push(`(${escapePdfText(value)}) Tj`);
+  };
+
+  addLine("Issuer", passport.asset.issuer);
+  addLine("Currency", passport.asset.currency || "—");
+  if (passport.asset.domain) addLine("Domain", passport.asset.domain);
+
+  contentLines.push("0 -20 Td");
+  contentLines.push(`(${escapePdfText(`Verdict: ${passport.authority.verdict.toUpperCase()}`)}) Tj`);
+  contentLines.push("0 -12 Td");
+  contentLines.push(`(${escapePdfText(`Rules version: ${passport.authority.rulesVersion}`)}) Tj`);
+  contentLines.push(`(${escapePdfText(`Ledger index: ${passport.authority.ledgerIndex}`)}) Tj`);
+  contentLines.push(`(${escapePdfText(`Source: ${passport.authority.source}`)}) Tj`);
+
+  contentLines.push("0 -20 Td");
+  contentLines.push(`(${escapePdfText("Receipt")}) Tj`);
+  contentLines.push("0 -12 Td");
+  contentLines.push(`(${escapePdfText(`Body digest: ${passport.receipt.bodyDigest}`)}) Tj`);
+  contentLines.push("0 -12 Td");
+  contentLines.push(`(${escapePdfText(`Signed digest: ${passport.receipt.signedDigest}`)}) Tj`);
+
+  contentLines.push("0 -20 Td");
+  contentLines.push(`(${escapePdfText(`Presenter: ${passport.presenter.name}`)}) Tj`);
+  contentLines.push("0 -12 Td");
+  contentLines.push(`(${escapePdfText(`Contact: ${passport.presenter.contact}`)}) Tj`);
+  contentLines.push("0 -12 Td");
+  contentLines.push(`(${escapePdfText(`Jurisdiction: ${passport.presenter.jurisdiction}`)}) Tj`);
+
+  contentLines.push("0 -20 Td");
+  contentLines.push(`(${escapePdfText(`Generated: ${passport.generatedAt}`)}) Tj`);
+
+  contentLines.push("ET");
+
+  const contentStream = contentLines.join("\n");
+  const contentStreamBytes = new TextEncoder().encode(contentStream);
+
+  push("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj");
+  push(`4 0 obj\n<< /Length ${contentStreamBytes.length} >>\nstream\n${contentStream}\nendstream\nendobj`);
+  push("5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj");
+
+  const header = "%PDF-1.4\n";
+  const body = objects.join("\n");
+  const bodyBytes = new TextEncoder().encode(body);
+
+  const offsets: number[] = [0];
+  for (let i = 1; i <= 5; i++) {
+    const marker = `${i} 0 obj`;
+    const markerBytes = new TextEncoder().encode(marker);
+    const idx = bodyBytes.indexOf(markerBytes);
+    offsets.push(idx >= 0 ? header.length + idx : 0);
+  }
+
+  const xrefLines: string[] = [];
+  xrefLines.push("xref");
+  xrefLines.push("0 6");
+  xrefLines.push("0000000000 65535 f ");
+  for (let i = 1; i <= 5; i++) {
+    xrefLines.push(`${String(offsets[i]).padStart(10, "0")} 00000 n `);
+  }
+
+  const xrefOffset = header.length + bodyBytes.length;
+  const trailerLines = [
+    "trailer",
+    "<< /Size 6 /Root 1 0 R >>",
+    "startxref",
+    String(xrefOffset),
+    "%%EOF",
+  ];
+
+  const pdf = [
+    header,
+    body,
+    ...xrefLines,
+    ...trailerLines,
+  ].join("\n");
+
+  return new TextEncoder().encode(pdf);
+}
+
 export async function exportPassport(
   passport: AssetPassport,
   fileName?: string
-): Promise<{ json: string; csv: string; saved: { json: string; csv: string } }> {
+): Promise<{ json: string; csv: string; pdf: Uint8Array; saved: { json: string; csv: string; pdf: string } }> {
   const json = passportToJson(passport);
   const csv = passportToCsv(passport);
+  const pdf = passportToPdf(passport);
   const base = fileName ?? `passport-${passport.asset.currency ?? passport.asset.issuer.slice(0, 8)}`;
   const stamp = passport.generatedAt.slice(0, 10);
 
   const savedJson = await saveTextFile(`${base}-${stamp}.json`, json, "application/json");
   const savedCsv = await saveTextFile(`${base}-${stamp}.csv`, csv, "text/csv");
+  const savedPdf = await saveBinaryFile(`${base}-${stamp}.pdf`, pdf);
 
   return {
     json,
     csv,
-    saved: { json: savedJson, csv: savedCsv },
+    pdf,
+    saved: { json: savedJson, csv: savedCsv, pdf: savedPdf },
   };
 }

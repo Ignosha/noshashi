@@ -131,6 +131,7 @@ jobs:
             letting it surprise you.
           releaseDraft: false
           prerelease: false
+          includeUpdaterJson: true
 
       # tauri-action attaches to the release, but a plain artefact makes the
       # binaries retrievable from a workflow_dispatch run with no tag.

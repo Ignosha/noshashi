@@ -11,6 +11,7 @@ import {
   buildPassport,
   passportToJson,
   passportToCsv,
+  passportToPdf,
   type AssetPassport,
 } from "@/lib/desk/passport";
 import { useToast } from "@/lib/toast";
@@ -82,7 +83,11 @@ function PassportBody() {
     setExporting(true);
     try {
       const result = await exportPassport(passport);
-      push({ title: "PASSPORT EXPORTED", body: `${result.saved.json}`, tone: "go" });
+      push({ 
+        title: "PASSPORT EXPORTED", 
+        body: `${result.saved.json}\n${result.saved.csv}\n${result.saved.pdf}`, 
+        tone: "go" 
+      });
     } catch (error) {
       push({
         title: "EXPORT FAILED",
@@ -410,12 +415,14 @@ function ExportSection({ passport }: { passport: AssetPassport }) {
 async function exportPassport(passport: AssetPassport) {
   const json = passportToJson(passport);
   const csv = passportToCsv(passport);
+  const pdf = passportToPdf(passport);
   const base = `passport-${passport.asset.currency ?? passport.asset.issuer.slice(0, 8)}`;
   const stamp = passport.generatedAt.slice(0, 10);
 
-  const { saveTextFile } = await import("@/lib/export");
+  const { saveTextFile, saveBinaryFile } = await import("@/lib/export");
   const savedJson = await saveTextFile(`${base}-${stamp}.json`, json, "application/json");
   const savedCsv = await saveTextFile(`${base}-${stamp}.csv`, csv, "text/csv");
+  const savedPdf = await saveBinaryFile(`${base}-${stamp}.pdf`, pdf);
 
-  return { json, csv, saved: { json: savedJson, csv: savedCsv } };
+  return { json, csv, pdf, saved: { json: savedJson, csv: savedCsv, pdf: savedPdf } };
 }
