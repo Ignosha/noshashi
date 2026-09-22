@@ -60,6 +60,11 @@
   --status-no-go-dim: 355 70% 95%;
 
   --spectral: 210 20% 96%;
+  /* The board's rule colour — a hairline on a light ground is darker
+     than the card, and on a dark ground lighter than the surface. This
+     is the one neutral that is not the same on both themes, because a
+     rule is a printed thing and has to read against whatever it sits on. */
+  --line: 210 16% 78%;
 }
 
 .dark {
@@ -102,6 +107,7 @@
   --status-no-go-dim: 355 55% 13%;
 
   --spectral: 135 20% 90%;
+  --line: 135 15% 20%;                  /* #263B2A — rule colour on dark ground */
 }
 
 @font-face {
@@ -196,6 +202,7 @@
   --color-hold-dim: hsl(var(--status-hold-dim));
   --color-no-go-dim: hsl(var(--status-no-go-dim));
   --color-spectral: hsl(var(--spectral));
+  --color-line: hsl(var(--line));
   --color-brand: hsl(var(--brand));
   --color-telemetry: hsl(var(--telemetry));
   --color-faint: hsl(var(--faint));

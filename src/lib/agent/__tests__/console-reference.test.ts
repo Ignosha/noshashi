@@ -137,7 +137,7 @@ describe("agent console reference", () => {
       // A gated scene must say so, or the agent will send a free user into
       // a paywall without warning.
       expect(
-        /Requires (Desk|Institution)/.test(line!),
+        /Requires (Desk|Institution|Enterprise)/.test(line!),
         `${scene.label} is gated on ${scene.requires} but its line does not say which plan`
       ).toBe(true);
     }
@@ -149,7 +149,7 @@ describe("agent console reference", () => {
       const line = lineFor(scene);
       if (!line) continue;
       expect(
-        /Requires (Desk|Institution)/.test(line),
+        /Requires (Desk|Institution|Enterprise)/.test(line),
         `${scene.label} is free but its line claims a paid plan`
       ).toBe(false);
     }
