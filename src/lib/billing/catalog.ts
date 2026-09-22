@@ -6,7 +6,7 @@
  * a tampered client cannot invent a cheaper plan.
  */
 
-export type PlanId = "operator" | "desk" | "institution";
+export type PlanId = "operator" | "desk" | "institution" | "enterprise" | "strategic";
 
 /**
  * Note on naming: the customer-facing names are FREE, PRO and
@@ -196,6 +196,97 @@ export const PLANS: Plan[] = [
       "custom_alert_logic",
     ],
   },
+  {
+    id: "enterprise",
+    name: "ENTERPRISE",
+    audience: "Institutional teams operating at scale",
+    priceLabel: "$10,000",
+    monthlyUsd: 10000,
+    cadence: "per month",
+    priceId: "price_ENTERPRISE_MONTHLY",
+    annualUsd: 100_000,
+    annualPriceId: "price_ENTERPRISE_ANNUAL",
+    purchase: "contact_sales",
+    seatBased: false,
+    emphasis: true,
+    features: [
+      "Everything in Institutional",
+      "Asset passports and issuer intelligence at institutional scope",
+      "Portfolio monitoring, counterparty and liquidity intelligence",
+      "Deterministic policy engine, adjudication and decision history",
+      "Evidence records, hashes, audit exports and review workflow",
+      "Institutional API, scoped keys and webhooks",
+      "Dedicated environment options where supported",
+      "Architecture review and named implementation planning",
+    ],
+    grants: [
+      "console",
+      "gate",
+      "agent",
+      "export",
+      "portfolios",
+      "alerts",
+      "receipt_anchoring",
+      "priority_support",
+      "authority_certificate",
+      "compliance_api",
+      "webhooks",
+      "regulator_seats",
+      "white_label",
+      "sla",
+      "sso",
+      "audit_log",
+      "bulk_monitoring",
+      "custom_alert_logic",
+      "asset_passports",
+      "dedicated_environment",
+    ],
+  },
+  {
+    id: "strategic",
+    name: "STRATEGIC INFRASTRUCTURE",
+    audience: "Institutions building their own XRPL intelligence layer",
+    priceLabel: "$20,850",
+    monthlyUsd: 20850,
+    cadence: "per month",
+    priceId: "price_STRATEGIC_MONTHLY",
+    annualUsd: 208_500,
+    annualPriceId: "price_STRATEGIC_ANNUAL",
+    purchase: "contact_sales",
+    seatBased: false,
+    features: [
+      "Everything in Enterprise",
+      "High-volume API capacity and contracted burst limits",
+      "XRPL event feeds, webhooks and machine-readable delivery",
+      "Custom schemas, retention and bulk export design",
+      "Architecture review before commitment",
+      "Scope documented against the integration",
+    ],
+    grants: [
+      "console",
+      "gate",
+      "agent",
+      "export",
+      "portfolios",
+      "alerts",
+      "receipt_anchoring",
+      "priority_support",
+      "authority_certificate",
+      "compliance_api",
+      "webhooks",
+      "regulator_seats",
+      "white_label",
+      "sla",
+      "sso",
+      "audit_log",
+      "bulk_monitoring",
+      "custom_alert_logic",
+      "asset_passports",
+      "dedicated_environment",
+      "event_feeds",
+      "custom_schemas",
+    ],
+  },
 ];
 
 export type CreditPack = {
@@ -351,6 +442,30 @@ export const FEATURE_CATALOG: Record<
     requires: "institution",
     blurb:
       "Your own thresholds and expressions over the same measured facts, routed to your own destinations. A compliance function that cannot state its own trigger is using someone else's risk appetite.",
+  },
+  asset_passports: {
+    label: "Asset passports",
+    requires: "enterprise",
+    blurb:
+      "A signed, portable record of an asset's compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks.",
+  },
+  dedicated_environment: {
+    label: "Dedicated environment",
+    requires: "enterprise",
+    blurb:
+      "Isolated compute and storage for your compliance workload, with your own node endpoints, retention policies and disaster recovery. Not shared tenancy.",
+  },
+  event_feeds: {
+    label: "XRPL event feeds",
+    requires: "strategic",
+    blurb:
+      "Real-time, machine-readable streams of ledger closes, amendment votes, issuer flag changes and domain updates — delivered over gRPC, WebSocket or HTTPS with exactly-once semantics.",
+  },
+  custom_schemas: {
+    label: "Custom schemas & bulk export",
+    requires: "strategic",
+    blurb:
+      "Define your own record shapes for adjudications, receipts and portfolio state. Bulk export on your schedule with your schema, your encryption, your retention.",
   },
 };
 

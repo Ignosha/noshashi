@@ -686,6 +686,70 @@
     html[data-theme="light"] .hi-bloom{color:rgb(36 122 59 / .38)}
   }
 
+  /* ── Garden aesthetic enhancements ────────────────────────────────────
+     Matcha and garden organic feel: soft greens, organic shapes,
+     garden-like elements. The layout stays the same — we're adding
+     atmosphere, not changing the structure. */
+  .garden-bg{
+    position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+  }
+  .garden-bg::before{
+    content:"";position:absolute;top:-10%;right:-15%;width:60vw;height:60vw;
+    background:radial-gradient(circle at 60% 40%,color-mix(in srgb,var(--brand) 8%,transparent) 0%,transparent 70%);
+    border-radius:50%;
+  }
+  .garden-bg::after{
+    content:"";position:absolute;bottom:-20%;left:-10%;width:50vw;height:50vw;
+    background:radial-gradient(circle at 40% 60%,color-mix(in srgb,var(--tele) 6%,transparent) 0%,transparent 70%);
+    border-radius:50%;
+  }
+  .leaf-accent{
+    position:absolute;pointer-events:none;opacity:.06;z-index:0;
+    color:var(--brand);
+  }
+  .leaf-accent.top-right{top:8%;right:12%;width:180px;height:180px;transform:rotate(25deg)}
+  .leaf-accent.bottom-left{bottom:12%;left:8%;width:140px;height:140px;transform:rotate(-15deg)}
+  .leaf-accent.mid{top:50%;right:30%;width:100px;height:100px;transform:rotate(45deg);opacity:.04}
+  /* Organic divider instead of straight rule */
+  .organic-rule{
+    height:2px;border:0;margin:0;
+    background:linear-gradient(90deg,transparent 0%,var(--rule) 8%,var(--rule) 92%,transparent 100%);
+    border-radius:2px;
+  }
+  /* Soft glow on buttons for garden feel */
+  .btn{
+    box-shadow:0 4px 14px color-mix(in srgb,var(--brand) 18%,transparent);
+  }
+  .btn:hover{
+    box-shadow:0 6px 22px color-mix(in srgb,var(--brand) 30%,transparent);
+  }
+  /* Panel hover: subtle green tint */
+  .panel:hover,.tier:hover,.plat:hover{
+    background:color-mix(in srgb,var(--surface) 92%,var(--brand));
+    border-color:color-mix(in srgb,var(--brand) 35%,var(--rule));
+  }
+  /* Softened grid lines for garden feel */
+  .grid{background:linear-gradient(90deg,var(--rule) 0 1px,transparent 1px),linear-gradient(0deg,var(--rule) 0 1px,transparent 1px);
+    background-size:100% 1px,1px 100%;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+  .grid > *{background:var(--surface)}
+  /* Hero: add subtle garden atmosphere behind the bloom */
+  .hero-instrument{
+    background:
+      radial-gradient(ellipse at 30% 20%,color-mix(in srgb,var(--brand) 6%,transparent) 0%,transparent 50%),
+      radial-gradient(ellipse at 70% 80%,color-mix(in srgb,var(--tele) 5%,transparent) 0%,transparent 50%),
+      var(--ground);
+  }
+  /* Softened the instrument field for garden feel */
+  .field svg{opacity:.4}
+  /* Typography: softer, more organic feel for headings */
+  .hero-instrument h1{
+    text-shadow:0 1px 20px color-mix(in srgb,var(--brand) 15%,transparent);
+  }
+  /* Footer: garden accent */
+  footer{
+    background:linear-gradient(180deg,var(--ground),color-mix(in srgb,var(--ground) 80%,var(--surface)));
+  }
+
   /* ── The measured grid. Four verticals, two horizontals, eight
    *    crossings. Percentages, so it is the same composition at every
    *    width. ─────────────────────────────────────────────────────── */
@@ -805,6 +869,20 @@
 </style>
 </head>
 <body>
+<div class="garden-bg">
+  <svg class="leaf-accent top-right" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+    <path d="M50 95C30 70 20 40 50 10C80 40 70 70 50 95Z" fill="currentColor"/>
+    <path d="M50 95V20M50 50C35 55 30 65 50 95M50 50C65 55 70 65 50 95" stroke="currentColor" stroke-width="0.5" opacity=".5"/>
+  </svg>
+  <svg class="leaf-accent bottom-left" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+    <path d="M50 95C30 70 20 40 50 10C80 40 70 70 50 95Z" fill="currentColor"/>
+    <path d="M50 95V20M50 50C35 55 30 65 50 95M50 50C65 55 70 65 50 95" stroke="currentColor" stroke-width="0.5" opacity=".5"/>
+  </svg>
+  <svg class="leaf-accent mid" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+    <path d="M50 95C30 70 20 40 50 10C80 40 70 70 50 95Z" fill="currentColor"/>
+    <path d="M50 95V20M50 50C35 55 30 65 50 95M50 50C65 55 70 65 50 95" stroke="currentColor" stroke-width="0.5" opacity=".5"/>
+  </svg>
+</div>
 <div class="layer">
 <header>
   <div class="shell nav">

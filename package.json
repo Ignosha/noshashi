@@ -1,7 +1,7 @@
 {
   "name": "noshashi",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "NOSHASHI institutional XRPL intelligence and data infrastructure",
   "main": "main.js",
   "author": "Ignoshashi",

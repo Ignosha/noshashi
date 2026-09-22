@@ -336,6 +336,37 @@ export const TIERS: Tier[] = [
       "Published SLA and named support",
     ],
   },
+  {
+    id: "enterprise",
+    name: "ENTERPRISE",
+    audience: "Institutional teams operating at scale",
+    ...priced("enterprise"),
+    features: [
+      "Everything in Institutional",
+      "Asset passports and issuer intelligence at institutional scope",
+      "Portfolio monitoring, counterparty and liquidity intelligence",
+      "Deterministic policy engine, adjudication and decision history",
+      "Evidence records, hashes, audit exports and review workflow",
+      "Institutional API, scoped keys and webhooks",
+      "Dedicated environment options where supported",
+      "Architecture review and named implementation planning",
+    ],
+    emphasis: true,
+  },
+  {
+    id: "strategic",
+    name: "STRATEGIC INFRASTRUCTURE",
+    audience: "Institutions building their own XRPL intelligence layer",
+    ...priced("strategic"),
+    features: [
+      "Everything in Enterprise",
+      "High-volume API capacity and contracted burst limits",
+      "XRPL event feeds, webhooks and machine-readable delivery",
+      "Custom schemas, retention and bulk export design",
+      "Architecture review before commitment",
+      "Scope documented against the integration",
+    ],
+  },
 ];
 
 export type RevenueStream = {
