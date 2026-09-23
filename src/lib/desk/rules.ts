@@ -4,11 +4,14 @@ import { readSetting, writeSetting } from "@/lib/store";
 /**
  * The editable rule set.
  *
- * Until now the thresholds that decide a verdict were constants in the
- * source. An institution cannot accept that: its risk appetite is its
- * own, and a compliance officer has to be able to state — and change —
- * the number that produced a HOLD. These persist to disk and are applied
- * by every adjudication.
+ * An institution's risk appetite is its own, and a compliance officer
+ * has to be able to state it. These thresholds persist to disk and are
+ * exported with the rule set.
+ *
+ * They are NOT read by the gate verdict (src/lib/policy.ts evaluatePolicy)
+ * today, and the Policy editor says so. The policy simulation
+ * (src/lib/desk/simulate.ts) can apply a proposed HHI limit to recorded
+ * verdicts to show what enforcing one would change.
  */
 
 export type RuleSet = {

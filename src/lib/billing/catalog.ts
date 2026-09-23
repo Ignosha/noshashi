@@ -367,7 +367,7 @@ export const FEATURE_CATALOG: Record<
     label: "Editable rule set",
     requires: "desk",
     blurb:
-      "State your own thresholds for concentration, reserve headroom and Travel Rule scope. A compliance officer has to be able to change the number that produced a HOLD.",
+      "State your own thresholds for concentration, reserve headroom and Travel Rule scope, and simulate what a changed rule, severity or transfer ceiling would do to every verdict already on your ledger before you adopt it.",
   },
   drift_monitor: {
     label: "Issuer drift monitor",

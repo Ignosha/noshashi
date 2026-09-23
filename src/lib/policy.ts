@@ -160,6 +160,23 @@ export function reserveRequirementXrp(ownerCount: number): number {
 }
 
 /**
+ * The verdict a set of check results produces. The one place the
+ * decision rule lives, so a stored check list can be re-decided later
+ * (evidence verification, policy simulation) by exactly the rule that
+ * decided it the first time.
+ *
+ * Blocking failure → NO-GO. Otherwise any unreadable evidence source
+ * (an EVIDENCE_* check) → INSUFFICIENT DATA. Otherwise an advisory
+ * failure → HOLD. Otherwise GO.
+ */
+export function verdictForChecks(checks: PolicyCheck[]): Status {
+  if (checks.some((check) => check.severity === "block" && !check.passed)) return "no-go";
+  if (checks.some((check) => check.id.startsWith("EVIDENCE_"))) return "insufficient-data";
+  if (checks.some((check) => check.severity === "warn" && !check.passed)) return "hold";
+  return "go";
+}
+
+/**
  * Run the full rule set. Pure — no I/O, no clock beyond the timestamp.
  */
 export function evaluatePolicy(input: {
@@ -278,18 +295,8 @@ export function evaluatePolicy(input: {
     });
   }
 
-  const blocked = checks.some((check) => check.severity === "block" && !check.passed);
-  const warned = checks.some((check) => check.severity === "warn" && !check.passed);
-  const verdict: Status = blocked
-    ? "no-go"
-    : evidenceUnavailable.length > 0
-      ? "insufficient-data"
-      : warned
-        ? "hold"
-        : "go";
-
   return {
-    verdict,
+    verdict: verdictForChecks(checks),
     domainId: domain.id,
     subject: account?.address ?? "unknown",
     amountXrp,
