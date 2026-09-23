@@ -36,6 +36,10 @@ import {
 import { CONTACT } from "@/lib/brand";
 import { dataBoundary, recordFor, useAiUseLog, type AiUseRecord } from "@/lib/agent/governance";
 import { AgentGovernance } from "./AgentGovernance";
+import { useLedger } from "@/lib/desk/ledger";
+import { usePolicyStore } from "@/lib/desk/policyStore";
+import { buildPolicyBrief, parseWhatIf, simulationFact } from "@/lib/agent/policyContext";
+import { useClaimedSubject } from "@/lib/nav/handoff";
 import { clearProviderKey, hasProviderKey, storeProviderKey } from "@/lib/agent/keys";
 import { findAnswers, fallbackAnswer, KNOWLEDGE } from "@/lib/support/knowledge";
 import { runDiagnostics, type Diagnostic } from "@/lib/support/diagnostics";
@@ -53,6 +57,8 @@ type Turn = {
   /** Set while the assistant turn is still streaming in. */
   streaming?: boolean;
   error?: boolean;
+  /** Output of the deterministic policy simulation, not of the model. */
+  simulation?: boolean;
 };
 
 let turnId = 0;
@@ -86,6 +92,13 @@ export function AgentScene({ data }: { data: XrplState }) {
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState<"chat" | "governance">("chat");
   const useLog = useAiUseLog();
+  const { entries: ledgerEntries } = useLedger();
+  const { active: activePolicy } = usePolicyStore();
+  // A question handed over from a verdict ("ASK NOSHASHI WHY") arrives pre-filled.
+  useClaimedSubject("agent", (subject) => {
+    setMode("compliance");
+    setDraft(subject.value);
+  });
 
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -240,16 +253,34 @@ export function AgentScene({ data }: { data: XrplState }) {
       return;
     }
 
-    if (!config.model) return;
+    // A "what if" about a policy threshold runs the real simulation first.
+    // Its numbers come from the engine; the model may only explain them.
+    const whatIf = activePolicy ? parseWhatIf(prompt, activePolicy.params) : null;
+    const simText = whatIf && activePolicy ? simulationFact(ledgerEntries, activePolicy, whatIf) : null;
+
+    if (!config.model) {
+      if (simText) {
+        setTurns((prev) => [
+          ...prev,
+          { id: ++turnId, role: "user", content: prompt },
+          { id: ++turnId, role: "assistant", content: simText, simulation: true },
+        ]);
+        setDraft("");
+      }
+      return;
+    }
 
     const userTurn: Turn = { id: ++turnId, role: "user", content: prompt };
+    const simTurn: Turn | null = simText
+      ? { id: ++turnId, role: "assistant", content: simText, simulation: true }
+      : null;
     const assistantTurn: Turn = {
       id: ++turnId,
       role: "assistant",
       content: "",
       streaming: true,
     };
-    setTurns((prev) => [...prev, userTurn, assistantTurn]);
+    setTurns((prev) => [...prev, userTurn, ...(simTurn ? [simTurn] : []), assistantTurn]);
     setDraft("");
     setBusy(true);
 
@@ -258,8 +289,13 @@ export function AgentScene({ data }: { data: XrplState }) {
 
     // Send the last few turns for continuity without blowing the window.
     const history: ChatMessage[] = [
-      { role: "system", content: buildSystemPrompt(mode, data, boundary) },
-      ...turns.slice(-HISTORY_TURNS).map((turn) => ({
+      {
+        role: "system",
+        content:
+          buildSystemPrompt(mode, data, boundary, buildPolicyBrief(activePolicy, ledgerEntries[0] ?? null)) +
+          (simText ? `\n\n${simText}` : ""),
+      },
+      ...turns.filter((turn) => !turn.simulation).slice(-HISTORY_TURNS).map((turn) => ({
         role: turn.role,
         content: turn.content,
       })),
@@ -506,10 +542,16 @@ export function AgentScene({ data }: { data: XrplState }) {
                           <NovaLogo size={12} animated={false} tone="color" />
                         )}
                       </span>
-                      <div className="min-w-0 flex-1">
+                      <div className={cn("min-w-0 flex-1", turn.simulation && "border border-hold/40 p-2")}>
+                        {turn.simulation && (
+                          <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-hold">
+                            SIMULATION · COMPUTED BY THE POLICY ENGINE · NOT MODEL OUTPUT
+                          </p>
+                        )}
                         <p
                           className={cn(
-                            "selectable whitespace-pre-wrap break-words text-[11.5px] leading-relaxed",
+                            "selectable whitespace-pre-wrap break-words leading-relaxed",
+                            turn.simulation ? "mono-font text-[10px]" : "text-[11.5px]",
                             turn.role === "user"
                               ? "text-foreground/85"
                               : turn.error

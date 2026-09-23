@@ -18,7 +18,8 @@ import { saveTextFile } from "@/lib/export";
 import { useLedger, summariseWallets, ledgerToCsv, signContent } from "@/lib/desk/ledger";
 import { EvidencePanel } from "@/components/scenes/EvidencePanel";
 import { SimulationPanel } from "@/components/scenes/SimulationPanel";
-import { useRuleSet, DEFAULT_RULES } from "@/lib/desk/rules";
+import { PolicyManager } from "@/components/scenes/PolicyManager";
+import { usePolicyStore } from "@/lib/desk/policyStore";
 import { useIssuerWatch, WATCH_INTERVALS, postureLabel } from "@/lib/desk/watch";
 import { useOfflineVault, provenanceLine } from "@/lib/desk/offline";
 import { useIssuerRisk } from "@/lib/desk/useRisk";
@@ -72,7 +73,7 @@ function WorkstationBody({
   onUpgrade: () => void;
 }) {
   const { entries, loaded, clear } = useLedger();
-  const { rules, dirty, update, save, reset, asJson } = useRuleSet();
+  const { active: activePolicy } = usePolicyStore();
   const { has } = useBilling();
   const { push } = useToast();
 
@@ -256,7 +257,7 @@ function WorkstationBody({
                         <td className="mono-font px-3 py-2 text-[10px] tabular-nums text-muted-foreground">{w.scans}</td>
                         <td className={cn(
                           "mono-font px-3 py-2 text-[10px] tabular-nums",
-                          (w.worstHhi ?? 0) > rules.hhiMaxBeforeHold ? "text-no-go" : "text-muted-foreground"
+                          activePolicy?.params.hhiLimit != null && (w.worstHhi ?? 0) > activePolicy.params.hhiLimit ? "text-no-go" : "text-muted-foreground"
                         )}>
                           {w.worstHhi?.toLocaleString() ?? "—"}
                         </td>
@@ -294,98 +295,11 @@ function WorkstationBody({
         {tab === "evidence" && <EvidencePanel entries={entries} loaded={loaded} />}
 
         {/* ── Policy editor ────────────────────────────────────── */}
-        {tab === "policy" && (
-          <div className="p-4">
-            <p className="mb-4 max-w-[560px] text-[11px] leading-relaxed text-muted-foreground">
-              Your stated risk thresholds, saved to disk and exportable for review. The
-              gate verdict in Verification does not read them yet: it is decided by the
-              engine's rules — account, credentials, reserve, spendable balance, transfer
-              ceiling, domain governance and attestation. Use SIMULATE to see what a
-              changed rule, ceiling or HHI limit would do to the verdicts you have recorded.
-            </p>
-
-            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-              <NumberRule
-                label="MAX HHI BEFORE HOLD"
-                hint="Herfindahl-Hirschman Index, 0–10,000. Above 2,500 is treated as concentrated."
-                value={rules.hhiMaxBeforeHold}
-                onChange={(v) => update("hhiMaxBeforeHold", v)}
-              />
-              <NumberRule
-                label="MAX SINGLE COUNTERPARTY %"
-                hint="Share of settlement volume one counterparty may hold before a HOLD."
-                value={rules.counterpartyMaxSharePct}
-                onChange={(v) => update("counterpartyMaxSharePct", v)}
-              />
-              <NumberRule
-                label={`TRAVEL RULE THRESHOLD (${rules.travelRuleCurrency})`}
-                hint="FATF R.16 reporting threshold in your jurisdiction."
-                value={rules.travelRuleThresholdFiat}
-                onChange={(v) => update("travelRuleThresholdFiat", v)}
-              />
-              <NumberRule
-                label="XRP REFERENCE RATE"
-                hint="No price feed ships in this build — supply the rate your books use."
-                value={rules.xrpReferenceRate}
-                step={0.01}
-                onChange={(v) => update("xrpReferenceRate", v)}
-              />
-              <NumberRule
-                label="MIN RESERVE HEADROOM (XRP)"
-                hint="Spendable margin above the owner reserve before a HOLD."
-                value={rules.minReserveHeadroomXrp}
-                onChange={(v) => update("minReserveHeadroomXrp", v)}
-              />
-              <NumberRule
-                label="CREDENTIAL EXPIRY WARNING (DAYS)"
-                hint="How far ahead the radar flags an expiring credential."
-                value={rules.credentialExpiryWarningDays}
-                onChange={(v) => update("credentialExpiryWarningDays", v)}
-              />
-            </div>
-
-            <div className="mt-5 flex items-center gap-3 border-t border-border pt-4">
-              <Switch
-                checked={rules.strictFreezeRights}
-                onCheckedChange={(v) => update("strictFreezeRights", Boolean(v))}
-              />
-              <div>
-                <p className="text-[11px] font-medium text-foreground">Strict freeze-rights check</p>
-                <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">
-                  Treat an issuer that merely <em>retains</em> the right to freeze as a blocking
-                  failure rather than an advisory one. Custodians generally want this on.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-5 flex items-center gap-2">
-              <Button onClick={() => void save().then(() => push({ title: "RULE SET SAVED", tone: "go" }))} disabled={!dirty}>
-                {dirty ? "SAVE RULE SET" : "SAVED"}
-              </Button>
-              <Button variant="outline" onClick={reset}>RESTORE DEFAULTS</Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  void navigator.clipboard.writeText(asJson());
-                  push({ title: "RULE SET COPIED", body: "Portable JSON on the clipboard.", tone: "info" });
-                }}
-              >
-                COPY AS JSON
-              </Button>
-            </div>
-
-            {rules.hhiMaxBeforeHold !== DEFAULT_RULES.hhiMaxBeforeHold && (
-              <p className="mono-font mt-3 text-[9px] text-hold">
-                HHI threshold differs from the {DEFAULT_RULES.hhiMaxBeforeHold.toLocaleString()} default —
-                document the rationale for your examiner.
-              </p>
-            )}
-          </div>
-        )}
+        {tab === "policy" && <PolicyManager entries={entries} />}
 
         {/* ── Policy simulation ────────────────────────────────── */}
         {tab === "simulate" && (
-          <SimulationPanel entries={entries} loaded={loaded} hhiDefault={rules.hhiMaxBeforeHold} />
+          <SimulationPanel entries={entries} loaded={loaded} />
         )}
 
         {/* ── Signed export ────────────────────────────────────── */}
@@ -524,6 +438,11 @@ function WorkstationBody({
                         credentials: data.credentials,
                         trustLines: lines,
                         postures: exposures.map((e) => e.posture),
+                        transactions: data.activityError ? undefined : data.transactions,
+                        reserve:
+                          data.server?.reserveBaseXrp != null && data.server?.reserveIncXrp != null
+                            ? { baseXrp: data.server.reserveBaseXrp, incXrp: data.server.reserveIncXrp }
+                            : undefined,
                       });
                       setSnapLabel("");
                       push({
@@ -720,31 +639,3 @@ function describeAge(iso: string): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-function NumberRule({
-  label,
-  hint,
-  value,
-  onChange,
-  step = 1,
-}: {
-  label: string;
-  hint: string;
-  value: number;
-  onChange: (value: number) => void;
-  step?: number;
-}) {
-  return (
-    <div>
-      <Label htmlFor={label}>{label}</Label>
-      <Input
-        id={label}
-        type="number"
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="mono-font mt-1.5 text-[11px]"
-      />
-      <p className="mt-1 text-[9px] leading-snug text-muted-foreground">{hint}</p>
-    </div>
-  );
-}

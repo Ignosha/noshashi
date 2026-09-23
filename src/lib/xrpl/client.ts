@@ -204,6 +204,12 @@ export async function fetchWalletTransactions(
   }
 }
 
+function finiteOrNull(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
 export async function fetchServerInfo(): Promise<ServerInfo> {
   const result = await rpc("server_info");
   const info = result.info ?? {};
@@ -222,6 +228,9 @@ export async function fetchServerInfo(): Promise<ServerInfo> {
     ),
     loadFactor: Number(info.load_factor ?? 1),
     peers: Number(info.peers ?? 0),
+    reserveBaseXrp: finiteOrNull(info.validated_ledger?.reserve_base_xrp),
+    reserveIncXrp: finiteOrNull(info.validated_ledger?.reserve_inc_xrp),
+    validatedLedger: finiteOrNull(info.validated_ledger?.seq),
   };
 }
 

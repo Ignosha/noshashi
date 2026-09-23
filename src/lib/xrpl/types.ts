@@ -60,6 +60,15 @@ export type ServerInfo = {
   /** Load-derived fee multiplier reported by the node. */
   loadFactor: number;
   peers: number;
+  /**
+   * Account reserve values in force on the validated ledger, read from the
+   * node. Null when the node did not report them; callers must not
+   * substitute a guess.
+   */
+  reserveBaseXrp: number | null;
+  reserveIncXrp: number | null;
+  /** Validated ledger the reserve values were read at. */
+  validatedLedger: number | null;
 };
 
 /** A transaction the node validated while we were watching. */

@@ -22,6 +22,19 @@ import {
 } from "@/lib/policy";
 import { useToast } from "@/lib/toast";
 import { useLedger, receiptToEntry } from "@/lib/desk/ledger";
+import { usePolicyStore } from "@/lib/desk/policyStore";
+import { useIssuerRisk } from "@/lib/desk/useRisk";
+import {
+  judge,
+  measure,
+  refOf,
+  toChecks,
+  type Measurements,
+  type PolicyFacts,
+  type RuleResult,
+} from "@/lib/desk/institutional";
+import { PolicyRefLine, PolicyVerdictBlock } from "./PolicyVerdict";
+import { useHandoff } from "@/lib/nav/handoff";
 import { useOfflineVault } from "@/lib/desk/offline";
 import { sendNativeNotification } from "@/lib/notifications";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
@@ -66,8 +79,12 @@ export function VerificationScene({ data }: { data: XrplState }) {
   const [destination, setDestination] = useState("");
   const [amount, setAmount] = useState("100");
   const [running, setRunning] = useState(false);
-  const [receipt, setReceipt] = useState<PolicyReceipt | null>(null);
-  const [log, setLog] = useState<PolicyReceipt[]>([]);
+  const [run, setRun] = useState<GateRun | null>(null);
+  const [log, setLog] = useState<GateRun[]>([]);
+  const receipt = run?.receipt ?? null;
+  const policies = usePolicyStore();
+  const handOff = useHandoff();
+  const issuerRisk = useIssuerRisk(vault.engaged ? undefined : liveAccount?.address);
 
   // When offline mode is engaged the engine adjudicates against captured
   // state rather than the live read. Same rules, same digest algorithm —
@@ -83,7 +100,43 @@ export function VerificationScene({ data }: { data: XrplState }) {
   const amountXrp = Number(amount);
   const amountValid = Number.isFinite(amountXrp) && amountXrp >= 0;
   const destinationValid = destination.trim() === "" || isValidAddress(destination);
-  const canRun = amountValid && destinationValid && !running;
+  // A policy that cannot be verified is never replaced by defaults: the
+  // gate waits rather than issue a verdict under an unknown policy.
+  const policyBlocked = policies.state.status !== "ready";
+  const canRun = amountValid && destinationValid && !running && !policyBlocked;
+
+  /** The facts the institutional policy is applied to, exactly as read. */
+  const gatherFacts = (): PolicyFacts => {
+    const snap = vault.engaged ? vault.active! : null;
+    const server = data.server;
+    return {
+      amountXrp,
+      destination: destination.trim() || undefined,
+      account,
+      reserve: snap
+        ? snap.reserve
+          ? { ...snap.reserve, source: `snapshot of ledger ${snap.ledgerIndex.toLocaleString("en-US")}` }
+          : null
+        : server?.reserveBaseXrp != null && server?.reserveIncXrp != null
+          ? {
+              baseXrp: server.reserveBaseXrp,
+              incXrp: server.reserveIncXrp,
+              source: `server_info, validated ledger ${server.validatedLedger?.toLocaleString("en-US") ?? "unknown"}`,
+            }
+          : null,
+      transactions: snap
+        ? snap.transactions ?? null
+        : data.activityError || data.loadingAccount
+          ? null
+          : data.transactions,
+      trustLines: snap ? snap.trustLines : issuerRisk.loading || issuerRisk.error ? null : issuerRisk.lines,
+      postures: snap
+        ? snap.postures
+        : issuerRisk.loading || issuerRisk.error
+          ? null
+          : issuerRisk.exposures.map((e) => e.posture),
+    };
+  };
 
   const execute = async () => {
     if (!canRun) return;
@@ -91,6 +144,11 @@ export function VerificationScene({ data }: { data: XrplState }) {
     try {
       // A visible dwell makes the verdict feel adjudicated rather than
       // guessed; the evaluation itself is sub-millisecond.
+      // FACTS → CALCULATIONS → ACTIVE POLICY → RULES → VERDICT → RECEIPT.
+      const active = policies.active;
+      const facts = gatherFacts();
+      const measurements = measure(facts);
+      const results = active && measurements ? judge(measurements, active.params) : null;
       const [result] = await Promise.all([
         runPolicy({
           account,
@@ -99,11 +157,16 @@ export function VerificationScene({ data }: { data: XrplState }) {
           amountXrp,
           evidenceUnavailable:
             vault.engaged || !credentialError ? [] : ["credential registry"],
+          reserve: facts.reserve ?? undefined,
+          ...(active && results
+            ? { policy: refOf(active), policyChecks: toChecks(results, active.params) }
+            : {}),
         }),
         new Promise((resolve) => setTimeout(resolve, 620)),
       ]);
-      setReceipt(result);
-      setLog((prev) => [result, ...prev].slice(0, 12));
+      const gateRun: GateRun = { receipt: result, results, measurements };
+      setRun(gateRun);
+      setLog((prev) => [gateRun, ...prev].slice(0, 12));
 
       // The durable record. A session log is a convenience; this is the
       // thing that still exists when an examiner asks in six months.
@@ -111,12 +174,25 @@ export function VerificationScene({ data }: { data: XrplState }) {
         receiptToEntry(result, {
           domainCode: domain.code,
           offline: vault.engaged,
+          hhi: measurements.concentration.state === "ok" ? measurements.concentration.hhi : undefined,
+          measurements,
+          policyResults: results ?? undefined,
         })
       );
 
+      const exceptions = (results ?? []).filter((r) => r.state === "REVIEW" || r.state === "FAIL");
+      if (active && exceptions.length) {
+        const first = exceptions[0];
+        push({
+          title: "POLICY EXCEPTION",
+          body: `${first.label}: observed ${first.observed ?? "—"}, policy ${first.configured} · ${active.name} v${active.version}${exceptions.length > 1 ? ` · +${exceptions.length - 1} more` : ""}`,
+          tone: first.state === "FAIL" ? "no-go" : "hold",
+        });
+      }
+
       push({
         title: `GATE ${VERDICT_COPY[result.verdict].title}`,
-        body: `${domain.code} · ${result.checks.filter((check) => check.passed).length}/${result.checks.length} rules passed${vault.engaged ? " · OFFLINE STATE" : ""}`,
+        body: `${domain.code} · ${result.checks.filter((check) => check.passed).length}/${result.checks.length} rules passed${active ? ` · ${active.name} v${active.version}` : " · no institutional policy"}${vault.engaged ? " · OFFLINE STATE" : ""}`,
         tone: result.verdict,
       });
       void sendNativeNotification({
@@ -236,6 +312,8 @@ export function VerificationScene({ data }: { data: XrplState }) {
                 ))}
               </div>
 
+              <PolicyGateStatus state={policies.state} active={policies.active} />
+
               <Button
                 className="w-full gap-2"
                 onClick={() => void execute()}
@@ -342,8 +420,33 @@ export function VerificationScene({ data }: { data: XrplState }) {
                   </div>
 
                   <div className="min-h-0 flex-1 overflow-y-auto p-3">
-                    <Eyebrow className="mb-2">RULE EVALUATION</Eyebrow>
-                    {receipt.checks.map((check, index) => (
+                    {run?.measurements && <LedgerFacts m={run.measurements} />}
+
+                    <div className="mb-4">
+                      <PolicyVerdictBlock
+                        policy={receipt.policy}
+                        results={run?.results ?? undefined}
+                        verdict={{ label: VERDICT_COPY[receipt.verdict].title, tone: verdictText[receipt.verdict] }}
+                      />
+                      {receipt.policy && run?.results && (
+                        <button
+                          onClick={() =>
+                            handOff({
+                              scene: "agent",
+                              from: "verify",
+                              as: "question about a verdict",
+                              value: `Why did the last gate check come back ${VERDICT_COPY[receipt.verdict].title}? Receipt ${receipt.digest.slice(0, 16)}.`,
+                            })
+                          }
+                          className="stencil mt-2 border border-border px-2 py-1 text-[8px] tracking-[0.2em] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                        >
+                          ASK NOSHASHI WHY
+                        </button>
+                      )}
+                    </div>
+
+                    <Eyebrow className="mb-2">DOMAIN &amp; ENGINE RULES</Eyebrow>
+                    {receipt.checks.filter((check) => !isPolicyCheck(check.id)).map((check, index) => (
                       <motion.div
                         key={check.id}
                         initial={{ opacity: 0, x: -6 }}
@@ -391,6 +494,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
 
                   <div className="shrink-0 border-t border-border p-3">
                     <Eyebrow className="mb-1.5">CRYPTOGRAPHIC RECEIPT</Eyebrow>
+                    {receipt.policy && <PolicyRefLine policy={receipt.policy} className="mb-1.5" />}
                     <p className="mono-font selectable break-all text-[9px] leading-relaxed text-foreground/80">
                       {receipt.digest}
                     </p>
@@ -503,10 +607,12 @@ export function VerificationScene({ data }: { data: XrplState }) {
               </p>
             ) : (
               <div className="space-y-1">
-                {log.map((entry) => (
+                {log.map((logged) => {
+                  const entry = logged.receipt;
+                  return (
                   <button
                     key={entry.digest}
-                    onClick={() => setReceipt(entry)}
+                    onClick={() => setRun(logged)}
                     className={cn(
                       "flex w-full items-center gap-2 border border-border px-2 py-1.5 text-left transition-colors hover:border-foreground/40",
                       receipt?.digest === entry.digest && "border-foreground/50 bg-secondary/50"
@@ -518,9 +624,11 @@ export function VerificationScene({ data }: { data: XrplState }) {
                     </span>
                     <span className="mono-font shrink-0 text-[8px] tabular-nums text-muted-foreground">
                       {entry.amountXrp.toLocaleString()}
+                      {entry.policy && ` · v${entry.policy.version}`}
                     </span>
                   </button>
-                ))}
+                  );
+                })}
               </div>
             )}
           </Panel>
@@ -579,5 +687,98 @@ function DomainOption({
         {domain.code}
       </Badge>
     </button>
+  );
+}
+
+type GateRun = {
+  receipt: PolicyReceipt;
+  /** Institutional policy results, as decided. Null when no policy was active. */
+  results: RuleResult[] | null;
+  measurements: Measurements;
+};
+
+const isPolicyCheck = (id: string) => id.startsWith("POLICY_") || id.startsWith("EVIDENCE_POLICY_");
+
+/** Which policy the next verdict will use — or why none will be issued. */
+function PolicyGateStatus({
+  state,
+  active,
+}: {
+  state: ReturnType<typeof usePolicyStore>["state"];
+  active: ReturnType<typeof usePolicyStore>["active"];
+}) {
+  if (state.status === "loading") {
+    return <p className="mono-font animate-pulse text-[9px] text-muted-foreground">LOADING POLICY…</p>;
+  }
+  if (state.status === "unavailable") {
+    return (
+      <div className="border border-no-go/50 p-2">
+        <p className="stencil text-[8px] tracking-[0.2em] text-no-go">POLICY UNAVAILABLE</p>
+        <p className="mt-1 text-[9px] leading-snug text-muted-foreground">
+          A verified policy configuration could not be loaded. No verdict will be generated until it
+          is available. {state.reason}
+        </p>
+      </div>
+    );
+  }
+  return active ? (
+    <div className="border border-border p-2">
+      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">APPLYING POLICY</p>
+      <p className="mono-font mt-0.5 text-[9.5px] text-foreground">
+        {active.name} v{active.version} <span className="text-go">● ACTIVE</span>
+      </p>
+      <p className="mono-font text-[8.5px] text-muted-foreground">SHA-256 {active.hash.slice(0, 8)}…{active.hash.slice(-4)}</p>
+    </div>
+  ) : (
+    <div className="border border-border p-2">
+      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">NO ACTIVE INSTITUTIONAL POLICY</p>
+      <p className="mt-0.5 text-[9px] leading-snug text-muted-foreground">
+        The domain's rules still apply. No institutional thresholds will be evaluated until a policy
+        is activated in Ledger &amp; Policy.
+      </p>
+    </div>
+  );
+}
+
+/** RAW LEDGER FACTS — what was measured, before any policy is applied. */
+function LedgerFacts({ m }: { m: Measurements }) {
+  const rows: Array<[string, string]> = [];
+  const c = m.concentration;
+  rows.push(["TRANSFER", `${m.amountXrp.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`]);
+  rows.push(
+    c.state === "ok"
+      ? ["COUNTERPARTY HHI", `${c.hhi.toLocaleString("en-US")} over ${c.parties} counterparties`]
+      : ["COUNTERPARTY HHI", c.state === "unavailable" ? "unavailable" : "no counterparty transfers"]
+  );
+  if (c.state === "ok") {
+    rows.push([
+      c.counterpartyRole === "destination" ? "DESTINATION SHARE" : "LARGEST COUNTERPARTY",
+      `${c.sharePct.toLocaleString("en-US", { maximumFractionDigits: 2 })}% · ${c.counterparty}`,
+    ]);
+  }
+  const h = m.headroom;
+  rows.push([
+    "HEADROOM AFTER SETTLEMENT",
+    h.state === "ok"
+      ? `${h.headroomXrp.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP above ${h.reserveXrp.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP reserve`
+      : h.state === "unavailable" ? "unavailable" : "no activated account",
+  ]);
+  const f = m.freeze;
+  rows.push([
+    "ISSUER FREEZE CAPABILITY",
+    f.state === "ok"
+      ? `${f.capable.length} of ${f.issuers} issuers can freeze${f.active.length ? ` · ${f.active.length} frozen now` : ""}`
+      : f.state === "unavailable" ? "unavailable" : "no issued positions",
+  ]);
+  return (
+    <div className="mb-4">
+      <Eyebrow className="mb-1">RAW LEDGER FACTS · NO POLICY APPLIED</Eyebrow>
+      {rows.map(([k, v]) => (
+        <div key={k} className="flex items-baseline justify-between gap-3 border-b border-border/30 py-1 last:border-0">
+          <span className="stencil shrink-0 text-[7.5px] tracking-[0.2em] text-muted-foreground">{k}</span>
+          <span className="mono-font selectable truncate text-right text-[9.5px] text-foreground">{v}</span>
+        </div>
+      ))}
+    </div>
   );
 }

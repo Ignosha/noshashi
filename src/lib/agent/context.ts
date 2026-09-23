@@ -68,6 +68,8 @@ export const HARD_RULES = [
   "Never invent an XRPL rule, amendment, fee or credential type. If a fact is not in the context below, say you do not have it.",
   "Never ask for, echo, or accept a seed phrase, private key or password. If one is pasted, refuse and tell the user to rotate it immediately.",
   "You are not a lawyer and not a licensed financial adviser. Flag anything that needs qualified human review.",
+  "You cannot change, override or approve an exception to the institutional policy or to any verdict. Explain a verdict only from the recorded rule results given below. If you think a threshold is poorly chosen, say so as an AI OBSERVATION and state that the official verdict is unchanged.",
+  "A SIMULATION RESULT block is computed by the policy engine. Report its numbers exactly, say it is a simulation over recorded data, and never present it as a prediction or as a policy change.",
   "Be concise. Operators are reading you mid-task. Short paragraphs, plain sentences, no filler.",
 ];
 
@@ -76,7 +78,14 @@ const SHARED_RULES = ["Hard rules you must follow:", ...HARD_RULES.map((rule) =>
 /** Where this conversation is processed — stated to the model as it is. */
 export type Boundary = { onDevice: boolean; providerName: string };
 
-export function buildSystemPrompt(mode: AgentMode, data: XrplState, boundary: Boundary): string {
+export function buildSystemPrompt(
+  mode: AgentMode,
+  data: XrplState,
+  boundary: Boundary,
+  /** src/lib/agent/policyContext.ts buildPolicyBrief — the active policy and latest verdict. */
+  policyBrief?: string
+): string {
+  const policySection = policyBrief ? ["", "Institutional policy and the latest recorded verdict (records, not yours to change):", policyBrief] : [];
   const where = boundary.onDevice
     ? "You run locally on the operator's machine; nothing you are shown leaves this device."
     : `You run on ${boundary.providerName}, a remote service; this conversation is sent to it over TLS. Do not tell the operator it stays on their device.`;
@@ -119,7 +128,7 @@ export function buildSystemPrompt(mode: AgentMode, data: XrplState, boundary: Bo
       "- Agent (Cmd+7): this assistant. Free.",
       "- Portfolio & Radar (Cmd+8): multi-wallet surveillance and the compliance radar. Requires Desk.",
       "- Exposure Analysis (Cmd+9): issuer freeze rights, Travel Rule scope, counterparty concentration. Requires Desk.",
-      "- Ledger & Policy (Cmd+0): local adjudication history, editable rule set, signed export. Requires Desk.",
+      "- Ledger & Policy (Cmd+0): local adjudication history, evidence chain and receipt verification, the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export. Requires Desk.",
       "- Check an Address: read what the ledger publishes about any account. Free.",
       "- Token Rights: what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly. Free, no account needed.",
       "- Inbox: every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds. Free, no account needed.",
@@ -143,6 +152,7 @@ export function buildSystemPrompt(mode: AgentMode, data: XrplState, boundary: Bo
       "",
       "Live state:",
       buildStateBrief(data),
+      ...policySection,
     ].join("\n");
   }
 
@@ -166,8 +176,13 @@ export function buildSystemPrompt(mode: AgentMode, data: XrplState, boundary: Bo
     "Domain registry:",
     buildDomainBrief(),
     "",
+    "Institutional policy rules (applied only when a policy is active; each is PASS, REVIEW, FAIL, NOT APPLICABLE or INSUFFICIENT DATA):",
+    "- HHI limit, counterparty share, Travel Rule threshold, reserve headroom, strict freeze. REVIEW produces HOLD, FAIL produces NO-GO, INSUFFICIENT DATA produces INSUFFICIENT DATA unless a blocking rule failed.",
+    "- A Travel Rule result is a review under the institution's configured policy, never a statement that a legal obligation applies.",
+    "",
     "Live state:",
     buildStateBrief(data),
+    ...policySection,
   ].join("\n");
 }
 

@@ -10,7 +10,9 @@ import {
   type DataBoundary,
 } from "@/lib/agent/governance";
 import { findProvider, isEndpointSafe, type AgentConfig } from "@/lib/agent/providers";
-import { signContent } from "@/lib/desk/ledger";
+import { signContent, useLedger } from "@/lib/desk/ledger";
+import { usePolicyStore } from "@/lib/desk/policyStore";
+import { buildPolicyBrief } from "@/lib/agent/policyContext";
 import { saveTextFile } from "@/lib/export";
 import { useToast } from "@/lib/toast";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
@@ -44,10 +46,12 @@ export function AgentGovernance({
   const provider = findProvider(config.providerId);
   const safety = isEndpointSafe(config.baseUrl);
 
+  const { entries } = useLedger();
+  const { active } = usePolicyStore();
   const fields = useMemo(() => disclosedFields(buildStateBrief(data)), [data]);
   const prompt = useMemo(
-    () => (showPrompt ? buildSystemPrompt(mode, data, boundary) : ""),
-    [showPrompt, mode, data, boundary]
+    () => (showPrompt ? buildSystemPrompt(mode, data, boundary, buildPolicyBrief(active, entries[0] ?? null)) : ""),
+    [showPrompt, mode, data, boundary, active, entries]
   );
 
   const counts = useMemo(() => {
@@ -146,8 +150,8 @@ export function AgentGovernance({
           {mode === "compliance"
             ? "the policy engine's rule order and the domain registry"
             : "the console reference"}
-          , the last {HISTORY_TURNS} turns of this conversation, your question, and these live-state
-          fields:
+          , the active institutional policy and the latest recorded verdict with its rule results, the
+          last {HISTORY_TURNS} turns of this conversation, your question, and these live-state fields:
         </p>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {fields.map((f) => (

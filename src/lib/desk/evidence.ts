@@ -42,6 +42,7 @@ export async function verifyEntry(entry: LedgerEntry): Promise<ReceiptCheck> {
     amountXrp: entry.amountXrp,
     evaluatedAt: entry.at,
     checks: entry.checks,
+    policy: entry.policy,
   });
   return recomputed === entry.digest
     ? { state: "verified", digest: recomputed }
@@ -93,15 +94,33 @@ export function buildChain(entry: LedgerEntry): ChainStep[] {
       value: domain ? `${domain.code} · ${domain.name}` : entry.domainCode,
       detail: `${entry.checksTotal} rules evaluated for a ${entry.amountXrp} XRP settlement.`,
     },
+    entry.policy
+      ? {
+          kind: "policy",
+          title: "INSTITUTIONAL POLICY",
+          value: `${entry.policy.name} v${entry.policy.version}`,
+          detail: `Policy SHA-256 ${entry.policy.hash} · engine ${entry.policy.engine}. Bound into the receipt digest, and fixed: a later policy change does not alter this verdict.`,
+        }
+      : {
+          kind: "policy",
+          title: "INSTITUTIONAL POLICY",
+          value: "NONE ACTIVE",
+          detail: "Decided on the domain's rules only; no institutional thresholds were evaluated.",
+        },
   ];
 
   if (entry.checks) {
     for (const c of entry.checks) {
+      const recorded = entry.policyResults?.find((r) => r.id === c.id || `EVIDENCE_${r.id}` === c.id);
       steps.push({
         kind: "rule",
         title: c.id,
-        value: c.passed ? "PASS" : c.severity === "block" ? "FAIL · BLOCKING" : "FAIL · ADVISORY",
-        detail: c.passed ? c.label : `${c.label} — ${c.detail}`,
+        value: recorded
+          ? recorded.state.replace("_", " ")
+          : c.passed ? "PASS" : c.severity === "block" ? "FAIL · BLOCKING" : "FAIL · ADVISORY",
+        detail: recorded
+          ? `FACT ${recorded.observed ?? "n/a"} · POLICY ${recorded.configured}${recorded.delta ? ` · Δ ${recorded.delta}` : ""} — ${recorded.reason}`
+          : c.passed ? c.label : `${c.label} — ${c.detail}`,
         tone: c.passed ? "go" : c.severity === "block" ? "no-go" : "hold",
       });
     }
@@ -152,9 +171,11 @@ export function explain(entry: LedgerEntry) {
           : entry.failedRules.length
             ? `Failed: ${entry.failedRules.join(", ")}.`
             : "A required source could not be read.",
-    how: "Blocking failure → NO-GO; unavailable evidence → INSUFFICIENT DATA; advisory failure → HOLD; otherwise GO. Deterministic: the same state and rules return the same verdict.",
+    how: "Blocking failure → NO-GO; unavailable evidence → INSUFFICIENT DATA; advisory failure → HOLD; otherwise GO. Institutional policy rules enter as FAIL → blocking, REVIEW → advisory. Deterministic: the same state and rules return the same verdict.",
     evidence: `${entry.offline ? "Captured snapshot" : "Validated mainnet state"} for ${entry.subject}, ${entry.at}.`,
-    policy: entry.domainCode,
+    policy: entry.policy
+      ? `${entry.domainCode} domain rules and institutional policy ${entry.policy.name} v${entry.policy.version} (SHA-256 ${entry.policy.hash.slice(0, 16)}…)`
+      : `${entry.domainCode} domain rules; no institutional policy was active`,
     limitations:
       "The verdict describes the state at the time it was read and the rules configured then. It is not legal advice and does not say the settlement is lawful.",
   };

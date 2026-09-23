@@ -364,10 +364,10 @@ export const FEATURE_CATALOG: Record<
       "Every verdict written to disk and kept. A session log is a convenience; this is the record that still exists when an examiner asks in six months.",
   },
   policy_editor: {
-    label: "Editable rule set",
+    label: "Institutional policy",
     requires: "desk",
     blurb:
-      "State your own thresholds for concentration, reserve headroom and Travel Rule scope, and simulate what a changed rule, severity or transfer ceiling would do to every verdict already on your ledger before you adopt it.",
+      "Encode your own thresholds for concentration, counterparty share, Travel Rule scope, reserve headroom and issuer freeze as a versioned policy. The active version decides every gate verdict and is named and hashed in its receipt; a draft is simulated against your recorded verdicts before you activate it, and recorded verdicts never change.",
   },
   drift_monitor: {
     label: "Issuer drift monitor",

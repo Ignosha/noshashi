@@ -284,7 +284,7 @@ const SCENES: SceneDef[] = [
     id: "workstation",
     label: "LEDGER & POLICY",
     title: "LEDGER & POLICY",
-    hint: "Local adjudication history, editable rule set and signed export",
+    hint: "Adjudication history, institutional policy and signed export",
     icon: <NovaTerminal size={15} />,
     digit: "0",
     group: "primary",

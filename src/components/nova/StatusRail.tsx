@@ -7,6 +7,7 @@ import { copyrightLine } from "@/lib/brand";
 import { shortAddress } from "@/lib/xrpl/client";
 import type { LiveEvent } from "@/lib/xrpl/useXRPL";
 import type { Status } from "@/lib/xrpl/types";
+import { usePolicyStore } from "@/lib/desk/policyStore";
 
 /**
  * StatusRail — the always-on footer.
@@ -71,6 +72,16 @@ export function StatusRail({
 
       <span className="h-3 w-px shrink-0 bg-border" />
 
+      <PolicyIndicator />
+
+      <span className="h-3 w-px shrink-0 bg-border" />
+
+      <span className="stencil flex shrink-0 items-center gap-1 text-[8px] tracking-[0.2em] text-muted-foreground" title="The AI agent explains verdicts; it never issues, changes or overrides them.">
+        AI <span className="text-foreground/80">ADVISORY</span>
+      </span>
+
+      <span className="h-3 w-px shrink-0 bg-border" />
+
       {/* Live ticker — duplicated once so the marquee wraps seamlessly */}
       <div className="relative min-w-0 flex-1 overflow-hidden">
         {ticker.length === 0 ? (
@@ -132,5 +143,31 @@ export function StatusRail({
         {clock}
       </span>
     </footer>
+  );
+}
+
+/** The policy every new verdict will use, always visible. */
+function PolicyIndicator() {
+  const { state, active } = usePolicyStore();
+  const label =
+    state.status === "loading"
+      ? "LOADING"
+      : state.status === "unavailable"
+        ? "UNAVAILABLE"
+        : active
+          ? `${active.name.toUpperCase()} v${active.version}`
+          : "NONE ACTIVE";
+  const tone = state.status === "unavailable" ? "no-go" : active ? "go" : "hold";
+  return (
+    <span
+      className="flex min-w-0 shrink items-center gap-1.5"
+      title={active ? `Active institutional policy · SHA-256 ${active.hash}` : "No institutional policy is applied to new verdicts"}
+    >
+      <span className="stencil shrink-0 text-[8px] tracking-[0.2em] text-muted-foreground">POLICY</span>
+      <span className={cn("mono-font truncate text-[9px]", tone === "go" ? "text-foreground/80" : tone === "no-go" ? "text-no-go" : "text-hold")}>
+        {label}
+      </span>
+      <StatusDot status={tone} size={5} />
+    </span>
   );
 }
