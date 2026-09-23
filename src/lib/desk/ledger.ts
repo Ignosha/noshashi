@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { readSetting, writeSetting } from "@/lib/store";
-import type { PolicyReceipt } from "@/lib/policy";
+import type { PolicyCheck, PolicyReceipt } from "@/lib/policy";
 import type { Status } from "@/lib/xrpl/types";
 
 /**
@@ -33,6 +33,14 @@ export type LedgerEntry = {
   at: string;
   /** True when adjudicated against cached state rather than a live read. */
   offline: boolean;
+  /**
+   * The domain id and the full check list, kept so the receipt can be
+   * re-derived later (src/lib/desk/evidence.ts). Absent on entries
+   * written before they were recorded; those cannot be re-verified and
+   * say so rather than passing.
+   */
+  domainId?: string;
+  checks?: PolicyCheck[];
 };
 
 const KEY = "engine.ledger";
@@ -57,6 +65,8 @@ export function receiptToEntry(
     latencyMs: receipt.latencyMs,
     at: receipt.evaluatedAt,
     offline: Boolean(extra.offline),
+    domainId: receipt.domainId,
+    checks: receipt.checks.map((c) => ({ ...c })),
   };
 }
 
