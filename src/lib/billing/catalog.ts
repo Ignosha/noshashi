@@ -203,9 +203,10 @@ export const PLANS: Plan[] = [
     priceLabel: "$10,000",
     monthlyUsd: 10000,
     cadence: "per month",
-    priceId: "price_ENTERPRISE_MONTHLY",
+    // No Stripe price exists yet: contract tiers are invoiced per deal.
+    priceId: null,
     annualUsd: 100_000,
-    annualPriceId: "price_ENTERPRISE_ANNUAL",
+    annualPriceId: null,
     purchase: "contact_sales",
     seatBased: false,
     emphasis: true,
@@ -249,9 +250,10 @@ export const PLANS: Plan[] = [
     priceLabel: "$20,850",
     monthlyUsd: 20850,
     cadence: "per month",
-    priceId: "price_STRATEGIC_MONTHLY",
+    // No Stripe price exists yet: contract tiers are invoiced per deal.
+    priceId: null,
     annualUsd: 208_500,
-    annualPriceId: "price_STRATEGIC_ANNUAL",
+    annualPriceId: null,
     purchase: "contact_sales",
     seatBased: false,
     features: [
@@ -453,13 +455,13 @@ export const FEATURE_CATALOG: Record<
     label: "Dedicated environment",
     requires: "enterprise",
     blurb:
-      "Isolated compute and storage for your compliance workload, with your own node endpoints, retention policies and disaster recovery. Not shared tenancy.",
+      "Isolated compute and storage for your compliance workload, with your own node endpoints and retention policy, scoped and provisioned per contract after architecture review.",
   },
   event_feeds: {
     label: "XRPL event feeds",
     requires: "strategic",
     blurb:
-      "Real-time, machine-readable streams of ledger closes, amendment votes, issuer flag changes and domain updates — delivered over gRPC, WebSocket or HTTPS with exactly-once semantics.",
+      "Machine-readable streams of issuer flag changes, trust-line and domain updates, delivered to your endpoint. Transport, delivery guarantees and volume are fixed in the contract rather than promised here.",
   },
   custom_schemas: {
     label: "Custom schemas & bulk export",

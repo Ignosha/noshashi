@@ -70,13 +70,18 @@ function webhookTierFeatures(): Record<string, string[]> {
   return table;
 }
 
-/** Tiers sold via Stripe (free + self_serve). Contact-sales tiers are handled manually. */
-const STRIPE_TIERS: PlanId[] = ["operator", "desk", "institution"];
+/**
+ * Every tier, including the contact-sales ones. Contact-sales still bills
+ * through a Stripe subscription whose metadata names the tier, and the
+ * webhook is what grants it — so a tier missing here is a contract the
+ * customer pays for and does not receive.
+ */
+const STRIPE_TIERS: PlanId[] = ["operator", "desk", "institution", "enterprise", "strategic"];
 
 describe("entitlement parity — catalog against the webhook", () => {
   const webhook = webhookTierFeatures();
 
-  it("describes every Stripe-sold tier the catalog sells", () => {
+  it("describes every tier the catalog sells", () => {
     expect(Object.keys(webhook).sort()).toEqual([...STRIPE_TIERS].sort());
   });
 
