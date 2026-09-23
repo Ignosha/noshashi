@@ -7,7 +7,7 @@ import { copyrightLine } from "@/lib/brand";
 import { shortAddress } from "@/lib/xrpl/client";
 import type { LiveEvent } from "@/lib/xrpl/useXRPL";
 import type { Status } from "@/lib/xrpl/types";
-import { usePolicyStore } from "@/lib/desk/policyStore";
+import { useGoverningPolicy } from "@/lib/org/useOrg";
 
 /**
  * StatusRail — the always-on footer.
@@ -148,7 +148,7 @@ export function StatusRail({
 
 /** The policy every new verdict will use, always visible. */
 function PolicyIndicator() {
-  const { state, active } = usePolicyStore();
+  const { state, active, source, organizationName } = useGoverningPolicy();
   const label =
     state.status === "loading"
       ? "LOADING"
@@ -161,9 +161,9 @@ function PolicyIndicator() {
   return (
     <span
       className="flex min-w-0 shrink items-center gap-1.5"
-      title={active ? `Active institutional policy · SHA-256 ${active.hash}` : "No institutional policy is applied to new verdicts"}
+      title={`${source === "organization" ? `Organization policy · ${organizationName ?? ""}` : "Workstation policy"} · ${active ? `SHA-256 ${active.hash}` : state.status === "unavailable" ? state.reason : "no institutional policy is applied to new verdicts"}`}
     >
-      <span className="stencil shrink-0 text-[8px] tracking-[0.2em] text-muted-foreground">POLICY</span>
+      <span className="stencil shrink-0 text-[8px] tracking-[0.2em] text-muted-foreground">{source === "organization" ? "ORG POLICY" : "POLICY"}</span>
       <span className={cn("mono-font truncate text-[9px]", tone === "go" ? "text-foreground/80" : tone === "no-go" ? "text-no-go" : "text-hold")}>
         {label}
       </span>

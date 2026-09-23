@@ -15,6 +15,8 @@ import {
 import { useAuth } from "@/lib/auth/useAuth";
 import type { LedgerEntry } from "@/lib/desk/ledger";
 import { usePolicyStore, keyOf } from "@/lib/desk/policyStore";
+import { useOrg } from "@/lib/org/useOrg";
+import { OrgBar, OrgPolicyManager } from "./OrgPolicyManager";
 import {
   describeParams,
   diffParams,
@@ -34,7 +36,7 @@ import { cn } from "@/lib/utils";
 
 /* ── Form model: strings while typing, validated params on save ──── */
 
-type Form = {
+export type Form = {
   name: string;
   hhiOn: boolean; hhi: string; hhiOut: RuleOutcome;
   cpOn: boolean; cp: string; cpOut: RuleOutcome;
@@ -43,7 +45,7 @@ type Form = {
   freeze: boolean; freezeOut: RuleOutcome;
 };
 
-function formOf(p: InstitutionalPolicy): Form {
+export function formOf(p: Pick<InstitutionalPolicy, "name" | "params">): Form {
   const x = p.params;
   return {
     name: p.name,
@@ -61,7 +63,7 @@ function formOf(p: InstitutionalPolicy): Form {
 
 const num = (s: string) => (s.trim() === "" ? NaN : Number(s));
 
-function paramsOf(f: Form): PolicyParams {
+export function paramsOf(f: Form): PolicyParams {
   return {
     hhiLimit: f.hhiOn ? num(f.hhi) : null,
     counterpartyShareLimitPct: f.cpOn ? num(f.cp) : null,
@@ -77,7 +79,7 @@ function paramsOf(f: Form): PolicyParams {
 const VERDICT_WORD: Record<Status, string> = { go: "PASS · GO", hold: "REVIEW · HOLD", "no-go": "FAIL · NO-GO", "insufficient-data": "INSUFFICIENT DATA" };
 const VERDICT_TONE: Record<Status, string> = { go: "text-go", hold: "text-hold", "no-go": "text-no-go", "insufficient-data": "text-muted-foreground" };
 const RULE_NAMES: Record<RuleKey, string> = { hhi: "HHI", counterparty: "Counterparty share", travelRule: "Travel Rule", reserve: "Reserve headroom", freeze: "Strict freeze" };
-const utc = (iso?: string) => (iso ? `${iso.slice(0, 16).replace("T", " ")} UTC` : "—");
+export const utc = (iso?: string | null) => (iso ? `${iso.slice(0, 16).replace("T", " ")} UTC` : "—");
 
 /**
  * The Policy tab: the active policy (read-only), a draft to edit and
@@ -85,6 +87,24 @@ const utc = (iso?: string) => (iso ? `${iso.slice(0, 16).replace("T", " ")} UTC`
  * every version kept, and an audit trail.
  */
 export function PolicyManager({ entries }: { entries: LedgerEntry[] }) {
+  const org = useOrg();
+  const orgMode = org.state.status === "ready" && org.selectedId !== null;
+  return (
+    <>
+      <OrgBar />
+      {org.state.status === "loading" || org.authLoading ? (
+        <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING POLICY…</p>
+      ) : orgMode ? (
+        <OrgPolicyManager entries={entries} />
+      ) : (
+        <WorkstationPolicyManager entries={entries} />
+      )}
+    </>
+  );
+}
+
+/** The single-operator policy kept on this workstation (no organization). */
+function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
   const store = usePolicyStore();
   const { user } = useAuth();
   const { push } = useToast();
@@ -397,11 +417,11 @@ export function PolicyManager({ entries }: { entries: LedgerEntry[] }) {
   );
 }
 
-function GroupTitle({ children }: { children: React.ReactNode }) {
+export function GroupTitle({ children }: { children: React.ReactNode }) {
   return <p className="stencil mb-1 mt-3 border-b border-border pb-1 text-[8px] tracking-[0.24em] text-muted-foreground">{children}</p>;
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mt-2">
       <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground">{label}</p>
@@ -410,7 +430,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function RuleRow({
+export function RuleRow({
   label, hint, on, setOn, outcome, setOutcome, error, children,
 }: {
   label: string; hint: string; on: boolean; setOn: (v: boolean) => void;
@@ -440,7 +460,7 @@ function RuleRow({
   );
 }
 
-function ParamGroups({ params }: { params: PolicyParams }) {
+export function ParamGroups({ params }: { params: PolicyParams }) {
   const rows = describeParams(params);
   return (
     <div className="mt-2 grid grid-cols-2 gap-x-4">
@@ -454,7 +474,7 @@ function ParamGroups({ params }: { params: PolicyParams }) {
   );
 }
 
-function DiffTable({ from, to, fromLabel, toLabel }: { from: PolicyParams | null; to: PolicyParams; fromLabel: string; toLabel: string }) {
+export function DiffTable({ from, to, fromLabel, toLabel }: { from: PolicyParams | null; to: PolicyParams; fromLabel: string; toLabel: string }) {
   const b = describeParams(to);
   const a = from ? describeParams(from) : null;
   return (
@@ -483,7 +503,7 @@ function DiffTable({ from, to, fromLabel, toLabel }: { from: PolicyParams | null
   );
 }
 
-function SimulationResult({
+export function SimulationResult({
   sim, showChanges, setShowChanges,
 }: {
   sim: ReturnType<typeof simulatePolicy>; showChanges: boolean; setShowChanges: (v: boolean) => void;

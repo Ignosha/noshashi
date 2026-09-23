@@ -37,7 +37,7 @@ import { CONTACT } from "@/lib/brand";
 import { dataBoundary, recordFor, useAiUseLog, type AiUseRecord } from "@/lib/agent/governance";
 import { AgentGovernance } from "./AgentGovernance";
 import { useLedger } from "@/lib/desk/ledger";
-import { usePolicyStore } from "@/lib/desk/policyStore";
+import { useGoverningPolicy } from "@/lib/org/useOrg";
 import { buildPolicyBrief, parseWhatIf, simulationFact } from "@/lib/agent/policyContext";
 import { useClaimedSubject } from "@/lib/nav/handoff";
 import { clearProviderKey, hasProviderKey, storeProviderKey } from "@/lib/agent/keys";
@@ -93,7 +93,7 @@ export function AgentScene({ data }: { data: XrplState }) {
   const [view, setView] = useState<"chat" | "governance">("chat");
   const useLog = useAiUseLog();
   const { entries: ledgerEntries } = useLedger();
-  const { active: activePolicy } = usePolicyStore();
+  const { active: activePolicy } = useGoverningPolicy();
   // A question handed over from a verdict ("ASK NOSHASHI WHY") arrives pre-filled.
   useClaimedSubject("agent", (subject) => {
     setMode("compliance");

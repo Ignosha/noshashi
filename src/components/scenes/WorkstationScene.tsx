@@ -22,7 +22,7 @@ import { PolicyManager } from "@/components/scenes/PolicyManager";
 import { CasesPanel } from "@/components/scenes/CasesPanel";
 import { useInvestigations, stateOf as caseState } from "@/lib/desk/investigations";
 import { useClaimedSubject } from "@/lib/nav/handoff";
-import { usePolicyStore } from "@/lib/desk/policyStore";
+import { useGoverningPolicy } from "@/lib/org/useOrg";
 import { useIssuerWatch, WATCH_INTERVALS, postureLabel } from "@/lib/desk/watch";
 import { useOfflineVault, provenanceLine } from "@/lib/desk/offline";
 import { useIssuerRisk } from "@/lib/desk/useRisk";
@@ -76,7 +76,7 @@ function WorkstationBody({
   onUpgrade: () => void;
 }) {
   const { entries, loaded, clear } = useLedger();
-  const { active: activePolicy } = usePolicyStore();
+  const { active: activePolicy } = useGoverningPolicy();
   const { has } = useBilling();
   const { push } = useToast();
 

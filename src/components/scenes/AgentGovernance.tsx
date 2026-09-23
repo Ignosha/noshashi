@@ -11,7 +11,7 @@ import {
 } from "@/lib/agent/governance";
 import { findProvider, isEndpointSafe, type AgentConfig } from "@/lib/agent/providers";
 import { signContent, useLedger } from "@/lib/desk/ledger";
-import { usePolicyStore } from "@/lib/desk/policyStore";
+import { useGoverningPolicy } from "@/lib/org/useOrg";
 import { buildPolicyBrief } from "@/lib/agent/policyContext";
 import { saveTextFile } from "@/lib/export";
 import { useToast } from "@/lib/toast";
@@ -47,7 +47,7 @@ export function AgentGovernance({
   const safety = isEndpointSafe(config.baseUrl);
 
   const { entries } = useLedger();
-  const { active } = usePolicyStore();
+  const { active } = useGoverningPolicy();
   const fields = useMemo(() => disclosedFields(buildStateBrief(data)), [data]);
   const prompt = useMemo(
     () => (showPrompt ? buildSystemPrompt(mode, data, boundary, buildPolicyBrief(active, entries[0] ?? null)) : ""),
