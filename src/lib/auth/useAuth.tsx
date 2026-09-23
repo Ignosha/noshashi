@@ -9,7 +9,7 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
 import { supabaseErrorMessage } from "@/lib/supabase/errors";
-import { assertNotPwned } from "@/lib/auth/pwned";
+import { UNAVAILABLE_MESSAGE, breachedMessage, isUnscreenedRefusal, screenPassword } from "@/lib/auth/screening";
 
 /**
  * Authentication.
@@ -138,20 +138,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (problems.length > 0) {
         throw new Error(`Password needs: ${problems.join(", ").toLowerCase()}.`);
       }
-      await assertNotPwned(password);
+      // The server refuses a breached password before an account exists…
+      const before = await screenPassword(email, password);
+      if (!before.ok) {
+        throw new Error(before.code === "PASSWORD_BREACHED" ? breachedMessage(before.count) : UNAVAILABLE_MESSAGE);
+      }
       const { error } = await supabase().auth.signUp({
         email,
         password,
         options: { data: displayName ? { display_name: displayName } : undefined },
       });
       if (error) throw new Error(supabaseErrorMessage(error));
+      // …and records it as screened once it does. If this second call
+      // cannot run, the first password sign-in screens it instead.
+      await screenPassword(email, password);
     },
     []
   );
 
   const signIn = useCallback(
     async (email: string, password: string) => {
-      const { error } = await supabase().auth.signInWithPassword({ email, password });
+      let { error } = await supabase().auth.signInWithPassword({ email, password });
+      if (error && isUnscreenedRefusal(error.message)) {
+        // The server refuses password sign-in until the account's current
+        // password has been screened against known breaches. Screen it, then
+        // try once more; a breached password is never accepted.
+        const screened = await screenPassword(email, password);
+        if (!screened.ok) {
+          throw new Error(
+            screened.code === "PASSWORD_BREACHED"
+              ? `${breachedMessage(screened.count)} Use "Forgot password" to set a new one.`
+              : UNAVAILABLE_MESSAGE
+          );
+        }
+        ({ error } = await supabase().auth.signInWithPassword({ email, password }));
+      }
       if (error) throw new Error(supabaseErrorMessage(error));
       const { data } = await supabase().auth.mfa.getAuthenticatorAssuranceLevel();
       const needsSecondFactor =
@@ -193,9 +214,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (problems.length > 0) {
       throw new Error(`Password needs: ${problems.join(", ").toLowerCase()}.`);
     }
-    await assertNotPwned(password);
+    const { data: current } = await supabase().auth.getUser();
+    const email = current.user?.email ?? "";
+    const before = await screenPassword(email, password);
+    if (!before.ok) {
+      throw new Error(before.code === "PASSWORD_BREACHED" ? breachedMessage(before.count) : UNAVAILABLE_MESSAGE);
+    }
     const { error } = await supabase().auth.updateUser({ password });
     if (error) throw new Error(supabaseErrorMessage(error));
+    // Record the new password as screened so the next password sign-in is allowed.
+    await screenPassword(email, password);
   }, []);
 
   const enrollTotp = useCallback(async () => {
