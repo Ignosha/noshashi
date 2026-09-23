@@ -192,24 +192,29 @@ data, decorative axes, chart junk of any kind.
 
 ## Brand assets
 
-The shipped mark comes from the supplied **SVG pack** (`Noshashi_SVG_Logo_Pack`),
-not from the brand board's raster. **Do not redraw or approximate the geometry.**
+The mark is the **lotus**: five petals fanned from one base point over two
+raked-sand ripples. It replaced the rocket in September 2026, when the
+product moved to the garden palette — a launch vehicle said *speed*, and
+the product's promise is the opposite: settled, checked, calm.
 
-> **Two different marks exist.** The board (section 02) shows a rocket inside a
-> closed ring with three exhaust trails. The SVG pack shows a rocket at 45° with
-> two broken orbital arcs, fins and a porthole. The SVG pack ships because it is
-> the real vector asset and was handed over with "use the asset exactly"; the
-> board is a rendered mockup. Worth resolving before any print run.
+**One source.** `scripts/gen-brand.mjs` holds the geometry and writes every
+copy: the console's `src/components/nova/brand/lotus.ts`, the site header
+mark (`api/_lib/brand-mark.js`), `site/favicon.svg`, `public/app-icon.svg`
+and the Tauri icon source `app-icon.svg`. Never hand-edit an output;
+`npm run check:brand` fails CI when one is stale. After changing the
+geometry run `node scripts/gen-brand.mjs && npm run icon` and re-render the
+tray template images.
 
-Repackaging faults are corrected in `src/components/nova/brand/` without moving
-a path node:
+Rules the drawing keeps:
 
-- porthole and nose dot cut with a `<mask>` scoped to the body. They were opaque `#05070A` fills, so the mark was invisible on any other ground. `evenodd` does not work here: the porthole overhangs the body's lower-left edge, so it would fill the overhang instead of hiding it.
-- a `compact` variant drops the orbital arcs below 24px, where a stroke of 7 in a 180 grid renders sub-pixel and aliases into mush
-- gradient IDs namespaced per instance so two inline marks cannot collide
-- duplicate `<title id>` removed
-- baked background rects dropped so the mark sits on any surface
-- app-icon transform fitted to the **measured** ink box (`x[61.0, 169.1] y[13.0, 164.7]`, centre `115.1, 88.9`) at 76% canvas fill. The artwork is not centred in its own viewBox, so centring on the viewBox is wrong too.
+- flat fills only, no strokes in the artwork, so it survives 16px, a macOS
+  template image and a single-colour print
+- front petals are separated from those behind by a **cut in a mask**, not
+  an outline, so the gaps are transparent on any ground
+- petals are broad with gently pointed tips — narrow pointed leaves in a
+  green fan read as a cannabis leaf, which a finance brand cannot afford
+- the app icon is full-bleed (each OS applies its own corner mask) with an
+  open ensō ring at low opacity; the ring never appears in the small mark
 
 Components: `NoshashiMark`, `NoshashiLogo`, `NoshashiWordmark`.
 

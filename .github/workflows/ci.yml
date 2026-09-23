@@ -88,6 +88,11 @@ jobs:
       - name: Hero bloom is regenerated
         run: npm run check:bloom
 
+      # Every brand file (favicon, site header mark, console mark, Tauri
+      # icon source) is written by scripts/gen-brand.mjs from one geometry.
+      - name: Brand mark is regenerated
+        run: npm run check:brand
+
       - name: Tests
         run: npm test
 

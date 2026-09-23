@@ -35,7 +35,7 @@ import { getNews } from "../api/_lib/news.js";
 import { getMarket } from "../api/_lib/market.js";
 import { getProjectFeed, deriveStatus } from "../api/_lib/project-feed.js";
 import { ENTRIES as KB } from "../api/_lib/kb.js";
-import { renderPage, breadcrumb, ORGANIZATION, ORIGIN } from "../api/_lib/shell.js";
+import { renderPage, breadcrumb, ORGANIZATION, ORIGIN, MARK } from "../api/_lib/shell.js";
 import { esc, isoDate, ago } from "../api/_lib/html.js";
 import {
   renderNews, renderNewsHead, renderLog, renderBoard, renderClock,
@@ -72,6 +72,7 @@ async function buildHome({ news, market, feed, status, release }) {
   const slots = {
     ORIGIN: ORIGIN,
     HEROBLOOM: bloom,
+    BRANDMARK: MARK,
     VERSION: release ? esc(release.tag) : "beta",
     MARKETHEAD: renderMarketHead(market),
     MARKET: renderMarket(market),

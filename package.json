@@ -41,6 +41,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:functions": "cd supabase/functions && deno check */index.ts",
+    "check:brand": "node scripts/gen-brand.mjs --check",
     "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg"
   },
   "build": {
@@ -84,16 +85,16 @@
     "mac": {
       "category": "public.app-category.finance",
       "target": ["dmg", "zip"],
-      "icon": "Unknown.png"
+      "icon": "app-icon-master.png"
     },
     "win": {
       "target": ["nsis", "portable"],
-      "icon": "Unknown.png"
+      "icon": "app-icon-master.png"
     },
     "linux": {
       "target": ["AppImage", "deb", "rpm"],
       "category": "Finance",
-      "icon": "Unknown.png"
+      "icon": "app-icon-master.png"
     }
   },
   "dependencies": {
