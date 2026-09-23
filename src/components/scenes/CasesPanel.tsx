@@ -305,7 +305,9 @@ function CaseDetail({
                 <textarea value={rationale} onChange={(e) => setRationale(e.target.value)} rows={3} placeholder="Rationale (required, at least 10 characters)" className="mt-1.5 w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
                 {outcome === "exception-approved" && (
                   <p className="mt-1 text-[9px] leading-snug text-hold">
-                    An approved exception is recorded against your name. The verdict and its receipt stay as the engine issued them.
+                    This closes the case as a local record against your name. It is not an organization approval: an
+                    organization exception is requested from the verdict and decided by a second authorized person
+                    (Ledger &amp; Policy → POLICY). The verdict and its receipt stay as the engine issued them.
                   </p>
                 )}
                 <div className="mt-1.5 flex gap-1.5">

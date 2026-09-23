@@ -1,6 +1,12 @@
 # Plan: organisation-level policies, cases and roles
 
-Status: **PROPOSAL — nothing here has been applied.** Review, then approve applying it.
+Status: **POLICIES, FOUR-EYES ACTIVATION AND EXCEPTIONS APPLIED** on 2026-09-23 as migration
+`governance_policies_exceptions` (`supabase/migrations/20260923210000_governance_policies_exceptions.sql`),
+with the Edge Functions `noshashi-policy-activate` and `noshashi-exception-decide`. The decisions taken:
+owner, admin and compliance activate and approve; analyst and risk draft, simulate, submit and request;
+viewer reads; the author of a version can never activate it, and the requester of an exception can never
+decide it. **Shared (server-side) investigations are not yet built** — cases remain on the workstation.
+The text below is the original proposal, kept for the record.
 
 ## What already exists (read from the live project, `xiurbiwuwcfowqnpmwki`)
 

@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { PolicyVerdictBlock } from "./PolicyVerdict";
 import { OpenInvestigationButton } from "./CasesPanel";
+import { RequestExceptionButton } from "./OrgPolicyManager";
 
 const LIST = 60;
 
@@ -142,6 +143,7 @@ export function EvidencePanel({
               {checking ? "RECOMPUTING…" : "VERIFY RECEIPT"}
             </Button>
             <OpenInvestigationButton entry={selected} onOpened={onOpenCase} />
+            {selected.verdict !== "go" && <RequestExceptionButton entry={selected} />}
             {consistent === false && (
               <span className="stencil text-[8px] tracking-[0.18em] text-no-go">
                 STORED VERDICT DOES NOT FOLLOW FROM ITS RULES

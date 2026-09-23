@@ -22,7 +22,7 @@ import {
 } from "@/lib/policy";
 import { useToast } from "@/lib/toast";
 import { useLedger, receiptToEntry } from "@/lib/desk/ledger";
-import { usePolicyStore } from "@/lib/desk/policyStore";
+import { useGoverningPolicy, type GoverningPolicy } from "@/lib/org/useOrg";
 import { useIssuerRisk } from "@/lib/desk/useRisk";
 import {
   judge,
@@ -37,6 +37,7 @@ import { PolicyRefLine, PolicyVerdictBlock } from "./PolicyVerdict";
 import { useHandoff } from "@/lib/nav/handoff";
 import { useBilling } from "@/lib/billing/useEntitlements";
 import { OpenInvestigationButton } from "./CasesPanel";
+import { RequestExceptionButton } from "./OrgPolicyManager";
 import type { LedgerEntry } from "@/lib/desk/ledger";
 import { useOfflineVault } from "@/lib/desk/offline";
 import { sendNativeNotification } from "@/lib/notifications";
@@ -85,7 +86,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
   const [run, setRun] = useState<GateRun | null>(null);
   const [log, setLog] = useState<GateRun[]>([]);
   const receipt = run?.receipt ?? null;
-  const policies = usePolicyStore();
+  const policies = useGoverningPolicy();
   const handOff = useHandoff();
   const { has } = useBilling();
   const issuerRisk = useIssuerRisk(vault.engaged ? undefined : liveAccount?.address);
@@ -314,7 +315,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                 ))}
               </div>
 
-              <PolicyGateStatus state={policies.state} active={policies.active} />
+              <PolicyGateStatus policy={policies} />
 
               <Button
                 className="w-full gap-2"
@@ -452,6 +453,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                           onOpened={(id) => handOff({ scene: "workstation", from: "verify", as: "investigation", value: id })}
                         />
                       )}
+                      {run && run.receipt.verdict !== "go" && <RequestExceptionButton entry={run.entry} className="ml-2 mt-2" />}
                     </div>
 
                     <Eyebrow className="mb-2">DOMAIN &amp; ENGINE RULES</Eyebrow>
@@ -711,13 +713,9 @@ type GateRun = {
 const isPolicyCheck = (id: string) => id.startsWith("POLICY_") || id.startsWith("EVIDENCE_POLICY_");
 
 /** Which policy the next verdict will use — or why none will be issued. */
-function PolicyGateStatus({
-  state,
-  active,
-}: {
-  state: ReturnType<typeof usePolicyStore>["state"];
-  active: ReturnType<typeof usePolicyStore>["active"];
-}) {
+function PolicyGateStatus({ policy }: { policy: GoverningPolicy }) {
+  const { state, active } = policy;
+  const scope = policy.source === "organization" ? `ORGANIZATION · ${(policy.organizationName ?? "").toUpperCase()}` : "WORKSTATION";
   if (state.status === "loading") {
     return <p className="mono-font animate-pulse text-[9px] text-muted-foreground">LOADING POLICY…</p>;
   }
@@ -734,7 +732,7 @@ function PolicyGateStatus({
   }
   return active ? (
     <div className="border border-border p-2">
-      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">APPLYING POLICY</p>
+      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">APPLYING POLICY · {scope}</p>
       <p className="mono-font mt-0.5 text-[9.5px] text-foreground">
         {active.name} v{active.version} <span className="text-go">● ACTIVE</span>
       </p>
@@ -742,7 +740,7 @@ function PolicyGateStatus({
     </div>
   ) : (
     <div className="border border-border p-2">
-      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">NO ACTIVE INSTITUTIONAL POLICY</p>
+      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">NO ACTIVE INSTITUTIONAL POLICY · {scope}</p>
       <p className="mt-0.5 text-[9px] leading-snug text-muted-foreground">
         The domain's rules still apply. No institutional thresholds will be evaluated until a policy
         is activated in Ledger &amp; Policy.
