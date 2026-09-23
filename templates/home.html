@@ -662,6 +662,10 @@
   @media(min-width:768px){ .hero-instrument{--hi-gut:35px} }
   @media(min-width:1024px){ .hero-instrument{min-height:max(560px, calc(100svh - 76px))} }
 
+  /* The page-wide ASCII pond behind every section below the hero. */
+  .garden-page > .garden-field{opacity:.24}
+  html[data-theme="light"] .garden-page > .garden-field{opacity:.2}
+
   /* ── The flower and its pond. The owner's artwork is the hero, and
    *    asciify-engine renders the water around it (site/assets/
    *    garden-field.js, source src/lib/garden/field.ts): liquid folds,
@@ -683,22 +687,17 @@
   .hi-flower.sm{z-index:1;opacity:.92}
   .hi-flower.sm img,.hi-flower.sm::before{animation-delay:var(--d,0s)}
   .hi-flower.sm .turn{animation-direction:var(--spin,normal);animation-duration:180s}
-  /* The title, set on the main flower's lower petals: part of the same
-     lockup, scaled with the flower, never rotating with it. */
-  .hi-word{position:absolute;left:49.7%;top:71%;translate:-50% -50%;
-    z-index:2;margin:0;white-space:nowrap;
-    font:600 calc(var(--w) * .105)/1 "Space Grotesk",system-ui,sans-serif;
-    letter-spacing:.3em;padding-left:.3em;color:var(--ink);
-    text-shadow:0 0 2px var(--ground),0 0 12px var(--ground),0 0 28px color-mix(in srgb,var(--brand) 55%,transparent);
-    animation:hiUp 1s cubic-bezier(.16,1,.3,1) both;animation-delay:1.4s}
-  /* The CONTROL node's square and wires sat exactly where the title now
-     sits; the label itself stays. Below 1440 the card rises into the
-     flower's lower petals, so the title rises with it. */
-  .hi-nodes .hi-n2{display:none !important}
-  @media(max-width:1439px){ .hi-word{top:65%;left:30%;font-size:calc(var(--w) * .085)} }
-  /* Below 1200 the node labels and the title no longer fit beside the
-     headline and the card; the brief below the hero repeats the labels. */
-  @media(max-width:1199px){ .hi-word{display:none} }
+  /* NOSHASHI, set as the hero's title above the question: the brand
+     first, then what it answers. Gradient ink from the page colour into
+     the brand green, so it reads in both themes and sits in the garden. */
+  .hi-title{margin:auto 0 14px;white-space:nowrap;
+    font:700 clamp(30px,9.2vw,104px)/.9 "Space Grotesk",system-ui,sans-serif;
+    letter-spacing:.14em;margin-right:-.14em;
+    background:linear-gradient(180deg,var(--ink) 38%,color-mix(in srgb,var(--brand) 85%,var(--ink)));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 26px color-mix(in srgb,var(--brand) 28%,transparent));
+    animation:hiUp .9s cubic-bezier(.16,1,.3,1) both;animation-delay:.05s}
+  .hero-instrument .hi-title + h1{margin-top:0}
   /* The bloom, back as a layer rather than a centrepiece: it sits behind
      the flowers and the pond, and blends into the ground instead of
      painting over it — screen lifts it out of the dark ground, multiply
@@ -743,7 +742,6 @@
     .hi-flower:not(.sm){--x:50%;--y:40%;--w:min(92vw,72svh);opacity:.5}
     .hi-flower.sm{display:none}
     .hi-flower.sm.keep{display:block;--x:88%;--y:12%;--w:64px}
-    .hi-word{display:none}
     .hi-bloom{left:0;right:0;width:100%;color:rgb(155 225 93 / .38)}
     html[data-theme="light"] .hi-bloom{color:rgb(36 122 59 / .22)}
     .hero-instrument > .garden-field{opacity:.45}
@@ -942,6 +940,7 @@
      * band of nothing under the CTA — measured, not assumed. */
     .hero-instrument{min-height:auto;padding-block:16px}
     .hero-instrument h1{margin-top:28px}
+    .hero-instrument .hi-title{margin-top:28px}
     .hi-bottom{margin-top:32px}
   }
 
@@ -1024,7 +1023,6 @@
       <div class="open"><div class="turn">
         <img src="/assets/flower.webp" alt="" width="960" height="946" decoding="async" fetchpriority="high">
       </div></div>
-      <p class="hi-word" aria-hidden="true">NOSHASHI</p>
     </div>
     <div class="hi-flower sm keep" data-garden-origin aria-hidden="true" style="--x:90%;--y:15%;--w:92px;--d:-1.5s;--spin:reverse">
       <div class="open"><div class="turn">
@@ -1119,6 +1117,7 @@
         <span class="s" data-i18n="hero.tagline">Analyze · Discover · Navigate</span>
       </div>
 
+      <p class="hi-title">NOSHASHI</p>
       <h1 data-i18n="hero.h1">Am I allowed to move this — and could I actually get out of it?</h1>
 
       <div class="hi-bottom">

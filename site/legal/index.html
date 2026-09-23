@@ -53,7 +53,10 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;color:var(--faint)}
   footer{border-top:1px solid var(--rule);padding:34px 0;font-size:12px;color:var(--faint)}
   @media (max-width:900px){
-    .wrap{grid-template-columns:1fr;gap:24px}
+    /* minmax(0,1fr), not 1fr: a bare 1fr track cannot shrink below its
+       longest unbreakable word, which pushed the page 29px wide at 320px. */
+    .wrap{grid-template-columns:minmax(0,1fr);gap:24px}
+    .policy{overflow-wrap:anywhere}
     aside{position:static}
     .policy{padding:22px}
   }
@@ -374,5 +377,6 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     <a href="/status/">Status</a> · <a href="/contact/">Contact</a></div>
 </footer>
 <script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
 </body>
 </html>

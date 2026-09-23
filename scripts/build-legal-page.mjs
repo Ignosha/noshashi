@@ -126,7 +126,10 @@ const html = `<!doctype html>
   .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;color:var(--faint)}
   footer{border-top:1px solid var(--rule);padding:34px 0;font-size:12px;color:var(--faint)}
   @media (max-width:900px){
-    .wrap{grid-template-columns:1fr;gap:24px}
+    /* minmax(0,1fr), not 1fr: a bare 1fr track cannot shrink below its
+       longest unbreakable word, which pushed the page 29px wide at 320px. */
+    .wrap{grid-template-columns:minmax(0,1fr);gap:24px}
+    .policy{overflow-wrap:anywhere}
     aside{position:static}
     .policy{padding:22px}
   }
@@ -166,6 +169,7 @@ const html = `<!doctype html>
 <footer>
   <div class="shell">© 2026 NOSHASHI Labs · Generated from src/lib/legal.ts · XRPL Mainnet</div>
 </footer>
+<script src="/assets/garden-field.js" defer></script>
 </body>
 </html>
 `;

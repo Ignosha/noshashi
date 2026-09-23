@@ -3,8 +3,13 @@
  * scripts/build-garden-field.mjs into site/assets/garden-field.js, a
  * self-hosted file, because the site's CSP allows scripts from 'self' only.
  *
- * Mounts on every [data-garden-field] host. Every [data-garden-origin]
- * inside it is a flower in the pond (the first is the main one): each
+ * Two layers. A page-wide pond sits fixed behind every page's content,
+ * faint and slow, so the whole site shares the garden without any of it
+ * competing with text. And every [data-garden-field] host (the home hero)
+ * gets its own, denser pond.
+ *
+ * In a hero host, every [data-garden-origin] inside it is a flower in
+ * the pond (the first is the main one): each
  * sends rings on its breath and keeps a clear pool. The XRP mark sits
  * behind the main flower, its arms reaching out past the petals. Ink is
  * the page's --brand, so the light/dark toggle recolours the pond on the
@@ -43,7 +48,50 @@ function mount(host: HTMLElement) {
   });
 }
 
+/**
+ * The page-wide pond: fixed, behind everything (z-index -1 paints above
+ * the root background and below all content), faint, 20fps, with the
+ * pointer's ripples and an occasional ambient ring. It pauses while a hero
+ * pond fills most of the screen, which covers it anyway, so the two never
+ * both run.
+ */
+function mountPage() {
+  if (document.documentElement.dataset.gardenPage === "off") return;
+  const layer = document.createElement("div");
+  layer.className = "garden-page";
+  layer.setAttribute("aria-hidden", "true");
+  Object.assign(layer.style, {
+    position: "fixed",
+    inset: "0",
+    zIndex: "-1",
+    pointerEvents: "none",
+    overflow: "hidden",
+  });
+  document.body.appendChild(layer);
+
+  let heroShare = 0;
+  const hero = document.querySelector<HTMLElement>("[data-garden-field]");
+  if (hero) {
+    new IntersectionObserver(
+      ([entry]) => {
+        heroShare = entry?.intersectionRatio ?? 0;
+      },
+      { threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] }
+    ).observe(hero);
+  }
+
+  mountGardenField(layer, {
+    color: () => getComputedStyle(document.documentElement).getPropertyValue("--brand"),
+    fontSize: 13,
+    intensity: 0.9,
+    fps: 20,
+    ambient: 9,
+    paused: () => heroShare >= 0.6,
+  });
+}
+
 function start() {
+  mountPage();
   document.querySelectorAll<HTMLElement>("[data-garden-field]").forEach(mount);
 }
 

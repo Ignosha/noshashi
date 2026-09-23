@@ -41,8 +41,10 @@ export const NAV = [
   { href: "/status/", label: "Status", key: "status", i18n: "nav.status", optional: true },
   { href: "/research/", label: "Findings", i18n: "nav.findings", optional: true },
   { href: "/guide/", label: "XRP guide", i18n: "nav.guide", optional: true },
-  { href: "/enterprise/", label: "Enterprise", i18n: "nav.enterprise", optional: true },
-  { href: "/strategic-infrastructure/", label: "Infrastructure", i18n: "nav.infrastructure", optional: true },
+  // `wide`: these two made the header 188px too wide from 1200 to 1480.
+  // They drop out first; the pricing section and footer still link both.
+  { href: "/enterprise/", label: "Enterprise", i18n: "nav.enterprise", optional: true, wide: true },
+  { href: "/strategic-infrastructure/", label: "Infrastructure", i18n: "nav.infrastructure", optional: true, wide: true },
   { href: "/#download", label: "Download", i18n: "nav.download" },
   { href: "/pricing/", label: "Pricing", i18n: "nav.pricing" },
 ];
@@ -71,7 +73,7 @@ export const FOOTER_LINKS = [
 export function renderHeader(current = "") {
   const links = NAV.map((item) => {
     const active = item.key && item.key === current;
-    return `<a class="nav-link${item.optional ? " optional" : ""}" href="${attrUrl(item.href)}"${
+    return `<a class="nav-link${item.optional ? " optional" : ""}${item.wide ? " wide" : ""}" href="${attrUrl(item.href)}"${
       active ? ' aria-current="page"' : ""
     }>${item.i18n ? `<span data-i18n="${item.i18n}">${esc(item.label)}</span>` : esc(item.label)}</a>`;
   }).join("\n      ");
@@ -234,6 +236,7 @@ ${renderFooter()}
 <script src="/assets/subscribe.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
 ${THEME_TOGGLE}
 ${scripts}
 </body>

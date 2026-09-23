@@ -43,6 +43,14 @@ export type GardenFieldOptions = {
   pulse?: number;
   /** Ripples from the pointer. */
   interactive?: boolean;
+  /** Multiplier on the water's brightness: 1 for a hero, lower for a page backdrop. */
+  intensity?: number;
+  /** Frame rate cap. */
+  fps?: number;
+  /** Seconds between ambient rings at random spots, for a pond with no flowers. */
+  ambient?: number;
+  /** Checked every frame; true skips drawing (e.g. while a hero field covers this one). */
+  paused?: () => boolean;
 };
 
 export type GardenField = { destroy(): void; refresh(): void };
@@ -51,7 +59,6 @@ export type GardenField = { destroy(): void; refresh(): void };
 export const GARDEN_CHARSET = " .·:-~=+*";
 
 const MAX_SOURCE_COLUMNS = 180;
-const FRAME_MS = 1000 / 30;
 const RING_SPEED = 0.16; // host heights per second
 const RING_LIFE = 7; // seconds
 
@@ -115,7 +122,8 @@ export function waterAt(
   aspect: number,
   rings: readonly Ring[],
   pools: readonly Flower[],
-  mark: Mark | null = null
+  mark: Mark | null = null,
+  intensity = 1
 ): number {
   // Liquid folds, after asciify-engine's paintLiquidSource.
   const px = (u - 0.5) * aspect;
@@ -125,7 +133,7 @@ export function waterAt(
   const radius = Math.hypot(qx * 0.8 + 0.18, qy * 1.1);
   const folds = 0.5 + 0.5 * Math.sin(radius * 14 - qx * 2.8 + Math.sin(qy * 5) * 1.4 - time * 0.24);
   const cloud = 0.5 + 0.5 * Math.sin(qx * 3.6 - qy * 2.9 + time * 0.09);
-  let light = folds * folds * (0.26 + cloud * 0.18) - 0.06;
+  let light = (folds * folds * (0.26 + cloud * 0.18) - 0.06) * intensity;
 
   // Rings: a crest and a weaker echo behind it. Each also pushes the
   // water outward a little, which is what bends the mark as it passes.
@@ -141,7 +149,7 @@ export function waterAt(
     const fade = Math.exp(-age * 0.42) * ring.strength;
     const crest = Math.exp(-((d - front) ** 2) / 0.0011);
     const echo = Math.exp(-((d - front + 0.045) ** 2) / 0.0007) * 0.45;
-    light += (crest + echo) * fade;
+    light += (crest + echo) * fade * intensity;
     if (d > 1e-6) {
       const push = crest * fade * 0.03;
       bendX += (ox / d) * push;
@@ -180,6 +188,9 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const pulse = options.pulse ?? 6;
+  const intensity = options.intensity ?? 1;
+  const frameMs = 1000 / (options.fps ?? 30);
+  let lastAmbient = 0;
   const ascii: AsciiOptions = {
     ...DEFAULT_OPTIONS,
     fontSize: options.fontSize ?? 11,
@@ -229,6 +240,10 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
       if (!flowers.length && mark) rings.push({ x: mark.x, y: mark.y, born: time, strength: 0.95 });
       lastPulse = time;
     }
+    if (options.ambient && time - lastAmbient >= options.ambient) {
+      rings.push({ x: 0.1 + Math.random() * 0.8, y: 0.1 + Math.random() * 0.8, born: time, strength: 0.55 });
+      lastAmbient = time;
+    }
     for (let i = rings.length - 1; i >= 0; i--) if (time - rings[i].born > RING_LIFE) rings.splice(i, 1);
     if (rings.length > 40) rings.splice(0, rings.length - 40);
 
@@ -236,7 +251,7 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
     const aspect = width / height;
     for (let y = 0; y < sh; y++) {
       for (let x = 0; x < sw; x++) {
-        const value = Math.round(waterAt(x / sw, y / sh, time, aspect, rings, flowers, mark) * 255);
+        const value = Math.round(waterAt(x / sw, y / sh, time, aspect, rings, flowers, mark, intensity) * 255);
         const i = (y * sw + x) * 4;
         data[i] = data[i + 1] = data[i + 2] = value;
         // Still water is transparent, not black. The engine paints its
@@ -253,7 +268,8 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
 
   const loop = (ts: number) => {
     raf = requestAnimationFrame(loop);
-    if (!visible || document.hidden || ts - lastFrame < FRAME_MS) return;
+    if (!visible || document.hidden || ts - lastFrame < frameMs) return;
+    if (options.paused?.()) return;
     lastFrame = ts;
     draw(now());
   };
