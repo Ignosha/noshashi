@@ -12,7 +12,7 @@
  *                              around its lit core, transparent (favicons embed
  *                              the 64px one; headers and console marks use 128).
  *   site/assets/flower.webp    the artwork at hero size, transparent, for the
- *   public/brand/flower.webp   website hero and the console (the 1.4 MB PNG
+ *                              website hero (the 1.4 MB PNG
  *                              source is too heavy to serve).
  *
  * Full-bleed ground by design: every OS applies its own corner mask, and a
@@ -84,7 +84,7 @@ for (const [px, pad, out] of [
     return c.toDataURL("image/webp", 0.9).split(",")[1];
   }, flower);
   const bytes = Buffer.from(webp, "base64");
-  for (const out of ["site/assets/flower.webp", "public/brand/flower.webp"]) {
+  for (const out of ["site/assets/flower.webp"]) {
     mkdirSync(dirname(resolve(root, out)), { recursive: true });
     writeFileSync(resolve(root, out), bytes);
     console.log(`wrote ${out} (${(bytes.length / 1024).toFixed(0)} KB)`);

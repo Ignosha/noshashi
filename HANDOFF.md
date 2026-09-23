@@ -36,14 +36,18 @@ Every line below was executed on `3382015`, not inferred:
 
 ## Open
 
-**Do first — needs your hands (edge-function access was denied to the agent):**
+**Deployed 2026-09-23 by the agent:** `noshashi-stripe-webhook` v9 and
+`noshashi-verify` v12, each from the repo file (JWT verification off, as
+before). The sandbox cannot reach supabase.co, so they are not smoke-tested.
+First thing to run from a machine that can:
 
 ```bash
-supabase functions deploy noshashi-stripe-webhook noshashi-verify --project-ref xiurbiwuwcfowqnpmwki
+curl -s https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify | jq '.published_limits.enterprise, .verbs'
 ```
 
-Until then, an Enterprise/Strategic subscription still receives the *free* tier's
-features and a 2/sec API limit. The database side (tier constraint) is already live.
+Expect `{"perSecond":200,"perMinute":9000}` and the two verbs. The Enterprise and
+Strategic tiers are now deliverable end to end (DB constraint, webhook grants,
+API limits).
 
 Also: `scripts/build-legal-page.mjs` is stale against the committed `site/legal/`
 (Google Fonts, old blue palette) — do not run it until it is brought up to date.

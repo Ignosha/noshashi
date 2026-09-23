@@ -266,24 +266,32 @@ surface where a number is being read. A field that drifts down the page and
 ends up behind a reading is the original mistake, and should be deleted
 rather than argued about.
 
-### The second exception: the flower and its pond
+### The second exception: the flowers, the bloom and the XRP pond
 
-The landing hero's centrepiece is the owner's flower artwork, animated (it
-opens once, then breathes and turns very slowly), over an ASCII pond:
-`src/lib/garden/field.ts` paints slow liquid folds with a ring spreading from
-the flower on every breath and ripples under the pointer, and
-[asciify-engine](https://github.com/ayangabryl/asciify-engine) (MIT) renders
-it as glyphs in `--brand`. It replaced the generated bloom in September 2026
-on the product owner's instruction. It is decoration, bounded like the sky:
+The website hero is a garden: the owner's flower artwork, animated (it opens
+once, then breathes and turns slowly), with four smaller flowers around it and
+**NOSHASHI** set on its lower petals; the generated bloom
+(`scripts/gen-hero-bloom.mjs`) behind them, blended into the ground (`screen`
+on dark, `multiply` on light) rather than painted over it; and an ASCII pond
+underneath. `src/lib/garden/field.ts` paints slow liquid folds and the **XRP
+mark** into the water, sends a ring from every flower on its breath and from
+the pointer, and bends the mark as each ring passes, so the logo ripples like a
+reflection; [asciify-engine](https://github.com/ayangabryl/asciify-engine) (MIT)
+renders it as glyphs in `--brand`. The desktop app's landing has the pond and
+the XRP mark only, with no flower artwork.
 
-| The objection | How the flower and pond answer it |
+The XRP mark is drawn as the plain X of two cupped arcs that identifies the XRP
+Ledger, the network this product reads. It says what the product is about; it
+does not claim an affiliation.
+
+| The objection | How it answers |
 |---|---|
 | "decoration is banned" | Granted explicitly, for the website's marketing hero and the console's landing scene only, and recorded here. |
-| "decorative data" | Neither is data or resembles any: no axis, no baseline, no tick, no numeral. The pond's glyphs are `. · : - ~ = + *`, texture and never a figure. |
-| "a permanent frame cost" | Bounded rather than absent: 30fps, a source image of at most 180 columns, paused off-screen and in hidden tabs, and a single still frame under `prefers-reduced-motion`, which also stops the flower. |
-| "behind live telemetry" | Only the hero. No panel, table, chart, ticker or verdict sits over it; the calm pool keeps glyphs off the flower, and text that crosses the artwork carries a ground-coloured halo. |
-| "a third-party asset" | The artwork is ours (`brand/flower-source.png`). The engine is bundled from npm into `site/assets/garden-field.js` and served from our own origin, so `script-src 'self'` holds; `npm run check:garden` fails CI when the bundle is stale. |
-| "unreadable in one theme" | Ink is read from `--brand` and re-read when the theme toggles. On the light ground the artwork multiplies instead of glowing, so its dark haze drops out. |
+| "decorative data" | Nothing here is data or resembles any: no axis, no baseline, no tick, no numeral. The glyphs are `. · : - ~ = + *`, texture and never a figure. |
+| "a permanent frame cost" | Bounded rather than absent: 30fps, a source image of at most 180 columns, paused off-screen and in hidden tabs, and one still frame under `prefers-reduced-motion`, which also stops every flower. |
+| "behind live telemetry" | Only the hero. No panel, table, chart, ticker or verdict sits over it; each flower keeps a clear pool, text crossing the artwork carries a ground-coloured halo, and below 1200px the node labels and the title step aside rather than collide. |
+| "a third-party asset" | The artwork is ours (`brand/flower-source.png`). The engine is bundled from npm into `site/assets/garden-field.js` and served from our own origin, so `script-src 'self'` holds; `npm run check:garden` and `npm run check:bloom` fail CI when a generated file is stale. |
+| "unreadable in one theme" | Ink is read from `--brand` and re-read when the theme toggles; the artwork multiplies on the light ground so its dark haze drops out. |
 
 **This exception does not travel.** Decoration behind a reading stays banned,
 and "decorative data" stays banned without qualification.

@@ -1,5 +1,4 @@
-import { useRef } from "react";
-import { GardenField, GardenFlower } from "@/components/nova/GardenField";
+import { GardenField } from "@/components/nova/GardenField";
 import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { motion } from "framer-motion";
 import { NovaLogo } from "@/components/nova/NovaLogo";
@@ -134,7 +133,6 @@ export function LandingScene({
   onNavigate: (scene: string) => void;
 }) {
   const { ledger, connected, events, successRate } = data;
-  const flowerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="scanlines relative h-full w-full overflow-y-auto overflow-x-hidden bg-background text-foreground">
@@ -183,8 +181,7 @@ export function LandingScene({
         <div className="mx-auto w-full max-w-[1120px] px-6">
           {/* ── Hero ───────────────────────────────────────────── */}
           <section className="relative overflow-hidden py-20">
-            <GardenField originRef={flowerRef} />
-            <GardenFlower flowerRef={flowerRef} size={370} className="right-2 top-12 hidden lg:block" />
+            <GardenField />
 
             <motion.div
               className="relative flex flex-col items-start gap-6"

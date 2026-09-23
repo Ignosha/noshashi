@@ -1,13 +1,14 @@
 /**
- * The garden field: an ASCII pond behind the flower.
+ * The garden field: an ASCII pond with the XRP mark in it.
  *
- * Every frame paints a small greyscale "water" image — slow liquid folds
- * with rings spreading from the flower on each breath and from the
+ * Every frame paints a small greyscale "water" image — slow liquid folds,
+ * the XRP mark drawn into the water, rings spreading from each flower on
+ * its breath (or from the mark when there are no flowers) and from the
  * pointer — and asciify-engine (MIT, github.com/ayangabryl/asciify-engine)
- * turns it into glyphs in the brand green. The liquid folds are adapted
- * from the engine's own fluid source (paintLiquidSource), with the pond's
- * ripples added and a calm pool left clear around the flower so the
- * artwork is never overprinted.
+ * turns it into glyphs in the brand green. Rings refract the mark as they
+ * pass through it, so the logo ripples like a reflection. The liquid folds
+ * are adapted from the engine's own fluid source (paintLiquidSource); a
+ * calm pool is left clear under every flower so no artwork is overprinted.
  *
  * Framework-agnostic: the website bundles this into
  * site/assets/garden-field.js (scripts/build-garden-field.mjs), and the
@@ -24,9 +25,16 @@ import {
   type AsciiOptions,
 } from "asciify-engine/core";
 
+/** A flower in the pond: centre (host-relative 0..1) and radius in host heights. */
+export type Flower = { x: number; y: number; r: number };
+/** The XRP mark: centre (host-relative 0..1) and half-size in host heights. */
+export type Mark = { x: number; y: number; size: number };
+
 export type GardenFieldOptions = {
-  /** Where the flower sits, host-relative 0..1. Null for no origin. */
-  origin?: () => { x: number; y: number } | null;
+  /** Flowers, first = the main one. Each sends rings and keeps a clear pool. */
+  flowers?: () => Flower[];
+  /** The XRP mark drawn into the water. When there are no flowers, rings start here. */
+  mark?: () => Mark | null;
   /** Any CSS colour; converted to hex for the engine. Re-read on theme change. */
   color: () => string;
   /** Glyph cell size in CSS pixels. */
@@ -49,6 +57,40 @@ const RING_LIFE = 7; // seconds
 
 type Ring = { x: number; y: number; born: number; strength: number };
 
+/**
+ * The XRP mark as two strokes, in units of its half-size: an upper curve
+ * falling from both top corners to a rounded bottom just above centre,
+ * and the same curve mirrored below — the familiar X of two cupped arcs.
+ * Sampled once into polylines; distance to them is what draws the mark.
+ */
+const XRP_STROKE = 0.13;
+const XRP_CURVE: Array<[number, number]> = Array.from({ length: 25 }, (_, i) => {
+  const t = -1 + (2 * i) / 24;
+  return [t, -0.2 - 0.8 * Math.pow(Math.abs(t), 1.35)];
+});
+
+function segmentDistance(px: number, py: number, ax: number, ay: number, bx: number, by: number) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)));
+  return Math.hypot(px - ax - t * dx, py - ay - t * dy);
+}
+
+/** 0..1 ink of the XRP mark at a point in mark units (soft-edged stroke). */
+export function xrpInk(lx: number, ly: number): number {
+  if (Math.abs(lx) > 1.2 || Math.abs(ly) > 1.2) return 0;
+  // The lower stroke is the upper one mirrored, so fold the point instead.
+  const fy = -Math.abs(ly);
+  let d = Infinity;
+  for (let i = 1; i < XRP_CURVE.length; i++) {
+    const [ax, ay] = XRP_CURVE[i - 1];
+    const [bx, by] = XRP_CURVE[i];
+    d = Math.min(d, segmentDistance(lx, fy, ax, ay, bx, by));
+  }
+  const edge = (d - XRP_STROKE) / 0.05;
+  return edge <= 0 ? 1 : edge >= 1 ? 0 : 1 - edge * edge * (3 - 2 * edge);
+}
+
 /** Resolve any CSS colour string to #rrggbb, which is what the engine accepts. */
 export function toHex(css: string): string {
   const probe = document.createElement("canvas").getContext("2d");
@@ -64,7 +106,7 @@ export function toHex(css: string): string {
 
 /**
  * The water's brightness at (u, v), 0..1. Exported for tests: it is the
- * whole visual, and it must stay bounded and leave the pool clear.
+ * whole visual, and it must stay bounded and leave every pool clear.
  */
 export function waterAt(
   u: number,
@@ -72,7 +114,8 @@ export function waterAt(
   time: number,
   aspect: number,
   rings: readonly Ring[],
-  origin: { x: number; y: number } | null
+  pools: readonly Flower[],
+  mark: Mark | null = null
 ): number {
   // Liquid folds, after asciify-engine's paintLiquidSource.
   const px = (u - 0.5) * aspect;
@@ -82,24 +125,43 @@ export function waterAt(
   const radius = Math.hypot(qx * 0.8 + 0.18, qy * 1.1);
   const folds = 0.5 + 0.5 * Math.sin(radius * 14 - qx * 2.8 + Math.sin(qy * 5) * 1.4 - time * 0.24);
   const cloud = 0.5 + 0.5 * Math.sin(qx * 3.6 - qy * 2.9 + time * 0.09);
-  let light = folds * folds * (0.3 + cloud * 0.22) - 0.06;
+  let light = folds * folds * (0.26 + cloud * 0.18) - 0.06;
 
-  // Rings: a crest and a weaker trough-side echo behind it.
+  // Rings: a crest and a weaker echo behind it. Each also pushes the
+  // water outward a little, which is what bends the mark as it passes.
+  let bendX = 0;
+  let bendY = 0;
   for (const ring of rings) {
     const age = time - ring.born;
     if (age < 0 || age > RING_LIFE) continue;
-    const d = Math.hypot((u - ring.x) * aspect, v - ring.y);
+    const ox = (u - ring.x) * aspect;
+    const oy = v - ring.y;
+    const d = Math.hypot(ox, oy);
     const front = age * RING_SPEED;
     const fade = Math.exp(-age * 0.42) * ring.strength;
     const crest = Math.exp(-((d - front) ** 2) / 0.0011);
     const echo = Math.exp(-((d - front + 0.045) ** 2) / 0.0007) * 0.45;
     light += (crest + echo) * fade;
+    if (d > 1e-6) {
+      const push = crest * fade * 0.03;
+      bendX += (ox / d) * push;
+      bendY += (oy / d) * push;
+    }
   }
 
-  // A calm pool: glyphs thin out towards the flower and vanish under it.
-  if (origin) {
-    const d = Math.hypot((u - origin.x) * aspect, v - origin.y);
-    const t = Math.max(0, Math.min(1, (d - 0.1) / 0.16));
+  // The XRP mark, drawn into the water and refracted by the rings.
+  if (mark && mark.size > 0) {
+    const lx = ((u - mark.x) * aspect - bendX) / mark.size;
+    const ly = (v - mark.y - bendY) / mark.size;
+    const ink = xrpInk(lx, ly);
+    // Denser than any still water, so the mark reads as a mark.
+    if (ink > 0) light = Math.max(light, ink * (0.66 + 0.2 * folds));
+  }
+
+  // Calm pools: glyphs thin out towards each flower and vanish under it.
+  for (const pool of pools) {
+    const d = Math.hypot((u - pool.x) * aspect, v - pool.y);
+    const t = Math.max(0, Math.min(1, (d - pool.r * 0.34) / (pool.r * 0.56)));
     light *= t * t * (3 - 2 * t);
   }
   return Math.max(0, Math.min(1, light));
@@ -156,18 +218,25 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
 
   const draw = (time: number) => {
     if (!image || width < 2) return;
-    const origin = options.origin?.() ?? null;
-    if (origin && time - lastPulse >= pulse) {
-      rings.push({ ...origin, born: time, strength: 0.95 });
+    const flowers = options.flowers?.() ?? [];
+    const mark = options.mark?.() ?? null;
+    if (time - lastPulse >= pulse) {
+      // The main flower rings at full strength, the small ones softer and
+      // staggered through the period so the pond never pulses in unison.
+      flowers.forEach((f, i) => {
+        rings.push({ x: f.x, y: f.y, born: time + i * 0.9, strength: i === 0 ? 0.95 : 0.45 });
+      });
+      if (!flowers.length && mark) rings.push({ x: mark.x, y: mark.y, born: time, strength: 0.95 });
       lastPulse = time;
     }
-    while (rings.length && time - rings[0].born > RING_LIFE) rings.shift();
+    for (let i = rings.length - 1; i >= 0; i--) if (time - rings[i].born > RING_LIFE) rings.splice(i, 1);
+    if (rings.length > 40) rings.splice(0, rings.length - 40);
 
     const { width: sw, height: sh, data } = image;
     const aspect = width / height;
     for (let y = 0; y < sh; y++) {
       for (let x = 0; x < sw; x++) {
-        const value = Math.round(waterAt(x / sw, y / sh, time, aspect, rings, origin) * 255);
+        const value = Math.round(waterAt(x / sw, y / sh, time, aspect, rings, flowers, mark) * 255);
         const i = (y * sw + x) * 4;
         data[i] = data[i + 1] = data[i + 2] = value;
         // Still water is transparent, not black. The engine paints its
@@ -226,8 +295,8 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
 
   if (reduced) {
     // One still frame with a ring mid-flight, so the pond still reads.
-    const origin = options.origin?.() ?? null;
-    if (origin) rings.push({ ...origin, born: 0, strength: 0.95 });
+    const first = options.flowers?.()[0] ?? options.mark?.() ?? null;
+    if (first) rings.push({ x: first.x, y: first.y, born: 0, strength: 0.95 });
     lastPulse = Infinity;
     draw(pulse * 0.6);
   } else {
