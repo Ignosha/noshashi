@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.0.7
+
+### The flower is the brand
+
+- **Logo:** the owner's flower artwork replaces the rocket on the app icon,
+  the dock, the installers, the favicon, every page header and inside the
+  console. The macOS menu bar uses a flat single-colour version of it.
+- **Website hero:** NOSHASHI as the title above the question; the flower,
+  animated, with smaller flowers around it; the bloom blended behind them;
+  an ASCII pond (asciify-engine) with the XRP mark rippling in the water.
+- **Whole site:** a faint ASCII pond behind every page, green, following the
+  light/dark toggle, pausing under the hero and in background tabs.
+- **Desktop app:** the landing screen carries the ASCII pond and XRP mark;
+  garden patterns replace the orbit graphics; matcha primary buttons.
+
+### Fixes
+
+- Enterprise and Strategic subscriptions now receive their tier (database,
+  webhook and API limits); before, they fell through to the free tier.
+- The Asset Passport PDF had a corrupt cross-reference table.
+- The console showed "100%" stream success and ledger "0" before connecting;
+  it now shows a dash until real data arrives.
+- Site header overflowed from 1200 to 1480px; three pages scrolled sideways
+  on phones.
+
+
 ## 1.0.4
 
 ### Website design theme unified across all pages

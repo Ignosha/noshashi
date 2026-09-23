@@ -1,7 +1,7 @@
 {
   "name": "noshashi",
   "private": true,
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "NOSHASHI institutional XRPL intelligence and data infrastructure",
   "main": "main.js",
   "author": "Ignoshashi",
@@ -42,7 +42,8 @@
     "test:watch": "vitest",
     "check:functions": "cd supabase/functions && deno check */index.ts",
     "check:brand": "node scripts/gen-brand.mjs --check",
-    "check:garden": "node scripts/build-garden-field.mjs --check"
+    "check:garden": "node scripts/build-garden-field.mjs --check",
+    "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg"
   },
   "build": {
     "appId": "com.ignoshashi.terminal",
