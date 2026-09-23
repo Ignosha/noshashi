@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo } from "react";
 import { SceneHeader } from "./SceneHeader";
+import { ControlRoom } from "./ControlRoom";
 import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
 import { CountUp } from "@/components/nova/CountUp";
@@ -196,6 +197,8 @@ export function MissionControlScene({
           </Button>
         }
       />
+
+      <ControlRoom data={data} />
 
       <Panel
         label="DECISION RECORD"
