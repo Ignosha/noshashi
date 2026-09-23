@@ -192,29 +192,37 @@ data, decorative axes, chart junk of any kind.
 
 ## Brand assets
 
-The mark is the **lotus**: five petals fanned from one base point over two
-raked-sand ripples. It replaced the rocket in September 2026, when the
-product moved to the garden palette — a launch vehicle said *speed*, and
-the product's promise is the opposite: settled, checked, calm.
+The mark is the **flower**, the owner's artwork (`brand/flower-source.png`):
+four long cardinal petals, four diagonals with the lower pair longer, inner
+petals and a white-hot core. It replaced the rocket in September 2026.
 
-**One source.** `scripts/gen-brand.mjs` holds the geometry and writes every
-copy: the console's `src/components/nova/brand/lotus.ts`, the site header
-mark (`api/_lib/brand-mark.js`), `site/favicon.svg`, `public/app-icon.svg`
-and the Tauri icon source `app-icon.svg`. Never hand-edit an output;
-`npm run check:brand` fails CI when one is stale. After changing the
-geometry run `node scripts/gen-brand.mjs && npm run icon` and re-render the
-tray template images.
+**Two sources, one drawing.**
+
+- `brand/flower-source.png` is the artwork itself. The app icon is that
+  image on the garden ground (`scripts/gen-brand-raster.mjs` →
+  `app-icon-master.png` → `npm run icon`).
+- `scripts/gen-brand.mjs` holds a vector tracing of it, measured from the
+  source image's own pixels. It writes everything that must stay crisp at
+  16–24px: `site/favicon.svg`, `public/app-icon.svg`, the site header mark
+  (`api/_lib/brand-mark.js`), the console geometry
+  (`src/components/nova/brand/flower.ts`) and the single-colour
+  `brand/flower-mono.svg` the menu-bar template images are rendered from.
+  `npm run check:brand` fails CI when an output is stale.
+
+Regenerate everything after a change:
+
+```bash
+node scripts/gen-brand.mjs && node scripts/gen-brand-raster.mjs && npm run icon
+```
 
 Rules the drawing keeps:
 
-- flat fills only, no strokes in the artwork, so it survives 16px, a macOS
-  template image and a single-colour print
-- front petals are separated from those behind by a **cut in a mask**, not
-  an outline, so the gaps are transparent on any ground
-- petals are broad with gently pointed tips — narrow pointed leaves in a
-  green fan read as a cannabis leaf, which a finance brand cannot afford
-- the app icon is full-bleed (each OS applies its own corner mask) with an
-  open ensō ring at low opacity; the ring never appears in the small mark
+- `color` rendering: translucent petals, lime edges and veins, lit core — the
+  artwork's look. Use it wherever the mark appears on its own.
+- `mono` rendering: one flat colour with the cardinal petals *cut* out of the
+  diagonals by a mask, so the gaps are transparent on any ground. For the
+  macOS template image and currentColor chrome.
+- the app icon is full-bleed (each OS applies its own corner mask).
 
 Components: `NoshashiMark`, `NoshashiLogo`, `NoshashiWordmark`.
 

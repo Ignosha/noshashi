@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
  *
  * Four garden elements: raked stones, a gravel dot grid, a leaf spray
  * and raked sand. They replaced the brand board's orbital geometry when
- * the mark became the lotus; the exported names are unchanged so every
+ * the mark became the flower; the exported names are unchanged so every
  * scene that placed an orbit now places the garden.
  *
  * These are the sanctioned background graphics and they replace the

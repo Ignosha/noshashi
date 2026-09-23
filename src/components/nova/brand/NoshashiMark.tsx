@@ -1,20 +1,20 @@
 import { useId } from "react";
 import { cn } from "@/lib/utils";
-import { LOTUS } from "./lotus";
+import { FLOWER } from "./flower";
 
 export type MarkTone = "mono" | "color";
 
 /**
- * NoshashiMark — the lotus.
+ * NoshashiMark — the flower.
  *
- * Geometry comes from ./lotus.ts, which scripts/gen-brand.mjs writes
- * alongside the site favicon, the site header mark and the Tauri icon
- * source, so the console cannot drift from the brand.
+ * Geometry comes from ./flower.ts, which scripts/gen-brand.mjs traces from
+ * the owner's artwork (brand/flower-source.png) and writes alongside the
+ * site favicon and header mark, so the console cannot drift from the brand.
  *
- * Front petals are separated from those behind by a cut in a mask rather
- * than by an outline, so the gaps are genuinely transparent: `mono`
- * inherits currentColor and works on any ground; `color` fills the same
- * shape with the brand gradient.
+ * `color` is the artwork's look: translucent petals, lime edges and veins,
+ * a white-hot core. `mono` is one flat currentColor, the cardinal petals
+ * cut out of the diagonals by a mask so the gaps are genuinely transparent
+ * on any ground.
  */
 export function NoshashiMark({
   size = 20,
@@ -24,7 +24,7 @@ export function NoshashiMark({
 }: {
   size?: number;
   tone?: MarkTone;
-  /** Kept for call-site compatibility; the lotus needs no small-size variant. */
+  /** Kept for call-site compatibility; the flower needs no small-size variant. */
   compact?: boolean;
   /** Accessible name. Omit for decorative use beside a visible wordmark. */
   title?: string;
@@ -32,22 +32,14 @@ export function NoshashiMark({
 }) {
   const uid = useId().replace(/:/g, "");
   const titleId = `nsh-title-${uid}`;
-  const maskId = `nsh-lotus-${uid}`;
-  const gradId = `nsh-grad-${uid}`;
-  const fill = tone === "color" ? `url(#${gradId})` : "currentColor";
-
   const a11y = title
     ? ({ role: "img", "aria-labelledby": titleId } as const)
     : ({ "aria-hidden": true, focusable: false } as const);
-
-  const cut = (d: string, key: string) => [
-    <path key={`${key}-gap`} d={d} fill="#000" stroke="#000" strokeWidth={LOTUS.gap * 2} strokeLinejoin="round" />,
-    <path key={`${key}-fill`} d={d} fill="#fff" />,
-  ];
+  const petals = [...FLOWER.diagonal, ...FLOWER.cardinal, ...FLOWER.inner];
 
   return (
     <svg
-      viewBox={LOTUS.viewBox}
+      viewBox={FLOWER.viewBox}
       width={size}
       height={size}
       fill="none"
@@ -55,26 +47,54 @@ export function NoshashiMark({
       {...a11y}
     >
       {title && <title id={titleId}>{title}</title>}
-      <defs>
-        {tone === "color" && (
-          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#C8F59A" />
-            <stop offset=".55" stopColor="#9BE15D" />
-            <stop offset="1" stopColor="#55D98A" />
-          </linearGradient>
-        )}
-        <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
-          {LOTUS.back.map((d, i) => (
-            <path key={`b${i}`} d={d} fill="#fff" />
-          ))}
-          {LOTUS.middle.flatMap((d, i) => cut(d, `m${i}`))}
-          {LOTUS.front.flatMap((d, i) => cut(d, `f${i}`))}
-        </mask>
-      </defs>
-      <rect width="64" height="64" fill={fill} mask={`url(#${maskId})`} />
-      {LOTUS.ripples.map((d, i) => (
-        <path key={`r${i}`} d={d} fill={fill} />
-      ))}
+      {tone === "color" ? (
+        <>
+          <defs>
+            <radialGradient id={`${uid}-p`} gradientUnits="userSpaceOnUse" cx="50" cy="50" r="50">
+              <stop offset="0" stopColor="#EAFFA0" stopOpacity=".95" />
+              <stop offset=".14" stopColor="#8EDD4A" stopOpacity=".62" />
+              <stop offset=".4" stopColor="#2A7F32" stopOpacity=".42" />
+              <stop offset="1" stopColor="#0A3316" stopOpacity=".62" />
+            </radialGradient>
+            <radialGradient id={`${uid}-c`} gradientUnits="userSpaceOnUse" cx="50" cy="50" r="13">
+              <stop offset="0" stopColor="#fff" />
+              <stop offset=".18" stopColor="#F4FFB8" />
+              <stop offset=".5" stopColor="#A9F152" stopOpacity=".55" />
+              <stop offset="1" stopColor="#7BD83A" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <g fill={`url(#${uid}-p)`} stroke="#8FE34E" strokeWidth=".55" strokeLinejoin="round">
+            {petals.map((d, i) => (
+              <path key={i} d={d} />
+            ))}
+          </g>
+          <g stroke="#C6F77E" strokeWidth=".35" strokeOpacity=".85">
+            {FLOWER.veins.map((d, i) => (
+              <path key={i} d={d} />
+            ))}
+          </g>
+          <circle cx="50" cy="50" r="13" fill={`url(#${uid}-c)`} />
+        </>
+      ) : (
+        <>
+          <defs>
+            <mask id={`${uid}-m`} maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+              {FLOWER.diagonal.map((d, i) => (
+                <path key={`d${i}`} d={d} fill="#fff" />
+              ))}
+              {FLOWER.cardinal.flatMap((d, i) => [
+                <path key={`g${i}`} d={d} fill="#000" stroke="#000" strokeWidth={4.8} strokeLinejoin="round" />,
+                <path key={`c${i}`} d={d} fill="#fff" />,
+              ])}
+              {FLOWER.veins.map((d, i) => (
+                <path key={`v${i}`} d={d} stroke="#000" strokeWidth={1.6} />
+              ))}
+              <circle cx="50" cy="50" r="6.5" fill="#fff" />
+            </mask>
+          </defs>
+          <rect width="100" height="100" fill="currentColor" mask={`url(#${uid}-m)`} />
+        </>
+      )}
     </svg>
   );
 }

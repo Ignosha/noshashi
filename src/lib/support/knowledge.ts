@@ -68,7 +68,7 @@ export const KNOWLEDGE: Answer[] = [
     id: "menubar",
     question: "How do I open the menu bar HUD?",
     answer:
-      "Press Cmd+Shift+X from anywhere, or click the lotus in the macOS menu bar. The HUD shows one thing at a glance — whether this wallet can settle right now — and the menu bar itself carries a live ticker with the gate state and current ledger height. It needs the desktop app; the browser build has no menu bar.",
+      "Press Cmd+Shift+X from anywhere, or click the flower in the macOS menu bar. The HUD shows one thing at a glance — whether this wallet can settle right now — and the menu bar itself carries a live ticker with the gate state and current ledger height. It needs the desktop app; the browser build has no menu bar.",
     keywords: ["menu", "menubar", "hud", "tray", "icon", "shortcut", "cmd", "toggle", "ticker"],
   },
   {

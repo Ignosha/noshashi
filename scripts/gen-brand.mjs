@@ -1,27 +1,23 @@
 #!/usr/bin/env node
 /**
- * The NOSHASHI lotus — one geometry, every brand file.
+ * The NOSHASHI flower — one geometry, every vector brand file.
  *
- * Replaces the rocket. Five petals fanned from a single base point over
- * two raked-sand ripples: a garden mark, drawn with ruler-and-compass
- * restraint so it reads as an institution's seal rather than an
- * illustration. Flat fills only, so it survives 16px, a macOS template
- * image and a monochrome print.
+ * The artwork is the owner's flower (brand/flower-source.png): four long
+ * cardinal petals, four diagonals (the lower pair longer, as drawn), four
+ * inner petals and a lit core. The app icon uses that artwork itself
+ * (scripts/gen-brand-raster.mjs). Everything that must stay crisp at
+ * 16-24px (favicon, site header, console marks, the menu-bar template)
+ * uses this vector tracing of it, measured from the source image in its
+ * own pixel space and normalised to a 100-unit box.
  *
- * Front petals are separated from the ones behind them by a cut, not an
- * outline: each is drawn into a mask as a black stroke (the gap) under a
- * white fill (the petal). The mark therefore works in any single colour
- * on any ground — the gaps are transparent, not painted ground colour.
+ * Two renderings:
+ *   color  translucent petals, lime edges and veins, a white-hot core:
+ *          the source artwork's look.
+ *   mono   one flat colour, petals separated by transparent cuts: for a
+ *          macOS template image, currentColor chrome and print.
  *
  *   node scripts/gen-brand.mjs          write every file
  *   node scripts/gen-brand.mjs --check  fail if any file is stale (CI)
- *
- * Written files:
- *   src/components/nova/brand/lotus.ts   path data for the console's NoshashiMark
- *   api/_lib/brand-mark.js    header mark for every generated site page
- *   site/favicon.svg          website favicon (brand green)
- *   public/app-icon.svg       console favicon (brand green)
- *   app-icon.svg              Tauri icon source (`npm run icon`)
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -30,104 +26,114 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const r = (n) => Math.round(n * 100) / 100;
 
-// Base point of the bloom in a 64-unit box.
-const BX = 32;
-const BY = 45;
+// Measured in the source image: core at (628, 578); a 1210px square
+// around it holds every petal tip. Map that square to 0..100.
+const SRC = { cx: 628, cy: 578, box: 1210 };
+const k = 100 / SRC.box;
 
-/** An almond petal from the base, `len` long, `w` half-width, at `deg` from vertical. */
-function petal(len, w, deg) {
-  const a = (deg * Math.PI) / 180;
-  const rot = (x, y) => [r(BX + x * Math.cos(a) - y * Math.sin(a)), r(BY + x * Math.sin(a) + y * Math.cos(a))];
-  const p = (x, y) => rot(x, y).join(" ");
+/** A vesica petal, pointed at both ends, from the core to (dx, dy) source pixels, half-width hw source pixels. */
+function petal(dx, dy, hw) {
+  const len = Math.hypot(dx, dy);
+  const ux = dx / len, uy = dy / len; // along the petal
+  const nx = -uy, ny = ux; // across it
+  const at = (along, across) =>
+    `${r(50 + (ux * along + nx * across) * k)} ${r(50 + (uy * along + ny * across) * k)}`;
   return (
-    `M${p(0, 0)}` +
-    `C${p(w * 1.28, -len * 0.24)} ${p(w * 0.82, -len * 0.8)} ${p(0, -len)}` +
-    `C${p(-w * 0.82, -len * 0.8)} ${p(-w * 1.28, -len * 0.24)} ${p(0, 0)}Z`
+    `M${at(0, 0)}` +
+    `C${at(len * 0.22, hw * 1.25)} ${at(len * 0.64, hw * 1.2)} ${at(len, 0)}` +
+    `C${at(len * 0.64, -hw * 1.2)} ${at(len * 0.22, -hw * 1.25)} ${at(0, 0)}Z`
   );
 }
 
-export const LOTUS = {
-  viewBox: "0 0 64 64",
-  back: [petal(20, 7.4, -68), petal(20, 7.4, 68)],
-  middle: [petal(27, 8.4, -35), petal(27, 8.4, 35)],
-  front: [petal(32, 9.2, 0)],
-  ripples: [
-    "M13.5 51.5h37a1.75 1.75 0 0 1 0 3.5h-37a1.75 1.75 0 0 1 0-3.5Z",
-    "M21.5 57.5h21a1.75 1.75 0 0 1 0 3.5h-21a1.75 1.75 0 0 1 0-3.5Z",
+export const FLOWER = {
+  viewBox: "0 0 100 100",
+  // Back to front.
+  diagonal: [
+    petal(-348, 397, 98), petal(350, 397, 98), // lower pair, longer
+    petal(-285, -320, 86), petal(290, -320, 86), // upper pair
   ],
-  gap: 2.2,
+  cardinal: [petal(0, -549, 132), petal(0, 558, 122), petal(-582, 2, 112), petal(587, 2, 112)],
+  inner: [petal(-120, -250, 56), petal(120, -250, 56), petal(-150, 330, 64), petal(150, 330, 64)],
+  veins: [
+    `M${r(50)} ${r(50 - 549 * k)}V${r(50 + 558 * k)}`,
+    `M${r(50 - 582 * k)} ${r(50 + 2 * k)}H${r(50 + 587 * k)}`,
+  ],
 };
 
-/**
- * The mark as SVG markup for a 64-unit box. `id` namespaces the mask so
- * two marks on one page cannot restyle each other.
- */
-export function lotusMarkup({ id = "nl", fill = "currentColor" } = {}) {
-  const cut = (d) =>
-    `<path d="${d}" fill="#000" stroke="#000" stroke-width="${LOTUS.gap * 2}" stroke-linejoin="round"/><path d="${d}" fill="#fff"/>`;
+const ALL = () => [...FLOWER.diagonal, ...FLOWER.cardinal, ...FLOWER.inner];
+
+/** The glowing rendering. `id` namespaces gradients per instance. */
+export function flowerColor({ id = "nf" } = {}) {
   return (
-    `<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">` +
-    LOTUS.back.map((d) => `<path d="${d}" fill="#fff"/>`).join("") +
-    LOTUS.middle.map(cut).join("") +
-    LOTUS.front.map(cut).join("") +
-    `</mask>` +
-    `<rect width="64" height="64" fill="${fill}" mask="url(#${id})"/>` +
-    LOTUS.ripples.map((d) => `<path d="${d}" fill="${fill}"/>`).join("")
+    `<defs>` +
+    `<radialGradient id="${id}-p" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="50">` +
+    `<stop offset="0" stop-color="#EAFFA0" stop-opacity=".95"/>` +
+    `<stop offset=".14" stop-color="#8EDD4A" stop-opacity=".62"/>` +
+    `<stop offset=".4" stop-color="#2A7F32" stop-opacity=".42"/>` +
+    `<stop offset="1" stop-color="#0A3316" stop-opacity=".62"/>` +
+    `</radialGradient>` +
+    `<radialGradient id="${id}-c" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="13">` +
+    `<stop offset="0" stop-color="#fff"/>` +
+    `<stop offset=".18" stop-color="#F4FFB8"/>` +
+    `<stop offset=".5" stop-color="#A9F152" stop-opacity=".55"/>` +
+    `<stop offset="1" stop-color="#7BD83A" stop-opacity="0"/>` +
+    `</radialGradient>` +
+    `</defs>` +
+    `<g fill="url(#${id}-p)" stroke="#8FE34E" stroke-width=".55" stroke-linejoin="round">` +
+    ALL().map((d) => `<path d="${d}"/>`).join("") +
+    `</g>` +
+    `<g stroke="#C6F77E" stroke-width=".35" stroke-opacity=".85">` +
+    FLOWER.veins.map((d) => `<path d="${d}"/>`).join("") +
+    `</g>` +
+    `<circle cx="50" cy="50" r="13" fill="url(#${id}-c)"/>`
   );
 }
 
-const GREEN = "#9BE15D";
+/** The flat rendering: cardinals cut out of the diagonals, veins cut through. */
+export function flowerMono({ id = "nm", fill = "currentColor" } = {}) {
+  const gap = 2.4;
+  return (
+    `<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">` +
+    FLOWER.diagonal.map((d) => `<path d="${d}" fill="#fff"/>`).join("") +
+    FLOWER.cardinal
+      .map((d) => `<path d="${d}" fill="#000" stroke="#000" stroke-width="${gap * 2}" stroke-linejoin="round"/><path d="${d}" fill="#fff"/>`)
+      .join("") +
+    FLOWER.veins.map((d) => `<path d="${d}" stroke="#000" stroke-width="1.6"/>`).join("") +
+    `<circle cx="50" cy="50" r="6.5" fill="#fff"/>` +
+    `</mask>` +
+    `<rect width="100" height="100" fill="${fill}" mask="url(#${id})"/>`
+  );
+}
 
-const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-<!-- NOSHASHI lotus. Generated by scripts/gen-brand.mjs; edit there. -->
-${lotusMarkup({ id: "nl", fill: GREEN })}
+const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+<!-- NOSHASHI flower. Generated by scripts/gen-brand.mjs; edit there. -->
+${flowerColor({ id: "nf" })}
 </svg>
 `;
 
-// App icon: full-bleed ground (every OS applies its own mask — see the
-// history of this file for why a rounded rect here produced white
-// corners), a soft light behind the bloom, an open ensō ring, and the
-// lotus in the brand gradient.
-const appIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-<title>NOSHASHI</title>
-<!-- Source for \`npm run icon\` (tauri icon app-icon.svg). Generated by
-     scripts/gen-brand.mjs; edit there. Full-bleed by design: each OS
-     applies its own corner mask, and a second rounding under theirs is
-     what used to leave white corners. -->
-<defs>
-<radialGradient id="glow" cx="50%" cy="46%" r="56%">
-<stop offset="0" stop-color="#1D3A24"/><stop offset=".62" stop-color="#0C1710"/><stop offset="1" stop-color="#070D09"/>
-</radialGradient>
-<linearGradient id="bloom" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#C8F59A"/><stop offset=".55" stop-color="${GREEN}"/><stop offset="1" stop-color="#55D98A"/>
-</linearGradient>
-</defs>
-<rect width="512" height="512" fill="url(#glow)"/>
-<path d="M404 150A176 176 0 1 1 330 97" fill="none" stroke="${GREEN}" stroke-opacity=".28" stroke-width="7" stroke-linecap="round"/>
-<g transform="translate(96 88) scale(5)">
-${lotusMarkup({ id: "nl", fill: "url(#bloom)" })}
-</g>
+const mono = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+<!-- NOSHASHI flower, single colour. Generated by scripts/gen-brand.mjs; edit there. -->
+${flowerMono({ id: "nm", fill: "#000" })}
 </svg>
 `;
 
 const GENERATED = "Generated by scripts/gen-brand.mjs — do not edit; edit the generator.";
 
-const lotusTs = `// ${GENERATED}
-export const LOTUS = ${JSON.stringify(LOTUS, null, 2)} as const;
+const flowerTs = `// ${GENERATED}
+export const FLOWER = ${JSON.stringify(FLOWER, null, 2)} as const;
 `;
 
-// The site header mark. currentColor, set to the brand green on the
-// <svg> itself so the wordmark beside it keeps the ink colour.
+// The site header mark, in the artwork's own colours on both themes.
 const brandMarkJs = `// ${GENERATED}
-export const MARK = \`<svg viewBox="0 0 64 64" width="24" height="24" fill="none" aria-hidden="true" style="color:var(--brand)">${lotusMarkup({ id: "nm" })}</svg>\`;
+export const MARK = \`<svg viewBox="0 0 100 100" width="26" height="26" fill="none" aria-hidden="true">${flowerColor({ id: "hf" })}</svg>\`;
 `;
 
 const outputs = {
-  "src/components/nova/brand/lotus.ts": lotusTs,
+  "src/components/nova/brand/flower.ts": flowerTs,
   "api/_lib/brand-mark.js": brandMarkJs,
   "site/favicon.svg": favicon,
   "public/app-icon.svg": favicon,
-  "app-icon.svg": appIcon,
+  "brand/flower-mono.svg": mono,
 };
 
 const check = process.argv.includes("--check");

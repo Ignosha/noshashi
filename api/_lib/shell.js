@@ -30,7 +30,7 @@ import { MARK } from "./brand-mark.js";
  */
 export const ORIGIN = (process.env.PUBLIC_SITE_URL || "https://www.noshashi.app").replace(/\/+$/, "");
 
-// The lotus. Generated from scripts/gen-brand.mjs so the site, the
+// The flower. Generated from scripts/gen-brand.mjs so the site, the
 // console and the app icon cannot drift apart.
 export { MARK };
 

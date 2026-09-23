@@ -6,7 +6,7 @@ import { NoshashiMark, type MarkTone } from "./brand/NoshashiMark";
 /**
  * NOSHASHI brand mark.
  *
- * The artwork is the lotus, drawn by NoshashiMark from the generated
+ * The artwork is the flower, drawn by NoshashiMark from the generated
  * brand geometry; this component is kept as the app-wide entry point so the eleven
  * existing call sites keep their `size` / `animated` / `className`
  * contract and the swap is one edit rather than eleven.
