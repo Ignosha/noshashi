@@ -196,18 +196,20 @@ The mark is the **flower**, the owner's artwork (`brand/flower-source.png`):
 four long cardinal petals, four diagonals with the lower pair longer, inner
 petals and a white-hot core. It replaced the rocket in September 2026.
 
-**Two sources, one drawing.**
+**The artwork is the logo.** Everywhere the mark appears in colour it is the
+artwork itself, never a redrawing: the app icon (on the garden ground), the
+favicons (an SVG embedding the 64px crop, so every page's existing
+`/favicon.svg` link carries it), the site header on every page, the sign-up
+popup, the Stripe return pages and every colour `NoshashiMark` in the console
+(`public/brand/flower-mark-128.png`). `scripts/gen-brand-raster.mjs` makes
+the square crops, centred on the artwork's lit core.
 
-- `brand/flower-source.png` is the artwork itself. The app icon is that
-  image on the garden ground (`scripts/gen-brand-raster.mjs` →
-  `app-icon-master.png` → `npm run icon`).
-- `scripts/gen-brand.mjs` holds a vector tracing of it, measured from the
-  source image's own pixels. It writes everything that must stay crisp at
-  16–24px: `site/favicon.svg`, `public/app-icon.svg`, the site header mark
-  (`api/_lib/brand-mark.js`), the console geometry
-  (`src/components/nova/brand/flower.ts`) and the single-colour
-  `brand/flower-mono.svg` the menu-bar template images are rendered from.
-  `npm run check:brand` fails CI when an output is stale.
+The one vector is the **single-colour silhouette** traced from the artwork
+(`scripts/gen-brand.mjs` → `brand/flower-mono.svg`,
+`src/components/nova/brand/flower.ts`), because some places must be one flat
+colour: the macOS menu-bar template image, and `mono` marks such as the icon
+inside a filled button or the error screen. `npm run check:brand` fails CI
+when a generated file is stale.
 
 Regenerate everything after a change:
 
@@ -217,11 +219,10 @@ node scripts/gen-brand.mjs && node scripts/gen-brand-raster.mjs && npm run icon
 
 Rules the drawing keeps:
 
-- `color` rendering: translucent petals, lime edges and veins, lit core — the
-  artwork's look. Use it wherever the mark appears on its own.
-- `mono` rendering: one flat colour with the cardinal petals *cut* out of the
-  diagonals by a mask, so the gaps are transparent on any ground. For the
-  macOS template image and currentColor chrome.
+- `color`: the artwork. Use it wherever the mark appears on its own.
+- `mono`: the flat silhouette, cardinal petals *cut* out of the diagonals by a
+  mask so the gaps are transparent on any ground. Only where one colour is
+  required.
 - the app icon is full-bleed (each OS applies its own corner mask).
 
 Components: `NoshashiMark`, `NoshashiLogo`, `NoshashiWordmark`.

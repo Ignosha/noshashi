@@ -7,6 +7,10 @@
  *                              Source for `npm run icon` (tauri icon).
  *   src-tauri/icons/tray.png   macOS menu-bar template images from the
  *   src-tauri/icons/tray@2x.png  single-colour vector (brand/flower-mono.svg).
+ *   site/assets/flower-mark-{64,128,180}.png, public/brand/flower-mark-128.png
+ *                              the artwork itself as the logo: square, cropped
+ *                              around its lit core, transparent (favicons embed
+ *                              the 64px one; headers and console marks use 128).
  *   site/assets/flower.webp    the artwork at hero size, transparent, for the
  *   public/brand/flower.webp   website hero and the console (the 1.4 MB PNG
  *                              source is too heavy to serve).
@@ -85,6 +89,42 @@ for (const [px, pad, out] of [
     writeFileSync(resolve(root, out), bytes);
     console.log(`wrote ${out} (${(bytes.length / 1024).toFixed(0)} KB)`);
   }
+  await page.close();
+}
+
+// The logo marks: the artwork, square, centred on its core.
+{
+  const page = await browser.newPage();
+  const sizes = [64, 128, 180];
+  const pngs = await page.evaluate(
+    async ({ src, sizes }) => {
+      const img = new Image();
+      img.src = src;
+      await img.decode();
+      // Core at (628, 578); every petal tip lies within 600px of it.
+      const half = 600;
+      return sizes.map((px) => {
+        const c = document.createElement("canvas");
+        c.width = c.height = px;
+        const g = c.getContext("2d");
+        g.imageSmoothingQuality = "high";
+        g.drawImage(img, 628 - half, 578 - half, half * 2, half * 2, 0, 0, px, px);
+        return c.toDataURL("image/png").split(",")[1];
+      });
+    },
+    { src: flower, sizes }
+  );
+  const outs = {
+    64: ["site/assets/flower-mark-64.png"],
+    128: ["site/assets/flower-mark-128.png", "public/brand/flower-mark-128.png"],
+    180: ["site/assets/flower-mark-180.png"],
+  };
+  sizes.forEach((px, i) => {
+    for (const out of outs[px]) {
+      writeFileSync(resolve(root, out), Buffer.from(pngs[i], "base64"));
+      console.log(`wrote ${out}`);
+    }
+  });
   await page.close();
 }
 

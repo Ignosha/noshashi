@@ -154,7 +154,7 @@ export function LandingScene({
             className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
             aria-label={`${BRAND.name} — enter console`}
           >
-            <NovaLogo size={18} className="text-brand" />
+            <NovaLogo size={18} tone="color" />
             <span className="display text-[13px] font-[800] tracking-[0.14em] text-foreground">
               {BRAND.name}
             </span>
@@ -479,7 +479,7 @@ export function LandingScene({
           <footer className="mt-10 border-t border-border py-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <NovaLogo size={15} animated={false} className="text-muted-foreground" />
+                <NovaLogo size={15} animated={false} tone="color" />
                 <span className="mono-font text-[9px] text-muted-foreground">
                   {copyrightLine()} · v{BRAND.version} · {BRAND.network}
                 </span>

@@ -629,7 +629,7 @@ export function HomeScene({
         <footer className="mt-10 border-t border-border pt-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <NovaLogo size={16} animated={false} className="text-muted-foreground" />
+              <NovaLogo size={16} animated={false} tone="color" />
               <span className="mono-font text-[9px] text-muted-foreground">
                 {copyrightLine()} · v{BRAND.version} · {BRAND.network}
               </span>

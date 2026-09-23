@@ -224,7 +224,7 @@ export function LegalScene() {
               )}
 
               <footer className="mt-8 flex items-center gap-2.5 border-t border-border pt-4">
-                <NovaLogo size={15} animated={false} className="text-muted-foreground" />
+                <NovaLogo size={15} animated={false} tone="color" />
                 <span className="mono-font text-[9px] text-muted-foreground">
                   {copyrightLine()} · All rights reserved.
                 </span>

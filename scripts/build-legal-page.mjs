@@ -86,6 +86,7 @@ const html = `<!doctype html>
 <meta name="description" content="Terms, privacy, accessibility statement, billing, data processing, acceptable use and regulatory disclosures for NOSHASHI.">
 <link rel="canonical" href="https://noshashi.app/legal/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">

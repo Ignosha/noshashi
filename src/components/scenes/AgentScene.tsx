@@ -454,7 +454,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                         {turn.role === "user" ? (
                           "YOU"
                         ) : (
-                          <NovaLogo size={12} animated={false} />
+                          <NovaLogo size={12} animated={false} tone="color" />
                         )}
                       </span>
                       <div className="min-w-0 flex-1">
