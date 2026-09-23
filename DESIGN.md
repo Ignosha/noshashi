@@ -266,15 +266,14 @@ surface where a number is being read. A field that drifts down the page and
 ends up behind a reading is the original mistake, and should be deleted
 rather than argued about.
 
-### The second exception: the flowers, the bloom and the XRP pond
+### The second exception: the bloom and the XRP pond
 
 The website hero is a garden: **NOSHASHI** as the title above the question,
-and the owner's flower artwork, animated (it opens once, then breathes and
-turns slowly), with four smaller flowers around it; the generated bloom
-(`scripts/gen-hero-bloom.mjs`) behind them, blended into the ground (`screen`
-on dark, `multiply` on light) rather than painted over it; and an ASCII pond
-underneath. `src/lib/garden/field.ts` paints slow liquid folds and the **XRP
-mark** into the water, sends a ring from every flower on its breath and from
+the generated bloom (`scripts/gen-hero-bloom.mjs`) as the static centrepiece,
+and an ASCII pond underneath. The owner's flower artwork was tried as an
+animated hero in 1.0.7 and taken back off the home page; it remains the logo.
+`src/lib/garden/field.ts` paints slow liquid folds and the **XRP
+mark** into the water, sends a ring from each of the bloom's flowers and from
 the pointer, and bends the mark as each ring passes, so the logo ripples like a
 reflection; [asciify-engine](https://github.com/ayangabryl/asciify-engine) (MIT)
 renders it as glyphs in `--brand`. Behind every page of the site, below the
@@ -291,8 +290,8 @@ does not claim an affiliation.
 |---|---|
 | "decoration is banned" | Granted explicitly, for the website's marketing hero and the console's landing scene only, and recorded here. |
 | "decorative data" | Nothing here is data or resembles any: no axis, no baseline, no tick, no numeral. The glyphs are `. · : - ~ = + *`, texture and never a figure. |
-| "a permanent frame cost" | Bounded rather than absent: 30fps, a source image of at most 180 columns, paused off-screen and in hidden tabs, and one still frame under `prefers-reduced-motion`, which also stops every flower. |
-| "behind live telemetry" | Panels, tables, charts and verdicts all sit on opaque surfaces, so the page pond is only ever visible between them, behind plain section text at a quarter opacity. In the hero, each flower keeps a clear pool, text crossing the artwork carries a ground-coloured halo, and below 1200px the node labels step aside rather than collide. |
+| "a permanent frame cost" | Bounded rather than absent: 30fps, a source image of at most 180 columns, paused off-screen and in hidden tabs, and one still frame under `prefers-reduced-motion`. |
+| "behind live telemetry" | Panels, tables, charts and verdicts all sit on opaque surfaces, so the page pond is only ever visible between them, behind plain section text at a quarter opacity. In the hero, each of the bloom's flowers keeps a clear pool, text crossing the bloom carries a ground-coloured halo, and below 1200px the node labels step aside rather than collide. |
 | "a third-party asset" | The artwork is ours (`brand/flower-source.png`). The engine is bundled from npm into `site/assets/garden-field.js` and served from our own origin, so `script-src 'self'` holds; `npm run check:garden` and `npm run check:bloom` fail CI when a generated file is stale. |
 | "unreadable in one theme" | Ink is read from `--brand` and re-read when the theme toggles; the artwork multiplies on the light ground so its dark haze drops out. |
 

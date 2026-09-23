@@ -8,33 +8,36 @@
  * competing with text. And every [data-garden-field] host (the home hero)
  * gets its own, denser pond.
  *
- * In a hero host, every [data-garden-origin] inside it is a flower in
- * the pond (the first is the main one): each
- * sends rings on its breath and keeps a clear pool. The XRP mark sits
- * behind the main flower, its arms reaching out past the petals. Ink is
- * the page's --brand, so the light/dark toggle recolours the pond on the
- * next frame.
+ * In a hero host, each flower of the bloom (the SVG's translated groups,
+ * or any [data-garden-origin]) is a flower in the pond, the largest
+ * being the main one: each sends rings and keeps a clear pool. The XRP
+ * mark sits behind the main flower, its arms reaching out past the
+ * petals. Ink is the page's --brand, so the light/dark toggle recolours
+ * the pond on the next frame.
  */
 import { mountGardenField, type Flower } from "./field";
 
-// The artwork's lit core sits at (49.7%, 46.4%) of the image.
-const CORE_X = 0.497;
-const CORE_Y = 0.464;
+const ORIGINS = "[data-garden-origin], .hi-bloom g[transform^='translate']";
 
 function mount(host: HTMLElement) {
-  const blooms = Array.from(host.querySelectorAll<HTMLElement>("[data-garden-origin]"));
+  const blooms = Array.from(host.querySelectorAll<Element>(ORIGINS));
   const flowers = (): Flower[] => {
     const box = host.getBoundingClientRect();
     if (!box.width || !box.height) return [];
-    return blooms.flatMap((el) => {
-      const f = el.getBoundingClientRect();
-      if (!f.width || getComputedStyle(el).display === "none") return [];
-      return [{
-        x: (f.left + f.width * CORE_X - box.left) / box.width,
-        y: (f.top + f.height * CORE_Y - box.top) / box.height,
-        r: f.height / 2 / box.height,
-      }];
-    });
+    return blooms
+      .flatMap((el) => {
+        const f = el.getBoundingClientRect();
+        if (!f.width || !f.height) return [];
+        // A bloom flower's box includes its long, faint petal tips; its
+        // visible body is about seven tenths of that.
+        const body = el.hasAttribute("data-garden-origin") ? 1 : 0.7;
+        return [{
+          x: (f.left + f.width / 2 - box.left) / box.width,
+          y: (f.top + f.height / 2 - box.top) / box.height,
+          r: (Math.max(f.width, f.height) / 2 / box.height) * body,
+        }];
+      })
+      .sort((a, b) => b.r - a.r);
   };
   mountGardenField(host, {
     color: () => getComputedStyle(document.documentElement).getPropertyValue("--brand"),
