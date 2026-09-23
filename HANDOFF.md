@@ -1,6 +1,6 @@
 # Handoff — NOSHASHI master directive
 
-Updated 2026-09-21 · branch `claude/feature-pricing-recommendation-dp8xke` · PR #12 open (3 commits, clean)
+Updated 2026-09-23 · branch `claude/feature-pricing-recommendation-dp8xke` · PR #12 open, main merged in
 
 ## Where this is
 
@@ -18,7 +18,10 @@ Every line below was executed on `3382015`, not inferred:
 - `npx tsc --noEmit` 0 errors · `npx vitest run` **504 tests, 25 files, all passing**
 - `npm run check:functions` (deno, 3 edge functions), `npm run check:bloom`
   (generated-SVG drift guard), `npm run build`, `node scripts/build-site.mjs` — all exit 0
-- `npm audit` — **0 vulnerabilities** (Vite 5→7 closed the 2 dev-server CVEs)
+- `npm audit` — was 0 on `3382015`; **130 since main was merged in** (7 critical),
+  almost all from dependencies main added (`@reown/appkit`, `@walletconnect/*`,
+  `@metamask/sdk`, `electron` 31). Not fixed here: removing or upgrading them is
+  a product decision (the Tauri app does not use Electron)
 - `cd src-tauri && cargo check --locked` + `cargo clippy -- -D warnings` — exit 0 (needs
   `libgtk-3-dev libwebkit2gtk-4.1-dev libsoup-3.0-dev librsvg2-dev`)
 - Nav overflow: 6 pages clean 320–1250px, swept in 10px steps; Vite 7 dev server
@@ -63,8 +66,9 @@ In priority order.
 4. **Smoke-test the live verify endpoint.** Impossible from the sandbox
    (`supabase.co` egress-blocked). Expect `""` and `"authority/check"` from
    `curl -s https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify | jq .verbs`
-5. **PR #12's body is stale** — written before the Vite upgrade and migration work
-   landed on the same branch. Refresh before review.
+5. **Dependency audit** — see Verified: 130 findings from main's wallet SDKs and
+   Electron. Decide whether the Electron shell (`main.js`, `preload.js`) and the
+   wallet SDKs stay; if not, removing them clears most of it.
 6. Pre-existing: `api_rate_windows` has RLS on with no policy (INFO); Supabase Auth
    leaked-password protection is off (WARN).
 
