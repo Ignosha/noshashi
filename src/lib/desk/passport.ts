@@ -317,16 +317,15 @@ export function passportToCsv(passport: AssetPassport): string {
   return rows.join("\n");
 }
 
+// The page uses the standard Helvetica font, whose strings are single
+// bytes. Anything outside printable ASCII would be written as UTF-8 and
+// render as mojibake, so it is replaced with "?" rather than guessed at.
 function escapePdfText(text: string): string {
   return text
+    .replace(/[^\x20-\x7e]/g, "?")
     .replace(/\\/g, "\\\\")
     .replace(/\(/g, "\\(")
     .replace(/\)/g, "\\)");
-}
-
-function pdfString(text: string): string {
-  const escaped = escapePdfText(text);
-  return `(${escaped})`;
 }
 
 export function passportToPdf(passport: AssetPassport): Uint8Array {
@@ -352,14 +351,16 @@ export function passportToPdf(passport: AssetPassport): Uint8Array {
   };
 
   addLine("Issuer", passport.asset.issuer);
-  addLine("Currency", passport.asset.currency || "—");
+  addLine("Currency", passport.asset.currency || "-");
   if (passport.asset.domain) addLine("Domain", passport.asset.domain);
 
   contentLines.push("0 -20 Td");
   contentLines.push(`(${escapePdfText(`Verdict: ${passport.authority.verdict.toUpperCase()}`)}) Tj`);
   contentLines.push("0 -12 Td");
   contentLines.push(`(${escapePdfText(`Rules version: ${passport.authority.rulesVersion}`)}) Tj`);
+  contentLines.push("0 -12 Td");
   contentLines.push(`(${escapePdfText(`Ledger index: ${passport.authority.ledgerIndex}`)}) Tj`);
+  contentLines.push("0 -12 Td");
   contentLines.push(`(${escapePdfText(`Source: ${passport.authority.source}`)}) Tj`);
 
   contentLines.push("0 -20 Td");
@@ -388,43 +389,40 @@ export function passportToPdf(passport: AssetPassport): Uint8Array {
   push(`4 0 obj\n<< /Length ${contentStreamBytes.length} >>\nstream\n${contentStream}\nendstream\nendobj`);
   push("5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj");
 
-  const header = "%PDF-1.4\n";
-  const body = objects.join("\n");
-  const bodyBytes = new TextEncoder().encode(body);
+  // Byte offsets are counted as the file is assembled. The xref table
+  // must point at each object's first byte exactly, or readers either
+  // repair the file silently or refuse it.
+  const enc = new TextEncoder();
+  const chunks: Uint8Array[] = [];
+  let length = 0;
+  const write = (text: string) => {
+    const bytes = enc.encode(text);
+    chunks.push(bytes);
+    length += bytes.length;
+  };
 
-  const offsets: number[] = [0];
-  for (let i = 1; i <= 5; i++) {
-    const marker = `${i} 0 obj`;
-    const markerBytes = new TextEncoder().encode(marker);
-    const idx = bodyBytes.indexOf(markerBytes);
-    offsets.push(idx >= 0 ? header.length + idx : 0);
+  write("%PDF-1.4\n");
+  const offsets: number[] = [];
+  for (const obj of objects) {
+    offsets.push(length);
+    write(`${obj}\n`);
   }
 
-  const xrefLines: string[] = [];
-  xrefLines.push("xref");
-  xrefLines.push("0 6");
-  xrefLines.push("0000000000 65535 f ");
-  for (let i = 1; i <= 5; i++) {
-    xrefLines.push(`${String(offsets[i]).padStart(10, "0")} 00000 n `);
+  const xrefOffset = length;
+  write(`xref\n0 ${objects.length + 1}\n`);
+  write("0000000000 65535 f \n");
+  for (const offset of offsets) {
+    write(`${String(offset).padStart(10, "0")} 00000 n \n`);
   }
+  write(`trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
 
-  const xrefOffset = header.length + bodyBytes.length;
-  const trailerLines = [
-    "trailer",
-    "<< /Size 6 /Root 1 0 R >>",
-    "startxref",
-    String(xrefOffset),
-    "%%EOF",
-  ];
-
-  const pdf = [
-    header,
-    body,
-    ...xrefLines,
-    ...trailerLines,
-  ].join("\n");
-
-  return new TextEncoder().encode(pdf);
+  const pdf = new Uint8Array(length);
+  let at = 0;
+  for (const chunk of chunks) {
+    pdf.set(chunk, at);
+    at += chunk.length;
+  }
+  return pdf;
 }
 
 export async function exportPassport(
