@@ -1,4 +1,4 @@
-import { receiptDigest, DOMAIN_REGISTRY, type PolicyCheck } from "@/lib/policy";
+import { receiptDigest, verdictForChecks, DOMAIN_REGISTRY, type PolicyCheck } from "@/lib/policy";
 import type { Status } from "@/lib/xrpl/types";
 import type { LedgerEntry } from "@/lib/desk/ledger";
 
@@ -48,23 +48,14 @@ export async function verifyEntry(entry: LedgerEntry): Promise<ReceiptCheck> {
     : { state: "mismatch", stored: entry.digest, recomputed };
 }
 
-/**
- * The verdict the engine's own rule gives for these checks. The stored
- * verdict must agree, except that INSUFFICIENT DATA is decided by
- * evidence that was unavailable rather than by a check, so it can only
- * be confirmed as consistent (no blocking failure), not re-derived.
- */
+/** The verdict the engine's own rule gives for these checks. */
 export function verdictFromChecks(checks: PolicyCheck[]): Status {
-  if (checks.some((c) => c.severity === "block" && !c.passed)) return "no-go";
-  if (checks.some((c) => c.severity === "warn" && !c.passed)) return "hold";
-  return "go";
+  return verdictForChecks(checks);
 }
 
 export function verdictConsistent(entry: LedgerEntry): boolean | null {
   if (!entry.checks) return null;
-  const derived = verdictFromChecks(entry.checks);
-  if (entry.verdict === "insufficient-data") return derived !== "no-go";
-  return derived === entry.verdict;
+  return verdictForChecks(entry.checks) === entry.verdict;
 }
 
 /** The rule that decided the verdict: the first blocking failure, else the first warning. */

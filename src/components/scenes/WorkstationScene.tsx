@@ -17,6 +17,7 @@ import { shortAddress } from "@/lib/xrpl/client";
 import { saveTextFile } from "@/lib/export";
 import { useLedger, summariseWallets, ledgerToCsv, signContent } from "@/lib/desk/ledger";
 import { EvidencePanel } from "@/components/scenes/EvidencePanel";
+import { SimulationPanel } from "@/components/scenes/SimulationPanel";
 import { useRuleSet, DEFAULT_RULES } from "@/lib/desk/rules";
 import { useIssuerWatch, WATCH_INTERVALS, postureLabel } from "@/lib/desk/watch";
 import { useOfflineVault, provenanceLine } from "@/lib/desk/offline";
@@ -76,7 +77,7 @@ function WorkstationBody({
   const { push } = useToast();
 
   const [tab, setTab] = useState<
-    "explorer" | "evidence" | "policy" | "watch" | "offline" | "export"
+    "explorer" | "evidence" | "policy" | "simulate" | "watch" | "offline" | "export"
   >("explorer");
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
@@ -178,6 +179,8 @@ function WorkstationBody({
               ? "EVIDENCE CHAIN · RECEIPT VERIFICATION"
               : tab === "policy"
               ? "POLICY EDITOR"
+              : tab === "simulate"
+              ? "POLICY SIMULATION · RECORDED VERDICTS UNDER A CHANGED POLICY"
               : tab === "watch"
                 ? "ISSUER DRIFT MONITOR"
                 : tab === "offline"
@@ -193,6 +196,7 @@ function WorkstationBody({
               <TabsTrigger value="explorer">EXPLORER</TabsTrigger>
               <TabsTrigger value="evidence">EVIDENCE</TabsTrigger>
               <TabsTrigger value="policy">POLICY</TabsTrigger>
+              <TabsTrigger value="simulate">SIMULATE</TabsTrigger>
               <TabsTrigger value="watch">
                 WATCH
                 {unacknowledged > 0 && (
@@ -293,9 +297,11 @@ function WorkstationBody({
         {tab === "policy" && (
           <div className="p-4">
             <p className="mb-4 max-w-[560px] text-[11px] leading-relaxed text-muted-foreground">
-              These thresholds decide every verdict. They are yours, not ours — a
-              compliance officer has to be able to state the number that produced a
-              HOLD, and change it. Saved to disk and applied immediately.
+              Your stated risk thresholds, saved to disk and exportable for review. The
+              gate verdict in Verification does not read them yet: it is decided by the
+              engine's rules — account, credentials, reserve, spendable balance, transfer
+              ceiling, domain governance and attestation. Use SIMULATE to see what a
+              changed rule, ceiling or HHI limit would do to the verdicts you have recorded.
             </p>
 
             <div className="grid grid-cols-2 gap-x-8 gap-y-4">
@@ -375,6 +381,11 @@ function WorkstationBody({
               </p>
             )}
           </div>
+        )}
+
+        {/* ── Policy simulation ────────────────────────────────── */}
+        {tab === "simulate" && (
+          <SimulationPanel entries={entries} loaded={loaded} hhiDefault={rules.hhiMaxBeforeHold} />
         )}
 
         {/* ── Signed export ────────────────────────────────────── */}
