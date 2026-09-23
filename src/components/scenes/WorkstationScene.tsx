@@ -19,6 +19,9 @@ import { useLedger, summariseWallets, ledgerToCsv, signContent } from "@/lib/des
 import { EvidencePanel } from "@/components/scenes/EvidencePanel";
 import { SimulationPanel } from "@/components/scenes/SimulationPanel";
 import { PolicyManager } from "@/components/scenes/PolicyManager";
+import { CasesPanel } from "@/components/scenes/CasesPanel";
+import { useInvestigations, stateOf as caseState } from "@/lib/desk/investigations";
+import { useClaimedSubject } from "@/lib/nav/handoff";
 import { usePolicyStore } from "@/lib/desk/policyStore";
 import { useIssuerWatch, WATCH_INTERVALS, postureLabel } from "@/lib/desk/watch";
 import { useOfflineVault, provenanceLine } from "@/lib/desk/offline";
@@ -78,8 +81,18 @@ function WorkstationBody({
   const { push } = useToast();
 
   const [tab, setTab] = useState<
-    "explorer" | "evidence" | "policy" | "simulate" | "watch" | "offline" | "export"
+    "explorer" | "evidence" | "cases" | "policy" | "simulate" | "watch" | "offline" | "export"
   >("explorer");
+  const [caseId, setCaseId] = useState<string | null>(null);
+  const investigations = useInvestigations();
+  const openCases = investigations.cases.filter((c) => caseState(c).status !== "closed").length;
+  // "OPEN INVESTIGATION" elsewhere lands here, on that case.
+  useClaimedSubject("workstation", (subject) => {
+    if (subject.as === "investigation") {
+      setTab("cases");
+      setCaseId(subject.value);
+    }
+  });
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"recent" | "hhi">("recent");
@@ -178,6 +191,8 @@ function WorkstationBody({
             ? "WALLET EXPLORER"
             : tab === "evidence"
               ? "EVIDENCE CHAIN · RECEIPT VERIFICATION"
+              : tab === "cases"
+              ? "INVESTIGATIONS · HUMAN FOLLOW-UP ON VERDICTS"
               : tab === "policy"
               ? "POLICY EDITOR"
               : tab === "simulate"
@@ -196,6 +211,10 @@ function WorkstationBody({
             <TabsList>
               <TabsTrigger value="explorer">EXPLORER</TabsTrigger>
               <TabsTrigger value="evidence">EVIDENCE</TabsTrigger>
+              <TabsTrigger value="cases">
+                CASES
+                {openCases > 0 && <span className="ml-1.5 bg-hold px-1 text-[9px] font-bold text-black">{openCases}</span>}
+              </TabsTrigger>
               <TabsTrigger value="policy">POLICY</TabsTrigger>
               <TabsTrigger value="simulate">SIMULATE</TabsTrigger>
               <TabsTrigger value="watch">
@@ -292,7 +311,12 @@ function WorkstationBody({
         )}
 
         {/* ── Evidence chain ───────────────────────────────────── */}
-        {tab === "evidence" && <EvidencePanel entries={entries} loaded={loaded} />}
+        {tab === "evidence" && (
+          <EvidencePanel entries={entries} loaded={loaded} onOpenCase={(id) => { setCaseId(id); setTab("cases"); }} />
+        )}
+
+        {/* ── Investigations ────────────────────────────────────── */}
+        {tab === "cases" && <CasesPanel entries={entries} initialCaseId={caseId} />}
 
         {/* ── Policy editor ────────────────────────────────────── */}
         {tab === "policy" && <PolicyManager entries={entries} />}

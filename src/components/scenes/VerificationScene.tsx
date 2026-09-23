@@ -35,6 +35,9 @@ import {
 } from "@/lib/desk/institutional";
 import { PolicyRefLine, PolicyVerdictBlock } from "./PolicyVerdict";
 import { useHandoff } from "@/lib/nav/handoff";
+import { useBilling } from "@/lib/billing/useEntitlements";
+import { OpenInvestigationButton } from "./CasesPanel";
+import type { LedgerEntry } from "@/lib/desk/ledger";
 import { useOfflineVault } from "@/lib/desk/offline";
 import { sendNativeNotification } from "@/lib/notifications";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
@@ -84,6 +87,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
   const receipt = run?.receipt ?? null;
   const policies = usePolicyStore();
   const handOff = useHandoff();
+  const { has } = useBilling();
   const issuerRisk = useIssuerRisk(vault.engaged ? undefined : liveAccount?.address);
 
   // When offline mode is engaged the engine adjudicates against captured
@@ -164,21 +168,19 @@ export function VerificationScene({ data }: { data: XrplState }) {
         }),
         new Promise((resolve) => setTimeout(resolve, 620)),
       ]);
-      const gateRun: GateRun = { receipt: result, results, measurements };
-      setRun(gateRun);
-      setLog((prev) => [gateRun, ...prev].slice(0, 12));
-
       // The durable record. A session log is a convenience; this is the
       // thing that still exists when an examiner asks in six months.
-      void append(
-        receiptToEntry(result, {
+      const entry = receiptToEntry(result, {
           domainCode: domain.code,
           offline: vault.engaged,
           hhi: measurements.concentration.state === "ok" ? measurements.concentration.hhi : undefined,
           measurements,
           policyResults: results ?? undefined,
-        })
-      );
+        });
+      void append(entry);
+      const gateRun: GateRun = { receipt: result, results, measurements, entry };
+      setRun(gateRun);
+      setLog((prev) => [gateRun, ...prev].slice(0, 12));
 
       const exceptions = (results ?? []).filter((r) => r.state === "REVIEW" || r.state === "FAIL");
       if (active && exceptions.length) {
@@ -443,6 +445,13 @@ export function VerificationScene({ data }: { data: XrplState }) {
                           ASK NOSHASHI WHY
                         </button>
                       )}
+                      {run && has("portfolios") && (
+                        <OpenInvestigationButton
+                          entry={run.entry}
+                          className="ml-2 mt-2"
+                          onOpened={(id) => handOff({ scene: "workstation", from: "verify", as: "investigation", value: id })}
+                        />
+                      )}
                     </div>
 
                     <Eyebrow className="mb-2">DOMAIN &amp; ENGINE RULES</Eyebrow>
@@ -695,6 +704,8 @@ type GateRun = {
   /** Institutional policy results, as decided. Null when no policy was active. */
   results: RuleResult[] | null;
   measurements: Measurements;
+  /** The ledger entry this run recorded, for opening an investigation. */
+  entry: LedgerEntry;
 };
 
 const isPolicyCheck = (id: string) => id.startsWith("POLICY_") || id.startsWith("EVIDENCE_POLICY_");
