@@ -33,6 +33,21 @@ Every line below was executed on `3382015`, not inferred:
 
 ## Open
 
+**Do first — needs your hands (edge-function access was denied to the agent):**
+
+```bash
+supabase functions deploy noshashi-stripe-webhook noshashi-verify --project-ref xiurbiwuwcfowqnpmwki
+```
+
+Until then, an Enterprise/Strategic subscription still receives the *free* tier's
+features and a 2/sec API limit. The database side (tier constraint) is already live.
+
+Also: `scripts/build-legal-page.mjs` is stale against the committed `site/legal/`
+(Google Fonts, old blue palette) — do not run it until it is brought up to date.
+Strategic's `event_feeds` / `custom_schemas` and Enterprise's
+`dedicated_environment` are contract services with no code behind them; the copy
+now says so rather than promising gRPC or exactly-once delivery.
+
 In priority order.
 
 1. **§18 per-check five-state result.** `PolicyCheck.passed` is a boolean hashed by
