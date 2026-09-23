@@ -42,8 +42,8 @@ export function renderNews(news, { columns = false, limit = 8 } = {}) {
         ? `<time datetime="${esc(item.publishedAt)}">${esc(ago(item.publishedAt))}</time>`
         : "";
       return `<article class="feed-item">
-      <span class="feed-meta"><span class="src">${esc(item.publisher)}</span>${when}</span>
-      <a class="headline" href="${attrUrl(item.url)}" rel="noopener nofollow" target="_blank">${esc(item.title)}</a>
+      <span class="feed-meta"><span class="src" translate="no">${esc(item.publisher)}</span>${when}</span>
+      <a class="headline" data-i18n-live href="${attrUrl(item.url)}" rel="noopener nofollow" target="_blank">${esc(item.title)}</a>
     </article>`;
     })
     .join("\n    ");
@@ -55,8 +55,8 @@ export function renderNews(news, { columns = false, limit = 8 } = {}) {
     ${rows}
   </div>
   <p class="feed-note" id="news-note">
-    Merged from ${esc(ok.join(", ") || "no source")}${
-      failed.length ? `. Not answering: ${esc(failed.join(", "))}` : ""
+    Merged from ${ok.length ? `<span translate="no">${esc(ok.join(", "))}</span>` : "no source"}${
+      failed.length ? `. Not answering: <span translate="no">${esc(failed.join(", "))}</span>` : ""
     }. Headlines link to the publisher and are reproduced as titles only.
     They are news about the XRP Ledger, not a NOSHASHI reading, and no verdict is implied by any of them.
   </p>`;
@@ -88,13 +88,17 @@ export function renderLog(entries, { limit = 8 } = {}) {
               /^https?:/i.test(entry.url) ? ' rel="noopener"' : ""
             }>${/^https?:/i.test(entry.url) ? "RELEASE NOTES" : "OPEN"} →</a>`
           : "";
+        // Release notes arrive from GitHub and change with every release,
+        // so the page translation leaves them to the on-device fallback
+        // rather than the catalogue. Repository notices are ours.
+        const live = entry.source === "github" ? " data-i18n-live" : "";
         return `<article class="log-entry" data-kind="${esc(entry.kind)}">
       <div class="log-meta">
         <time datetime="${esc(entry.at)}">${esc(isoDate(entry.at))}</time>
         <span class="log-kind">${esc(KIND_WORD[entry.kind] || "NOTE")}</span>
       </div>
-      <h3>${esc(entry.title)}</h3>
-      <p>${esc(clamp(entry.body, 300))}</p>
+      <h3${live}>${esc(entry.title)}</h3>
+      <p${live}>${esc(clamp(entry.body, 300))}</p>
       ${link}
     </article>`;
       })
@@ -265,13 +269,13 @@ export function renderDownloads(release) {
         if (!asset) return "";
         return `<a href="${attrUrl(asset.url)}">${esc(alt.label)}</a> — ${esc(
           megabytes(asset.size)
-        )}${asset.sha256 ? `, sha256 <span class="mono">${esc(shortHash(asset.sha256))}</span>` : ""}`;
+        )}${asset.sha256 ? `, sha256 <span class="mono" translate="no">${esc(shortHash(asset.sha256))}</span>` : ""}`;
       })
       .filter(Boolean);
 
     const hashLine = primary.sha256
       ? `<div class="hashline">
-          <p class="phash mono">${esc(primary.sha256)}</p>
+          <p class="phash mono" translate="no">${esc(primary.sha256)}</p>
           <button class="copyhash" type="button" data-copy="${esc(primary.sha256)}" data-i18n="release.copy">COPY</button>
         </div>`
       : "";

@@ -980,7 +980,6 @@
     rather than rewritten.
   -->
   <section class="hero-instrument" data-garden-field>
-    <!--SLOT:HEROBLOOM-->
 
     <div class="hi-grid" aria-hidden="true">
       <span class="hi-v" style="left:12.6%;animation-delay:.30s"></span>
@@ -2395,6 +2394,10 @@
     } catch (e) { return null; }
   }
 
+  /* Data (addresses, codes, currencies) is marked translate="no" so the
+     page translation (site/assets/i18n.js) leaves it exactly as read. */
+  function nt(x) { return '<span translate="no">' + esc(x) + "</span>"; }
+
   function fact(k, v, cls, note) {
     return '<div class="fact"><p class="k">' + esc(k) + '</p>' +
            '<p class="v ' + (cls || "") + '">' + v + '</p>' +
@@ -2462,7 +2465,7 @@
       var keys = Object.keys(ob).sort(function (x, y) { return Number(ob[y]) - Number(ob[x]); });
       var shown = keys.slice(0, 3);
       var parts = shown.map(function (c) {
-        return esc(c) + " " + Number(ob[c]).toLocaleString(undefined, { maximumFractionDigits: 2 });
+        return nt(c) + " " + Number(ob[c]).toLocaleString(undefined, { maximumFractionDigits: 2 });
       });
       var rest = keys.length - shown.length;
       f.push(fact("Outstanding obligations", parts.join("<br>"), "mono",
@@ -2496,7 +2499,7 @@
     }
 
     var dom = hexToText(a.Domain);
-    f.push(fact("Domain", dom ? esc(dom) : "Not set", dom ? "mono" : "unknown",
+    f.push(fact("Domain", dom ? nt(dom) : "Not set", dom ? "mono" : "unknown",
       dom ? "Self-declared by the account. It is a claim, not a verification."
           : "No domain is published."));
 
@@ -2510,7 +2513,7 @@
     out.style.setProperty("--sev", sev);
     out.innerHTML =
       '<p class="verdict">' + verdict + "</p>" +
-      '<p class="sub">' + sub + ' <span class="mono">' + esc(addr) + "</span></p>" +
+      '<p class="sub">' + sub + ' <span class="mono" translate="no">' + esc(addr) + "</span></p>" +
       '<div class="facts">' + f.join("") + "</div>" +
       '<p class="foot">Read from validated ledger ' +
         (info.ledger_index ? esc(info.ledger_index) : "state") +
@@ -2521,11 +2524,19 @@
     out.hidden = false;
   }
 
-  function fail(msg) {
+  function fail(msg, html) {
     out.className = "checkout err";
     out.style.setProperty("--sev", "var(--hold)");
-    out.innerHTML = '<p class="verdict">' + esc(msg) + "</p>";
+    out.innerHTML = '<p class="verdict">' + (html || esc(msg)) + "</p>";
     out.hidden = false;
+  }
+
+  /* A rippled error code the reader has no plain-words version of. The
+     code itself is data; the sentence around it is translated. */
+  function declined(code, known) {
+    var e = new Error(known || ("The ledger declined the read: " + code));
+    if (!known) e.html = "The ledger declined the read: " + nt(code);
+    return e;
   }
 
   form.addEventListener("submit", function (ev) {
@@ -2552,7 +2563,7 @@
             actMalformed: "That is not a valid XRPL address — it has the right shape but fails its checksum, which usually means a mistyped or transposed character.",
             invalidParams: "That address was not accepted by the ledger. Check it for a missing or extra character."
           };
-          throw new Error(says[info.error] || ("The ledger declined the read: " + info.error));
+          throw declined(info.error, says[info.error]);
         }
         return Promise.all([
           info,
@@ -2565,7 +2576,7 @@
         ]);
       })
       .then(function (r) { render(addr, r[0], r[1], r[2]); })
-      .catch(function (e) { fail(e.message || "Could not reach a public XRPL node. Try again in a moment."); })
+      .catch(function (e) { fail(e.message || "Could not reach a public XRPL node. Try again in a moment.", e.html); })
       .then(function () { btn.disabled = false; btn.textContent = was; });
   });
 })();
@@ -2609,6 +2620,14 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+  /* Data is marked translate="no" so the page translation leaves it as read. */
+  function nt(x) { return '<span translate="no">' + esc(x) + "</span>"; }
+  function declined(code, known) {
+    var e = new Error(known || ("The ledger declined the read: " + code));
+    if (!known) e.html = "The ledger declined the read: " + nt(code);
+    return e;
+  }
+
   function fact(k, v, cls, note) {
     return '<div class="fact"><p class="k">' + esc(k) + '</p><p class="v ' + (cls || "") + '">' +
       v + '</p>' + (note ? '<p class="n">' + note + '</p>' : "") + "</div>";
@@ -2650,17 +2669,17 @@
   var payBtn = document.getElementById("payBtn");
   var payOut = document.getElementById("payOut");
 
-  function payFail(m) {
+  function payFail(m, html) {
     payOut.className = "checkout err";
     payOut.style.setProperty("--sev", "var(--hold)");
-    payOut.innerHTML = '<p class="verdict">' + esc(m) + "</p>";
+    payOut.innerHTML = '<p class="verdict">' + (html || esc(m)) + "</p>";
     payOut.hidden = false;
   }
 
   function renderPay(hash, tx, meta) {
     var type = tx.TransactionType;
     if (type !== "Payment") {
-      payFail("That is a " + esc(type) + ", not a payment. This tool reads what a payment delivered.");
+      payFail("", "That is a " + nt(type) + ", not a payment. This tool reads what a payment delivered.");
       return;
     }
     var res = (meta && meta.TransactionResult) || "?";
@@ -2685,7 +2704,7 @@
     if (res !== "tesSUCCESS") {
       sev = "var(--faint)";
       verdict = "This payment did not succeed.";
-      sub = "Result " + esc(res) + ". Nothing was delivered.";
+      sub = "Result " + nt(res) + ". Nothing was delivered.";
     } else if (partial) {
       sev = "var(--nogo)";
       verdict = "It succeeded and delivered " +
@@ -2698,13 +2717,13 @@
     }
 
     var f = [];
-    f.push(fact("Result", esc(res), res === "tesSUCCESS" ? "good mono" : "warn mono",
+    f.push(fact("Result", nt(res), res === "tesSUCCESS" ? "good mono" : "warn mono",
       res === "tesSUCCESS" ? "The transaction succeeded — which says nothing about the amount."
                            : "The transaction did not succeed."));
-    f.push(fact("Stated amount", num(rv, 6) + " " + esc(amtCur(req)), "mono",
+    f.push(fact("Stated amount", num(rv, 6) + " " + nt(amtCur(req)), "mono",
       "The <span class=\"mono\">Amount</span> field. This is the figure naive systems credit."));
     f.push(fact("Actually delivered",
-      dv === null ? "Not recorded" : num(dv, 6) + " " + esc(amtCur(del)),
+      dv === null ? "Not recorded" : num(dv, 6) + " " + nt(amtCur(del)),
       dv === null ? "unknown" : ("mono" + (partial ? " bad" : " good")),
       dv === null ? "No <span class=\"mono\">delivered_amount</span> in the metadata."
                   : "The <span class=\"mono\">delivered_amount</span> field. This is what arrived."));
@@ -2718,7 +2737,7 @@
     payOut.style.setProperty("--sev", sev);
     payOut.innerHTML =
       '<p class="verdict">' + verdict + "</p>" +
-      '<p class="sub">' + sub + ' <span class="mono">' + esc(hash.slice(0, 24)) + "…</span></p>" +
+      '<p class="sub">' + sub + ' <span class="mono" translate="no">' + esc(hash.slice(0, 24)) + "…</span></p>" +
       (partial ? '<div class="depth">' +
         '<div><div class="lab"><span>Stated</span><em>' + num(rv, 6) + '</em></div>' +
         '<div class="bar"><i style="width:100%"></i></div></div>' +
@@ -2746,12 +2765,12 @@
       payOut.innerHTML = '<p class="spin">Reading the transaction…</p>';
       rpc("tx", { transaction: h, binary: false }).then(function (r) {
         if (r.error) {
-          throw new Error(r.error === "txnNotFound"
+          throw declined(r.error, r.error === "txnNotFound"
             ? "No transaction with that hash is in this node's history. Public nodes keep only recent ledgers."
-            : "The ledger declined the read: " + r.error);
+            : null);
         }
         renderPay(h, r.tx_json || r, r.meta || r.metaData);
-      }).catch(function (e) { payFail(e.message || "Could not reach a public XRPL node."); })
+      }).catch(function (e) { payFail(e.message || "Could not reach a public XRPL node.", e.html); })
         .then(function () { payBtn.disabled = false; payBtn.textContent = was; });
     });
   }
@@ -2844,7 +2863,7 @@
         limit: 200,
         ledger_index: "validated"
       }).then(function (r) {
-        if (r.error) throw new Error("The ledger declined the read: " + r.error);
+        if (r.error) throw declined(r.error);
         var offers = r.offers || [];
         if (!offers.length) throw new Error("There are no resting offers on this book right now.");
         var adv = 0, fund = 0, under = 0, worst = null;
@@ -2873,7 +2892,7 @@
             num(worst.a) + " offered<br>" + num(worst.f) + " backed", "mono bad",
             "One offer, advertised against what its owner can actually deliver."));
         }
-        f.push(fact("Depth you can rely on", num(fund) + " " + esc(cur),
+        f.push(fact("Depth you can rely on", num(fund) + " " + nt(cur),
           "mono" + (phantom > 10 ? " warn" : " good"),
           "Size an exit off this figure, not the advertised one."));
 
@@ -2883,7 +2902,7 @@
           '<p class="verdict">' +
             (phantom < 1 ? "This book is fully backed."
               : num(phantom, 1) + "% of this book’s visible depth could not fill.") + "</p>" +
-          '<p class="sub">' + esc(label) + " · measured just now against validated ledger " +
+          '<p class="sub">' + nt(label) + " · measured just now against validated ledger " +
             esc(r.ledger_index || r.ledger_current_index || "state") + "</p>" +
           '<div class="depth">' +
             '<div><div class="lab"><span>Advertised</span><em>' + num(adv) + "</em></div>" +
@@ -2903,7 +2922,7 @@
       }).catch(function (e) {
         bookOut.className = "checkout err";
         bookOut.style.setProperty("--sev", "var(--hold)");
-        bookOut.innerHTML = '<p class="verdict">' + esc(e.message || "Could not reach a public XRPL node.") + "</p>";
+        bookOut.innerHTML = '<p class="verdict">' + (e.html || esc(e.message || "Could not reach a public XRPL node.")) + "</p>";
         bookOut.hidden = false;
       }).then(function () { bookBtn.disabled = false; bookBtn.textContent = was; });
     });
@@ -2998,8 +3017,17 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+  /* Data is marked translate="no" so the page translation leaves it as
+     read. A fact's key may be data too: pass { html: … }. */
+  function nt(x) { return '<span translate="no">' + esc(x) + "</span>"; }
+  function declined(code, known) {
+    var e = new Error(known || ("The ledger declined the read: " + code));
+    if (!known) e.html = "The ledger declined the read: " + nt(code);
+    return e;
+  }
+
   function fact(k, v, cls, note) {
-    return '<div class="fact"><p class="k">' + esc(k) + '</p><p class="v ' + (cls || "") + '">' +
+    return '<div class="fact"><p class="k">' + (k && k.html ? k.html : esc(k)) + '</p><p class="v ' + (cls || "") + '">' +
       v + '</p>' + (note ? '<p class="n">' + note + '</p>' : "") + "</div>";
   }
   function num(n, d) {
@@ -3020,10 +3048,10 @@
     el.innerHTML = html;
     el.hidden = false;
   }
-  function oops(el, msg) {
+  function oops(el, msg, html) {
     el.className = "checkout err";
     el.style.setProperty("--sev", "var(--hold)");
-    el.innerHTML = '<p class="verdict">' + esc(msg) + "</p>";
+    el.innerHTML = '<p class="verdict">' + (html || esc(msg)) + "</p>";
     el.hidden = false;
   }
   function busy(el, msg) {
@@ -3066,9 +3094,7 @@
     return rpc("account_lines", { account: a, ledger_index: "validated", limit: 200 })
       .then(function (r) {
         if (r.error) {
-          throw new Error(r.error === "actNotFound"
-            ? "No such account on mainnet."
-            : "The ledger declined the read: " + r.error);
+          throw declined(r.error, r.error === "actNotFound" ? "No such account on mainnet." : null);
         }
         /* The sign is the whole meaning. A positive balance is a token this
            account HOLDS, and its issuer may be able to freeze it. A negative
@@ -3119,9 +3145,9 @@
               : noFreeze === null ? "Issuer unread"
               : noFreeze ? "Cannot be frozen" : "Can be frozen";
             var cls = isFrozen ? "bad" : noFreeze === null ? "unknown" : noFreeze ? "good" : "warn";
-            return fact(curName(l.currency) + " · " + num(Number(l.balance), 4),
+            return fact({ html: nt(curName(l.currency)) + " · " + num(Number(l.balance), 4) },
               state, cls,
-              "Issued by <span class=\"mono\">" + esc(l.account.slice(0, 12)) + "…</span>" +
+              "Issued by <span class=\"mono\" translate=\"no\">" + esc(l.account.slice(0, 12)) + "…</span>" +
               (isFrozen ? ". This specific line is frozen right now." : ""));
           });
 
@@ -3139,14 +3165,14 @@
               (lines.length > top.length ? ", largest " + top.length + " shown" : "") +
               (owed.length ? "; " + owed.length + " further line" + (owed.length === 1 ? " is" : "s are") +
                 " this account's own issuance, not a holding" : "") +
-              ' · <span class="mono">' + esc(a.slice(0, 16)) + "…</span></p>" +
+              ' · <span class="mono" translate="no">' + esc(a.slice(0, 16)) + "…</span></p>" +
             '<div class="facts">' + f.join("") + "</div>" +
             '<p class="foot">A freeze right is not wrongdoing — most issuers keep it, and it is how ' +
             'a regulated issuer answers a court order. It is a fact about what you hold, and one ' +
             'that is published rather than disclosed. The desktop app reads deep freeze ' +
             '(XLS-77) and counterparty history too. <a href="#download">Download it free</a>.</p>');
         });
-      }).catch(function (e) { oops(expOut, e.message || "Could not reach a public XRPL node."); });
+      }).catch(function (e) { oops(expOut, e.message || "Could not reach a public XRPL node.", e.html); });
   });
 
   /* ── NFT: the id carries the issuer, the royalty and the rights ── */
@@ -3222,7 +3248,7 @@
                        : "This token cannot be transferred.";
 
       var f = [];
-      f.push(fact("Issuer", '<span class="mono">' + esc(iss.addr) + "</span>", "",
+      f.push(fact("Issuer", '<span class="mono" translate="no">' + esc(iss.addr) + "</span>", "",
         iss.ok === true ? "Decoded from the id itself, and the account exists on mainnet."
           : iss.ok === false ? "Decoded from the id, but no such account is on mainnet — treat the id as suspect."
           : "Decoded from the id. The node did not answer a check."));
@@ -3282,11 +3308,11 @@
         : "The nodes agree, within " + spread + " ledger" + (spread === 1 ? "" : "s") + " of each other.";
 
       var f = rs.map(function (r) {
-        return fact(r.name,
+        return fact({ html: nt(r.name) },
           r.idx ? String(r.idx) : "No answer",
           r.idx ? ("mono" + (r.idx === max ? " good" : "")) : "unknown",
           esc(r.who) + " · " +
-          (r.idx ? (r.hash ? '<span class="mono">' + esc(r.hash.slice(0, 16)) + "…</span> · " + r.ms + " ms"
+          (r.idx ? (r.hash ? '<span class="mono" translate="no">' + esc(r.hash.slice(0, 16)) + "…</span> · " + r.ms + " ms"
                            : r.ms + " ms")
                  : "did not respond"));
       });
@@ -3376,9 +3402,9 @@
         /* Only http(s) reaches an href. A feed is third-party text and
            is treated as such everywhere it is rendered. */
         var url = /^https?:\/\//.test(item.url || "") ? item.url : "#";
-        return '<article class="feed-item"><span class="feed-meta"><span class="src">' +
+        return '<article class="feed-item"><span class="feed-meta"><span class="src" translate="no">' +
           escapeHtml(item.publisher) + "</span>" + when + '</span>' +
-          '<a class="headline" href="' + escapeHtml(url) + '" rel="noopener nofollow" target="_blank">' +
+          '<a class="headline" data-i18n-live href="' + escapeHtml(url) + '" rel="noopener nofollow" target="_blank">' +
           escapeHtml(item.title) + "</a></article>";
       }).join("");
       if (state) {

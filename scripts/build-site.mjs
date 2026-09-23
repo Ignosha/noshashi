@@ -64,15 +64,9 @@ const FAQ = FAQ_IDS.map((id) => KB.find((e) => e.id === id)).filter(Boolean);
 async function buildHome({ news, market, feed, status, release }) {
   let html = await readFile(path.join(ROOT, "templates", "home.html"), "utf8");
 
-  // Inlined, not <img>: the bloom takes its colour from the one `color`
-  // on its container, which is how the light theme flips it. An <img>
-  // cannot see the page's custom properties.
-  const bloom = await readFile(path.join(ROOT, "templates", "hero-bloom.svg"), "utf8");
-
   const slots = {
     ORIGIN: ORIGIN,
     BRANDMARK: MARK,
-    HEROBLOOM: bloom,
     VERSION: release ? esc(release.tag) : "beta",
     MARKETHEAD: renderMarketHead(market),
     MARKET: renderMarket(market),
@@ -211,8 +205,8 @@ const NEWS_REFRESH = `<script>
         feed.innerHTML=d.items.map(function(i){
           var w=i.publishedAt?'<time datetime="'+esc(i.publishedAt)+'">'+esc(ago(i.publishedAt))+"</time>":"";
           var u=/^https?:\\/\\//.test(i.url||"")?i.url:"#";
-          return '<article class="feed-item"><span class="feed-meta"><span class="src">'+
-            esc(i.publisher)+"</span>"+w+'</span><a class="headline" href="'+esc(u)+
+          return '<article class="feed-item"><span class="feed-meta"><span class="src" translate="no">'+
+            esc(i.publisher)+"</span>"+w+'</span><a class="headline" data-i18n-live href="'+esc(u)+
             '" rel="noopener nofollow" target="_blank">'+esc(i.title)+"</a></article>";}).join("");
         if(state){state.textContent="UPDATED "+ago(d.fetchedAt);state.className="reading live";}
       }).catch(function(){});
@@ -531,6 +525,8 @@ async function buildContact() {
   }catch(e){}
 
   function say(text,tone){status.textContent=text;status.setAttribute("data-tone",tone||"");}
+  function esc(v){return String(v).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 
   form.addEventListener("submit",function(event){
     event.preventDefault();
@@ -552,7 +548,10 @@ async function buildContact() {
         /* 503 means nobody has the message. Say that, and hand over the
            address that does work, rather than a generic failure. */
         if(result.body.mailto){
-          say(result.body.error+" Email "+result.body.mailto+" instead — that address works.","bad");
+          /* The address is data, so the page translation leaves it be. */
+          status.innerHTML=esc(result.body.error)+' Email <a translate="no" href="mailto:'+
+            esc(result.body.mailto)+'">'+esc(result.body.mailto)+'</a> instead — that address works.';
+          status.setAttribute("data-tone","bad");
           return;
         }
         say(result.body.error||"That did not send.","bad");
@@ -717,6 +716,20 @@ async function buildCertificate() {
   function say(text,tone){status.textContent=text;status.setAttribute("data-tone",tone||"");}
   function esc(v){return String(v).replace(/[&<>"]/g,function(c){
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  /* A finding's label and detail are sentences with data inside them —
+     the currency code, an address. The data is marked translate="no" so
+     the page translation (site/assets/i18n.js) translates the sentence
+     around it and leaves the reading exactly as the ledger gave it. */
+  function data(text,cert){
+    var out=esc(text).replace(/(^|[^A-Za-z0-9])(r[1-9A-HJ-NP-Za-km-z]{24,34})(?![A-Za-z0-9])/g,
+      function(m,pre,a){return pre+'<span translate="no">'+a+'</span>';});
+    var cur=cert.currencyLabel&&String(cert.currencyLabel).split(" ")[0];
+    if(cur&&/^[A-Za-z0-9]{2,20}$/.test(cur)){
+      out=out.replace(new RegExp("(^|[ (])("+cur+")(?=[ .,;)]|$)","g"),
+        function(m,pre,c){return pre+'<span translate="no">'+c+'</span>';});
+    }
+    return out;
+  }
 
   /* Wording mirrors AUTHORITY_VERDICT_COPY in src/lib/desk/authority.ts.
      The console and this page must not describe the same verdict two
@@ -754,18 +767,18 @@ async function buildCertificate() {
     var copy=COPY[cert.verdict]||COPY["insufficient-data"];
     var html='<div class="cert-verdict '+copy.cls+'">'+
       '<p class="tag">'+esc(copy.tag)+'</p>'+
-      '<h2>'+esc(cert.issuer)+'</h2>'+
+      '<h2 translate="no">'+esc(cert.issuer)+'</h2>'+
       '<p>'+esc(copy.text)+'</p>'+
       '<p class="cert-meta">LEDGER '+esc(String(cert.ledgerIndex))+
-        (cert.currencyLabel?' · '+esc(cert.currencyLabel):'')+
-        ' · READ '+esc(new Date(cert.evaluatedAt).toLocaleString())+
+        (cert.currencyLabel?' · <span translate="no">'+esc(cert.currencyLabel)+'</span>':'')+
+        ' · READ <span translate="no">'+esc(new Date(cert.evaluatedAt).toLocaleString())+'</span>'+
         ' · '+esc(SOURCE_LABEL[cert.source]||'DISTRIBUTION UNSTATED')+
         /* Also inside the digest, so a reader recomputing from this page
            needs it. Printed plainly rather than hidden behind a label:
            it is the difference between two certificates that otherwise
            read identically. */
         (cert.rulesVersion ? ' · RULES v'+esc(String(cert.rulesVersion)) : '')+
-        '<br>DIGEST '+esc(cert.digest)+'</p>'+
+        '<br>DIGEST <span translate="no">'+esc(cert.digest)+'</span></p>'+
       '</div><div class="cert-checks">';
 
     for(var i=0;i<cert.checks.length;i++){
@@ -781,8 +794,8 @@ async function buildCertificate() {
       var word=c.passed?"CLEAR":"FINDING";
       html+='<div class="cert-check">'+
         '<span class="mark '+mark+'">'+word+'</span>'+
-        '<h3>'+esc(c.label)+'</h3>'+
-        '<p>'+esc(c.detail)+'</p>'+
+        '<h3>'+data(c.label,cert)+'</h3>'+
+        '<p>'+data(c.detail,cert)+'</p>'+
         '<code>'+esc(c.id)+'</code>'+
       '</div>';
     }
@@ -1030,6 +1043,13 @@ async function buildPricingEnhancement() {
   html = html.replace("Three tiers, and one of them is not a product", "Five operating layers, and one of them is not a product");
   html = html.replace("The free tier exists so you can check our arithmetic against an address you\n        already know the answer for, before any money changes hands. It is not a\n        starter plan and we do not pretend it scales into one. Pro is the working\n        tool for a desk. Institutional is the contract, the controls and the API.",
     "Free is the proof surface. Pro is the working tool for a desk. Institutional is the contract, controls and API. Enterprise adds operational evidence; Strategic Infrastructure is the contracted data plane for teams building on NOSHASHI.");
+  // The pricing page predates the shared shell and never loaded the
+  // translation script, so it was the one page with no language switch
+  // and nothing translated. It loads it before nav.js like every other page.
+  if (!html.includes('src="/assets/i18n.js"')) {
+    html = html.replace('<script src="/assets/nav.js" defer></script>',
+      '<script src="/assets/i18n.js" defer></script>\n<script src="/assets/nav.js" defer></script>');
+  }
   await write("pricing/index.html", html);
 }
 

@@ -77,12 +77,15 @@
     wrap.className = "support-msg " + (from === "you" ? "visitor" : "console");
     if (from !== "you") wrap.setAttribute("data-grounded", options.grounded === false ? "false" : "true");
 
+    /* The visitor's own words are never translated, and nor is a reply
+       the server says is already in the page's language. */
+    var fixed = from === "you" || (options.lang && options.lang !== "en");
     var html =
       '<span class="from">' + (from === "you" ? "YOU" : "CONSOLE") + "</span>" +
-      "<p>" + escapeHtml(text) + "</p>";
+      "<p" + (fixed ? ' translate="no"' : "") + ">" + escapeHtml(text) + "</p>";
 
     if (options.links && options.links.length) {
-      html += '<span class="links">' + options.links.map(function (link) {
+      html += '<div class="links">' + options.links.map(function (link) {
         // Only same-origin paths and http(s) are rendered as links.
         var href = String(link.href || "");
         if (!/^(https?:\/\/|\/|mailto:)/.test(href)) return "";
@@ -90,7 +93,7 @@
         return '<a href="' + escapeHtml(href) + '"' +
           (external ? ' rel="noopener" target="_blank"' : "") + ">" +
           escapeHtml(link.label || href) + "</a>";
-      }).join("") + "</span>";
+      }).join("") + "</div>";
     }
 
     wrap.innerHTML = html;
@@ -106,8 +109,9 @@
       button.type = "button";
       button.textContent = text;
       button.addEventListener("click", function () {
-        input.value = text;
-        form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event("submit", { cancelable: true }));
+        /* The English question is what the knowledge base matches; the
+           bubble shows the words the visitor actually clicked. */
+        ask(text, button.textContent);
       });
       suggest.appendChild(button);
     });
@@ -141,14 +145,15 @@
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
-    if (busy) return;
+    ask(input.value.trim());
+  });
 
-    var question = input.value.trim();
-    if (!question) return;
+  function ask(question, shown) {
+    if (busy || !question) return;
 
     input.value = "";
     suggest.innerHTML = "";
-    add("you", question);
+    add("you", shown || question);
     history.push({ role: "user", content: question });
 
     busy = true;
@@ -158,7 +163,11 @@
     fetch("/api/support-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: question, history: history.slice(-6) }),
+      body: JSON.stringify({
+        message: question,
+        history: history.slice(-6),
+        lang: document.documentElement.getAttribute("lang") || "en",
+      }),
     })
       .then(function (response) { return response.json().catch(function () { return {}; }); })
       .then(function (data) {
@@ -168,7 +177,7 @@
         var links = data.links && data.links.length
           ? data.links
           : [{ label: "Contact the team", href: "/contact/" }];
-        add("console", reply, { links: links, grounded: data.grounded !== false });
+        add("console", reply, { links: links, grounded: data.grounded !== false, lang: data.lang });
         history.push({ role: "assistant", content: reply });
         if (data.related && data.related.length) drawSuggestions(data.related);
       })
@@ -183,5 +192,5 @@
         send.disabled = false;
         input.focus();
       });
-  });
+  }
 })();

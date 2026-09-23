@@ -44,7 +44,8 @@ function mount(host: HTMLElement) {
     flowers,
     mark: () => {
       const main = flowers()[0];
-      return main ? { x: main.x, y: main.y, size: main.r * 1.9 } : null;
+      // No flowers in the hero: the mark sits on its own, right of the text.
+      return main ? { x: main.x, y: main.y, size: main.r * 1.9 } : { x: 0.72, y: 0.42, size: 0.3 };
     },
     fontSize: Number(host.dataset.gardenFont) || 11,
     pulse: 6,
