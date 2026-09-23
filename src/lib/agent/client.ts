@@ -36,6 +36,13 @@ export class AgentUnavailableError extends Error {
 
 const PROBE_TIMEOUT_MS = 2500;
 
+/** Sampling temperature for conversation turns. Low: the agent explains a fixed rule set. */
+export const CHAT_TEMPERATURE = 0.3;
+/** Output cap sent to Anthropic, which requires one. Other runtimes use their own default. */
+export const ANTHROPIC_MAX_TOKENS = 2048;
+/** Earlier turns re-sent with each question, for continuity without blowing the window. */
+export const HISTORY_TURNS = 6;
+
 async function fetchWithTimeout(
   url: string,
   init: RequestInit = {},
@@ -204,7 +211,7 @@ export async function chatStream({
   messages,
   onToken,
   signal,
-  temperature = 0.3,
+  temperature = CHAT_TEMPERATURE,
 }: ChatOptions): Promise<string> {
   const provider = findProvider(config.providerId);
   const safety = isEndpointSafe(config.baseUrl);
@@ -231,7 +238,7 @@ export async function chatStream({
   const body = isAnthropic
     ? {
         model: config.model,
-        max_tokens: 2048,
+        max_tokens: ANTHROPIC_MAX_TOKENS,
         system: systemPrompt,
         messages: conversation,
         stream: true,

@@ -187,7 +187,7 @@ export const PROVIDERS: Provider[] = [
     requiresKey: true,
     autodetect: false,
     setupHint:
-      "Remote calls are proxied through the native layer so the key never enters the web view.",
+      "The key is kept in the OS keyring and read only for the duration of each request.",
     docsUrl: "https://openrouter.ai/docs",
   },
 ];
@@ -256,16 +256,30 @@ export function isEndpointSafe(baseUrl: string): { ok: boolean; reason?: string 
     return { ok: false, reason: "Not a valid URL." };
   }
 
-  const isLoopback =
-    url.hostname === "localhost" ||
-    url.hostname === "127.0.0.1" ||
-    url.hostname === "[::1]";
-
   if (url.protocol === "https:") return { ok: true };
-  if (url.protocol === "http:" && isLoopback) return { ok: true };
+  if (url.protocol === "http:" && isLoopbackHost(url.hostname)) return { ok: true };
 
   return {
     ok: false,
     reason: "Remote endpoints must use HTTPS. Plaintext would expose the request in transit.",
   };
+}
+
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+}
+
+/**
+ * Whether requests to this endpoint stay on the operator's machine.
+ *
+ * Decided by the endpoint actually configured, not by the provider's
+ * label: vLLM or LM Studio pointed at a remote host is a remote call,
+ * and has to be described as one.
+ */
+export function isOnDeviceEndpoint(baseUrl: string): boolean {
+  try {
+    return isLoopbackHost(new URL(normalizeEndpoint(baseUrl)).hostname);
+  } catch {
+    return false;
+  }
 }
