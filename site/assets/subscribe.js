@@ -106,14 +106,7 @@
         '<button class="sub-close" type="button" aria-label="Close" data-close>✕</button>' +
         '<div class="sub-mark" aria-hidden="true">' +
           '<span class="ring"></span><span class="ring"></span>' +
-          '<svg viewBox="0 0 180 180" fill="none">' +
-            '<g stroke="currentColor" stroke-width="9" stroke-linecap="round">' +
-            '<path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/></g>' +
-            '<circle cx="151" cy="69" r="8" fill="currentColor"/>' +
-            '<path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="currentColor"/>' +
-            '<path d="M92 111 63 132C60 116 66 103 78 93Z" fill="currentColor"/>' +
-            '<path d="M111 91 130 118C114 119 101 113 93 103Z" fill="currentColor"/>' +
-          '</svg>' +
+          '<img src="/assets/flower-mark-128.png" alt="" width="44" height="44" decoding="async">' +
         '</div>' +
         '<h2 id="sub-dlg-title">Hear when something ships.</h2>' +
         '<p class="lede">An email when a build ships or a capability lands — drawn from the same ' +

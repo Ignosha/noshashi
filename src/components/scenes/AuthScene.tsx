@@ -182,7 +182,7 @@ export function AuthScene({
 
       <div className="relative w-full max-w-[420px]">
         <div className="mb-6 flex flex-col items-center text-center">
-          <NovaLogo size={44} className="text-foreground" />
+          <NovaLogo size={44} tone="color" />
           <h1 className="display mt-4 text-[22px] font-[800] tracking-[0.1em] text-foreground">
             {BRAND.name}
           </h1>

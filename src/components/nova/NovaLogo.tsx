@@ -6,16 +6,13 @@ import { NoshashiMark, type MarkTone } from "./brand/NoshashiMark";
 /**
  * NOSHASHI brand mark.
  *
- * The artwork now comes from the supplied brand pack via NoshashiMark;
- * this component is kept as the app-wide entry point so the eleven
+ * The artwork is the flower, drawn by NoshashiMark from the generated
+ * brand geometry; this component is kept as the app-wide entry point so the eleven
  * existing call sites keep their `size` / `animated` / `className`
  * contract and the swap is one edit rather than eleven.
  *
- * The animation is deliberately small: a faint lift, and — only on the
- * full mark — a slow orbital drift. A logo that performs is a logo you
- * stop trusting. Below 24px NoshashiMark drops the orbital arcs on its
- * own, because they render sub-pixel there, so the drift is suppressed
- * to match.
+ * The animation is deliberately small: a faint lift, like a bloom
+ * resting on water. A logo that performs is a logo you stop trusting.
  */
 export function NovaLogo({
   size = 40,
@@ -25,7 +22,7 @@ export function NovaLogo({
 }: {
   size?: number;
   className?: string;
-  /** Adds the lift and orbital drift. Suppressed under reduced motion. */
+  /** Adds the lift. Suppressed under reduced motion. */
   animated?: boolean;
   tone?: MarkTone;
 }) {

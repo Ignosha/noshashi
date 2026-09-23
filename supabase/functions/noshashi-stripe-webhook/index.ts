@@ -52,6 +52,36 @@ const TIER_FEATURES: Record<string, string[]> = {
     "webhooks", "regulator_seats", "white_label", "sla",
     "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
   ],
+  // Contact-sales tiers. Sales creates the subscription with
+  // metadata[tier] set, and this table is what that customer receives.
+  // Without these two entries a $10,000/month Enterprise contract fell
+  // through to TIER_FEATURES.operator — the free tier.
+  enterprise: [
+    "console", "gate", "agent", "export",
+    "portfolios", "alerts", "receipt_anchoring", "priority_support",
+    "authority_certificate", "compliance_api",
+    "webhooks", "regulator_seats", "white_label", "sla",
+    "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
+    "asset_passports", "dedicated_environment",
+  ],
+  strategic: [
+    "console", "gate", "agent", "export",
+    "portfolios", "alerts", "receipt_anchoring", "priority_support",
+    "authority_certificate", "compliance_api",
+    "webhooks", "regulator_seats", "white_label", "sla",
+    "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
+    "asset_passports", "dedicated_environment",
+    "event_feeds", "custom_schemas",
+  ],
+};
+
+/** Included API verifications per period. Contract tiers start at Institutional's. */
+const TIER_QUOTA: Record<string, number> = {
+  operator: 0,
+  desk: 5_000,
+  institution: 100_000,
+  enterprise: 100_000,
+  strategic: 100_000,
 };
 
 function timingSafeEqual(a: string, b: string): boolean {
@@ -218,7 +248,7 @@ Deno.serve(async (request: Request) => {
         tier,
         seats,
         features: TIER_FEATURES[tier] ?? TIER_FEATURES.operator,
-        verification_quota: tier === "institution" ? 100000 : tier === "desk" ? 5000 : 0,
+        verification_quota: TIER_QUOTA[tier] ?? 0,
         valid_until: validUntil,
         updated_at: new Date().toISOString(),
       },

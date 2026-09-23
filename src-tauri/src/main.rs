@@ -3,7 +3,7 @@
 // The app is a menu bar resident first and a window second: the tray
 // icon owns a compact HUD panel, and the full console is a separate
 // window that hides rather than quits. Closing every window leaves the
-// rocket in the menu bar, which is where the product lives.
+// flower in the menu bar, which is where the product lives.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::fs;
@@ -49,7 +49,7 @@ fn toggle_hud(app: &AppHandle) {
     }
 
     // `move_window` reads the tray rectangle recorded by the positioner
-    // plugin's tray event hook, so this lands under the rocket.
+    // plugin's tray event hook, so this lands under the flower.
     let _ = window.move_window(Position::TrayCenter);
     let _ = window.show();
     let _ = window.set_focus();

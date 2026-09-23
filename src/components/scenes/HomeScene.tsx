@@ -241,7 +241,7 @@ export function HomeScene({
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ ...SPRING, delay: 0.1 }}
               >
-                <NovaLogo size={72} className="text-foreground" />
+                <NovaLogo size={72} tone="color" />
               </motion.div>
               <div>
                 <h1 className="display text-[46px] font-[900] leading-[0.9] tracking-[0.02em] text-foreground">
@@ -285,7 +285,7 @@ export function HomeScene({
               {[
                 {
                   label: "VALIDATED LEDGER",
-                  value: ledger?.ledgerIndex ?? 0,
+                  value: ledger?.ledgerIndex ?? null,
                   icon: <NovaSat size={14} />,
                 },
                 {
@@ -312,8 +312,8 @@ export function HomeScene({
                         {stat.label}
                       </p>
                       <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
-                        <CountUp value={stat.value} />
-                        {stat.suffix && (
+                        {stat.value === null ? "—" : <CountUp value={stat.value} />}
+                        {stat.suffix && stat.value !== null && (
                           <span className="ml-0.5 text-[11px] font-normal text-muted-foreground">
                             {stat.suffix}
                           </span>
@@ -358,7 +358,7 @@ export function HomeScene({
                 </div>
                 <div className="space-y-2">
                   <DataRow label="STREAM" value={connected ? "LOCKED" : "OFFLINE"} tone={connected ? "go" : "hold"} />
-                  <DataRow label="SUCCESS" value={`${successRate}%`} tone={successRate > 95 ? "go" : "hold"} />
+                  <DataRow label="SUCCESS" value={successRate === null ? "—" : `${successRate}%`} tone={successRate === null ? undefined : successRate > 95 ? "go" : "hold"} />
                   <DataRow label="LATEST" value={events[0]?.type ?? "WAITING"} />
                   <DataRow label="LEDGER" value={events[0]?.ledger?.toLocaleString() ?? "—"} />
                 </div>
@@ -629,7 +629,7 @@ export function HomeScene({
         <footer className="mt-10 border-t border-border pt-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <NovaLogo size={16} animated={false} className="text-muted-foreground" />
+              <NovaLogo size={16} animated={false} tone="color" />
               <span className="mono-font text-[9px] text-muted-foreground">
                 {copyrightLine()} · v{BRAND.version} · {BRAND.network}
               </span>

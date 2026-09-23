@@ -192,24 +192,38 @@ data, decorative axes, chart junk of any kind.
 
 ## Brand assets
 
-The shipped mark comes from the supplied **SVG pack** (`Noshashi_SVG_Logo_Pack`),
-not from the brand board's raster. **Do not redraw or approximate the geometry.**
+The mark is the **flower**, the owner's artwork (`brand/flower-source.png`):
+four long cardinal petals, four diagonals with the lower pair longer, inner
+petals and a white-hot core. It replaced the rocket in September 2026.
 
-> **Two different marks exist.** The board (section 02) shows a rocket inside a
-> closed ring with three exhaust trails. The SVG pack shows a rocket at 45° with
-> two broken orbital arcs, fins and a porthole. The SVG pack ships because it is
-> the real vector asset and was handed over with "use the asset exactly"; the
-> board is a rendered mockup. Worth resolving before any print run.
+**The artwork is the logo.** Everywhere the mark appears in colour it is the
+artwork itself, never a redrawing: the app icon (on the garden ground), the
+favicons (an SVG embedding the 64px crop, so every page's existing
+`/favicon.svg` link carries it), the site header on every page, the sign-up
+popup, the Stripe return pages and every colour `NoshashiMark` in the console
+(`public/brand/flower-mark-128.png`). `scripts/gen-brand-raster.mjs` makes
+the square crops, centred on the artwork's lit core.
 
-Repackaging faults are corrected in `src/components/nova/brand/` without moving
-a path node:
+The one vector is the **single-colour silhouette** traced from the artwork
+(`scripts/gen-brand.mjs` → `brand/flower-mono.svg`,
+`src/components/nova/brand/flower.ts`), because some places must be one flat
+colour: the macOS menu-bar template image, and `mono` marks such as the icon
+inside a filled button or the error screen. `npm run check:brand` fails CI
+when a generated file is stale.
 
-- porthole and nose dot cut with a `<mask>` scoped to the body. They were opaque `#05070A` fills, so the mark was invisible on any other ground. `evenodd` does not work here: the porthole overhangs the body's lower-left edge, so it would fill the overhang instead of hiding it.
-- a `compact` variant drops the orbital arcs below 24px, where a stroke of 7 in a 180 grid renders sub-pixel and aliases into mush
-- gradient IDs namespaced per instance so two inline marks cannot collide
-- duplicate `<title id>` removed
-- baked background rects dropped so the mark sits on any surface
-- app-icon transform fitted to the **measured** ink box (`x[61.0, 169.1] y[13.0, 164.7]`, centre `115.1, 88.9`) at 76% canvas fill. The artwork is not centred in its own viewBox, so centring on the viewBox is wrong too.
+Regenerate everything after a change:
+
+```bash
+node scripts/gen-brand.mjs && node scripts/gen-brand-raster.mjs && npm run icon
+```
+
+Rules the drawing keeps:
+
+- `color`: the artwork. Use it wherever the mark appears on its own.
+- `mono`: the flat silhouette, cardinal petals *cut* out of the diagonals by a
+  mask so the gaps are transparent on any ground. Only where one colour is
+  required.
+- the app icon is full-bleed (each OS applies its own corner mask).
 
 Components: `NoshashiMark`, `NoshashiLogo`, `NoshashiWordmark`.
 
@@ -252,26 +266,27 @@ surface where a number is being read. A field that drifts down the page and
 ends up behind a reading is the original mistake, and should be deleted
 rather than argued about.
 
-### The second exception: the hero bloom
+### The second exception: the flower and its pond
 
-`scripts/gen-hero-bloom.mjs` generates a decorative organic form that fills
-the middle of the landing hero. It is decoration, which the ban above would
-otherwise refuse outright. It is granted on the product owner's instruction,
-on the same pattern as the sky, and bounded on the same principle:
+The landing hero's centrepiece is the owner's flower artwork, animated (it
+opens once, then breathes and turns very slowly), over an ASCII pond:
+`src/lib/garden/field.ts` paints slow liquid folds with a ring spreading from
+the flower on every breath and ripples under the pointer, and
+[asciify-engine](https://github.com/ayangabryl/asciify-engine) (MIT) renders
+it as glyphs in `--brand`. It replaced the generated bloom in September 2026
+on the product owner's instruction. It is decoration, bounded like the sky:
 
-| The objection | How the bloom answers it |
+| The objection | How the flower and pond answer it |
 |---|---|
-| "decoration is banned" | Granted explicitly, hero only, and recorded here rather than left as an undocumented drift in the template. |
-| "decorative data" | It is not data and must never resemble any. No axis, no baseline, no trace, no tick, no numeral. A visitor cannot mistake it for a measurement, so no figure on this site is decorative and no decoration is a figure. |
-| "a permanent frame cost" | It is a static inline SVG. There is no loop, no canvas, no timer, nothing to stop under reduced motion, and nothing to pause on `visibilitychange`. |
-| "behind live telemetry" | Hidden below 1024px, and no panel, table, chart, ticker or verdict sits over it at any width. It shares the hero with the headline and the brief card only. |
-| "a third-party asset" | Generated here from a fixed seed, committed as `templates/hero-bloom.svg`, served from our own origin. `default-src 'self'` would refuse anything else, and a stock render would not be ours. |
-| "unreadable in one theme" | Every stop is `currentColor`. The dark theme carries it at `#BBD8FF`; on `#F4F7FA` a translucent white petal is invisible, so the light theme takes the brand hue at a lower weight. |
+| "decoration is banned" | Granted explicitly, for the website's marketing hero and the console's landing scene only, and recorded here. |
+| "decorative data" | Neither is data or resembles any: no axis, no baseline, no tick, no numeral. The pond's glyphs are `. · : - ~ = + *`, texture and never a figure. |
+| "a permanent frame cost" | Bounded rather than absent: 30fps, a source image of at most 180 columns, paused off-screen and in hidden tabs, and a single still frame under `prefers-reduced-motion`, which also stops the flower. |
+| "behind live telemetry" | Only the hero. No panel, table, chart, ticker or verdict sits over it; the calm pool keeps glyphs off the flower, and text that crosses the artwork carries a ground-coloured halo. |
+| "a third-party asset" | The artwork is ours (`brand/flower-source.png`). The engine is bundled from npm into `site/assets/garden-field.js` and served from our own origin, so `script-src 'self'` holds; `npm run check:garden` fails CI when the bundle is stale. |
+| "unreadable in one theme" | Ink is read from `--brand` and re-read when the theme toggles. On the light ground the artwork multiplies instead of glowing, so its dark haze drops out. |
 
-**This exception does not travel either.** Same terms as the sky: the public
-marketing hero and nowhere else. Decoration behind a reading stays banned,
-and "decorative data" stays banned without qualification — the bloom is
-permitted *because* it is not data, not in spite of it.
+**This exception does not travel.** Decoration behind a reading stays banned,
+and "decorative data" stays banned without qualification.
 
 ## Signals
 

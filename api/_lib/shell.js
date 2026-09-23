@@ -12,6 +12,7 @@
  */
 
 import { esc, attrUrl } from "./html.js";
+import { MARK } from "./brand-mark.js";
 
 /*
  * The canonical origin.
@@ -29,19 +30,9 @@ import { esc, attrUrl } from "./html.js";
  */
 export const ORIGIN = (process.env.PUBLIC_SITE_URL || "https://www.noshashi.app").replace(/\/+$/, "");
 
-export const MARK = `<svg viewBox="0 0 180 180" width="24" height="24" fill="none" aria-hidden="true">
-<mask id="nm" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
-<path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
-<path d="M95 99C91 80 94 64 103 50 114 59 121 70 123 83 116 91 106 97 95 99Z" fill="#000"/>
-<circle cx="129" cy="63" r="5" fill="#000"/></mask>
-<g stroke="currentColor" stroke-width="7" stroke-linecap="round">
-<path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/></g>
-<circle cx="151" cy="69" r="7" fill="currentColor"/>
-<path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="currentColor" mask="url(#nm)"/>
-<path d="M92 111 63 132C60 116 66 103 78 93Z" fill="currentColor"/>
-<path d="M111 91 130 118C114 119 101 113 93 103Z" fill="currentColor"/>
-<path d="M82 121 67 150 94 132Z" fill="currentColor"/>
-<path d="M73 143 61 164 84 151Z" fill="currentColor"/></svg>`;
+// The flower. Generated from scripts/gen-brand.mjs so the site, the
+// console and the app icon cannot drift apart.
+export { MARK };
 
 export const NAV = [
   { href: "/#public", label: "Free tools", i18n: "nav.tools" },
@@ -222,6 +213,7 @@ export function renderPage({
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">

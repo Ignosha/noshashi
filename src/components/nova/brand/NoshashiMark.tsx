@@ -1,112 +1,59 @@
 import { useId } from "react";
 import { cn } from "@/lib/utils";
+import { FLOWER } from "./flower";
 
 export type MarkTone = "mono" | "color";
 
 /**
- * NoshashiMark — the bloom, from the website's hero.
+ * NoshashiMark — the flower.
  *
- * Uses the same bloom SVG as templates/hero-bloom.svg but simplified
- * for use as a logo mark at small sizes. Inherits currentColor so it
- * works on any ground (rail, dialog, light mode, printed export).
+ * `color` is the owner's artwork itself (brand/flower-source.png, cropped
+ * square around its core by scripts/gen-brand-raster.mjs into
+ * public/brand/flower-mark-128.png). `mono` is the single-colour silhouette
+ * traced from it (./flower.ts, from scripts/gen-brand.mjs) for places that
+ * must be one flat currentColor: inside a filled button, an error state,
+ * the menu-bar template. The cardinal petals are cut out of the diagonals
+ * by a mask, so the gaps are transparent on any ground.
  */
 export function NoshashiMark({
   size = 20,
   tone = "mono",
-  compact,
   title,
   className,
 }: {
   size?: number;
   tone?: MarkTone;
-  /**
-   * Simplify at small sizes. Defaults to automatic:
-   * engaged below 24px.
-   */
+  /** Kept for call-site compatibility; the flower needs no small-size variant. */
   compact?: boolean;
   /** Accessible name. Omit for decorative use beside a visible wordmark. */
   title?: string;
   className?: string;
 }) {
   const uid = useId().replace(/:/g, "");
-  const tight = compact ?? size < 24;
   const titleId = `nsh-title-${uid}`;
+
+  if (tone === "color") {
+    return (
+      <img
+        src="/brand/flower-mark-128.png"
+        width={size}
+        height={size}
+        alt={title ?? ""}
+        aria-hidden={title ? undefined : true}
+        draggable={false}
+        decoding="async"
+        className={cn("shrink-0 select-none object-contain", className)}
+      />
+    );
+  }
 
   const a11y = title
     ? ({ role: "img", "aria-labelledby": titleId } as const)
     : ({ "aria-hidden": true, focusable: false } as const);
 
-  // Simplified bloom paths derived from hero-bloom.svg
-  const petalPaths = [
-    // Large outer petals
-    "M50 95C30 70 20 40 50 10C80 40 70 70 50 95Z",
-    "M50 95C35 75 30 50 50 15C70 50 65 75 50 95Z",
-    // Medium petals
-    "M50 85C38 65 32 40 50 12C68 40 62 65 50 85Z",
-    // Small center
-    "M50 75C42 58 38 40 50 18C62 40 58 58 50 75Z",
-  ];
-
-  const veinPaths = [
-    "M50 90V20",
-    "M50 50C40 55 35 65 50 90",
-    "M50 50C60 55 65 65 50 90",
-  ];
-
-  if (tone === "mono") {
-    return (
-      <svg
-        viewBox="0 0 100 100"
-        width={size}
-        height={size}
-        fill="none"
-        className={cn("shrink-0", className)}
-        {...a11y}
-      >
-        {title && <title id={titleId}>{title}</title>}
-        <defs>
-          <radialGradient id={`bloom-petal-${uid}`} cx="50%" cy="86%" r="74%">
-            <stop offset="0%" stopColor="currentColor" stopOpacity=".44" />
-            <stop offset="46%" stopColor="currentColor" stopOpacity=".21" />
-            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id={`bloom-core-${uid}`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="currentColor" stopOpacity=".60" />
-            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        {!tight && (
-          <g className="hb-filaments" stroke="currentColor" strokeOpacity=".17" strokeWidth="0.5" strokeLinecap="round" fill="none">
-            <path d="M20 40 C40 55 60 45 50 30" />
-            <path d="M80 45 C65 60 40 70 50 55" />
-            <path d="M25 50 C45 65 55 55 45 40" />
-            <path d="M75 35 C55 50 45 45 55 30" />
-          </g>
-        )}
-        <g opacity={tight ? 1 : 0.95}>
-          {petalPaths.map((d, i) => (
-            <g key={i} transform={`rotate(${i * 90}) scale(${1 - i * 0.12})`} opacity={0.55 + i * 0.1}>
-              <path d={d} fill={`url(#bloom-petal-${uid})`} stroke="currentColor" strokeOpacity=".30" strokeWidth={tight ? 0.5 : 0.9} />
-              {!tight && (
-                <>
-                  <path d={veinPaths[0]} fill="none" stroke="currentColor" strokeOpacity=".18" strokeWidth={0.5} />
-                  <path d={veinPaths[1]} fill="none" stroke="currentColor" strokeOpacity=".11" strokeWidth={0.4} />
-                  <path d={veinPaths[2]} fill="none" stroke="currentColor" strokeOpacity=".11" strokeWidth={0.4} />
-                </>
-              )}
-            </g>
-          ))}
-          <ellipse cx="50" cy="50" rx="19" ry="25" fill={`url(#bloom-core-${uid})`} />
-          <ellipse cx="50" cy="50" rx="7" ry="10" fill="currentColor" opacity=".30" />
-        </g>
-      </svg>
-    );
-  }
-
-  // Color tone - uses the brand green
   return (
     <svg
-      viewBox="0 0 100 100"
+      viewBox={FLOWER.viewBox}
       width={size}
       height={size}
       fill="none"
@@ -115,40 +62,21 @@ export function NoshashiMark({
     >
       {title && <title id={titleId}>{title}</title>}
       <defs>
-        <radialGradient id={`bloom-petal-color-${uid}`} cx="50%" cy="86%" r="74%">
-          <stop offset="0%" stopColor="#9BE15D" stopOpacity=".44" />
-          <stop offset="46%" stopColor="#9BE15D" stopOpacity=".21" />
-          <stop offset="100%" stopColor="#9BE15D" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id={`bloom-core-color-${uid}`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#9BE15D" stopOpacity=".60" />
-          <stop offset="100%" stopColor="#9BE15D" stopOpacity="0" />
-        </radialGradient>
+        <mask id={`${uid}-m`} maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+          {FLOWER.diagonal.map((d, i) => (
+            <path key={`d${i}`} d={d} fill="#fff" />
+          ))}
+          {FLOWER.cardinal.flatMap((d, i) => [
+            <path key={`g${i}`} d={d} fill="#000" stroke="#000" strokeWidth={4.8} strokeLinejoin="round" />,
+            <path key={`c${i}`} d={d} fill="#fff" />,
+          ])}
+          {FLOWER.veins.map((d, i) => (
+            <path key={`v${i}`} d={d} stroke="#000" strokeWidth={1.6} />
+          ))}
+          <circle cx="50" cy="50" r="6.5" fill="#fff" />
+        </mask>
       </defs>
-      {!tight && (
-        <g className="hb-filaments" stroke="#9BE15D" strokeOpacity=".17" strokeWidth="0.5" strokeLinecap="round" fill="none">
-          <path d="M20 40 C40 55 60 45 50 30" />
-          <path d="M80 45 C65 60 40 70 50 55" />
-          <path d="M25 50 C45 65 55 55 45 40" />
-          <path d="M75 35 C55 50 45 45 55 30" />
-        </g>
-      )}
-      <g opacity={tight ? 1 : 0.95}>
-        {petalPaths.map((d, i) => (
-          <g key={i} transform={`rotate(${i * 90}) scale(${1 - i * 0.12})`} opacity={0.55 + i * 0.1}>
-            <path d={d} fill={`url(#bloom-petal-color-${uid})`} stroke="#9BE15D" strokeOpacity=".30" strokeWidth={tight ? 0.5 : 0.9} />
-            {!tight && (
-              <>
-                <path d={veinPaths[0]} fill="none" stroke="#9BE15D" strokeOpacity=".18" strokeWidth={0.5} />
-                <path d={veinPaths[1]} fill="none" stroke="#9BE15D" strokeOpacity=".11" strokeWidth={0.4} />
-                <path d={veinPaths[2]} fill="none" stroke="#9BE15D" strokeOpacity=".11" strokeWidth={0.4} />
-              </>
-            )}
-          </g>
-        ))}
-        <ellipse cx="50" cy="50" rx="19" ry="25" fill={`url(#bloom-core-color-${uid})`} />
-        <ellipse cx="50" cy="50" rx="7" ry="10" fill="#9BE15D" opacity=".30" />
-      </g>
+      <rect width="100" height="100" fill="currentColor" mask={`url(#${uid}-m)`} />
     </svg>
   );
 }

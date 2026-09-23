@@ -296,14 +296,15 @@ export function RingGauge({
   tone = "default",
   className,
 }: {
-  value: number;
+  /** Null when there is nothing to measure yet: an empty ring and a dash, never a 0. */
+  value: number | null;
   size?: number;
   label?: string;
   tone?: "default" | "go" | "hold" | "no-go";
   className?: string;
 }) {
   const reduced = usePrefersReducedMotion();
-  const pct = Math.max(0, Math.min(100, value));
+  const pct = value === null ? 0 : Math.max(0, Math.min(100, value));
   const radius = size / 2 - 4;
   const circumference = 2 * Math.PI * radius;
 
@@ -345,7 +346,7 @@ export function RingGauge({
       </svg>
       <div className="absolute grid place-items-center text-center">
         <span className="data-font text-[13px] font-[600] leading-none tabular-nums text-foreground">
-          {Math.round(pct)}
+          {value === null ? "—" : Math.round(pct)}
         </span>
         {label && (
           <span className="stencil mt-0.5 text-[6px] tracking-[0.18em] text-muted-foreground">

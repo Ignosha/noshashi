@@ -231,10 +231,14 @@ export function useXRPL(address: string) {
     return unsubscribe;
   }, []);
 
-  /** Successful transactions as a share of the live window. */
-  const successRate =
+  /**
+   * Successful transactions as a share of the live window, or null when
+   * nothing has been observed. It used to read 100 with an empty window,
+   * so a console that had never connected reported a perfect stream.
+   */
+  const successRate: number | null =
     events.length === 0
-      ? 100
+      ? null
       : Math.round(
           (events.filter((event) => event.result === "tesSUCCESS").length /
             events.length) *

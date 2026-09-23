@@ -81,12 +81,16 @@ jobs:
       - name: Typecheck Edge Functions
         run: npm run check:functions
 
-      # templates/hero-bloom.svg is generated output that is committed.
-      # A change to the generator that is pushed without its regenerated
-      # file leaves the two disagreeing, and the site ships the stale
-      # one — which is exactly how a mobile fix once landed inert.
-      - name: Hero bloom is regenerated
-        run: npm run check:bloom
+      # site/assets/garden-field.js is the bundled hero field, committed
+      # like every site asset. A source change pushed without its bundle
+      # would leave the site running the old field.
+      - name: Garden field is rebuilt
+        run: npm run check:garden
+
+      # Every brand file (favicon, site header mark, console mark, Tauri
+      # icon source) is written by scripts/gen-brand.mjs from one geometry.
+      - name: Brand mark is regenerated
+        run: npm run check:brand
 
       - name: Tests
         run: npm test

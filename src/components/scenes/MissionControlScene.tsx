@@ -255,7 +255,7 @@ export function MissionControlScene({
       >
         <Readout
           label="VALIDATED LEDGER"
-          value={ledger?.ledgerIndex ?? 0}
+          value={ledger?.ledgerIndex ?? "—"}
           icon={<NovaFlare size={15} />}
         />
         <Readout
@@ -383,7 +383,7 @@ export function MissionControlScene({
                 <RingGauge
                   value={successRate}
                   label="TX OK"
-                  tone={successRate > 90 ? "go" : successRate > 70 ? "hold" : "no-go"}
+                  tone={successRate === null ? "default" : successRate > 90 ? "go" : successRate > 70 ? "hold" : "no-go"}
                 />
                 <RingGauge
                   value={

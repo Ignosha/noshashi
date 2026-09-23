@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { GardenField, GardenFlower } from "@/components/nova/GardenField";
 import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { motion } from "framer-motion";
 import { NovaLogo } from "@/components/nova/NovaLogo";
@@ -132,12 +134,12 @@ export function LandingScene({
   onNavigate: (scene: string) => void;
 }) {
   const { ledger, connected, events, successRate } = data;
+  const flowerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="scanlines relative h-full w-full overflow-y-auto overflow-x-hidden bg-background text-foreground">
       {/* Board geometry, static — see the note in App.tsx. */}
       <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <PatternMark element="orbital" size={720} opacity={0.04} className="-right-64 -top-52" />
         <PatternMark element="dots" size={280} opacity={0.05} className="bottom-10 left-10" />
       </div>
 
@@ -152,7 +154,7 @@ export function LandingScene({
             className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
             aria-label={`${BRAND.name} — enter console`}
           >
-            <NovaLogo size={18} className="text-foreground" />
+            <NovaLogo size={18} tone="color" />
             <span className="display text-[13px] font-[800] tracking-[0.14em] text-foreground">
               {BRAND.name}
             </span>
@@ -181,8 +183,8 @@ export function LandingScene({
         <div className="mx-auto w-full max-w-[1120px] px-6">
           {/* ── Hero ───────────────────────────────────────────── */}
           <section className="relative overflow-hidden py-20">
-            <PatternMark element="orbital" size={460} opacity={0.07} className="-right-32 -top-16" />
-            <PatternMark element="dots" size={220} opacity={0.07} className="-left-20 bottom-4" />
+            <GardenField originRef={flowerRef} />
+            <GardenFlower flowerRef={flowerRef} size={370} className="right-2 top-12 hidden lg:block" />
 
             <motion.div
               className="relative flex flex-col items-start gap-6"
@@ -203,7 +205,7 @@ export function LandingScene({
                   animate={{ opacity: 1, scale: 1, rotate: 0 }}
                   transition={{ ...SPRING, delay: 0.15 }}
                 >
-                  <NovaLogo size={86} className="text-foreground" />
+                  <NovaLogo size={86} tone="color" />
                 </motion.div>
                 <div>
                   <h1 className="display text-[60px] font-[900] leading-[0.86] tracking-[0.02em] text-foreground">
@@ -271,7 +273,7 @@ export function LandingScene({
           <Reveal>
             <div className="grid grid-cols-4 gap-3 border-y border-border py-5">
               {[
-                { label: "VALIDATED LEDGER", value: ledger?.ledgerIndex ?? 0, icon: <NovaSat size={13} /> },
+                { label: "VALIDATED LEDGER", value: ledger?.ledgerIndex ?? null, icon: <NovaSat size={13} /> },
                 { label: "TX OBSERVED LIVE", value: events.length, icon: <NovaBolt size={13} /> },
                 { label: "STREAM SUCCESS", value: successRate, suffix: "%", icon: <NovaEye size={13} /> },
                 { label: "SETTLEMENT DELAY", value: 0, suffix: "MS ADDED", icon: <NovaShield size={13} /> },
@@ -282,8 +284,8 @@ export function LandingScene({
                       {stat.label}
                     </p>
                     <p className="data-font mt-1.5 text-[24px] font-[600] leading-none text-foreground">
-                      <CountUp value={stat.value} />
-                      {stat.suffix && (
+                      {stat.value === null ? "—" : <CountUp value={stat.value} />}
+                      {stat.suffix && stat.value !== null && (
                         <span className="ml-1 text-[10px] font-normal text-muted-foreground">
                           {stat.suffix}
                         </span>
@@ -447,7 +449,7 @@ export function LandingScene({
               <PatternMark element="orbital" size={240} className="-bottom-16 -right-16" opacity={0.07} />
               <PatternMark element="hatch" size={200} className="-left-12 -top-12" opacity={0.07} />
               <div className="relative">
-                <NovaLogo size={44} className="mx-auto text-foreground" />
+                <NovaLogo size={44} tone="color" className="mx-auto" />
                 <h2 className="display mt-5 text-[26px] font-[800] leading-tight text-foreground">
                   RUN YOUR FIRST GATE CHECK
                 </h2>
@@ -477,7 +479,7 @@ export function LandingScene({
           <footer className="mt-10 border-t border-border py-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <NovaLogo size={15} animated={false} className="text-muted-foreground" />
+                <NovaLogo size={15} animated={false} tone="color" />
                 <span className="mono-font text-[9px] text-muted-foreground">
                   {copyrightLine()} · v{BRAND.version} · {BRAND.network}
                 </span>

@@ -206,7 +206,7 @@
   padding:12px 16px;
   border-radius:var(--ri);
   border:var(--hair) solid var(--brand);
-  background:var(--brand);color:#fff;
+  background:var(--brand);color:var(--on-brand,#08100B);
   cursor:pointer;text-decoration:none;
   transition:background var(--quick) var(--ease),
              border-color var(--quick) var(--ease),

@@ -405,7 +405,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={SPRING}
                 >
-                  <NovaLogo size={40} className="text-foreground" />
+                  <NovaLogo size={40} tone="color" />
                 </motion.div>
                 <div className="max-w-[420px]">
                   <p className="display text-[13px] font-[700] tracking-[0.1em] text-foreground">
@@ -454,7 +454,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                         {turn.role === "user" ? (
                           "YOU"
                         ) : (
-                          <NovaLogo size={12} animated={false} />
+                          <NovaLogo size={12} animated={false} tone="color" />
                         )}
                       </span>
                       <div className="min-w-0 flex-1">

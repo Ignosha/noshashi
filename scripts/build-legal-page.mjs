@@ -14,10 +14,11 @@
  *   node scripts/build-legal-page.mjs
  */
 import { build } from "esbuild";
-import { writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { MARK } from "../api/_lib/brand-mark.js";
 
 const tmp = join(tmpdir(), `noshashi-legal-${Date.now()}.mjs`);
 
@@ -29,6 +30,10 @@ await build({
   outfile: tmp,
   logLevel: "silent",
   // brand.ts is the only import legal.ts carries; bundling it is fine.
+  // It reads the Vite-injected version, so inject it the same way.
+  define: {
+    __APP_VERSION__: JSON.stringify(JSON.parse(readFileSync("package.json", "utf8")).version),
+  },
 });
 
 const mod = await import(pathToFileURL(tmp).href);
@@ -81,6 +86,7 @@ const html = `<!doctype html>
 <meta name="description" content="Terms, privacy, accessibility statement, billing, data processing, acceptable use and regulatory disclosures for NOSHASHI.">
 <link rel="canonical" href="https://noshashi.app/legal/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -130,22 +136,7 @@ const html = `<!doctype html>
 <header>
   <div class="shell nav">
     <a class="brand" href="/">
-      <svg viewBox="0 0 180 180" width="24" height="24" fill="none" aria-hidden="true">
-        <mask id="lm" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
-          <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#fff"/>
-          <path d="M95 99C91 80 94 64 103 50 114 59 121 70 123 83 116 91 106 97 95 99Z" fill="#000"/>
-          <circle cx="129" cy="63" r="5" fill="#000"/>
-        </mask>
-        <g stroke="#E6E8EB" stroke-width="7" stroke-linecap="round">
-          <path d="M76 20A56 56 0 0 1 150 68"/><path d="M164 92A56 56 0 0 1 86 156"/>
-        </g>
-        <circle cx="151" cy="69" r="7" fill="#E6E8EB"/>
-        <path d="M78 119C82 86 98 53 129 29 139 21 149 16 160 13 157 29 151 43 141 56 124 79 105 96 78 119Z" fill="#E6E8EB" mask="url(#lm)"/>
-        <path d="M92 111 63 132C60 116 66 103 78 93Z" fill="#E6E8EB"/>
-        <path d="M111 91 130 118C114 119 101 113 93 103Z" fill="#E6E8EB"/>
-        <path d="M82 121 67 150 94 132Z" fill="#E6E8EB"/>
-        <path d="M73 143 61 164 84 151Z" fill="#E6E8EB"/>
-      </svg>
+      ${MARK}
       <span>NOSHASHI</span>
     </a>
     <a class="back" href="/">&larr; Back to noshashi.app</a>

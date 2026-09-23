@@ -576,7 +576,7 @@ export function SettingsScene({
           <motion.div variants={staggerChild}>
             <Panel label="ABOUT">
               <div className="flex items-center gap-3">
-                <NovaLogo size={34} className="text-foreground" />
+                <NovaLogo size={34} tone="color" />
                 <div>
                   <p className="display text-[12px] font-[700] tracking-[0.1em] text-foreground">
                     {BRAND.name} v{BRAND.version}

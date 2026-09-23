@@ -217,9 +217,27 @@ the file twice was what caught it not being idempotent — Postgres has
 no CREATE POLICY IF NOT EXISTS, so it looked re-runnable and failed
 halfway.
 
-**Still open:** nothing writes to the audit log yet, no organization
-bootstrap path exists, and the nullable `organization_id` columns are
-not yet populated by any writer. `accounts.organization` (free text)
+**Applied to production**, verified against the live catalogue: three
+tables, `organization_id` nullable on all six re-parented tables, the
+existing rows untouched. The grant table shows why append-only needs
+two layers — `authenticated` SELECT, `service_role` INSERT+SELECT,
+`postgres` everything, because an owner's privileges cannot be
+revoked. The owner is exactly the case the trigger covers.
+
+**The audit log is written by the database, not the application.** API
+keys are created client-side as `authenticated`, which has no INSERT
+on `audit_log` by design: a client that can write its own audit trail
+does not have one. So `api_key.created`, `api_key.revoked`,
+`member.added`, `member.role_changed` and `member.removed` are written
+by SECURITY DEFINER triggers. They cannot be skipped by a caller,
+forged by a client, or forgotten by a future code path. `key_hash` is
+never logged, and `last_used_at` churn is filtered out so real events
+are not buried under API traffic.
+
+**Still open:** no organization bootstrap path, and no writer populates
+`organization_id` on the re-parented tables — so audit rows currently
+carry a null organization, which the read policy treats as invisible
+to everyone but `service_role`. That resolves itself once orgs exist. `accounts.organization` (free text)
 is left in place rather than dropped — a dropped column is the one
 thing here a later migration cannot undo. The migration is NOT applied
 to production; it is committed for review.
@@ -267,7 +285,7 @@ already issued.
   the canonical form for everything after settlement. Changing either
   breaks stored receipts.
 - **`site/` is generated.** `templates/` is the source. Committed
-  generated artifacts (`templates/hero-bloom.svg`) have a CI guard;
+  generated artifacts (brand files, `site/assets/garden-field.js`) have CI guards;
   anything else generated needs one too.
 - **CSP.** `default-src 'self'`, `font-src 'self'`. No third-party
   assets, fonts or scripts.
@@ -275,11 +293,43 @@ already issued.
   indexers are all egress-blocked. Live validation goes through Vercel
   preview deploys; nothing here can be confirmed by calling it directly.
 
-## 7. Not verified from here
+## 7. Verification status
 
-Stated so no one mistakes absence of a finding for a clean result:
+### Since closed
+
+- **`cargo check` and `cargo clippy -D warnings` both pass** on
+  `src-tauri`. The Rust shell is no longer audited by reading alone.
+  They needed GTK and WebKit system libraries, which this sandbox did
+  not have; installing `libgtk-3-dev`, `libwebkit2gtk-4.1-dev`,
+  `libsoup-3.0-dev` and `librsvg2-dev` is what made the check possible.
+  Anyone repeating it on a bare Linux box needs the same.
+- **`Cargo.lock` was incomplete for Linux.** `cargo check --locked`
+  failed against the committed lockfile: it had to resolve 74 crates
+  that were not in it, so a Linux build was silently re-resolving
+  dependencies — exactly what a lockfile exists to prevent, and a
+  reproducibility hole in the desktop shell. The completed lockfile is
+  committed. The change is purely additive: 74 added, no version of any
+  existing crate changed (three entries only move position in the file).
+  `cargo check --locked` now passes.
+- **`npm audit` is recorded.** Production dependencies: **0
+  vulnerabilities**. Full tree including dev: 2 (1 high, 1 moderate),
+  both in the Vite dev server and its bundled esbuild — a path
+  traversal in optimized-deps `.map` handling, a `server.fs.deny`
+  bypass on Windows alternate paths, and esbuild allowing any site to
+  request from the dev server. **Neither ships**: they affect
+  `npm run dev`, not the built artifact, which is why the production
+  gate in CI reads clean.
+
+  They are NOT fixed here. `npm audit fix` cannot resolve them; only
+  `--force` can, and that is a major Vite 5 → 7 upgrade. A major build
+  tool bump to close a non-shipping dev-server issue deserves its own
+  change and its own testing, not a quiet ride alongside unrelated
+  work. It is real, it is bounded to developer machines, and it is
+  written down here rather than left implied by a passing CI gate.
+
+### Still not verified
 
 - No end-to-end HTTP test of any deployed endpoint (egress blocked).
-- `cargo` was not run; the Rust shell is audited by reading only.
-- `npm audit` results are not recorded in this document.
+  `supabase.co`, the XRPL hosts and the indexers are all refused by the
+  sandbox proxy, so nothing here is confirmed by calling it.
 - No load, latency or performance measurement was taken.

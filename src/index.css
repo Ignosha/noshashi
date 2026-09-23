@@ -28,7 +28,7 @@
   --card-foreground: 0 0% 0%;
   --popover: 0 0% 98%;
   --popover-foreground: 0 0% 0%;
-  --primary: 0 0% 0%;
+  --primary: 138 63% 31%;            /* #1D6630 — matcha, deepened for AA on white text */
   --primary-foreground: 0 0% 100%;
   --secondary: 0 0% 94%;
   --secondary-foreground: 0 0% 0%;
@@ -81,7 +81,7 @@
   --card-foreground: 135 20% 90%;
   --popover: 125 18% 12%;            /* #15251A */
   --popover-foreground: 135 20% 90%;
-  --primary: 0 0% 100%;
+  --primary: 108 70% 62%;            /* #9FE463 — matcha, the site's CTA green */
   --primary-foreground: 120 18% 5%;
   --secondary: 125 18% 12%;
   --secondary-foreground: 135 20% 90%;
@@ -859,4 +859,47 @@ tbody tr:hover {
 .high-contrast :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 3px solid hsl(var(--foreground));
   outline-offset: 3px;
+}
+
+/* ── Garden hero: the owner's flower, animated, over the ASCII pond ──
+   Shared with the website hero (templates/home.html). The lit core of
+   the artwork sits at (49.7%, 46.4%), so every transform pivots there
+   and the flower breathes in place. One 6s period drives the breath,
+   the halo and the pond's rings (GardenField pulse). */
+.garden-field-host > .garden-field {
+  opacity: 0.45;
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+  mask-image: linear-gradient(180deg, #000 55%, transparent);
+}
+:root:not(.dark) .garden-field-host > .garden-field { opacity: 0.4; }
+.garden-flower { position: absolute; }
+.garden-flower .open,
+.garden-flower .turn,
+.garden-flower img { position: absolute; inset: 0; transform-origin: 49.7% 46.4%; }
+.garden-flower img { width: 100%; height: 100%; animation: flowerBreathe 6s ease-in-out infinite; }
+.garden-flower .open { animation: flowerOpen 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
+.garden-flower .turn { animation: flowerTurn 240s linear infinite; }
+.garden-flower::before {
+  content: ""; position: absolute; left: 49.7%; top: 46.4%; width: 70%; aspect-ratio: 1;
+  border-radius: 50%; transform: translate(-50%, -50%);
+  background: radial-gradient(circle, hsl(var(--brand) / 0.34), transparent 62%);
+  animation: flowerHalo 6s ease-in-out infinite;
+}
+:root:not(.dark) .garden-flower img { mix-blend-mode: multiply; }
+:root:not(.dark) .garden-flower::before { opacity: 0.5; }
+@keyframes flowerOpen {
+  from { opacity: 0; transform: scale(0.42) rotate(-38deg); filter: blur(10px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes flowerTurn { to { transform: rotate(360deg); } }
+@keyframes flowerBreathe {
+  0%, 100% { transform: scale(1.045); filter: brightness(1.18) drop-shadow(0 0 22px rgb(155 225 93 / 0.35)); }
+  50% { transform: scale(0.985); filter: brightness(0.95) drop-shadow(0 0 6px rgb(155 225 93 / 0.12)); }
+}
+@keyframes flowerHalo {
+  0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+  50% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.9); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .garden-flower .open, .garden-flower .turn, .garden-flower img, .garden-flower::before { animation: none; }
 }

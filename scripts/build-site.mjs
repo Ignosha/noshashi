@@ -35,7 +35,7 @@ import { getNews } from "../api/_lib/news.js";
 import { getMarket } from "../api/_lib/market.js";
 import { getProjectFeed, deriveStatus } from "../api/_lib/project-feed.js";
 import { ENTRIES as KB } from "../api/_lib/kb.js";
-import { renderPage, breadcrumb, ORGANIZATION, ORIGIN } from "../api/_lib/shell.js";
+import { renderPage, breadcrumb, ORGANIZATION, ORIGIN, MARK } from "../api/_lib/shell.js";
 import { esc, isoDate, ago } from "../api/_lib/html.js";
 import {
   renderNews, renderNewsHead, renderLog, renderBoard, renderClock,
@@ -64,14 +64,9 @@ const FAQ = FAQ_IDS.map((id) => KB.find((e) => e.id === id)).filter(Boolean);
 async function buildHome({ news, market, feed, status, release }) {
   let html = await readFile(path.join(ROOT, "templates", "home.html"), "utf8");
 
-  // Inlined, not <img>: the bloom takes its colour from the one `color`
-  // on its container, which is how the light theme flips it. An <img>
-  // cannot see the page's custom properties.
-  const bloom = await readFile(path.join(ROOT, "templates", "hero-bloom.svg"), "utf8");
-
   const slots = {
     ORIGIN: ORIGIN,
-    HEROBLOOM: bloom,
+    BRANDMARK: MARK,
     VERSION: release ? esc(release.tag) : "beta",
     MARKETHEAD: renderMarketHead(market),
     MARKET: renderMarket(market),
@@ -873,7 +868,7 @@ async function buildPricingEnhancement() {
     .replaceAll("#b69cff", "#9BE15D")
     .replace('content="dark"', 'content="dark light"');
   const css = `<style id="noshashi-tier-comparison">
-    html[data-theme="light"]{--ground:#F2F8F0;--surface:#FFF;--elevated:#E5F0E2;--ink:#0B160D;--muted:#3F5843;--faint:#66806A;--rule:#C4D7C5;--brand:#247A3B;--tele:#168A55;--go:#247A3B}
+    html[data-theme="light"]{--ground:#F2F8F0;--surface:#FFF;--elevated:#E5F0E2;--ink:#0B160D;--muted:#3F5843;--faint:#66806A;--rule:#C4D7C5;--brand:#247A3B;--tele:#168A55;--on-brand:#FFFFFF;--go:#247A3B}
     .hero::before{content:"";position:absolute;inset:24px -8vw auto auto;width:220px;height:150px;opacity:.28;pointer-events:none;background:radial-gradient(ellipse at 68% 36%,color-mix(in srgb,var(--brand) 42%,transparent) 0 18%,transparent 19%),radial-gradient(ellipse at 42% 65%,color-mix(in srgb,var(--tele) 30%,transparent) 0 15%,transparent 16%),radial-gradient(ellipse at 78% 76%,color-mix(in srgb,var(--brand) 24%,transparent) 0 12%,transparent 13%);border:1px solid color-mix(in srgb,var(--brand) 32%,transparent);border-radius:58% 42% 64% 36%;transform:rotate(-12deg)}
     .price{grid-template-columns:repeat(5,minmax(220px,1fr));overflow-x:auto;padding-bottom:8px}
     .price .tier{min-width:220px}

@@ -84,6 +84,11 @@ const TIER_LIMITS: Record<string, { perSecond: number; perMinute: number }> = {
   operator:    { perSecond: 2,   perMinute: 30 },
   desk:        { perSecond: 50,  perMinute: 1_500 },
   institution: { perSecond: 200, perMinute: 9_000 },
+  // Contract tiers default to the Institutional ceiling until a
+  // negotiated limit is set on the account; before these entries they
+  // fell through to operator, 2/sec.
+  enterprise:  { perSecond: 200, perMinute: 9_000 },
+  strategic:   { perSecond: 200, perMinute: 9_000 },
 };
 
 /* ------------------------------------------------------------------ */

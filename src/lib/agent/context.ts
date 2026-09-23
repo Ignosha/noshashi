@@ -39,7 +39,9 @@ export function buildStateBrief(data: XrplState): string {
     `WALLET_OWNED_OBJECTS: ${account?.ownerCount ?? 0}`,
     `WALLET_DOMAIN_ATTESTATION: ${account?.domain ?? "none"}`,
     `HELD_CREDENTIALS: ${heldCredentials}`,
-    `LIVE_STREAM_WINDOW: ${events.length} transactions, ${successRate}% tesSUCCESS`,
+    successRate === null
+      ? "LIVE_STREAM_WINDOW: no transactions observed yet"
+      : `LIVE_STREAM_WINDOW: ${events.length} transactions, ${successRate}% tesSUCCESS`,
   ].join("\n");
 }
 

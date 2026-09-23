@@ -15,7 +15,7 @@
  :root{
   --ground:#08100B; --surface:#0E1911; --elevated:#15251A;
   --ink:#E9F5E7; --muted:#A7B8A8; --faint:#718473; --rule:#263B2A;
-  --brand:#9BE15D; --tele:#55D98A;
+  --brand:#9BE15D; --tele:#55D98A; --on-brand:#08100B;
   --go:#9BE15D; --hold:#E7C766; --nogo:#FF7B7B;
   --shell:min(1180px, 92vw);
   --r:10px;
@@ -23,7 +23,7 @@
 html[data-theme="light"]{
   --ground:#F2F8F0; --surface:#FFFFFF; --elevated:#E5F0E2;
   --ink:#0B160D; --muted:#3F5843; --faint:#66806A; --rule:#C4D7C5;
-  --brand:#247A3B; --tele:#168A55;
+  --brand:#247A3B; --tele:#168A55; --on-brand:#FFFFFF;
   --go:#247A3B; --hold:#8B6500; --nogo:#B42332;
 }
 
@@ -76,7 +76,7 @@ header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
 .nav-links a[aria-current="page"]{color:var(--ink)}
 .nav-links a[aria-current="page"]::before{background:var(--brand)}
 .nav-links a:focus-visible,.theme-toggle:focus-visible{outline:2px solid var(--tele);outline-offset:3px}
-.btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:#fff;
+.btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:var(--on-brand);
   padding:11px 20px;font-size:12px;font-weight:600;letter-spacing:.04em;text-decoration:none;
   border:1px solid var(--brand);border-radius:var(--r);cursor:pointer;
   transition:filter .14s,transform .14s,box-shadow .14s}
@@ -85,10 +85,12 @@ header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
 .btn.ghost:hover{border-color:var(--brand);filter:none}
 .btn[disabled]{opacity:.55;cursor:progress;transform:none;box-shadow:none}
+.brand-mark{flex:none;display:block;object-fit:contain}
 .theme-toggle{display:inline-flex;align-items:center;gap:7px;background:transparent;
   color:var(--muted);border:1px solid var(--rule);border-radius:var(--r);padding:8px 11px;
   font:11px "IBM Plex Mono",monospace;cursor:pointer;white-space:nowrap}
 .theme-toggle:hover,.theme-toggle:focus-visible{color:var(--ink);border-color:var(--brand)}
+@media(max-width:340px){ .theme-toggle{padding-inline:8px;gap:5px} }
 
 main{padding:56px 0 24px}
 .page-head{max-width:66ch;margin-bottom:34px}
@@ -115,11 +117,15 @@ footer{border-top:1px solid var(--rule);padding:36px 0;margin-top:24px}
 .foot-links a{font-size:12px;color:var(--muted);text-decoration:none}
 .foot-links a:hover{color:var(--ink)}
 
-@media (max-width:1100px){ .nav-links a.optional{display:none} }
+/* 1180, from measurement. At 1100 the optional links were still shown
+   between 1101 and 1180 and did not fit: /contact/ and /news/ overflowed
+   by up to 65px across 1110–1170. 1180 is the first width where they fit
+   with the optional links present. */
+@media (max-width:1180px){ .nav-links a.optional{display:none} }
 @media (max-width:900px){
   .g2,.g3{grid-template-columns:1fr}
   main{padding:40px 0 16px}
 }
 /* Must match the menu breakpoint in modules.css — see the note there. */
-@media (max-width:760px){ .nav-links a:not(.btn){display:none} }
+@media (max-width:920px){ .nav-links a:not(.btn){display:none} }
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
