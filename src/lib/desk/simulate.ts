@@ -1,4 +1,5 @@
 import { verdictForChecks, type PolicyCheck } from "@/lib/policy";
+import { judge, toChecks, type PolicyParams, type RuleKey, type RuleState } from "@/lib/desk/institutional";
 import type { Status } from "@/lib/xrpl/types";
 import type { LedgerEntry } from "@/lib/desk/ledger";
 
@@ -16,9 +17,8 @@ import type { LedgerEntry } from "@/lib/desk/ledger";
  *     entry with a check list can be re-decided exactly.
  *   - Transfer ceiling per domain: the rule compares the recorded
  *     amount to the ceiling, so it can be re-run exactly.
- *   - A proposed HHI limit: the gate does not enforce one today. It is
- *     applied only to entries that recorded an HHI; the rest are counted
- *     as unmeasured, never assumed to pass.
+ *   - An institutional policy (simulatePolicy below): its rules are
+ *     applied to the facts each verdict recorded.
  *
  * Nothing here writes to the ledger or touches a receipt.
  */
@@ -30,13 +30,9 @@ export type Scenario = {
   severity: Record<string, Severity>;
   /** Per domain id, in XRP; 0 closes the domain. Absent means as recorded. */
   ceilings: Record<string, number>;
-  /** Proposed HOLD above this HHI. Null leaves it out. */
-  hhiLimit: number | null;
 };
 
-export const EMPTY_SCENARIO: Scenario = { severity: {}, ceilings: {}, hhiLimit: null };
-
-export const HHI_RULE_ID = "PROPOSED_HHI_LIMIT";
+export const EMPTY_SCENARIO: Scenario = { severity: {}, ceilings: {} };
 
 export type SimResult =
   | { entry: LedgerEntry; state: "skipped"; reason: string }
@@ -48,8 +44,6 @@ export type SimResult =
       checks: PolicyCheck[];
       /** Rules whose effect on the outcome differs between the two policies. */
       drivers: string[];
-      /** A proposed HHI limit was set but this entry has no HHI reading. */
-      hhiUnmeasured: boolean;
     };
 
 function failing(checks: PolicyCheck[]): Set<string> {
@@ -90,21 +84,6 @@ export function simulateEntry(entry: LedgerEntry, scenario: Scenario): SimResult
     else checks.push(rule);
   }
 
-  let hhiUnmeasured = false;
-  if (scenario.hhiLimit !== null) {
-    if (typeof entry.hhi === "number") {
-      checks.push({
-        id: HHI_RULE_ID,
-        label: "Concentration within proposed limit",
-        severity: "warn",
-        passed: entry.hhi <= scenario.hhiLimit,
-        detail: `Recorded HHI ${entry.hhi.toLocaleString()} against a proposed limit of ${scenario.hhiLimit.toLocaleString()}.`,
-      });
-    } else {
-      hhiUnmeasured = true;
-    }
-  }
-
   checks = checks.flatMap((c) => {
     const set = scenario.severity[c.id];
     if (set === "off") return [];
@@ -128,7 +107,6 @@ export function simulateEntry(entry: LedgerEntry, scenario: Scenario): SimResult
     after: verdictForChecks(checks),
     checks,
     drivers,
-    hhiUnmeasured,
   };
 }
 
@@ -136,7 +114,6 @@ export type SimSummary = {
   evaluated: number;
   skipped: number;
   changed: number;
-  hhiUnmeasured: number;
   before: Record<Status, number>;
   after: Record<Status, number>;
   /** "from>to" → count, changed entries only. */
@@ -151,7 +128,6 @@ export function simulate(entries: LedgerEntry[], scenario: Scenario) {
     evaluated: 0,
     skipped: 0,
     changed: 0,
-    hhiUnmeasured: 0,
     before: zero(),
     after: zero(),
     transitions: {},
@@ -164,7 +140,6 @@ export function simulate(entries: LedgerEntry[], scenario: Scenario) {
     summary.evaluated += 1;
     summary.before[r.before] = (summary.before[r.before] ?? 0) + 1;
     summary.after[r.after] = (summary.after[r.after] ?? 0) + 1;
-    if (r.hhiUnmeasured) summary.hhiUnmeasured += 1;
     if (r.before !== r.after) {
       summary.changed += 1;
       const key = `${r.before}>${r.after}`;
@@ -219,4 +194,80 @@ export function simulationToCsv(scenario: Scenario, results: SimResult[]): strin
     ),
   ];
   return lines.join("\n");
+}
+
+/* ── Institutional policy simulation ─────────────────────────────── */
+
+const isPolicyCheck = (id: string) => id.startsWith("POLICY_") || id.startsWith("EVIDENCE_POLICY_");
+
+/** A recorded verdict re-decided under a policy (or none), from its recorded facts. */
+export function decideUnder(entry: LedgerEntry, params: PolicyParams | null) {
+  const domainChecks = (entry.checks ?? []).filter((c) => !isPolicyCheck(c.id));
+  const results = params && entry.measurements ? judge(entry.measurements, params) : [];
+  const checks = [...domainChecks, ...(params ? toChecks(results, params) : [])];
+  return { verdict: verdictForChecks(checks), results };
+}
+
+export type PolicySimRow = {
+  entry: LedgerEntry;
+  baseline: Status;
+  candidate: Status;
+  /** Rules whose state differs between the two policies. */
+  drivers: string[];
+};
+
+export type PolicySimSummary = {
+  evaluated: number;
+  /** Recorded without the facts the policy rules need. */
+  skipped: number;
+  changed: number;
+  baseline: Record<Status, number>;
+  candidate: Record<Status, number>;
+  transitions: Record<string, number>;
+  /** Per rule: how many verdicts it put in REVIEW or FAIL under each policy. */
+  exceptions: Record<RuleKey, { baseline: number; candidate: number }>;
+};
+
+/**
+ * Re-decide every recorded verdict that kept its facts, once under the
+ * baseline policy (normally the active one) and once under the candidate
+ * (a draft). Both come from the same recorded facts, so the difference is
+ * the policy change alone. Nothing is written.
+ */
+export function simulatePolicy(
+  entries: LedgerEntry[],
+  baseline: PolicyParams | null,
+  candidate: PolicyParams | null
+): { rows: PolicySimRow[]; summary: PolicySimSummary } {
+  const exceptions = Object.fromEntries(
+    (["hhi", "counterparty", "travelRule", "reserve", "freeze"] as RuleKey[]).map((k) => [k, { baseline: 0, candidate: 0 }])
+  ) as PolicySimSummary["exceptions"];
+  const summary: PolicySimSummary = { evaluated: 0, skipped: 0, changed: 0, baseline: zero(), candidate: zero(), transitions: {}, exceptions };
+  const rows: PolicySimRow[] = [];
+  const flagged = (s: RuleState) => s === "REVIEW" || s === "FAIL";
+
+  for (const entry of entries) {
+    if (!entry.checks || !entry.measurements) {
+      summary.skipped += 1;
+      continue;
+    }
+    const a = decideUnder(entry, baseline);
+    const b = decideUnder(entry, candidate);
+    summary.evaluated += 1;
+    summary.baseline[a.verdict] += 1;
+    summary.candidate[b.verdict] += 1;
+    for (const r of a.results) if (flagged(r.state)) exceptions[r.key].baseline += 1;
+    for (const r of b.results) if (flagged(r.state)) exceptions[r.key].candidate += 1;
+    const stateOf = (rs: typeof a.results, key: RuleKey) => rs.find((r) => r.key === key)?.state ?? "NOT_APPLICABLE";
+    const drivers = (["hhi", "counterparty", "travelRule", "reserve", "freeze"] as RuleKey[])
+      .filter((k) => stateOf(a.results, k) !== stateOf(b.results, k))
+      .map((k) => (a.results.find((r) => r.key === k) ?? b.results.find((r) => r.key === k))!.label);
+    if (a.verdict !== b.verdict) {
+      summary.changed += 1;
+      const key = `${a.verdict}>${b.verdict}`;
+      summary.transitions[key] = (summary.transitions[key] ?? 0) + 1;
+    }
+    rows.push({ entry, baseline: a.verdict, candidate: b.verdict, drivers });
+  }
+  return { rows, summary };
 }

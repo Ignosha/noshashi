@@ -8,10 +8,10 @@ import { readSetting, writeSetting } from "@/lib/store";
  * has to be able to state it. These thresholds persist to disk and are
  * exported with the rule set.
  *
- * They are NOT read by the gate verdict (src/lib/policy.ts evaluatePolicy)
- * today, and the Policy editor says so. The policy simulation
- * (src/lib/desk/simulate.ts) can apply a proposed HHI limit to recorded
- * verdicts to show what enforcing one would change.
+ * Superseded by the versioned institutional policy
+ * (src/lib/desk/policyStore.ts, src/lib/desk/institutional.ts), which is
+ * what the gate applies. This module remains only so thresholds saved in
+ * the earlier editor are carried into the first policy draft.
  */
 
 export type RuleSet = {

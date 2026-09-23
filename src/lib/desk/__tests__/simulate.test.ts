@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { evaluatePolicy, runPolicy, verdictForChecks, type PermissionedDomain } from "@/lib/policy";
 import { receiptToEntry, type LedgerEntry } from "../ledger";
-import { EMPTY_SCENARIO, HHI_RULE_ID, recordedRules, simulate, simulateEntry, simulationToCsv } from "../simulate";
+import { EMPTY_SCENARIO, recordedRules, simulate, simulateEntry, simulatePolicy, simulationToCsv } from "../simulate";
+import { judge, measure, toChecks, refOf, type PolicyParams } from "../institutional";
 import type { AccountInfo, CredentialRecord } from "@/lib/xrpl/types";
 
 /**
@@ -132,17 +133,6 @@ describe("simulate", () => {
     });
   });
 
-  it("applies a proposed HHI limit only where an HHI was recorded", async () => {
-    const concentrated = await entry({ hhi: 6_000 });
-    const diffuse = await entry({ hhi: 900 });
-    const unmeasured = await entry({});
-    const { summary, results } = simulate([concentrated, diffuse, unmeasured], { ...EMPTY_SCENARIO, hhiLimit: 2_500 });
-    expect(summary.transitions).toEqual({ "go>hold": 1 });
-    expect(summary.hhiUnmeasured).toBe(1);
-    const r = results[0];
-    expect(r.state === "evaluated" && r.drivers).toEqual([HHI_RULE_ID]);
-  });
-
   it("never re-decides an entry recorded without its check list", async () => {
     const legacy = { ...(await entry({})), checks: undefined, domainId: undefined };
     const { summary } = simulate([legacy], { ...EMPTY_SCENARIO, ceilings: { "d-test": 0 } });
@@ -153,7 +143,7 @@ describe("simulate", () => {
   it("does not modify the recorded entry", async () => {
     const e = await entry({ acct: { domain: undefined } });
     const snapshot = JSON.stringify(e);
-    simulate([e], { severity: { DOMAIN_ATTESTATION: "off" }, ceilings: { "d-test": 0 }, hhiLimit: 1 });
+    simulate([e], { severity: { DOMAIN_ATTESTATION: "off" }, ceilings: { "d-test": 0 } });
     expect(JSON.stringify(e)).toBe(snapshot);
   });
 
@@ -165,5 +155,68 @@ describe("simulate", () => {
     const csv = simulationToCsv(scenario, simulate(entries, scenario).results);
     expect(csv.split("\n")[0]).toBe(`# scenario=${JSON.stringify(scenario)}`);
     expect(csv.split("\n")).toHaveLength(4);
+  });
+});
+
+/* ── Draft vs active institutional policy ─────────────────────────── */
+
+const pparams = (over: Partial<PolicyParams> = {}): PolicyParams => ({
+  hhiLimit: 2500,
+  counterpartyShareLimitPct: 90,
+  travelRule: null,
+  reserveHeadroomMinXrp: null,
+  strictFreeze: false,
+  outcomes: { hhi: "review", counterparty: "review", travelRule: "review", reserve: "review", freeze: "fail" },
+  ...over,
+});
+
+const pay = (counterparty: string, amountXrp: number) => ({
+  hash: counterparty + amountXrp, transactionType: "Payment", result: "tesSUCCESS", ledgerIndex: 10, date: "", timestamp: 0,
+  direction: "out" as const, counterparty, amountXrp, feeXrp: "0",
+});
+
+/** A verdict decided under `active`, with its facts recorded, as the gate records it. */
+async function decided(transactions: ReturnType<typeof pay>[], active: PolicyParams | null) {
+  const facts = { amountXrp: 10, account: account(), reserve: { baseXrp: 1, incXrp: 0.2, source: "server_info" }, transactions, trustLines: [], postures: [] };
+  const m = measure(facts);
+  const results = active ? judge(m, active) : undefined;
+  const receipt = await runPolicy({
+    account: account(), credentials: [kyc], domain: domain(), amountXrp: 10,
+    ...(active && results ? { policy: refOf({ id: "p", name: "P", version: 1, status: "active", params: active, hash: "H", createdAt: "", updatedAt: "" }), policyChecks: toChecks(results, active) } : {}),
+  });
+  return receiptToEntry(receipt, { domainCode: "TEST", measurements: m, policyResults: results });
+}
+
+describe("simulatePolicy", () => {
+  it("re-decides each recorded verdict under the draft from its recorded facts", async () => {
+    const concentrated = await decided([pay("rA", 60), pay("rB", 40)], pparams()); // HHI 5200
+    const diverse = await decided([pay("rA", 25), pay("rB", 25), pay("rC", 25), pay("rD", 25)], pparams()); // HHI 2500
+    expect(concentrated.verdict).toBe("hold");
+    expect(diverse.verdict).toBe("go");
+
+    const { summary, rows } = simulatePolicy([concentrated, diverse], pparams(), pparams({ hhiLimit: 6000 }));
+    expect(summary.transitions).toEqual({ "hold>go": 1 });
+    expect(summary.exceptions.hhi).toEqual({ baseline: 1, candidate: 0 });
+    expect(rows[0].drivers).toEqual(["HHI limit"]);
+    // The recorded verdict is untouched.
+    expect(concentrated.verdict).toBe("hold");
+  });
+
+  it("the active policy against itself changes nothing", async () => {
+    const e = await decided([pay("rA", 60), pay("rB", 40)], pparams());
+    expect(simulatePolicy([e], pparams(), pparams()).summary.changed).toBe(0);
+  });
+
+  it("simulates a first policy on verdicts decided with none, from their recorded facts", async () => {
+    const e = await decided([pay("rA", 60), pay("rB", 40)], null);
+    expect(e.policy).toBeUndefined();
+    expect(e.measurements).toBeDefined();
+    const { summary } = simulatePolicy([e], null, pparams());
+    expect(summary.transitions).toEqual({ "go>hold": 1 });
+  });
+
+  it("skips verdicts recorded without facts rather than guessing", async () => {
+    const e = { ...(await decided([pay("rA", 1)], null)), measurements: undefined };
+    expect(simulatePolicy([e], null, pparams()).summary).toMatchObject({ evaluated: 0, skipped: 1 });
   });
 });

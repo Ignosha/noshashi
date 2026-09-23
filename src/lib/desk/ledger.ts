@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { readSetting, writeSetting } from "@/lib/store";
 import type { PolicyCheck, PolicyReceipt } from "@/lib/policy";
+import type { Measurements, PolicyRef, RuleResult } from "@/lib/desk/institutional";
 import type { Status } from "@/lib/xrpl/types";
 
 /**
@@ -41,6 +42,15 @@ export type LedgerEntry = {
    */
   domainId?: string;
   checks?: PolicyCheck[];
+  /**
+   * The institutional policy version that produced this verdict and what
+   * each of its rules found, as decided at the time — never recomputed
+   * from the current policy. Absent when no policy was active.
+   * `measurements` are the facts the rules read, recorded on every verdict.
+   */
+  policy?: PolicyRef;
+  measurements?: Measurements;
+  policyResults?: RuleResult[];
 };
 
 const KEY = "engine.ledger";
@@ -48,7 +58,14 @@ const MAX_ENTRIES = 10_000;
 
 export function receiptToEntry(
   receipt: PolicyReceipt,
-  extra: { domainCode: string; label?: string; hhi?: number; offline?: boolean }
+  extra: {
+    domainCode: string;
+    label?: string;
+    hhi?: number;
+    offline?: boolean;
+    measurements?: Measurements;
+    policyResults?: RuleResult[];
+  }
 ): LedgerEntry {
   return {
     id: `${receipt.digest.slice(0, 16)}-${Date.parse(receipt.evaluatedAt)}`,
@@ -67,6 +84,12 @@ export function receiptToEntry(
     offline: Boolean(extra.offline),
     domainId: receipt.domainId,
     checks: receipt.checks.map((c) => ({ ...c })),
+    // Facts are recorded whether or not a policy was active: they do not
+    // depend on policy, and they are what a draft policy is simulated on.
+    ...(extra.measurements ? { measurements: structuredClone(extra.measurements) } : {}),
+    ...(receipt.policy
+      ? { policy: { ...receipt.policy }, policyResults: extra.policyResults?.map((r) => ({ ...r })) }
+      : {}),
   };
 }
 

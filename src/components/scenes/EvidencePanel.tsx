@@ -16,6 +16,7 @@ import {
   type ReceiptCheck,
 } from "@/lib/desk/evidence";
 import { cn } from "@/lib/utils";
+import { PolicyVerdictBlock } from "./PolicyVerdict";
 
 const LIST = 60;
 
@@ -160,6 +161,20 @@ export function EvidencePanel({ entries, loaded }: { entries: LedgerEntry[]; loa
               </li>
             ))}
           </ol>
+
+          <div className="mt-6">
+            <PolicyVerdictBlock
+              policy={selected.policy}
+              results={selected.policyResults}
+              verdict={{
+                label: selected.verdict.toUpperCase(),
+                tone: selected.verdict === "go" ? "text-go" : selected.verdict === "no-go" ? "text-no-go" : "text-hold",
+              }}
+            />
+            <p className="mt-1.5 text-[9px] text-muted-foreground/80">
+              As recorded when the verdict was issued. The current policy is not applied to it.
+            </p>
+          </div>
 
           <Eyebrow className="mb-2 mt-6">EXPLANATION</Eyebrow>
           <dl className="grid grid-cols-[88px_1fr] gap-x-3 gap-y-2">

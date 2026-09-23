@@ -6,6 +6,7 @@ import type {
   IssuerPosture,
   LedgerInfo,
   TrustLine,
+  WalletTransaction,
 } from "@/lib/xrpl/types";
 
 /**
@@ -49,6 +50,10 @@ export type Snapshot = {
   credentials: CredentialRecord[];
   trustLines: TrustLine[];
   postures: IssuerPosture[];
+  /** Account history at capture. Absent on snapshots taken before it was captured. */
+  transactions?: WalletTransaction[];
+  /** Reserve values at capture. Absent on snapshots taken before they were captured. */
+  reserve?: { baseXrp: number; incXrp: number };
 };
 
 export type SnapshotInput = {
@@ -58,6 +63,8 @@ export type SnapshotInput = {
   credentials: CredentialRecord[];
   trustLines?: TrustLine[];
   postures?: IssuerPosture[];
+  transactions?: WalletTransaction[];
+  reserve?: { baseXrp: number; incXrp: number };
 };
 
 export type Staleness = {
@@ -110,6 +117,8 @@ export function captureSnapshot(input: SnapshotInput): Snapshot {
     credentials: input.credentials ?? [],
     trustLines: input.trustLines ?? [],
     postures: input.postures ?? [],
+    ...(input.transactions ? { transactions: input.transactions } : {}),
+    ...(input.reserve ? { reserve: input.reserve } : {}),
   };
 }
 

@@ -5,14 +5,12 @@ import { StatusDot } from "@/components/nova/StatusDot";
 import { NovaTerminal } from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { DOMAIN_REGISTRY } from "@/lib/policy";
 import { shortAddress } from "@/lib/xrpl/client";
 import { saveTextFile } from "@/lib/export";
 import { signContent, type LedgerEntry } from "@/lib/desk/ledger";
 import {
   EMPTY_SCENARIO,
-  HHI_RULE_ID,
   recordedRules,
   simulate,
   simulationToCsv,
@@ -46,32 +44,14 @@ const TONE: Record<Status, string> = {
 export function SimulationPanel({
   entries,
   loaded,
-  hhiDefault,
 }: {
   entries: LedgerEntry[];
   loaded: boolean;
-  hhiDefault: number;
 }) {
   const { push } = useToast();
   const [scenario, setScenario] = useState<Scenario>(EMPTY_SCENARIO);
-  const [hhiDraft, setHhiDraft] = useState(hhiDefault);
 
-  const rules = useMemo(() => {
-    const recorded = recordedRules(entries);
-    if (scenario.hhiLimit === null) return recorded;
-    // The proposed rule is not on any record; list it so its severity can be set too.
-    const measured = entries.filter((e) => e.checks && typeof e.hhi === "number");
-    return [
-      ...recorded,
-      {
-        id: HHI_RULE_ID,
-        label: "Concentration within proposed limit",
-        severities: new Set(["warn"]),
-        seen: measured.length,
-        failed: measured.filter((e) => (e.hhi as number) > (scenario.hhiLimit as number)).length,
-      },
-    ];
-  }, [entries, scenario.hhiLimit]);
+  const rules = useMemo(() => recordedRules(entries), [entries]);
   const domains = useMemo(() => {
     const ids = new Set(entries.filter((e) => e.domainId).map((e) => e.domainId!));
     return DOMAIN_REGISTRY.filter((d) => ids.has(d.id));
@@ -84,8 +64,7 @@ export function SimulationPanel({
 
   const touched =
     Object.keys(scenario.severity).length > 0 ||
-    Object.keys(scenario.ceilings).length > 0 ||
-    scenario.hhiLimit !== null;
+    Object.keys(scenario.ceilings).length > 0;
 
   const setSeverity = (id: string, value: Severity | "") =>
     setScenario((s) => {
@@ -151,7 +130,6 @@ export function SimulationPanel({
                 <p className="mono-font text-[8.5px] text-muted-foreground">
                   failed {r.failed.toLocaleString()} of {r.seen.toLocaleString()} ·{" "}
                   {[...r.severities].map((sev) => (sev === "block" ? "blocking" : "advisory")).join(" / ")}
-                  {r.id === HHI_RULE_ID && " · proposed"}
                 </p>
               </div>
               <select
@@ -189,29 +167,10 @@ export function SimulationPanel({
           </>
         )}
 
-        <Eyebrow className="mb-2 mt-5">PROPOSED HHI LIMIT</Eyebrow>
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={scenario.hhiLimit !== null}
-            onCheckedChange={(on) => setScenario((s) => ({ ...s, hhiLimit: on ? hhiDraft : null }))}
-            aria-label="Apply a proposed HHI limit"
-          />
-          <Input
-            inputMode="numeric"
-            aria-label="Proposed HHI limit"
-            value={hhiDraft}
-            onChange={(e) => {
-              const n = Math.min(10_000, Math.max(0, Number(e.target.value) || 0));
-              setHhiDraft(n);
-              setScenario((s) => (s.hhiLimit === null ? s : { ...s, hhiLimit: n }));
-            }}
-            className="mono-font h-6 w-24 text-[9.5px]"
-          />
-        </div>
-        <p className="mt-1.5 text-[9px] leading-relaxed text-muted-foreground/80">
-          The gate does not enforce an HHI limit today. This adds one as an advisory rule ({HHI_RULE_ID})
-          to entries that recorded an HHI; its severity can be changed in the list above. Entries without
-          a reading are counted as unmeasured, not passed.
+        <p className="mt-5 text-[9px] leading-relaxed text-muted-foreground/80">
+          To see what a change to institutional thresholds (HHI, counterparty share, Travel Rule,
+          reserve headroom, strict freeze) would do, edit a draft in the POLICY tab: its impact on
+          these recorded verdicts is simulated there.
         </p>
 
         <Button
@@ -227,12 +186,11 @@ export function SimulationPanel({
 
       {/* ── Outcome ──────────────────────────────────────────── */}
       <div className="min-w-0 p-4">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {[
             { k: "RE-DECIDED", v: summary.evaluated },
             { k: "CHANGED", v: summary.changed, tone: summary.changed ? "text-hold" : "" },
             { k: "NOT RE-DECIDABLE", v: summary.skipped },
-            { k: "HHI UNMEASURED", v: summary.hhiUnmeasured },
           ].map((t) => (
             <div key={t.k}>
               <p className="stencil text-[8px] tracking-[0.22em] text-muted-foreground">{t.k}</p>
@@ -296,7 +254,7 @@ export function SimulationPanel({
         </div>
         {!touched ? (
           <p className="text-[10px] text-muted-foreground">
-            Change a rule, a ceiling or the HHI limit to see which recorded verdicts would move.
+            Change a rule's severity or a ceiling to see which recorded verdicts would move.
           </p>
         ) : changed.length === 0 ? (
           <p className="text-[10px] text-muted-foreground">No recorded verdict changes under this policy.</p>

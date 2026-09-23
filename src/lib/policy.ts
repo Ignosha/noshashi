@@ -1,4 +1,5 @@
 import type { AccountInfo, CredentialRecord, Status } from "./xrpl/types";
+import type { PolicyRef } from "./desk/institutional";
 
 /**
  * NOSHASHI policy engine — the deterministic core of the
@@ -58,6 +59,11 @@ export type PolicyReceipt = {
   subject: string;
   amountXrp: number;
   checks: PolicyCheck[];
+  /**
+   * The institutional policy version applied, when one was active. Bound
+   * into the digest, so a receipt names the exact policy that produced it.
+   */
+  policy?: PolicyRef;
   /** SHA-256 over the canonical receipt body. */
   digest: string;
   evaluatedAt: string;
@@ -155,8 +161,11 @@ export function heldCredentialTypes(
 }
 
 /** XRPL account reserve: 1 XRP base + 0.2 XRP per owned object. */
-export function reserveRequirementXrp(ownerCount: number): number {
-  return 1 + ownerCount * 0.2;
+export function reserveRequirementXrp(
+  ownerCount: number,
+  reserve: { baseXrp: number; incXrp: number } = { baseXrp: 1, incXrp: 0.2 }
+): number {
+  return reserve.baseXrp + ownerCount * reserve.incXrp;
 }
 
 /**
@@ -185,11 +194,16 @@ export function evaluatePolicy(input: {
   domain: PermissionedDomain;
   amountXrp: number;
   evidenceUnavailable?: string[];
+  /** Live reserve values; the protocol values in force today when omitted. */
+  reserve?: { baseXrp: number; incXrp: number };
+  /** Institutional policy checks (src/lib/desk/institutional.ts toChecks). */
+  policyChecks?: PolicyCheck[];
+  policy?: PolicyRef;
 }): Omit<PolicyReceipt, "digest" | "latencyMs"> {
   const { account, credentials, domain, amountXrp, evidenceUnavailable = [] } = input;
   const held = heldCredentialTypes(credentials);
   const balance = account ? Number(account.balanceXrp) : 0;
-  const reserve = reserveRequirementXrp(account?.ownerCount ?? 0);
+  const reserve = reserveRequirementXrp(account?.ownerCount ?? 0, input.reserve);
   const spendable = Math.max(0, balance - reserve);
 
   const checks: PolicyCheck[] = [];
@@ -295,7 +309,10 @@ export function evaluatePolicy(input: {
     });
   }
 
+  checks.push(...(input.policyChecks ?? []));
+
   return {
+    ...(input.policy ? { policy: input.policy } : {}),
     verdict: verdictForChecks(checks),
     domainId: domain.id,
     subject: account?.address ?? "unknown",
@@ -338,6 +355,12 @@ export async function receiptDigest(
       amountXrp: body.amountXrp,
       evaluatedAt: body.evaluatedAt,
       checks: body.checks.map((check) => [check.id, check.passed]),
+      // Present only when an institutional policy was applied, so every
+      // receipt issued without one keeps exactly the bytes it always had
+      // (and the server-side verifier's canonical form still matches).
+      ...(body.policy
+        ? { policy: [body.policy.id, body.policy.version, body.policy.hash, body.policy.engine] }
+        : {}),
     })
   );
 }
@@ -377,13 +400,7 @@ export async function digestOf(input: {
 }
 
 /** Full evaluation with timing and digest — what the UI actually calls. */
-export async function runPolicy(input: {
-  account: AccountInfo | null;
-  credentials: CredentialRecord[];
-  domain: PermissionedDomain;
-  amountXrp: number;
-  evidenceUnavailable?: string[];
-}): Promise<PolicyReceipt> {
+export async function runPolicy(input: Parameters<typeof evaluatePolicy>[0]): Promise<PolicyReceipt> {
   const started = performance.now();
   const body = evaluatePolicy(input);
   const digest = await receiptDigest(body);
