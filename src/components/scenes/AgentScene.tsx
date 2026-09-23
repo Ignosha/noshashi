@@ -14,6 +14,7 @@ import {
   AgentUnavailableError,
   autodetect,
   chatStream,
+  HISTORY_TURNS,
   listModels,
   pickModel,
   type AgentModel,
@@ -33,6 +34,8 @@ import {
   type AgentMode,
 } from "@/lib/agent/context";
 import { CONTACT } from "@/lib/brand";
+import { dataBoundary, recordFor, useAiUseLog, type AiUseRecord } from "@/lib/agent/governance";
+import { AgentGovernance } from "./AgentGovernance";
 import { clearProviderKey, hasProviderKey, storeProviderKey } from "@/lib/agent/keys";
 import { findAnswers, fallbackAnswer, KNOWLEDGE } from "@/lib/support/knowledge";
 import { runDiagnostics, type Diagnostic } from "@/lib/support/diagnostics";
@@ -81,12 +84,26 @@ export function AgentScene({ data }: { data: XrplState }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  const [view, setView] = useState<"chat" | "governance">("chat");
+  const useLog = useAiUseLog();
 
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const provider = findProvider(config.providerId);
+  const boundary = dataBoundary(config);
+
+  // Every model call is recorded as digests and sizes — never the text.
+  const recordUse = (
+    mode: AiUseRecord["mode"],
+    messages: ChatMessage[],
+    response: string,
+    outcome: AiUseRecord["outcome"]
+  ) =>
+    void recordFor({ at: new Date().toISOString(), mode, config, messages, response, outcome })
+      .then(useLog.append)
+      .catch(() => undefined);
 
   const probe = useCallback(
     async (target?: AgentConfig) => {
@@ -171,11 +188,12 @@ export function AgentScene({ data }: { data: XrplState }) {
   const testRuntime = async () => {
     if (!ready || testingRuntime) return;
     setTestingRuntime(true);
+    const probeMessages: ChatMessage[] = [{ role: "user", content: "Reply with READY only." }];
+    let response = "";
     try {
-      let response = "";
       await chatStream({
         config,
-        messages: [{ role: "user", content: "Reply with READY only." }],
+        messages: probeMessages,
         onToken: (token) => {
           response += token;
         },
@@ -186,7 +204,9 @@ export function AgentScene({ data }: { data: XrplState }) {
         body: response.trim() ? `Probe returned: ${response.trim().slice(0, 80)}` : "The runtime accepted the request.",
         tone: "go",
       });
+      recordUse("runtime-test", probeMessages, response, "complete");
     } catch (error) {
+      recordUse("runtime-test", probeMessages, response, "error");
       push({
         title: "MODEL TEST FAILED",
         body: error instanceof Error ? error.message : "The runtime did not return a response.",
@@ -238,20 +258,22 @@ export function AgentScene({ data }: { data: XrplState }) {
 
     // Send the last few turns for continuity without blowing the window.
     const history: ChatMessage[] = [
-      { role: "system", content: buildSystemPrompt(mode, data) },
-      ...turns.slice(-6).map((turn) => ({
+      { role: "system", content: buildSystemPrompt(mode, data, boundary) },
+      ...turns.slice(-HISTORY_TURNS).map((turn) => ({
         role: turn.role,
         content: turn.content,
       })),
       { role: "user", content: prompt },
     ];
 
+    let response = "";
     try {
       await chatStream({
         config,
         messages: history,
         signal: controller.signal,
         onToken: (token: string) => {
+          response += token;
           setTurns((prev) =>
             prev.map((turn) =>
               turn.id === assistantTurn.id
@@ -266,8 +288,10 @@ export function AgentScene({ data }: { data: XrplState }) {
           turn.id === assistantTurn.id ? { ...turn, streaming: false } : turn
         )
       );
+      recordUse(mode, history, response, "complete");
     } catch (error) {
       const aborted = controller.signal.aborted;
+      recordUse(mode, history, response, aborted ? "stopped" : "error");
       const message = aborted
         ? "Generation stopped."
         : error instanceof Error
@@ -330,11 +354,11 @@ export function AgentScene({ data }: { data: XrplState }) {
     <div className="flex h-full min-w-0 flex-col gap-3 p-4">
       <SceneHeader
         index="07"
-        kicker="ON-DEVICE ANALYST · OLLAMA / HERMES"
+        kicker={`${boundary.onDevice ? "ON-DEVICE" : "REMOTE"} ANALYST · ${provider.name.toUpperCase()} · ADVISORY ONLY`}
         title="COMPLIANCE AGENT"
-        sub="A local model grounded in live ledger state and the real policy rule set. Nothing you type leaves this machine."
-        status={ready ? "go" : probing ? "hold" : "no-go"}
-        statusLabel={probing ? "PROBING" : ready ? "LOCAL RUNTIME" : "RUNTIME DOWN"}
+        sub={`A model grounded in live ledger state and the real policy rule set. It explains verdicts; it never issues them. ${boundary.statement}`}
+        status={ready ? (boundary.onDevice ? "go" : "hold") : probing ? "hold" : "no-go"}
+        statusLabel={probing ? "PROBING" : ready ? (boundary.onDevice ? "LOCAL RUNTIME" : "REMOTE RUNTIME") : "RUNTIME DOWN"}
         right={
           <div className="flex items-center gap-2">
             <Tabs value={mode} onValueChange={(value) => setMode(value as AgentMode)}>
@@ -343,6 +367,14 @@ export function AgentScene({ data }: { data: XrplState }) {
                 <TabsTrigger value="support">SUPPORT</TabsTrigger>
               </TabsList>
             </Tabs>
+            <Button
+              size="sm"
+              variant={view === "governance" ? "default" : "outline"}
+              onClick={() => setView((v) => (v === "chat" ? "governance" : "chat"))}
+              aria-pressed={view === "governance"}
+            >
+              GOVERNANCE
+            </Button>
             {turns.length > 0 && (
               <Button size="sm" variant="outline" onClick={() => setTurns([])}>
                 CLEAR
@@ -353,7 +385,24 @@ export function AgentScene({ data }: { data: XrplState }) {
       />
 
       <div className="grid min-h-0 min-w-0 flex-1 grid-cols-4 gap-3">
-        {/* Conversation */}
+        {view === "governance" ? (
+          <Panel
+            label="AI GOVERNANCE · WHAT THE AGENT MAY DO, WHERE ITS INPUT GOES, EVERY CALL MADE"
+            corners
+            className="col-span-3 min-h-0 min-w-0"
+            bodyClassName="min-h-0 overflow-y-auto p-0"
+          >
+            <AgentGovernance
+              config={config}
+              boundary={boundary}
+              keyStored={keyStored}
+              mode={mode}
+              data={data}
+              log={useLog}
+            />
+          </Panel>
+        ) : (
+        /* Conversation */
         <Panel
           label={mode === "compliance" ? "COMPLIANCE ANALYST" : "SUPPORT DESK"}
           corners
@@ -525,11 +574,12 @@ export function AgentScene({ data }: { data: XrplState }) {
                 <Kbd keys="shift+enter" /> newline
               </span>
               <span className="stencil text-[8px] tracking-[0.2em] text-muted-foreground/70">
-                {provider.local ? "ON-DEVICE · NOTHING TRANSMITTED" : "REMOTE RUNTIME · TLS"}
+                {boundary.onDevice ? "ON-DEVICE · NOTHING TRANSMITTED" : "REMOTE RUNTIME · TLS"}
               </span>
             </div>
           </div>
         </Panel>
+        )}
 
         {/* Runtime + escalation */}
         <div className="col-span-1 flex min-h-0 min-w-0 flex-col gap-3">
@@ -562,8 +612,8 @@ export function AgentScene({ data }: { data: XrplState }) {
               />
               <DataRow
                 label="TRANSPORT"
-                value={provider.local ? "ON-DEVICE" : "REMOTE (TLS)"}
-                tone={provider.local ? "go" : "hold"}
+                value={boundary.onDevice ? "ON-DEVICE" : "REMOTE (TLS)"}
+                tone={boundary.onDevice ? "go" : "hold"}
               />
             </div>
 
@@ -622,7 +672,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                     </span>
                   </button>
                 ))}
-                {!provider.local && (
+                {!boundary.onDevice && (
                   <p className="border border-hold/40 bg-hold-dim p-2 text-[8.5px] leading-relaxed text-hold">
                     A remote endpoint sends your prompt off this machine.
                     {isEndpointSafe(config.baseUrl).ok
@@ -835,9 +885,9 @@ export function AgentScene({ data }: { data: XrplState }) {
               { icon: <NovaBolt size={11} />, text: "Answers only from live state; no invented rules." },
               {
                 icon: <NovaTerminal size={11} />,
-                text: provider.local
+                text: boundary.onDevice
                   ? "Runs on this machine — prompts never leave the device."
-                  : "Remote runtime selected — prompts leave this machine over TLS.",
+                  : `Remote runtime selected — prompts go to ${boundary.host} over TLS.`,
               },
             ].map((rule) => (
               <div key={rule.text} className="flex gap-2 border-b border-border/30 py-1.5 last:border-0">

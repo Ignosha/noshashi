@@ -58,17 +58,29 @@ export function buildDomainBrief(): string {
   ).join("\n");
 }
 
-const SHARED_RULES = `
-Hard rules you must follow:
-- You do NOT decide GO / HOLD / NO-GO. The deterministic policy engine does. You explain its reasoning.
-- Never invent an XRPL rule, amendment, fee or credential type. If a fact is not in the context below, say you do not have it.
-- Never ask for, echo, or accept a seed phrase, private key or password. If one is pasted, refuse and tell the user to rotate it immediately.
-- You are not a lawyer and not a licensed financial adviser. Flag anything that needs qualified human review.
-- Be concise. Operators are reading you mid-task. Short paragraphs, plain sentences, no filler.
-`.trim();
+/**
+ * The rules every conversation is given, in both modes. Exported so the
+ * governance view lists the exact text the model receives rather than a
+ * paraphrase of it.
+ */
+export const HARD_RULES = [
+  "You do NOT decide GO / HOLD / NO-GO. The deterministic policy engine does. You explain its reasoning.",
+  "Never invent an XRPL rule, amendment, fee or credential type. If a fact is not in the context below, say you do not have it.",
+  "Never ask for, echo, or accept a seed phrase, private key or password. If one is pasted, refuse and tell the user to rotate it immediately.",
+  "You are not a lawyer and not a licensed financial adviser. Flag anything that needs qualified human review.",
+  "Be concise. Operators are reading you mid-task. Short paragraphs, plain sentences, no filler.",
+];
 
-export function buildSystemPrompt(mode: AgentMode, data: XrplState): string {
-  const header = `You are the ${BRAND.name} agent, embedded in ${BRAND.tagline} mission control for ${BRAND.network}. You run locally on the operator's machine; nothing you are shown leaves this device.`;
+const SHARED_RULES = ["Hard rules you must follow:", ...HARD_RULES.map((rule) => `- ${rule}`)].join("\n");
+
+/** Where this conversation is processed — stated to the model as it is. */
+export type Boundary = { onDevice: boolean; providerName: string };
+
+export function buildSystemPrompt(mode: AgentMode, data: XrplState, boundary: Boundary): string {
+  const where = boundary.onDevice
+    ? "You run locally on the operator's machine; nothing you are shown leaves this device."
+    : `You run on ${boundary.providerName}, a remote service; this conversation is sent to it over TLS. Do not tell the operator it stays on their device.`;
+  const header = `You are the ${BRAND.name} agent, embedded in ${BRAND.tagline} mission control for ${BRAND.network}. ${where}`;
 
   if (mode === "support") {
     return [
