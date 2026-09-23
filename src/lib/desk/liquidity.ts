@@ -66,15 +66,16 @@ export function simulateExit(book: OrderBook, size: number): ExitFill {
   for (const level of bids) {
     if (remaining <= 0) break;
     const take = Math.min(remaining, level.quantity);
-    // `price` on the bid side is quote-per-XRP, so XRP received is
-    // quantity divided by price.
-    proceedsXrp += take / level.price;
+    // `price` on the bid side is quote-per-issued-unit, so selling `take`
+    // units receives `take * price` quote units.
+    if (level.price <= 0 || !Number.isFinite(level.price)) continue;
+    proceedsXrp += take * level.price;
     remaining -= take;
     levelsConsumed += 1;
   }
 
   const filled = requested - remaining;
-  const vwap = proceedsXrp > 0 ? filled / proceedsXrp : undefined;
+  const vwap = filled > 0 && proceedsXrp > 0 ? proceedsXrp / filled : undefined;
   const mid = book.mid;
   const slippageBps =
     vwap !== undefined && mid !== undefined && mid > 0

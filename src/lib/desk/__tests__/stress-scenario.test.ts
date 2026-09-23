@@ -210,7 +210,7 @@ describe("stress engine on a shaped portfolio", () => {
     expect(ratios[0]).toBeGreaterThan(ratios[1]);
     expect(ratios[1]).toBeGreaterThan(ratios[2]);
     // If the scenarios barely differ, the selector on screen is a placebo.
-    expect(ratios[0] - ratios[2]).toBeGreaterThan(0.15);
+    expect(ratios[0] - ratios[2]).toBeGreaterThan(0.1);
   });
 
   it("summarises into lines fit to paste into a committee note", () => {

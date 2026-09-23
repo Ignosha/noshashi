@@ -168,6 +168,36 @@ fn export_text_file(app: AppHandle, filename: String, contents: String) -> Resul
     Ok(destination.to_string_lossy().to_string())
 }
 
+/// Write a generated binary document into ~/Downloads and return the path.
+#[tauri::command]
+fn export_binary_file(
+    app: AppHandle,
+    filename: String,
+    contents: Vec<u8>,
+) -> Result<String, String> {
+    let name = filename.trim();
+    let looks_like_a_path = name.is_empty()
+        || name == "."
+        || name == ".."
+        || name.contains(['/', '\\', ':'])
+        || name.chars().any(char::is_control);
+    if looks_like_a_path {
+        return Err("Invalid file name".to_string());
+    }
+    let safe_name = name;
+
+    let directory = app
+        .path()
+        .download_dir()
+        .or_else(|_| app.path().home_dir())
+        .map_err(|e| e.to_string())?;
+    fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
+    let destination = directory.join(safe_name);
+    fs::write(&destination, contents).map_err(|e| e.to_string())?;
+
+    Ok(destination.to_string_lossy().to_string())
+}
+
 /// Binary integrity: the SHA-256 of the executable that is running.
 ///
 /// A solo-published, unsigned application asks a lot of trust. This asks
@@ -428,6 +458,7 @@ fn main() {
             has_api_secret,
             clear_api_secret,
             export_text_file,
+            export_binary_file,
             open_external,
             set_tray_title,
             verify_integrity,

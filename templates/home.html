@@ -27,18 +27,18 @@
 <style>
   :root{
     /* Brand board, section 05 */
-    --ground:#0B0F14; --surface:#11161D; --elevated:#1C2330;
-    --ink:#E6E8EB; --muted:#A3A8B3; --faint:#747C8B; --rule:#2A313C;
-    --brand:#3A82F6; --tele:#00E0C6;
-    --go:#35D49A; --hold:#F5B942; --nogo:#FF5F6D;
+    --ground:#08100B; --surface:#0E1911; --elevated:#15251A;
+    --ink:#E9F5E7; --muted:#A7B8A8; --faint:#718473; --rule:#263B2A;
+    --brand:#9BE15D; --tele:#55D98A;
+    --go:#9BE15D; --hold:#E7C766; --nogo:#FF7B7B;
     --shell:min(1180px, 92vw);
     --r:3px;
   }
   html[data-theme="light"]{
-    --ground:#F4F7FA; --surface:#FFFFFF; --elevated:#E8EEF5;
-    --ink:#142033; --muted:#4A586B; --faint:#64748B; --rule:#C9D4E0;
-    --brand:#145FD1; --tele:#007D70;
-    --go:#087A50; --hold:#9A6500; --nogo:#B42332;
+    --ground:#F2F8F0; --surface:#FFFFFF; --elevated:#E5F0E2;
+    --ink:#0B160D; --muted:#3F5843; --faint:#66806A; --rule:#C4D7C5;
+    --brand:#247A3B; --tele:#168A55;
+    --go:#247A3B; --hold:#8B6500; --nogo:#B42332;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -99,7 +99,7 @@
    * introduced no hue, which is why it survived the earlier pass that
    * took out the blue and teal washes. It still read as a gradient
    * field on a large desktop display, which is the thing being
-   * objected to. The hero's depth now comes from the starfield and the
+   * objected to. The hero's depth now comes from the static floral plates and the
    * static orbital plates alone.
    */
 
@@ -232,6 +232,14 @@
   .micro{font-size:11px;color:var(--faint);margin-top:20px}
   .verdicts{display:inline-flex;gap:4px;font-weight:700}
   .go{color:var(--go)} .hold{color:var(--hold)} .nogo{color:var(--nogo)}
+  .proof-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;
+    margin-top:18px;background:var(--rule);border:1px solid var(--rule);
+    border-radius:var(--r);overflow:hidden}
+  .proof-stat{background:var(--surface);padding:14px 16px;min-width:0}
+  .proof-stat .label{display:block;font:9px "IBM Plex Mono",monospace;
+    letter-spacing:.18em;color:var(--faint);margin-bottom:8px}
+  .proof-stat strong{display:block;font-size:14px;line-height:1.3;color:var(--ink)}
+  .proof-stat small{display:block;margin-top:5px;font-size:10px;line-height:1.4;color:var(--muted)}
   .hero-brief{display:grid;grid-template-columns:1.2fr repeat(3,1fr);gap:1px;
     margin-top:34px;background:var(--rule);border:1px solid var(--rule);
     border-radius:var(--r);overflow:hidden;position:relative}
@@ -252,8 +260,8 @@
   .decision-step b{display:block;color:var(--brand);font:9px "IBM Plex Mono",monospace;letter-spacing:.16em}
   .decision-step span{display:block;margin-top:5px;color:var(--ink);font-size:12px}
   .decision-step small{display:block;margin-top:3px;color:var(--faint);font-size:10px;line-height:1.4}
-  @media (max-width:900px){.hero-brief{grid-template-columns:repeat(2,1fr)}.decision-loop{grid-template-columns:repeat(2,1fr);row-gap:4px}}
-  @media (max-width:560px){.hero-brief{grid-template-columns:1fr}.decision-loop{grid-template-columns:1fr}.decision-step:not(:last-child)::after{display:none}}
+  @media (max-width:900px){.proof-strip{grid-template-columns:repeat(2,1fr)}.hero-brief{grid-template-columns:repeat(2,1fr)}.decision-loop{grid-template-columns:repeat(2,1fr);row-gap:4px}}
+  @media (max-width:560px){.proof-strip{grid-template-columns:1fr}.hero-brief{grid-template-columns:1fr}.decision-loop{grid-template-columns:1fr}.decision-step:not(:last-child)::after{display:none}}
 
   /* The header is sticky, so an anchor jump would land the heading
      underneath it without this. */
@@ -412,12 +420,18 @@
   .measure td.before{color:var(--nogo)}
   .measure td.after{color:var(--go)}
 
-  .price{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+  .price{display:grid;gap:14px;grid-template-columns:repeat(5,minmax(0,1fr))}
   .tier{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;position:relative;overflow:hidden}
   .tier.focus{border-color:color-mix(in srgb,var(--brand) 45%,var(--rule))}
   .tier .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--rule)}
   .tier.focus .cap{background:var(--brand)}
   .tier.inst .cap{background:var(--tele)}
+  .tier.enterprise{border-color:color-mix(in srgb,var(--tele) 55%,var(--rule))}
+  .tier.enterprise .cap{background:var(--tele)}
+  .tier.enterprise .name{color:var(--tele)}
+  .tier.strategic{border-color:color-mix(in srgb,#b69cff 55%,var(--rule))}
+  .tier.strategic .cap{background:#b69cff}
+  .tier.strategic .name{color:#b69cff}
   .tier .name{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--muted)}
   .tier.focus .name{color:var(--brand)} .tier.inst .name{color:var(--tele)}
   .tier .amt{font-size:34px;font-weight:700;margin:18px 0 2px;letter-spacing:-.02em}
@@ -611,9 +625,8 @@
    *   Its background was an MP4 on someone else's CloudFront bucket.
    *   Hotlinking a third party's asset is fragile and not ours to
    *   spend, and vercel.json's `default-src 'self'` would refuse it
-   *   outright. The cosmos canvas already here does the same job, is
-   *   ours, and already stops when the tab is hidden and holds still
-   *   under prefers-reduced-motion.
+   *   outright. The static bloom here does the same job in a more
+   *   restrained way and stays fully within the site's green palette.
    *
    *   Its display face was Graphik LCG pulled from a font-piracy CDN.
    *   Graphik is licensed commercially; `font-src 'self'` would refuse
@@ -644,8 +657,6 @@
   @media(min-width:768px){ .hero-instrument{--hi-gut:35px} }
   @media(min-width:1024px){ .hero-instrument{min-height:max(560px, calc(100svh - 76px))} }
 
-  .hero-instrument .cosmos{position:absolute;inset:0;width:100%;height:100%;z-index:0}
-
   /* ── The bloom. Decoration, granted as a bounded exception in
    *    DESIGN.md; see the "marketing hero" section there for the terms.
    *    Static: no loop, no frame cost, nothing to stop under reduced
@@ -656,11 +667,11 @@
      * stop is currentColor, and `opacity` here is already owned by the
      * hiFade animation, whose `both` fill holds it at 1 and silently
      * overrides any opacity declared on this element. */
-    color:rgb(187 216 255 / 1);
+    color:rgb(155 225 93 / .9);
     animation:hiFade 1.4s cubic-bezier(.16,1,.3,1) both;animation-delay:.35s}
   /* On #F4F7FA a translucent white petal is invisible, so the light
    * theme gets the brand hue at a lower weight instead. */
-  html[data-theme="light"] .hi-bloom{color:rgb(20 95 209 / .55)}
+  html[data-theme="light"] .hi-bloom{color:rgb(36 122 59 / .58)}
   /* Below 1024 there is no node diagram for the bloom to sit behind,
    * so it becomes the hero's backdrop instead: full bleed, and carried
    * at a lower weight because here it is behind the headline itself
@@ -671,8 +682,72 @@
      * 390px phone made the element 538px wide and pushed it off the
      * screen. An explicit width is what makes left/right bind. */
     .hi-bloom{left:0;right:0;top:0;bottom:0;width:100%;height:100%;
-      color:rgb(187 216 255 / .58)}
-    html[data-theme="light"] .hi-bloom{color:rgb(20 95 209 / .34)}
+      color:rgb(155 225 93 / .52)}
+    html[data-theme="light"] .hi-bloom{color:rgb(36 122 59 / .38)}
+  }
+
+  /* ── Garden aesthetic enhancements ────────────────────────────────────
+     Matcha and garden organic feel: soft greens, organic shapes,
+     garden-like elements. The layout stays the same — we're adding
+     atmosphere, not changing the structure. */
+  .garden-bg{
+    position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+  }
+  .garden-bg::before{
+    content:"";position:absolute;top:-10%;right:-15%;width:60vw;height:60vw;
+    background:radial-gradient(circle at 60% 40%,color-mix(in srgb,var(--brand) 8%,transparent) 0%,transparent 70%);
+    border-radius:50%;
+  }
+  .garden-bg::after{
+    content:"";position:absolute;bottom:-20%;left:-10%;width:50vw;height:50vw;
+    background:radial-gradient(circle at 40% 60%,color-mix(in srgb,var(--tele) 6%,transparent) 0%,transparent 70%);
+    border-radius:50%;
+  }
+  .leaf-accent{
+    position:absolute;pointer-events:none;opacity:.06;z-index:0;
+    color:var(--brand);
+  }
+  .leaf-accent.top-right{top:8%;right:12%;width:180px;height:180px;transform:rotate(25deg)}
+  .leaf-accent.bottom-left{bottom:12%;left:8%;width:140px;height:140px;transform:rotate(-15deg)}
+  .leaf-accent.mid{top:50%;right:30%;width:100px;height:100px;transform:rotate(45deg);opacity:.04}
+  /* Organic divider instead of straight rule */
+  .organic-rule{
+    height:2px;border:0;margin:0;
+    background:linear-gradient(90deg,transparent 0%,var(--rule) 8%,var(--rule) 92%,transparent 100%);
+    border-radius:2px;
+  }
+  /* Soft glow on buttons for garden feel */
+  .btn{
+    box-shadow:0 4px 14px color-mix(in srgb,var(--brand) 18%,transparent);
+  }
+  .btn:hover{
+    box-shadow:0 6px 22px color-mix(in srgb,var(--brand) 30%,transparent);
+  }
+  /* Panel hover: subtle green tint */
+  .panel:hover,.tier:hover,.plat:hover{
+    background:color-mix(in srgb,var(--surface) 92%,var(--brand));
+    border-color:color-mix(in srgb,var(--brand) 35%,var(--rule));
+  }
+  /* Softened grid lines for garden feel */
+  .grid{background:linear-gradient(90deg,var(--rule) 0 1px,transparent 1px),linear-gradient(0deg,var(--rule) 0 1px,transparent 1px);
+    background-size:100% 1px,1px 100%;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+  .grid > *{background:var(--surface)}
+  /* Hero: add subtle garden atmosphere behind the bloom */
+  .hero-instrument{
+    background:
+      radial-gradient(ellipse at 30% 20%,color-mix(in srgb,var(--brand) 6%,transparent) 0%,transparent 50%),
+      radial-gradient(ellipse at 70% 80%,color-mix(in srgb,var(--tele) 5%,transparent) 0%,transparent 50%),
+      var(--ground);
+  }
+  /* Softened the instrument field for garden feel */
+  .field svg{opacity:.4}
+  /* Typography: softer, more organic feel for headings */
+  .hero-instrument h1{
+    text-shadow:0 1px 20px color-mix(in srgb,var(--brand) 15%,transparent);
+  }
+  /* Footer: garden accent */
+  footer{
+    background:linear-gradient(180deg,var(--ground),color-mix(in srgb,var(--ground) 80%,var(--surface)));
   }
 
   /* ── The measured grid. Four verticals, two horizontals, eight
@@ -794,6 +869,20 @@
 </style>
 </head>
 <body>
+<div class="garden-bg">
+  <svg class="leaf-accent top-right" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+    <path d="M50 95C30 70 20 40 50 10C80 40 70 70 50 95Z" fill="currentColor"/>
+    <path d="M50 95V20M50 50C35 55 30 65 50 95M50 50C65 55 70 65 50 95" stroke="currentColor" stroke-width="0.5" opacity=".5"/>
+  </svg>
+  <svg class="leaf-accent bottom-left" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+    <path d="M50 95C30 70 20 40 50 10C80 40 70 70 50 95Z" fill="currentColor"/>
+    <path d="M50 95V20M50 50C35 55 30 65 50 95M50 50C65 55 70 65 50 95" stroke="currentColor" stroke-width="0.5" opacity=".5"/>
+  </svg>
+  <svg class="leaf-accent mid" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+    <path d="M50 95C30 70 20 40 50 10C80 40 70 70 50 95Z" fill="currentColor"/>
+    <path d="M50 95V20M50 50C35 55 30 65 50 95M50 50C65 55 70 65 50 95" stroke="currentColor" stroke-width="0.5" opacity=".5"/>
+  </svg>
+</div>
 <div class="layer">
 <header>
   <div class="shell nav">
@@ -826,7 +915,7 @@
       <a class="nav-link" href="#download"><span data-i18n="nav.download">Download</span></a>
       <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
-        <span aria-hidden="true">◐</span><span id="themeLabel">LIGHT</span>
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
       </button>
       <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
       <a class="btn" href="#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
@@ -861,7 +950,6 @@
     rather than rewritten.
   -->
   <section class="hero-instrument">
-    <canvas class="cosmos" aria-hidden="true"></canvas>
     <!--SLOT:HEROBLOOM-->
 
     <div class="hi-grid" aria-hidden="true">
@@ -961,10 +1049,33 @@
               adjudication and market intelligence read from one validated ledger state,
               in the same second.
             </p>
-            <a href="/certificate/">READ_AN_AUTHORITY_CERTIFICATE &rarr;</a>
+            <a href="/certificate/" data-i18n="hero.bloom.cta">READ AN AUTHORITY CERTIFICATE →</a>
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="proof-strip" aria-label="NOSHASHI proof strip" data-i18n-aria-label="proof.aria" data-i18n-aria-label-en="NOSHASHI proof strip">
+    <div class="proof-stat">
+      <span class="label" data-i18n="proof.ledger.label">VALIDATED LEDGER</span>
+      <strong data-i18n="proof.ledger.value">XRPL mainnet</strong>
+      <small data-i18n="proof.ledger.note">same state going into every decision</small>
+    </div>
+    <div class="proof-stat">
+      <span class="label" data-i18n="proof.rules.label">RULES</span>
+      <strong data-i18n="proof.rules.value">GO · HOLD · NO-GO</strong>
+      <small data-i18n="proof.rules.note">deterministic, replayable policy checks</small>
+    </div>
+    <div class="proof-stat">
+      <span class="label" data-i18n="proof.receipt.label">RECEIPT</span>
+      <strong data-i18n="proof.receipt.value">SHA-256</strong>
+      <small data-i18n="proof.receipt.note">byte-stable evidence for review</small>
+    </div>
+    <div class="proof-stat">
+      <span class="label" data-i18n="proof.control.label">CONTROL</span>
+      <strong data-i18n="proof.control.value">Read-only</strong>
+      <small data-i18n="proof.control.note">no custody, no keys, no broadcast path</small>
     </div>
   </section>
 
@@ -1810,6 +1921,38 @@
         </ul>
         <a class="btn ghost block" href="/contact/?topic=institutions" style="margin-top:22px">Talk to us</a>
       </div>
+      <div class="tier enterprise">
+        <span class="cap"></span>
+        <p class="name">ENTERPRISE</p>
+        <p class="amt">$10,000</p><p class="per">per month</p>
+        <p class="who">Institutional teams and regulated operations</p>
+        <ul>
+          <li>Everything in Institutional</li>
+          <li>Asset passports and issuer intelligence</li>
+          <li>Counterparty and liquidity intelligence</li>
+          <li>Policy engine, adjudication and decision history</li>
+          <li>Evidence records, audit exports and review workflow</li>
+          <li>Scoped API keys, webhooks and environment options</li>
+          <li>Architecture review and implementation planning</li>
+        </ul>
+        <a class="btn ghost block" href="/enterprise/" style="margin-top:22px">Explore Enterprise</a>
+      </div>
+      <div class="tier strategic">
+        <span class="cap"></span>
+        <p class="name">STRATEGIC INFRASTRUCTURE</p>
+        <p class="amt">$20,850</p><p class="per">per month</p>
+        <p class="who">Teams building their own XRPL intelligence layer</p>
+        <ul>
+          <li>Everything in Enterprise</li>
+          <li>High-volume API capacity and burst limits</li>
+          <li>XRPL event feeds and machine-readable delivery</li>
+          <li>Custom schemas, retention and bulk export design</li>
+          <li>Custom integrations and dedicated environment options</li>
+          <li>Embedded or white-label delivery when contracted</li>
+          <li>Strategic architecture review and roadmap</li>
+        </ul>
+        <a class="btn ghost block" href="/strategic-infrastructure/" style="margin-top:22px">Build with NOSHASHI</a>
+      </div>
     </div>
     <div class="cta" style="margin-top:26px">
       <a class="btn" href="/pricing/">Full pricing and comparison</a>
@@ -1923,7 +2066,6 @@
 </footer>
 </div>
 
-<script src="/assets/cosmos.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/i18n.js" defer></script>
 <script src="/assets/nav.js" defer></script>
@@ -1941,8 +2083,9 @@
   if (savedTheme === "light" || savedTheme === "dark") document.documentElement.setAttribute("data-theme", savedTheme);
   function updateThemeButton() {
     var light = document.documentElement.getAttribute("data-theme") === "light";
-    if (themeLabel) themeLabel.textContent = light ? "DARK" : "LIGHT";
-    if (themeToggle) themeToggle.setAttribute("aria-label", light ? "Switch to dark mode" : "Switch to light mode");
+    var map = window.__NOSHASHI_I18N || {};
+    if (themeLabel) themeLabel.textContent = map[light ? "theme.dark" : "theme.light"] || (light ? "DARK" : "LIGHT");
+    if (themeToggle) themeToggle.setAttribute("aria-label", map[light ? "theme.ariaDark" : "theme.ariaLight"] || (light ? "Switch to dark mode" : "Switch to light mode"));
   }
   updateThemeButton();
   if (themeToggle) themeToggle.addEventListener("click", function () {

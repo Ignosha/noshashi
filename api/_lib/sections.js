@@ -238,20 +238,20 @@ export function renderDownloads(release) {
 
   const rail = `<div class="release-rail" aria-label="Current release metadata">
       <div class="release-cell">
-        <span class="label">CURRENT CHANNEL</span>
+        <span class="label" data-i18n="release.channel.label">CURRENT CHANNEL</span>
         <strong>Beta · ${esc(release.tag)}</strong>
       </div>
       <div class="release-cell">
-        <span class="label">RELEASED</span>
+        <span class="label" data-i18n="release.released.label">RELEASED</span>
         <strong class="mono">${esc(isoDate(release.at))}</strong>
       </div>
       <div class="release-cell">
-        <span class="label">SOURCE</span>
+        <span class="label" data-i18n="release.source.label">SOURCE</span>
         <strong class="mono">GitHub Actions</strong>
       </div>
       <div class="release-cell">
-        <span class="label">INTEGRITY</span>
-        <strong class="live">SHA-256 listed</strong>
+        <span class="label" data-i18n="release.integrity.label">INTEGRITY</span>
+        <strong class="live" data-i18n="release.integrity.value">SHA-256 listed</strong>
       </div>
     </div>`;
 
@@ -272,7 +272,7 @@ export function renderDownloads(release) {
     const hashLine = primary.sha256
       ? `<div class="hashline">
           <p class="phash mono">${esc(primary.sha256)}</p>
-          <button class="copyhash" type="button" data-copy="${esc(primary.sha256)}">COPY</button>
+          <button class="copyhash" type="button" data-copy="${esc(primary.sha256)}" data-i18n="release.copy">COPY</button>
         </div>`
       : "";
 
@@ -283,7 +283,7 @@ export function renderDownloads(release) {
             <p class="pname">${esc(platform.name)}</p>
             <p class="pver">${esc(platform.requirement)}</p>
           </div>
-          <span class="availability" data-channel="beta">BETA</span>
+          <span class="availability" data-channel="beta" data-i18n="release.beta">BETA</span>
         </div>
         <p class="pver">${esc(platform.detail)}</p>
         <a class="btn" href="${attrUrl(primary.url)}">
@@ -306,8 +306,8 @@ export function renderDownloads(release) {
     </div>
     <div class="download-note">
       <span class="signal" aria-hidden="true"></span>
-      <span><strong style="color:var(--ink)">Operator note.</strong> Every build on this page is a
-        <strong style="color:var(--hold)">beta</strong>: pre-1.0, and intentionally unsigned while the
+      <span><strong style="color:var(--ink)" data-i18n="release.operator">Operator note.</strong> Every build on this page is a
+        <strong style="color:var(--hold)" data-i18n="release.beta">beta</strong>: pre-1.0, and intentionally unsigned while the
         release pipeline is being hardened. Verify the SHA-256 value above, then follow your
         institution's software admission process before deployment.</span>
     </div>`;

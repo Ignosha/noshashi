@@ -58,18 +58,29 @@
   }
 
   function apply(code, map) {
+    window.__NOSHASHI_I18N = map;
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       var key = el.getAttribute("data-i18n");
       var base = original(el);
       var text = (code === DEFAULT) ? base : (map[key] || base);
+      if (el.id === "themeLabel") {
+        var themeKey = document.documentElement.getAttribute("data-theme") === "light"
+          ? "theme.dark" : "theme.light";
+        text = (code === DEFAULT ? (window.__NOSHASHI_I18N || {})[themeKey] : map[themeKey]) || text;
+      }
       if (el.hasAttribute("placeholder")) el.setAttribute("placeholder", text);
       else el.textContent = text;
+    });
+    document.querySelectorAll("[data-i18n-aria-label]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n-aria-label");
+      el.setAttribute("aria-label", (code === DEFAULT ? el.getAttribute("data-i18n-aria-label-en") : map[key]) || el.getAttribute("aria-label"));
     });
     document.documentElement.setAttribute("lang", code);
     var current = document.getElementById("lang-current");
     if (current) current.textContent = code.toUpperCase();
     var select = document.getElementById("lang-select");
     if (select) select.value = code;
+    document.dispatchEvent(new CustomEvent("noshashi:i18n", { detail: { code: code, map: map } }));
   }
 
   function setLanguage(code, options) {

@@ -3,9 +3,10 @@
 Each file is a flat map of `key: translation`. Keys are referenced from
 the markup with `data-i18n="key"`, and `site/assets/i18n.js` swaps them.
 
-**This translates the interface, not the argument.** Navigation,
-headings, calls to action and the mission — the text that decides
-whether a visitor stays. Body copy, the findings, the guide and the
+**This translates the interface, not the argument.** Navigation, theme
+controls, proof labels, release/download controls, selected pricing
+labels and calls to action are translated. Longer explanatory body copy,
+release warnings, comparison detail, the findings, the guide and the
 legal pages remain in English.
 
 That boundary is deliberate rather than unfinished. This is a compliance

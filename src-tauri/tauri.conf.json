@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "NOSHASHI",
-  "version": "0.3.1",
+  "version": "1.0.6",
   "identifier": "com.noshashi.compliance",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -64,7 +64,7 @@
       "endpoints": [
         "https://github.com/Ignosha/noshashi/releases/latest/download/latest.json"
       ],
-      "pubkey": ""
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE1RjE1OTVGODdFNUM1NUQKUldSZHhlV0hYMW54RmJocUZVM0lTelZmdDZSTU8zb1RoNnpESnA3S2JvdkdOazZJemtJTzVLcmYK"
     }
   },
   "bundle": {
@@ -74,6 +74,7 @@
     "shortDescription": "Autonomous compliance layer for XRPL mainnet",
     "longDescription": "NOSHASHI is mission control for the Autonomous Compliance Layer \u2014 live XRPL mainnet telemetry, XLS-70 credential registry, XLS-80 permissioned domains, and an explainable GO / HOLD / NO-GO settlement gate, in the macOS menu bar and the Windows and Linux system tray.",
     "copyright": "\u00a9 2026 NOSHASHI",
+    "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

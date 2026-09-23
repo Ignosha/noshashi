@@ -95,6 +95,22 @@ describe("simulateExit — filling into real depth", () => {
     const fill = simulateExit(book(), 1_000);
     expect(fill.fillRate).toBe(1);
     expect(fill.filled).toBe(1_000);
+    expect(fill.proceedsXrp).toBe(500);
+    expect(fill.vwap).toBe(0.5);
+  });
+
+  it("walks multiple bid levels using quote-per-unit pricing", () => {
+    const fill = simulateExit(
+      book({
+        bids: [level(0.5, 400), level(0.49, 600)],
+        mid: 0.5,
+      }),
+      1_000
+    );
+    expect(fill.filled).toBe(1_000);
+    expect(fill.proceedsXrp).toBeCloseTo(494, 8);
+    expect(fill.vwap).toBeCloseTo(0.494, 8);
+    expect(fill.slippageBps).toBeCloseTo(120, 8);
   });
 
   it("reports a partial fill rather than pretending the rest cleared", () => {

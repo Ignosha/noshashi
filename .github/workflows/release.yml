@@ -129,8 +129,9 @@ jobs:
             warn about an unidentified developer; Windows SmartScreen will
             warn too. That is expected and worth saying plainly rather than
             letting it surprise you.
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
+          includeUpdaterJson: true
 
       # tauri-action attaches to the release, but a plain artefact makes the
       # binaries retrievable from a workflow_dispatch run with no tag.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
 <title>NOSHASHI — A plain guide to the XRP Ledger and what NOSHASHI does</title>
 <meta name="description" content="No jargon. What the XRP Ledger is, what a freeze right is, what an amendment is, and why NOSHASHI reads both the rules and the market before you move anything.">
 <link rel="canonical" href="https://noshashi.app/guide/">
@@ -12,13 +12,15 @@
 <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
 <link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
 <style>
   :root{
-    --ground:#0B0F14;--surface:#11161D;--elevated:#1C2330;
-    --ink:#E6E8EB;--muted:#A3A8B3;--faint:#747C8B;--rule:#2A313C;
-    --brand:#3A82F6;--tele:#00E0C6;--go:#35D49A;--hold:#F5B942;--nogo:#FF5F6D;
-    --r:10px;--shell:min(1180px,92vw);
+    --shell:min(1180px,92vw);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}

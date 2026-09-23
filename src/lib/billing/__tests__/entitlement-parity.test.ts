@@ -70,16 +70,17 @@ function webhookTierFeatures(): Record<string, string[]> {
   return table;
 }
 
-const TIERS: PlanId[] = ["operator", "desk", "institution"];
+/** Tiers sold via Stripe (free + self_serve). Contact-sales tiers are handled manually. */
+const STRIPE_TIERS: PlanId[] = ["operator", "desk", "institution"];
 
 describe("entitlement parity — catalog against the webhook", () => {
   const webhook = webhookTierFeatures();
 
-  it("describes every tier the catalog sells", () => {
-    expect(Object.keys(webhook).sort()).toEqual([...TIERS].sort());
+  it("describes every Stripe-sold tier the catalog sells", () => {
+    expect(Object.keys(webhook).sort()).toEqual([...STRIPE_TIERS].sort());
   });
 
-  for (const tier of TIERS) {
+  for (const tier of STRIPE_TIERS) {
     const plan = PLANS.find((p) => p.id === tier)!;
 
     it(`grants ${tier} exactly what the catalog promises`, () => {
@@ -119,7 +120,7 @@ describe("entitlement parity — catalog against the webhook", () => {
  * here, so a new gate is covered the day it is written instead of the
  * day somebody remembers this file.
  */
-const rank: Record<PlanId, number> = { operator: 0, desk: 1, institution: 2 };
+const rank: Record<PlanId, number> = { operator: 0, desk: 1, institution: 2, enterprise: 3, strategic: 4 };
 
 /** Every flag the UI actually gates on, read out of the components. */
 function gatedFlags(): string[] {

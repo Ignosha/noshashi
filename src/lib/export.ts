@@ -26,7 +26,30 @@ export async function saveTextFile(
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  // Revoke on the next tick so the download has claimed the URL.
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return filename;
+}
+
+export async function saveBinaryFile(
+  filename: string,
+  contents: Uint8Array
+): Promise<string> {
+  if (isTauri) {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return await invoke<string>("export_binary_file", {
+      filename,
+      contents: Array.from(contents),
+    });
+  }
+
+  const blob = new Blob([contents], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   return filename;
 }

@@ -17,9 +17,8 @@
    ------------------------------------------------------------ */
 /* ============================================================
    NOSHASHI · NOVA THEME
-   Black & white space tech — zero gradients, sharp geometry,
-   spectral starlight text, Inkwell-grade hairline borders.
-   Mission colors: GO / HOLD / NO-GO.
+   Matcha garden aesthetic — soft greens, organic shapes,
+   garden-like atmosphere. Mission colors: GO / HOLD / NO-GO.
    ============================================================ */
 
 :root {
@@ -49,70 +48,66 @@
 
   --faint: 210 11% 47%;
 
-  /* Light mode is a true inversion of the instrument, not a different
-     product: same hues, same relationships, flipped lightness.
+  /* Light mode matches the website's light theme */
+  --brand: 138 63% 40%;              /* #247A3B - matcha green */
+  --telemetry: 148 70% 30%;          /* #168A55 - darker garden green */
 
-     Every value here was measured against paper-white rather than eyeballed.
-     telemetry, hold and faint each needed one to two points of lightness to
-     clear WCAG AA at 4.5:1; hue and saturation are untouched, so the palette
-     reads identically. */
-  --brand: 217 84% 46%;              /* 5.79:1 */
-  --telemetry: 180 100% 25%;         /* 4.80:1 */
-
-  --status-go: 158 70% 30%;          /* 4.79:1 */
-  --status-hold: 36 90% 34%;         /* 4.66:1 */
-  --status-no-go: 355 78% 46%;
-  --status-go-dim: 158 55% 93%;
-  --status-hold-dim: 36 85% 93%;
+  --status-go: 138 63% 40%;
+  --status-hold: 42 95% 45%;         /* #E7C766 - warm amber */
+  --status-no-go: 355 85% 50%;       /* #FF7B7B - soft coral */
+  --status-go-dim: 138 55% 93%;
+  --status-hold-dim: 42 85% 93%;
   --status-no-go-dim: 355 70% 95%;
 
   --spectral: 210 20% 96%;
+  /* The board's rule colour — a hairline on a light ground is darker
+     than the card, and on a dark ground lighter than the surface. This
+     is the one neutral that is not the same on both themes, because a
+     rule is a printed thing and has to read against whatever it sits on. */
+  --line: 210 16% 78%;
 }
 
 .dark {
   /* ------------------------------------------------------------------
-     Palette taken from the brand board, section 05.
-       ground   #0B0F14   surface  #11161D   elevated #1C2330
-       blue     #3A82F6   teal     #00E0C6
-       neutrals #FFFFFF #E6E8EB #A3A8B3 #6B7280 #2A313C
-     Navy rather than neutral black: the board's ground carries a blue
-     cast, which is what makes the blue and teal read as lit rather than
-     printed on top.
+     Palette matching the website's green-black brand palette (section 05):
+       ground   #08100B   surface  #0E1911   elevated #15251A
+       brand    #9BE15D   tele     #55D98A
+       neutrals #E9F5E7 #A7B8A8 #718473 #263B2A
+     Matcha garden aesthetic: soft greens, organic feel.
      ------------------------------------------------------------------ */
-  --background: 213 29% 6%;          /* #0B0F14 */
-  --foreground: 216 11% 91%;         /* #E6E8EB */
-  --card: 215 26% 9%;                /* #11161D */
-  --card-foreground: 216 11% 91%;
-  --popover: 219 26% 15%;            /* #1C2330 */
-  --popover-foreground: 216 11% 91%;
+  --background: 120 18% 5%;          /* #08100B */
+  --foreground: 135 20% 90%;         /* #E9F5E7 */
+  --card: 130 15% 8%;                /* #0E1911 */
+  --card-foreground: 135 20% 90%;
+  --popover: 125 18% 12%;            /* #15251A */
+  --popover-foreground: 135 20% 90%;
   --primary: 0 0% 100%;
-  --primary-foreground: 213 29% 6%;
-  --secondary: 219 26% 15%;
-  --secondary-foreground: 216 11% 91%;
-  --muted: 217 18% 20%;              /* #2A313C */
-  --muted-foreground: 221 10% 67%;   /* #A3A8B3 */
-  /* Board value is #6B7280 (220 9% 46%), which measures 3.98:1 on this
-     ground and fails AA. Four points of lightness, same hue: 4.56:1. */
-  --faint: 220 9% 50%;               /* #747C8B */
-  --accent: 219 26% 15%;
-  --accent-foreground: 216 11% 91%;
-  --destructive: 355 100% 69%;
-  --destructive-foreground: 213 29% 6%;
-  --border: 217 18% 20%;             /* #2A313C */
-  --input: 217 18% 20%;
-  --ring: 217 91% 60%;
+  --primary-foreground: 120 18% 5%;
+  --secondary: 125 18% 12%;
+  --secondary-foreground: 135 20% 90%;
+  --muted: 125 15% 16%;              /* #263B2A */
+  --muted-foreground: 130 10% 65%;   /* #A7B8A8 */
+  --faint: 130 10% 50%;              /* #718473 */
+  --accent: 125 18% 12%;
+  --accent-foreground: 135 20% 90%;
+  --destructive: 355 85% 50%;
+  --destructive-foreground: 120 18% 5%;
+  --border: 125 15% 16%;             /* #263B2A */
+  --input: 125 15% 16%;
+  --ring: 138 63% 60%;               /* brand */
 
-  --brand: 217 91% 60%;              /* #3A82F6 */
-  --telemetry: 173 100% 44%;         /* #00E0C6 */
+  --brand: 108 70% 60%;              /* #9BE15D - bright matcha */
+  --telemetry: 148 70% 60%;          /* #55D98A - fresh green */
 
-  --status-go: 158 65% 52%;
-  --status-hold: 40 90% 61%;
-  --status-no-go: 355 100% 69%;
-  --status-go-dim: 158 45% 12%;
-  --status-hold-dim: 40 60% 12%;
+  --status-go: 108 70% 60%;          /* #9BE15D */
+  --status-hold: 42 95% 64%;         /* #E7C766 */
+  --status-no-go: 355 85% 70%;       /* #FF7B7B */
+  --status-go-dim: 108 45% 12%;
+  --status-hold-dim: 42 60% 12%;
   --status-no-go-dim: 355 55% 13%;
 
-  --spectral: 216 11% 91%;
+  --spectral: 135 20% 90%;
+  --line: 135 15% 20%;                  /* #263B2A — rule colour on dark ground */
 }
 
 @font-face {
@@ -207,6 +202,7 @@
   --color-hold-dim: hsl(var(--status-hold-dim));
   --color-no-go-dim: hsl(var(--status-no-go-dim));
   --color-spectral: hsl(var(--spectral));
+  --color-line: hsl(var(--line));
   --color-brand: hsl(var(--brand));
   --color-telemetry: hsl(var(--telemetry));
   --color-faint: hsl(var(--faint));

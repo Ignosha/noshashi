@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.0.4
+
+### Website design theme unified across all pages
+
+The guide, research/findings and legal pages were still rendering with the
+old blue-dark palette (`--brand:#3A82F6`, `--ground:#0B0F14`) instead of
+the green-black brand palette that the home page and all other public pages
+use (`--brand:#9BE15D`, `--ground:#08100B`). This made the product look
+like two different products depending on which page you landed on.
+
+All three pages now link `core.css` — the single stylesheet that holds the
+correct tokens — and no longer carry an inline copy of a superseded palette.
+The inline token block was the only thing that needed to change; layout and
+component styles were untouched.
+
+Light-mode support is now active across every public page. The `color-scheme`
+meta was `dark`-only on the three affected pages; it is now `dark light`, and
+the theme-toggle script and `localStorage` persistence are wired in, matching
+every other page on the site.
+
+**Pages fixed:** `/guide/`, `/research/` (Findings), `/legal/`
+**Pages already correct:** home, pricing, contact, news, progress, status,
+certificate, developers, enterprise, strategic-infrastructure
+
 ## Unreleased
 
 ### The public site is now rendered before it is served

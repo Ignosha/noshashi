@@ -1,16 +1,24 @@
-# Dependencies
 node_modules/
 site/node_modules/
-
-# Build output
+backend/data/
+backend/**/__pycache__/
+__pycache__/
+*.py[cod]
 dist/
 dist-demo/
+frontend/.next/
+frontend/tsconfig.tsbuildinfo
 site/.next/
 src-tauri/target/
 src-tauri/gen/
-
-# Secrets — never commit. Paste credentials into the hosting provider's
-# own settings, not into this repo.
+release/
+*.log
+npm-debug.log*
+ignoshashi.db
+ignoshashi.db-journal
+ignoshashi.db-shm
+ignoshashi.db-wal
+backups/
 .env
 .env.*
 !.env.example
@@ -20,59 +28,13 @@ site/.env.*
 *.pem
 *.key
 *.p12
-
-# Tauri build output. Rebuilt by CI (.github/workflows/release.yml), so
-# there is no reason to carry it in history.
-release/
-
-# NOTE: site/download/ no longer holds installers, and nothing links to it.
-#
-# It used to: the site served the .dmg out of this repository, so the
-# directory could not be ignored without breaking the live download. That
-# migration is done — every button in site/index.html now points at a
-# GitHub Release asset, which is where the release workflow uploads all
-# four targets. The installers that were carried here (0.1.0, 0.2.0, 0.2.1)
-# were deleted in v0.3.0 along with this note's previous warning.
-#
-# The directory is still tracked because site/downloads/ carries the XRPL
-# edge pack, which is content rather than build output. Installers do not
-# belong here again — a release asset has a checksum, a download count and
-# no cost in repository history.
-
-# OS / editor
-.DS_Store
-Thumbs.db
-*.swp
 .idea/
 .vscode/*
 !.vscode/extensions.json
-
-# Logs
-*.log
-npm-debug.log*
-
-# Build caches
-*.tsbuildinfo
-
-# Vite cache
+*.swp
+*.swo
+.DS_Store
 .vite/
-
-# Business/setup notes — kept locally, never committed (see ~/noshashi-private)
+supabase/.temp/
 COMMERCIALIZATION_PLAN.txt
 SETUP.md
-# Supabase CLI local state. Written by supabase link and rewritten on
-# every command: which project this checkout is linked to, the pooler
-# host, and the versions the CLI last saw. Per-machine and not shared.
-supabase/.temp/
-
-# Per-machine toolchain shim. Dot-source it (`. .\env.ps1`) to put the
-# portable git/node/supabase/deno on PATH for one terminal, on a machine
-# where the persistent user PATH does not stick. It hardcodes this
-# machine's layout, so it is local setup rather than project code.
-env.ps1
-
-# Python bytecode. Regenerated on every run and machine-specific —
-# three of these were tracked, so running any ads/ script dirtied the
-# tree with a diff nobody would ever read.
-__pycache__/
-*.py[cod]

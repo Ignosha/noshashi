@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
 <title>Pricing — NOSHASHI</title>
 <meta name="description" content="Free for a single address. $749/month for a desk. $4,000/month for a regulated institution. Compliance state and exit liquidity read from the same validated ledger, in the same second.">
 <link rel="canonical" href="https://noshashi.app/pricing/">
@@ -25,10 +25,10 @@
      stylesheet, so these are duplicated deliberately; the tokens are the
      contract, and they must not drift. */
   :root{
-    --ground:#0B0F14; --surface:#11161D; --elevated:#1C2330;
-    --ink:#E6E8EB; --muted:#A3A8B3; --faint:#747C8B; --rule:#2A313C;
-    --brand:#3A82F6; --tele:#00E0C6;
-    --go:#35D49A; --hold:#F5B942; --nogo:#FF5F6D;
+    --ground:#08100B; --surface:#0E1911; --elevated:#15251A;
+    --ink:#E9F5E7; --muted:#A7B8A8; --faint:#718473; --rule:#263B2A;
+    --brand:#9BE15D; --tele:#55D98A;
+    --go:#9BE15D; --hold:#F5B942; --nogo:#FF5F6D;
     --shell:min(1180px, 92vw);
     --r:2px;
   }
@@ -187,7 +187,32 @@
     section{padding:44px 0}
   }
   @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
-</style>
+<style id="noshashi-tier-comparison">
+    .tier-compare{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);overflow-x:auto;background:color-mix(in srgb,var(--surface) 55%,transparent)}
+    .tier-compare table{min-width:1080px;width:100%;border-collapse:collapse;table-layout:fixed}
+    .tier-compare th,.tier-compare td{padding:13px 12px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top;font-size:12px}
+    .tier-compare thead th{padding-top:17px;padding-bottom:15px;color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase}
+    .tier-compare thead th:not(:first-child){border-left:1px solid var(--rule)}
+    .tier-compare thead th:first-child{width:23%;color:var(--faint)}
+    .tier-compare thead th:nth-child(4){color:var(--tele)}
+    .tier-compare thead th:nth-child(5){color:#9BE15D}
+    .tier-compare tbody th{color:var(--muted);font-weight:500}
+    .tier-compare tbody td{color:var(--ink);border-left:1px solid var(--rule)}
+    .tier-compare tbody tr:last-child th,.tier-compare tbody tr:last-child td{border-bottom:0}
+    .tier-compare .group th{padding:10px 12px 7px;color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:color-mix(in srgb,var(--ground) 70%,transparent);border-bottom:1px solid var(--rule)}
+    .tier-compare .group th:not(:first-child){border-left:0}
+    .tier-compare .yes{color:var(--go);font-family:"IBM Plex Mono",monospace;font-size:10px}
+    .tier-compare .contracted{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:10px}
+    .tier-compare .optional{color:#9BE15D;font-family:"IBM Plex Mono",monospace;font-size:10px}
+    .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
+    .tier-compare .no{color:var(--faint)}
+    .tier-compare caption{caption-side:bottom;padding:12px;color:var(--faint);text-align:left;font-size:11px}
+    .tier-compare .tier-price{font-size:13px;font-weight:700;color:var(--ink)}
+    .tier-compare .tier-price small{display:block;margin-top:3px;color:var(--faint);font:10px "IBM Plex Mono",monospace;font-weight:400}
+    .tier-compare .tier-link{display:inline-flex;margin-top:8px;color:inherit;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
+    .tier-compare .tier-link:hover{color:var(--tele)}
+    @media(max-width:760px){.tier-compare{margin-right:calc((100vw - var(--shell))/2 * -1);margin-left:calc((100vw - var(--shell))/2 * -1);padding-left:4vw;padding-right:4vw}.tier-compare th,.tier-compare td{padding:12px 10px}}
+  </style></style>
 </head>
 <body>
 
@@ -196,8 +221,8 @@
     <nav class="nav">
       <a class="brand" href="/">
         <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="10.2" fill="none" stroke="#3A82F6" stroke-width="1.4"/>
-          <circle cx="12" cy="12" r="3.1" fill="#3A82F6"/>
+          <circle cx="12" cy="12" r="10.2" fill="none" stroke="#9BE15D" stroke-width="1.4"/>
+          <circle cx="12" cy="12" r="3.1" fill="#9BE15D"/>
         </svg>
         <span>NOSHASHI</span>
       </a>
@@ -269,12 +294,9 @@
   <section id="plans">
     <div class="kicker-block">
       <p class="eyebrow">01 / Plans</p>
-      <h2>Three tiers, and one of them is not a product</h2>
+      <h2>Five operating layers, and one of them is not a product</h2>
       <p>
-        The free tier exists so you can check our arithmetic against an address you
-        already know the answer for, before any money changes hands. It is not a
-        starter plan and we do not pretend it scales into one. Pro is the working
-        tool for a desk. Institutional is the contract, the controls and the API.
+        Free is the proof surface. Pro is the working tool for a desk. Institutional is the contract, controls and API. Enterprise adds operational evidence; Strategic Infrastructure is the contracted data plane for teams building on NOSHASHI.
       </p>
     </div>
 
@@ -420,242 +442,88 @@
           </p>
         </div>
         </div>
+      </article><!-- NOSHASHI-TIER-CARDS -->
+      <article class="tier enterprise gauge">
+        <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
+        <div class="body">
+          <p class="fig">$10,000</p>
+          <p class="per">per month · $120,000 / year</p>
+          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
+          <p class="role">Contracted · architecture and commercial review</p>
+          <ul class="spec">
+            <li>Everything in Institutional</li>
+            <li>Asset passports and issuer intelligence at institutional scope</li>
+            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
+            <li>Deterministic policy engine, adjudication and decision history</li>
+            <li>Evidence records, hashes, audit exports and review workflow</li>
+            <li>Institutional API, scoped keys and webhooks</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Architecture review and named implementation planning</li>
+          </ul>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+        </div>
+      </article>
+      <article class="tier strategic gauge">
+        <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
+        <div class="body">
+          <p class="fig">$20,850</p>
+          <p class="per">per month · $250,000 / year</p>
+          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
+          <p class="role">Contracted infrastructure · architecture review required</p>
+          <ul class="spec">
+            <li>Everything in Enterprise</li>
+            <li>High-volume API capacity and contracted burst limits</li>
+            <li>XRPL event feeds, webhooks and machine-readable delivery</li>
+            <li>Custom schemas, retention and bulk export design</li>
+            <li>Custom data integrations for risk, custody, trading and compliance</li>
+            <li>Dedicated environment options where supported</li>
+            <li>Embedded or white-label delivery when contracted</li>
+            <li>Strategic architecture review and integration roadmap</li>
+          </ul>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+        </div>
       </article>
 
     </div>
-  </section>
-
-  <section id="compare">
+  </section><!-- NOSHASHI-TIER-COMPARISON -->
+  <section id="compare" class="tier-comparison">
     <div class="kicker-block">
-      <p class="eyebrow">02 / Comparison</p>
-      <h2>What each tier actually entitles you to</h2>
-      <p>
-        Rows are capabilities, not adjectives. Where a limit is a number it is
-        stated as a number.
-      </p>
+      <p class="eyebrow"><span data-i18n="pricing.comparison.eyebrow">02 / Comparison</span></p>
+      <h2><span data-i18n="pricing.comparison.title">Five operating layers. One evidence standard.</span></h2>
+      <p><span data-i18n="pricing.comparison.body">Every row names the actual entitlement. Included, limited, contracted, optional and unavailable are intentionally different promises.</span></p>
     </div>
-
-    <div class="tablewrap">
-      <table class="cmp">
-        <caption>Entitlements by tier. API verification counts are per month and do not roll over.</caption>
-        <thead>
-          <tr>
-            <th scope="col">Capability</th>
-            <th scope="col">Free</th>
-            <th scope="col">Pro</th>
-            <th scope="col">Institutional</th>
-          </tr>
-        </thead>
+    <div class="tier-compare">
+      <table>
+        <caption><span data-i18n="pricing.comparison.caption">Commercial, intelligence and infrastructure entitlements. Contracted scope is confirmed during architecture review; no live integration or certification is implied.</span></caption>
+        <thead><tr><th scope="col">Capability</th><th scope="col">Free</th><th scope="col">Pro</th><th scope="col">Institutional</th><th scope="col">Enterprise</th><th scope="col">Strategic Infrastructure</th></tr></thead>
         <tbody>
-          <tr class="grp"><th scope="rowgroup" colspan="4">Commercial</th></tr>
-          <tr><th scope="row">Price</th><td>$0</td><td>$749 / seat / mo</td><td>$4,000 / mo</td></tr>
-          <tr><th scope="row">Annual prepay</th><td class="no">—</td><td>$7,490 / seat</td><td>$40,000</td></tr>
-          <tr><th scope="row">Seats</th><td>1</td><td>Per seat</td><td class="yes">Unlimited</td></tr>
-          <tr><th scope="row">Purchase route</th><td>Download</td><td>Stripe Checkout</td><td>Contact sales</td></tr>
-          <tr><th scope="row">Payment methods</th><td class="no">—</td><td>Card</td><td>Invoice, ACH, wire, NET-30</td></tr>
-          <tr><th scope="row">Contract</th><td>Standard terms</td><td>Standard terms</td><td>MSA + DPA + SLA</td></tr>
-
-          <tr class="grp"><th scope="rowgroup" colspan="4">Adjudication</th></tr>
-          <tr><th scope="row">Local gate checks</th><td class="yes">Unlimited</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
-          <tr><th scope="row">Addresses under watch</th><td>1 at a time</td><td>Portfolios</td><td class="yes">Unlimited</td></tr>
-          <tr><th scope="row">Adjudication ledger</th><td>Session only</td><td>10,000 verdicts, persistent</td><td class="yes">Unlimited, immutable</td></tr>
-          <tr><th scope="row">Editable policy thresholds</th><td class="no">—</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">Offline adjudication</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-
-          <tr class="grp"><th scope="rowgroup" colspan="4">Market and liquidity</th></tr>
-          <tr><th scope="row">Order book integrity</th><td class="no">—</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">Issuer freeze-rights analysis</th><td class="no">—</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">Redemption stress testing</th><td class="no">—</td><td class="yes">On demand</td><td class="yes">Scheduled + signed</td></tr>
-          <tr><th scope="row">Counterparty concentration (HHI)</th><td class="no">—</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">Issuance surveillance</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-
-          <tr class="grp"><th scope="rowgroup" colspan="4">Integration</th></tr>
-          <tr><th scope="row">Compliance API</th><td class="no">—</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">API verifications included</th><td class="no">—</td><td>5,000 / mo</td><td>100,000 / mo</td></tr>
-          <tr><th scope="row">API rate limit</th><td class="no">—</td><td>50 req/sec</td><td>Negotiated</td></tr>
-          <tr><th scope="row">Webhooks</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">CSV export</th><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">Signed export (chain-of-custody)</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-
-          <tr class="grp"><th scope="rowgroup" colspan="4">Governance</th></tr>
-          <tr><th scope="row">SSO (SAML 2.0 / OIDC)</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">SCIM provisioning</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">Immutable audit log</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">Regulator read-only seats</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">Travel Rule (FATF R.16) scoping</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-          <tr><th scope="row">White-labelled wallet</th><td class="no">—</td><td class="no">—</td><td class="yes">Yes</td></tr>
-
-          <tr class="grp"><th scope="rowgroup" colspan="4">Support</th></tr>
-          <tr><th scope="row">Support channel</th><td>Community</td><td>Priority email</td><td>Named contact</td></tr>
-          <tr><th scope="row">First response target</th><td>Best effort</td><td>1 business day</td><td>See SLA</td></tr>
-          <tr><th scope="row">Uptime SLA</th><td class="no">—</td><td class="no">—</td><td>99.9% with credits</td></tr>
-          <tr><th scope="row">Onboarding</th><td>Self-serve</td><td>Quickstart + docs</td><td>Dedicated</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Commercial</th></tr>
+          <tr><th scope="row">Price</th><td class="tier-price">$0<small>forever</small></td><td class="tier-price">$749<small>/ seat / month</small></td><td class="tier-price">$4,000<small>/ month</small></td><td class="tier-price">$10,000<small>/ month · $120,000 / year</small></td><td class="tier-price">$20,850<small>/ month · $250,000 / year</small></td></tr>
+          <tr><th scope="row">Purchase route</th><td>Download</td><td>Stripe Checkout</td><td>Contact sales</td><td><a class="tier-link" href="/enterprise/">Explore Enterprise ↗</a></td><td><a class="tier-link" href="/strategic-infrastructure/">Build with NOSHASHI ↗</a></td></tr>
+          <tr><th scope="row">Commercial status</th><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Asset intelligence &amp; controls</th></tr>
+          <tr><th scope="row">Asset passports</th><td class="limited">Limited</td><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
+          <tr><th scope="row">Issuer controls &amp; freeze-rights</th><td class="limited">Single address</td><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
+          <tr><th scope="row">Liquidity &amp; redemption stress</th><td class="no">Unavailable</td><td class="yes">On demand</td><td class="yes">Scheduled</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
+          <tr><th scope="row">Counterparty intelligence</th><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Policy, adjudication &amp; evidence</th></tr>
+          <tr><th scope="row">Policy engine &amp; adjudication</th><td class="limited">Session only</td><td class="yes">10,000 verdicts</td><td class="yes">Unlimited</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
+          <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>
+          <tr><th scope="row">Evidence &amp; audit export</th><td class="yes">CSV</td><td class="yes">CSV</td><td class="yes">Signed export</td><td class="contracted">Immutable audit</td><td class="contracted">Data delivery</td></tr>
+          <tr><th scope="row">Custom schemas</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="optional">Optional</td><td class="contracted">Included in scope</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">API &amp; delivery</th></tr>
+          <tr><th scope="row">API access</th><td class="no">Unavailable</td><td>5,000 / month</td><td>100,000 / month</td><td class="contracted">Institutional API</td><td class="contracted">High-volume API</td></tr>
+          <tr><th scope="row">Webhooks &amp; event feeds</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Webhooks</td><td class="contracted">Webhooks</td><td class="contracted">Event feeds</td></tr>
+          <tr><th scope="row">Dedicated environment</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
+          <tr><th scope="row">Embedded / white-label</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">White-label wallet</td><td class="optional">Optional</td><td class="contracted">Architecture scope</td></tr>
+          <tr><th scope="row">Architecture review</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="yes">Included</td><td class="contracted">Included</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Governance</th></tr>
+          <tr><th scope="row">SSO / SCIM / regulator access</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Contracted scope</td></tr>
+          <tr><th scope="row">SLA</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="contracted">99.9% contracted</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td></tr>
         </tbody>
       </table>
     </div>
-  </section>
-
-  <section id="stress">
-    <div class="kicker-block">
-      <p class="eyebrow">03 / Why the join is the product</p>
-      <h2>A mark-to-mid portfolio value assumes two things that are false</h2>
-      <p>
-        It assumes every unit sells at the touch, and it assumes nobody can stop you
-        selling. Redemption stress testing prices both. It routes a full exit across
-        the resting DEX book and the AMM pool together, applies a stated depth shock,
-        charges you for competing with your own other lines on the same issuer, and
-        discounts balances the issuer retains the right to freeze. What comes out is
-        one number a risk committee can interrogate — and a waterfall showing exactly
-        where the gap between mark and recoverable went.
-      </p>
-    </div>
-    <div class="trust">
-      <div>
-        <b>ROUTED, NOT ASSUMED</b>
-        <span>
-          Book-only exit simulation understates thin markets, because a pool is real
-          depth priced by a constant product rather than a queue. Both venues are
-          walked and the split is optimised.
-        </span>
-      </div>
-      <div>
-        <b>DEPTH COUNTED ONCE</b>
-        <span>
-          Two lines on one issuer are one market. Assessed independently they both
-          look liquid against the same depth. The contention is measured and given
-          its own line.
-        </span>
-      </div>
-      <div>
-        <b>DISCRETION PRICED</b>
-        <span>
-          A balance behind freeze rights is worth less than one that is not. The
-          haircut is a parameter you set and can defend, not a constant buried in a
-          formula.
-        </span>
-      </div>
-    </div>
-  </section>
-
-  <section id="faq">
-    <div class="kicker-block">
-      <p class="eyebrow">04 / Questions</p>
-      <h2>The four we are asked before every purchase</h2>
-    </div>
-
-    <div class="faq">
-      <details>
-        <summary>Why is there nothing between free and $749?</summary>
-        <div class="body">
-          <p>
-            Because there is no capability we could honestly put there. The jump from
-            Free to Pro is not a jump in volume, it is a jump in kind: Free answers a
-            question about one address, and Pro answers questions about a book — which
-            requires persistent state, multi-wallet reads, and the liquidity engine.
-            There is no half-book.
-          </p>
-          <p>
-            A $199 tier would have to be Pro with an artificial cap on it. We would be
-            charging you to remove a limit we invented, and you would be sizing your
-            desk around our pricing page instead of around your positions. If $749 is
-            not obviously worth it for your book, the honest answer is that you should
-            stay on Free until it is.
-          </p>
-        </div>
-      </details>
-
-      <details>
-        <summary>Can I cancel?</summary>
-        <div class="body">
-          <p>
-            Pro: yes, at any time, from the Stripe billing portal without contacting
-            us. Cancellation stops the next renewal; access continues to the end of
-            the period you have already paid for, and we do not pro-rate a partial
-            month back. There is no cancellation fee and no notice period.
-          </p>
-          <p>
-            Institutional: the term and notice period are whatever the executed MSA
-            says. The default we propose is twelve months with thirty days' notice
-            before renewal, but that is a negotiating position rather than a policy.
-          </p>
-          <p>
-            In both cases your adjudication history stays exportable for thirty days
-            after the subscription ends, so a lapsed account never means a lost audit
-            trail. Free keeps working.
-          </p>
-        </div>
-      </details>
-
-      <details>
-        <summary>Do you offer trials?</summary>
-        <div class="body">
-          <p>
-            Not as a time-boxed trial of Pro, no — and that is deliberate. A
-            fourteen-day trial of a risk tool is the wrong shape: the thing you want
-            to know is whether our reading of an issuer matches yours, and you can
-            establish that on the free tier against an address you already understand,
-            with no clock running and nothing to cancel.
-          </p>
-          <p>
-            For Institutional, the equivalent of a trial is a paid pilot with a defined
-            scope and a stated success criterion, normally one month. We would rather
-            agree what would make it a failure up front than hand over a login and hope.
-          </p>
-        </div>
-      </details>
-
-      <details>
-        <summary>What payment methods are available for Institutional?</summary>
-        <div class="body">
-          <p>
-            Invoice against a purchase order, ACH, or wire. NET-30 as standard, and
-            longer terms are negotiable as part of the MSA. Annual prepay is invoiced
-            once at $40,000.
-          </p>
-          <p>
-            We do not take cards for Institutional. It is not a technical limitation:
-            the tier carries an SLA, a DPA and regulator access, and none of those
-            exist until a contract is signed. Letting a card payment complete first
-            would provision an account whose obligations nobody had agreed to.
-          </p>
-          <p>
-            Procurement paperwork — security questionnaire, DPA, sub-processor list,
-            insurance certificates, W-9 — is available on request before you commit to
-            anything. Ask <a href="mailto:institutions@noshashi.app">institutions@noshashi.app</a>.
-          </p>
-        </div>
-      </details>
-    </div>
-  </section>
-
-  <section id="terms">
-    <div class="kicker-block">
-      <p class="eyebrow">05 / What you are buying</p>
-      <h2>And what you are not</h2>
-    </div>
-    <div class="disclaimer">
-      <p>
-        NOSHASHI is informational tooling. It reads validated XRPL state and reports
-        what that state implies under rules you can inspect and change. It does not
-        provide investment advice, does not recommend transactions, and is not a
-        substitute for your own compliance programme, your own legal counsel, or your
-        own judgement about a counterparty.
-      </p>
-      <p style="margin-top:12px">
-        Every figure it produces depends on ledger state at the moment it was read,
-        and every verdict carries the ledger index it rests on for exactly that
-        reason. Nothing here is a warranty that a transfer will settle, that an
-        issuer will behave, or that liquidity observed at one moment will be there at
-        another. Trading and settlement decisions remain yours.
-      </p>
-      <p style="margin-top:12px">
-        Full terms, privacy policy and accessibility statement:
-        <a href="/legal/" style="color:var(--brand)">noshashi.app/legal</a>.
-      </p>
-    </div>
-  </section>
-
-</main>
+  </section></main>
 
 <footer>
   <div class="shell foot">

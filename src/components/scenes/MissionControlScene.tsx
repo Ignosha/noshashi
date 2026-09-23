@@ -15,6 +15,8 @@ import {
 } from "@/components/nova/Charts";
 import { StatusDot } from "@/components/nova/StatusDot";
 import { EmptyState } from "@/components/nova/EmptyState";
+import { EvidenceBlock } from "@/components/nova/EvidenceBlock";
+import { FreshnessBadge } from "@/components/nova/FreshnessBadge";
 import {
   NovaBolt,
   NovaFlare,
@@ -104,6 +106,7 @@ export function MissionControlScene({
     server,
     connected,
     ledgerError,
+    credentialError,
     events,
     history,
     latencyMs,
@@ -161,8 +164,9 @@ export function MissionControlScene({
       credentials,
       domain,
       amountXrp: 0,
+      evidenceUnavailable: credentialError ? ["credentials"] : [],
     });
-  }, [account, credentials]);
+  }, [account, credentials, credentialError]);
 
   const reserve = reserveRequirementXrp(account?.ownerCount ?? 0);
   const balance = account ? Number(account.balanceXrp) : 0;
@@ -192,6 +196,55 @@ export function MissionControlScene({
           </Button>
         }
       />
+
+      <Panel
+        label="DECISION RECORD"
+        className="shrink-0"
+        right={
+          <span className="flex items-center gap-3">
+            <FreshnessBadge
+              lastRunAt={ledger ? Date.parse(ledger.closeTime) || null : null}
+              intervalMs={30_000}
+              failed={Boolean(ledgerError)}
+            />
+            <Badge
+              variant={
+                gate.verdict === "insufficient-data"
+                  ? "insufficient-data"
+                  : gate.verdict
+              }
+            >
+              {gate.verdict.toUpperCase()}
+            </Badge>
+          </span>
+        }
+      >
+        <div className="grid gap-x-5 gap-y-2 md:grid-cols-3">
+          <EvidenceBlock
+            label="OBSERVED"
+            value={ledger ? `Ledger ${ledger.ledgerIndex.toLocaleString()}` : "Unavailable"}
+            detail={ledgerError ?? "Validated XRPL mainnet state"}
+            tone={ledgerError ? "hold" : "default"}
+          />
+          <EvidenceBlock
+            label="POLICY"
+            value={DOMAIN_REGISTRY[0].name}
+            detail={`${gate.checks.length} deterministic checks evaluated`}
+          />
+          <EvidenceBlock
+            label="PRIMARY CONDITION"
+            value={
+              gate.checks.find((check) => !check.passed)?.label ??
+              "All evaluated checks passed"
+            }
+            detail={
+              gate.checks.find((check) => !check.passed)?.detail ??
+              "No blocking or warning condition was observed."
+            }
+            tone={gate.verdict === "insufficient-data" ? "default" : gate.verdict}
+          />
+        </div>
+      </Panel>
 
       {/* Telemetry strip */}
       <motion.div

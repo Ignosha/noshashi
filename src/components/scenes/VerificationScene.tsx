@@ -55,6 +55,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
   const {
     account: liveAccount,
     credentials: liveCredentials,
+    credentialError,
     connected,
   } = data;
   const { push } = useToast();
@@ -91,7 +92,14 @@ export function VerificationScene({ data }: { data: XrplState }) {
       // A visible dwell makes the verdict feel adjudicated rather than
       // guessed; the evaluation itself is sub-millisecond.
       const [result] = await Promise.all([
-        runPolicy({ account, credentials, domain, amountXrp }),
+        runPolicy({
+          account,
+          credentials,
+          domain,
+          amountXrp,
+          evidenceUnavailable:
+            vault.engaged || !credentialError ? [] : ["credential registry"],
+        }),
         new Promise((resolve) => setTimeout(resolve, 620)),
       ]);
       setReceipt(result);
