@@ -19,9 +19,10 @@ function mount(host: HTMLElement) {
       const box = host.getBoundingClientRect();
       const f = flower.getBoundingClientRect();
       if (!f.width || !box.width) return null;
+      // The artwork's lit core sits at (49.7%, 46.4%) of the image.
       return {
-        x: (f.left + f.width / 2 - box.left) / box.width,
-        y: (f.top + f.height / 2 - box.top) / box.height,
+        x: (f.left + f.width * 0.497 - box.left) / box.width,
+        y: (f.top + f.height * 0.464 - box.top) / box.height,
       };
     },
     fontSize: Number(host.dataset.gardenFont) || 11,
