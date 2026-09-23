@@ -59,6 +59,12 @@ export type CaseEvent = {
   to?: string;
   linked?: LinkedVerdict;
   outcome?: CaseOutcome;
+  /**
+   * Organization cases only: the approved policy exception a closure as
+   * "exception approved" rests on. The server refuses the closure unless
+   * a second authorized person approved that exception.
+   */
+  exceptionId?: string;
   /** SHA-256 of the previous event ("GENESIS" for the first). */
   prev: string;
   /** SHA-256 over this event's canonical form, including `prev`. */
@@ -101,7 +107,9 @@ async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(d)).map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
 }
 
-const body = (e: Omit<CaseEvent, "hash">) => canonicalJson({ ...e });
+/** The exact text an event's hash is taken over: its canonical JSON without `hash`. */
+export const eventBody = (e: Omit<CaseEvent, "hash">) => canonicalJson({ ...e });
+const body = eventBody;
 
 async function append(c: Investigation, e: Omit<CaseEvent, "seq" | "prev" | "hash">): Promise<Investigation> {
   const prev = c.events.length ? c.events[c.events.length - 1].hash : "GENESIS";
@@ -162,13 +170,13 @@ export async function openCase(
   return { data: { ...data, cases: [c, ...data.cases] }, id };
 }
 
-type Mutation =
+export type Mutation =
   | { kind: "note"; text: string }
   | { kind: "status"; to: Exclude<CaseStatus, "closed"> }
   | { kind: "priority"; to: CasePriority }
   | { kind: "assign"; to: string }
   | { kind: "link"; entry: LedgerEntry }
-  | { kind: "close"; outcome: CaseOutcome; rationale: string }
+  | { kind: "close"; outcome: CaseOutcome; rationale: string; exceptionId?: string }
   | { kind: "reopen"; reason: string };
 
 export class CaseError extends Error {}
@@ -210,7 +218,10 @@ export async function mutate(data: CaseData, id: string, m: Mutation, actor: str
     case "close": {
       const rationale = m.rationale.trim().slice(0, 4000);
       if (rationale.length < 10) throw new CaseError("Closing a case needs a written rationale of at least 10 characters.");
-      next = await append(c, { at: now, actor, kind: "closed", from: s.status, outcome: m.outcome, text: rationale });
+      next = await append(c, {
+        at: now, actor, kind: "closed", from: s.status, outcome: m.outcome, text: rationale,
+        ...(m.exceptionId ? { exceptionId: m.exceptionId } : {}),
+      });
       break;
     }
     case "reopen": {

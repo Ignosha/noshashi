@@ -3,6 +3,8 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { readSetting, writeSetting } from "@/lib/store";
 import { usePolicyStore } from "@/lib/desk/policyStore";
 import type { InstitutionalPolicy } from "@/lib/desk/institutional";
+import type { Investigation } from "@/lib/desk/investigations";
+import { listOrgCases } from "@/lib/org/cases";
 import {
   can,
   listDirectory,
@@ -40,6 +42,8 @@ export type OrgData = {
   exceptions: PolicyException[];
   /** Null when the role may not read the audit log (RLS). */
   audit: AuditRow[] | null;
+  /** Shared investigations, as stored by the server (verified by the client on display). */
+  cases: Investigation[];
   active: { ok: true; policy: InstitutionalPolicy | null } | { ok: false; reason: string };
   loadedAt: string;
 };
@@ -64,9 +68,9 @@ function set(next: OrgState) {
 
 async function loadOrg(membership: Membership): Promise<OrgData> {
   const id = membership.organizationId;
-  const [policies, directory, exceptions] = await Promise.all([listPolicies(id), listDirectory(id), listExceptions(id)]);
+  const [policies, directory, exceptions, cases] = await Promise.all([listPolicies(id), listDirectory(id), listExceptions(id), listOrgCases(id)]);
   const audit = can.readAudit(membership.role) ? await listGovernanceAudit(id) : null;
-  return { membership, policies, directory, exceptions, audit, active: await verifiedActive(policies), loadedAt: new Date().toISOString() };
+  return { membership, policies, directory, exceptions, audit, cases, active: await verifiedActive(policies), loadedAt: new Date().toISOString() };
 }
 
 async function load(accountId: string, keepSelection?: string | null) {

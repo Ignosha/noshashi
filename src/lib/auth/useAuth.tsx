@@ -9,6 +9,7 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
 import { supabaseErrorMessage } from "@/lib/supabase/errors";
+import { assertNotPwned } from "@/lib/auth/pwned";
 
 /**
  * Authentication.
@@ -137,6 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (problems.length > 0) {
         throw new Error(`Password needs: ${problems.join(", ").toLowerCase()}.`);
       }
+      await assertNotPwned(password);
       const { error } = await supabase().auth.signUp({
         email,
         password,
@@ -191,6 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (problems.length > 0) {
       throw new Error(`Password needs: ${problems.join(", ").toLowerCase()}.`);
     }
+    await assertNotPwned(password);
     const { error } = await supabase().auth.updateUser({ password });
     if (error) throw new Error(supabaseErrorMessage(error));
   }, []);
