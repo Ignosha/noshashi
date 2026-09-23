@@ -4,7 +4,6 @@ import { Eyebrow } from "@/components/nova/Panel";
 import { NovaVault } from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/lib/auth/useAuth";
 import { saveTextFile } from "@/lib/export";
 import { verifyEntry, type ReceiptCheck } from "@/lib/desk/evidence";
 import type { LedgerEntry } from "@/lib/desk/ledger";
@@ -12,7 +11,6 @@ import {
   OUTCOME_LABEL,
   exportCase,
   stateOf,
-  useInvestigations,
   verifyCase,
   type CaseEvent,
   type CaseOutcome,
@@ -21,6 +19,7 @@ import {
   type Investigation,
 } from "@/lib/desk/investigations";
 import { useToast } from "@/lib/toast";
+import { useCaseStore, type CaseStore } from "@/lib/org/useCaseStore";
 import { shortAddress } from "@/lib/xrpl/client";
 import { cn } from "@/lib/utils";
 
@@ -39,10 +38,8 @@ const utc = (iso?: string) => (iso ? `${iso.slice(0, 16).replace("T", " ")} UTC`
  * log that reports any after-the-fact edit.
  */
 export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[]; initialCaseId?: string | null }) {
-  const inv = useInvestigations();
-  const { user } = useAuth();
+  const inv = useCaseStore();
   const { push } = useToast();
-  const actor = user?.email ?? "local operator";
   const [filter, setFilter] = useState<"active" | "closed" | "all">("active");
   const [selectedId, setSelectedId] = useState<string | null>(initialCaseId ?? null);
 
@@ -68,13 +65,19 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
     }
   };
 
-  if (!inv.loaded) return <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING CASES…</p>;
+  if (!inv.loaded) {
+    return inv.error ? (
+      <p className="p-4 text-[10px] text-no-go">Shared cases could not be loaded: {inv.error}</p>
+    ) : (
+      <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING CASES…</p>
+    );
+  }
   if (inv.cases.length === 0) {
     return (
       <EmptyState
         icon={<NovaVault size={16} />}
         title="NO INVESTIGATIONS"
-        body="Open one from any verdict — in Verification after a gate check, or from the EVIDENCE tab. A case records what people did about a verdict; it never changes the verdict itself."
+        body={`${inv.scope === "organization" ? `Cases here are shared with everyone in ${inv.organizationName ?? "your organization"}. ` : ""}Open one from any verdict — in Verification after a gate check, or from the EVIDENCE tab. A case records what people did about a verdict; it never changes the verdict itself.`}
       />
     );
   }
@@ -82,6 +85,11 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
   return (
     <div className="grid min-h-full grid-cols-1 lg:grid-cols-[minmax(240px,320px)_1fr]">
       <div className="border-b border-border lg:border-b-0 lg:border-r">
+        <p className="stencil border-b border-border px-3 py-1.5 text-[7.5px] tracking-[0.2em] text-muted-foreground">
+          {inv.scope === "organization"
+            ? `SHARED · ${(inv.organizationName ?? "").toUpperCase()} · SERVER-VERIFIED CHAIN${inv.canWrite ? "" : " · READ ONLY"}`
+            : "THIS WORKSTATION ONLY"}
+        </p>
         <div className="flex gap-1 border-b border-border p-2.5">
           {(["active", "closed", "all"] as const).map((f) => (
             <button
@@ -120,7 +128,7 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
           ))}
         </ul>
       </div>
-      {selected && <CaseDetail key={selected.id} c={selected} entries={entries} actor={actor} run={run} mutate={inv.mutate} />}
+      {selected && <CaseDetail key={selected.id} c={selected} entries={entries} run={run} store={inv} />}
     </div>
   );
 }
@@ -128,15 +136,13 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
 function CaseDetail({
   c,
   entries,
-  actor,
   run,
-  mutate,
+  store,
 }: {
   c: Investigation;
   entries: LedgerEntry[];
-  actor: string;
   run: (label: string, fn: () => Promise<unknown>) => Promise<void>;
-  mutate: ReturnType<typeof useInvestigations>["mutate"];
+  store: CaseStore;
 }) {
   const { push } = useToast();
   const s = stateOf(c);
@@ -146,6 +152,7 @@ function CaseDetail({
   const [closing, setClosing] = useState(false);
   const [outcome, setOutcome] = useState<CaseOutcome>("cleared");
   const [rationale, setRationale] = useState("");
+  const [exceptionId, setExceptionId] = useState("");
   const [reopenReason, setReopenReason] = useState("");
   const [linkId, setLinkId] = useState("");
   const [receipts, setReceipts] = useState<Record<string, ReceiptCheck | "not-held">>({});
@@ -156,6 +163,10 @@ function CaseDetail({
 
   const linkable = entries.filter((e) => e.subject === c.subject && !s.linked.some((l) => l.entryId === e.id)).slice(0, 25);
   const closed = s.status === "closed";
+  // Approved exceptions whose receipt or subject belongs to this case (organization mode).
+  const approvable = store.approvedExceptions.filter(
+    (x) => x.subject === c.subject || s.linked.some((l) => l.digest === x.receiptDigest)
+  );
   const broken = integrity && !integrity.ok;
 
   const checkReceipt = async (entryId: string) => {
@@ -177,7 +188,7 @@ function CaseDetail({
           </span>
         </div>
         <p className="mono-font mt-1 text-[9.5px] text-muted-foreground">
-          SUBJECT <span className="selectable text-foreground">{c.subject}</span> · OPENED {utc(s.openedAt)} BY {s.openedBy}
+          SUBJECT <span className="selectable text-foreground">{c.subject}</span> · OPENED {utc(s.openedAt)} BY {store.who(s.openedBy)}
           {s.assignee && ` · ASSIGNED ${s.assignee}`}
         </p>
         <p className="mono-font mt-0.5 text-[9.5px]">
@@ -227,7 +238,7 @@ function CaseDetail({
             </div>
           );
         })}
-        {!closed && !broken && linkable.length > 0 && (
+        {store.canWrite && !closed && !broken && linkable.length > 0 && (
           <div className="mt-2 flex items-center gap-2">
             <select
               value={linkId}
@@ -246,7 +257,7 @@ function CaseDetail({
               size="sm"
               variant="outline"
               disabled={!linkId}
-              onClick={() => run("LINK", async () => { await mutate(c.id, { kind: "link", entry: entries.find((e) => e.id === linkId)! }, actor); setLinkId(""); })}
+              onClick={() => run("LINK", async () => { await store.mutate(c.id, { kind: "link", entry: entries.find((e) => e.id === linkId)! }); setLinkId(""); })}
             >
               LINK
             </Button>
@@ -254,7 +265,7 @@ function CaseDetail({
         )}
       </section>
 
-      {!closed && !broken && (
+      {store.canWrite && !closed && !broken && (
         <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           <div>
             <Eyebrow className="mb-2">ADD NOTE</Eyebrow>
@@ -266,7 +277,7 @@ function CaseDetail({
               placeholder="What was checked, with whom, and what it showed."
               className="w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground"
             />
-            <Button size="sm" className="mt-1.5" disabled={!note.trim()} onClick={() => run("NOTE", async () => { await mutate(c.id, { kind: "note", text: note }, actor); setNote(""); })}>
+            <Button size="sm" className="mt-1.5" disabled={!note.trim()} onClick={() => run("NOTE", async () => { await store.mutate(c.id, { kind: "note", text: note }); setNote(""); })}>
               ADD NOTE
             </Button>
           </div>
@@ -274,21 +285,21 @@ function CaseDetail({
             <Eyebrow>STATUS · PRIORITY · ASSIGNMENT</Eyebrow>
             <div className="flex flex-wrap gap-1.5">
               {(["open", "in-review", "escalated"] as const).map((st) => (
-                <Button key={st} size="sm" variant={s.status === st ? "default" : "outline"} onClick={() => run("STATUS", () => mutate(c.id, { kind: "status", to: st }, actor))}>
+                <Button key={st} size="sm" variant={s.status === st ? "default" : "outline"} onClick={() => run("STATUS", () => store.mutate(c.id, { kind: "status", to: st }))}>
                   {st.toUpperCase()}
                 </Button>
               ))}
             </div>
             <div className="flex flex-wrap gap-1.5">
               {(["low", "medium", "high"] as CasePriority[]).map((p) => (
-                <Button key={p} size="sm" variant={s.priority === p ? "default" : "outline"} onClick={() => run("PRIORITY", () => mutate(c.id, { kind: "priority", to: p }, actor))}>
+                <Button key={p} size="sm" variant={s.priority === p ? "default" : "outline"} onClick={() => run("PRIORITY", () => store.mutate(c.id, { kind: "priority", to: p }))}>
                   {p.toUpperCase()}
                 </Button>
               ))}
             </div>
             <div className="flex gap-1.5">
               <Input value={assignee} onChange={(e) => setAssignee(e.target.value)} placeholder="Assign to (name or email)" className="h-7 text-[10px]" />
-              <Button size="sm" variant="outline" disabled={!assignee.trim()} onClick={() => run("ASSIGN", async () => { await mutate(c.id, { kind: "assign", to: assignee }, actor); setAssignee(""); })}>
+              <Button size="sm" variant="outline" disabled={!assignee.trim()} onClick={() => run("ASSIGN", async () => { await store.mutate(c.id, { kind: "assign", to: assignee }); setAssignee(""); })}>
                 ASSIGN
               </Button>
             </div>
@@ -303,15 +314,37 @@ function CaseDetail({
                   ))}
                 </select>
                 <textarea value={rationale} onChange={(e) => setRationale(e.target.value)} rows={3} placeholder="Rationale (required, at least 10 characters)" className="mt-1.5 w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
-                {outcome === "exception-approved" && (
+                {outcome === "exception-approved" && store.scope === "workstation" && (
                   <p className="mt-1 text-[9px] leading-snug text-hold">
                     This closes the case as a local record against your name. It is not an organization approval: an
                     organization exception is requested from the verdict and decided by a second authorized person
                     (Ledger &amp; Policy → POLICY). The verdict and its receipt stay as the engine issued them.
                   </p>
                 )}
+                {outcome === "exception-approved" && store.scope === "organization" && (
+                  approvable.length === 0 ? (
+                    <p className="mt-1 text-[9px] leading-snug text-no-go">
+                      No approved policy exception exists for a verdict in this case. Request one from the verdict; an
+                      owner, admin or compliance member other than the requester must approve it before the case can
+                      close this way.
+                    </p>
+                  ) : (
+                    <select value={exceptionId} onChange={(e) => setExceptionId(e.target.value)} aria-label="Approved exception" className="mono-font mt-1.5 h-7 w-full rounded border border-border bg-background px-1 text-[9.5px] text-foreground">
+                      <option value="">Choose the approved exception…</option>
+                      {approvable.map((x) => (
+                        <option key={x.id} value={x.id}>
+                          {x.verdict.toUpperCase()} · receipt {x.receiptDigest.slice(0, 10)}… · approved by {store.who(x.decidedBy ?? undefined)}
+                        </option>
+                      ))}
+                    </select>
+                  )
+                )}
                 <div className="mt-1.5 flex gap-1.5">
-                  <Button size="sm" disabled={rationale.trim().length < 10} onClick={() => run("CLOSE", async () => { await mutate(c.id, { kind: "close", outcome, rationale }, actor); setClosing(false); setRationale(""); })}>
+                  <Button
+                    size="sm"
+                    disabled={rationale.trim().length < 10 || (outcome === "exception-approved" && store.scope === "organization" && !exceptionId)}
+                    onClick={() => run("CLOSE", async () => { await store.mutate(c.id, { kind: "close", outcome, rationale, ...(outcome === "exception-approved" && exceptionId ? { exceptionId } : {}) }); setClosing(false); setRationale(""); setExceptionId(""); })}
+                  >
                     CLOSE CASE
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => setClosing(false)}>CANCEL</Button>
@@ -322,14 +355,14 @@ function CaseDetail({
         </section>
       )}
 
-      {closed && !broken && (
+      {closed && !broken && store.canWrite && (
         <section>
           <Eyebrow className="mb-1">RESOLVED {utc(s.closedAt)}</Eyebrow>
           <p className="text-[10.5px] text-foreground">{s.outcome && OUTCOME_LABEL[s.outcome]}</p>
           <p className="mt-0.5 whitespace-pre-wrap text-[10px] text-muted-foreground">{s.rationale}</p>
           <div className="mt-2 flex gap-1.5">
             <Input value={reopenReason} onChange={(e) => setReopenReason(e.target.value)} placeholder="Reason to reopen (at least 10 characters)" className="h-7 text-[10px]" />
-            <Button size="sm" variant="outline" disabled={reopenReason.trim().length < 10} onClick={() => run("REOPEN", async () => { await mutate(c.id, { kind: "reopen", reason: reopenReason }, actor); setReopenReason(""); })}>
+            <Button size="sm" variant="outline" disabled={reopenReason.trim().length < 10} onClick={() => run("REOPEN", async () => { await store.mutate(c.id, { kind: "reopen", reason: reopenReason }); setReopenReason(""); })}>
               REOPEN
             </Button>
           </div>
@@ -357,7 +390,7 @@ function CaseDetail({
             <li key={e.seq} className="relative pb-2.5 pl-4 last:pb-0">
               <span className={cn("absolute -left-[3px] top-1.5 h-[5px] w-[5px]", integrity && !integrity.ok && e.seq >= integrity.at ? "bg-no-go" : "bg-border")} />
               <p className="mono-font text-[9px] text-muted-foreground">
-                #{e.seq} · {utc(e.at)} · {e.actor}
+                #{e.seq} · {utc(e.at)} · {store.who(e.actor)}
               </p>
               <p className="text-[10px] leading-relaxed text-foreground">{describe(e)}</p>
               <p className="mono-font text-[8px] text-muted-foreground/60">{e.hash.slice(0, 16)}…</p>
@@ -384,7 +417,7 @@ function describe(e: CaseEvent): string {
     case "linked":
       return `Linked a ${e.linked?.verdict.toUpperCase()} verdict for ${e.linked?.amountXrp.toLocaleString()} XRP (receipt ${e.linked?.digest.slice(0, 12)}…).`;
     case "closed":
-      return `Closed — ${e.outcome ? OUTCOME_LABEL[e.outcome] : ""}. ${e.text ?? ""}`;
+      return `Closed — ${e.outcome ? OUTCOME_LABEL[e.outcome] : ""}${e.exceptionId ? ` (policy exception ${e.exceptionId.slice(0, 8)}…)` : ""}. ${e.text ?? ""}`;
     case "reopened":
       return `Reopened: ${e.text ?? ""}`;
   }
@@ -403,12 +436,11 @@ export function OpenInvestigationButton({
   onOpened?: (caseId: string) => void;
   className?: string;
 }) {
-  const inv = useInvestigations();
-  const { user } = useAuth();
+  const inv = useCaseStore();
   const { push } = useToast();
-  const actor = user?.email ?? "local operator";
   const existing = inv.cases.find((c) => c.subject === entry.subject && stateOf(c).status !== "closed");
   const already = inv.cases.find((c) => stateOf(c).linked.some((l) => l.entryId === entry.id));
+  if (!inv.canWrite && !already) return null;
   return (
     <button
       disabled={!inv.loaded}
@@ -420,11 +452,11 @@ export function OpenInvestigationButton({
               return;
             }
             if (existing) {
-              await inv.mutate(existing.id, { kind: "link", entry }, actor);
+              await inv.mutate(existing.id, { kind: "link", entry });
               push({ title: "VERDICT ADDED TO CASE", body: existing.title, tone: "info" });
               onOpened?.(existing.id);
             } else {
-              const id = await inv.open({ entry, actor, now: new Date().toISOString() });
+              const id = await inv.open(entry);
               push({ title: "INVESTIGATION OPENED", body: "Ledger & Policy → CASES", tone: "info" });
               onOpened?.(id);
             }
