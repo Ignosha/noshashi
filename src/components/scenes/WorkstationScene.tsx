@@ -20,7 +20,8 @@ import { EvidencePanel } from "@/components/scenes/EvidencePanel";
 import { SimulationPanel } from "@/components/scenes/SimulationPanel";
 import { PolicyManager } from "@/components/scenes/PolicyManager";
 import { CasesPanel } from "@/components/scenes/CasesPanel";
-import { useInvestigations, stateOf as caseState } from "@/lib/desk/investigations";
+import { stateOf as caseState } from "@/lib/desk/investigations";
+import { useCaseStore } from "@/lib/org/useCaseStore";
 import { useClaimedSubject } from "@/lib/nav/handoff";
 import { useGoverningPolicy } from "@/lib/org/useOrg";
 import { useIssuerWatch, WATCH_INTERVALS, postureLabel } from "@/lib/desk/watch";
@@ -42,6 +43,8 @@ const PAGE = 25;
  * ability to state its own thresholds rather than inherit ours, and an
  * export that can be proven unaltered.
  */
+export const WORKSTATION_TABS = ["explorer", "evidence", "cases", "policy", "simulate", "watch", "offline", "export"] as const;
+
 export function WorkstationScene({
   data,
   onUpgrade,
@@ -80,17 +83,19 @@ function WorkstationBody({
   const { has } = useBilling();
   const { push } = useToast();
 
-  const [tab, setTab] = useState<
-    "explorer" | "evidence" | "cases" | "policy" | "simulate" | "watch" | "offline" | "export"
-  >("explorer");
+  const [tab, setTab] = useState<(typeof WORKSTATION_TABS)[number]>("explorer");
   const [caseId, setCaseId] = useState<string | null>(null);
-  const investigations = useInvestigations();
+  const investigations = useCaseStore();
   const openCases = investigations.cases.filter((c) => caseState(c).status !== "closed").length;
   // "OPEN INVESTIGATION" elsewhere lands here, on that case.
   useClaimedSubject("workstation", (subject) => {
     if (subject.as === "investigation") {
       setTab("cases");
       setCaseId(subject.value);
+    }
+    // A drill-down from the control room names the tab to open.
+    if (subject.as === "tab" && WORKSTATION_TABS.includes(subject.value as (typeof WORKSTATION_TABS)[number])) {
+      setTab(subject.value as (typeof WORKSTATION_TABS)[number]);
     }
   });
   const [page, setPage] = useState(0);

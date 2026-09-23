@@ -8,7 +8,10 @@ import { deriveAlerts, usePortfolio } from "@/lib/desk/portfolio";
 import { useStoredDrift } from "@/lib/desk/watch";
 import { controlRoom, type ControlRoom as Room, type ControlRoomInput, type Figure } from "@/lib/desk/controlRoom";
 import { useCaseStore } from "@/lib/org/useCaseStore";
-import { useOrg } from "@/lib/org/useOrg";
+import { useGoverningPolicy, useOrg } from "@/lib/org/useOrg";
+import { lensMetrics } from "@/lib/desk/lenses";
+import { RoleLens } from "./RoleLens";
+import type { SceneId } from "@/App";
 import { useHandoff } from "@/lib/nav/handoff";
 import { shortAddress } from "@/lib/xrpl/client";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
@@ -19,26 +22,35 @@ import { cn } from "@/lib/utils";
  * from records the app holds. A figure whose source is unavailable says so
  * and why; nothing here is a placeholder or an estimate.
  */
-export function ControlRoom({ data }: { data: XrplState }) {
+export function ControlRoom({ data, onNavigate }: { data: XrplState; onNavigate?: (scene: SceneId) => void }) {
   const { user } = useAuth();
   const { has } = useBilling();
-  if (!user) return <ControlRoomBody data={data} portfolio={{ unavailable: "Sign in to include your portfolio's live exposure." }} />;
-  if (!has("portfolios")) return <ControlRoomBody data={data} portfolio={{ unavailable: "Portfolio exposure is part of the Desk plan." }} />;
-  return <WithPortfolio data={data} />;
+  if (!user) return <ControlRoomBody data={data} onNavigate={onNavigate} portfolio={{ unavailable: "Sign in to include your portfolio's live exposure." }} />;
+  if (!has("portfolios")) return <ControlRoomBody data={data} onNavigate={onNavigate} portfolio={{ unavailable: "Portfolio exposure is part of the Desk plan." }} />;
+  return <WithPortfolio data={data} onNavigate={onNavigate} />;
 }
 
-function WithPortfolio({ data }: { data: XrplState }) {
+function WithPortfolio({ data, onNavigate }: { data: XrplState; onNavigate?: (scene: SceneId) => void }) {
   const { snapshots, error } = usePortfolio();
   const alerts = useMemo(() => deriveAlerts(snapshots), [snapshots]);
-  return <ControlRoomBody data={data} portfolio={error ? { unavailable: `Portfolio could not be read: ${error}` } : { snapshots, alerts }} />;
+  return <ControlRoomBody data={data} onNavigate={onNavigate} portfolio={error ? { unavailable: `Portfolio could not be read: ${error}` } : { snapshots, alerts }} />;
 }
 
-function ControlRoomBody({ data, portfolio }: { data: XrplState; portfolio: ControlRoomInput["portfolio"] }) {
+function ControlRoomBody({
+  data,
+  portfolio,
+  onNavigate,
+}: {
+  data: XrplState;
+  portfolio: ControlRoomInput["portfolio"];
+  onNavigate?: (scene: SceneId) => void;
+}) {
   const { entries } = useLedger();
   const drift = useStoredDrift();
   const cases = useCaseStore();
   const org = useOrg();
   const handOff = useHandoff();
+  const governing = useGoverningPolicy();
   const orgExceptions = org.state.status === "ready" && org.selectedId !== null ? org.data?.exceptions ?? null : null;
 
   const room: Room = useMemo(
@@ -53,6 +65,19 @@ function ControlRoomBody({ data, portfolio }: { data: XrplState; portfolio: Cont
         orgExceptions,
       }),
     [portfolio, entries, drift.alerts, drift.issuers, cases.cases, orgExceptions]
+  );
+
+  const metrics = useMemo(
+    () =>
+      lensMetrics({
+        now: Date.now(),
+        room,
+        entries,
+        snapshots: "unavailable" in portfolio ? null : portfolio.snapshots,
+        mainnet: data.ledgerError ? "degraded" : data.connected ? "connected" : "offline",
+        policy: governing.state.status === "ready" ? (governing.active ? "active" : "none") : governing.state.status,
+      }),
+    [room, entries, portfolio, data.ledgerError, data.connected, governing.state.status, governing.active]
   );
 
   const ledger = data.ledger;
@@ -168,6 +193,7 @@ function ControlRoomBody({ data, portfolio }: { data: XrplState; portfolio: Cont
           </p>
         </div>
       </div>
+      <RoleLens metrics={metrics} role={org.role} onNavigate={onNavigate} />
     </Panel>
   );
 }

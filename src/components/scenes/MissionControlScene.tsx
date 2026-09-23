@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMemo } from "react";
 import { SceneHeader } from "./SceneHeader";
 import { ControlRoom } from "./ControlRoom";
+import type { SceneId } from "@/App";
 import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
 import { CountUp } from "@/components/nova/CountUp";
@@ -96,9 +97,11 @@ function Readout({
 export function MissionControlScene({
   data,
   onOpenVerification,
+  onNavigate,
 }: {
   data: XrplState;
   onOpenVerification: () => void;
+  onNavigate?: (scene: SceneId) => void;
 }) {
   const {
     ledger,
@@ -198,7 +201,7 @@ export function MissionControlScene({
         }
       />
 
-      <ControlRoom data={data} />
+      <ControlRoom data={data} onNavigate={onNavigate} />
 
       <Panel
         label="DECISION RECORD"
