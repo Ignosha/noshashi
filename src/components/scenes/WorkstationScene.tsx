@@ -16,6 +16,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { shortAddress } from "@/lib/xrpl/client";
 import { saveTextFile } from "@/lib/export";
 import { useLedger, summariseWallets, ledgerToCsv, signContent } from "@/lib/desk/ledger";
+import { EvidencePanel } from "@/components/scenes/EvidencePanel";
 import { useRuleSet, DEFAULT_RULES } from "@/lib/desk/rules";
 import { useIssuerWatch, WATCH_INTERVALS, postureLabel } from "@/lib/desk/watch";
 import { useOfflineVault, provenanceLine } from "@/lib/desk/offline";
@@ -75,7 +76,7 @@ function WorkstationBody({
   const { push } = useToast();
 
   const [tab, setTab] = useState<
-    "explorer" | "policy" | "watch" | "offline" | "export"
+    "explorer" | "evidence" | "policy" | "watch" | "offline" | "export"
   >("explorer");
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
@@ -173,7 +174,9 @@ function WorkstationBody({
         label={
           tab === "explorer"
             ? "WALLET EXPLORER"
-            : tab === "policy"
+            : tab === "evidence"
+              ? "EVIDENCE CHAIN · RECEIPT VERIFICATION"
+              : tab === "policy"
               ? "POLICY EDITOR"
               : tab === "watch"
                 ? "ISSUER DRIFT MONITOR"
@@ -188,6 +191,7 @@ function WorkstationBody({
           <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
             <TabsList>
               <TabsTrigger value="explorer">EXPLORER</TabsTrigger>
+              <TabsTrigger value="evidence">EVIDENCE</TabsTrigger>
               <TabsTrigger value="policy">POLICY</TabsTrigger>
               <TabsTrigger value="watch">
                 WATCH
@@ -281,6 +285,9 @@ function WorkstationBody({
             )}
           </div>
         )}
+
+        {/* ── Evidence chain ───────────────────────────────────── */}
+        {tab === "evidence" && <EvidencePanel entries={entries} loaded={loaded} />}
 
         {/* ── Policy editor ────────────────────────────────────── */}
         {tab === "policy" && (
