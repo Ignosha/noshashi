@@ -27,6 +27,7 @@
 
 import { answer as retrievalAnswer, asPromptContext, CONTACT } from "./_lib/kb.js";
 import { clientKey, take } from "./_lib/rate-limit.js";
+import { LANGUAGES, isSupported } from "./_lib/i18n.js";
 
 const MODEL = "claude-opus-5";
 const MAX_MESSAGE = 600;
@@ -79,8 +80,21 @@ Rules, in priority order:
 KNOWLEDGE BASE
 ${KB_TEXT}`;
 
+/*
+ * The reply language. The site translates everything, including this
+ * console's fixed answers, so a model answering in English to a visitor
+ * reading Japanese would be the one untranslated thing on the page.
+ */
+function systemFor(lang) {
+  const language = LANGUAGES.find((l) => l.code === lang);
+  if (!language || lang === "en") return SYSTEM;
+  return `${SYSTEM}
+
+The visitor is reading the site in ${language.label}. Reply in ${language.label}, keeping product names, figures and addresses exactly as the knowledge base writes them. Rule 5's register applies in that language.`;
+}
+
 /** Ask Claude. Returns null on anything that is not a clean answer. */
-async function askClaude(message, history) {
+async function askClaude(message, history, system = SYSTEM) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return null;
 
@@ -107,7 +121,7 @@ async function askClaude(message, history) {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 700,
-        system: SYSTEM,
+        system,
         messages,
         // Thinking stays on — it is the default on this model, and
         // disabling it is a documented way to get tool-call text and
@@ -150,7 +164,7 @@ async function askClaude(message, history) {
  *   SUPPORT_LLM_API_KEY
  *   SUPPORT_LLM_MODEL      e.g. openai/gpt-oss-120b
  */
-async function askOpenAICompatible(message, history) {
+async function askOpenAICompatible(message, history, system = SYSTEM) {
   const key = process.env.SUPPORT_LLM_API_KEY;
   const base = process.env.SUPPORT_LLM_BASE_URL;
   const model = process.env.SUPPORT_LLM_MODEL;
@@ -171,7 +185,7 @@ async function askOpenAICompatible(message, history) {
         // base verbatim, which reads as a lookup rather than an answer.
         temperature: 0.3,
         messages: [
-          { role: "system", content: SYSTEM },
+          { role: "system", content: system },
           ...history.map((turn) => ({
             role: turn.role === "assistant" ? "assistant" : "user",
             content: String(turn.content || "").slice(0, MAX_MESSAGE),
@@ -226,16 +240,19 @@ export default async function handler(req, res) {
     .filter((t) => t && typeof t.content === "string" && t.content.trim())
     .slice(-MAX_TURNS);
 
+  const lang = isSupported(body.lang) ? body.lang : "en";
+  const system = systemFor(lang);
+
   // The deterministic answer is computed first, every time. It is what
   // ships, and it is what a model reply has to beat.
   const grounded = retrievalAnswer(message);
 
   // Claude first when configured, then any OpenAI-compatible provider,
   // then neither. Each step falls through on failure.
-  let modelReply = await askClaude(message, history);
+  let modelReply = await askClaude(message, history, system);
   let source = modelReply ? "claude" : null;
   if (!modelReply) {
-    modelReply = await askOpenAICompatible(message, history);
+    modelReply = await askOpenAICompatible(message, history, system);
     source = modelReply ? "provider" : null;
   }
 
@@ -260,5 +277,9 @@ export default async function handler(req, res) {
     related: modelReply ? [] : grounded.related || [],
     grounded: Boolean(modelReply) || grounded.grounded,
     mode: modelReply ? "assisted" : "reference",
+    // The language the reply is written in. A model reply is already in
+    // the visitor's language; the reference answer is English and the
+    // page translates it like any other text.
+    lang: modelReply ? lang : "en",
   });
 }

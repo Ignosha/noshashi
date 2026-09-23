@@ -175,7 +175,9 @@
    Styled as an instrument panel: one title bar carrying its own state,
    a transcript, one command field. No avatars, no bubbles with tails,
    no typing dots pretending to be a person breathing. */
-.support-launch{position:fixed;right:20px;bottom:20px;z-index:60;
+/* --lang-bar-h is the language bar's height while it is showing (set by
+   i18n.js), so the console sits above it instead of underneath. */
+.support-launch{position:fixed;right:20px;bottom:calc(20px + var(--lang-bar-h, 0px));z-index:60;
   display:inline-flex;align-items:center;gap:9px;
   background:var(--surface);color:var(--ink);border:1px solid var(--rule);
   border-radius:999px;padding:11px 17px;cursor:pointer;
@@ -187,8 +189,8 @@
 .support-launch i{width:7px;height:7px;border-radius:50%;background:var(--tele);flex:none}
 .support-launch[hidden]{display:none}
 
-.support-panel{position:fixed;right:20px;bottom:20px;z-index:61;
-  width:min(390px,calc(100vw - 32px));max-height:min(620px,calc(100vh - 40px));
+.support-panel{position:fixed;right:20px;bottom:calc(20px + var(--lang-bar-h, 0px));z-index:61;
+  width:min(390px,calc(100vw - 32px));max-height:min(620px,calc(100vh - 40px - var(--lang-bar-h, 0px)));
   display:flex;flex-direction:column;
   background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);
   box-shadow:0 18px 50px rgba(0,0,0,.45);overflow:hidden}
