@@ -15,7 +15,7 @@
  :root{
   --ground:#08100B; --surface:#0E1911; --elevated:#15251A;
   --ink:#E9F5E7; --muted:#A7B8A8; --faint:#718473; --rule:#263B2A;
-  --brand:#9BE15D; --tele:#55D98A;
+  --brand:#9BE15D; --tele:#55D98A; --on-brand:#08100B;
   --go:#9BE15D; --hold:#E7C766; --nogo:#FF7B7B;
   --shell:min(1180px, 92vw);
   --r:10px;
@@ -23,7 +23,7 @@
 html[data-theme="light"]{
   --ground:#F2F8F0; --surface:#FFFFFF; --elevated:#E5F0E2;
   --ink:#0B160D; --muted:#3F5843; --faint:#66806A; --rule:#C4D7C5;
-  --brand:#247A3B; --tele:#168A55;
+  --brand:#247A3B; --tele:#168A55; --on-brand:#FFFFFF;
   --go:#247A3B; --hold:#8B6500; --nogo:#B42332;
 }
 
@@ -76,7 +76,7 @@ header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
 .nav-links a[aria-current="page"]{color:var(--ink)}
 .nav-links a[aria-current="page"]::before{background:var(--brand)}
 .nav-links a:focus-visible,.theme-toggle:focus-visible{outline:2px solid var(--tele);outline-offset:3px}
-.btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:#fff;
+.btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:var(--on-brand);
   padding:11px 20px;font-size:12px;font-weight:600;letter-spacing:.04em;text-decoration:none;
   border:1px solid var(--brand);border-radius:var(--r);cursor:pointer;
   transition:filter .14s,transform .14s,box-shadow .14s}

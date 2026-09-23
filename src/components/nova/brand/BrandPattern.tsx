@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils";
 /**
  * Brand pattern — board section 07.
  *
- * Four geometric elements, reproduced from the brand board: a concentric
- * orbital system, a dot grid, a tilted ellipse orbit with nodes, and a
- * diagonal hatch.
+ * Four garden elements: raked stones, a gravel dot grid, a leaf spray
+ * and raked sand. They replaced the brand board's orbital geometry when
+ * the mark became the lotus; the exported names are unchanged so every
+ * scene that placed an orbit now places the garden.
  *
  * These are the sanctioned background graphics and they replace the
  * starfield and warp effects that came before. The distinction is not
@@ -26,8 +27,15 @@ type PatternProps = {
   size?: number;
 };
 
-/** Concentric orbital rings with a body at the centre and nodes on the paths. */
+/**
+ * Raked stones — the karesansui figure. Two stones, each with the sand
+ * raked in rings around it, the smaller set of rings stopping where it
+ * meets the larger, as a gardener's rake would. Kept under the old name
+ * so every scene that placed an orbital system now places the garden.
+ */
 export function OrbitalSystem({ className, opacity = 0.07, size = 240 }: PatternProps) {
+  const uid = useId().replace(/:/g, "");
+  const clip = `nsh-rake-${uid}`;
   return (
     <svg
       viewBox="0 0 240 240"
@@ -38,19 +46,27 @@ export function OrbitalSystem({ className, opacity = 0.07, size = 240 }: Pattern
       style={{ opacity }}
       aria-hidden
     >
-      <g stroke="currentColor" strokeWidth="0.6" fill="none">
-        <ellipse cx="120" cy="120" rx="34" ry="46" />
-        <ellipse cx="120" cy="120" rx="58" ry="76" />
-        <ellipse cx="120" cy="120" rx="80" ry="102" />
-        <ellipse cx="120" cy="120" rx="100" ry="126" transform="rotate(-14 120 120)" />
+      <defs>
+        {/* The small stone's rings are cut where the large stone's outer ring runs. */}
+        <clipPath id={clip}>
+          <path d="M0 0H240V240H0Z M216 120A96 96 0 1 0 24 120A96 96 0 1 0 216 120Z" clipRule="evenodd" />
+        </clipPath>
+      </defs>
+      <g stroke="currentColor" strokeWidth="0.7" fill="none">
+        {[30, 46, 62, 78, 96].map((r) => (
+          <circle key={r} cx="120" cy="120" r={r} />
+        ))}
+        <g clipPath={`url(#${clip})`}>
+          {[14, 24, 34, 44].map((r) => (
+            <circle key={r} cx="206" cy="206" r={r} />
+          ))}
+        </g>
       </g>
-      <circle cx="120" cy="120" r="7" fill="currentColor" />
-      {/* Bodies on the paths — asymmetric, as on the board. */}
-      <circle cx="120" cy="74" r="3" fill="currentColor" />
-      <circle cx="120" cy="178" r="2.6" fill="currentColor" />
-      <circle cx="62" cy="120" r="2" fill="currentColor" />
-      <circle cx="178" cy="120" r="2" fill="currentColor" />
-      <circle cx="120" cy="18" r="2.2" fill="currentColor" />
+      <path
+        d="M104 110c4-11 20-15 30-9 9 5 11 16 5 24-7 9-24 11-33 4-5-4-5-12-2-19Z"
+        fill="currentColor"
+      />
+      <path d="M199 202c2-5 9-7 13-4 4 2 4 8 1 11-3 4-10 4-13 1-2-2-2-5-1-8Z" fill="currentColor" />
     </svg>
   );
 }
@@ -83,11 +99,19 @@ export function DotGrid({
 }
 
 /**
- * A single tilted orbit — two arcs meeting at a apex and a perigee, with a
- * body on the path. The board's most distinctive element, and the one that
- * echoes the mark's own arcs.
+ * A leaf spray — one curved stem with leaves along it, the garden's
+ * answer to the tilted orbit it replaces (same name, same corner
+ * placements, same diagonal sweep).
  */
 export function EllipseOrbit({ className, opacity = 0.12, size = 200 }: PatternProps) {
+  // Leaves: [x, y, angle, length] along the stem.
+  const leaves: [number, number, number, number][] = [
+    [58, 146, -62, 30],
+    [80, 118, 28, 34],
+    [102, 92, -58, 36],
+    [126, 68, 32, 32],
+    [148, 48, -54, 26],
+  ];
   return (
     <svg
       viewBox="0 0 200 200"
@@ -98,21 +122,22 @@ export function EllipseOrbit({ className, opacity = 0.12, size = 200 }: PatternP
       style={{ opacity }}
       aria-hidden
     >
-      <g stroke="currentColor" strokeWidth="0.7" fill="none">
-        <path d="M28 176 C34 96 86 30 168 24" />
-        <path d="M168 24 C162 104 110 170 28 176" />
-      </g>
-      <circle cx="168" cy="24" r="4" fill="currentColor" />
-      <circle cx="120" cy="108" r="6.5" fill="currentColor" />
-      <circle cx="28" cy="176" r="2.6" fill="currentColor" />
+      <path d="M28 184C60 140 110 80 172 26" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+      {leaves.map(([x, y, a, l], i) => (
+        <path
+          key={i}
+          transform={`translate(${x} ${y}) rotate(${a})`}
+          d={`M0 0C${l * 0.3} ${-l * 0.28} ${l * 0.75} ${-l * 0.26} ${l} 0C${l * 0.75} ${l * 0.26} ${l * 0.3} ${l * 0.28} 0 0Z`}
+          fill="currentColor"
+        />
+      ))}
     </svg>
   );
 }
 
-/** Diagonal hatch, lines of uneven length as on the board. */
+/** Raked sand — parallel lines with one slow swell, as a rake leaves them. */
 export function DiagonalHatch({ className, opacity = 0.09, size = 200 }: PatternProps) {
-  // Deterministic lengths — a random pattern would reflow on every render.
-  const lines = [0.62, 0.78, 0.9, 1, 1, 0.94, 0.82, 0.7, 0.56, 0.42];
+  const rows = Array.from({ length: 11 }, (_, i) => 18 + i * 16);
   return (
     <svg
       viewBox="0 0 200 200"
@@ -124,11 +149,9 @@ export function DiagonalHatch({ className, opacity = 0.09, size = 200 }: Pattern
       aria-hidden
     >
       <g stroke="currentColor" strokeWidth="0.8" strokeLinecap="round">
-        {lines.map((len, i) => {
-          const x = 8 + i * 20;
-          const span = 150 * len;
-          return <line key={i} x1={x} y1={192} x2={x + span} y2={192 - span} />;
-        })}
+        {rows.map((y) => (
+          <path key={y} d={`M4 ${y}C54 ${y - 7} 96 ${y + 7} 146 ${y}S186 ${y - 4} 196 ${y}`} />
+        ))}
       </g>
     </svg>
   );
@@ -173,10 +196,10 @@ export function PatternMark({
  * Three registers, so scenes of different character are not all wearing the
  * identical backdrop while still coming from one vocabulary:
  *
- *   orbital  — concentric system. Whole-network scenes: sync, domains.
- *   survey   — grid and hatch. Measurement scenes: books, issuance, stress.
- *   approach — the tilted orbit, echoing the mark's own arcs. Subject
- *              scenes, where one account or one token is being read.
+ *   orbital  — raked stones. Whole-network scenes: sync, domains.
+ *   survey   — gravel and raked sand. Measurement scenes: books, issuance, stress.
+ *   approach — the leaf spray. Subject scenes, where one account or one
+ *              token is being read.
  *
  * Opacity is capped well under the 8% the design system allows, because
  * these sit inside panels that already carry a lit top edge. No z-index is

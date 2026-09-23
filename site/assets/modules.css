@@ -229,7 +229,7 @@
   border:1px solid var(--rule);border-radius:var(--r);padding:11px 13px;font-size:13.5px;
   font-family:inherit}
 .support-form input:focus{outline:none;border-color:var(--brand)}
-.support-form button{flex:none;background:var(--brand);color:#fff;border:1px solid var(--brand);
+.support-form button{flex:none;background:var(--brand);color:var(--on-brand);border:1px solid var(--brand);
   border-radius:var(--r);padding:0 15px;font:11px "IBM Plex Mono",monospace;letter-spacing:.1em;
   cursor:pointer}
 .support-form button[disabled]{opacity:.55;cursor:progress}
@@ -497,7 +497,7 @@
   padding:14px max(4vw,18px) 18px}
 .nav-panel-foot a{justify-content:center;min-height:46px;border:1px solid var(--rule);
   border-radius:var(--r);padding:0 14px;font-size:13px;font-weight:600;color:var(--ink)}
-.nav-panel-foot a:last-child{background:var(--brand);border-color:var(--brand);color:#fff}
+.nav-panel-foot a:last-child{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
 
 /*
  * 920px, and this number is measured rather than reasoned.

@@ -28,7 +28,7 @@
   --card-foreground: 0 0% 0%;
   --popover: 0 0% 98%;
   --popover-foreground: 0 0% 0%;
-  --primary: 0 0% 0%;
+  --primary: 138 63% 31%;            /* #1D6630 — matcha, deepened for AA on white text */
   --primary-foreground: 0 0% 100%;
   --secondary: 0 0% 94%;
   --secondary-foreground: 0 0% 0%;
@@ -81,7 +81,7 @@
   --card-foreground: 135 20% 90%;
   --popover: 125 18% 12%;            /* #15251A */
   --popover-foreground: 135 20% 90%;
-  --primary: 0 0% 100%;
+  --primary: 108 70% 62%;            /* #9FE463 — matcha, the site's CTA green */
   --primary-foreground: 120 18% 5%;
   --secondary: 125 18% 12%;
   --secondary-foreground: 135 20% 90%;
