@@ -285,7 +285,7 @@ already issued.
   the canonical form for everything after settlement. Changing either
   breaks stored receipts.
 - **`site/` is generated.** `templates/` is the source. Committed
-  generated artifacts (`templates/hero-bloom.svg`) have a CI guard;
+  generated artifacts (brand files, `site/assets/garden-field.js`) have CI guards;
   anything else generated needs one too.
 - **CSP.** `default-src 'self'`, `font-src 'self'`. No third-party
   assets, fonts or scripts.

@@ -7,13 +7,16 @@
  *                              Source for `npm run icon` (tauri icon).
  *   src-tauri/icons/tray.png   macOS menu-bar template images from the
  *   src-tauri/icons/tray@2x.png  single-colour vector (brand/flower-mono.svg).
+ *   site/assets/flower.webp    the artwork at hero size, transparent, for the
+ *   public/brand/flower.webp   website hero and the console (the 1.4 MB PNG
+ *                              source is too heavy to serve).
  *
  * Full-bleed ground by design: every OS applies its own corner mask, and a
  * second rounding under theirs is what once left white icon corners.
  *
  *   node scripts/gen-brand.mjs && node scripts/gen-brand-raster.mjs && npm run icon
  */
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
@@ -58,6 +61,31 @@ for (const [px, pad, out] of [
     px,
     out
   );
+}
+
+// Web copies of the artwork: WebP keeps the alpha channel at a fraction
+// of the PNG's weight.
+{
+  const page = await browser.newPage();
+  const webp = await page.evaluate(async (src) => {
+    const img = new Image();
+    img.src = src;
+    await img.decode();
+    const w = 960;
+    const h = Math.round((img.height * w) / img.width);
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    c.getContext("2d").drawImage(img, 0, 0, w, h);
+    return c.toDataURL("image/webp", 0.9).split(",")[1];
+  }, flower);
+  const bytes = Buffer.from(webp, "base64");
+  for (const out of ["site/assets/flower.webp", "public/brand/flower.webp"]) {
+    mkdirSync(dirname(resolve(root, out)), { recursive: true });
+    writeFileSync(resolve(root, out), bytes);
+    console.log(`wrote ${out} (${(bytes.length / 1024).toFixed(0)} KB)`);
+  }
+  await page.close();
 }
 
 await browser.close();

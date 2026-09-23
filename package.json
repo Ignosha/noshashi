@@ -42,7 +42,7 @@
     "test:watch": "vitest",
     "check:functions": "cd supabase/functions && deno check */index.ts",
     "check:brand": "node scripts/gen-brand.mjs --check",
-    "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg"
+    "check:garden": "node scripts/build-garden-field.mjs --check"
   },
   "build": {
     "appId": "com.ignoshashi.terminal",
@@ -84,15 +84,25 @@
     ],
     "mac": {
       "category": "public.app-category.finance",
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "icon": "app-icon-master.png"
     },
     "win": {
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "app-icon-master.png"
     },
     "linux": {
-      "target": ["AppImage", "deb", "rpm"],
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
       "category": "Finance",
       "icon": "app-icon-master.png"
     }
@@ -126,6 +136,7 @@
     "@tauri-apps/plugin-updater": "2.11.0",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/web3wallet": "^1.16.1",
+    "asciify-engine": "^4.1.0",
     "better-sqlite3": "^11.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

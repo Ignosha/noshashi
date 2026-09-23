@@ -16,7 +16,7 @@ organizations, roles and an append-only audit log is **applied to production**.
 Every line below was executed on `3382015`, not inferred:
 
 - `npx tsc --noEmit` 0 errors · `npx vitest run` **504 tests, 25 files, all passing**
-- `npm run check:functions` (deno, 3 edge functions), `npm run check:bloom`
+- `npm run check:functions` (deno, 3 edge functions), `npm run check:brand`, `npm run check:garden`
   (generated-SVG drift guard), `npm run build`, `node scripts/build-site.mjs` — all exit 0
 - `npm audit` — was 0 on `3382015`; **130 since main was merged in** (7 critical),
   almost all from dependencies main added (`@reown/appkit`, `@walletconnect/*`,

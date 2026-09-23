@@ -64,14 +64,8 @@ const FAQ = FAQ_IDS.map((id) => KB.find((e) => e.id === id)).filter(Boolean);
 async function buildHome({ news, market, feed, status, release }) {
   let html = await readFile(path.join(ROOT, "templates", "home.html"), "utf8");
 
-  // Inlined, not <img>: the bloom takes its colour from the one `color`
-  // on its container, which is how the light theme flips it. An <img>
-  // cannot see the page's custom properties.
-  const bloom = await readFile(path.join(ROOT, "templates", "hero-bloom.svg"), "utf8");
-
   const slots = {
     ORIGIN: ORIGIN,
-    HEROBLOOM: bloom,
     BRANDMARK: MARK,
     VERSION: release ? esc(release.tag) : "beta",
     MARKETHEAD: renderMarketHead(market),

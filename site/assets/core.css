@@ -89,6 +89,7 @@ header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
   color:var(--muted);border:1px solid var(--rule);border-radius:var(--r);padding:8px 11px;
   font:11px "IBM Plex Mono",monospace;cursor:pointer;white-space:nowrap}
 .theme-toggle:hover,.theme-toggle:focus-visible{color:var(--ink);border-color:var(--brand)}
+@media(max-width:340px){ .theme-toggle{padding-inline:8px;gap:5px} }
 
 main{padding:56px 0 24px}
 .page-head{max-width:66ch;margin-bottom:34px}
