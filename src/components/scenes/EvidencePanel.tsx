@@ -17,6 +17,7 @@ import {
 } from "@/lib/desk/evidence";
 import { cn } from "@/lib/utils";
 import { PolicyVerdictBlock } from "./PolicyVerdict";
+import { OpenInvestigationButton } from "./CasesPanel";
 
 const LIST = 60;
 
@@ -32,7 +33,15 @@ const TONE: Record<NonNullable<ChainStep["tone"]>, string> = {
  * receipt. Everything shown is a field of the stored entry or a rule of
  * the engine; nothing is fetched and no model is involved.
  */
-export function EvidencePanel({ entries, loaded }: { entries: LedgerEntry[]; loaded: boolean }) {
+export function EvidencePanel({
+  entries,
+  loaded,
+  onOpenCase,
+}: {
+  entries: LedgerEntry[];
+  loaded: boolean;
+  onOpenCase?: (caseId: string) => void;
+}) {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [check, setCheck] = useState<ReceiptCheck | null>(null);
@@ -132,6 +141,7 @@ export function EvidencePanel({ entries, loaded }: { entries: LedgerEntry[]; loa
               <NovaShield size={13} />
               {checking ? "RECOMPUTING…" : "VERIFY RECEIPT"}
             </Button>
+            <OpenInvestigationButton entry={selected} onOpened={onOpenCase} />
             {consistent === false && (
               <span className="stencil text-[8px] tracking-[0.18em] text-no-go">
                 STORED VERDICT DOES NOT FOLLOW FROM ITS RULES
