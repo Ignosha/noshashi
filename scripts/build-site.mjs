@@ -861,7 +861,7 @@ async function buildCertificate() {
 
 /* ── institutional product pages ─────────────────────────────────── */
 const PRODUCT_PAGES = [
-  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Operating evidence</p><h2>Make every decision reviewable.</h2><p>Enterprise brings the same validated-ledger reading used in the public certificate into a governed workflow: the observation, policy result and adjudication remain connected.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p><ul class="proof-list"><li>Evidence attached to each policy result</li><li>Decision history suitable for second-line review</li></ul></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth, while teams retain the context required to act on them.</p><ul class="proof-list"><li>Validated state before interpretation</li><li>Exportable records for internal controls</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p>Architecture and commercial scope are confirmed before any contracted capability is promised.</p><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a></p></div></section>`],
+  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Operating evidence</p><h2>Make every decision reviewable.</h2><p>Enterprise brings the same validated-ledger reading used in the public certificate into a governed workflow: the observation, policy result and adjudication remain connected.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p><ul class="proof-list"><li>Evidence attached to each policy result</li><li>Decision history suitable for second-line review</li></ul></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth, while teams retain the context required to act on them.</p><ul class="proof-list"><li>Validated state before interpretation</li><li>Exportable records for internal controls</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p>Architecture and commercial scope are confirmed before any contracted capability is promised.</p><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Trust &amp; security</a></p></div></section>`],
   ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build your institutional XRPL intelligence layer with NOSHASHI.", "Connect validated XRPL data, intelligence, monitoring, evidence and policy infrastructure to your own systems.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Delivery evidence</p><h2>Build on a source you can inspect.</h2><p>Strategic infrastructure connects validated XRPL observations to the systems your institution already governs. Delivery, retention and integration boundaries are explicit rather than implied.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">DATA</p><h2>Machine-readable intelligence.</h2><p>APIs, event feeds, webhooks, bulk exports and custom schemas.</p><ul class="proof-list"><li>Stable records for downstream controls</li><li>Evidence and timestamps travel with the result</li></ul></div><div class="panel"><p class="eyebrow">CAPACITY</p><h2>Contracted high-volume access.</h2><p>Capacity, retention and delivery are based on deployment requirements and commercial scope.</p><ul class="proof-list"><li>Architecture review before commitment</li><li>Scope documented against the integration</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">REVIEW</p><h2>Request architecture review.</h2><p>We will map data sources, operating boundaries and delivery requirements before proposing a contracted design.</p><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>`],
   ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.", `<div class="panel"><p class="eyebrow">REFERENCE</p><h2>API endpoint families</h2><ul><li><code>/api/v1/institutional/overview</code></li><li><code>/api/v1/institutional/assets</code></li><li><code>/api/v1/institutional/evidence</code></li><li><code>/api/v1/institutional/policies/check</code></li><li><code>/api/v1/institutional/monitoring/events</code></li></ul></div>`],
 ];
@@ -1064,6 +1064,62 @@ async function buildProductPage([path, current, eyebrow, title, intro, content])
   }));
 }
 
+/* ── /trust/ ──────────────────────────────────────────────────────── */
+/*
+ * Rendered from src/lib/trust/boundary.json, the same file the desktop
+ * app's TRUST & SECURITY scene renders, and whose claims
+ * src/lib/trust/__tests__/boundary.test.ts checks against the code. The
+ * page adds layout and nothing else: no claim is written here.
+ */
+async function buildTrust() {
+  const t = JSON.parse(await readFile(path.join(ROOT, "src/lib/trust/boundary.json"), "utf8"));
+  const stages = t.stages
+    .map(
+      (s, i) => `<li><details${i === 0 ? " open" : ""}><summary><span class="mono">${String(i + 1).padStart(2, "0")}</span> ${esc(s.label)}<span class="trust-sum">${esc(s.summary)}</span></summary>
+        <p>${esc(s.detail)}</p>
+        <p class="mono trust-src">Source: ${s.where.map((w) => `<a href="https://github.com/Ignosha/noshashi/tree/main/${esc(w)}">${esc(w)}</a>`).join(" · ")}</p></details></li>`
+    )
+    .join("\n");
+  const bounds = t.boundaries
+    .map((b) => `<div class="panel"><p class="eyebrow">${esc(b.label)}</p><h3>${esc(b.claim)}</h3><p>${esc(b.basis)}</p></div>`)
+    .join("");
+  const flows = t.dataFlows
+    .map((f) => `<tr><th scope="row">${esc(f.party)}</th><td>${esc(f.what)}</td><td>${esc(f.why)}</td></tr>`)
+    .join("");
+  const list = (items) => `<ul class="proof-list">${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+
+  const content = `
+<section><div class="grid g2 trust-bounds">${bounds}</div></section>
+<section><div class="section-head"><p class="eyebrow">01 / Data path</p><h2>From the ledger to the receipt.</h2><p>Every verdict follows this path. Open a stage to see what happens there and where it is implemented.</p></div>
+  <ol class="trust-path qa">${stages}</ol></section>
+<section><div class="section-head"><p class="eyebrow">02 / Ledger commands</p><h2>The only commands NOSHASHI sends.</h2></div>
+  <div class="panel"><p class="mono">${t.readCommands.map(esc).join(" · ")}</p><p>Never sent: ${t.forbiddenCommands.map(esc).join(", ")}. A test fails the build if any of them appears in the covered code.</p></div></section>
+<section><div class="section-head"><p class="eyebrow">03 / Data</p><h2>Where your data goes.</h2></div>
+  <div class="table-scroll"><table class="trust-flows"><thead><tr><th scope="col">Who</th><th scope="col">What</th><th scope="col">Why</th></tr></thead><tbody>${flows}</tbody></table></div></section>
+<section><div class="grid g2"><div class="panel"><p class="eyebrow">04 / Human oversight</p>${list(t.oversight)}</div>
+  <div class="panel"><p class="eyebrow">05 / What this page does not claim</p>${list(t.limits)}</div></div></section>
+<section><div class="panel"><p class="eyebrow">Scope</p><p>${esc(t.scope)}</p><p>Security questions or a disclosure: <a href="/contact/">contact us</a>. Institutional review: <a href="/enterprise/">Enterprise</a>.</p></div></section>`;
+
+  await write("trust/index.html", renderPage({
+    title: "Trust & security · NOSHASHI",
+    description: "What NOSHASHI reads from the XRP Ledger, what it never does — no keys, no custody, no signing, no broadcast — and where your data goes.",
+    path: "/trust/",
+    head: `<style>
+.trust-path{list-style:none;padding:0;margin:0;display:grid;gap:1px}
+.trust-path summary{gap:12px}
+.trust-sum{display:block;flex:1;color:var(--faint);font-size:13px;margin-left:8px}
+.trust-path details p{padding:0 18px 14px;margin:0}
+.trust-src{font-size:12px;color:var(--faint)}
+.table-scroll{overflow-x:auto}
+.trust-flows{width:100%;border-collapse:collapse;font-size:14px}
+.trust-flows th,.trust-flows td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
+.trust-flows thead th{font:12px "IBM Plex Mono",monospace;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+</style>`,
+    body: `<div class="page-head"><p class="eyebrow">TRUST &amp; SECURITY</p><h1>Read-only by construction.</h1><p>NOSHASHI reads the XRP Ledger and applies your rules. It holds no keys, takes no custody, signs nothing and broadcasts nothing — and the claims on this page are checked against the code by test.</p></div>${content}`,
+    structured: [breadcrumb("Trust & security", "/trust/")],
+  }));
+}
+
 /* ── sitemap ──────────────────────────────────────────────────────── */
 async function buildSitemap() {
   const pages = [
@@ -1075,6 +1131,7 @@ async function buildSitemap() {
     ["/certificate/", "weekly", "0.9"],
     ["/pricing/", "monthly", "0.9"],
     ["/enterprise/", "monthly", "0.9"],
+    ["/trust/", "monthly", "0.8"],
     ["/strategic-infrastructure/", "monthly", "0.9"],
     ["/developers/", "monthly", "0.8"],
     ["/progress/", "weekly", "0.8"],
@@ -1159,6 +1216,7 @@ async function main() {
   await buildCertificate();
   await buildPricingEnhancement();
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
+  await buildTrust();
   await buildSitemap();
   await buildRobots();
 

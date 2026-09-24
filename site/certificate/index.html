@@ -70,8 +70,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
       <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
       <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
-      <a class="nav-link optional" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
-      <a class="nav-link optional" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
       <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
       <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
@@ -168,6 +168,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="/guide/">Plain-language guide</a>
       <a href="/pricing/">Pricing</a>
       <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
       <a href="/strategic-infrastructure/">Strategic infrastructure</a>
       <a href="/developers/">Developers</a>
       <a href="/legal/">Legal &amp; accessibility</a>
@@ -180,6 +181,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 <script src="/assets/subscribe.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
 <script>
 (function(){
   var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
@@ -208,6 +210,20 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   function say(text,tone){status.textContent=text;status.setAttribute("data-tone",tone||"");}
   function esc(v){return String(v).replace(/[&<>"]/g,function(c){
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  /* A finding's label and detail are sentences with data inside them —
+     the currency code, an address. The data is marked translate="no" so
+     the page translation (site/assets/i18n.js) translates the sentence
+     around it and leaves the reading exactly as the ledger gave it. */
+  function data(text,cert){
+    var out=esc(text).replace(/(^|[^A-Za-z0-9])(r[1-9A-HJ-NP-Za-km-z]{24,34})(?![A-Za-z0-9])/g,
+      function(m,pre,a){return pre+'<span translate="no">'+a+'</span>';});
+    var cur=cert.currencyLabel&&String(cert.currencyLabel).split(" ")[0];
+    if(cur&&/^[A-Za-z0-9]{2,20}$/.test(cur)){
+      out=out.replace(new RegExp("(^|[ (])("+cur+")(?=[ .,;)]|$)","g"),
+        function(m,pre,c){return pre+'<span translate="no">'+c+'</span>';});
+    }
+    return out;
+  }
 
   /* Wording mirrors AUTHORITY_VERDICT_COPY in src/lib/desk/authority.ts.
      The console and this page must not describe the same verdict two
@@ -245,18 +261,18 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     var copy=COPY[cert.verdict]||COPY["insufficient-data"];
     var html='<div class="cert-verdict '+copy.cls+'">'+
       '<p class="tag">'+esc(copy.tag)+'</p>'+
-      '<h2>'+esc(cert.issuer)+'</h2>'+
+      '<h2 translate="no">'+esc(cert.issuer)+'</h2>'+
       '<p>'+esc(copy.text)+'</p>'+
       '<p class="cert-meta">LEDGER '+esc(String(cert.ledgerIndex))+
-        (cert.currencyLabel?' · '+esc(cert.currencyLabel):'')+
-        ' · READ '+esc(new Date(cert.evaluatedAt).toLocaleString())+
+        (cert.currencyLabel?' · <span translate="no">'+esc(cert.currencyLabel)+'</span>':'')+
+        ' · READ <span translate="no">'+esc(new Date(cert.evaluatedAt).toLocaleString())+'</span>'+
         ' · '+esc(SOURCE_LABEL[cert.source]||'DISTRIBUTION UNSTATED')+
         /* Also inside the digest, so a reader recomputing from this page
            needs it. Printed plainly rather than hidden behind a label:
            it is the difference between two certificates that otherwise
            read identically. */
         (cert.rulesVersion ? ' · RULES v'+esc(String(cert.rulesVersion)) : '')+
-        '<br>DIGEST '+esc(cert.digest)+'</p>'+
+        '<br>DIGEST <span translate="no">'+esc(cert.digest)+'</span></p>'+
       '</div><div class="cert-checks">';
 
     for(var i=0;i<cert.checks.length;i++){
@@ -272,8 +288,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       var word=c.passed?"CLEAR":"FINDING";
       html+='<div class="cert-check">'+
         '<span class="mark '+mark+'">'+word+'</span>'+
-        '<h3>'+esc(c.label)+'</h3>'+
-        '<p>'+esc(c.detail)+'</p>'+
+        '<h3>'+data(c.label,cert)+'</h3>'+
+        '<p>'+data(c.detail,cert)+'</p>'+
         '<code>'+esc(c.id)+'</code>'+
       '</div>';
     }
@@ -313,6 +329,5 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   }catch(e){}
 })();
 </script>
-<script src="/assets/garden-field.js" defer></script>
 </body>
 </html>

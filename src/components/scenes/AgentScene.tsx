@@ -49,6 +49,7 @@ import { useToast } from "@/lib/toast";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import { cn } from "@/lib/utils";
 import { SPRING } from "@/lib/motion";
+import { containsLedgerSeed, SecretInMessageError } from "@/lib/agent/secrets";
 
 type Turn = {
   id: number;
@@ -233,6 +234,15 @@ export function AgentScene({ data }: { data: XrplState }) {
   const send = async (text: string) => {
     const prompt = text.trim();
     if (!prompt || busy) return;
+
+    // A ledger secret is never echoed into the transcript or sent to a
+    // model, local or hosted. chatStream refuses it too; stopping it here
+    // keeps it out of the history every later message would carry.
+    if (await containsLedgerSeed(prompt)) {
+      setTurns((prev) => [...prev, { id: ++turnId, role: "assistant", content: new SecretInMessageError().message }]);
+      setDraft("");
+      return;
+    }
 
     // Support has to work on the free tier with nothing installed, so the
     // knowledge base answers directly whenever no model is available.
@@ -923,7 +933,7 @@ export function AgentScene({ data }: { data: XrplState }) {
           <Panel label="GUARDRAILS" className="shrink-0">
             {[
               { icon: <NovaShield size={11} />, text: "Never adjudicates — the deterministic engine decides." },
-              { icon: <NovaVault size={11} />, text: "Refuses seed phrases, keys and passwords outright." },
+              { icon: <NovaVault size={11} />, text: "Will not send a message containing an XRPL secret seed, to any model." },
               { icon: <NovaBolt size={11} />, text: "Answers only from live state; no invented rules." },
               {
                 icon: <NovaTerminal size={11} />,

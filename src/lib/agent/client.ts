@@ -6,6 +6,7 @@ import {
   type AgentConfig,
 } from "./providers";
 import { getProviderKey } from "./keys";
+import { containsLedgerSeed, SecretInMessageError } from "./secrets";
 
 /**
  * One agent transport for every runtime.
@@ -213,6 +214,11 @@ export async function chatStream({
   signal,
   temperature = CHAT_TEMPERATURE,
 }: ChatOptions): Promise<string> {
+  // Before anything else: a message carrying a ledger secret is never
+  // sent, to a local model or a hosted one. See ./secrets.ts.
+  for (const message of messages) {
+    if (message.role !== "system" && (await containsLedgerSeed(message.content))) throw new SecretInMessageError();
+  }
   const provider = findProvider(config.providerId);
   const safety = isEndpointSafe(config.baseUrl);
   if (!safety.ok) throw new AgentUnavailableError(safety.reason!);
