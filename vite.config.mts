@@ -8,6 +8,10 @@ const { version } = createRequire(import.meta.url)("./package.json") as {
   version: string;
 };
 
+// Set by `tauri ios dev` to the Mac's network address, so a phone on the
+// same network can load the dev server and its hot reload.
+const devHost = process.env.TAURI_DEV_HOST;
+
 export default defineConfig(({ mode }) => ({
   plugins: [react(), tailwindcss()],
   define: {
@@ -25,6 +29,8 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 1420,
     strictPort: true,
+    host: devHost || false,
+    hmr: devHost ? { protocol: "ws", host: devHost, port: 1421 } : undefined,
     watch: {
       ignored: ["**/src-tauri/**"],
     },

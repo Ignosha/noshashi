@@ -1,0 +1,56 @@
+name: iOS build check
+
+# Compiles the app for iOS on a Mac runner, so a change that breaks the
+# iOS build is caught on the pull request rather than at a desk with Xcode.
+#
+# It compiles the Rust app for an iPhone and for the iPhone simulator,
+# with the iOS config (tauri.ios.conf.json) and the mobile capability
+# applied. It does not sign or package anything: installing on a phone
+# needs an Apple ID in Xcode on a Mac, which docs/IOS.md walks through.
+
+on:
+  pull_request:
+    paths:
+      - "src-tauri/**"
+      - "vite.config.mts"
+      - ".github/workflows/ios.yml"
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,aarch64-apple-ios-sim
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+          key: ios
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm install --no-audit --no-fund
+
+      # The app embeds the built front end, so it has to exist first.
+      - run: npm run build
+
+      # The same change moves the desktop app behind lib.rs, and CI does not
+      # otherwise compile Rust before a release. The Mac runner is here anyway.
+      - name: Compile the macOS desktop app
+        working-directory: src-tauri
+        run: cargo check --locked
+
+      - name: Compile for iPhone
+        working-directory: src-tauri
+        run: cargo build --locked --lib --target aarch64-apple-ios
+
+      - name: Compile for the iPhone simulator
+        working-directory: src-tauri
+        run: cargo build --locked --lib --target aarch64-apple-ios-sim
