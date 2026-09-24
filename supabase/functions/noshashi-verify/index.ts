@@ -26,6 +26,15 @@
  */
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import {
+  normaliseTxHash,
+  readVerbOf,
+  reservesOf,
+  summariseAddress,
+  summariseIssuer,
+  summariseTransaction,
+  type ReadVerb,
+} from "./read.ts";
 
 /**
  * The service-role client, and its type.
@@ -89,6 +98,21 @@ const TIER_LIMITS: Record<string, { perSecond: number; perMinute: number }> = {
   // fell through to operator, 2/sec.
   enterprise:  { perSecond: 200, perMinute: 9_000 },
   strategic:   { perSecond: 200, perMinute: 9_000 },
+};
+
+/**
+ * Every verb this function serves, as GET on the bare path lists them.
+ * Paths are relative to /functions/v1/noshashi-verify.
+ */
+const VERBS: Record<string, string> = {
+  "": "POST — adjudicate a settlement. verify scope, one credit.",
+  "authority/check":
+    "POST — re-derive an authority certificate's digest from its own body. Free, unauthenticated, reads nothing.",
+  "receipts/{digest}":
+    "GET — a receipt this account or its organization recorded, as it was served. read or verify scope, free.",
+  "analyze/issuer": "POST { issuer } — an issuer's controls, read live from the validated ledger. read or verify scope, free.",
+  "analyze/address": "POST { address } — balance, reserve, owner count and credentials, read live. read or verify scope, free.",
+  "analyze/transaction": "POST { hash } — a transaction's type, parties, result and delivered amount, read live. read or verify scope, free.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -441,7 +465,16 @@ class RippledError extends Error {
   }
 }
 
-async function rippleRpc(command: string, params: Record<string, unknown>): Promise<Record<string, any>> {
+async function rippleRpc(
+  command: string,
+  params: Record<string, unknown>,
+  /**
+   * Refusals that one node can give and the next may not. The published
+   * nodes keep different amounts of history: s1 answers txnNotFound for
+   * an old transaction that full-history s2 holds.
+   */
+  tryNextOn: string[] = []
+): Promise<Record<string, any>> {
   let lastError: Error | null = null;
   for (const endpoint of PUBLISHED_RIPPLE_HTTP) {
     try {
@@ -477,7 +510,7 @@ async function rippleRpc(command: string, params: Record<string, unknown>): Prom
     } catch (error) {
       // A refusal is the ledger's answer, not a sick node — the next
       // endpoint would only repeat it. Transport failures do get retried.
-      if (error instanceof RippledError) throw error;
+      if (error instanceof RippledError && !tryNextOn.includes(error.code)) throw error;
       lastError = error instanceof Error ? error : new Error(String(error));
     }
   }
@@ -545,14 +578,22 @@ async function sha256Hex(value: string): Promise<string> {
     .join("");
 }
 
-type ApiKeyAuth = { accountId: string; keyId: string };
+type ApiKeyAuth = { accountId: string; keyId: string; organizationId: string | null };
+
+/**
+ * What a call needs the key to be allowed to do. "verify" spends credits;
+ * "read" only reads. A verify key can read — it can already see every
+ * receipt it produced — but a read key cannot spend.
+ */
+type RequiredScope = "verify" | "read";
 
 /** Why a key was refused. Never returned to the caller — see below. */
 type AuthFailure = "malformed" | "unknown" | "revoked" | "expired" | "out_of_scope";
 
 async function authenticate(
   client: ServiceClient,
-  authorization: string | null
+  authorization: string | null,
+  required: RequiredScope
 ): Promise<{ auth: ApiKeyAuth } | { failure: AuthFailure }> {
   if (!authorization?.startsWith("Bearer nsh_live_")) return { failure: "malformed" };
   const raw = authorization.slice("Bearer ".length).trim();
@@ -561,7 +602,7 @@ async function authenticate(
   const { data, error } = await client
     .schema("noshashi")
     .from("api_keys")
-    .select("id, account_id, revoked_at, expires_at, scopes")
+    .select("id, account_id, organization_id, revoked_at, expires_at, scopes")
     .eq("key_hash", keyHash)
     .maybeSingle();
   if (error) throw error;
@@ -580,9 +621,16 @@ async function authenticate(
   // for a webhook receiver or a usage reader should not be able to spend
   // verification credits just because it authenticates.
   const scopes = (data.scopes as string[] | null) ?? [];
-  if (!scopes.includes("verify")) return { failure: "out_of_scope" };
+  const allowed = required === "verify" ? ["verify"] : ["verify", "read"];
+  if (!scopes.some((scope) => allowed.includes(scope))) return { failure: "out_of_scope" };
 
-  return { auth: { accountId: String(data.account_id), keyId: String(data.id) } };
+  return {
+    auth: {
+      accountId: String(data.account_id),
+      keyId: String(data.id),
+      organizationId: data.organization_id ? String(data.organization_id) : null,
+    },
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -771,12 +819,23 @@ async function handle(request: Request, requestId: string): Promise<Response> {
   if (verb === "authority/check") {
     return await checkAuthorityCertificate(request, requestId);
   }
+  const read = readVerbOf(verb);
+  if (read === "bad_digest") {
+    return json(
+      400,
+      { error: "invalid_digest", message: "A receipt digest is 64 hexadecimal characters." },
+      requestId
+    );
+  }
+  if (read) {
+    return await handleRead(request, requestId, read);
+  }
   if (verb) {
     return json(
       404,
       {
         error: "unknown_verb",
-        message: `No verb "${verb}". Known: the bare path (settlement adjudication) and authority/check.`,
+        message: `No verb "${verb}". Known: ${Object.keys(VERBS).map((v) => (v ? v : "the bare path")).join(", ")}.`,
       },
       requestId
     );
@@ -791,11 +850,7 @@ async function handle(request: Request, requestId: string): Promise<Response> {
           "POST JSON { subject, domain, amount_xrp } with Authorization: Bearer nsh_live_…",
         domains: DOMAIN_REGISTRY.map((domain) => domain.code),
         idempotency: "Send Idempotency-Key to make a retry replay rather than re-charge.",
-        verbs: {
-          "": "POST — adjudicate a settlement. Authenticated, one credit.",
-          "authority/check":
-            "POST — re-derive an authority certificate's digest from its own body. Free, unauthenticated, reads nothing.",
-        },
+        verbs: VERBS,
         published_limits: TIER_LIMITS,
       },
       requestId
@@ -812,106 +867,10 @@ async function handle(request: Request, requestId: string): Promise<Response> {
 
   const started = performance.now();
 
-  const projectUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!projectUrl || !serviceKey) {
-    // The non-null assertions this replaces threw a TypeError deep inside
-    // createClient on a misconfigured deploy, which surfaced as an opaque
-    // 500 on every request. Say what is wrong, once, in the log.
-    console.error(
-      JSON.stringify({
-        level: "error",
-        request_id: requestId,
-        message: "missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
-      })
-    );
-    return json(
-      503,
-      { error: "not_configured", message: "Service is not configured. This is not your fault." },
-      requestId
-    );
-  }
-  const supabase = createServiceClient(projectUrl, serviceKey);
-
-  /* 1. Authenticate the key. ---------------------------------------- */
-  const authResult = await authenticate(supabase, request.headers.get("authorization"));
-  if ("failure" in authResult) {
-    // One message for every failure mode. Distinguishing "revoked" from
-    // "unknown" in the response would confirm that a key had once been
-    // valid, which turns this endpoint into an oracle for testing
-    // harvested keys. The reason goes to the log, where the account's own
-    // operator can be told it.
-    console.warn(
-      JSON.stringify({
-        level: "warn",
-        request_id: requestId,
-        event: "auth_refused",
-        reason: authResult.failure,
-      })
-    );
-    return json(
-      401,
-      {
-        error: "unauthorized",
-        message: "A valid, unexpired nsh_live_ key with the verify scope is required.",
-      },
-      requestId,
-      { "WWW-Authenticate": 'Bearer realm="noshashi"' }
-    );
-  }
-  const auth = authResult.auth;
-
-  /* 2. Entitlement and tier. ---------------------------------------- */
-  const { data: entitlements, error: entitlementError } = await supabase
-    .schema("noshashi")
-    .from("entitlements")
-    .select("tier, verification_quota, features, valid_until, rate_limit_per_second")
-    .eq("account_id", auth.accountId)
-    .maybeSingle();
-  if (entitlementError) throw entitlementError;
-
-  const tier = String(entitlements?.tier ?? "operator");
-  const features = (entitlements?.features as string[] | undefined) ?? [];
-  const expired =
-    entitlements?.valid_until &&
-    new Date(String(entitlements.valid_until)).getTime() < Date.now();
-
-  /* 3. Rate limit — durable, per key, two windows. ------------------- */
-  const published = TIER_LIMITS[tier] ?? TIER_LIMITS.operator;
-  // A negotiated Institutional limit overrides the published ceiling.
-  // Null means "use the published figure for the tier".
-  const negotiated = entitlements?.rate_limit_per_second;
-  const hasNegotiated = negotiated !== null && negotiated !== undefined;
-  const perSecond = hasNegotiated ? Number(negotiated) : published.perSecond;
-  // Sustained allowance is 30x the burst rate rather than 60x: a caller
-  // is not expected to hold their peak rate for every second of a
-  // minute, and pricing the sustained window at the full product would
-  // make the per-second limit decorative.
-  const perMinute = hasNegotiated ? Number(negotiated) * 30 : published.perMinute;
-
-  for (const [windowSeconds, limit] of [[1, perSecond], [60, perMinute]] as const) {
-    const decision = await takeRate(supabase, auth.keyId, windowSeconds, limit);
-    if (!decision.allowed) {
-      const retryAfter = Math.max(
-        1,
-        Math.ceil((new Date(decision.resetAt).getTime() - Date.now()) / 1000)
-      );
-      return json(
-        429,
-        {
-          error: "rate_limited",
-          message: `Exceeded ${limit} requests per ${windowSeconds}s for the ${tier} tier.`,
-        },
-        requestId,
-        {
-          "Retry-After": String(retryAfter),
-          "RateLimit-Limit": String(decision.limit),
-          "RateLimit-Remaining": "0",
-          "RateLimit-Reset": String(retryAfter),
-        }
-      );
-    }
-  }
+  /* 1–3. Key, entitlement, rate limit. ------------------------------ */
+  const admitted = await admit(request, requestId, "verify");
+  if (admitted instanceof Response) return admitted;
+  const { supabase, auth, features, expired, perSecond } = admitted;
 
   /* 4. Read and validate the body. ---------------------------------- */
   const contentType = (request.headers.get("content-type") ?? "").toLowerCase();
@@ -1129,6 +1088,10 @@ async function handle(request: Request, requestId: string): Promise<Response> {
     .insert({
       account_id: auth.accountId,
       api_key_id: auth.keyId,
+      // Set for a key issued to an organization. It is what makes the
+      // receipt the organization's record, visible to its members and
+      // delivered to its receipt_created webhooks.
+      organization_id: auth.organizationId,
       request_id: requestId,
       idempotency_key: idempotencyKey,
       subject_address: subject,
@@ -1189,6 +1152,322 @@ async function handle(request: Request, requestId: string): Promise<Response> {
   }
 
   return json(200, responseBody, requestId, { "RateLimit-Limit": String(perSecond) });
+}
+
+/**
+ * Steps every authenticated verb shares: configuration, the key, the
+ * entitlement row, and the durable per-key rate limit. Returns a Response
+ * when the request is refused, otherwise what the verb needs to proceed.
+ */
+type Admitted = {
+  supabase: ServiceClient;
+  auth: ApiKeyAuth;
+  tier: string;
+  features: string[];
+  expired: boolean;
+  perSecond: number;
+};
+
+async function admit(request: Request, requestId: string, scope: RequiredScope): Promise<Admitted | Response> {
+  const projectUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!projectUrl || !serviceKey) {
+    // The non-null assertions this replaces threw a TypeError deep inside
+    // createClient on a misconfigured deploy, which surfaced as an opaque
+    // 500 on every request. Say what is wrong, once, in the log.
+    console.error(
+      JSON.stringify({
+        level: "error",
+        request_id: requestId,
+        message: "missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
+      })
+    );
+    return json(
+      503,
+      { error: "not_configured", message: "Service is not configured. This is not your fault." },
+      requestId
+    );
+  }
+  const supabase = createServiceClient(projectUrl, serviceKey);
+
+  /* 1. Authenticate the key. ---------------------------------------- */
+  const authResult = await authenticate(supabase, request.headers.get("authorization"), scope);
+  if ("failure" in authResult) {
+    // One message for every failure mode. Distinguishing "revoked" from
+    // "unknown" in the response would confirm that a key had once been
+    // valid, which turns this endpoint into an oracle for testing
+    // harvested keys. The reason goes to the log, where the account's own
+    // operator can be told it.
+    console.warn(
+      JSON.stringify({
+        level: "warn",
+        request_id: requestId,
+        event: "auth_refused",
+        reason: authResult.failure,
+      })
+    );
+    return json(
+      401,
+      {
+        error: "unauthorized",
+        message: `A valid, unexpired nsh_live_ key with the ${scope === "verify" ? "verify" : "read or verify"} scope is required.`,
+      },
+      requestId,
+      { "WWW-Authenticate": 'Bearer realm="noshashi"' }
+    );
+  }
+  const auth = authResult.auth;
+
+  /* 2. Entitlement and tier. ---------------------------------------- */
+  const { data: entitlements, error: entitlementError } = await supabase
+    .schema("noshashi")
+    .from("entitlements")
+    .select("tier, verification_quota, features, valid_until, rate_limit_per_second")
+    .eq("account_id", auth.accountId)
+    .maybeSingle();
+  if (entitlementError) throw entitlementError;
+
+  const tier = String(entitlements?.tier ?? "operator");
+  const features = (entitlements?.features as string[] | undefined) ?? [];
+  const expired = Boolean(
+    entitlements?.valid_until &&
+    new Date(String(entitlements.valid_until)).getTime() < Date.now()
+  );
+
+  /* 3. Rate limit — durable, per key, two windows. ------------------- */
+  const published = TIER_LIMITS[tier] ?? TIER_LIMITS.operator;
+  // A negotiated Institutional limit overrides the published ceiling.
+  // Null means "use the published figure for the tier".
+  const negotiated = entitlements?.rate_limit_per_second;
+  const hasNegotiated = negotiated !== null && negotiated !== undefined;
+  const perSecond = hasNegotiated ? Number(negotiated) : published.perSecond;
+  // Sustained allowance is 30x the burst rate rather than 60x: a caller
+  // is not expected to hold their peak rate for every second of a
+  // minute, and pricing the sustained window at the full product would
+  // make the per-second limit decorative.
+  const perMinute = hasNegotiated ? Number(negotiated) * 30 : published.perMinute;
+
+  for (const [windowSeconds, limit] of [[1, perSecond], [60, perMinute]] as const) {
+    const decision = await takeRate(supabase, auth.keyId, windowSeconds, limit);
+    if (!decision.allowed) {
+      const retryAfter = Math.max(
+        1,
+        Math.ceil((new Date(decision.resetAt).getTime() - Date.now()) / 1000)
+      );
+      return json(
+        429,
+        {
+          error: "rate_limited",
+          message: `Exceeded ${limit} requests per ${windowSeconds}s for the ${tier} tier.`,
+        },
+        requestId,
+        {
+          "Retry-After": String(retryAfter),
+          "RateLimit-Limit": String(decision.limit),
+          "RateLimit-Remaining": "0",
+          "RateLimit-Reset": String(retryAfter),
+        }
+      );
+    }
+  }
+
+  return { supabase, auth, tier, features, expired, perSecond };
+}
+
+/* ------------------------------------------------------------------ */
+/* Read verbs                                                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Receipts and live ledger analysis. Authenticated and rate-limited like
+ * adjudication, gated on the same compliance_api entitlement, and free:
+ * none of them decides anything, so none of them draws a credit or writes
+ * a receipt. Each analysis states the ledger it was read from; a fact the
+ * ledger did not return is null, never a default.
+ */
+async function handleRead(request: Request, requestId: string, verb: ReadVerb): Promise<Response> {
+  const method = request.method.toUpperCase();
+  const expected = verb.kind === "receipt" ? "GET" : "POST";
+  if (method !== expected) {
+    return json(
+      405,
+      { error: "method_not_allowed", message: `This verb takes ${expected}.` },
+      requestId,
+      { Allow: expected }
+    );
+  }
+
+  const admitted = await admit(request, requestId, "read");
+  if (admitted instanceof Response) return admitted;
+  const { supabase, auth, features, expired, perSecond } = admitted;
+  const headers = { "RateLimit-Limit": String(perSecond) };
+
+  if (!features.includes("compliance_api")) {
+    return json(
+      403,
+      { error: "feature_not_enabled", message: "The Compliance API requires the Institutional plan." },
+      requestId
+    );
+  }
+  if (expired) {
+    return json(
+      403,
+      { error: "entitlement_expired", message: "Entitlement has expired. Renew to continue." },
+      requestId
+    );
+  }
+
+  if (verb.kind === "receipt") {
+    // The key's own account, or the organization the key was issued to.
+    // Anyone else's receipt with the same digest is not found, not
+    // forbidden: saying it exists would disclose that someone checked.
+    let query = supabase
+      .schema("noshashi")
+      .from("verification_events")
+      .select("receipt, receipt_digest, request_id, created_at, organization_id")
+      .eq("receipt_digest", verb.digest);
+    query = auth.organizationId
+      ? query.or(`account_id.eq.${auth.accountId},organization_id.eq.${auth.organizationId}`)
+      : query.eq("account_id", auth.accountId);
+    const { data, error } = await query.order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (error) throw error;
+    if (!data?.receipt) {
+      return json(
+        404,
+        { error: "receipt_not_found", message: "No receipt with that digest was recorded for this key's account or organization." },
+        requestId,
+        headers
+      );
+    }
+    return json(
+      200,
+      {
+        receipt: data.receipt,
+        digest: data.receipt_digest,
+        recorded_at: data.created_at,
+        original_request_id: data.request_id,
+        scope: data.organization_id ? "organization" : "account",
+      },
+      requestId,
+      headers
+    );
+  }
+
+  /* Analysis: a small JSON body naming one ledger object. ------------ */
+  const contentType = (request.headers.get("content-type") ?? "").toLowerCase();
+  if (!contentType.includes("application/json")) {
+    return json(
+      415,
+      { error: "unsupported_media_type", message: "Content-Type must be application/json." },
+      requestId
+    );
+  }
+  const rawBody = await request.text();
+  if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    return json(
+      413,
+      { error: "payload_too_large", message: `Body must be under ${MAX_BODY_BYTES} bytes.` },
+      requestId
+    );
+  }
+  let body: Record<string, unknown>;
+  try {
+    const parsed = JSON.parse(rawBody);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) throw new Error("not an object");
+    body = parsed as Record<string, unknown>;
+  } catch {
+    return json(400, { error: "invalid_json", message: "Request body must be a JSON object." }, requestId);
+  }
+
+  const readAt = new Date().toISOString();
+  const source = "XRPL mainnet, validated ledger, read live from the public rippled servers";
+
+  try {
+    if (verb.kind === "transaction") {
+      const hash = normaliseTxHash(body.hash);
+      if (!hash) {
+        return json(400, { error: "invalid_hash", message: "hash must be a 64-character hexadecimal transaction hash." }, requestId);
+      }
+      const result = await rippleRpc("tx", { transaction: hash, binary: false }, ["txnNotFound"]);
+      return json(200, { ...summariseTransaction(result), source, read_at: readAt }, requestId, headers);
+    }
+
+    const field = verb.kind === "issuer" ? "issuer" : "address";
+    const address = typeof body[field] === "string" ? String(body[field]).trim() : "";
+    if (!(await isValidClassicAddress(address))) {
+      return json(
+        400,
+        { error: "invalid_address", message: `${field} must be an XRPL classic address that passes its base58 checksum.` },
+        requestId
+      );
+    }
+
+    if (verb.kind === "issuer") {
+      const result = await rippleRpc("account_info", { account: address, ledger_index: "validated" });
+      const ledgerIndex = result.ledger_index === undefined ? null : Number(result.ledger_index);
+      return json(
+        200,
+        { ...summariseIssuer(address, (result.account_data ?? {}) as Record<string, unknown>, ledgerIndex), source, read_at: readAt },
+        requestId,
+        headers
+      );
+    }
+
+    const [info, credentials, server] = await Promise.all([
+      rippleRpc("account_info", { account: address, ledger_index: "validated" }).catch((error) => {
+        if (error instanceof RippledError && error.code === "actNotFound") return null;
+        throw error;
+      }),
+      fetchLedgerCredentials(address),
+      rippleRpc("server_info", {}).catch(() => null),
+    ]);
+    return json(
+      200,
+      {
+        ...summariseAddress({
+          address,
+          accountData: info ? ((info.account_data ?? {}) as Record<string, unknown>) : null,
+          ledgerIndex: info?.ledger_index === undefined ? null : Number(info.ledger_index),
+          credentials,
+          reserves: reservesOf(server),
+        }),
+        source,
+        read_at: readAt,
+      },
+      requestId,
+      headers
+    );
+  } catch (error) {
+    if (error instanceof RippledError && (error.code === "actNotFound" || error.code === "txnNotFound")) {
+      return json(
+        404,
+        {
+          error: error.code === "actNotFound" ? "account_not_found" : "transaction_not_found",
+          message:
+            error.code === "actNotFound"
+              ? "The validated ledger has no account at that address."
+              : "Neither public server holds a transaction with that hash.",
+        },
+        requestId,
+        headers
+      );
+    }
+    console.error(
+      JSON.stringify({
+        level: "error",
+        request_id: requestId,
+        event: "ledger_read_failed",
+        verb: verb.kind,
+        message: error instanceof Error ? error.message : String(error),
+      })
+    );
+    return json(
+      502,
+      { error: "ledger_unavailable", message: "Could not read ledger state. Try again shortly." },
+      requestId,
+      headers
+    );
+  }
 }
 
 /**

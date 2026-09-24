@@ -61,10 +61,15 @@ Errors are JSON with `{ "error": "<stable_code>", "message": "…" }`:
 | 403    | `feature_not_enabled` | key is valid but the account lacks the feature |
 | 403    | `entitlement_expired`  | entitlement has lapsed                      |
 | 404    | `unknown_domain`    | domain code not in the registry                |
-| 429    | `rate_limited`      | basic per-instance rate limit (60/min)         |
+| 429    | `rate_limited`      | durable per-key, per-tier limit (see GET)      |
 | 502    | `ledger_unavailable`| mainnet read failed; nothing consumed          |
 
 `GET` the same URL (no auth) for the registry and a summary of the contract.
+
+Receipts lookup and live ledger analysis (`receipts/{digest}`,
+`analyze/issuer`, `analyze/address`, `analyze/transaction`) are served by
+the same function and documented in
+[`docs/api/COMPLIANCE_API.md`](../../../docs/api/COMPLIANCE_API.md).
 
 ## Billing
 
