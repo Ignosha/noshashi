@@ -1,0 +1,838 @@
+{
+  "scenes": [
+    {
+      "name": "Overview",
+      "plan": "Free",
+      "summary": "what NOSHASHI is and what it reads."
+    },
+    {
+      "name": "Mission Control",
+      "plan": "Free",
+      "summary": "live mainnet telemetry, wallet gate, policy rule set."
+    },
+    {
+      "name": "Verification",
+      "plan": "Free",
+      "summary": "describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast."
+    },
+    {
+      "name": "Credentials",
+      "plan": "Free",
+      "summary": "XLS-70 objects held by the wallet, and which domains they unlock."
+    },
+    {
+      "name": "Domain Grid",
+      "plan": "Free",
+      "summary": "XLS-80 permissioned domains and their rule sets."
+    },
+    {
+      "name": "Audit Trail",
+      "plan": "Free",
+      "summary": "wallet history, filterable, exportable to CSV."
+    },
+    {
+      "name": "Agent",
+      "plan": "Free",
+      "summary": "this assistant."
+    },
+    {
+      "name": "Portfolio & Radar",
+      "plan": "Desk",
+      "summary": "multi-wallet surveillance and the compliance radar."
+    },
+    {
+      "name": "Exposure Analysis",
+      "plan": "Desk",
+      "summary": "issuer freeze rights, Travel Rule scope, counterparty concentration."
+    },
+    {
+      "name": "Ledger & Policy",
+      "plan": "Desk",
+      "summary": "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export."
+    },
+    {
+      "name": "Check an Address",
+      "plan": "Free",
+      "summary": "read what the ledger publishes about any account."
+    },
+    {
+      "name": "Token Rights",
+      "plan": "Free",
+      "summary": "what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly."
+    },
+    {
+      "name": "Inbox",
+      "plan": "Free",
+      "summary": "every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds."
+    },
+    {
+      "name": "Ledger Sync",
+      "plan": "Free",
+      "summary": "four public XRPL nodes queried and compared, with disagreement between them treated as the reading."
+    },
+    {
+      "name": "Learn",
+      "plan": "Free",
+      "summary": "short animated explainers."
+    },
+    {
+      "name": "Settlement",
+      "plan": "Desk",
+      "summary": "what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question."
+    },
+    {
+      "name": "Ledger Garden",
+      "plan": "Desk",
+      "summary": "walk the ledger's relationships one validated read at a time — an issuer's assets, an asset's holders (from the first 200 of the issuer's trust lines, in ledger order; Issuance walks them all), an account's holdings and recent transactions, a transaction's settlement evidence — then hand the whole path to this agent as a question."
+    },
+    {
+      "name": "Provenance",
+      "plan": "Desk",
+      "summary": "how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts."
+    },
+    {
+      "name": "Control Surface",
+      "plan": "Desk",
+      "summary": "how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable."
+    },
+    {
+      "name": "Order Book",
+      "plan": "Desk",
+      "summary": "how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill."
+    },
+    {
+      "name": "Pool Governance",
+      "plan": "Desk",
+      "summary": "who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot."
+    },
+    {
+      "name": "Issuance",
+      "plan": "Institution",
+      "summary": "holder concentration and enforcement history for an issuer, from the issuer's side."
+    },
+    {
+      "name": "Authority Certificate",
+      "plan": "Desk",
+      "summary": "what authority an issuer has kept over an asset it issued — whether it can freeze a holder, whether it gave that power up irrevocably (lsfNoFreeze cannot be cleared once set), whether the asset is frozen right now, whether holding it needs the issuer's permission, whether one signer reaches the quorum alone, what it charges on a transfer between holders, and how concentrated the supply is. Each answer is a fact at one named ledger index, and the set is digested with SHA-256 so the same reading can be checked again later. It is NOT a score — no number is composited from the checks — and NOT a legal finding: whether an asset is decentralised or is a security is a determination for an agency applying statutory criteria, which this software does not evaluate. If the supply walk is skipped, or trust-line coverage falls below 95%, the concentration check abstains rather than passing."
+    },
+    {
+      "name": "Asset Passport",
+      "plan": "Enterprise",
+      "summary": "a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks."
+    },
+    {
+      "name": "Growth",
+      "plan": "Free",
+      "summary": "platform-native drafts built from measured figures."
+    },
+    {
+      "name": "Pricing",
+      "plan": "Free",
+      "summary": "plans, checkout and verification credits."
+    },
+    {
+      "name": "Account",
+      "plan": "Free",
+      "summary": "subscription, two-factor authentication and API keys."
+    },
+    {
+      "name": "Business Plan",
+      "plan": "Free",
+      "summary": "revenue streams, tiers and sequencing."
+    },
+    {
+      "name": "Legal & Accessibility",
+      "plan": "Free",
+      "summary": "policies, accessibility statement and contact routes."
+    },
+    {
+      "name": "Trust & Security",
+      "plan": "Free",
+      "summary": "the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim."
+    },
+    {
+      "name": "Settings",
+      "plan": "Free",
+      "summary": "appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage."
+    }
+  ],
+  "servers": [
+    "wss://xrplcluster.com",
+    "wss://s1.ripple.com",
+    "wss://s2.ripple.com"
+  ],
+  "readCommands": [
+    "account_info",
+    "account_lines",
+    "account_objects",
+    "account_tx",
+    "amm_info",
+    "book_offers",
+    "fee",
+    "gateway_balances",
+    "ledger",
+    "ledger_entry",
+    "nft_buy_offers",
+    "nft_sell_offers",
+    "server_info",
+    "subscribe",
+    "tx"
+  ],
+  "forbiddenCommands": [
+    "submit",
+    "submit_multisigned",
+    "sign",
+    "sign_for",
+    "wallet_propose",
+    "channel_authorize",
+    "validation_create",
+    "wallet_seed"
+  ],
+  "stages": [
+    {
+      "label": "XRPL MAINNET",
+      "summary": "Public XRP Ledger servers, read over WebSocket and HTTPS.",
+      "detail": "The app connects directly to public servers: xrplcluster.com, s1.ripple.com and s2.ripple.com, in failover order (the Network view also compares xrpl.ws). The Compliance API reads s1 and s2 over HTTPS. No NOSHASHI server sits between the app and the ledger. Only read commands are sent; the full list is below and is checked by test.",
+      "where": [
+        "src/lib/xrpl/link.ts",
+        "src/lib/xrpl/client.ts"
+      ]
+    },
+    {
+      "label": "VALIDATED STATE",
+      "summary": "Ledger state is read from the last validated ledger, never an open one.",
+      "detail": "Every state read asks for ledger_index \"validated\" or reads a validated range. A transaction counts as final only when the server says validated: true; until then it is shown as not final.",
+      "where": [
+        "src/lib/xrpl/client.ts",
+        "src/lib/desk/settlement.ts"
+      ]
+    },
+    {
+      "label": "NORMALIZATION",
+      "summary": "Raw ledger fields become comparable facts.",
+      "detail": "Drops become XRP exactly; hex fields are decoded; Ripple-epoch times become UTC; delivered_amount is used instead of Amount; a field the ledger did not return stays empty rather than becoming zero.",
+      "where": [
+        "src/lib/xrpl/client.ts",
+        "supabase/functions/noshashi-verify/read.ts"
+      ]
+    },
+    {
+      "label": "ANALYSIS",
+      "summary": "Deterministic engines: issuer controls, concentration, liquidity, credentials, provenance.",
+      "detail": "Each engine is ordinary code over the normalized facts. The same input produces the same output. No language model runs in this path.",
+      "where": [
+        "src/lib/desk/"
+      ]
+    },
+    {
+      "label": "POLICY ENGINE",
+      "summary": "Rules applied to the facts: the domain registry and, when set, an institutional policy.",
+      "detail": "Institutional policies are versioned and hashed. In an organization, the person who submits a policy cannot also activate it; activation is checked on the server.",
+      "where": [
+        "src/lib/policy.ts",
+        "src/lib/desk/institutional.ts",
+        "supabase/functions/noshashi-policy-activate/"
+      ]
+    },
+    {
+      "label": "DECISION",
+      "summary": "GO, HOLD, NO-GO or INSUFFICIENT DATA, from the rule results alone.",
+      "detail": "The verdict is a fixed function of which rules passed. The AI assistant can explain a verdict but has no path to change one.",
+      "where": [
+        "src/lib/policy.ts"
+      ]
+    },
+    {
+      "label": "EVIDENCE",
+      "summary": "What was read, which rules applied, what each found.",
+      "detail": "Each verdict keeps its check list, so it can be walked backwards from the verdict to the facts. Investigations are hash-chained: each event includes the hash of the one before it.",
+      "where": [
+        "src/lib/desk/evidence.ts",
+        "src/lib/desk/investigations.ts"
+      ]
+    },
+    {
+      "label": "CRYPTOGRAPHIC RECEIPT",
+      "summary": "A SHA-256 digest over a fixed, canonical form of the decision.",
+      "detail": "Anyone holding the receipt body can recompute the digest and see whether it was altered. A digest is not a digital signature: it proves the body is unchanged, not who produced it.",
+      "where": [
+        "src/lib/policy.ts",
+        "src/lib/desk/evidence.ts"
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "label": "NO PRIVATE KEYS",
+      "claim": "NOSHASHI never asks for, generates or stores an XRPL secret, seed or private key.",
+      "basis": "No XRPL wallet or key-pair library is imported. The app will not send a message containing an XRPL secret seed to any AI model: it checks every message before sending and refuses. The keys NOSHASHI does hold are of other kinds: model-provider API keys and the Compliance API secret sit in the operating system keyring, and nsh_live_ API keys are stored only as SHA-256 hashes."
+    },
+    {
+      "label": "NO CUSTODY",
+      "claim": "NOSHASHI holds no client assets and controls no account on the ledger.",
+      "basis": "Addresses are entered to be read. There is no deposit address, balance under management or withdrawal path."
+    },
+    {
+      "label": "NO SIGNING",
+      "claim": "No code path signs an XRPL transaction.",
+      "basis": "The signing commands (sign, sign_for, submit_multisigned, wallet_propose, channel_authorize) appear nowhere in the covered code, which a test checks. NOSHASHI does sign messages of its own kind — webhook deliveries carry an HMAC — which is unrelated to ledger transactions."
+    },
+    {
+      "label": "NO BROADCAST",
+      "claim": "Nothing is ever submitted to the ledger.",
+      "basis": "The submit command appears nowhere in the covered code, which a test checks. Every command that is sent is on the published read-only list."
+    }
+  ],
+  "dataFlows": [
+    {
+      "party": "Public XRPL servers",
+      "what": "The addresses, transactions and order books you ask about.",
+      "why": "To read the ledger. These servers are run by third parties and see your queries."
+    },
+    {
+      "party": "Your device",
+      "what": "The workstation's verdict ledger, settings and cases outside an organization.",
+      "why": "Kept locally on purpose; not transmitted."
+    },
+    {
+      "party": "Supabase (NOSHASHI's hosted database)",
+      "what": "Account, subscription, organization data, shared cases, audit log, API receipts, hashed API keys.",
+      "why": "Accounts, billing entitlements and anything shared across an organization."
+    },
+    {
+      "party": "Stripe",
+      "what": "Payment details, entered on Stripe's own page.",
+      "why": "Billing. NOSHASHI never sees card numbers."
+    },
+    {
+      "party": "Have I Been Pwned",
+      "what": "The first five characters of a SHA-1 hash of a new password, sent from NOSHASHI's server.",
+      "why": "To refuse passwords known from breaches. The password itself never leaves NOSHASHI."
+    },
+    {
+      "party": "An AI provider you choose",
+      "what": "Your questions and the context attached to them.",
+      "why": "Only if you configure a hosted provider. The default is a model on your own machine, and the app shows which applies."
+    }
+  ],
+  "oversight": [
+    "A policy submitted by one member must be activated by another; the server refuses self-activation.",
+    "Policy exceptions are requested by one member and decided by another, and every decision is written to an append-only audit log.",
+    "Investigations are opened, prioritised and closed by people. The AI assistant can be asked about a case but cannot create, change or close one.",
+    "Every call to an AI model is recorded with digests and sizes, so what was sent and when can be shown without keeping a second copy of the text."
+  ],
+  "limits": [
+    "NOSHASHI trusts the public servers it reads from. It does not verify ledger proofs or validator signatures itself, and individual reads are not cross-checked between servers (the Network view compares servers separately).",
+    "A receipt digest shows the receipt was not altered. It is not a signature and does not by itself prove NOSHASHI issued it.",
+    "If you configure a hosted AI provider, your prompts are processed by that provider under its terms.",
+    "NOSHASHI holds no security certification (such as SOC 2 or ISO 27001) and makes no claim of regulatory compliance. It is software that reads the ledger and applies rules; the decisions stay yours."
+  ],
+  "verdicts": [
+    {
+      "id": "go",
+      "title": "GO",
+      "blurb": "Every blocking rule passed. Settlement is cleared to broadcast."
+    },
+    {
+      "id": "hold",
+      "title": "HOLD",
+      "blurb": "Blocking rules passed but an advisory rule failed. Manual sign-off required."
+    },
+    {
+      "id": "no-go",
+      "title": "NO-GO",
+      "blurb": "A blocking rule failed. Settlement is refused by the compliance layer."
+    },
+    {
+      "id": "insufficient-data",
+      "title": "INSUFFICIENT DATA",
+      "blurb": "A rule could not be evaluated because the evidence it needs could not be read. This is not a pass, a failure or a soft refusal — it is the absence of an answer, and it says nothing about the subject."
+    }
+  ],
+  "rules": [
+    {
+      "id": "ACCOUNT_ACTIVATED",
+      "label": "Account activated on mainnet",
+      "severity": "block",
+      "domains": [
+        "DEX-US",
+        "LEND-INST",
+        "TOKEN-PVT",
+        "MINT-US",
+        "CUST-Q",
+        "RTL-OPEN"
+      ]
+    },
+    {
+      "id": "CREDENTIAL_KYC_LEVEL_1",
+      "label": "Holds kyc level 1",
+      "severity": "block",
+      "domains": [
+        "DEX-US",
+        "RTL-OPEN"
+      ]
+    },
+    {
+      "id": "CREDENTIAL_SANCTIONS_CLEARANCE",
+      "label": "Holds sanctions clearance",
+      "severity": "block",
+      "domains": [
+        "DEX-US",
+        "LEND-INST",
+        "MINT-US"
+      ]
+    },
+    {
+      "id": "RESERVE_SOLVENCY",
+      "label": "Clears XRPL owner reserve",
+      "severity": "block",
+      "domains": [
+        "DEX-US",
+        "LEND-INST",
+        "TOKEN-PVT",
+        "MINT-US",
+        "CUST-Q",
+        "RTL-OPEN"
+      ]
+    },
+    {
+      "id": "SPENDABLE_BALANCE",
+      "label": "Spendable balance covers transfer",
+      "severity": "block",
+      "domains": [
+        "DEX-US",
+        "LEND-INST",
+        "TOKEN-PVT",
+        "MINT-US",
+        "CUST-Q",
+        "RTL-OPEN"
+      ]
+    },
+    {
+      "id": "TRANSFER_CEILING",
+      "label": "Within domain transfer ceiling",
+      "severity": "block",
+      "domains": [
+        "DEX-US",
+        "LEND-INST",
+        "TOKEN-PVT",
+        "CUST-Q",
+        "RTL-OPEN"
+      ]
+    },
+    {
+      "id": "DOMAIN_GOVERNANCE",
+      "label": "Domain governance is active",
+      "severity": "warn",
+      "domains": [
+        "DEX-US",
+        "LEND-INST",
+        "TOKEN-PVT",
+        "CUST-Q",
+        "RTL-OPEN"
+      ]
+    },
+    {
+      "id": "DOMAIN_ATTESTATION",
+      "label": "Account publishes a domain attestation",
+      "severity": "warn",
+      "domains": [
+        "DEX-US",
+        "LEND-INST",
+        "TOKEN-PVT",
+        "MINT-US",
+        "CUST-Q",
+        "RTL-OPEN"
+      ]
+    },
+    {
+      "id": "CREDENTIAL_ACCREDITED_INVESTOR",
+      "label": "Holds accredited investor",
+      "severity": "block",
+      "domains": [
+        "LEND-INST",
+        "TOKEN-PVT",
+        "MINT-US"
+      ]
+    },
+    {
+      "id": "CREDENTIAL_PEP_SCREENING",
+      "label": "Holds pep screening",
+      "severity": "block",
+      "domains": [
+        "TOKEN-PVT"
+      ]
+    },
+    {
+      "id": "CREDENTIAL_KYC_LEVEL_2",
+      "label": "Holds kyc level 2",
+      "severity": "block",
+      "domains": [
+        "MINT-US",
+        "CUST-Q"
+      ]
+    },
+    {
+      "id": "CREDENTIAL_INSTITUTIONAL_CUSTODY",
+      "label": "Holds institutional custody",
+      "severity": "block",
+      "domains": [
+        "MINT-US",
+        "CUST-Q"
+      ]
+    },
+    {
+      "id": "TRANSFER_CEILING",
+      "label": "Domain accepts settlements",
+      "severity": "block",
+      "domains": [
+        "MINT-US"
+      ]
+    },
+    {
+      "id": "DOMAIN_GOVERNANCE",
+      "label": "Domain governance is active",
+      "severity": "block",
+      "domains": [
+        "MINT-US"
+      ]
+    }
+  ],
+  "domains": [
+    {
+      "code": "DEX-US",
+      "name": "US_REGULATED_DEX",
+      "requirements": [
+        "KYC_LEVEL_1",
+        "SANCTIONS_CLEARANCE"
+      ],
+      "ceilingXrp": 250000,
+      "governance": "active"
+    },
+    {
+      "code": "LEND-INST",
+      "name": "INSTITUTIONAL_LENDING",
+      "requirements": [
+        "ACCREDITED_INVESTOR",
+        "SANCTIONS_CLEARANCE"
+      ],
+      "ceilingXrp": 5000000,
+      "governance": "active"
+    },
+    {
+      "code": "TOKEN-PVT",
+      "name": "PRIVATE_TOKEN_SALES",
+      "requirements": [
+        "ACCREDITED_INVESTOR",
+        "PEP_SCREENING"
+      ],
+      "ceilingXrp": 1000000,
+      "governance": "review"
+    },
+    {
+      "code": "MINT-US",
+      "name": "STABLECOIN_MINTING",
+      "requirements": [
+        "KYC_LEVEL_2",
+        "ACCREDITED_INVESTOR",
+        "SANCTIONS_CLEARANCE",
+        "INSTITUTIONAL_CUSTODY"
+      ],
+      "ceilingXrp": 0,
+      "governance": "suspended"
+    },
+    {
+      "code": "CUST-Q",
+      "name": "QUALIFIED_CUSTODY",
+      "requirements": [
+        "KYC_LEVEL_2",
+        "INSTITUTIONAL_CUSTODY"
+      ],
+      "ceilingXrp": 20000000,
+      "governance": "active"
+    },
+    {
+      "code": "RTL-OPEN",
+      "name": "RETAIL_SETTLEMENT",
+      "requirements": [
+        "KYC_LEVEL_1"
+      ],
+      "ceilingXrp": 10000,
+      "governance": "active"
+    }
+  ],
+  "providers": [
+    {
+      "name": "Ollama",
+      "local": true,
+      "free": true,
+      "requiresKey": false,
+      "docsUrl": "https://ollama.com/download"
+    },
+    {
+      "name": "LM Studio",
+      "local": true,
+      "free": true,
+      "requiresKey": false,
+      "docsUrl": "https://lmstudio.ai"
+    },
+    {
+      "name": "llama.cpp",
+      "local": true,
+      "free": true,
+      "requiresKey": false,
+      "docsUrl": "https://github.com/ggml-org/llama.cpp"
+    },
+    {
+      "name": "Jan",
+      "local": true,
+      "free": true,
+      "requiresKey": false,
+      "docsUrl": "https://jan.ai"
+    },
+    {
+      "name": "vLLM",
+      "local": true,
+      "free": true,
+      "requiresKey": false,
+      "docsUrl": "https://docs.vllm.ai"
+    },
+    {
+      "name": "Claude (Anthropic)",
+      "local": false,
+      "free": false,
+      "requiresKey": true,
+      "docsUrl": "https://docs.anthropic.com"
+    },
+    {
+      "name": "OpenAI",
+      "local": false,
+      "free": false,
+      "requiresKey": true,
+      "docsUrl": "https://platform.openai.com/docs"
+    },
+    {
+      "name": "Groq",
+      "local": false,
+      "free": true,
+      "requiresKey": true,
+      "docsUrl": "https://console.groq.com/docs"
+    },
+    {
+      "name": "OpenRouter",
+      "local": false,
+      "free": false,
+      "requiresKey": true,
+      "docsUrl": "https://openrouter.ai/docs"
+    },
+    {
+      "name": "DeepSeek",
+      "local": false,
+      "free": false,
+      "requiresKey": true,
+      "docsUrl": "https://api-docs.deepseek.com"
+    },
+    {
+      "name": "Mistral",
+      "local": false,
+      "free": false,
+      "requiresKey": true,
+      "docsUrl": "https://docs.mistral.ai"
+    }
+  ],
+  "roles": [
+    {
+      "role": "owner",
+      "permissions": [
+        "editDraft",
+        "simulate",
+        "submit",
+        "activate",
+        "requestException",
+        "approveException",
+        "manageMembers",
+        "readAudit"
+      ]
+    },
+    {
+      "role": "admin",
+      "permissions": [
+        "editDraft",
+        "simulate",
+        "submit",
+        "activate",
+        "requestException",
+        "approveException",
+        "manageMembers",
+        "readAudit"
+      ]
+    },
+    {
+      "role": "compliance",
+      "permissions": [
+        "editDraft",
+        "simulate",
+        "submit",
+        "activate",
+        "requestException",
+        "approveException",
+        "readAudit"
+      ]
+    },
+    {
+      "role": "risk",
+      "permissions": [
+        "editDraft",
+        "simulate",
+        "submit",
+        "requestException",
+        "readAudit"
+      ]
+    },
+    {
+      "role": "analyst",
+      "permissions": [
+        "editDraft",
+        "simulate",
+        "submit",
+        "requestException"
+      ]
+    },
+    {
+      "role": "viewer",
+      "permissions": []
+    },
+    {
+      "role": "api",
+      "permissions": []
+    }
+  ],
+  "permissions": [
+    "editDraft",
+    "simulate",
+    "submit",
+    "activate",
+    "requestException",
+    "approveException",
+    "manageMembers",
+    "readAudit"
+  ],
+  "webhookEvents": [
+    {
+      "id": "policy_exception",
+      "label": "Policy exception requested"
+    },
+    {
+      "id": "exception_decided",
+      "label": "Exception approved or rejected"
+    },
+    {
+      "id": "policy_activated",
+      "label": "Policy version activated"
+    },
+    {
+      "id": "investigation_created",
+      "label": "Investigation opened"
+    },
+    {
+      "id": "investigation_resolved",
+      "label": "Investigation closed"
+    },
+    {
+      "id": "receipt_created",
+      "label": "API verification receipt recorded"
+    }
+  ],
+  "verbs": [
+    {
+      "path": "(bare path)",
+      "description": "POST — adjudicate a settlement. verify scope, one credit."
+    },
+    {
+      "path": "authority/check",
+      "description": "POST — re-derive an authority certificate's digest from its own body. Free, unauthenticated, reads nothing."
+    },
+    {
+      "path": "receipts/{digest}",
+      "description": "GET — a receipt this account or its organization recorded, as it was served. read or verify scope, free."
+    },
+    {
+      "path": "analyze/issuer",
+      "description": "POST { issuer } — an issuer's controls, read live from the validated ledger. read or verify scope, free."
+    },
+    {
+      "path": "analyze/address",
+      "description": "POST { address } — balance, reserve, owner count and credentials, read live. read or verify scope, free."
+    },
+    {
+      "path": "analyze/transaction",
+      "description": "POST { hash } — a transaction's type, parties, result and delivered amount, read live. read or verify scope, free."
+    }
+  ],
+  "edgeFunctions": [
+    "noshashi-checkout",
+    "noshashi-exception-decide",
+    "noshashi-password",
+    "noshashi-policy-activate",
+    "noshashi-stripe-webhook",
+    "noshashi-verify"
+  ],
+  "troubleshooting": [
+    {
+      "question": "Why did my check come back NO-GO?",
+      "answer": "NO-GO means at least one blocking rule failed, and the Verification scene names which one. In practice it is almost always one of three things: the account holds none of the XLS-70 credentials the target domain requires (most mainnet accounts hold none yet), the transfer exceeds the domain's per-settlement ceiling, or the balance does not clear the XRPL owner reserve of 1 XRP plus 0.2 XRP per owned object. Open the verdict and read the row marked BLOCK — the detail line states the exact number that failed."
+    },
+    {
+      "question": "What is the difference between HOLD and NO-GO?",
+      "answer": "NO-GO means a blocking rule failed and the settlement is refused. HOLD means every blocking rule passed but an advisory one did not — most often the account publishes no Domain attestation, or the target domain is under governance review. HOLD is 'a human should look at this', not 'this is forbidden'."
+    },
+    {
+      "question": "Why does my wallet show no credentials?",
+      "answer": "Because it genuinely holds none. XLS-70 credentials are ledger objects that an issuer creates and the subject then accepts; they do not exist until someone issues one. An empty registry on mainnet is the normal state today, not a bug or a sync failure. Any domain rule that requires a credential will correctly read NO-GO until one is issued and accepted."
+    },
+    {
+      "question": "The console says OFFLINE or DEGRADED.",
+      "answer": "The console holds one WebSocket to a public XRPL node and rotates across three endpoints with exponential backoff. OFFLINE almost always means outbound WebSocket traffic on port 443 is being blocked — a corporate proxy, a VPN, or a strict firewall. Run the diagnostics below and use Reconnect; if it still fails, try without the VPN."
+    },
+    {
+      "question": "How do I change which wallet is being watched?",
+      "answer": "Settings → Wallet. Paste any XRPL classic address and press LOAD. It must start with r and be 25–35 characters. The console is read-only: it never asks for a seed, a private key or a signature, and it cannot move funds."
+    },
+    {
+      "question": "How do I export an audit trail?",
+      "answer": "Audit Trail → EXPORT CSV. It writes every record currently matching your filters, with the compliance metadata attached, into your Downloads folder. The file is plain CSV, so it opens directly in Excel, Numbers or a spreadsheet your accountant already uses."
+    },
+    {
+      "question": "How do I open the menu bar HUD?",
+      "answer": "Press Cmd+Shift+X from anywhere, or click the flower in the macOS menu bar. The HUD shows one thing at a glance — whether this wallet can settle right now — and the menu bar itself carries a live ticker with the gate state and current ledger height. It needs the desktop app; the browser build has no menu bar."
+    },
+    {
+      "question": "Where are my API keys and secrets stored?",
+      "answer": "In the macOS Keychain, through the OS keyring — never in a preferences file, never in browser storage, and never in a log. Compliance API keys you issue are stored only as a SHA-256 hash, shown once at creation, and cannot be recovered afterwards by you or by us. Model-provider keys are scoped per provider so revoking one does not disturb another."
+    },
+    {
+      "question": "How do I cancel or get a refund?",
+      "answer": "Account → Manage Billing opens Stripe's own portal; cancelling takes two clicks, needs no email and no phone call, and access continues to the end of the period you already paid for. Full refund within 14 days of a first subscription charge if you have not used a paid capability, and unused verification credits are refundable pro rata within 30 days."
+    },
+    {
+      "question": "What do I get without paying?",
+      "answer": "The whole console. Live mainnet telemetry, unlimited gate checks, the credential registry, the domain grid, the audit trail with CSV export, the on-device AI agent and the menu bar HUD are all free forever, with no account required. Paid plans add multi-wallet portfolios, drift and expiry alerting, receipt anchoring and the Compliance API — capabilities a desk needs, not a paywall on the basics."
+    },
+    {
+      "question": "The AI agent says no runtime is detected.",
+      "answer": "The agent defaults to a local model so your prompts never leave the machine. Install Ollama, run `ollama serve`, then `ollama pull hermes3`, and press RE-DETECT. LM Studio, llama.cpp, Jan and vLLM are detected automatically too. You can instead point it at Claude, OpenAI, Groq or any OpenAI-compatible endpoint by adding a key in the runtime panel. Support answers like this one work with no runtime at all."
+    },
+    {
+      "question": "What data do you collect about me?",
+      "answer": "Without an account: nothing. No analytics, no telemetry, no crash reporting, no advertising identifiers, and no server of ours receives your usage. With an account we hold your email, subscription state, any wallet addresses you add to a portfolio, and verification records. Passwords are bcrypt-hashed by our auth provider and we never see them. The full list is in Legal → Data Processing."
+    },
+    {
+      "question": "macOS says the app cannot be opened.",
+      "answer": "The build is not yet notarized by Apple, so Gatekeeper warns on first launch. Right-click the app and choose Open, then Open again — you only do this once. Notarization requires an Apple Developer account and is on the roadmap."
+    },
+    {
+      "question": "Can I rely on a verdict legally?",
+      "answer": "No, and we will not pretend otherwise. A GO means the rules you configured passed — it is not legal advice, not a regulatory determination, and it does not discharge an obligation you owe a regulator. The receipt proves a check ran against a stated rule set at a stated time. Anything with legal consequence needs your compliance officer and qualified counsel."
+    }
+  ]
+}

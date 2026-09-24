@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Getting started · NOSHASHI docs</title>
+<meta name="description" content="What NOSHASHI does, how to install it, and which screens each plan opens.">
+<link rel="canonical" href="https://www.noshashi.app/docs/getting-started/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/docs/getting-started/">
+<meta property="og:title" content="Getting started · NOSHASHI docs">
+<meta property="og:description" content="What NOSHASHI does, how to install it, and which screens each plan opens.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Getting started · NOSHASHI docs">
+<meta name="twitter:description" content="What NOSHASHI does, how to install it, and which screens each plan opens.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Getting started","item":"https://www.noshashi.app/docs/getting-started/"}]}]}</script>
+<style>
+.docs{display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px;align-items:start}
+.docs-nav{position:sticky;top:88px;display:grid;gap:2px;font-size:14px}
+.docs-nav a{padding:6px 10px;border-left:2px solid var(--rule);color:var(--muted);text-decoration:none}
+.docs-nav a[aria-current="page"]{border-left-color:var(--accent,currentColor);color:var(--ink)}
+.doc-body{min-width:0;max-width:820px}
+.doc-body h2{margin-top:36px}
+.doc-body pre{overflow-x:auto;padding:14px;border:1px solid var(--rule);font-size:13px}
+.table-scroll{overflow-x:auto}
+.doc-table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+.doc-table th,.doc-table td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+.doc-table thead th{font:12px "IBM Plex Mono",monospace;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.doc-src,.doc-where{font-size:12px;color:var(--faint)}
+.doc-steps li{margin-bottom:10px}
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.docs-grid a{display:block;padding:16px;border:1px solid var(--rule);text-decoration:none;color:inherit}
+.docs-grid a:hover{border-color:var(--ink)}
+@media (max-width:860px){.docs{grid-template-columns:1fr}.docs-nav{position:static;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/news/"><span data-i18n="nav.news">Newsroom</span></a>
+      <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
+      <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
+      <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
+      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head"><p class="eyebrow"><a href="/docs/">DOCUMENTATION</a></p><h1>Getting started</h1><p>What NOSHASHI does, how to install it, and which screens each plan opens.</p></div>
+<section class="docs"><nav class="docs-nav" aria-label="Documentation"><a href="/docs/getting-started/" aria-current="page">Getting started</a><a href="/docs/architecture/">Architecture</a><a href="/docs/xrpl-data/">XRPL data</a><a href="/docs/analysis/">Analysis engines</a><a href="/docs/ai/">AI</a><a href="/docs/policies/">Policies</a><a href="/docs/evidence/">Evidence</a><a href="/docs/receipts/">Receipts</a><a href="/docs/api/">API</a><a href="/docs/webhooks/">Webhooks</a><a href="/docs/security/">Security</a><a href="/docs/enterprise/">Enterprise</a><a href="/docs/troubleshooting/">Troubleshooting</a><a href="/docs/release-notes/">Release notes</a></nav><article class="doc-body">
+<p>NOSHASHI reads the XRP Ledger's validated state, applies deterministic rules to what it reads, and shows the evidence behind every answer. It holds no keys and signs or submits nothing (see <a href="/docs/security/">Security</a>).</p>
+<h2>Install</h2>
+<p>Download the desktop app for macOS, Windows or Linux from the <a href="/#download">download section</a>. The free screens work without an account. Paid plans are on the <a href="/pricing/">pricing page</a>.</p>
+<h2>First steps</h2>
+<ol>
+<li>Open <strong>Check an Address</strong> and paste any XRPL address to see what the ledger publishes about it.</li>
+<li>Open <strong>Verification</strong>, describe a settlement, and read the verdict and the rule that decided it.</li>
+<li>Read <a href="/docs/policies/">Policies</a> for how a verdict is decided and <a href="/docs/receipts/">Receipts</a> for how it is recorded.</li>
+</ol>
+<h2>Screens by plan</h2>
+<h3>Free</h3><ul><li>Overview</li><li>Mission Control</li><li>Verification</li><li>Credentials</li><li>Domain Grid</li><li>Audit Trail</li><li>Agent</li><li>Check an Address</li><li>Token Rights</li><li>Inbox</li><li>Ledger Sync</li><li>Learn</li><li>Growth</li><li>Pricing</li><li>Account</li><li>Business Plan</li><li>Legal &amp; Accessibility</li><li>Trust &amp; Security</li><li>Settings</li></ul>
+<h3>Desk</h3><ul><li>Portfolio &amp; Radar</li><li>Exposure Analysis</li><li>Ledger &amp; Policy</li><li>Settlement</li><li>Ledger Garden</li><li>Provenance</li><li>Control Surface</li><li>Order Book</li><li>Pool Governance</li><li>Authority Certificate</li></ul>
+<h3>Institution</h3><ul><li>Issuance</li></ul>
+<h3>Enterprise</h3><ul><li>Asset Passport</li></ul>
+<p>The list is the app's own console reference, which the in-app agent also reads, and a test keeps it in step with the screens the app has.</p>
+<p class="doc-src mono">Generated from <a href="https://github.com/Ignosha/noshashi/tree/main/src/lib/agent/context.ts">src/lib/agent/context.ts</a></p></article></section>
+</main>
+<footer>
+  <div class="shell foot">
+    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
+    <div class="foot-links">
+      <a href="/contact/">Contact</a>
+      <a href="/certificate/">Authority certificate</a>
+      <a href="/news/">Newsroom</a>
+      <a href="/progress/">Progress</a>
+      <a href="/status/">Status</a>
+      <a href="/research/">Findings</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
+      <a href="/misread/">The ledger can be misread</a>
+      <a href="/strategic-infrastructure/">Strategic infrastructure</a>
+      <a href="/developers/">Developers</a>
+      <a href="/docs/">Documentation</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="https://github.com/Ignosha/noshashi">GitHub</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script>
+(function(){
+  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
+  if(!button)return;
+  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
+    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
+    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
+  sync();
+  button.addEventListener("click",function(){
+    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
+    sync();});
+})();
+</script>
+
+</body>
+</html>
