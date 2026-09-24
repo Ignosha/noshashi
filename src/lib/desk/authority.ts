@@ -170,7 +170,7 @@ const HHI_CONCENTRATED = 2500;
  * does not — so a changed rule cannot reach main wearing an old
  * version.
  */
-export const AUTHORITY_RULES_VERSION = 1;
+export const AUTHORITY_RULES_VERSION = 2;
 
 export async function readAuthoritySurface(
   issuer: string,
@@ -397,6 +397,7 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
       label: "Supply concentration",
       severity: "warn",
       passed: false,
+      state: "INSUFFICIENT_DATA",
       detail: walkFailed
         ? `The holder walk was requested and could not be completed (${walkFailed.replace(/^issuance:\s*/, "")}), so no concentration finding is made. This is a failed read, not an abstention and not a pass.`
         : "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass.",
@@ -406,7 +407,10 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
       id: "SUPPLY_CONCENTRATION",
       label: "Supply concentration",
       severity: "warn",
-      passed: false,
+      // Nothing to concentrate: the rule does not apply, and it must not
+      // hold a certificate back as though it had failed.
+      passed: true,
+      state: "NOT_APPLICABLE",
       detail: "The issuer reports no outstanding obligations, so there is no supply to measure.",
     });
   } else if (currency.coverage < COVERAGE_FLOOR) {
@@ -418,6 +422,7 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
       label: `${decodeCurrency(currency.currency)} supply concentration`,
       severity: "warn",
       passed: false,
+      state: "INSUFFICIENT_DATA",
       detail: `The holder lines read account for ${(currency.coverage * 100).toFixed(1)}% of the outstanding ${decodeCurrency(currency.currency)}. Below ${COVERAGE_FLOOR * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`,
     });
   } else {

@@ -1,6 +1,7 @@
 import { certifyAuthority, type AuthorityCertificate } from "@/lib/desk/authority";
 import { fetchIssuerObligations } from "@/lib/xrpl/client";
 import { decodeCurrency } from "@/lib/format";
+import { checkState, CHECK_STATE_COPY } from "@/lib/policy";
 import type { IssuerObligations } from "@/lib/xrpl/types";
 
 /**
@@ -44,13 +45,16 @@ export function investigationPrompt(inv: IssuerInvestigation): string {
     `Investigate the XRPL issuer ${inv.issuer}. NOSHASHI read it from validated mainnet ledger ${c.ledgerIndex.toLocaleString("en-US")} at ${c.evaluatedAt}.`,
     `Authority certificate digest ${c.digest} (rules v${c.rulesVersion}); overall result ${c.verdict.toUpperCase()}.`,
     "Checks:",
-    ...c.checks.map((k) => `- ${k.passed ? "PASS" : k.severity === "block" ? "FAIL" : "REVIEW"} · ${k.label}${k.passed ? "" : ` — ${k.detail}`}`),
+    ...c.checks.map((k) => {
+      const state = checkState(k);
+      return `- ${CHECK_STATE_COPY[state].label} · ${k.label}${state === "PASS" ? "" : ` — ${k.detail}`}`;
+    }),
     inv.obligations.unreadable
       ? `Outstanding obligations could not be read: ${inv.obligations.unreadable}.`
       : assets.length
         ? `Outstanding obligations: ${assets.slice(0, 10).map(([cur, v]) => `${n(v)} ${decodeCurrency(cur)}`).join("; ")}${assets.length > 10 ? `; and ${assets.length - 10} more` : ""}.`
         : "The issuer reports no outstanding obligations.",
-    "Supply concentration was not walked in this one-click run, so those checks abstain; do not infer holder concentration.",
+    "Supply concentration was not walked in this one-click run, so it reads INSUFFICIENT DATA: no answer, not a finding. Do not infer holder concentration.",
     "Summarise what authority this issuer has kept over holders, what that means for someone holding its assets, and what a person should check next. Use only the facts above, and say so where they are not enough. This is not a legal or investment finding.",
   ];
   return lines.join("\n");

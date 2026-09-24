@@ -85,6 +85,15 @@ The example above is Bitstamp's account as read at ledger 107,193,471. The test 
 - **`delivered_amount`:** the amount the ledger says was actually delivered. It is `null` for a transaction that delivers nothing, and `"unavailable"` where rippled says so (partial payments before 2014).
 - **Lookup across nodes:** if the first public node does not hold the transaction, the API asks the full-history node before answering `404 transaction_not_found`.
 
+## Check results: five states
+
+Every check carries `passed`, and may carry `state`: `PASS`, `FAIL`, `REVIEW`, `INSUFFICIENT_DATA` or `NOT_APPLICABLE`. Without `state`, the state is implied: `PASS` when passed, otherwise `FAIL` for a blocking check and `REVIEW` for an advisory one.
+
+- **`INSUFFICIENT_DATA`** (`passed: false`) means the evidence the rule needs could not be read. It is no answer, not a failure.
+- **`NOT_APPLICABLE`** (`passed: true`) means the rule does not apply to this subject, for example supply concentration for an issuer with nothing outstanding.
+
+In a digest a check is `[id, passed]`, or `[id, passed, state]` when the state is one of those two. Every receipt and certificate issued before the states existed therefore keeps its bytes. `authority/check` accepts `state` on each check and binds it the same way; any other value is refused with `invalid_checks`.
+
 ## Errors
 
 Every response is JSON and carries a `request_id`. Every refusal is `{ "error": "<stable code>", "message": "…" }`.

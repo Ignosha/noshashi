@@ -18,6 +18,7 @@ import {
   type AuthorityCertificate,
 } from "@/lib/desk/authority";
 import { cn } from "@/lib/utils";
+import { checkState, type CheckState } from "@/lib/policy";
 import { InvestigateIssuerButton } from "@/components/nova/InvestigateIssuerButton";
 import { TraceButton } from "@/lib/nav/handoff";
 
@@ -71,11 +72,25 @@ export function AuthorityScene({
   );
 }
 
-/** Blocking failures are critical; advisory ones warn; passes read ok. */
-function severityOf(check: { severity: "block" | "warn"; passed: boolean }) {
+/**
+ * Blocking failures are critical; advisory ones warn; passes read ok. An
+ * unanswered or inapplicable check is information, never a warning: it
+ * says nothing about the issuer either way.
+ */
+function severityOf(check: { severity: "block" | "warn"; passed: boolean; state?: CheckState }) {
+  const state = checkState(check);
+  if (state === "INSUFFICIENT_DATA" || state === "NOT_APPLICABLE") return "info" as const;
   if (check.passed) return "ok" as const;
   return check.severity === "block" ? ("critical" as const) : ("warn" as const);
 }
+
+const KICKER: Record<CheckState, string> = {
+  PASS: "NO AUTHORITY FOUND",
+  FAIL: "AUTHORITY RETAINED",
+  REVIEW: "AUTHORITY RETAINED",
+  INSUFFICIENT_DATA: "NOT ESTABLISHED — NO ANSWER",
+  NOT_APPLICABLE: "DOES NOT APPLY",
+};
 
 function AuthorityBody() {
   const [query, setQuery] = useState("");
@@ -294,7 +309,7 @@ function AuthorityBody() {
                 <Signal
                   key={check.id}
                   severity={severityOf(check)}
-                  kicker={check.passed ? "NO AUTHORITY FOUND" : "AUTHORITY RETAINED"}
+                  kicker={KICKER[checkState(check)]}
                   headline={check.label}
                   detail={check.detail}
                   source={`${check.id} · ledger ${certificate.ledgerIndex.toLocaleString()}`}

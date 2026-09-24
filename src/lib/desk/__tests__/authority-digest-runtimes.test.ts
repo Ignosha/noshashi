@@ -84,6 +84,22 @@ const CASES = [
     },
   },
   {
+    // Five-state results: the two states a boolean cannot say are bound,
+    // and a REVIEW (implied by passed:false) is not, in all three runtimes.
+    name: "a certificate carrying five-state results",
+    input: {
+      kind: "authority",
+      subject: "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+      scope: { currency: "USD", ledgerIndex: 107_193_471, verdict: "hold", rules: 2 },
+      checks: [
+        { id: "FREEZE_SURRENDERED", passed: false, state: "REVIEW" },
+        { id: "SUPPLY_CONCENTRATION", passed: false, state: "INSUFFICIENT_DATA" },
+        { id: "NO_TRANSFER_FEE", passed: true, state: "NOT_APPLICABLE" },
+      ],
+      evaluatedAt: "2026-09-24T01:34:12.000Z",
+    },
+  },
+  {
     name: "no currency scoped",
     input: {
       kind: "authority",
@@ -157,5 +173,17 @@ describe("the authority digest is the same in all three runtimes", () => {
       evaluatedAt: "2026-05-05T12:00:00.000Z",
     });
     expect(await deno(withResult(true))).not.toBe(await deno(withResult(false)));
+  });
+});
+
+describe("five-state results keep every earlier digest", () => {
+  it("a check with no state, or with PASS, FAIL or REVIEW, hashes exactly as before", async () => {
+    const { digestOf } = await import("@/lib/policy");
+    const base = { kind: "authority", subject: "rIssuer", scope: { ledgerIndex: 1 }, evaluatedAt: "2026-01-01T00:00:00.000Z" };
+    const old = await digestOf({ ...base, checks: [{ id: "A", passed: false }, { id: "B", passed: true }] });
+    const stated = await digestOf({ ...base, checks: [{ id: "A", passed: false, state: "REVIEW" }, { id: "B", passed: true, state: "PASS" }] });
+    expect(stated).toBe(old);
+    const unknown = await digestOf({ ...base, checks: [{ id: "A", passed: false, state: "INSUFFICIENT_DATA" }, { id: "B", passed: true }] });
+    expect(unknown).not.toBe(old);
   });
 });
