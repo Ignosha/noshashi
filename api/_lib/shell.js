@@ -64,6 +64,7 @@ export const FOOTER_LINKS = [
   { href: "/pricing/", label: "Pricing" },
   { href: "/enterprise/", label: "Enterprise" },
   { href: "/trust/", label: "Trust & security" },
+  { href: "/misread/", label: "The ledger can be misread" },
   { href: "/strategic-infrastructure/", label: "Strategic infrastructure" },
   { href: "/developers/", label: "Developers" },
   { href: "/legal/", label: "Legal & accessibility" },

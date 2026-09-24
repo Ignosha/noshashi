@@ -1,0 +1,122 @@
+[
+  {
+    "id": "delivered",
+    "title": "delivered_amount ≠ Amount",
+    "basic": {
+      "label": "Amount field",
+      "value": "100,000 XRP paid"
+    },
+    "verified": {
+      "label": "delivered_amount",
+      "value": "0.077162 XRP arrived — 0.00008% of the stated amount"
+    },
+    "why": "A successful (tesSUCCESS) payment carries the amount it asked to deliver and, separately, what arrived. With the partial-payment flag set they differ and the transaction still succeeds. Crediting the Amount field would over-credit by 1,295,975×. This one is an account paying itself through the exchange; the same flag on a payment to an exchange is how deposits get over-credited.",
+    "evidence": {
+      "ledger": 107194530,
+      "ref": "307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA",
+      "refLabel": "transaction"
+    },
+    "module": "src/lib/desk/settlement.ts",
+    "scene": "settlement"
+  },
+  {
+    "id": "depth",
+    "title": "Quoted depth ≠ fillable depth",
+    "basic": {
+      "label": "Sum of offers",
+      "value": "128,309.49 USD on offer"
+    },
+    "verified": {
+      "label": "Funded and unexpired",
+      "value": "42,328.77 USD can fill — 33% of what is shown; 31 of 60 offers cannot fill at all"
+    },
+    "why": "An offer stays in the book whether or not its owner still holds the asset, and an expired offer is removed only when something touches it. Summing the advertised figures counts exits that cannot happen.",
+    "evidence": {
+      "ledger": 107194532,
+      "ref": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+      "refLabel": "60 USD.Bitstamp offers for XRP"
+    },
+    "module": "src/lib/desk/book.ts",
+    "scene": "book"
+  },
+  {
+    "id": "sequence",
+    "title": "Sequence ≠ transaction count",
+    "basic": {
+      "label": "Sequence",
+      "value": "86,795,414 transactions sent"
+    },
+    "verified": {
+      "label": "Sequence − creation ledger",
+      "value": "0 transactions sent. The account was created in ledger 86,795,414, and as an AMM pseudo-account it cannot send any."
+    },
+    "why": "Since the DeletableAccounts amendment, a new account's Sequence starts at the ledger index it was created in. It says when the account began, not what it has done.",
+    "evidence": {
+      "ledger": 107194965,
+      "ref": "rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am",
+      "refLabel": "account"
+    },
+    "module": "src/lib/desk/provenance.ts",
+    "scene": "provenance"
+  },
+  {
+    "id": "quorum",
+    "title": "Quorum ≠ signer headcount",
+    "basic": {
+      "label": "Signers listed",
+      "value": "3 signers control the account"
+    },
+    "verified": {
+      "label": "Minimum who must agree",
+      "value": "2 of 3 can sign: quorum 2 against weights 1, 1, 1"
+    },
+    "why": "XRPL compares a multi-signature quorum against the sum of signing weights, not the number of signers. The number that describes control is the fewest signers who can reach the quorum.",
+    "evidence": {
+      "ledger": 107194532,
+      "ref": "rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX",
+      "refLabel": "signer list owner"
+    },
+    "module": "src/lib/desk/control.ts",
+    "scene": "control"
+  },
+  {
+    "id": "absent",
+    "title": "Absent ≠ false",
+    "basic": {
+      "label": "Balance",
+      "value": "0 XRP"
+    },
+    "verified": {
+      "label": "Account activated on mainnet",
+      "value": "FAIL — Address is well-formed but has never been funded on mainnet."
+    },
+    "why": "The ledger answered actNotFound: there is no account at this address. That is not an account holding nothing; a payment to it would have to create it, and nothing about it can be verified.",
+    "evidence": {
+      "ledger": 107194798,
+      "ref": "rPGJe8F1FzegsNDJEMkq3hUrupovdBjQMi",
+      "refLabel": "address"
+    },
+    "module": "src/lib/xrpl/client.ts",
+    "scene": "verify"
+  },
+  {
+    "id": "epoch",
+    "title": "Ripple epoch ≠ Unix epoch",
+    "basic": {
+      "label": "date as Unix time",
+      "value": "1996-09-24 02:42:12 UTC"
+    },
+    "verified": {
+      "label": "date from 2000-01-01",
+      "value": "2026-09-24 02:42:12 UTC"
+    },
+    "why": "Ledger times count seconds from 2000-01-01, not 1970-01-01. Both readings are plausible dates and only one is right; the wrong one is 30 years early.",
+    "evidence": {
+      "ledger": 107194530,
+      "ref": "307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA",
+      "refLabel": "transaction"
+    },
+    "module": "src/lib/format.ts",
+    "scene": "settlement"
+  }
+]

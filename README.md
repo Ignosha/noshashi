@@ -177,7 +177,7 @@ value. They are handled explicitly and documented at the top of each module.
 | Trap | Where | What goes wrong if ignored |
 |---|---|---|
 | `delivered_amount` ≠ `Amount` | `lib/desk/settlement.ts` | A `tesSUCCESS` payment can deliver 0.4% of the stated amount. Crediting `Amount` over-credits by 250x. This is how exchanges get drained. |
-| Absent ≠ false | `lib/desk/issuance.ts` | A trust line carries `freeze`/`authorized` only when set. Reading absence as "not frozen" asserts a guarantee the ledger never made. |
+| Absent ≠ false | `lib/xrpl/client.ts` | `actNotFound` means there is no account, not an account holding nothing. `unfundedAccount()` marks it, and the policy engine's ACCOUNT_ACTIVATED check fails it rather than reading a 0 XRP balance. |
 | Partial walk ≠ measurement | `lib/desk/issuance.ts` | Concentration over an incomplete holder set has no known direction of error. Coverage below 95% withholds the figure rather than caveating it. |
 | Quorum is weight, not count | `lib/desk/control.ts` | Five signers where one carries the quorum is a single-key account. The headline reports minimum signers required. |
 | One node ≠ the network | `lib/net/sync.ts` | `server_info` describes the node that answered. Four are queried and their disagreement is the reading. |

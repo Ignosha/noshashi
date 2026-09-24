@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>The ledger can be misread · NOSHASHI</title>
+<meta name="description" content="Six real XRPL mainnet replies read two ways: the obvious field at face value, and what NOSHASHI&#39;s own code reports for the same reply.">
+<link rel="canonical" href="https://www.noshashi.app/misread/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/misread/">
+<meta property="og:title" content="The ledger can be misread · NOSHASHI">
+<meta property="og:description" content="Six real XRPL mainnet replies read two ways: the obvious field at face value, and what NOSHASHI&#39;s own code reports for the same reply.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The ledger can be misread · NOSHASHI">
+<meta name="twitter:description" content="Six real XRPL mainnet replies read two ways: the obvious field at face value, and what NOSHASHI&#39;s own code reports for the same reply.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"The ledger can be misread","item":"https://www.noshashi.app/misread/"}]}]}</script>
+<style>
+.mis-case{margin:0 0 18px}
+.mis-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+@media (max-width:720px){.mis-cols{grid-template-columns:1fr}}
+.mis-basic,.mis-verified{border-left:2px solid var(--hold);padding:4px 0 4px 12px}
+.mis-verified{border-left-color:var(--go)}
+.mis-k{font:11px "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--hold)}
+.mis-verified .mis-k{color:var(--go)}
+.mis-l{font-size:12px;color:var(--faint);margin-top:4px}
+.mis-v{font:15px "IBM Plex Mono",monospace;color:var(--ink);margin-top:2px;overflow-wrap:anywhere}
+.mis-src{font-size:12px;color:var(--faint);overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/news/"><span data-i18n="nav.news">Newsroom</span></a>
+      <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
+      <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
+      <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
+      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head"><p class="eyebrow">THE LEDGER CAN BE TRANSPARENT AND STILL BE MISREAD</p><h1>Every field is public. Not every reading is right.</h1><p>Six replies read from XRPL mainnet, each shown two ways. The right-hand column is not written for this page: it is what NOSHASHI's own code returns for the recorded reply, and a test fails the build if the two ever disagree.</p></div>
+<section><article class="panel mis-case" id="delivered">
+  <p class="eyebrow">01 / delivered_amount ≠ Amount</p>
+  <div class="mis-cols">
+    <div class="mis-basic"><p class="mis-k">What a basic interface sees</p><p class="mis-l">Amount field</p><p class="mis-v">100,000 XRP paid</p></div>
+    <div class="mis-verified"><p class="mis-k">What NOSHASHI verifies</p><p class="mis-l">delivered_amount</p><p class="mis-v">0.077162 XRP arrived — 0.00008% of the stated amount</p></div>
+  </div>
+  <p>A successful (tesSUCCESS) payment carries the amount it asked to deliver and, separately, what arrived. With the partial-payment flag set they differ and the transaction still succeeds. Crediting the Amount field would over-credit by 1,295,975×. This one is an account paying itself through the exchange; the same flag on a payment to an exchange is how deposits get over-credited.</p>
+  <p class="mono mis-src">Ledger 107,194,530 · transaction <a href="https://livenet.xrpl.org/transactions/307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA" rel="noopener">307662378F…</a> · <a href="https://github.com/Ignosha/noshashi/blob/main/src/lib/desk/settlement.ts">src/lib/desk/settlement.ts</a></p>
+</article>
+<article class="panel mis-case" id="depth">
+  <p class="eyebrow">02 / Quoted depth ≠ fillable depth</p>
+  <div class="mis-cols">
+    <div class="mis-basic"><p class="mis-k">What a basic interface sees</p><p class="mis-l">Sum of offers</p><p class="mis-v">128,309.49 USD on offer</p></div>
+    <div class="mis-verified"><p class="mis-k">What NOSHASHI verifies</p><p class="mis-l">Funded and unexpired</p><p class="mis-v">42,328.77 USD can fill — 33% of what is shown; 31 of 60 offers cannot fill at all</p></div>
+  </div>
+  <p>An offer stays in the book whether or not its owner still holds the asset, and an expired offer is removed only when something touches it. Summing the advertised figures counts exits that cannot happen.</p>
+  <p class="mono mis-src">Ledger 107,194,532 · 60 USD.Bitstamp offers for XRP <a href="https://livenet.xrpl.org/accounts/rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B" rel="noopener">rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B</a> · <a href="https://github.com/Ignosha/noshashi/blob/main/src/lib/desk/book.ts">src/lib/desk/book.ts</a></p>
+</article>
+<article class="panel mis-case" id="sequence">
+  <p class="eyebrow">03 / Sequence ≠ transaction count</p>
+  <div class="mis-cols">
+    <div class="mis-basic"><p class="mis-k">What a basic interface sees</p><p class="mis-l">Sequence</p><p class="mis-v">86,795,414 transactions sent</p></div>
+    <div class="mis-verified"><p class="mis-k">What NOSHASHI verifies</p><p class="mis-l">Sequence − creation ledger</p><p class="mis-v">0 transactions sent. The account was created in ledger 86,795,414, and as an AMM pseudo-account it cannot send any.</p></div>
+  </div>
+  <p>Since the DeletableAccounts amendment, a new account&#39;s Sequence starts at the ledger index it was created in. It says when the account began, not what it has done.</p>
+  <p class="mono mis-src">Ledger 107,194,965 · account <a href="https://livenet.xrpl.org/accounts/rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am" rel="noopener">rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am</a> · <a href="https://github.com/Ignosha/noshashi/blob/main/src/lib/desk/provenance.ts">src/lib/desk/provenance.ts</a></p>
+</article>
+<article class="panel mis-case" id="quorum">
+  <p class="eyebrow">04 / Quorum ≠ signer headcount</p>
+  <div class="mis-cols">
+    <div class="mis-basic"><p class="mis-k">What a basic interface sees</p><p class="mis-l">Signers listed</p><p class="mis-v">3 signers control the account</p></div>
+    <div class="mis-verified"><p class="mis-k">What NOSHASHI verifies</p><p class="mis-l">Minimum who must agree</p><p class="mis-v">2 of 3 can sign: quorum 2 against weights 1, 1, 1</p></div>
+  </div>
+  <p>XRPL compares a multi-signature quorum against the sum of signing weights, not the number of signers. The number that describes control is the fewest signers who can reach the quorum.</p>
+  <p class="mono mis-src">Ledger 107,194,532 · signer list owner <a href="https://livenet.xrpl.org/accounts/rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX" rel="noopener">rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX</a> · <a href="https://github.com/Ignosha/noshashi/blob/main/src/lib/desk/control.ts">src/lib/desk/control.ts</a></p>
+</article>
+<article class="panel mis-case" id="absent">
+  <p class="eyebrow">05 / Absent ≠ false</p>
+  <div class="mis-cols">
+    <div class="mis-basic"><p class="mis-k">What a basic interface sees</p><p class="mis-l">Balance</p><p class="mis-v">0 XRP</p></div>
+    <div class="mis-verified"><p class="mis-k">What NOSHASHI verifies</p><p class="mis-l">Account activated on mainnet</p><p class="mis-v">FAIL — Address is well-formed but has never been funded on mainnet.</p></div>
+  </div>
+  <p>The ledger answered actNotFound: there is no account at this address. That is not an account holding nothing; a payment to it would have to create it, and nothing about it can be verified.</p>
+  <p class="mono mis-src">Ledger 107,194,798 · address <a href="https://livenet.xrpl.org/accounts/rPGJe8F1FzegsNDJEMkq3hUrupovdBjQMi" rel="noopener">rPGJe8F1FzegsNDJEMkq3hUrupovdBjQMi</a> · <a href="https://github.com/Ignosha/noshashi/blob/main/src/lib/xrpl/client.ts">src/lib/xrpl/client.ts</a></p>
+</article>
+<article class="panel mis-case" id="epoch">
+  <p class="eyebrow">06 / Ripple epoch ≠ Unix epoch</p>
+  <div class="mis-cols">
+    <div class="mis-basic"><p class="mis-k">What a basic interface sees</p><p class="mis-l">date as Unix time</p><p class="mis-v">1996-09-24 02:42:12 UTC</p></div>
+    <div class="mis-verified"><p class="mis-k">What NOSHASHI verifies</p><p class="mis-l">date from 2000-01-01</p><p class="mis-v">2026-09-24 02:42:12 UTC</p></div>
+  </div>
+  <p>Ledger times count seconds from 2000-01-01, not 1970-01-01. Both readings are plausible dates and only one is right; the wrong one is 30 years early.</p>
+  <p class="mono mis-src">Ledger 107,194,530 · transaction <a href="https://livenet.xrpl.org/transactions/307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA" rel="noopener">307662378F…</a> · <a href="https://github.com/Ignosha/noshashi/blob/main/src/lib/format.ts">src/lib/format.ts</a></p>
+</article></section>
+<section><div class="panel"><p class="eyebrow">How to check this</p><p>Every case links the transaction or account it was read from, at the ledger it was read at, and the module that makes the reading. Open the same object in the desktop app and it is read again on today's ledger.</p></div></section>
+</main>
+<footer>
+  <div class="shell foot">
+    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
+    <div class="foot-links">
+      <a href="/contact/">Contact</a>
+      <a href="/certificate/">Authority certificate</a>
+      <a href="/news/">Newsroom</a>
+      <a href="/progress/">Progress</a>
+      <a href="/status/">Status</a>
+      <a href="/research/">Findings</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
+      <a href="/misread/">The ledger can be misread</a>
+      <a href="/strategic-infrastructure/">Strategic infrastructure</a>
+      <a href="/developers/">Developers</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="https://github.com/Ignosha/noshashi">GitHub</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script>
+(function(){
+  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
+  if(!button)return;
+  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
+    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
+    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
+  sync();
+  button.addEventListener("click",function(){
+    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
+    sync();});
+})();
+</script>
+
+</body>
+</html>

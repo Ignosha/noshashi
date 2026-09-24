@@ -90,6 +90,16 @@ function decodeHexDomain(hex: string): string | undefined {
   }
 }
 
+/**
+ * What the ledger's actNotFound means, as an account: a well-formed address
+ * that has never been funded. Not an empty account — `unfunded` is what the
+ * policy engine's ACCOUNT_ACTIVATED check reads, so "no account" can never
+ * be adjudicated as "an account holding nothing".
+ */
+export function unfundedAccount(address: string): AccountInfo {
+  return { address, balanceXrp: "0.00", sequence: 0, ownerCount: 0, unfunded: true };
+}
+
 export async function fetchAccount(address: string): Promise<AccountInfo> {
   try {
     const result = await rpc("account_info", {
@@ -107,15 +117,7 @@ export async function fetchAccount(address: string): Promise<AccountInfo> {
   } catch (error) {
     // actNotFound is a legitimate state: a well-formed address that has
     // never been funded. The console shows it rather than erroring out.
-    if (error instanceof XrplError && error.code === "actNotFound") {
-      return {
-        address,
-        balanceXrp: "0.00",
-        sequence: 0,
-        ownerCount: 0,
-        unfunded: true,
-      };
-    }
+    if (error instanceof XrplError && error.code === "actNotFound") return unfundedAccount(address);
     // The base58 checksum is only verifiable by the ledger, so this is
     // where a typo'd address is actually caught.
     if (error instanceof XrplError && error.code === "actMalformed") {

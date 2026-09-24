@@ -144,6 +144,22 @@
     .trap{grid-template-columns:1fr;gap:10px}
     .trap .tm{font-size:15px}
   }
+  /* The misread rows: the trap and why | what a basic interface sees |
+     what NOSHASHI verifies. The two readings carry the only colour on the
+     row, as a rule, never as the only signal: each is also labelled. */
+  .trap.mis{grid-template-columns:minmax(0,1.3fr) minmax(0,.85fr) minmax(0,1.1fr)}
+  .trap .te{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);
+    margin-top:8px;overflow-wrap:anywhere}
+  .trap .te a{color:var(--muted)}
+  .mis-b,.mis-v{border-left:2px solid var(--hold);padding-left:12px}
+  .mis-v{border-left-color:var(--go)}
+  .trap .mk{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--hold)}
+  .mis-v .mk{color:var(--go)}
+  .trap .ml{font-size:11px;color:var(--faint);margin-top:4px}
+  .trap .mv{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--ink);
+    line-height:1.45;margin-top:2px;overflow-wrap:anywhere}
+  @media (max-width:900px){.trap.mis{grid-template-columns:1fr}}
 
   /* ── Amendment state ───────────────────────────────────────────────
      Three states, and only the third one works. Live takes telemetry
@@ -1592,62 +1608,20 @@
     </div>
 
     <div class="kicker-block">
-      <p class="eyebrow">06 · What the ledger will let you believe</p>
-      <h2>Every reading here exists because a field lies</h2>
-      <p>Not edge cases. These are the default readings — what you get if you take the
-         obvious field at face value — and each one is handled explicitly, documented at the
-         top of the module that handles it. The figures are measured on mainnet, not modelled.</p>
+      <p class="eyebrow">06 · The ledger can be transparent and still be misread</p>
+      <h2>Every field is public. Not every reading is right.</h2>
+      <p>Six real mainnet replies, each read two ways: the obvious field at face value, and
+         what NOSHASHI reports. The right-hand column is not written for this page — it is what
+         NOSHASHI's own code returns for the recorded reply, and a test fails the build if the
+         two ever disagree.</p>
     </div>
 
-    <div class="traps">
-      <div class="trap">
-        <p class="tf">delivered_amount ≠ Amount</p>
-        <p class="tw">A <span class="mono">tesSUCCESS</span> payment carries the amount it asked to
-           deliver and, separately, the amount that arrived. On a partial payment those differ and
-           the transaction still succeeds.</p>
-        <p class="tm">250×<small>Over-credit from reading the requested figure. One real transfer
-           asked 999,332.87 and delivered 3,958.64.</small></p>
-      </div>
-      <div class="trap">
-        <p class="tf">Quoted depth ≠ fillable depth</p>
-        <p class="tw">An offer rests in the book whether or not its owner still holds the asset.
-           Summing the advertised figure counts exits that cannot happen.</p>
-        <p class="tm">92.8%<small>Of one book's visible depth could not fill. A single offer
-           advertised 1,400,100 USD against a 22,273 balance.</small></p>
-      </div>
-      <div class="trap">
-        <p class="tf">Sequence is not a count</p>
-        <p class="tw">Since DeletableAccounts a new account's sequence is seeded to its creation
-           ledger index, so it describes when the account began, not what it has done.</p>
-        <p class="tm">92,835,117<small>Read from a live AMM account that has sent zero
-           transactions. The obvious reading is wrong by the whole number.</small></p>
-      </div>
-      <div class="trap">
-        <p class="tf">Quorum is weight, not headcount</p>
-        <p class="tw">XRPL compares a multi-signature quorum against the sum of signing weights.
-           Counting signers describes a committee that may not exist.</p>
-        <p class="tm">5 → 1<small>Five signers where one carries the quorum is a single-key
-           account. We report the minimum who must actually agree.</small></p>
-      </div>
-      <div class="trap">
-        <p class="tf">Absent ≠ false</p>
-        <p class="tw">A trust line carries <span class="mono">freeze</span> and
-           <span class="mono">authorized</span> only when set. Reading absence as "not frozen"
-           asserts a guarantee the ledger never made.</p>
-        <p class="tm">not stated<small>What we report instead. An unset flag is unknown, and
-           unknown is not the same as safe.</small></p>
-      </div>
-      <div class="trap">
-        <p class="tf">Ripple epoch ≠ Unix epoch</p>
-        <p class="tw">Escrow times count from 2000-01-01, not 1970-01-01. The two are both
-           plausible integers and only one is right.</p>
-        <p class="tm">30 years<small>How early every release date reads if the offset is
-           missed. Silent, and wrong in the safe-looking direction.</small></p>
-      </div>
-    </div>
+    <!--SLOT:MISREAD-->
 
     <p class="micro" style="margin-top:18px">
-      Thirteen are documented in full, with the module that handles each, in the
+      Each case links the object it was read from on the public explorer.
+      <a href="/misread/" style="color:var(--brand)">The same cases, with the module behind each reading</a>;
+      thirteen traps in all are documented in the
       <a href="https://github.com/Ignosha/noshashi" rel="noopener" style="color:var(--brand)">repository README</a>.
     </p>
   </section>

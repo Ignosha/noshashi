@@ -19,6 +19,7 @@ import {
 } from "@/lib/desk/settlement";
 import { cn } from "@/lib/utils";
 import { TraceButton } from "@/lib/nav/handoff";
+import { useClaimedSubject } from "@/lib/nav/handoff";
 
 /**
  * SettlementScene — what a transaction actually moved.
@@ -60,14 +61,16 @@ export function SettlementScene({
   );
 }
 
-function SettlementBody() {
+/** Exported for the harness; the scene wraps it in the plan gate. */
+export function SettlementBody() {
   const [query, setQuery] = useState("");
   const [report, setReport] = useState<SettlementReport | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const run = async () => {
-    const hash = query.trim();
+  const run = async (given?: string) => {
+    const hash = (given ?? query).trim();
+    if (given !== undefined) setQuery(given);
     if (!hash || busy) return;
     if (!/^[0-9A-Fa-f]{64}$/.test(hash)) {
       setError("A transaction hash is 64 hexadecimal characters.");
@@ -84,6 +87,11 @@ function SettlementBody() {
       setBusy(false);
     }
   };
+
+  // A hash handed over from another scene is read straight away.
+  useClaimedSubject("settlement", (subject) => {
+    void run(subject.value);
+  });
 
   const findings = report ? settlementFindings(report) : [];
   const short =
