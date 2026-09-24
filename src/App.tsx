@@ -112,6 +112,9 @@ const RevenueScene = lazy(() =>
 const TrustScene = lazy(() =>
   import("@/components/scenes/TrustScene").then((m) => ({ default: m.TrustScene }))
 );
+const GardenScene = lazy(() =>
+  import("@/components/scenes/GardenScene").then((m) => ({ default: m.GardenScene }))
+);
 const LegalScene = lazy(() =>
   import("@/components/scenes/LegalScene").then((m) => ({ default: m.LegalScene }))
 );
@@ -165,6 +168,7 @@ export type SceneId =
   | "revenue"
   | "legal"
   | "trust"
+  | "garden"
   | "settings";
 
 type SceneDef = {
@@ -195,7 +199,7 @@ const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "markets", label: "MARKETS & EXPOSURE", scenes: ["risk", "desk", "book", "amm"] },
   { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance", "authority", "passport"] },
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
-  { id: "intelligence", label: "INTELLIGENCE", scenes: ["agent"] },
+  { id: "intelligence", label: "INTELLIGENCE", scenes: ["agent", "garden"] },
   { id: "public", label: "PUBLIC", scenes: ["safeshop", "claims", "nft", "network", "learn"] },
   { id: "growth", label: "GROWTH", scenes: ["growth"] },
 ];
@@ -396,6 +400,16 @@ const SCENES: SceneDef[] = [
     title: "SETTLEMENT",
     hint: "What a transaction actually delivered, not what it requested",
     icon: <NovaCredit size={15} />,
+    digit: "",
+    group: "primary",
+    requires: "portfolios",
+  },
+  {
+    id: "garden",
+    label: "LEDGER GARDEN",
+    title: "LEDGER GARDEN",
+    hint: "Walk issuer → asset → holder → transaction → evidence, then ask the agent",
+    icon: <NovaGrid size={15} />,
     digit: "",
     group: "primary",
     requires: "portfolios",
@@ -1073,6 +1087,8 @@ function ConsoleApp() {
                       <ProvenanceScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "settlement" ? (
                       <SettlementScene onUpgrade={openPlans} onSignIn={openAuth} />
+                    ) : scene === "garden" ? (
+                      <GardenScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "network" ? (
                       <NetworkScene />
                     ) : scene === "amm" ? (

@@ -135,6 +135,7 @@ export function buildSystemPrompt(
       "- Ledger Sync: four public XRPL nodes queried and compared, with disagreement between them treated as the reading. Free, no account needed.",
       "- Learn: short animated explainers. Free.",
       "- Settlement: what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question. Requires Desk.",
+      "- Ledger Garden: walk the ledger's relationships one validated read at a time — an issuer's assets, an asset's holders (from the first 200 of the issuer's trust lines, in ledger order; Issuance walks them all), an account's holdings and recent transactions, a transaction's settlement evidence — then hand the whole path to this agent as a question. Requires Desk.",
       "- Provenance: how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts. Requires Desk.",
       "- Control Surface: how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable. Requires Desk.",
       "- Order Book: how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill. Requires Desk.",
