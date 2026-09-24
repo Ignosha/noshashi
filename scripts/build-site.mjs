@@ -36,6 +36,7 @@ import { getMarket } from "../api/_lib/market.js";
 import { getProjectFeed, deriveStatus } from "../api/_lib/project-feed.js";
 import { ENTRIES as KB } from "../api/_lib/kb.js";
 import { renderPage, breadcrumb, ORGANIZATION, ORIGIN, MARK } from "../api/_lib/shell.js";
+import { renderMisread } from "../api/_lib/misread.js";
 import { esc, isoDate, ago } from "../api/_lib/html.js";
 import {
   renderNews, renderNewsHead, renderLog, renderBoard, renderClock,
@@ -63,6 +64,7 @@ const FAQ = FAQ_IDS.map((id) => KB.find((e) => e.id === id)).filter(Boolean);
 /* ── The landing page ─────────────────────────────────────────────── */
 async function buildHome({ news, market, feed, status, release }) {
   let html = await readFile(path.join(ROOT, "templates", "home.html"), "utf8");
+  const misread = JSON.parse(await readFile(path.join(ROOT, "src/lib/learn/misread.rendered.json"), "utf8"));
 
   const slots = {
     ORIGIN: ORIGIN,
@@ -80,6 +82,7 @@ async function buildHome({ news, market, feed, status, release }) {
     LOG: renderLog(feed.entries, { limit: 5 }),
     FAQ: renderFaq(FAQ),
     SUBSCRIBE: renderSubscribe(),
+    MISREAD: renderMisread(misread),
     JSONLD: jsonLd([
       ORGANIZATION,
       {
