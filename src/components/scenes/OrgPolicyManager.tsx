@@ -37,6 +37,7 @@ import {
   type ServerFailure,
 } from "@/lib/org/governance";
 import { nameOf, useOrg, type OrgData } from "@/lib/org/useOrg";
+import { WebhooksPanel } from "./WebhooksPanel";
 import {
   DiffTable,
   Field,
@@ -530,6 +531,7 @@ function OrgPolicyBody({
 
       <ExceptionsPanel data={data} accountId={accountId} refresh={refresh} push={push} />
       <MembersPanel data={data} refresh={refresh} push={push} />
+      {can.manageMembers(role) && <WebhooksPanel organizationId={data.membership.organizationId} />}
       <AuditPanel data={data} />
 
       {/* ── Activation confirmation ── */}
