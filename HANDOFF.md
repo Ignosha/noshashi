@@ -1,108 +1,68 @@
 # Handoff — NOSHASHI master directive
 
-Updated 2026-09-23 · branch `claude/feature-pricing-recommendation-dp8xke` · PR #12 open, main merged in
+Updated 2026-09-24 · branch `claude/feature-pricing-recommendation-dp8xke` (reset to `main` after each merge) · **1.0.8 released**
 
 ## Where this is
 
-Phase 1 is done — `docs/AUDIT.md` is a gap map, not a rebuild plan, because the product
-was already largely built. Its §3 is the live scoreboard for gaps G1–G5 and is kept
-current. Three defects found along the way were the product publishing claims that were
-not true (a false allegation on the public certificate page, a false clearance in the
-desktop app, a fabricated Travel Rule finding) — fixed and merged in #11. The schema for
-organizations, roles and an append-only audit log is **applied to production**.
+The transformation prompt is complete except two items the owner has parked:
+
+- **Translations**: paused until the owner resumes them (week of 2026-09-28).
+- **SSO**: deferred until the product needs to scale.
+
+1.0.8 (PR #33, merged as `35d5339`) shipped:
+- the Observer and one-click issuer investigation
+- the request-more-evidence step in exception review
+- five-state per-check results
+- the ledger-driven garden
+
+Installers: https://github.com/Ignosha/noshashi/releases/tag/v1.0.8. The home page's Download section was redeployed to point at them.
 
 ## Verified
 
-Every line below was executed on `3382015`, not inferred:
+Executed on `6286069` (the head of PR #33), not inferred:
 
-- `npx tsc --noEmit` 0 errors · `npx vitest run` **504 tests, 25 files, all passing**
-- `npm run check:functions` (deno, 3 edge functions), `npm run check:brand`, `npm run check:garden`
-  (generated-SVG drift guard), `npm run build`, `node scripts/build-site.mjs` — all exit 0
-- `npm audit` — was 0 on `3382015`; **130 since main was merged in** (7 critical),
-  almost all from dependencies main added (`@reown/appkit`, `@walletconnect/*`,
-  `@metamask/sdk`, `electron` 31). Not fixed here: removing or upgrading them is
-  a product decision (the Tauri app does not use Electron)
-- `cd src-tauri && cargo check --locked` + `cargo clippy -- -D warnings` — exit 0 (needs
-  `libgtk-3-dev libwebkit2gtk-4.1-dev libsoup-3.0-dev librsvg2-dev`)
-- Nav overflow: 6 pages clean 320–1250px, swept in 10px steps; Vite 7 dev server
-  boots (299ms) and serves HTTP 200 with React refresh
-- Migrations applied to prod, verified against the live catalogue: 3 tables,
-  `organization_id` nullable on all 6 re-parented tables, rows untouched, 0 SECURITY
-  DEFINER functions without a pinned `search_path`
-- Audit triggers, 6 behavioural tests on a throwaway Postgres 16: `authenticated`
-  cannot write `audit_log` directly yet its key creation still records a row; no key
-  hash logged; `last_used_at` churn adds nothing; revocation and membership
-  add/change/remove recorded; migration idempotent
+- `npx vitest run`: 802 passed, 3 skipped. `npx tsc --noEmit`: 0 errors. `deno check supabase/functions/noshashi-verify/index.ts`: clean.
+- `noshashi-verify` **v15** is deployed with JWT verification off, as before. The deployed `index.ts` and `read.ts` were fetched back and are byte-identical to the repo.
+- Live certificate check on the PR preview's `/api/authority`:
+  - Bitstamp at ledger 107,202,239 returned `SUPPLY_CONCENTRATION` as `INSUFFICIENT_DATA` under rules v2.
+  - Its digest `F1EB71B2…6EE9FF` was reproduced exactly by the app's `digestOf`, the Vercel API's `digestOf`, and `authorityDigest` lifted from the *deployed* edge function source.
+- Migration `exception_evidence_requests` is applied to production. `noshashi-exception-decide` v2 is deployed.
+- The Release run for v1.0.8 passed on all four targets.
 
 ## Open
 
-**Deployed 2026-09-23 by the agent:** `noshashi-stripe-webhook` v9 and
-`noshashi-verify` v12, each from the repo file (JWT verification off, as
-before). The sandbox cannot reach supabase.co, so they are not smoke-tested.
-First thing to run from a machine that can:
-
-```bash
-curl -s https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify | jq '.published_limits.enterprise, .verbs'
-```
-
-Expect `{"perSecond":200,"perMinute":9000}` and the two verbs. The Enterprise and
-Strategic tiers are now deliverable end to end (DB constraint, webhook grants,
-API limits).
-
-Also: `scripts/build-legal-page.mjs` is stale against the committed `site/legal/`
-(Google Fonts, old blue palette) — do not run it until it is brought up to date.
-Strategic's `event_feeds` / `custom_schemas` and Enterprise's
-`dedicated_environment` are contract services with no code behind them; the copy
-now says so rather than promising gRPC or exactly-once delivery.
-
-In priority order.
-
-1. **§18 per-check five-state result.** `PolicyCheck.passed` is a boolean hashed by
-   `digestOf` in all three runtimes. Converting it changes the digest contract a third
-   time and touches every check construction and consumer. Own PR.
-2. **Organization bootstrap.** Nothing creates an org or its first member, and no writer
-   populates `organization_id`; until then audit rows carry a null org, which the read
-   policy hides from everyone but `service_role`. Must be server-side — the roster
-   policies cannot authorise the first row.
-3. **Settlement policy versioning.** `receiptDigest`'s body is frozen, so a version
-   cannot go inside it — needs a second versioned digest beside it, or a
-   `policy_version` carried next to the receipt. Contract change.
-4. **Smoke-test the live verify endpoint.** Impossible from the sandbox
-   (`supabase.co` egress-blocked). Expect `""` and `"authority/check"` from
-   `curl -s https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify | jq .verbs`
-5. **Dependency audit** — resolved 2026-09-24: the legacy Ignoshashi wallet
-   server (`server.js`, which held ETH/Solana private keys in SQLite and signed
-   transactions), its `public/` frontend, the Electron shell (`main.js`,
-   `preload.js`), the meme-coin `contracts/`, its Docker/Railway/pm2 deploy files
-   and the 22 packages only it used were removed. A Railway service already
-   running it is not stopped by this; delete it and its `/data` volume there.
-6. Pre-existing: `api_rate_windows` has RLS on with no policy (INFO); Supabase Auth
-   leaked-password protection is off (WARN).
+1. **Translations.** The catalogue is `site/data/i18n/text/catalog.json` (1,559 keys).
+   - Entries 0–239 are already translated into ja, ko, zh, es, pt, fr and de, in `scripts/i18n-wip/partial.json`. It maps English key → translation per language, so a catalogue refresh cannot misalign it.
+   - The site does not read that file. The finished output is one `site/data/i18n/text/<lang>.json` per language.
+   - Carry `{0}` slots and `<0>…</0>` tags through unchanged. Escape `&` as `&amp;` and `<` as `&lt;`.
+2. **Exception evidence flow, untested live.** Request evidence → add evidence → back to pending has only been unit-tested. It needs a signed-in org, and this sandbox must not create production accounts. The owner is testing it in 1.0.8.
+3. **Sandbox egress.** `*.supabase.co`, `www.noshashi.app` and the XRPL hosts are blocked from this environment.
+   - Live checks go through the Vercel preview (`web_fetch_vercel_url`) and the Supabase MCP.
+   - Adding `xiurbiwuwcfowqnpmwki.supabase.co` under the environment's Network access would allow direct API tests.
+4. **Tags cannot be pushed from a session** (the git proxy returns 403).
+   - `release.yml` can now be run by hand on `main`. It tags `v<version>` from `tauri.conf.json` itself.
+   - To ship: bump the version, merge, then dispatch Release on `main`.
+5. **Site refresh hook.** `refresh-site.yml` does nothing: `VERCEL_DEPLOY_HOOK_URL` is not set. Redeploy through the Vercel MCP (`create_deployment` with `deploymentId` of the current production deployment, `target: production`) after a release, because the Download section is rendered from the latest release at build time.
+6. **Organization bootstrap and settlement policy versioning.** Both are unchanged from the previous handoff and are contract changes. Own PRs.
+7. **Pre-existing advisors:**
+   - `api_rate_windows` and `password_screens` have RLS on with no policy (INFO). Service-role only, by design.
+   - Auth leaked-password protection is off (WARN). This is a dashboard toggle for the owner.
 
 ## Rejected
 
 Dead ends already paid for. Do not re-derive these.
 
-- **A WATCH verdict.** Nothing in the codebase produces a signal separating it from
-  HOLD. A verdict no evaluation can return is a control that does nothing (§83). It
-  arrives with historical monitoring, which supplies the trend it would rest on.
-- **A counterparty confidence enum** (VERIFIED/ATTRIBUTED/PROBABLE/…), which the audit
-  predicted for G3. Wrong: NOSHASHI attributes nothing by design, so the enum would
-  have had no producer. The real defect was a fabricated Travel Rule finding.
-- **An application-level audit helper.** Impossible: keys are created client-side as
-  `authenticated`, which has no INSERT on `audit_log`, deliberately. Hence triggers.
-- **A phone hero height floor** of `max(440px, 64svh)`. Measured: it put 130px of
-  nothing under the CTA. The phone hero stays content-driven.
-- **`npm audit fix` without `--force`.** Cannot resolve the Vite CVEs at all.
-- **A live price ribbon as the hero centrepiece.** DESIGN.md bans "decorative data",
-  and a chart in the hero breaks the bound the starfield exception is granted under.
-  The decorative bloom was granted instead, as a documented second exception.
+- **Binding every check's state into the digest.** Only `INSUFFICIENT_DATA` and `NOT_APPLICABLE` are bound (`[id, passed, state]`). Binding PASS, FAIL or REVIEW would change the digest of every receipt and certificate ever issued, and the boolean already says them.
+- **Type annotations inside `authorityDigest`** in the edge function. The parity test lifts that function as text and runs it untyped. An annotation there silently dropped six tests once.
+- **A timer-driven pond.** The garden moves only when a validated ledger closes. With no ledger arriving the water is still, and the caption says so.
+- **Opening an XRPL socket on every site page.** Only pages with a hero pond follow the ledger. The trust page's data-flow text says so.
+- **A WATCH verdict, a counterparty confidence enum, an application-level audit helper.** See the git history of this file (before 2026-09-24) for why.
 
 ## Resume with
 
 ```bash
-git fetch origin && git checkout claude/feature-pricing-recommendation-dp8xke
+git fetch origin && git checkout -B claude/feature-pricing-recommendation-dp8xke origin/main
 npm install
-node .claude/skills/ponytail/scripts/trail.mjs     # reconcile before trusting this file
-npx tsc --noEmit && npx vitest run && npm run build
+npx tsc --noEmit && npx vitest run
+node scripts/build-site.mjs && git checkout site/index.html site/news site/progress site/status tsconfig.tsbuildinfo
 ```
