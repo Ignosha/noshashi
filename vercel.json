@@ -4,6 +4,7 @@
   "installCommand": "",
   "buildCommand": "node scripts/build-site.mjs",
   "outputDirectory": "site",
+  "ignoreCommand": "sh scripts/vercel-ignore-build.sh",
   "functions": {
     "api/authority.js": {
       "maxDuration": 60
