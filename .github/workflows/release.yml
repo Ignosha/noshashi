@@ -9,7 +9,13 @@ name: Release
 # three machines, which is exactly what a CI matrix is.
 #
 # Trigger:  git tag v0.1.0 && git push --tags
-# Output:   a draft GitHub Release with all three installers attached.
+#       or: run this workflow by hand on main (Actions › Release › Run
+#           workflow). With no tag, the release is tagged v<version> from
+#           src-tauri/tauri.conf.json and cut from main's head, so a session
+#           that cannot push tags can still ship a build. Bump the version
+#           first: a version that already has a release does not get a
+#           new one.
+# Output:   a GitHub Release with every installer attached.
 
 on:
   push:
@@ -32,6 +38,9 @@ jobs:
 
   build:
     needs: verify
+    # A hand-run build from any branch but main would publish a release
+    # from unmerged code, so only main may do it.
+    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
     permissions:
       contents: write
     strategy:
@@ -111,8 +120,9 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           args: --target ${{ matrix.target }}
-          tagName: ${{ github.ref_name }}
-          releaseName: "NOSHASHI ${{ github.ref_name }}"
+          # __VERSION__ is tauri-action's own placeholder for the app version.
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || 'v__VERSION__' }}
+          releaseName: ${{ github.ref_type == 'tag' && format('NOSHASHI {0}', github.ref_name) || 'NOSHASHI v__VERSION__' }}
           releaseBody: |
             Built from ${{ github.sha }} on ${{ matrix.platform }}.
 
