@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.0.8
+
+### Watching, investigating, and saying "no answer" honestly
+
+- **Observer (Agent › Observer):** watches your saved wallets every 5, 15
+  or 60 minutes against the validated ledger and reports only what changed:
+  a line frozen or deep-frozen, a holding or XRP balance falling 10% or
+  more, a credential revoked, expired or entering its last week, an
+  issuer's controls drifting, an account deleted. Each observation carries
+  the before and after readings, and one click hands it to the agent,
+  which is told to use only those facts. Readings stay on this device.
+- **One-click issuer investigation:** from the Garden and the authority
+  certificate, one button runs the authority certificate and the issuer's
+  outstanding obligations together and hands the agent every fact found.
+- **Five-state checks:** every check now reads PASS, FAIL, REVIEW,
+  INSUFFICIENT DATA or NOT APPLICABLE. A supply walk that did not finish is
+  "no answer", not a failure; an issuer with no obligations has nothing a
+  concentration check can measure. Receipts and certificates issued before
+  this keep their exact digests. Authority rules are now version 2.
+- **Exception review:** a reviewer can ask for more evidence instead of
+  approving or rejecting. The requester adds links, transaction hashes,
+  accounts or digests, and the exception returns to the queue. Both steps
+  are audited and delivered to webhooks (`exception_evidence_requested`,
+  `exception_evidence_added`).
+- **Landing garden:** the pond on the home page and the app's landing
+  screen moves with the XRP Ledger. Each validated ledger that closes sends
+  one ring, stronger the more transactions it carried, and the caption
+  names the ledger. With no ledger arriving the water stays still.
+
+
 ## 1.0.7
 
 ### The flower is the brand
