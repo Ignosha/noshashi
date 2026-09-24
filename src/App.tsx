@@ -109,6 +109,9 @@ const AgentScene = lazy(() =>
 const RevenueScene = lazy(() =>
   import("@/components/scenes/RevenueScene").then((m) => ({ default: m.RevenueScene }))
 );
+const TrustScene = lazy(() =>
+  import("@/components/scenes/TrustScene").then((m) => ({ default: m.TrustScene }))
+);
 const LegalScene = lazy(() =>
   import("@/components/scenes/LegalScene").then((m) => ({ default: m.LegalScene }))
 );
@@ -161,6 +164,7 @@ export type SceneId =
   | "account"
   | "revenue"
   | "legal"
+  | "trust"
   | "settings";
 
 type SceneDef = {
@@ -459,6 +463,15 @@ const SCENES: SceneDef[] = [
     icon: <NovaEye size={15} />,
     digit: "",
     group: "hidden",
+  },
+  {
+    id: "trust",
+    label: "TRUST & SECURITY",
+    title: "TRUST & SECURITY",
+    hint: "What NOSHASHI reads, what it never does, and where data goes",
+    icon: <NovaVault size={15} />,
+    digit: "",
+    group: "utility",
   },
   {
     id: "settings",
@@ -1082,6 +1095,8 @@ function ConsoleApp() {
                       <RevenueScene />
                     ) : scene === "legal" ? (
                       <LegalScene />
+                    ) : scene === "trust" ? (
+                      <TrustScene data={data} onNavigate={goTo} />
                     ) : (
                       <SettingsScene
                         data={data}

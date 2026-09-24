@@ -147,6 +147,7 @@ export function buildSystemPrompt(
       "- Account: subscription, two-factor authentication and API keys. Free.",
       "- Business Plan: revenue streams, tiers and sequencing. Free.",
       "- Legal & Accessibility: policies, accessibility statement and contact routes. Free.",
+      "- Trust & Security: the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim. Free.",
       "- Settings: appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage. Free.",
       "- Cmd+K opens the command palette. Cmd+Shift+X toggles the menu bar HUD.",
       "",

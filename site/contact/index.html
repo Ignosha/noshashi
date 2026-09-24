@@ -40,8 +40,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
       <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
       <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
-      <a class="nav-link optional" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
-      <a class="nav-link optional" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
       <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
       <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
@@ -160,6 +160,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="/guide/">Plain-language guide</a>
       <a href="/pricing/">Pricing</a>
       <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
       <a href="/strategic-infrastructure/">Strategic infrastructure</a>
       <a href="/developers/">Developers</a>
       <a href="/legal/">Legal &amp; accessibility</a>
@@ -172,6 +173,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 <script src="/assets/subscribe.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
 <script>
 (function(){
   var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
@@ -205,6 +207,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   }catch(e){}
 
   function say(text,tone){status.textContent=text;status.setAttribute("data-tone",tone||"");}
+  function esc(v){return String(v).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 
   form.addEventListener("submit",function(event){
     event.preventDefault();
@@ -226,7 +230,10 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         /* 503 means nobody has the message. Say that, and hand over the
            address that does work, rather than a generic failure. */
         if(result.body.mailto){
-          say(result.body.error+" Email "+result.body.mailto+" instead — that address works.","bad");
+          /* The address is data, so the page translation leaves it be. */
+          status.innerHTML=esc(result.body.error)+' Email <a translate="no" href="mailto:'+
+            esc(result.body.mailto)+'">'+esc(result.body.mailto)+'</a> instead — that address works.';
+          status.setAttribute("data-tone","bad");
           return;
         }
         say(result.body.error||"That did not send.","bad");
@@ -238,6 +245,5 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   });
 })();
 </script>
-<script src="/assets/garden-field.js" defer></script>
 </body>
 </html>
