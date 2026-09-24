@@ -1028,6 +1028,7 @@ function ConsoleApp() {
                       <MissionControlScene
                         data={data}
                         onOpenVerification={() => setScene("verify")}
+                        onNavigate={goTo}
                       />
                     ) : scene === "verify" ? (
                       <VerificationScene data={data} />

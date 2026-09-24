@@ -365,3 +365,31 @@ export function useIssuerWatch(issuers: string[]) {
     unacknowledged: alerts.filter((a) => !a.acknowledged).length,
   };
 }
+
+/**
+ * The drift alerts and watched issuers as last stored — read-only. For
+ * summaries (the control room) that must not start sweeps of their own;
+ * the sweeping itself stays with the one useIssuerWatch owner.
+ */
+export function useStoredDrift() {
+  const [state, setState] = useState<{ alerts: DriftAlert[]; issuers: string[]; loaded: boolean }>({
+    alerts: [],
+    issuers: [],
+    loaded: false,
+  });
+  useEffect(() => {
+    let alive = true;
+    void Promise.all([readSetting<DriftAlert[]>(ALERTS_KEY, []), readSetting<Baseline>(BASELINE_KEY, {})]).then(([alerts, baseline]) => {
+      if (!alive) return;
+      setState({
+        alerts: Array.isArray(alerts) ? alerts : [],
+        issuers: baseline && typeof baseline === "object" ? Object.keys(baseline) : [],
+        loaded: true,
+      });
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return state;
+}
