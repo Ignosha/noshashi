@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.0.9
+
+### Every screen scrolls instead of hiding its panels
+
+Several screens were fixed to the window height and squeezed their lower
+panels, sometimes to nothing, when the window was not tall enough. They
+now scroll, and no panel shrinks below its content.
+
+- **Mission Control:** the ledger cadence, compliance coverage, live ledger
+  stream, wallet gate, policy rule set and network panels were squeezed
+  under the status bar on a normal laptop screen. They are all there again.
+- **Compliance Agent:** the runtime, guardrails and human escalation column
+  was cut off; on a smaller window, human escalation had no height at all.
+  The support and security addresses are shown in full, the "runtime not
+  detected" message reads as two sentences, and Compliance, Support,
+  Observer and Governance are now one set of tabs.
+- **Trust & Security:** the page could not scroll, so "Where your data
+  goes", "Human oversight", "What this does not claim" and the list of
+  ledger commands could not be reached. It now scrolls and has the same
+  margins as every other screen.
+- **Domain Grid and Growth:** their side columns now scroll instead of
+  squeezing network facts and the publishing note.
+- **Sidebar:** the list fades out at the bottom, so a section heading below
+  the fold no longer looks like an empty section.
+
+### Groundwork for iPhone and iPad
+
+The desktop-only parts (menu bar tray, HUD, global shortcut, launch at
+login, updater) are now separated from the rest, the first step to an iOS
+build from a Mac with Xcode. `docs/IOS.md` has the steps. There is no iOS
+release yet, and the desktop app works exactly as before.
+
+
 ## 1.0.8
 
 ### Watching, investigating, and saying "no answer" honestly
