@@ -70,9 +70,12 @@ In priority order.
 4. **Smoke-test the live verify endpoint.** Impossible from the sandbox
    (`supabase.co` egress-blocked). Expect `""` and `"authority/check"` from
    `curl -s https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify | jq .verbs`
-5. **Dependency audit** — see Verified: 130 findings from main's wallet SDKs and
-   Electron. Decide whether the Electron shell (`main.js`, `preload.js`) and the
-   wallet SDKs stay; if not, removing them clears most of it.
+5. **Dependency audit** — resolved 2026-09-24: the legacy Ignoshashi wallet
+   server (`server.js`, which held ETH/Solana private keys in SQLite and signed
+   transactions), its `public/` frontend, the Electron shell (`main.js`,
+   `preload.js`), the meme-coin `contracts/`, its Docker/Railway/pm2 deploy files
+   and the 22 packages only it used were removed. A Railway service already
+   running it is not stopped by this; delete it and its `/data` volume there.
 6. Pre-existing: `api_rate_windows` has RLS on with no policy (INFO); Supabase Auth
    leaked-password protection is off (WARN).
 
