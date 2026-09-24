@@ -181,7 +181,7 @@ export function LandingScene({
         <div className="mx-auto w-full max-w-[1120px] px-6">
           {/* ── Hero ───────────────────────────────────────────── */}
           <section className="relative overflow-hidden py-20">
-            <GardenField />
+            <GardenField live ledger={ledger ? { index: ledger.ledgerIndex, txnCount: ledger.txnCount } : null} />
 
             <motion.div
               className="relative flex flex-col items-start gap-6"
@@ -195,6 +195,11 @@ export function LandingScene({
                   {connected ? "LIVE ON XRPL MAINNET" : "CONNECTING TO MAINNET"}
                 </span>
               </div>
+              <p className="mono-font -mt-3 text-[9px] text-faint" aria-live="off">
+                {connected && ledger
+                  ? `Each ring in the pond is a validated ledger closing · #${ledger.ledgerIndex.toLocaleString("en-US")} · ${ledger.txnCount} transactions`
+                  : "The pond is still until a validated ledger arrives."}
+              </p>
 
               <div className="flex items-center gap-6">
                 <motion.div
