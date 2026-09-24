@@ -915,8 +915,11 @@ function ConsoleApp() {
               </button>
             </div>
 
+            {/* The fade says the list continues. Without it, on a window too
+                short for every section, the next heading showed cut off
+                against the SYSTEM rule and read as an empty section. */}
             <nav
-              className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-2.5 pb-4"
+              className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-2.5 pb-6 [mask-image:linear-gradient(to_bottom,#000_calc(100%-28px),transparent)]"
               aria-label="Primary"
             >
               {NAV_SECTIONS.map((section) => {
