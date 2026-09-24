@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light">
 <title>Programmable institutional intelligence. · NOSHASHI</title>
-<meta name="description" content="Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.">
+<meta name="description" content="Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.">
 <link rel="canonical" href="https://www.noshashi.app/developers/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NOSHASHI">
 <meta property="og:url" content="https://www.noshashi.app/developers/">
 <meta property="og:title" content="Programmable institutional intelligence. · NOSHASHI">
-<meta property="og:description" content="Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.">
+<meta property="og:description" content="Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Programmable institutional intelligence. · NOSHASHI">
-<meta name="twitter:description" content="Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.">
+<meta name="twitter:description" content="Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
@@ -53,7 +53,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   </div>
 </header>
 <main class="shell">
-<div class="page-head"><p class="eyebrow">DEVELOPER PORTAL</p><h1>Programmable institutional intelligence.</h1><p>Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.</p></div><div class="panel"><p class="eyebrow">REFERENCE</p><h2>API endpoint families</h2><ul><li><code>/api/v1/institutional/overview</code></li><li><code>/api/v1/institutional/assets</code></li><li><code>/api/v1/institutional/evidence</code></li><li><code>/api/v1/institutional/policies/check</code></li><li><code>/api/v1/institutional/monitoring/events</code></li></ul></div>
+<div class="page-head"><p class="eyebrow">DEVELOPER PORTAL</p><h1>Programmable institutional intelligence.</h1><p>Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.</p></div><div class="panel"><p class="eyebrow">REFERENCE</p><h2>Compliance API verbs</h2><p>One edge function serves every verb: <code>https://&lt;project&gt;.supabase.co/functions/v1/noshashi-verify/&lt;verb&gt;</code>.</p><ul><li><code>(bare path)</code> — POST — adjudicate a settlement. verify scope, one credit.</li><li><code>authority/check</code> — POST — re-derive an authority certificate&#39;s digest from its own body. Free, unauthenticated, reads nothing.</li><li><code>receipts/{digest}</code> — GET — a receipt this account or its organization recorded, as it was served. read or verify scope, free.</li><li><code>analyze/issuer</code> — POST { issuer } — an issuer&#39;s controls, read live from the validated ledger. read or verify scope, free.</li><li><code>analyze/address</code> — POST { address } — balance, reserve, owner count and credentials, read live. read or verify scope, free.</li><li><code>analyze/transaction</code> — POST { hash } — a transaction&#39;s type, parties, result and delivered amount, read live. read or verify scope, free.</li></ul><p>Request and response shapes, authentication, scopes and rate limits: <a href="/docs/api/">API reference</a>. Signed event delivery: <a href="/docs/webhooks/">Webhooks</a>. Everything else: <a href="/docs/">documentation</a>.</p></div>
 </main>
 <footer>
   <div class="shell foot">
@@ -72,6 +72,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="/misread/">The ledger can be misread</a>
       <a href="/strategic-infrastructure/">Strategic infrastructure</a>
       <a href="/developers/">Developers</a>
+      <a href="/docs/">Documentation</a>
       <a href="/legal/">Legal &amp; accessibility</a>
       <a href="https://github.com/Ignosha/noshashi">GitHub</a>
     </div>

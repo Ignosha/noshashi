@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Security · NOSHASHI docs</title>
+<meta name="description" content="What NOSHASHI never does, where data goes, and how to report a vulnerability.">
+<link rel="canonical" href="https://www.noshashi.app/docs/security/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/docs/security/">
+<meta property="og:title" content="Security · NOSHASHI docs">
+<meta property="og:description" content="What NOSHASHI never does, where data goes, and how to report a vulnerability.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Security · NOSHASHI docs">
+<meta name="twitter:description" content="What NOSHASHI never does, where data goes, and how to report a vulnerability.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Security","item":"https://www.noshashi.app/docs/security/"}]}]}</script>
+<style>
+.docs{display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px;align-items:start}
+.docs-nav{position:sticky;top:88px;display:grid;gap:2px;font-size:14px}
+.docs-nav a{padding:6px 10px;border-left:2px solid var(--rule);color:var(--muted);text-decoration:none}
+.docs-nav a[aria-current="page"]{border-left-color:var(--accent,currentColor);color:var(--ink)}
+.doc-body{min-width:0;max-width:820px}
+.doc-body h2{margin-top:36px}
+.doc-body pre{overflow-x:auto;padding:14px;border:1px solid var(--rule);font-size:13px}
+.table-scroll{overflow-x:auto}
+.doc-table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+.doc-table th,.doc-table td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+.doc-table thead th{font:12px "IBM Plex Mono",monospace;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.doc-src,.doc-where{font-size:12px;color:var(--faint)}
+.doc-steps li{margin-bottom:10px}
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.docs-grid a{display:block;padding:16px;border:1px solid var(--rule);text-decoration:none;color:inherit}
+.docs-grid a:hover{border-color:var(--ink)}
+@media (max-width:860px){.docs{grid-template-columns:1fr}.docs-nav{position:static;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/news/"><span data-i18n="nav.news">Newsroom</span></a>
+      <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
+      <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
+      <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
+      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head"><p class="eyebrow"><a href="/docs/">DOCUMENTATION</a></p><h1>Security</h1><p>What NOSHASHI never does, where data goes, and how to report a vulnerability.</p></div>
+<section class="docs"><nav class="docs-nav" aria-label="Documentation"><a href="/docs/getting-started/">Getting started</a><a href="/docs/architecture/">Architecture</a><a href="/docs/xrpl-data/">XRPL data</a><a href="/docs/analysis/">Analysis engines</a><a href="/docs/ai/">AI</a><a href="/docs/policies/">Policies</a><a href="/docs/evidence/">Evidence</a><a href="/docs/receipts/">Receipts</a><a href="/docs/api/">API</a><a href="/docs/webhooks/">Webhooks</a><a href="/docs/security/" aria-current="page">Security</a><a href="/docs/enterprise/">Enterprise</a><a href="/docs/troubleshooting/">Troubleshooting</a><a href="/docs/release-notes/">Release notes</a></nav><article class="doc-body">
+<h2>Boundaries</h2>
+<div class="table-scroll"><table class="doc-table"><thead><tr><th scope="col">Boundary</th><th scope="col">Claim</th><th scope="col">Why it holds</th></tr></thead><tbody><tr><th scope="row">NO PRIVATE KEYS</th><td>NOSHASHI never asks for, generates or stores an XRPL secret, seed or private key.</td><td>No XRPL wallet or key-pair library is imported. The app will not send a message containing an XRPL secret seed to any AI model: it checks every message before sending and refuses. The keys NOSHASHI does hold are of other kinds: model-provider API keys and the Compliance API secret sit in the operating system keyring, and nsh_live_ API keys are stored only as SHA-256 hashes.</td></tr><tr><th scope="row">NO CUSTODY</th><td>NOSHASHI holds no client assets and controls no account on the ledger.</td><td>Addresses are entered to be read. There is no deposit address, balance under management or withdrawal path.</td></tr><tr><th scope="row">NO SIGNING</th><td>No code path signs an XRPL transaction.</td><td>The signing commands (sign, sign_for, submit_multisigned, wallet_propose, channel_authorize) appear nowhere in the covered code, which a test checks. NOSHASHI does sign messages of its own kind — webhook deliveries carry an HMAC — which is unrelated to ledger transactions.</td></tr><tr><th scope="row">NO BROADCAST</th><td>Nothing is ever submitted to the ledger.</td><td>The submit command appears nowhere in the covered code, which a test checks. Every command that is sent is on the published read-only list.</td></tr></tbody></table></div>
+<h2>Where data goes</h2>
+<div class="table-scroll"><table class="doc-table"><thead><tr><th scope="col">Who</th><th scope="col">What</th><th scope="col">Why</th></tr></thead><tbody><tr><th scope="row">Public XRPL servers</th><td>The addresses, transactions and order books you ask about.</td><td>To read the ledger. These servers are run by third parties and see your queries.</td></tr><tr><th scope="row">Your device</th><td>The workstation&#39;s verdict ledger, settings and cases outside an organization.</td><td>Kept locally on purpose; not transmitted.</td></tr><tr><th scope="row">Supabase (NOSHASHI&#39;s hosted database)</th><td>Account, subscription, organization data, shared cases, audit log, API receipts, hashed API keys.</td><td>Accounts, billing entitlements and anything shared across an organization.</td></tr><tr><th scope="row">Stripe</th><td>Payment details, entered on Stripe&#39;s own page.</td><td>Billing. NOSHASHI never sees card numbers.</td></tr><tr><th scope="row">Have I Been Pwned</th><td>The first five characters of a SHA-1 hash of a new password, sent from NOSHASHI&#39;s server.</td><td>To refuse passwords known from breaches. The password itself never leaves NOSHASHI.</td></tr><tr><th scope="row">An AI provider you choose</th><td>Your questions and the context attached to them.</td><td>Only if you configure a hosted provider. The default is a model on your own machine, and the app shows which applies.</td></tr></tbody></table></div>
+<h2>What is not claimed</h2><ul><li>NOSHASHI trusts the public servers it reads from. It does not verify ledger proofs or validator signatures itself, and individual reads are not cross-checked between servers (the Network view compares servers separately).</li><li>A receipt digest shows the receipt was not altered. It is not a signature and does not by itself prove NOSHASHI issued it.</li><li>If you configure a hosted AI provider, your prompts are processed by that provider under its terms.</li><li>NOSHASHI holds no security certification (such as SOC 2 or ISO 27001) and makes no claim of regulatory compliance. It is software that reads the ledger and applies rules; the decisions stay yours.</li></ul>
+<p>The same model, with each stage's source files, is on the <a href="/trust/">Trust &amp; security</a> page.</p>
+<p>How NOSHASHI is built to resist compromise, and — just as importantly — what is <em>not</em> yet hardened. Report anything you find to <strong>security@noshashi.app</strong>; we ask for coordinated disclosure and reply within one business day.</p>
+<h3>The core principle</h3>
+<p>The safest data is data we do not hold. Without an account the app has no server-side state at all: it reads public ledger data, keeps preferences in a local file, and never identifies you to anything we operate. Signing in adds exactly the data listed in the privacy policy and nothing more.</p>
+<h3>Desktop application</h3>
+<div class="table-scroll"><table class="doc-table"><thead><tr><th scope="col">Control</th><th scope="col">Implementation</th></tr></thead><tbody><tr><td>Content Security Policy</td><td>Strict allow-list. <code>default-src &#39;self&#39;</code>, no <code>unsafe-eval</code>, <code>object-src &#39;none&#39;</code>, <code>frame-src &#39;none&#39;</code>, <code>frame-ancestors &#39;none&#39;</code>. Every outbound host is named explicitly.</td></tr><tr><td>Global Tauri object</td><td><code>withGlobalTauri: false</code> — the web view has no ambient bridge to invoke commands.</td></tr><tr><td>Capabilities</td><td>Minimal permission set. The window may show/hide/minimise itself and use notifications, store, autostart, shortcut and positioner. Nothing else.</td></tr><tr><td>Filesystem</td><td>No filesystem plugin. The only write path is one command that refuses path separators, resolves inside <code>~/Downloads</code>, and caps output at 64 MB.</td></tr><tr><td>Shell</td><td>No shell plugin. Opening a URL goes through one command that parses the URL and refuses any scheme other than <code>http</code>/<code>https</code>.</td></tr><tr><td>Secrets</td><td>Held in the macOS Keychain via the <code>keyring</code> crate, never in a preferences file, browser storage, or a log. The <strong>compliance API secret</strong> is write-only from the UI and is never read back into the web view. <strong>Model-provider keys</strong> are readable by the front end at call time — the request to the provider is made from the web view, so the key has to reach it — and are scoped one keyring entry per provider so revoking one does not disturb another. Routing those calls through the native layer, so the key never enters the web view at all, is tracked as a known gap below.</td></tr><tr><td>Fonts</td><td>Self-hosted. No font CDN is contacted, so opening the app announces itself to nobody and it works fully offline.</td></tr><tr><td>Telemetry</td><td>None. No analytics, no crash reporting, no advertising identifiers.</td></tr></tbody></table></div>
+<h3>Authentication</h3>
+<ul><li>Passwords are passed straight to Supabase Auth, which hashes them with bcrypt server-side. The application never stores, logs, or transforms a password.</li><li>Minimum twelve characters with mixed case, a digit and a symbol, enforced before the value leaves the field, with a strength meter.</li><li><strong>TOTP two-factor</strong> (RFC 6238) via authenticator app, and <strong>email one-time codes</strong> as an alternative sign-in path.</li><li>Sessions use PKCE and rotating refresh tokens.</li></ul>
+<h3>Data isolation</h3>
+<ul><li>Row level security is enabled on <strong>every</strong> table. Each policy scopes rows to <code>auth.uid()</code>, so one account can never read another&#39;s.</li><li><code>entitlements</code> and <code>subscriptions</code> are <strong>read-only to clients</strong>. They are written exclusively by the Stripe webhook using the service role, so a tampered client cannot grant itself a paid plan.</li><li>The service-role key exists only inside Edge Functions and is never shipped to any client.</li></ul>
+<h3>Payments</h3>
+<ul><li>No card detail ever reaches this application. Checkout and card management both happen on Stripe&#39;s own domain.</li><li>The checkout function accepts <strong>only</strong> price IDs on a server-side allow-list, so a modified client cannot invent a cheaper plan.</li><li>Seat quantities are clamped server-side (1–500).</li><li>Webhook authenticity is established by verifying the <code>Stripe-Signature</code> HMAC in constant time, with a five-minute timestamp window that makes a captured request useless afterwards.</li></ul>
+<h3>API keys</h3>
+<ul><li>Generated from the platform CSPRNG (256 bits).</li><li>Stored <strong>only</strong> as a SHA-256 digest. Losing the database leaks no working key, and support genuinely cannot recover one.</li><li>Displayed exactly once, at creation.</li></ul>
+<h3>The AI agent</h3>
+<ul><li>Defaults to a <strong>local</strong> runtime. Prompts containing wallet addresses, receipts and rule traces never cross the network boundary.</li><li>Remote providers are opt-in, restricted to a named allow-list in the CSP, and <strong>must</strong> be HTTPS — the endpoint validator refuses plaintext for anything that is not loopback.</li><li>The interface states plainly, on the screen where you choose, whether the selected runtime is local or remote.</li><li>The system prompt forbids the agent from accepting seed phrases, keys or passwords, and from issuing verdicts itself.</li></ul>
+<h3>Known gaps</h3>
+<p>Named rather than hidden:</p>
+<ol><li><strong>The app is not code-signed or notarized.</strong> Distribution requires an Apple Developer account. Until then macOS Gatekeeper will warn on first launch, and users must right-click → Open.</li><li><strong><code>style-src</code> still allows <code>&#39;unsafe-inline&#39;</code>.</strong> Tailwind and the animation layer write inline style attributes. Removing this needs a nonce-based build pipeline.</li><li><strong>Edge Functions have no rate limiting.</strong> Add it before the Compliance API is opened to third parties.</li><li><strong>Leaked-password protection is not yet enabled</strong> in Supabase Auth. It is a dashboard toggle: Authentication → Policies → leaked password protection.</li><li><strong>The Compliance API is deployed from the repository but not yet pushed to the Supabase project.</strong> <code>supabase/functions/noshashi-verify</code> and its migration (<code>supabase/migrations/20260820_compliance_api.sql</code>) are in-tree and ready; run <code>supabase db push</code> and <code>supabase functions deploy noshashi-verify</code> to make the endpoint live. Until then the Institution-tier API returns 404.</li><li><strong>Model-provider API keys pass through the web view.</strong> They are stored in the OS keyring and read only for the duration of a request, but a web-view compromise could observe one in memory. The fix is to proxy remote model calls through the Rust layer. Local runtimes — the default — are unaffected, because they need no key at all.</li><li><strong>No penetration test has been performed.</strong> Do one before taking real institutional money.</li></ol>
+<p class="doc-src mono">Generated from <a href="https://github.com/Ignosha/noshashi/tree/main/src/lib/trust/boundary.json">src/lib/trust/boundary.json</a> · <a href="https://github.com/Ignosha/noshashi/tree/main/SECURITY.md">SECURITY.md</a></p></article></section>
+</main>
+<footer>
+  <div class="shell foot">
+    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
+    <div class="foot-links">
+      <a href="/contact/">Contact</a>
+      <a href="/certificate/">Authority certificate</a>
+      <a href="/news/">Newsroom</a>
+      <a href="/progress/">Progress</a>
+      <a href="/status/">Status</a>
+      <a href="/research/">Findings</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
+      <a href="/misread/">The ledger can be misread</a>
+      <a href="/strategic-infrastructure/">Strategic infrastructure</a>
+      <a href="/developers/">Developers</a>
+      <a href="/docs/">Documentation</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="https://github.com/Ignosha/noshashi">GitHub</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script>
+(function(){
+  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
+  if(!button)return;
+  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
+    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
+    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
+  sync();
+  button.addEventListener("click",function(){
+    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
+    sync();});
+})();
+</script>
+
+</body>
+</html>

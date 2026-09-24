@@ -67,6 +67,7 @@ export const FOOTER_LINKS = [
   { href: "/misread/", label: "The ledger can be misread" },
   { href: "/strategic-infrastructure/", label: "Strategic infrastructure" },
   { href: "/developers/", label: "Developers" },
+  { href: "/docs/", label: "Documentation" },
   { href: "/legal/", label: "Legal & accessibility" },
   { href: "https://github.com/Ignosha/noshashi", label: "GitHub" },
 ];

@@ -27,7 +27,7 @@
  * wagging the dog.
  */
 
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -37,6 +37,7 @@ import { getProjectFeed, deriveStatus } from "../api/_lib/project-feed.js";
 import { ENTRIES as KB } from "../api/_lib/kb.js";
 import { renderPage, breadcrumb, ORGANIZATION, ORIGIN, MARK } from "../api/_lib/shell.js";
 import { renderMisread } from "../api/_lib/misread.js";
+import { docsSections } from "../api/_lib/docs.js";
 import { esc, isoDate, ago } from "../api/_lib/html.js";
 import {
   renderNews, renderNewsHead, renderLog, renderBoard, renderClock,
@@ -49,6 +50,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
 
 const log = (...args) => console.log("[build]", ...args);
+
+// The documentation's facts, as the code produces them (see src/lib/docs/reference.ts).
+const DOCS_REF = JSON.parse(await readFile(path.join(ROOT, "src/lib/docs/reference.json"), "utf8"));
 
 async function write(relative, html) {
   const file = path.join(SITE, relative);
@@ -866,7 +870,9 @@ async function buildCertificate() {
 const PRODUCT_PAGES = [
   ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Operating evidence</p><h2>Make every decision reviewable.</h2><p>Enterprise brings the same validated-ledger reading used in the public certificate into a governed workflow: the observation, policy result and adjudication remain connected.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p><ul class="proof-list"><li>Evidence attached to each policy result</li><li>Decision history suitable for second-line review</li></ul></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth, while teams retain the context required to act on them.</p><ul class="proof-list"><li>Validated state before interpretation</li><li>Exportable records for internal controls</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p>Architecture and commercial scope are confirmed before any contracted capability is promised.</p><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Trust &amp; security</a></p></div></section>`],
   ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build your institutional XRPL intelligence layer with NOSHASHI.", "Connect validated XRPL data, intelligence, monitoring, evidence and policy infrastructure to your own systems.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Delivery evidence</p><h2>Build on a source you can inspect.</h2><p>Strategic infrastructure connects validated XRPL observations to the systems your institution already governs. Delivery, retention and integration boundaries are explicit rather than implied.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">DATA</p><h2>Machine-readable intelligence.</h2><p>APIs, event feeds, webhooks, bulk exports and custom schemas.</p><ul class="proof-list"><li>Stable records for downstream controls</li><li>Evidence and timestamps travel with the result</li></ul></div><div class="panel"><p class="eyebrow">CAPACITY</p><h2>Contracted high-volume access.</h2><p>Capacity, retention and delivery are based on deployment requirements and commercial scope.</p><ul class="proof-list"><li>Architecture review before commitment</li><li>Scope documented against the integration</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">REVIEW</p><h2>Request architecture review.</h2><p>We will map data sources, operating boundaries and delivery requirements before proposing a contracted design.</p><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>`],
-  ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Connect evidence, policy evaluation, adjudication, monitoring and XRPL data into your own workflows.", `<div class="panel"><p class="eyebrow">REFERENCE</p><h2>API endpoint families</h2><ul><li><code>/api/v1/institutional/overview</code></li><li><code>/api/v1/institutional/assets</code></li><li><code>/api/v1/institutional/evidence</code></li><li><code>/api/v1/institutional/policies/check</code></li><li><code>/api/v1/institutional/monitoring/events</code></li></ul></div>`],
+  // The verbs are the edge function's own list (reference.json), not a
+  // roadmap: an endpoint named here is one that answers today.
+  ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.", `<div class="panel"><p class="eyebrow">REFERENCE</p><h2>Compliance API verbs</h2><p>One edge function serves every verb: <code>https://&lt;project&gt;.supabase.co/functions/v1/noshashi-verify/&lt;verb&gt;</code>.</p><ul>${DOCS_REF.verbs.map((v) => `<li><code>${esc(v.path)}</code> — ${esc(v.description)}</li>`).join("")}</ul><p>Request and response shapes, authentication, scopes and rate limits: <a href="/docs/api/">API reference</a>. Signed event delivery: <a href="/docs/webhooks/">Webhooks</a>. Everything else: <a href="/docs/">documentation</a>.</p></div>`],
 ];
 
 async function buildPricingEnhancement() {
@@ -1174,8 +1180,74 @@ async function buildTrust() {
   }));
 }
 
+/* ── /docs/ ────────────────────────────────────────────────────────── */
+/*
+ * Documentation generated from the implementation (§47). The sections and
+ * their facts live in api/_lib/docs.js and src/lib/docs/reference.json;
+ * this only reads the repository's own documents and writes the pages.
+ */
+async function buildDocs() {
+  const readRepo = (p) => readFile(path.join(ROOT, p), "utf8");
+  const [api, webhooks, security, changelog, siteFunctions, migrations] = await Promise.all([
+    readRepo("docs/api/COMPLIANCE_API.md"),
+    readRepo("docs/api/WEBHOOKS.md"),
+    readRepo("SECURITY.md"),
+    readRepo("CHANGELOG.md"),
+    readdir(path.join(ROOT, "api")).then((names) => names.filter((n) => n.endsWith(".js")).map((n) => n.replace(/\.js$/, "")).sort()),
+    readdir(path.join(ROOT, "supabase/migrations")).then((names) => names.filter((n) => n.endsWith(".sql"))),
+  ]);
+  const sections = docsSections(DOCS_REF, { api, webhooks, security, changelog }, { siteFunctions, migrations });
+  const head = `<style>
+.docs{display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px;align-items:start}
+.docs-nav{position:sticky;top:88px;display:grid;gap:2px;font-size:14px}
+.docs-nav a{padding:6px 10px;border-left:2px solid var(--rule);color:var(--muted);text-decoration:none}
+.docs-nav a[aria-current="page"]{border-left-color:var(--accent,currentColor);color:var(--ink)}
+.doc-body{min-width:0;max-width:820px}
+.doc-body h2{margin-top:36px}
+.doc-body pre{overflow-x:auto;padding:14px;border:1px solid var(--rule);font-size:13px}
+.table-scroll{overflow-x:auto}
+.doc-table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+.doc-table th,.doc-table td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+.doc-table thead th{font:12px "IBM Plex Mono",monospace;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.doc-src,.doc-where{font-size:12px;color:var(--faint)}
+.doc-steps li{margin-bottom:10px}
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.docs-grid a{display:block;padding:16px;border:1px solid var(--rule);text-decoration:none;color:inherit}
+.docs-grid a:hover{border-color:var(--ink)}
+@media (max-width:860px){.docs{grid-template-columns:1fr}.docs-nav{position:static;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+</style>`;
+  const nav = (current) =>
+    `<nav class="docs-nav" aria-label="Documentation">${sections
+      .map((s) => `<a href="/docs/${s.slug}/"${s.slug === current ? ' aria-current="page"' : ""}>${esc(s.title)}</a>`)
+      .join("")}</nav>`;
+
+  await write("docs/index.html", renderPage({
+    title: "Documentation · NOSHASHI",
+    description: "NOSHASHI documentation, generated from the implementation: architecture, XRPL data, analysis engines, AI, policies, evidence, receipts, API, webhooks, security, enterprise, troubleshooting and release notes.",
+    path: "/docs/",
+    head,
+    body: `<div class="page-head"><p class="eyebrow">DOCUMENTATION</p><h1>How NOSHASHI works, from the code.</h1><p>Every rule, verb, event, role and screen listed in these pages is read from the implementation when the site is built, and a test fails when the two disagree.</p></div>
+<section><div class="docs-grid">${sections.map((s) => `<a href="/docs/${s.slug}/"><p class="eyebrow">${esc(s.title)}</p><p>${esc(s.intro)}</p></a>`).join("")}</div></section>`,
+    structured: [breadcrumb("Documentation", "/docs/")],
+  }));
+
+  for (const section of sections) {
+    await write(`docs/${section.slug}/index.html`, renderPage({
+      title: `${section.title} · NOSHASHI docs`,
+      description: section.intro,
+      path: `/docs/${section.slug}/`,
+      head,
+      body: `<div class="page-head"><p class="eyebrow"><a href="/docs/">DOCUMENTATION</a></p><h1>${esc(section.title)}</h1><p>${esc(section.intro)}</p></div>
+<section class="docs">${nav(section.slug)}<article class="doc-body">${section.body}
+<p class="doc-src mono">Generated from ${section.sources.map((p) => `<a href="https://github.com/Ignosha/noshashi/tree/main/${esc(p)}">${esc(p)}</a>`).join(" · ")}</p></article></section>`,
+      structured: [breadcrumb(section.title, `/docs/${section.slug}/`)],
+    }));
+  }
+  return sections;
+}
+
 /* ── sitemap ──────────────────────────────────────────────────────── */
-async function buildSitemap() {
+async function buildSitemap(docs = []) {
   const pages = [
     ["/", "daily", "1.0"],
     ["/news/", "hourly", "0.9"],
@@ -1189,6 +1261,8 @@ async function buildSitemap() {
     ["/misread/", "monthly", "0.8"],
     ["/strategic-infrastructure/", "monthly", "0.9"],
     ["/developers/", "monthly", "0.8"],
+    ["/docs/", "monthly", "0.8"],
+    ...docs.map((s) => [`/docs/${s.slug}/`, "monthly", "0.6"]),
     ["/progress/", "weekly", "0.8"],
     ["/status/", "daily", "0.8"],
     ["/guide/", "monthly", "0.8"],
@@ -1273,7 +1347,8 @@ async function main() {
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildTrust();
   await buildMisread();
-  await buildSitemap();
+  const docs = await buildDocs();
+  await buildSitemap(docs);
   await buildRobots();
 
   log(`canonical origin: ${ORIGIN}`);
