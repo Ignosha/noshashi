@@ -137,6 +137,7 @@ import { cn } from "@/lib/utils";
 import type { Status } from "@/lib/xrpl/types";
 import { DOMAIN_REGISTRY, evaluatePolicy } from "@/lib/policy";
 import { HandoffProvider } from "@/lib/nav/handoff";
+import { ObserverRunner } from "@/lib/agent/useObserver";
 
 export type SceneId =
   | "home"
@@ -829,6 +830,7 @@ function ConsoleApp() {
   return (
     <TooltipProvider delayDuration={220}>
       <HandoffProvider onNavigate={goTo} currentScene={scene}>
+      <ObserverRunner />
       <div className="scanlines vignette relative flex h-full w-full overflow-hidden bg-background text-foreground">
         <SkipLink />
         <Announcer

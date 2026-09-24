@@ -18,6 +18,7 @@ import {
   type AuthorityCertificate,
 } from "@/lib/desk/authority";
 import { cn } from "@/lib/utils";
+import { InvestigateIssuerButton } from "@/components/nova/InvestigateIssuerButton";
 import { TraceButton } from "@/lib/nav/handoff";
 
 /**
@@ -220,6 +221,7 @@ function AuthorityBody() {
                   from="authority"
                   as="issuer"
                 />
+                <InvestigateIssuerButton issuer={certificate.issuer} from="authority" />
               </div>
               <p className="mt-3 stencil text-[8px] tracking-[0.24em] text-muted-foreground">
                 DIGEST · SHA-256
