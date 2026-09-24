@@ -184,7 +184,12 @@ export function MissionControlScene({
       : 0;
 
   return (
-    <div className="flex h-full flex-col gap-3 p-4">
+    // The scene scrolls as a whole. Fixed to the window height, the four
+    // sections above the telemetry grid took all of a 900px window and
+    // left the grid 9px: the ledger stream and node state were there but
+    // squeezed out of sight under the status bar. Nothing here shrinks now;
+    // the grid keeps a floor and takes any height left over.
+    <div className="flex h-full flex-col gap-3 overflow-y-auto p-4 [&>*]:shrink-0">
       <SceneHeader
         index="01"
         kicker="LIVE TELEMETRY · XRPL MAINNET"
@@ -291,7 +296,7 @@ export function MissionControlScene({
         />
       </motion.div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-5 gap-3">
+      <div className="grid min-h-[560px] flex-1 grid-cols-5 gap-3">
         {/* Left — network telemetry.
             Scrolls rather than compressing: the stream is live primary data
             and a flex-1 panel in a short window collapses to its own header,

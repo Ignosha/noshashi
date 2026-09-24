@@ -5,6 +5,13 @@ description = "NOSHASHI — autonomous compliance layer mission control"
 edition = "2021"
 rust-version = "1.77"
 
+# The app is a library so iOS can load it: an iOS build enters through
+# `tauri::mobile_entry_point` on `run`, and the desktop binary in main.rs
+# calls the same `run`. One code path, two front doors.
+[lib]
+name = "noshashi_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
@@ -14,11 +21,21 @@ tauri = { version = "2", features = [
     "tray-icon",
     "image-png",
 ] }
+tauri-plugin-notification = "2"
+tauri-plugin-store = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+url = "2"
+sha2 = "0.10"
+
+# Desktop only: the menu bar tray and its HUD, the global accelerator,
+# launch at login and in-place updates have no iOS equivalent (iOS updates
+# come from the App Store or TestFlight), and these crates do not build for
+# it. lib.rs compiles the code that uses them for desktop only.
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
 tauri-plugin-global-shortcut = "2"
-tauri-plugin-notification = "2"
 tauri-plugin-positioner = { version = "2", features = ["tray-icon"] }
-tauri-plugin-store = "2"
 # Signed in-place updates. The updater verifies a minisign signature over
 # the downloaded bundle with the public key in tauri.conf.json, which is
 # what makes an unsigned, un-notarised application safe to update at all:
@@ -26,10 +43,6 @@ tauri-plugin-store = "2"
 tauri-plugin-updater = "=2.11.0"
 # Restarting into the installed version is the last step of an update.
 tauri-plugin-process = "2"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-url = "2"
-sha2 = "0.10"
 
 # keyring 3 compiles NO credential store unless a backend feature asks for
 # one, and silently falls back to an in-process mock when none is enabled.
@@ -40,6 +53,10 @@ sha2 = "0.10"
 # The backend has to be selected per target, because each one only builds
 # on its own platform.
 [target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3", features = ["apple-native"] }
+
+# The same backend on iOS: `apple-native` is the iOS keychain there.
+[target.'cfg(target_os = "ios")'.dependencies]
 keyring = { version = "3", features = ["apple-native"] }
 
 [target.'cfg(target_os = "windows")'.dependencies]

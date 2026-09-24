@@ -221,7 +221,9 @@ export function DomainsScene({ data }: { data: XrplState }) {
           </motion.div>
         </div>
 
-        <div className="col-span-2 flex min-h-0 flex-col gap-3">
+        {/* Scrolls rather than squeezing: on a 700px window network facts
+            was given no height at all. */}
+        <div className="col-span-2 flex min-h-0 flex-col gap-3 overflow-y-auto [&>*]:shrink-0">
           <Panel
             label="DOMAIN DETAIL"
             corners
@@ -321,7 +323,7 @@ export function DomainsScene({ data }: { data: XrplState }) {
 
           <Panel
             label="NETWORK FACTS"
-            className="min-h-0 flex-1"
+            className="flex-auto"
             bodyClassName="overflow-y-auto p-3"
             right={
               <Badge variant="outline">

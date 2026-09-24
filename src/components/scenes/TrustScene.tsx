@@ -21,7 +21,10 @@ export function TrustScene({ data, onNavigate }: { data: XrplState; onNavigate?:
   const open = TRUST.stages.find((s) => s.id === openId) ?? TRUST.stages[0];
 
   return (
-    <div className="space-y-4">
+    // Every other scene pads itself and scrolls inside the clipped main
+    // area; this one did neither, so it sat against the sidebar and
+    // everything below the first screen could not be reached.
+    <div className="h-full min-w-0 space-y-4 overflow-y-auto p-4">
       <SceneHeader
         kicker="READ-ONLY · NO CUSTODY · NO SIGNING · NO BROADCAST"
         title="TRUST & SECURITY"

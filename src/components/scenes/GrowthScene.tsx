@@ -112,7 +112,8 @@ export function GrowthScene({ data }: { data: XrplState }) {
         />
       ) : (
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
-        <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
+        {/* Scrolls rather than squeezing the explanation below the angles. */}
+        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto lg:col-span-2 [&>*]:shrink-0">
           <Panel label="ANGLE" className="shrink-0">
             <div className="grid gap-1.5">
               {ANGLES.map((a) => {
@@ -151,7 +152,7 @@ export function GrowthScene({ data }: { data: XrplState }) {
             </div>
           </Panel>
 
-          <Panel label="WHY THERE IS NO PUBLISH BUTTON" className="min-h-0 flex-1">
+          <Panel label="WHY THERE IS NO PUBLISH BUTTON" className="flex-auto">
             <p className="text-[11px] leading-relaxed text-muted-foreground">
               Posting to X, LinkedIn or Reddit outside their own APIs breaks
               those platforms&rsquo; terms, and automated promotional posting is

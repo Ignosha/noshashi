@@ -1,0 +1,17 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "Capabilities granted to the single console window on iOS. The tray, HUD, global shortcut, launch at login and updater are desktop only.",
+  "platforms": [
+    "iOS",
+    "android"
+  ],
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "notification:default",
+    "store:default"
+  ]
+}
