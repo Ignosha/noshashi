@@ -13,6 +13,8 @@ import { supabaseErrorMessage } from "@/lib/supabase/errors";
 export const WEBHOOK_EVENTS = [
   { id: "policy_exception", label: "Policy exception requested" },
   { id: "exception_decided", label: "Exception approved or rejected" },
+  { id: "exception_evidence_requested", label: "More evidence requested on an exception" },
+  { id: "exception_evidence_added", label: "Evidence added to an exception" },
   { id: "policy_activated", label: "Policy version activated" },
   { id: "investigation_created", label: "Investigation opened" },
   { id: "investigation_resolved", label: "Investigation closed" },

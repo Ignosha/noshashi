@@ -7,6 +7,7 @@ import {
   ACTIVATION_FAILED,
   can,
   evidenceOf,
+  evidenceReferences,
   readGovernedResponse,
   verifiedActive,
   type MemberRole,
@@ -211,5 +212,30 @@ describe("exception evidence is the verdict as recorded", () => {
       policy: { id: "policy_settlement", name: "Institutional Settlement", version: 5, hash: "B".repeat(64), engine: "1" },
       policyResults: [{ id: "POLICY_HHI_LIMIT", state: "REVIEW", observed: "5000", configured: "2500", reason: "above" }],
     });
+  });
+});
+
+describe("further evidence on an exception — every reference must lead somewhere", () => {
+  // Real mainnet values: Bitstamp's issuing account and a payment from the recorded fixture.
+  const account = "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B";
+  const tx = "017808F0426766661E431C513918AC8FA75B744ED33DBD83E0987DC60A9C24CE";
+
+  it("types each line as a link, transaction, account or document digest", () => {
+    const { references, rejected } = evidenceReferences(
+      [`https://livenet.xrpl.org/accounts/${account}`, tx.toLowerCase(), account, `sha256:${"ab".repeat(32)}`, ""].join("\n")
+    );
+    expect(rejected).toEqual([]);
+    expect(references).toEqual([
+      { kind: "url", value: `https://livenet.xrpl.org/accounts/${account}` },
+      { kind: "transaction", value: tx },
+      { kind: "account", value: account },
+      { kind: "digest", value: "AB".repeat(32) },
+    ]);
+  });
+
+  it("refuses free text and plain http rather than storing something a reviewer cannot follow", () => {
+    const { references, rejected } = evidenceReferences("see attached\nhttp://example.com/doc\n" + account);
+    expect(references).toEqual([{ kind: "account", value: account }]);
+    expect(rejected).toEqual(["see attached", "http://example.com/doc"]);
   });
 });

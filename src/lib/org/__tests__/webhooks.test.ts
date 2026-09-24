@@ -7,6 +7,8 @@ import { verifyNoshashiSignature } from "@/lib/org/webhookSignature";
 
 const root = resolve(import.meta.dirname, "../../../..");
 const sql = readFileSync(resolve(root, "supabase/migrations/20260924010000_org_webhooks.sql"), "utf8");
+// The newest migration that redefines the allowed events is the one in force.
+const events = readFileSync(resolve(root, "supabase/migrations/20260924120000_exception_evidence_requests.sql"), "utf8");
 
 describe("webhook addresses — the form explains what the server refuses", () => {
   // The refusals below were each confirmed against the live database function.
@@ -25,9 +27,16 @@ describe("webhook addresses — the form explains what the server refuses", () =
     });
   }
 
-  it("the app's event list is exactly the server's", () => {
-    const serverEvents = sql.match(/events <@ array\[([\s\S]*?)\]::text\[\]/)![1].match(/'([a-z_]+)'/g)!.map((s) => s.slice(1, -1));
-    expect(WEBHOOK_EVENTS.map((e) => e.id).sort()).toEqual([...serverEvents].sort());
+  it("the app's event list is exactly the server's, in the table check and in the creating function", () => {
+    const lists = [...events.matchAll(/events <@ array\[([\s\S]*?)\]::text\[\]/g)].map((m) => m[1].match(/'([a-z_]+)'/g)!.map((s) => s.slice(1, -1)).sort());
+    expect(lists).toHaveLength(2);
+    for (const serverEvents of lists) expect(WEBHOOK_EVENTS.map((e) => e.id).sort()).toEqual(serverEvents);
+  });
+
+  it("every event the audit trigger emits is one a webhook may subscribe to", () => {
+    const emitted = [...events.matchAll(/when '[a-z_.]+' then '([a-z_]+)'/g)].map((m) => m[1]);
+    expect(emitted.length).toBeGreaterThan(5);
+    for (const ev of emitted) expect(WEBHOOK_EVENTS.map((e) => e.id), ev).toContain(ev);
   });
 });
 

@@ -27,6 +27,8 @@ import {
   createDraft,
   createOrganization,
   decideException,
+  addExceptionEvidence,
+  evidenceReferences,
   discardDraft,
   requestException,
   saveDraft,
@@ -590,9 +592,32 @@ function ExceptionsPanel({
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<{ id: string; f: ServerFailure } | null>(null);
-  const rows = data.exceptions.filter((x) => filter === "all" || x.status === "pending");
+  const [refs, setRefs] = useState("");
+  // "Open" means someone still has to act: a reviewer (pending) or the requester (needs_evidence).
+  const isOpen = (x: PolicyException) => x.status === "pending" || x.status === "needs_evidence";
+  const rows = data.exceptions.filter((x) => filter === "all" || isOpen(x));
+  const parsed = evidenceReferences(refs);
 
-  const decide = async (x: PolicyException, decision: "approve" | "reject") => {
+  const supplement = async (x: PolicyException) => {
+    setBusy(true);
+    setFailure(null);
+    try {
+      const r = await addExceptionEvidence(x, note, parsed.references);
+      if (!r.ok) {
+        setFailure({ id: x.id, f: r });
+        return;
+      }
+      await refresh();
+      setNote("");
+      setRefs("");
+      setOpen(null);
+      push({ title: "EVIDENCE ADDED", body: `${parsed.references.length} reference${parsed.references.length === 1 ? "" : "s"} · back with the reviewers`, tone: "info" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const decide = async (x: PolicyException, decision: "approve" | "reject" | "request_evidence") => {
     setBusy(true);
     setFailure(null);
     try {
@@ -604,7 +629,11 @@ function ExceptionsPanel({
       }
       await refresh();
       setNote("");
-      push({ title: decision === "approve" ? "EXCEPTION APPROVED" : "EXCEPTION REJECTED", body: `Requested by ${nameOf(dir, r.requested_by)} · decided by ${nameOf(dir, r.decided_by)}`, tone: decision === "approve" ? "go" : "info" });
+      push(
+        decision === "request_evidence"
+          ? { title: "EVIDENCE REQUESTED", body: `${nameOf(dir, r.requested_by)} is asked to add evidence before a decision`, tone: "info" }
+          : { title: decision === "approve" ? "EXCEPTION APPROVED" : "EXCEPTION REJECTED", body: `Requested by ${nameOf(dir, r.requested_by)} · decided by ${nameOf(dir, r.decided_by ?? null)}`, tone: decision === "approve" ? "go" : "info" }
+      );
     } finally {
       setBusy(false);
     }
@@ -613,9 +642,12 @@ function ExceptionsPanel({
   return (
     <section>
       <div className="mb-2 flex items-center justify-between">
-        <Eyebrow>POLICY EXCEPTIONS · {data.exceptions.filter((x) => x.status === "pending").length} PENDING</Eyebrow>
+        <Eyebrow>
+          POLICY EXCEPTIONS · {data.exceptions.filter((x) => x.status === "pending").length} PENDING
+          {data.exceptions.some((x) => x.status === "needs_evidence") && ` · ${data.exceptions.filter((x) => x.status === "needs_evidence").length} AWAITING EVIDENCE`}
+        </Eyebrow>
         <select aria-label="Exception filter" value={filter} onChange={(e) => setFilter(e.target.value as "pending" | "all")} className="mono-font h-6 rounded border border-border bg-background px-1 text-[9px] text-foreground">
-          <option value="pending">Pending</option>
+          <option value="pending">Open</option>
           <option value="all">All</option>
         </select>
       </div>
@@ -625,7 +657,7 @@ function ExceptionsPanel({
       </p>
       {rows.length === 0 ? (
         <p className="text-[10px] text-muted-foreground">
-          {filter === "pending" && data.exceptions.length > 0 ? `No pending exceptions. ` : "No exceptions requested."}
+          {filter === "pending" && data.exceptions.length > 0 ? `No open exceptions. ` : "No exceptions requested."}
           {filter === "pending" && data.exceptions.length > 0 && (
             <button onClick={() => setFilter("all")} className="underline underline-offset-2">Show all {data.exceptions.length}</button>
           )}
@@ -640,7 +672,7 @@ function ExceptionsPanel({
                   {x.policyId ? ` · ${x.policyId} v${x.policyVersion}` : " · no institutional policy"}
                 </p>
                 <span className={cn("stencil text-[8px] tracking-[0.2em]", x.status === "approved" ? "text-go" : x.status === "rejected" ? "text-no-go" : "text-hold")}>
-                  ● {x.status.toUpperCase()}
+                  ● {x.status === "needs_evidence" ? "AWAITING EVIDENCE" : x.status.toUpperCase()}
                 </span>
               </div>
               <p className="mono-font mt-1 text-[9px] leading-relaxed text-muted-foreground">
@@ -654,17 +686,55 @@ function ExceptionsPanel({
               {x.evidence.failedRules.length > 0 && (
                 <p className="mono-font mt-0.5 text-[9px] text-muted-foreground">FAILED RULES · {x.evidence.failedRules.join(", ")}</p>
               )}
+              {x.notes.length > 0 && (
+                <ol className="mt-1.5 space-y-1 border-l border-border pl-2">
+                  {x.notes.map((n) => (
+                    <li key={n.id} className="text-[10px] leading-snug">
+                      <span className="stencil mr-1 text-[7.5px] tracking-[0.2em] text-muted-foreground">
+                        {n.kind === "evidence_requested" ? "EVIDENCE REQUESTED" : "EVIDENCE ADDED"} · {nameOf(dir, n.author)} · {utc(n.createdAt)}
+                      </span>
+                      <span className="block whitespace-pre-wrap text-foreground/90">{n.note}</span>
+                      {n.evidence?.references.map((ref, i) => (
+                        <span key={i} className="mono-font selectable block break-all text-[9px] text-muted-foreground">
+                          {ref.kind.toUpperCase()} · {ref.kind === "url" ? <a href={ref.value} target="_blank" rel="noreferrer" className="underline underline-offset-2">{ref.value}</a> : ref.value}
+                        </span>
+                      ))}
+                    </li>
+                  ))}
+                </ol>
+              )}
               {x.decisionNote && <p className="mt-0.5 text-[10px] text-muted-foreground">Decision note: {x.decisionNote}</p>}
+              {x.status === "needs_evidence" && x.requestedBy === accountId && (
+                open === x.id ? (
+                  <div className="mt-2">
+                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="What the new evidence shows (at least 10 characters)" className="w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
+                    <textarea value={refs} onChange={(e) => setRefs(e.target.value)} rows={3} placeholder={"One reference per line:\nhttps://… · a transaction hash · an r… account · sha256:<document digest>"} className="mono-font mt-1 w-full rounded border border-border bg-background p-2 text-[10px] text-foreground" />
+                    {parsed.rejected.length > 0 && (
+                      <p className="text-[9.5px] text-no-go">Not a link, transaction, account or sha256 digest: {parsed.rejected.join(" · ")}</p>
+                    )}
+                    <div className="mt-1.5 flex gap-1.5">
+                      <Button size="sm" disabled={busy || parsed.references.length === 0 || parsed.rejected.length > 0} onClick={() => void supplement(x)}>ADD EVIDENCE</Button>
+                      <Button size="sm" variant="ghost" disabled={busy} onClick={() => setOpen(null)}>CANCEL</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button size="sm" className="mt-2" onClick={() => { setOpen(x.id); setNote(""); setRefs(""); setFailure(null); }}>ADD THE REQUESTED EVIDENCE…</Button>
+                )
+              )}
+              {x.status === "needs_evidence" && x.requestedBy !== accountId && (
+                <p className="mt-1.5 text-[9.5px] text-hold">Waiting on {nameOf(dir, x.requestedBy)} to add evidence. It can be decided once they do.</p>
+              )}
               {x.status === "pending" && can.approveException(role) && (
                 open === x.id ? (
                   <div className="mt-2">
                     {x.requestedBy === accountId && (
                       <p className="mb-1 text-[9.5px] text-hold">You requested this exception. A second authorized person must decide it; the server refuses your decision.</p>
                     )}
-                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Decision note (required to reject, at least 10 characters)" className="w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
-                    <div className="mt-1.5 flex gap-1.5">
+                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Decision note (required to reject or to ask for more evidence, at least 10 characters)" className="w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
                       <Button size="sm" disabled={busy} onClick={() => void decide(x, "approve")}>APPROVE</Button>
                       <Button size="sm" variant="outline" disabled={busy} onClick={() => void decide(x, "reject")}>REJECT</Button>
+                      <Button size="sm" variant="outline" disabled={busy} onClick={() => void decide(x, "request_evidence")}>REQUEST MORE EVIDENCE</Button>
                       <Button size="sm" variant="ghost" disabled={busy} onClick={() => setOpen(null)}>CANCEL</Button>
                     </div>
                   </div>
