@@ -125,5 +125,17 @@ reader can check, not a description of the product.
 - On a new sending domain, ramp slowly: about 20 a day for the first
   weeks, watching bounces and complaints in Resend.
 
+## Sender logo
+
+- Yahoo, AOL and Fastmail show `site/bimi/logo.svg` once DNS has a
+  `default._bimi` TXT record and DMARC is at quarantine or reject.
+- Gmail and Apple Mail also need a paid mark certificate:
+  - a VMC, which needs a registered trademark and shows a blue check;
+  - or a CMC, which needs no trademark but does need 12 months of the logo
+    visible on noshashi.app in the Internet Archive. The flower went live
+    on 2026-09-23, so the earliest a CMC is possible is late September 2027.
+- Until then, the free route for Gmail is a Google Account on
+  `institutions@mail.noshashi.app` with the logo as its profile photo.
+
 Draft, show the owner, and let them send or queue it. Update `status` and
 commit when something is sent or answered.
