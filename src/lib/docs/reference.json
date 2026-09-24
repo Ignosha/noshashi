@@ -33,7 +33,7 @@
     {
       "name": "Agent",
       "plan": "Free",
-      "summary": "this assistant."
+      "summary": "this assistant, with an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant."
     },
     {
       "name": "Portfolio & Radar",
@@ -286,7 +286,7 @@
   "dataFlows": [
     {
       "party": "Public XRPL servers",
-      "what": "The addresses, transactions and order books you ask about.",
+      "what": "The addresses, transactions and order books you ask about. On the website's home page, a subscription to the public ledger stream that drives the pond, which shows the server your connection but no address or query.",
       "why": "To read the ledger. These servers are run by third parties and see your queries."
     },
     {
@@ -725,6 +725,14 @@
     {
       "id": "exception_decided",
       "label": "Exception approved or rejected"
+    },
+    {
+      "id": "exception_evidence_requested",
+      "label": "More evidence requested on an exception"
+    },
+    {
+      "id": "exception_evidence_added",
+      "label": "Evidence added to an exception"
     },
     {
       "id": "policy_activated",

@@ -1,7 +1,7 @@
 {
   "name": "noshashi",
   "private": true,
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "NOSHASHI institutional XRPL intelligence and data infrastructure",
   "author": "Ignoshashi",
   "license": "MIT",

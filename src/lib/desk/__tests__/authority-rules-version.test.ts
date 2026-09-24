@@ -139,6 +139,7 @@ const BATTERY: Array<[string, AuthoritySurface]> = [
   ["coverage just under", surface({ issuance: issuance([currency({ coverage: 0.949 })]) })],
   ["coverage exactly at the floor", surface({ issuance: issuance([currency({ coverage: 0.95 })]) })],
   ["no supply read", surface({ issuance: null })],
+  ["no outstanding obligations", surface({ issuance: issuance([]) })],
   ["posture unreadable", surface({ posture: null })],
   ["control unreadable", surface({ control: null })],
   ["a source threw", surface({ unreadable: ["posture: timeout"] })],
@@ -159,7 +160,7 @@ async function fingerprint(): Promise<string> {
   const rows: string[] = [];
   for (const [name, s] of BATTERY) {
     for (const check of authorityChecks(s)) {
-      rows.push(`${name}|${check.id}|${check.severity}|${check.passed}`);
+      rows.push(`${name}|${check.id}|${check.severity}|${check.passed}|${check.state ?? ""}`);
     }
   }
   return sha256Hex(rows.join("\n"));
@@ -169,9 +170,12 @@ async function fingerprint(): Promise<string> {
  * Bump AUTHORITY_RULES_VERSION and update this together, never
  * separately — that pairing is the whole point of the file.
  */
-const EXPECTED_VERSION = 1;
+// v2: five-state results. Concentration abstentions are INSUFFICIENT_DATA,
+// and an issuer with no outstanding obligations is NOT_APPLICABLE (passed)
+// rather than a failed advisory check that held the certificate at HOLD.
+const EXPECTED_VERSION = 2;
 const EXPECTED_FINGERPRINT =
-  "64A44BAFCCDEF12E8C866283E17D5E649397A3D5A453E176D5CAE4BC8EAE0B42";
+  "0011256FC99EA13B435109ED298453FD93EDD5C99B0A00E7516ADC49CE310026";
 
 describe("authority rule set version", () => {
   it("has not changed behaviour without a version bump", async () => {

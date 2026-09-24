@@ -52,7 +52,25 @@ export type OrgPolicy = {
   archivedAt: string | null;
 };
 
-export type ExceptionStatus = "pending" | "approved" | "rejected";
+/** `needs_evidence`: a reviewer asked for more before deciding; the requester must add it. */
+export type ExceptionStatus = "pending" | "needs_evidence" | "approved" | "rejected";
+
+/** One reference a requester offers as further evidence. */
+export type EvidenceReference =
+  | { kind: "url"; value: string }
+  | { kind: "transaction"; value: string }
+  | { kind: "account"; value: string }
+  | { kind: "digest"; value: string };
+
+/** A step in an exception's review thread, as the server recorded it (append-only). */
+export type ExceptionNote = {
+  id: string;
+  kind: "evidence_requested" | "evidence_added";
+  author: string;
+  note: string;
+  evidence: { references: EvidenceReference[] } | null;
+  createdAt: string;
+};
 
 export type ExceptionEvidence = {
   receiptDigest: string;
@@ -83,6 +101,8 @@ export type PolicyException = {
   decidedBy: string | null;
   decidedAt: string | null;
   decisionNote: string | null;
+  /** Evidence requests and the supplements that answered them, oldest first. */
+  notes: ExceptionNote[];
 };
 
 export type AuditRow = {
@@ -127,6 +147,10 @@ const RPC_OUTCOMES: Record<string, { title: string; message: string }> = {
   SLUG_TAKEN: { title: "IDENTIFIER TAKEN", message: "Another organization already uses that identifier." },
   NO_SUCH_ACCOUNT: { title: "NO SUCH ACCOUNT", message: "That person must create a NOSHASHI account before they can be added." },
   LAST_OWNER: { title: "LAST OWNER", message: "An organization must keep at least one owner." },
+  NOT_REQUESTER: { title: "NOT THE REQUESTER", message: "Only the person who requested this exception can add evidence to it." },
+  NOT_AWAITING_EVIDENCE: { title: "NOT AWAITING EVIDENCE", message: "No reviewer has asked for more evidence on this exception." },
+  NOTE_REQUIRED: { title: "NOTE REQUIRED", message: "Explain what the evidence shows, in at least 10 characters." },
+  EVIDENCE_REQUIRED: { title: "EVIDENCE REQUIRED", message: "Add at least one reference: a link, a transaction hash, an account or a document digest." },
 };
 
 export function failureOf(code: string, fallback: { title: string; message: string }): ServerFailure {
@@ -240,7 +264,32 @@ function exceptionFromRow(r: ExceptionRow): PolicyException {
     verdict: r.verdict, policyId: r.policy_id, policyVersion: r.policy_version, policyHash: r.policy_hash,
     caseId: r.case_id, reason: r.reason, evidence: r.evidence, status: r.status, requestedBy: r.requested_by,
     requestedAt: r.requested_at, decidedBy: r.decided_by, decidedAt: r.decided_at, decisionNote: r.decision_note,
+    notes: [],
   };
+}
+
+/**
+ * Parse what a requester pastes as further evidence, one reference per
+ * line, into typed references. A line that is none of the four kinds is
+ * returned as rejected rather than stored as free text: a reviewer should
+ * be able to follow every reference to the thing it names.
+ */
+export function evidenceReferences(text: string): { references: EvidenceReference[]; rejected: string[] } {
+  const references: EvidenceReference[] = [];
+  const rejected: string[] = [];
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (/^https:\/\/[^\s]+$/i.test(line)) references.push({ kind: "url", value: line });
+    else if (/^[0-9A-Fa-f]{64}$/.test(line)) {
+      // A 64-hex line is either a transaction hash or a document's SHA-256.
+      // "sha256:" marks the latter; bare hex is read as a transaction.
+      references.push({ kind: "transaction", value: line.toUpperCase() });
+    } else if (/^sha256:[0-9A-Fa-f]{64}$/i.test(line)) references.push({ kind: "digest", value: line.slice(7).toUpperCase() });
+    else if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(line)) references.push({ kind: "account", value: line });
+    else rejected.push(line);
+  }
+  return { references, rejected };
 }
 
 /**
@@ -335,7 +384,26 @@ export async function listExceptions(organizationId: string): Promise<PolicyExce
     .order("requested_at", { ascending: false })
     .limit(200);
   if (error) throw new Error(supabaseErrorMessage(error));
-  return (data as ExceptionRow[]).map(exceptionFromRow);
+  const exceptions = (data as ExceptionRow[]).map(exceptionFromRow);
+  if (!exceptions.length) return exceptions;
+  const { data: notes, error: notesError } = await db()
+    .from("policy_exception_notes")
+    .select("id, exception_id, kind, author, note, evidence, created_at")
+    .in("exception_id", exceptions.map((x) => x.id))
+    .order("created_at", { ascending: true });
+  if (notesError) throw new Error(supabaseErrorMessage(notesError));
+  const byId = new Map(exceptions.map((x) => [x.id, x]));
+  for (const n of (notes ?? []) as Array<Record<string, unknown>>) {
+    byId.get(String(n.exception_id))?.notes.push({
+      id: String(n.id),
+      kind: n.kind as ExceptionNote["kind"],
+      author: String(n.author),
+      note: String(n.note),
+      evidence: (n.evidence as ExceptionNote["evidence"]) ?? null,
+      createdAt: String(n.created_at),
+    });
+  }
+  return exceptions;
 }
 
 /** Policy and exception events. Readable by owner, admin, compliance and risk only (RLS). */
@@ -456,13 +524,20 @@ export async function requestException(input: {
   return { ok: true };
 }
 
-/** The only path to an approved or rejected exception: noshashi-exception-decide. */
-export const decideException = (x: PolicyException, decision: "approve" | "reject", note: string) =>
-  invokeGoverned<{ status: ExceptionStatus; requested_by: string; decided_by: string }>(
+/**
+ * The only path to an approved or rejected exception, or to one sent back
+ * for more evidence: noshashi-exception-decide.
+ */
+export const decideException = (x: PolicyException, decision: "approve" | "reject" | "request_evidence", note: string) =>
+  invokeGoverned<{ status: ExceptionStatus; requested_by: string; decided_by?: string; reviewer?: string }>(
     "noshashi-exception-decide",
     { exceptionId: x.id, decision, note },
     DECISION_FAILED
   );
+
+/** The requester answers an evidence request; the exception returns to pending. */
+export const addExceptionEvidence = (x: PolicyException, note: string, references: EvidenceReference[]) =>
+  rpcDone("add_exception_evidence", { p_exception: x.id, p_note: note.trim(), p_evidence: { references } }, "EVIDENCE");
 
 export const createOrganization = (name: string, slug: string) =>
   rpcDone("create_organization", { p_name: name, p_slug: slug }, "CREATE");

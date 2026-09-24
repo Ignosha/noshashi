@@ -2,8 +2,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 /**
- * noshashi-exception-decide — the only way a policy exception is approved
- * or rejected.
+ * noshashi-exception-decide — the only way a policy exception is approved,
+ * rejected, or sent back for more evidence.
  *
  * The caller is identified from their JWT. noshashi.decide_policy_exception
  * then checks, in one transaction: the actor exists and belongs to the
@@ -13,6 +13,11 @@ import { createClient } from "npm:@supabase/supabase-js@2";
  * It records the decision and writes the audit event. It is executable by
  * service_role only; a trigger on the table refuses any approval by a
  * non-authorized member even from a direct service-role write.
+ *
+ * `request_evidence` is the third decision: the reviewer asks the requester
+ * for more before deciding (noshashi.request_exception_evidence, the same
+ * role and four-eyes checks, a written note required). The requester answers
+ * from the app with a supplement; the exception then returns to pending.
  *
  * The verdict and its receipt are never touched: an exception is a record
  * beside them.
@@ -52,8 +57,10 @@ const OUTCOMES: Record<string, { status: number; title: string; message: string 
     message: "The person who requested this exception cannot decide it. A second authorized user must.",
   },
   ALREADY_DECIDED: { status: 409, title: "ALREADY DECIDED", message: "This exception has already been decided." },
+  AWAITING_EVIDENCE: { status: 409, title: "AWAITING EVIDENCE", message: "More evidence was requested. It can be decided once the requester adds it." },
+  ALREADY_REQUESTED: { status: 409, title: "EVIDENCE ALREADY REQUESTED", message: "More evidence has already been requested. The requester must add it before anyone decides." },
   EVIDENCE_REQUIRED: { status: 422, title: "EVIDENCE REQUIRED", message: "An exception cannot be decided without its evidence and receipt." },
-  NOTE_REQUIRED: { status: 422, title: "NOTE REQUIRED", message: "Rejecting an exception needs a written reason of at least 10 characters." },
+  NOTE_REQUIRED: { status: 422, title: "NOTE REQUIRED", message: "Rejecting an exception, or asking for more evidence, needs a written note of at least 10 characters." },
 };
 
 Deno.serve(async (request: Request) => {
@@ -81,19 +88,27 @@ Deno.serve(async (request: Request) => {
     const exceptionId = String(body.exceptionId ?? "");
     const decision = String(body.decision ?? "");
     const note = typeof body.note === "string" ? body.note.slice(0, 4000) : null;
-    if (!/^[0-9a-f-]{36}$/i.test(exceptionId) || (decision !== "approve" && decision !== "reject")) {
+    if (!/^[0-9a-f-]{36}$/i.test(exceptionId) || !["approve", "reject", "request_evidence"].includes(decision)) {
       return json(request, { ok: false, code: "BAD_REQUEST", title: "DECISION FAILED", message: "Malformed request. Nothing was changed." }, 400);
     }
 
     const service = createServiceClient(url, serviceKey).schema("noshashi");
-    const { data: result, error } = await service.rpc("decide_policy_exception", {
-      p_exception: exceptionId,
-      p_actor: userData.user.id,
-      p_approve: decision === "approve",
-      p_note: note,
-    });
+    const { data: result, error } =
+      decision === "request_evidence"
+        ? await service.rpc("request_exception_evidence", { p_exception: exceptionId, p_actor: userData.user.id, p_note: note })
+        : await service.rpc("decide_policy_exception", {
+            p_exception: exceptionId,
+            p_actor: userData.user.id,
+            p_approve: decision === "approve",
+            p_note: note,
+          });
     if (error) throw error;
-    if (!result?.ok) return fail(String(result?.code ?? "DECISION_FAILED"));
+    if (!result?.ok) {
+      // decide_policy_exception only decides from pending; an exception
+      // sent back for evidence is not "already decided", it is waiting.
+      if (result?.code === "ALREADY_DECIDED" && result?.status === "needs_evidence") return fail("AWAITING_EVIDENCE");
+      return fail(String(result?.code ?? "DECISION_FAILED"));
+    }
     return json(request, { ok: true, ...result });
   } catch (error) {
     console.error("noshashi-exception-decide", error instanceof Error ? error.message : error);

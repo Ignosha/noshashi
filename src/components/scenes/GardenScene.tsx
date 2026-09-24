@@ -26,6 +26,7 @@ import {
   type GardenTone,
 } from "@/lib/garden/graph";
 import { useClaimedSubject, useHandoff } from "@/lib/nav/handoff";
+import { InvestigateIssuerButton } from "@/components/nova/InvestigateIssuerButton";
 import { cn } from "@/lib/utils";
 
 /** Bitstamp's issuing account — a long-lived mainnet issuer to start from. */
@@ -314,6 +315,8 @@ export function GardenBody({ initial }: { initial?: { columns: GardenColumn[]; p
                       OPEN IN SETTLEMENT
                     </Button>
                   )}
+                  {selected.kind === "issuer" && <InvestigateIssuerButton issuer={selected.ref.address!} from="garden" />}
+                  {selected.kind === "asset" && <InvestigateIssuerButton issuer={selected.ref.issuer!} from="garden" />}
                   {(selected.kind === "account" || selected.kind === "issuer") && (
                     <Button
                       size="sm"

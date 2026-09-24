@@ -18,8 +18,7 @@ import {
   VERDICT_COPY,
   runPolicy,
   type PermissionedDomain,
-  type PolicyReceipt,
-} from "@/lib/policy";
+  type PolicyReceipt, checkState, CHECK_STATE_COPY, CHECK_TONE_CLASS } from "@/lib/policy";
 import { useToast } from "@/lib/toast";
 import { useLedger, receiptToEntry } from "@/lib/desk/ledger";
 import { useGoverningPolicy, type GoverningPolicy } from "@/lib/org/useOrg";
@@ -467,12 +466,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                       >
                         <span
                           className={cn(
-                            "mt-1 h-1.5 w-1.5 shrink-0",
-                            check.passed
-                              ? "bg-go"
-                              : check.severity === "block"
-                                ? "bg-no-go"
-                                : "bg-hold"
+                            "mt-1 h-1.5 w-1.5 shrink-0", CHECK_TONE_CLASS[CHECK_STATE_COPY[checkState(check)].tone][1]
                           )}
                         />
                         <div className="min-w-0 flex-1">
@@ -485,19 +479,10 @@ export function VerificationScene({ data }: { data: XrplState }) {
                         </div>
                         <span
                           className={cn(
-                            "stencil shrink-0 text-[8px] tracking-[0.18em]",
-                            check.passed
-                              ? "text-go"
-                              : check.severity === "block"
-                                ? "text-no-go"
-                                : "text-hold"
+                            "stencil shrink-0 text-[8px] tracking-[0.18em]", CHECK_TONE_CLASS[CHECK_STATE_COPY[checkState(check)].tone][0]
                           )}
                         >
-                          {check.passed
-                            ? "PASS"
-                            : check.severity === "block"
-                              ? "BLOCK"
-                              : "WARN"}
+                          {CHECK_STATE_COPY[checkState(check)].label}
                         </span>
                       </motion.div>
                     ))}

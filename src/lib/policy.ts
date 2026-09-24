@@ -42,15 +42,85 @@ export type PermissionedDomain = {
   members: number;
 };
 
+/**
+ * A check's result, in five states rather than a boolean.
+ *
+ *   PASS               the rule was evaluated and satisfied
+ *   FAIL               a blocking rule was evaluated and not satisfied
+ *   REVIEW             an advisory rule was evaluated and not satisfied
+ *   INSUFFICIENT_DATA  the evidence the rule needs could not be read — no answer
+ *   NOT_APPLICABLE     the rule does not apply to this subject
+ *
+ * The last two are why a boolean was not enough: "passed: false" printed an
+ * unreadable source as a failure and "passed: true" printed a rule that did
+ * not apply as a pass. They are the institutional policy engine's own words
+ * (RuleState), so a verdict and its policy results speak one vocabulary.
+ */
+export type CheckState = "PASS" | "FAIL" | "REVIEW" | "INSUFFICIENT_DATA" | "NOT_APPLICABLE";
+
 export type PolicyCheck = {
   /** Stable machine-readable rule id — appears in the audit trail. */
   id: string;
   label: string;
   /** `fail` blocks outright, `warn` degrades a GO to a HOLD. */
   severity: "block" | "warn";
+  /**
+   * Kept beside `state` and still hashed: every receipt issued before the
+   * five states existed carries only this, and must keep verifying.
+   * INSUFFICIENT_DATA is passed:false; NOT_APPLICABLE is passed:true.
+   */
   passed: boolean;
+  /**
+   * Set when the result is more than `passed` and `severity` imply —
+   * INSUFFICIENT_DATA or NOT_APPLICABLE. Absent means the implied state.
+   */
+  state?: CheckState;
   /** Plain-language reason shown when the check does not pass. */
   detail: string;
+};
+
+/** The state `passed` and `severity` alone imply — all an older receipt can say. */
+export function impliedState(check: Pick<PolicyCheck, "passed" | "severity">): CheckState {
+  return check.passed ? "PASS" : check.severity === "block" ? "FAIL" : "REVIEW";
+}
+
+/** A check's state: its own when it has one, otherwise the implied one. */
+export function checkState(check: Pick<PolicyCheck, "passed" | "severity" | "state">): CheckState {
+  return check.state ?? impliedState(check);
+}
+
+/** The two states a boolean cannot express; only these are ever bound into a digest. */
+export const EXTRA_STATES: ReadonlySet<CheckState> = new Set(["INSUFFICIENT_DATA", "NOT_APPLICABLE"]);
+
+/**
+ * How a check enters a digest. `[id, passed]` — exactly the bytes every
+ * earlier receipt was hashed with — unless the check is INSUFFICIENT_DATA
+ * or NOT_APPLICABLE, which `passed` cannot say; then the state is bound
+ * too: `[id, passed, state]`. So no issued receipt changes, and a new one
+ * cannot have "no answer" quietly rewritten as a failure after the fact.
+ * PASS, FAIL and REVIEW follow from `passed` and the severity and add
+ * nothing. The same rule runs in supabase/functions/noshashi-verify and
+ * api/_lib/authority.js; the runtime parity tests hold all three to it.
+ */
+export function canonicalCheck(check: Pick<PolicyCheck, "id" | "passed" | "state">): [string, boolean] | [string, boolean, CheckState] {
+  return check.state && EXTRA_STATES.has(check.state) ? [check.id, check.passed, check.state] : [check.id, check.passed];
+}
+
+/** Tailwind colour classes for a state's tone: [text, dot]. */
+export const CHECK_TONE_CLASS: Record<"go" | "no-go" | "hold" | "muted", [string, string]> = {
+  go: ["text-go", "bg-go"],
+  "no-go": ["text-no-go", "bg-no-go"],
+  hold: ["text-hold", "bg-hold"],
+  muted: ["text-muted-foreground", "bg-muted-foreground"],
+};
+
+/** Display words and tone for each state. */
+export const CHECK_STATE_COPY: Record<CheckState, { label: string; tone: "go" | "no-go" | "hold" | "muted" }> = {
+  PASS: { label: "PASS", tone: "go" },
+  FAIL: { label: "FAIL", tone: "no-go" },
+  REVIEW: { label: "REVIEW", tone: "hold" },
+  INSUFFICIENT_DATA: { label: "INSUFFICIENT DATA", tone: "hold" },
+  NOT_APPLICABLE: { label: "NOT APPLICABLE", tone: "muted" },
 };
 
 export type PolicyReceipt = {
@@ -180,7 +250,8 @@ export function reserveRequirementXrp(
  */
 export function verdictForChecks(checks: PolicyCheck[]): Status {
   if (checks.some((check) => check.severity === "block" && !check.passed)) return "no-go";
-  if (checks.some((check) => check.id.startsWith("EVIDENCE_"))) return "insufficient-data";
+  // Older receipts mark an unreadable source only by the EVIDENCE_ id prefix.
+  if (checks.some((check) => checkState(check) === "INSUFFICIENT_DATA" || check.id.startsWith("EVIDENCE_"))) return "insufficient-data";
   if (checks.some((check) => check.severity === "warn" && !check.passed)) return "hold";
   return "go";
 }
@@ -305,6 +376,7 @@ export function evaluatePolicy(input: {
       label: `${source} evidence available`,
       severity: "warn",
       passed: false,
+      state: "INSUFFICIENT_DATA",
       detail: `The ${source} source could not be read from the validated ledger. No conclusion is asserted for this source.`,
     });
   }
@@ -354,7 +426,7 @@ export async function receiptDigest(
       subject: body.subject,
       amountXrp: body.amountXrp,
       evaluatedAt: body.evaluatedAt,
-      checks: body.checks.map((check) => [check.id, check.passed]),
+      checks: body.checks.map(canonicalCheck),
       // Present only when an institutional policy was applied, so every
       // receipt issued without one keeps exactly the bytes it always had
       // (and the server-side verifier's canonical form still matches).
@@ -383,7 +455,7 @@ export async function digestOf(input: {
   subject: string;
   /** Whatever else identifies this evaluation: currency, ledger index. */
   scope: Record<string, string | number>;
-  checks: Array<Pick<PolicyCheck, "id" | "passed">>;
+  checks: Array<Pick<PolicyCheck, "id" | "passed" | "state">>;
   evaluatedAt: string;
 }): Promise<string> {
   return sha256Hex(
@@ -394,7 +466,7 @@ export async function digestOf(input: {
         .sort()
         .map((key) => [key, input.scope[key]]),
       evaluatedAt: input.evaluatedAt,
-      checks: input.checks.map((check) => [check.id, check.passed]),
+      checks: input.checks.map(canonicalCheck),
     })
   );
 }

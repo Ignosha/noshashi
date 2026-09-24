@@ -114,7 +114,7 @@ const HHI_CONCENTRATED = 2500;
  * digests, and the version is inside the digest scope, so a mismatch
  * fails there immediately.
  */
-export const AUTHORITY_RULES_VERSION = 1;
+export const AUTHORITY_RULES_VERSION = 2;
 
 const LSF_REQUIRE_AUTH = 0x00040000;
 const LSF_GLOBAL_FREEZE = 0x00400000;
@@ -680,6 +680,7 @@ export function authorityChecks(surface) {
       label: "Supply concentration",
       severity: "warn",
       passed: false,
+      state: "INSUFFICIENT_DATA",
       detail: walkFailed
         ? `The holder walk was requested and could not be completed (${walkFailed.replace(/^issuance:\s*/, "")}), so no concentration finding is made. This is a failed read, not an abstention and not a pass.`
         : "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass.",
@@ -689,7 +690,10 @@ export function authorityChecks(surface) {
       id: "SUPPLY_CONCENTRATION",
       label: "Supply concentration",
       severity: "warn",
-      passed: false,
+      // Nothing to concentrate: the rule does not apply, and it must not
+      // hold a certificate back as though it had failed.
+      passed: true,
+      state: "NOT_APPLICABLE",
       detail: "The issuer reports no outstanding obligations, so there is no supply to measure.",
     });
   } else if (currency.coverage < COVERAGE_FLOOR) {
@@ -698,6 +702,7 @@ export function authorityChecks(surface) {
       label: `${decodeCurrency(currency.currency)} supply concentration`,
       severity: "warn",
       passed: false,
+      state: "INSUFFICIENT_DATA",
       detail: `The holder lines read account for ${(currency.coverage * 100).toFixed(1)}% of the outstanding ${decodeCurrency(currency.currency)}. Below ${COVERAGE_FLOOR * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`,
     });
   } else {
@@ -753,6 +758,15 @@ export function verdictFor(checks, options = {}) {
   return "go";
 }
 
+/**
+ * canonicalCheck() in src/lib/policy.ts: [id, passed], or [id, passed, state]
+ * when the state is one a boolean cannot say. Every certificate issued
+ * before the five states existed keeps its bytes.
+ */
+const EXTRA_STATES = new Set(["INSUFFICIENT_DATA", "NOT_APPLICABLE"]);
+export const canonicalCheck = (check) =>
+  check.state && EXTRA_STATES.has(check.state) ? [check.id, check.passed, check.state] : [check.id, check.passed];
+
 /** Byte-for-byte the canonical form of digestOf() in src/lib/policy.ts. */
 export async function digestOf({ kind, subject, scope, checks, evaluatedAt }) {
   const canonical = JSON.stringify({
@@ -760,7 +774,7 @@ export async function digestOf({ kind, subject, scope, checks, evaluatedAt }) {
     subject,
     scope: Object.keys(scope).sort().map((key) => [key, scope[key]]),
     evaluatedAt,
-    checks: checks.map((check) => [check.id, check.passed]),
+    checks: checks.map(canonicalCheck),
   });
   const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical));
   return Array.from(new Uint8Array(hash))

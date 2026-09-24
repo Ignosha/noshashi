@@ -685,8 +685,9 @@
   /* ── The bloom and its pond. The generated bloom is the hero, and
    *    asciify-engine renders the water around it (site/assets/
    *    garden-field.js, source src/lib/garden/field.ts): liquid folds,
-   *    a ring from each of the bloom's flowers every 6s, ripples under
-   *    the pointer. Both are decoration under the bounded exception in
+   *    a ring from the flowers each time a validated XRPL ledger closes,
+   *    ripples under the pointer. Both are decoration under the bounded
+   *    exception in
    *    DESIGN.md. Reduced motion draws a single still frame. ── */
   .hero-instrument > .garden-field{z-index:0;opacity:.62;
     -webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);
@@ -1071,6 +1072,8 @@
 
       <p class="hi-title">NOSHASHI</p>
       <h1 data-i18n="hero.h1">Am I allowed to move this — and could I actually get out of it?</h1>
+      <!-- Filled by site/assets/garden-field.js from the live ledger stream; the text here is what shows without script. -->
+      <p class="mono" data-garden-caption translate="no" style="margin:6px 0 0;font-size:11px;color:var(--faint)">The pond answers each validated XRPL ledger as it closes.</p>
 
       <div class="hi-bottom">
         <a class="hi-cta" href="#download">

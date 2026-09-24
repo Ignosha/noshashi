@@ -50,6 +50,8 @@ import type { XrplState } from "@/lib/xrpl/useXRPL";
 import { cn } from "@/lib/utils";
 import { SPRING } from "@/lib/motion";
 import { containsLedgerSeed, SecretInMessageError } from "@/lib/agent/secrets";
+import { useObserver } from "@/lib/agent/useObserver";
+import { ObserverPanel } from "./ObserverPanel";
 
 type Turn = {
   id: number;
@@ -91,7 +93,9 @@ export function AgentScene({ data }: { data: XrplState }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
-  const [view, setView] = useState<"chat" | "governance">("chat");
+  const [view, setView] = useState<"chat" | "governance" | "observer">("chat");
+  const observer = useObserver();
+  const observerAlerts = observer.log.filter((o) => o.severity !== "info").length;
   const useLog = useAiUseLog();
   const { entries: ledgerEntries } = useLedger();
   const { active: activePolicy } = useGoverningPolicy();
@@ -415,8 +419,16 @@ export function AgentScene({ data }: { data: XrplState }) {
             </Tabs>
             <Button
               size="sm"
+              variant={view === "observer" ? "default" : "outline"}
+              onClick={() => setView((v) => (v === "observer" ? "chat" : "observer"))}
+              aria-pressed={view === "observer"}
+            >
+              OBSERVER{observerAlerts ? ` · ${observerAlerts}` : ""}
+            </Button>
+            <Button
+              size="sm"
               variant={view === "governance" ? "default" : "outline"}
-              onClick={() => setView((v) => (v === "chat" ? "governance" : "chat"))}
+              onClick={() => setView((v) => (v === "governance" ? "chat" : "governance"))}
               aria-pressed={view === "governance"}
             >
               GOVERNANCE
@@ -431,7 +443,22 @@ export function AgentScene({ data }: { data: XrplState }) {
       />
 
       <div className="grid min-h-0 min-w-0 flex-1 grid-cols-4 gap-3">
-        {view === "governance" ? (
+        {view === "observer" ? (
+          <Panel
+            label="OBSERVER · WHAT CHANGED ON THE LEDGER FOR THE WALLETS YOU WATCH"
+            corners
+            className="col-span-3 min-h-0 min-w-0"
+            bodyClassName="min-h-0 overflow-y-auto p-0"
+          >
+            <ObserverPanel
+              onAsk={(prompt) => {
+                setMode("compliance");
+                setDraft(prompt);
+                setView("chat");
+              }}
+            />
+          </Panel>
+        ) : view === "governance" ? (
           <Panel
             label="AI GOVERNANCE · WHAT THE AGENT MAY DO, WHERE ITS INPUT GOES, EVERY CALL MADE"
             corners

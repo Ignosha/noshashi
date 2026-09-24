@@ -11,6 +11,8 @@ mode) → **WEBHOOKS**.
 |---|---|
 | `policy_exception` | an exception request on a verdict |
 | `exception_decided` | an exception approved or rejected by an authorized second person |
+| `exception_evidence_requested` | a reviewer asking for more evidence before deciding an exception |
+| `exception_evidence_added` | the requester adding that evidence, which returns the exception to pending |
 | `policy_activated` | a policy version activated (four-eyes) |
 | `investigation_created` | a shared investigation opened |
 | `investigation_resolved` | a shared investigation closed |

@@ -35,8 +35,7 @@ import {
   evaluatePolicy,
   reserveRequirementXrp,
   VERDICT_DOT_CLASS,
-  VERDICT_TONE,
-} from "@/lib/policy";
+  VERDICT_TONE, checkState, CHECK_STATE_COPY, CHECK_TONE_CLASS } from "@/lib/policy";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import type { Status } from "@/lib/xrpl/types";
 import { cn } from "@/lib/utils";
@@ -634,12 +633,7 @@ export function MissionControlScene({
                 >
                   <span
                     className={cn(
-                      "mt-1 h-1.5 w-1.5 shrink-0",
-                      check.passed
-                        ? "bg-go"
-                        : check.severity === "block"
-                          ? "bg-no-go"
-                          : "bg-hold"
+                      "mt-1 h-1.5 w-1.5 shrink-0", CHECK_TONE_CLASS[CHECK_STATE_COPY[checkState(check)].tone][1]
                     )}
                   />
                   <div className="min-w-0 flex-1">
@@ -654,15 +648,10 @@ export function MissionControlScene({
                   </div>
                   <span
                     className={cn(
-                      "stencil shrink-0 text-[8px] tracking-[0.18em]",
-                      check.passed
-                        ? "text-go"
-                        : check.severity === "block"
-                          ? "text-no-go"
-                          : "text-hold"
+                      "stencil shrink-0 text-[8px] tracking-[0.18em]", CHECK_TONE_CLASS[CHECK_STATE_COPY[checkState(check)].tone][0]
                     )}
                   >
-                    {check.passed ? "PASS" : check.severity === "block" ? "FAIL" : "WARN"}
+                    {CHECK_STATE_COPY[checkState(check)].label}
                   </span>
                 </div>
               ))}

@@ -431,6 +431,17 @@ function evaluatePolicy(body: {
   };
 }
 
+/**
+ * canonicalCheck() in src/lib/policy.ts: [id, passed], or [id, passed, state]
+ * when the state is INSUFFICIENT_DATA or NOT_APPLICABLE — the two a boolean
+ * cannot say. Every receipt and certificate issued before the five states
+ * existed keeps its bytes. The runtime parity tests hold all three copies to it.
+ */
+const CHECK_STATES = new Set(["PASS", "FAIL", "REVIEW", "INSUFFICIENT_DATA", "NOT_APPLICABLE"]);
+const EXTRA_STATES = new Set(["INSUFFICIENT_DATA", "NOT_APPLICABLE"]);
+const canonicalCheck = (check: { id: string; passed: boolean; state?: string }) =>
+  check.state && EXTRA_STATES.has(check.state) ? [check.id, check.passed, check.state] : [check.id, check.passed];
+
 /** Canonical JSON → SHA-256 hex, uppercase — mirror of receiptDigest. */
 async function receiptDigest(
   body: ReturnType<typeof evaluatePolicy>
@@ -441,7 +452,7 @@ async function receiptDigest(
     subject: body.subject,
     amountXrp: body.amountXrp,
     evaluatedAt: body.evaluatedAt,
-    checks: body.checks.map((check) => [check.id, check.passed]),
+    checks: body.checks.map(canonicalCheck),
   });
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical));
   return Array.from(new Uint8Array(digest))
@@ -1532,15 +1543,19 @@ async function authorityDigest(input: {
   kind: string;
   subject: string;
   scope: Record<string, string | number>;
-  checks: Array<{ id: string; passed: boolean }>;
+  checks: Array<{ id: string; passed: boolean; state?: string }>;
   evaluatedAt: string;
 }): Promise<string> {
+  // canonicalCheck, written out here because the runtime-parity test lifts
+  // this one function out of the file and runs it on its own.
   const canonical = JSON.stringify({
     kind: input.kind,
     subject: input.subject,
     scope: Object.keys(input.scope).sort().map((key) => [key, input.scope[key]]),
     evaluatedAt: input.evaluatedAt,
-    checks: input.checks.map((check) => [check.id, check.passed]),
+    checks: input.checks.map((check) =>
+      check.state === "INSUFFICIENT_DATA" || check.state === "NOT_APPLICABLE" ? [check.id, check.passed, check.state] : [check.id, check.passed]
+    ),
   });
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical));
   return Array.from(new Uint8Array(digest))
@@ -1690,7 +1705,7 @@ async function checkAuthorityCertificate(
 
   // Only the id and the result are hashed, so a body whose check entries
   // are malformed is rejected rather than silently digesting undefined.
-  const normalised: Array<{ id: string; passed: boolean }> = [];
+  const normalised: Array<{ id: string; passed: boolean; state?: string }> = [];
   for (const entry of checks!) {
     if (typeof entry !== "object" || entry === null) {
       return json(
@@ -1710,7 +1725,17 @@ async function checkAuthorityCertificate(
         requestId
       );
     }
-    normalised.push({ id: check.id, passed: check.passed });
+    if (check.state !== undefined && (typeof check.state !== "string" || !CHECK_STATES.has(check.state))) {
+      return json(
+        400,
+        {
+          error: "invalid_checks",
+          message: "A check's state, when present, is PASS, FAIL, REVIEW, INSUFFICIENT_DATA or NOT_APPLICABLE.",
+        },
+        requestId
+      );
+    }
+    normalised.push({ id: check.id, passed: check.passed, ...(check.state ? { state: check.state as string } : {}) });
   }
 
   const recomputed = await authorityDigest({

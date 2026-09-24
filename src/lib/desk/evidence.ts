@@ -1,4 +1,4 @@
-import { receiptDigest, verdictForChecks, DOMAIN_REGISTRY, type PolicyCheck } from "@/lib/policy";
+import { receiptDigest, verdictForChecks, DOMAIN_REGISTRY, checkState, CHECK_STATE_COPY, type PolicyCheck } from "@/lib/policy";
 import type { Status } from "@/lib/xrpl/types";
 import type { LedgerEntry } from "@/lib/desk/ledger";
 
@@ -117,11 +117,11 @@ export function buildChain(entry: LedgerEntry): ChainStep[] {
         title: c.id,
         value: recorded
           ? recorded.state.replace("_", " ")
-          : c.passed ? "PASS" : c.severity === "block" ? "FAIL · BLOCKING" : "FAIL · ADVISORY",
+          : CHECK_STATE_COPY[checkState(c)].label,
         detail: recorded
           ? `FACT ${recorded.observed ?? "n/a"} · POLICY ${recorded.configured}${recorded.delta ? ` · Δ ${recorded.delta}` : ""} — ${recorded.reason}`
           : c.passed ? c.label : `${c.label} — ${c.detail}`,
-        tone: c.passed ? "go" : c.severity === "block" ? "no-go" : "hold",
+        tone: ({ go: "go", "no-go": "no-go", hold: "hold", muted: "default" } as const)[CHECK_STATE_COPY[checkState(c)].tone],
       });
     }
   } else if (entry.failedRules.length) {

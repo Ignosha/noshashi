@@ -14,8 +14,19 @@
  * mark sits behind the main flower, its arms reaching out past the
  * petals. Ink is the page's --brand, so the light/dark toggle recolours
  * the pond on the next frame.
+ *
+ * On a page with a hero pond (the home page) both ponds are driven by the
+ * XRP Ledger, not by a timer: every validated ledger that closes sends one
+ * ring, stronger the more transactions it carried, and the hero's
+ * [data-garden-caption] says so with the ledger's number. With no ledger
+ * arriving the water goes still and the caption says that instead. Other
+ * pages open no connection; their faint background keeps its ambient
+ * rings, which claim nothing.
  */
-import { mountGardenField, type Flower } from "./field";
+import { ledgerRingStrength, mountGardenField, type Flower, type GardenField } from "./field";
+import { followLedger } from "./ledgerStream";
+
+const fields: Array<{ field: GardenField; scale: number }> = [];
 
 const ORIGINS = "[data-garden-origin], .hi-bloom g[transform^='translate']";
 
@@ -39,8 +50,9 @@ function mount(host: HTMLElement) {
       })
       .sort((a, b) => b.r - a.r);
   };
-  mountGardenField(host, {
+  const field = mountGardenField(host, {
     color: () => getComputedStyle(document.documentElement).getPropertyValue("--brand"),
+    live: true,
     flowers,
     mark: () => {
       const main = flowers()[0];
@@ -50,16 +62,17 @@ function mount(host: HTMLElement) {
     fontSize: Number(host.dataset.gardenFont) || 11,
     pulse: 6,
   });
+  fields.push({ field, scale: 1 });
 }
 
 /**
  * The page-wide pond: fixed, behind everything (z-index -1 paints above
  * the root background and below all content), faint, 20fps, with the
- * pointer's ripples and an occasional ambient ring. It pauses while a hero
- * pond fills most of the screen, which covers it anyway, so the two never
- * both run.
+ * pointer's ripples. Beside a hero it answers each ledger close; elsewhere
+ * it has an occasional ambient ring. It pauses while a hero pond fills
+ * most of the screen, which covers it anyway, so the two never both run.
  */
-function mountPage() {
+function mountPage(live: boolean) {
   if (document.documentElement.dataset.gardenPage === "off") return;
   const layer = document.createElement("div");
   layer.className = "garden-page";
@@ -84,19 +97,41 @@ function mountPage() {
     ).observe(hero);
   }
 
-  mountGardenField(layer, {
+  const field = mountGardenField(layer, {
     color: () => getComputedStyle(document.documentElement).getPropertyValue("--brand"),
     fontSize: 13,
     intensity: 0.9,
     fps: 20,
-    ambient: 9,
+    live,
+    ambient: live ? undefined : 9,
     paused: () => heroShare >= 0.6,
+  });
+  // Beside a hero, the background answers each ledger more softly, somewhere in the page.
+  if (live) fields.push({ field, scale: 0.6 });
+}
+
+function caption(text: string) {
+  document.querySelectorAll<HTMLElement>("[data-garden-caption]").forEach((el) => {
+    el.textContent = text;
   });
 }
 
 function start() {
-  mountPage();
-  document.querySelectorAll<HTMLElement>("[data-garden-field]").forEach(mount);
+  const heroes = document.querySelectorAll<HTMLElement>("[data-garden-field]");
+  mountPage(heroes.length > 0);
+  heroes.forEach(mount);
+  if (!heroes.length) return;
+  caption("The pond is still until a validated XRPL ledger arrives.");
+  followLedger(
+    ({ index, txnCount }) => {
+      const strength = ledgerRingStrength(txnCount);
+      fields.forEach(({ field, scale }) => field.ripple(strength * scale));
+      caption(`Each ring is a validated XRPL ledger closing · #${index.toLocaleString("en-US")} · ${txnCount} transactions`);
+    },
+    (live) => {
+      if (!live) caption("Ledger stream reconnecting — the pond is still until a validated ledger arrives.");
+    }
+  );
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });

@@ -797,8 +797,11 @@ async function buildCertificate() {
          had given up a power it had kept. It also had no truthful
          answer for an abstention, where the honest report is that
          nothing was measured, which is neither yes nor no. */
-      var mark=c.passed?"pass":(c.severity==="block"?"block":"warn");
-      var word=c.passed?"CLEAR":"FINDING";
+      /* Five states: a check that could not be answered, or does not
+         apply, says so rather than borrowing CLEAR or FINDING. */
+      var st=c.state==="INSUFFICIENT_DATA"||c.state==="NOT_APPLICABLE"?c.state:null;
+      var mark=st?"warn":c.passed?"pass":(c.severity==="block"?"block":"warn");
+      var word=st==="INSUFFICIENT_DATA"?"NO ANSWER":st==="NOT_APPLICABLE"?"DOES NOT APPLY":c.passed?"CLEAR":"FINDING";
       html+='<div class="cert-check">'+
         '<span class="mark '+mark+'">'+word+'</span>'+
         '<h3>'+data(c.label,cert)+'</h3>'+

@@ -51,9 +51,36 @@ export type GardenFieldOptions = {
   ambient?: number;
   /** Checked every frame; true skips drawing (e.g. while a hero field covers this one). */
   paused?: () => boolean;
+  /**
+   * Driven by data: no timed pulse and no ambient rings. Every ring then
+   * comes from ripple(), called when something real happens — on the
+   * landing pages, a validated XRPL ledger closing. With no data the
+   * water goes still rather than pretending.
+   */
+  live?: boolean;
 };
 
-export type GardenField = { destroy(): void; refresh(): void };
+export type GardenField = {
+  destroy(): void;
+  refresh(): void;
+  /**
+   * One ring for one real event, at the main flower (or the mark, or a
+   * random spot on a pond with neither). `strength` is 0..1; see
+   * ledgerRingStrength.
+   */
+  ripple(strength: number): void;
+};
+
+/**
+ * How strong a ledger's ring is, from how many transactions it carried.
+ * Logarithmic, because mainnet ledgers run from a handful to several
+ * hundred transactions and a linear scale would make every quiet ledger
+ * invisible. An empty ledger still rings faintly: it still closed.
+ */
+export function ledgerRingStrength(txnCount: number): number {
+  const n = Math.max(0, Number.isFinite(txnCount) ? txnCount : 0);
+  return Math.round((0.3 + 0.7 * Math.min(1, Math.log1p(n) / Math.log1p(400))) * 1000) / 1000;
+}
 
 /** Light → dense. Dots are still water, tildes are moving water. */
 export const GARDEN_CHARSET = " .·:-~=+*";
@@ -184,7 +211,7 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
   const ctx = canvas.getContext("2d");
   const source = document.createElement("canvas");
   const sctx = source.getContext("2d", { willReadFrequently: true });
-  if (!ctx || !sctx) return { destroy: () => canvas.remove(), refresh: () => {} };
+  if (!ctx || !sctx) return { destroy: () => canvas.remove(), refresh: () => {}, ripple: () => {} };
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const pulse = options.pulse ?? 6;
@@ -231,7 +258,7 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
     if (!image || width < 2) return;
     const flowers = options.flowers?.() ?? [];
     const mark = options.mark?.() ?? null;
-    if (time - lastPulse >= pulse) {
+    if (!options.live && time - lastPulse >= pulse) {
       // The main flower rings at full strength, the small ones softer and
       // staggered through the period so the pond never pulses in unison.
       flowers.forEach((f, i) => {
@@ -240,7 +267,7 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
       if (!flowers.length && mark) rings.push({ x: mark.x, y: mark.y, born: time, strength: 0.95 });
       lastPulse = time;
     }
-    if (options.ambient && time - lastAmbient >= options.ambient) {
+    if (!options.live && options.ambient && time - lastAmbient >= options.ambient) {
       rings.push({ x: 0.1 + Math.random() * 0.8, y: 0.1 + Math.random() * 0.8, born: time, strength: 0.55 });
       lastAmbient = time;
     }
@@ -320,8 +347,21 @@ export function mountGardenField(host: HTMLElement, options: GardenFieldOptions)
     raf = requestAnimationFrame(loop);
   }
 
+  const ripple = (strength: number) => {
+    if (reduced) return;
+    const t = now();
+    const flowers = options.flowers?.() ?? [];
+    const origin = flowers[0] ?? options.mark?.() ?? { x: 0.1 + Math.random() * 0.8, y: 0.1 + Math.random() * 0.8 };
+    const s = Math.max(0, Math.min(1, strength));
+    rings.push({ x: origin.x, y: origin.y, born: t, strength: s });
+    // The smaller flowers answer softly, staggered, as they do on a pulse.
+    flowers.slice(1).forEach((f, i) => rings.push({ x: f.x, y: f.y, born: t + (i + 1) * 0.6, strength: s * 0.45 }));
+    if (rings.length > 40) rings.splice(0, rings.length - 40);
+  };
+
   return {
     refresh,
+    ripple,
     destroy() {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onPointer);

@@ -156,7 +156,7 @@
   "dataFlows": [
     {
       "party": "Public XRPL servers",
-      "what": "The addresses, transactions and order books you ask about.",
+      "what": "The addresses, transactions and order books you ask about. On the website's home page, a subscription to the public ledger stream that drives the pond, which shows the server your connection but no address or query.",
       "why": "To read the ledger. These servers are run by third parties and see your queries."
     },
     {

@@ -592,7 +592,7 @@ export function toChecks(results: RuleResult[], params: PolicyParams): PolicyChe
     const outcome = params.outcomes[r.key];
     if (r.state === "NOT_APPLICABLE") continue;
     if (r.state === "INSUFFICIENT_DATA") {
-      checks.push({ id: `EVIDENCE_${r.id}`, label: `${r.label}: evidence available`, severity: "warn", passed: false, detail: r.reason });
+      checks.push({ id: `EVIDENCE_${r.id}`, label: `${r.label}: evidence available`, severity: "warn", passed: false, state: "INSUFFICIENT_DATA", detail: r.reason });
       continue;
     }
     checks.push({
