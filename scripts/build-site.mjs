@@ -1064,6 +1064,57 @@ async function buildProductPage([path, current, eyebrow, title, intro, content])
   }));
 }
 
+/* ── /misread/ ────────────────────────────────────────────────────── */
+/*
+ * "The ledger can be transparent and still be misread." Rendered from
+ * src/lib/learn/misread.rendered.json, which is the output of
+ * misreadCases() — recorded mainnet replies run through the app's own
+ * interpreters. A test keeps that file identical to what the code
+ * produces, so nothing on this page is written by hand except the frame.
+ */
+async function buildMisread() {
+  const cases = JSON.parse(await readFile(path.join(ROOT, "src/lib/learn/misread.rendered.json"), "utf8"));
+  const ref = (c) =>
+    /^[0-9A-F]{64}$/.test(c.evidence.ref)
+      ? `<a href="https://livenet.xrpl.org/transactions/${esc(c.evidence.ref)}" rel="noopener">${esc(c.evidence.ref.slice(0, 10))}…</a>`
+      : `<a href="https://livenet.xrpl.org/accounts/${esc(c.evidence.ref)}" rel="noopener">${esc(c.evidence.ref)}</a>`;
+  const rows = cases
+    .map(
+      (c, i) => `<article class="panel mis-case" id="${esc(c.id)}">
+  <p class="eyebrow">${String(i + 1).padStart(2, "0")} / ${esc(c.title)}</p>
+  <div class="mis-cols">
+    <div class="mis-basic"><p class="mis-k">What a basic interface sees</p><p class="mis-l">${esc(c.basic.label)}</p><p class="mis-v">${esc(c.basic.value)}</p></div>
+    <div class="mis-verified"><p class="mis-k">What NOSHASHI verifies</p><p class="mis-l">${esc(c.verified.label)}</p><p class="mis-v">${esc(c.verified.value)}</p></div>
+  </div>
+  <p>${esc(c.why)}</p>
+  <p class="mono mis-src">Ledger ${Number(c.evidence.ledger).toLocaleString("en-US")} · ${esc(c.evidence.refLabel)} ${ref(c)} · <a href="https://github.com/Ignosha/noshashi/blob/main/${esc(c.module)}">${esc(c.module)}</a></p>
+</article>`
+    )
+    .join("\n");
+
+  await write("misread/index.html", renderPage({
+    title: "The ledger can be misread · NOSHASHI",
+    description: "Six real XRPL mainnet replies read two ways: the obvious field at face value, and what NOSHASHI's own code reports for the same reply.",
+    path: "/misread/",
+    head: `<style>
+.mis-case{margin:0 0 18px}
+.mis-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+@media (max-width:720px){.mis-cols{grid-template-columns:1fr}}
+.mis-basic,.mis-verified{border-left:2px solid var(--hold);padding:4px 0 4px 12px}
+.mis-verified{border-left-color:var(--go)}
+.mis-k{font:11px "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--hold)}
+.mis-verified .mis-k{color:var(--go)}
+.mis-l{font-size:12px;color:var(--faint);margin-top:4px}
+.mis-v{font:15px "IBM Plex Mono",monospace;color:var(--ink);margin-top:2px;overflow-wrap:anywhere}
+.mis-src{font-size:12px;color:var(--faint);overflow-wrap:anywhere}
+</style>`,
+    body: `<div class="page-head"><p class="eyebrow">THE LEDGER CAN BE TRANSPARENT AND STILL BE MISREAD</p><h1>Every field is public. Not every reading is right.</h1><p>Six replies read from XRPL mainnet, each shown two ways. The right-hand column is not written for this page: it is what NOSHASHI's own code returns for the recorded reply, and a test fails the build if the two ever disagree.</p></div>
+<section>${rows}</section>
+<section><div class="panel"><p class="eyebrow">How to check this</p><p>Every case links the transaction or account it was read from, at the ledger it was read at, and the module that makes the reading. Open the same object in the desktop app and it is read again on today's ledger.</p></div></section>`,
+    structured: [breadcrumb("The ledger can be misread", "/misread/")],
+  }));
+}
+
 /* ── /trust/ ──────────────────────────────────────────────────────── */
 /*
  * Rendered from src/lib/trust/boundary.json, the same file the desktop
@@ -1132,6 +1183,7 @@ async function buildSitemap() {
     ["/pricing/", "monthly", "0.9"],
     ["/enterprise/", "monthly", "0.9"],
     ["/trust/", "monthly", "0.8"],
+    ["/misread/", "monthly", "0.8"],
     ["/strategic-infrastructure/", "monthly", "0.9"],
     ["/developers/", "monthly", "0.8"],
     ["/progress/", "weekly", "0.8"],
@@ -1217,6 +1269,7 @@ async function main() {
   await buildPricingEnhancement();
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildTrust();
+  await buildMisread();
   await buildSitemap();
   await buildRobots();
 

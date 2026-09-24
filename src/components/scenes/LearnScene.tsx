@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { TUTORIALS, type Tutorial } from "@/lib/tutorials";
 import { usePrefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { MisreadPanel } from "./MisreadPanel";
 
 /**
  * LearnScene — the animated explainers.
@@ -28,6 +29,8 @@ export function LearnScene() {
   const [active, setActive] = useState<Tutorial>(TUTORIALS[0]);
   const [beat, setBeat] = useState(0);
   const [playing, setPlaying] = useState(false);
+  /** The misread cases replace the player while they are open. */
+  const [misread, setMisread] = useState(false);
 
   const timerRef = useRef<number | null>(null);
 
@@ -40,6 +43,7 @@ export function LearnScene() {
 
   const select = useCallback((t: Tutorial) => {
     clear();
+    setMisread(false);
     setActive(t);
     setBeat(0);
     setPlaying(false);
@@ -83,7 +87,7 @@ export function LearnScene() {
         {/* Chooser */}
         <div className="flex min-h-0 flex-col gap-2 lg:col-span-2">
           {TUTORIALS.map((t) => {
-            const on = t.id === active.id;
+            const on = !misread && t.id === active.id;
             return (
               <button
                 key={t.id}
@@ -114,6 +118,26 @@ export function LearnScene() {
             );
           })}
 
+          <button
+            onClick={() => {
+              clear();
+              setPlaying(false);
+              setMisread(true);
+            }}
+            aria-current={misread ? "true" : undefined}
+            className={cn("inset-row w-full px-3.5 py-3 text-left transition-colors", misread && "border-brand/50 bg-brand/10")}
+          >
+            <div className="flex items-baseline gap-2">
+              <span className={cn("text-[12.5px] font-medium", misread ? "text-brand" : "text-foreground")}>
+                The ledger can be misread
+              </span>
+              <span className="ml-auto font-mono text-[9px] text-faint">6 REAL CASES</span>
+            </div>
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              What a basic interface sees against what NOSHASHI verifies, on recorded mainnet replies.
+            </p>
+          </button>
+
           <Panel label="WHY NOT VIDEO" className="mt-1 shrink-0">
             <p className="text-[11px] leading-relaxed text-muted-foreground">
               These are drawn live from the same design system as the console,
@@ -124,7 +148,10 @@ export function LearnScene() {
           </Panel>
         </div>
 
-        {/* Player */}
+        {/* Player, or the misread cases in its place */}
+        {misread ? (
+          <MisreadPanel />
+        ) : (
         <Panel
           label={active.title.toUpperCase()}
           className="relative min-h-0 lg:col-span-3"
@@ -245,6 +272,7 @@ export function LearnScene() {
             </>
           )}
         </Panel>
+        )}
       </div>
     </div>
   );

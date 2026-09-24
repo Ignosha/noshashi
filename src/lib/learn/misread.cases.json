@@ -1,0 +1,116 @@
+{
+  "_about": "Replies read from XRPL mainnet on 2026-09-24 from the public servers (s1/s2.ripple.com, xrplcluster.com). Recorded, not written: fields not needed for the case are dropped (signatures, AffectedNodes, and for the order book every offer field except account, amounts, funded amount and expiry). Each case names the ledger it was read at.",
+  "partialPayment": {
+    "ledger": 107194530,
+    "reply": {
+      "Fee": "12", "date": 843532932,
+      "hash": "307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA",
+      "meta": { "DeliveredAmount": "77162", "TransactionIndex": 74, "delivered_amount": "77162", "TransactionResult": "tesSUCCESS" },
+      "Flags": 131072, "Amount": "100000000000",
+      "Account": "r3ASEe1LLnhfCwrHKr4Cg6YS15t52S1MK5",
+      "SendMax": { "value": "749.3357259479", "issuer": "rGLEgQdktoN4Be5thhk6seg1HifGPBxY5Q", "currency": "PLX" },
+      "Sequence": 107189124, "validated": true,
+      "DeliverMax": "100000000000", "DeliverMin": "76520",
+      "Destination": "r3ASEe1LLnhfCwrHKr4Cg6YS15t52S1MK5",
+      "ledger_index": 107194530, "TransactionType": "Payment", "LastLedgerSequence": 107194532
+    }
+  },
+  "book": {
+    "ledger": 107194532,
+    "closeTime": 843532941,
+    "pair": "USD.Bitstamp (rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B) offered for XRP",
+    "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+    "columns": ["Account", "TakerGets USD", "TakerPays drops", "taker_gets_funded USD or null", "Expiration or null"],
+    "offers": [
+      ["rPrDM69juKRkoCS1h7SeZ8v4WTib3sXkge","1.606","1100000",null,null],
+      ["rPrDM69juKRkoCS1h7SeZ8v4WTib3sXkge","1.595","1100000",null,null],
+      ["rw3PMGpyrf4qmvPfViJehrCfShXFw2Bptd","2.999999115","2150537",null,null],
+      ["rBci5N2MQdXjZtUQzFxrQHM6kssarRASTi","138","100000000",null,null],
+      ["rLEReo9p26mQXQovZvCKW9U8BEcxnXegxS","197.3450193","151803861",null,null],
+      ["rCdaGXaudMGENNyPtHAzfCsbj2hWEmJex","0.00199981053562","1649",null,null],
+      ["rnMDvAqi1JL5TCqUPHBB7KeduqTu5F12vE","0.12","100000",null,null],
+      ["rBci5N2MQdXjZtUQzFxrQHM6kssarRASTi","565","500000000",null,null],
+      ["rU1tArrr24FMw3iztqeVBJqQwiGFyj97ju","123.2","110000000",null,872178140],
+      ["rPrDM69juKRkoCS1h7SeZ8v4WTib3sXkge","2200.2","2000000000",null,null],
+      ["rnMDvAqi1JL5TCqUPHBB7KeduqTu5F12vE","0.11","100000",null,null],
+      ["rnLnRet7RRPgcGeKJ3StHDSy8CYicHHs4d","40.29","37092616","40.23884393709436",null],
+      ["r9cyWmzhsLqgVsUfkssKuzPGpTiQzcR9L3","1000","1000000000","0",null],
+      ["rwP1V7xV26Ej17VpoCyss5SoDH3xyJQ7fn","10","10000000",null,871995972],
+      ["rnMDvAqi1JL5TCqUPHBB7KeduqTu5F12vE","0.1","100000",null,null],
+      ["rU1tArrr24FMw3iztqeVBJqQwiGFyj97ju","99.1","100000000",null,871981312],
+      ["rBci5N2MQdXjZtUQzFxrQHM6kssarRASTi","990","1000000000",null,null],
+      ["r9cyWmzhsLqgVsUfkssKuzPGpTiQzcR9L3","985","1000000000","0",null],
+      ["rBci5N2MQdXjZtUQzFxrQHM6kssarRASTi","981","1000000000",null,null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","49.725","51000000","3.647322177940859",null],
+      ["r4eGxRo65bfq8Dptgc8vHHTzUnj4jLdDK8","1068.09","1100000000","2.209650524213646",null],
+      ["rBci5N2MQdXjZtUQzFxrQHM6kssarRASTi","960","1000000000",null,null],
+      ["raPqgE5gcqM84j9rHxHXz5AZFbzpPW1WLk","83.460934795","87393649","0",null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","48.705","51000000","0",null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","47.685","51000000","0",null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","46.665","51000000","0",null],
+      ["rnMDvAqi1JL5TCqUPHBB7KeduqTu5F12vE","0.009","10000",null,null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","45.645","51000000","0",null],
+      ["rLLoVN2E73QqErnDSfNxTkk9zMLVqAWBzB","1552.32","1764000000","28.82653870438542",865529897],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","40.25","46000000","0",null],
+      ["rPrDM69juKRkoCS1h7SeZ8v4WTib3sXkge","17202.02","20000000000",null,null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","39.422","46000000","0",null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","38.41","46000000","0",null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","37.49","46000000","0",null],
+      ["rwybco5oXaVXfbg9y7BYAKX8bwT4U9ridL","1620","2000000000","0",null],
+      ["rBci5N2MQdXjZtUQzFxrQHM6kssarRASTi","1602","2000000000",null,null],
+      ["rsYxaDTuectxHfhzDPi9kvf9gZHLXzPvCD","16000","20000000000",null,null],
+      ["rwybco5oXaVXfbg9y7BYAKX8bwT4U9ridL","1284.0503496","1605062937","0",null],
+      ["rnMDvAqi1JL5TCqUPHBB7KeduqTu5F12vE","0.08","100000",null,null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","36.57","46000000","0",null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","31.775","41000000","0",null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","30.955","41000000","0",null],
+      ["rDHyHTyPXsUZd6oH4tjsH5U2ZYHGBvvEgt","0.75","1000000",null,822962457],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","30.135","41000000","0",null],
+      ["rPn3eaoTQRPiwQGV72zyRCpvSfiYDntZH6","3534.375","4875000000","0",816554158],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","11040","15235200000","0",855485085],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","5000","6925000000","0",855485221],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","5000","6930000000","0",855485312],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","5000","6935000000","0",855485337],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","5000","6940000000","0",855485363],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","7200","10000000000","0",855486075],
+      ["rsDZYshvRNwAVxUStfbBQUiNWUSP9uRYTZ","1179.35","1638000000",null,null],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","5000","6975000000","0",855485438],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","29.315","41000000","0",null],
+      ["rhbHboSF2rYchtQjXz5Y47cdeVoSuxiwbb","26.064284","36489998","0.0000002064022965551673",null],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","10000","14050000000","0",855485742],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","10000","14080000000","0",855485802],
+      ["rnMHbYtycBoXWfgKGvKAa3nHbw7WrS73oc","11040","15566400000","0",855484956],
+      ["rnMDvAqi1JL5TCqUPHBB7KeduqTu5F12vE","0.007","10000",null,null],
+      ["rBwX7gAfNv9uwmPpWrbm9QbKwp65csEsmc","28.495","41000000","0",null]
+    ]
+  },
+  "sequence": {
+    "ledger": 107194965,
+    "accountRoot": {
+      "AMMID": "EF95AD04AF97DF0DD76C5C624F93EF6F5479CDF8F30FAE612F1D434B5D6A914B",
+      "Flags": 26214400, "Account": "rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am",
+      "Balance": "3334545217", "Sequence": 86795414, "OwnerCount": 1,
+      "LedgerEntryType": "AccountRoot", "PreviousTxnLgrSeq": 107194758
+    },
+    "pseudoAccount": "AMM",
+    "createdBy": { "hash": "ED0B8BB68ADA043301B4CE559A352A622FE7D2190B0D09C6C925E252AF5BEACE", "TransactionType": "AMMCreate", "ledger_index": 86795414 }
+  },
+  "quorum": {
+    "ledger": 107194532,
+    "signerList": {
+      "Owner": "rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX",
+      "SignerQuorum": 2,
+      "SignerEntries": [
+        { "SignerEntry": { "Account": "rwpQmc2ihyfGWHrvgR8pcS6NMeNBjaAyw", "SignerWeight": 1 } },
+        { "SignerEntry": { "Account": "rUr4CknSyJb79zgvi4c2vpBk8WkgGAkqZL", "SignerWeight": 1 } },
+        { "SignerEntry": { "Account": "rGtDNiHFHNTNSnoeLg5usoRnLx33ABTWhT", "SignerWeight": 1 } }
+      ],
+      "LedgerEntryType": "SignerList", "PreviousTxnLgrSeq": 107178777
+    }
+  },
+  "absent": {
+    "ledger": 107194798,
+    "address": "rPGJe8F1FzegsNDJEMkq3hUrupovdBjQMi",
+    "reply": { "error": "actNotFound", "status": "error", "error_code": 19, "error_message": "Account not found." }
+  }
+}

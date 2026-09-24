@@ -1631,11 +1631,11 @@
       </div>
       <div class="trap">
         <p class="tf">Absent ≠ false</p>
-        <p class="tw">A trust line carries <span class="mono">freeze</span> and
-           <span class="mono">authorized</span> only when set. Reading absence as "not frozen"
-           asserts a guarantee the ledger never made.</p>
-        <p class="tm">not stated<small>What we report instead. An unset flag is unknown, and
-           unknown is not the same as safe.</small></p>
+        <p class="tw">An address the ledger has no account for is not an account holding nothing.
+           Showing it as a zero balance invites a payment that would have to create it, and
+           nothing about it can be verified.</p>
+        <p class="tm">actNotFound<small>What the ledger answered. We fail the account check
+           instead of reporting 0 XRP.</small></p>
       </div>
       <div class="trap">
         <p class="tf">Ripple epoch ≠ Unix epoch</p>
@@ -1647,7 +1647,8 @@
     </div>
 
     <p class="micro" style="margin-top:18px">
-      Thirteen are documented in full, with the module that handles each, in the
+      <a href="/misread/" style="color:var(--brand)">See six of them on real mainnet replies</a>, read both ways by
+      NOSHASHI's own code. The full list, with the module that handles each, is in the
       <a href="https://github.com/Ignosha/noshashi" rel="noopener" style="color:var(--brand)">repository README</a>.
     </p>
   </section>

@@ -17,6 +17,7 @@ import {
 } from "@/lib/desk/control";
 import { cn } from "@/lib/utils";
 import { TraceButton } from "@/lib/nav/handoff";
+import { useClaimedSubject } from "@/lib/nav/handoff";
 
 /**
  * ControlScene — who can actually move this treasury.
@@ -63,8 +64,9 @@ function ControlBody() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const run = async () => {
-    const address = query.trim();
+  const run = async (given?: string) => {
+    const address = (given ?? query).trim();
+    if (given !== undefined) setQuery(given);
     if (!address || busy) return;
     if (!isValidAddress(address)) {
       setError("That is not a valid XRPL address.");
@@ -80,6 +82,11 @@ function ControlBody() {
       setBusy(false);
     }
   };
+
+  // A address handed over from another scene is read straight away.
+  useClaimedSubject("control", (subject) => {
+    void run(subject.value);
+  });
 
   const findings = surface ? controlFindings(surface) : [];
   const spendable = surface

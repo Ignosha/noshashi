@@ -160,6 +160,18 @@ export function readControlEvents(
   return out.sort((a, b) => a.ledgerIndex - b.ledgerIndex);
 }
 
+/**
+ * Transactions an account has sent, from its Sequence and the ledger it was
+ * created in. Since DeletableAccounts a new account's Sequence starts at its
+ * creation ledger index, so the count is the distance travelled from there;
+ * an older account started at 1.
+ */
+export function sentSinceCreation(sequence: number, originLedger: number): number {
+  return sequence >= originLedger
+    ? sequence - originLedger // modern: seq seeded at creation ledger
+    : Math.max(0, sequence - 1); // legacy: seq seeded at 1
+}
+
 export async function readProvenance(address: string): Promise<ProvenanceReport> {
   let info: Record<string, any>;
   try {
@@ -253,13 +265,7 @@ export async function readProvenance(address: string): Promise<ProvenanceReport>
    * its sequence at the creation ledger index, so the count of transactions
    * it has sent is the distance travelled from there — not the sequence.
    */
-  let approxSentCount: number | undefined;
-  if (originLedger !== undefined) {
-    approxSentCount =
-      sequence >= originLedger
-        ? sequence - originLedger // modern: seq seeded at creation ledger
-        : Math.max(0, sequence - 1); // legacy: seq seeded at 1
-  }
+  const approxSentCount = originLedger === undefined ? undefined : sentSinceCreation(sequence, originLedger);
 
   const historyIncomplete =
     originLedger !== undefined &&
