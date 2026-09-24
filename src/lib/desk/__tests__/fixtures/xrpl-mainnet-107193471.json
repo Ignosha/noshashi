@@ -1,0 +1,114 @@
+{
+  "_about": "Replies read from XRPL mainnet (s1/s2.ripple.com, Clio) on 2026-09-24 at validated ledger 107193471. Recorded, not written: only the result objects are kept, and for the two transactions meta.AffectedNodes and TxnSignature are dropped for size. Nothing else is altered.",
+  "account_info_bitstamp": {
+    "account_data": {
+      "Account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+      "Balance": "412602491965",
+      "Domain": "6269747374616D702E6E6574",
+      "EmailHash": "5B33B93C7FFE384D53450FC666BB11FB",
+      "Flags": 10092544,
+      "LedgerEntryType": "AccountRoot",
+      "OwnerCount": 378,
+      "PreviousTxnID": "6D256196080A6CFB901174A69BF5D5BA738A8362EF31132949FC00447A8409FE",
+      "PreviousTxnLgrSeq": 107192534,
+      "RegularKey": "rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ",
+      "Sequence": 4827,
+      "TransferRate": 1001500000,
+      "index": "B7D526FDDF9E3B3F95C3DC97C353065B0482302500BBB8051A5C090B596C6133",
+      "urlgravatar": "http://www.gravatar.com/avatar/5b33b93c7ffe384d53450fc666bb11fb"
+    },
+    "ledger_hash": "733DF715AA4879540BBC3FBCD7D51324F2B2ADA21C4EE48E0EBDE4762B1FFC86",
+    "ledger_index": 107193471,
+    "validated": true,
+    "account_flags": {
+      "defaultRipple": true,
+      "depositAuth": false,
+      "disableMasterKey": true,
+      "disallowIncomingXRP": true,
+      "globalFreeze": false,
+      "noFreeze": false,
+      "passwordSpent": false,
+      "requireAuthorization": false,
+      "requireDestinationTag": true,
+      "disallowIncomingNFTokenOffer": false,
+      "disallowIncomingCheck": false,
+      "disallowIncomingPayChan": false,
+      "disallowIncomingTrustline": false,
+      "allowTrustLineClawback": false,
+      "allowTrustLineLocking": false
+    },
+    "status": "success"
+  },
+  "server_info": {
+    "info": {
+      "complete_ledgers": "32570-107193471",
+      "load_factor": 1,
+      "time": "2026-Sep-24 01:34:12.383806 UTC",
+      "uptime": 110017,
+      "clio_version": "2.8.0",
+      "libxrpl_version": "3.3.0",
+      "validated_ledger": {
+        "age": 2,
+        "hash": "733DF715AA4879540BBC3FBCD7D51324F2B2ADA21C4EE48E0EBDE4762B1FFC86",
+        "seq": 107193471,
+        "base_fee_xrp": 1e-5,
+        "reserve_base_xrp": 1e0,
+        "reserve_inc_xrp": 2e-1
+      },
+      "validation_quorum": 28,
+      "rippled_version": "3.4.0",
+      "network_id": 0
+    },
+    "validated": true,
+    "status": "success"
+  },
+  "tx_payment": {
+    "Fee": "21",
+    "ctid": "C663A47F001D0000",
+    "date": 843528850,
+    "hash": "017808F0426766661E431C513918AC8FA75B744ED33DBD83E0987DC60A9C24CE",
+    "meta": {
+      "TransactionIndex": 29,
+      "delivered_amount": { "value": "287.022082836", "issuer": "rUmZDci9VKj9BgiBCE9TsLpypERU6jJqxR", "currency": "DIP" },
+      "TransactionResult": "tesSUCCESS"
+    },
+    "Flags": 0,
+    "Amount": { "value": "287.022082836", "issuer": "rUmZDci9VKj9BgiBCE9TsLpypERU6jJqxR", "currency": "DIP" },
+    "status": "success",
+    "Account": "rBTppNsJFvNbbwmWxfUNAkLLHcMkbmSBQQ",
+    "Sequence": 86511307,
+    "inLedger": 107193471,
+    "validated": true,
+    "DeliverMax": { "value": "287.022082836", "issuer": "rUmZDci9VKj9BgiBCE9TsLpypERU6jJqxR", "currency": "DIP" },
+    "Destination": "rJWhovyyd5YC6WPX32S59PYcwUUr94GZeU",
+    "ledger_index": 107193471,
+    "SigningPubKey": "025F6B11004A925D1E1C95BEAA8A076E9ACD3FE166B63F2BD38CA8E1358923FD05",
+    "TransactionType": "Payment",
+    "LastLedgerSequence": 107193472
+  },
+  "tx_offer_cancel": {
+    "Fee": "12",
+    "ctid": "C663A47F007B0000",
+    "date": 843528850,
+    "hash": "00AE90D0604A9ED56205407DB2A9F452D785C6EAD8DC7182A638DA10D0F5A50B",
+    "meta": { "TransactionIndex": 123, "TransactionResult": "tesSUCCESS" },
+    "Flags": 0,
+    "status": "success",
+    "Account": "rLtCVnojydtQy7GYGTmDegkM15hLX8VuZk",
+    "Sequence": 108342995,
+    "inLedger": 107193471,
+    "validated": true,
+    "ledger_index": 107193471,
+    "OfferSequence": 108342976,
+    "SigningPubKey": "EDAE01271F6264DC3830C43D5B93F47DC427722DC80D92EEE9AEAFA6B8B0F16E21",
+    "TransactionType": "OfferCancel",
+    "LastLedgerSequence": 107193489
+  },
+  "tx_not_found": {
+    "type": "response",
+    "error": "txnNotFound",
+    "status": "error",
+    "error_code": 29,
+    "error_message": "Transaction not found."
+  }
+}
