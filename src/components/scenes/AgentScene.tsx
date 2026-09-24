@@ -157,7 +157,7 @@ export function AgentScene({ data }: { data: XrplState }) {
         }
         setRuntimeError(
           error instanceof Error
-            ? `${error.message} Tried ${active.baseUrl}.`
+            ? `${error.message.replace(/[.!?]?$/, ".")} Tried ${active.baseUrl}.`
             : "No model runtime reachable."
         );
       } finally {
@@ -411,28 +411,29 @@ export function AgentScene({ data }: { data: XrplState }) {
         statusLabel={probing ? "PROBING" : ready ? (boundary.onDevice ? "LOCAL RUNTIME" : "REMOTE RUNTIME") : "RUNTIME DOWN"}
         right={
           <div className="flex items-center gap-2">
-            <Tabs value={mode} onValueChange={(value) => setMode(value as AgentMode)}>
+            {/* One control for the four views. The two chat modes and the two
+                panels used to be a tab strip beside two outline buttons of a
+                different height, which read as two unrelated controls. */}
+            <Tabs
+              value={view === "chat" ? mode : view}
+              onValueChange={(value) => {
+                if (value === "compliance" || value === "support") {
+                  setMode(value);
+                  setView("chat");
+                } else {
+                  setView(value as "observer" | "governance");
+                }
+              }}
+            >
               <TabsList>
                 <TabsTrigger value="compliance">COMPLIANCE</TabsTrigger>
                 <TabsTrigger value="support">SUPPORT</TabsTrigger>
+                <TabsTrigger value="observer">
+                  OBSERVER{observerAlerts ? ` · ${observerAlerts}` : ""}
+                </TabsTrigger>
+                <TabsTrigger value="governance">GOVERNANCE</TabsTrigger>
               </TabsList>
             </Tabs>
-            <Button
-              size="sm"
-              variant={view === "observer" ? "default" : "outline"}
-              onClick={() => setView((v) => (v === "observer" ? "chat" : "observer"))}
-              aria-pressed={view === "observer"}
-            >
-              OBSERVER{observerAlerts ? ` · ${observerAlerts}` : ""}
-            </Button>
-            <Button
-              size="sm"
-              variant={view === "governance" ? "default" : "outline"}
-              onClick={() => setView((v) => (v === "governance" ? "chat" : "governance"))}
-              aria-pressed={view === "governance"}
-            >
-              GOVERNANCE
-            </Button>
             {turns.length > 0 && (
               <Button size="sm" variant="outline" onClick={() => setTurns([])}>
                 CLEAR
@@ -661,7 +662,10 @@ export function AgentScene({ data }: { data: XrplState }) {
         )}
 
         {/* Runtime + escalation */}
-        <div className="col-span-1 flex min-h-0 min-w-0 flex-col gap-3">
+        {/* Scrolls rather than squeezing: fixed to the window height, the
+            last panels were cut in half or, on a 700px window, given no
+            height at all. */}
+        <div className="col-span-1 flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto [&>*]:shrink-0">
           <Panel
             label="RUNTIME"
             className="shrink-0"
@@ -978,7 +982,7 @@ export function AgentScene({ data }: { data: XrplState }) {
             ))}
           </Panel>
 
-          <Panel label="HUMAN ESCALATION" className="min-h-0 flex-1">
+          <Panel label="HUMAN ESCALATION" className="flex-auto">
             <p className="text-[10px] leading-relaxed text-muted-foreground">
               The agent hands off anything that needs a person. Support replies
               within {CONTACT.responseTarget}.
@@ -991,12 +995,12 @@ export function AgentScene({ data }: { data: XrplState }) {
                 <a
                   key={route.email}
                   href={`mailto:${route.email}`}
-                  className="inset-row flex items-center justify-between px-2.5 py-2"
+                  className="inset-row flex items-center justify-between gap-3 px-2.5 py-2"
                 >
-                  <span className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">
+                  <span className="stencil shrink-0 text-[8px] tracking-[0.2em] text-muted-foreground">
                     {route.label}
                   </span>
-                  <span className="mono-font truncate text-[9px] text-foreground">
+                  <span className="mono-font min-w-0 break-all text-right text-[9px] text-foreground">
                     {route.email}
                   </span>
                 </a>
