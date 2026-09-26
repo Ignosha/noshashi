@@ -20,6 +20,18 @@ describe("the NOSHASHI knowledge base", () => {
     expect(index.passages.some((p) => p.title.startsWith("Learn NOSHASHI › Word list"))).toBe(true);
   });
 
+  it("ships the pages as text compiled at build time, not HTML", async () => {
+    const { default: pages } = await import("virtual:noshx-pages");
+    expect(pages.length).toBeGreaterThan(300);
+    for (const p of pages) {
+      expect(p.text, p.title).not.toMatch(/<\/?(p|div|span|a|h[1-6]|script|style)\b/i);
+      expect(p.source, p.title).toMatch(/^https:\/\/www\.noshashi\.app\//);
+    }
+    expect(pages.some((p) => p.title.startsWith("Learn NOSHASHI › Knowledge check"))).toBe(true);
+    // Release notes rank below the pages that describe the product.
+    expect(pages.filter((p) => p.source.includes("/docs/release-notes/")).every((p) => p.weight === 0.45)).toBe(true);
+  });
+
   it("finds a plan's price from the catalogue", async () => {
     const [top] = await searchKnowledge("How much does the Institutional plan cost?", 5);
     expect(top.title).toBe("Pricing › INSTITUTIONAL");

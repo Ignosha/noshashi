@@ -31,6 +31,14 @@ export function dataBoundary(config: AgentConfig): DataBoundary {
   } catch {
     // Keep the raw value; isEndpointSafe will already have refused it.
   }
+  if (provider.api === "noshx") {
+    return {
+      onDevice: true,
+      providerName: provider.name,
+      host: "this app",
+      statement: "NOSHX Core runs inside the app. No model is used and nothing you ask is sent anywhere; only the ledger reads go to the public XRPL servers.",
+    };
+  }
   return {
     onDevice,
     providerName: provider.name,

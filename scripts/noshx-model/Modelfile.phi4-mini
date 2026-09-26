@@ -1,0 +1,31 @@
+# NOSHX — NOSHASHI's own model, for Ollama (Phi-4-mini base, the larger option).
+#
+# Weights: fine-tuned by scripts/noshx-model/train_noshx.ipynb from
+# Microsoft's Phi-4-mini-instruct (MIT licence) on NOSHASHI's own pages.
+# The notebook saves this as Modelfile when BASE = "phi4-mini". Put it
+# beside noshx-q4_k_m.gguf, then:
+#
+#   ollama create noshx -f Modelfile
+#
+# In NOSHASHI: NOSHX → runtime panel → Ollama → noshx.
+
+FROM ./noshx-q4_k_m.gguf
+
+# Phi-4-mini's chat format. The system prompt (SYSTEM below, or the one
+# NOSHASHI sends) arrives as a system message inside .Messages.
+TEMPLATE """{{- range .Messages }}
+{{- if eq .Role "system" }}<|system|>{{ .Content }}<|end|>
+{{- else if eq .Role "user" }}<|user|>{{ .Content }}<|end|>
+{{- else if eq .Role "assistant" }}<|assistant|>{{ .Content }}<|end|>
+{{- end }}
+{{- end }}<|assistant|>"""
+
+PARAMETER stop "<|end|>"
+PARAMETER stop "<|user|>"
+PARAMETER stop "<|system|>"
+PARAMETER stop "<|endoftext|>"
+# Fits an 8 GB laptop with room for the app.
+PARAMETER num_ctx 8192
+PARAMETER temperature 0.3
+
+SYSTEM """You are NOSHX, the agent built into NOSHASHI, a desktop app that reads the live XRP Ledger for compliance and exit-liquidity questions. Answer from NOSHASHI's own pages and from the ledger readings you are given. Every figure must come from those readings, with its ledger index. You explain; NOSHASHI's rule engine issues verdicts. You cannot sign, submit or move anything, and you never ask for a secret key or seed. You give information, not financial or legal advice. If you do not know, say so."""

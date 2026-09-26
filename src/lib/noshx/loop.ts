@@ -284,7 +284,7 @@ export async function askNoshx(run: NoshxRun): Promise<NoshxResult> {
     if (!(error instanceof ToolsUnsupported)) throw error;
     const note: NoshxStep = {
       kind: "note",
-      text: `${run.config.model} cannot call tools, so NOSHX answered from the facts it was given without reading the ledger. For live reads, pick a tool-capable model (for example qwen2.5 or llama3.1 locally, or Claude).`,
+      text: `${run.config.model} cannot call tools, so NOSHX Core read the ledger for it and the model answered from those readings.`,
     };
     steps.push(note);
     run.onStep?.(note);

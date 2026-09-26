@@ -159,7 +159,6 @@ export const PLANS: Plan[] = [
     seatBased: false,
     features: [
       "Everything in Pro, unlimited seats",
-      "SSO — SAML 2.0 or OIDC, with SCIM provisioning",
       "Immutable audit log of every adjudication, export and settings change",
       "Bulk portfolio monitoring — unlimited wallets, scheduled stress runs",
       "Custom alert logic — your own thresholds, expressions and destinations",
@@ -421,11 +420,14 @@ export const FEATURE_CATALOG: Record<
     blurb:
       "What the whole book would actually realise if it had to be raised as cash — routed across the DEX and the AMM together, shocked for depth that walks away, and discounted for balances an issuer could immobilise. A mark-to-mid portfolio value assumes every unit sells at the touch and that nobody can freeze it; both assumptions are false and neither is priced anywhere else.",
   },
+  // Not built. The flag stays in the grants because the Stripe webhook
+  // grants the same set (entitlement-parity.test.ts) and nothing gates on
+  // it; no plan lists SSO as a feature until it exists.
   sso: {
-    label: "Single sign-on",
+    label: "Single sign-on (not yet available)",
     requires: "institution",
     blurb:
-      "SAML 2.0 or OIDC against your identity provider, with SCIM provisioning so a leaver loses access when HR says so rather than when someone remembers.",
+      "Not available yet. Sign-in is by email and password with two-factor authentication. SAML 2.0 or OIDC with SCIM provisioning is on the roadmap, not in the product.",
   },
   audit_log: {
     label: "Immutable audit log",

@@ -1,5 +1,91 @@
 # Changelog
 
+## 1.0.10
+
+### NOSHX, the compliance agent
+
+The Agent screen is now NOSHX. It answers by reading the live ledger with
+the app's own read-only tools, and lists every read under its answer:
+issuer authority, order-book depth (listed and funded), settlements,
+control surfaces, provenance, AMM pools, issuance, the address check,
+claims, NFT rights, and ledger status and sync. It cannot sign, submit or
+move anything. Each tool needs the same plan as the screen it mirrors, and
+address checks on the Free plan count against the same 10 a month.
+
+- **It knows NOSHASHI.** Questions about the product itself (screens,
+  features, plans and prices, the API and webhooks, security, privacy, and
+  which tools suit a customer) are answered from the product's own pages:
+  the Learn course and its word list, every docs page, pricing, trust,
+  enterprise and legal. The pages are searched inside the app, with no
+  extra model and nothing sent anywhere. With no model running, the
+  support desk answers from the same pages.
+- **Compliance questions** (KYC, AML, the Travel Rule, MiCA, credentials,
+  audit evidence, treasury control) are explained, then pointed at the
+  screen that addresses them and what it does not cover.
+
+### Switching between a local model and a hosted one works
+
+Switching the agent from a local model to a hosted one (or back) could
+revert or fail. Five causes, all fixed:
+
+- The saved choice was overwritten with the default (Ollama) on every
+  launch.
+- A hosted provider that failed its first check (no key yet, a slow reply)
+  silently switched back to a local model.
+- A slow, older check could overwrite a newer choice.
+- Every request to Claude carried a setting current Claude models reject,
+  so the first message failed.
+- Custom endpoints could never connect, and some hosted providers were
+  blocked by the app window's security rules.
+
+Each provider now remembers its own endpoint and model, the endpoint can be
+edited, and optional **failover** answers with the last runtime that worked
+when the chosen one fails, and says so.
+
+### API keys never enter the app window
+
+Model requests are now made by the app itself rather than its window. A
+provider key goes from the operating system keyring straight to that
+provider's own host; the window can store, check or clear a key but not
+read one back. A named provider's key is only ever sent to that provider,
+a custom endpoint must use HTTPS, and local models never receive a key.
+
+### NOSHX Core: its own engine, no outside model
+
+NOSHX now runs on **NOSHX Core** by default: NOSHASHI's own engine, with
+no language model at all. It works out what is being asked (addresses,
+transaction hashes, currency codes, and what you want to know about
+them), runs the matching ledger readers, and writes the answer from what
+it read, in the same words the screens use. Product and compliance
+questions are answered with the most relevant sentences from NOSHASHI's
+pages, with their sources, and "which screen" questions name the screens
+that fit and the plan each needs. It answers in milliseconds, works
+offline, needs nothing installed and runs on any laptop. Its knowledge
+of NOSHASHI's pages is compiled when the app is built, so only their text
+ships (about 75 KB compressed), and it is indexed in the background when
+the NOSHX screen opens: the first answer no longer waits for it.
+
+A language model is optional. If one is added and cannot call tools
+itself, NOSHX Core reads the ledger for it. With failover on, any model
+that fails falls back to Core.
+
+### The NOSHX model
+
+A kit to train NOSHX's own language model is in `scripts/noshx-model`:
+training data made entirely from NOSHASHI's own content, a free Google
+Colab notebook, and the Ollama Modelfile. It fine-tunes IBM's Granite 4.0
+1B (Apache 2.0 licence) into NOSHX, about 1 GB, which answers quickly on a
+laptop's CPU. Microsoft's Phi-4-mini (MIT licence, about 2.5 GB) is an
+option for better writing at lower speed. Local requests use a fixed context size so memory use stays
+predictable, and **deep reasoning**, off by default, lets a model think
+before answering (for Claude it raises the reasoning effort).
+
+### Pricing
+
+Single sign-on (SSO/SCIM) is not available yet and is no longer listed as
+part of the Institutional plan.
+
+
 ## 1.0.9
 
 ### Every screen scrolls instead of hiding its panels

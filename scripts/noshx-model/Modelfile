@@ -1,0 +1,26 @@
+# NOSHX — NOSHASHI's own model, for Ollama.
+#
+# Weights: fine-tuned by scripts/noshx-model/train_noshx.ipynb from
+# IBM's Granite 4.0 1B (Apache 2.0 licence) on NOSHASHI's own pages.
+# About 1 GB, and quick on a laptop CPU. Put this file beside
+# noshx-q4_k_m.gguf, then:
+#
+#   ollama create noshx -f Modelfile
+#
+# In NOSHASHI: NOSHX → runtime panel → Ollama → noshx.
+# Trained from Phi-4-mini instead? Use Modelfile.phi4-mini.
+
+FROM ./noshx-q4_k_m.gguf
+
+# Granite 4.0's chat format. The system prompt (SYSTEM below, or the one
+# NOSHASHI sends) arrives as a system message inside .Messages.
+TEMPLATE """{{- range .Messages }}<|start_of_role|>{{ .Role }}<|end_of_role|>{{ .Content }}<|end_of_text|>
+{{ end }}<|start_of_role|>assistant<|end_of_role|>"""
+
+PARAMETER stop "<|end_of_text|>"
+PARAMETER stop "<|start_of_role|>"
+# Fits an 8 GB laptop with plenty of room for the app.
+PARAMETER num_ctx 8192
+PARAMETER temperature 0.3
+
+SYSTEM """You are NOSHX, the agent built into NOSHASHI, a desktop app that reads the live XRP Ledger for compliance and exit-liquidity questions. Answer from NOSHASHI's own pages and from the ledger readings you are given. Every figure must come from those readings, with its ledger index. You explain; NOSHASHI's rule engine issues verdicts. You cannot sign, submit or move anything, and you never ask for a secret key or seed. You give information, not financial or legal advice. If you do not know, say so."""

@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { noshxPages } from "./vite.noshx";
 
 const { version } = createRequire(import.meta.url)("./package.json") as {
   version: string;
@@ -13,7 +14,7 @@ const { version } = createRequire(import.meta.url)("./package.json") as {
 const devHost = process.env.TAURI_DEV_HOST;
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), noshxPages()],
   define: {
     __APP_VERSION__: JSON.stringify(version),
     "import.meta.env.VITE_NOSHASHI_EDITION": JSON.stringify(

@@ -126,7 +126,7 @@ get started by a system that has not noticed you already did.
 | `{{plan}}` | Pro | Institutional |
 | `{{first_action}}` | Add your book as a portfolio and run a redemption stress test on it. | Issue an API key and make one verification call. |
 | `{{first_action_detail}}` | Console → Portfolios → Add wallets, then Risk → Stress. Start with Orderly to see the shape, then Stressed. The waterfall shows where the gap between mark and recoverable actually goes — depth, contention between your own lines, and issuer discretion, separated. | Console → Account → Compliance API → New key. The screen has a pre-filled curl with your endpoint; the only thing to substitute is the key. Full reference: noshashi.app/docs/api |
-| `{{grants_list}}` | Multi-wallet portfolios · Redemption stress testing · Issuer freeze-rights analysis · Order book integrity · Editable policy thresholds · Drift and expiry alerts · Persistent adjudication ledger (10,000 verdicts) · 5,000 API verifications/month · Priority support | Everything in Pro with unlimited seats · SSO and SCIM · Immutable audit log · Bulk portfolio monitoring with scheduled runs · Custom alert logic · Compliance API and signed webhooks · Signed chain-of-custody export · Offline adjudication · Regulator read-only seats · Travel Rule scoping · 100,000 API verifications/month · 99.9% SLA · Named support contact |
+| `{{grants_list}}` | Multi-wallet portfolios · Redemption stress testing · Issuer freeze-rights analysis · Order book integrity · Editable policy thresholds · Drift and expiry alerts · Persistent adjudication ledger (10,000 verdicts) · 5,000 API verifications/month · Priority support | Everything in Pro with unlimited seats · Immutable audit log · Bulk portfolio monitoring with scheduled runs · Custom alert logic · Compliance API and signed webhooks · Signed chain-of-custody export · Offline adjudication · Regulator read-only seats · Travel Rule scoping · 100,000 API verifications/month · 99.9% SLA · Named support contact |
 
 ---
 
@@ -169,7 +169,7 @@ get started by a system that has not noticed you already did.
 >    runs entirely locally with no account and no server-side state, which
 >    is usually the fastest way through. I can send the DPA,
 >    sub-processor list and security questionnaire today if that helps.
-> 3. **You are waiting on us for SSO or webhook setup.** If so that is on
+> 3. **You are waiting on us for webhook setup.** If so that is on
 >    me — reply and I will book it in this week.
 
 ---
@@ -249,7 +249,7 @@ than sitting there as a permanent trophy.
 | 7 | Issue an API key | ≥1 unrevoked key | Account → Compliance API |
 | 8 | Make your first API call | ≥1 row in `verification_events` | Account → Compliance API |
 | 9 | Register a webhook endpoint | ≥1 endpoint verified | Account → Webhooks |
-| 10 | Configure SSO | IdP metadata accepted | Account → SSO |
+| 10 | SSO: not yet available, skip | — | — |
 | 11 | Invite your team | ≥2 members | Account → Members |
 | 12 | Schedule a stress run | ≥1 schedule saved | Risk → Stress → Schedule |
 

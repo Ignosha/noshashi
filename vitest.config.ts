@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import path from "node:path";
+import { noshxPages } from "./vite.noshx";
 
 /**
  * Tests cover the pure findings logic — the functions that turn a ledger
@@ -8,6 +9,7 @@ import path from "node:path";
  * reasoning changed, never that mainnet did.
  */
 export default defineConfig({
+  plugins: [noshxPages()],
   resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
   // Mirrors the build-time substitution in vite.config.ts, so a test that
   // pulls in anything reading BRAND.version does not hit an undefined global.

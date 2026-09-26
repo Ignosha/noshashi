@@ -23,9 +23,11 @@ import {
   type Reasoning,
 } from "@/lib/agent/client";
 import { askNoshx, NOSHX_PREAMBLE, type NoshxStep } from "@/lib/noshx/loop";
-import { referenceBlock, searchKnowledge } from "@/lib/noshx/knowledge";
+import { prewarmKnowledge, referenceBlock, searchKnowledge } from "@/lib/noshx/knowledge";
+import { answerWithCore } from "@/lib/noshx/core/engine";
 import { useBilling } from "@/lib/billing/useEntitlements";
 import {
+  NOSHX_CORE_URL,
   PROVIDERS,
   RECOMMENDED_LOCAL,
   defaultConfig,
@@ -226,6 +228,10 @@ export function AgentScene({ data }: { data: XrplState }) {
     [config, setConfig, remember]
   );
 
+  // Index NOSHASHI's pages while the operator reads the screen, so the
+  // first question is answered without waiting for it.
+  useEffect(() => prewarmKnowledge(), []);
+
   // Probe once the saved choice has loaded. Probing before that checked
   // the built-in default (Ollama) and wrote it back over the operator's
   // saved runtime on every launch.
@@ -289,7 +295,9 @@ export function AgentScene({ data }: { data: XrplState }) {
         return lb - la || (pb.okAt ?? 0) - (pa.okAt ?? 0);
       });
     const [id, profile] = candidates[0] ?? [];
-    return id && profile ? { providerId: id, baseUrl: profile.baseUrl, model: profile.model, hasStoredKey: false } : null;
+    if (id && profile) return { providerId: id, baseUrl: profile.baseUrl, model: profile.model, hasStoredKey: false };
+    // NOSHX Core always works, so it is the last resort for any model.
+    return config.providerId !== "noshx" ? { providerId: "noshx", baseUrl: NOSHX_CORE_URL, model: "noshx-core", hasStoredKey: false } : null;
   };
 
   // Address checks NOSHX makes on the free plan count against the same
@@ -337,6 +345,10 @@ export function AgentScene({ data }: { data: XrplState }) {
 
   const testRuntime = async () => {
     if (!ready || testingRuntime) return;
+    if (provider.api === "noshx") {
+      push({ title: "NOSHX CORE READY", body: "Built into the app. No model to test.", tone: "go" });
+      return;
+    }
     setTestingRuntime(true);
     const probeMessages: ChatMessage[] = [{ role: "user", content: "Reply with READY only." }];
     let response = "";
@@ -470,6 +482,13 @@ export function AgentScene({ data }: { data: XrplState }) {
     // One attempt on a given runtime. NOSHX (compliance mode) reads the
     // ledger through tools; support mode streams a plain answer.
     const attempt = async (target: AgentConfig): Promise<string> => {
+      const onStep = (step: NoshxStep) => patch((turn) => ({ ...turn, steps: [...(turn.steps ?? []), step] }));
+      // NOSHX Core answers by itself: no model, in both modes.
+      if (findProvider(target.providerId).api === "noshx") {
+        const core = await answerWithCore(prompt, { has, spendFreeCheck }, onStep);
+        patch((turn) => ({ ...turn, steps: turn.steps ?? core.steps, content: core.text }));
+        return core.text;
+      }
       if (mode === "compliance") {
         const result = await askNoshx({
           config: target,
@@ -484,7 +503,15 @@ export function AgentScene({ data }: { data: XrplState }) {
           patch((turn) => ({ ...turn, content: result.text }));
           return result.text;
         }
-        // The model cannot call tools: answer from the grounding alone.
+        // The model cannot call tools, so NOSHX Core reads the ledger for
+        // it and the model phrases the answer from those readings.
+        const core = await answerWithCore(prompt, { has, spendFreeCheck }, onStep);
+        if (core.facts) {
+          history[0] = {
+            ...history[0],
+            content: `${history[0].content}\n\nLEDGER READINGS (read by NOSHX Core just now; answer from these):\n${core.facts}`,
+          };
+        }
       }
       let streamed = "";
       await chatStream({
@@ -583,7 +610,7 @@ export function AgentScene({ data }: { data: XrplState }) {
         index="07"
         kicker={`NOSHX · ${boundary.onDevice ? "ON-DEVICE" : "REMOTE"} · ${provider.name.toUpperCase()} · ADVISORY ONLY`}
         title="NOSHX"
-        sub={`NOSHASHI's agent. It reads the live ledger through the app's own tools and explains what it finds; it never issues a verdict or moves anything. Switch between a local model and a hosted one at any time. ${boundary.statement}`}
+        sub={`NOSHASHI's agent. NOSHX Core, its own engine, reads the live ledger and NOSHASHI's pages and answers with no outside model; a language model, local or hosted, can be added in the runtime panel. It never issues a verdict or moves anything. ${boundary.statement}`}
         status={ready ? (boundary.onDevice ? "go" : "hold") : probing ? "hold" : "no-go"}
         statusLabel={probing ? "PROBING" : ready ? (boundary.onDevice ? "LOCAL RUNTIME" : "REMOTE RUNTIME") : "RUNTIME DOWN"}
         right={
@@ -900,7 +927,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                 label="ENDPOINT"
                 value={config.baseUrl.replace(/^https?:\/\//, "")}
               />
-              {endpointDraft === null ? (
+              {provider.api === "noshx" ? null : endpointDraft === null ? (
                 <button
                   onClick={() => setEndpointDraft(config.baseUrl)}
                   className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
@@ -1151,7 +1178,7 @@ export function AgentScene({ data }: { data: XrplState }) {
 
             {provider.api === "ollama" && (
               <div className="inset-row mt-3 p-2.5">
-                <Eyebrow className="mb-1.5">RECOMMENDED LOCAL MODELS</Eyebrow>
+                <Eyebrow className="mb-1.5">NOSHX MODEL</Eyebrow>
                 <div className="space-y-1.5">
                   {RECOMMENDED_LOCAL.map((entry) => {
                     const installed = models.some((m) => m.name === entry.model || m.name === `${entry.model}:latest`);
@@ -1178,7 +1205,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                             >
                               {active ? "IN USE" : "USE THIS MODEL"}
                             </button>
-                          ) : (
+                          ) : entry.installable ? (
                             <button
                               disabled={Boolean(installing) || !reachable}
                               onClick={() => void install(entry.model)}
@@ -1187,6 +1214,14 @@ export function AgentScene({ data }: { data: XrplState }) {
                             >
                               INSTALL
                             </button>
+                          ) : (
+                            <p className="text-[8.5px] leading-snug text-muted-foreground">
+                              Not on this machine yet. Train it with the free NOSHX kit, then run{" "}
+                              <span className="mono-font text-foreground">ollama create noshx -f Modelfile</span>.{" "}
+                              <a href="https://www.noshashi.app/docs/ai/#training-noshx" target="_blank" rel="noreferrer noopener" className="underline underline-offset-2">
+                                How
+                              </a>
+                            </p>
                           )}
                         </div>
                       </div>

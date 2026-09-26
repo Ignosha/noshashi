@@ -34,3 +34,9 @@ interface ImportMeta {
  * releases later, which is a bad thing for the legal row in particular to say.
  */
 declare const __APP_VERSION__: string;
+
+/** NOSHASHI's published pages as passages, compiled at build time by vite.noshx.ts. */
+declare module "virtual:noshx-pages" {
+  const passages: import("@/lib/noshx/pages").Passage[];
+  export default passages;
+}

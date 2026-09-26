@@ -160,6 +160,8 @@ export async function missingKey(config: AgentConfig): Promise<string | null> {
 
 export async function listModels(config: AgentConfig, signal?: AbortSignal): Promise<AgentModel[]> {
   const provider = findProvider(config.providerId);
+  // NOSHX Core is part of the app: always there, nothing to ask.
+  if (provider.api === "noshx") return [{ name: "noshx-core", sizeBytes: 0, detail: "built in" }];
   const missing = await missingKey(config);
   if (missing) throw new AgentUnavailableError(missing);
 
