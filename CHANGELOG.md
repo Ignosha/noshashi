@@ -1,5 +1,69 @@
 # Changelog
 
+## 1.0.10
+
+### NOSHX, the compliance agent
+
+The Agent screen is now NOSHX. It answers by reading the live ledger with
+the app's own read-only tools, and lists every read under its answer:
+issuer authority, order-book depth (listed and funded), settlements,
+control surfaces, provenance, AMM pools, issuance, the address check,
+claims, NFT rights, and ledger status and sync. It cannot sign, submit or
+move anything. Each tool needs the same plan as the screen it mirrors, and
+address checks on the Free plan count against the same 10 a month.
+
+- **It knows NOSHASHI.** Questions about the product itself (screens,
+  features, plans and prices, the API and webhooks, security, privacy, and
+  which tools suit a customer) are answered from the product's own pages:
+  the Learn course and its word list, every docs page, pricing, trust,
+  enterprise and legal. The pages are searched inside the app, with no
+  extra model and nothing sent anywhere. With no model running, the
+  support desk answers from the same pages.
+- **Compliance questions** (KYC, AML, the Travel Rule, MiCA, credentials,
+  audit evidence, treasury control) are explained, then pointed at the
+  screen that addresses them and what it does not cover.
+
+### Switching between a local model and a hosted one works
+
+Switching the agent from a local model to a hosted one (or back) could
+revert or fail. Five causes, all fixed:
+
+- The saved choice was overwritten with the default (Ollama) on every
+  launch.
+- A hosted provider that failed its first check (no key yet, a slow reply)
+  silently switched back to a local model.
+- A slow, older check could overwrite a newer choice.
+- Every request to Claude carried a setting current Claude models reject,
+  so the first message failed.
+- Custom endpoints could never connect, and some hosted providers were
+  blocked by the app window's security rules.
+
+Each provider now remembers its own endpoint and model, the endpoint can be
+edited, and optional **failover** answers with the last runtime that worked
+when the chosen one fails, and says so.
+
+### API keys never enter the app window
+
+Model requests are now made by the app itself rather than its window. A
+provider key goes from the operating system keyring straight to that
+provider's own host; the window can store, check or clear a key but not
+read one back. A named provider's key is only ever sent to that provider,
+a custom endpoint must use HTTPS, and local models never receive a key.
+
+### Runs well on an 8 GB laptop
+
+The runtime panel recommends qwen3.5:4b for 8 GB of memory and qwen3.5:9b
+for 16 GB or more, and installs either through Ollama with one click and a
+progress bar. Local requests use a fixed context size so memory use stays
+predictable. **Deep reasoning**, off by default, lets the model think
+before answering; for Claude it raises the reasoning effort.
+
+### Pricing
+
+Single sign-on (SSO/SCIM) is not available yet and is no longer listed as
+part of the Institutional plan.
+
+
 ## 1.0.9
 
 ### Every screen scrolls instead of hiding its panels
