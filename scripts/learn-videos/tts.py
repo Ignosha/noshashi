@@ -5,6 +5,8 @@ raw 16-bit mono PCM at 24 kHz to "out", skipping files that already exist
 (the name is a hash of the text and voice, so an edit re-speaks only that
 line). Model files come from the kokoro-onnx GitHub release:
   kokoro-v1.0.int8.onnx and voices-v1.0.bin, in the directory in argv[2].
+With argv[3] = "i/n", this process speaks only every n-th line from i, so
+several can share the work.
 """
 import json
 import os
@@ -16,7 +18,8 @@ from kokoro_onnx import Kokoro
 VOICE = "af_heart"
 SPEED = 1.0
 
-jobs = [j for j in json.load(open(sys.argv[1])) if not os.path.exists(j["out"])]
+shard, shards = map(int, (sys.argv[3] if len(sys.argv) > 3 else "0/1").split("/"))
+jobs = [j for j in json.load(open(sys.argv[1]))[shard::shards] if not os.path.exists(j["out"])]
 if jobs:
     model_dir = sys.argv[2]
     k = Kokoro(os.path.join(model_dir, "kokoro-v1.0.int8.onnx"), os.path.join(model_dir, "voices-v1.0.bin"))

@@ -45,8 +45,13 @@ const beatFile = (text) => path.join(CACHE, crypto.createHash("sha256").update("
 const videos = VIDEOS.filter((v) => !ONLY.length || ONLY.includes(v.id));
 const jobs = videos.flatMap((v) => v.scenes.flatMap((s) => s.say.map((t) => ({ text: spoken(t), out: beatFile(spoken(t)) }))));
 fs.writeFileSync(path.join(CACHE, "jobs.json"), JSON.stringify(jobs));
-const tts = spawnSync("python3", [path.join(HERE, "tts.py"), path.join(CACHE, "jobs.json"), MODEL_DIR], { stdio: "inherit" });
-if (tts.status !== 0) process.exit(tts.status ?? 1);
+// Kokoro uses about one core per process, so the lines are split across
+// parallel workers.
+const SHARDS = Math.max(1, Number(process.env.TTS_WORKERS) || 3);
+const codes = await Promise.all(Array.from({ length: SHARDS }, (_, i) => new Promise((ok) =>
+  spawn("python3", [path.join(HERE, "tts.py"), path.join(CACHE, "jobs.json"), MODEL_DIR, `${i}/${SHARDS}`], { stdio: "inherit" })
+    .on("close", ok))));
+if (codes.some((c) => c !== 0)) process.exit(1);
 
 // 2. Timeline: where each beat starts, from the real length of its audio.
 function timeline(video) {
