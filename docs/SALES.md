@@ -205,7 +205,7 @@ so it can be reproduced later.
 
 ### What $4,000 a month buys
 
-Unlimited seats. SSO with SCIM. An immutable audit log of every
+Unlimited seats. An immutable audit log of every
 adjudication, export, key issuance and policy change, with actor and
 timestamp. Bulk portfolio monitoring with scheduled stress runs. Custom
 alert logic on your thresholds, not ours. The Compliance API — 100,000

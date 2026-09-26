@@ -1020,7 +1020,8 @@ async function buildPricingEnhancement() {
           <tr><th scope="row">Embedded / white-label</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">White-label wallet</td><td class="optional">Optional</td><td class="contracted">Architecture scope</td></tr>
           <tr><th scope="row">Architecture review</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="yes">Included</td><td class="contracted">Included</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Governance</th></tr>
-          <tr><th scope="row">SSO / SCIM / regulator access</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Contracted scope</td></tr>
+          <tr><th scope="row">Regulator access</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Contracted scope</td></tr>
+          <tr><th scope="row">SSO / SCIM</th><td class="no">Not yet available</td><td class="no">Not yet available</td><td class="no">Not yet available</td><td class="no">Not yet available</td><td class="no">Not yet available</td></tr>
           <tr><th scope="row">SLA</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="contracted">99.9% contracted</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td></tr>
         </tbody>
       </table>

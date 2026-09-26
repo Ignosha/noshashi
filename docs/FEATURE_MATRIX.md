@@ -123,11 +123,9 @@ seats**, plus:
 
 | Capability | Grant | Detail |
 |---|---|---|
-| **SSO** | `sso` | SAML 2.0 or OIDC against your IdP. Okta, Entra ID, Google Workspace, Ping |
-| SCIM provisioning | `sso` | Automatic provisioning and de-provisioning, so a leaver loses access when HR says so rather than when someone remembers |
+| SSO and SCIM | `sso` | **Not yet available.** Sign-in is email and password with two-factor authentication. SAML 2.0 / OIDC with SCIM provisioning is on the roadmap; do not sell it |
 | Unlimited seats | — | No per-seat accounting. Add a compliance analyst without a purchase order |
 | Regulator read-only seats | `regulator_seats` | Scoped, time-boxed, read-only access for an examiner. Expires on its own |
-| Enforced session policy | `sso` | Maximum session lifetime and re-auth interval set by you, not by us |
 
 ### 3.2 Audit and evidence
 
@@ -200,7 +198,7 @@ the tier name.
 | `signed_export` | — | — | ✅ |
 | `offline_mode` | — | — | ✅ |
 | `sla` | — | — | ✅ |
-| `sso` | — | — | ✅ |
+| `sso` (flag only; SSO not built) | — | — | ✅ |
 | `audit_log` | — | — | ✅ |
 | `bulk_monitoring` | — | — | ✅ |
 | `custom_alert_logic` | — | — | ✅ |
