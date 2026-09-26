@@ -1,25 +1,30 @@
-# NOSHX — NOSHASHI's own model, for Ollama.
+# NOSHX — NOSHASHI's own model, for Ollama (Phi-4-mini base, the larger option).
 #
 # Weights: fine-tuned by scripts/noshx-model/train_noshx.ipynb from
-# IBM's Granite 4.0 1B (Apache 2.0 licence) on NOSHASHI's own pages.
-# About 1 GB, and quick on a laptop CPU. Put this file beside
-# noshx-q4_k_m.gguf, then:
+# Microsoft's Phi-4-mini-instruct (MIT licence) on NOSHASHI's own pages.
+# The notebook saves this as Modelfile when BASE = "phi4-mini". Put it
+# beside noshx-q4_k_m.gguf, then:
 #
 #   ollama create noshx -f Modelfile
 #
 # In NOSHASHI: NOSHX → runtime panel → Ollama → noshx.
-# Trained from Phi-4-mini instead? Use Modelfile.phi4-mini.
 
 FROM ./noshx-q4_k_m.gguf
 
-# Granite 4.0's chat format. The system prompt (SYSTEM below, or the one
+# Phi-4-mini's chat format. The system prompt (SYSTEM below, or the one
 # NOSHASHI sends) arrives as a system message inside .Messages.
-TEMPLATE """{{- range .Messages }}<|start_of_role|>{{ .Role }}<|end_of_role|>{{ .Content }}<|end_of_text|>
-{{ end }}<|start_of_role|>assistant<|end_of_role|>"""
+TEMPLATE """{{- range .Messages }}
+{{- if eq .Role "system" }}<|system|>{{ .Content }}<|end|>
+{{- else if eq .Role "user" }}<|user|>{{ .Content }}<|end|>
+{{- else if eq .Role "assistant" }}<|assistant|>{{ .Content }}<|end|>
+{{- end }}
+{{- end }}<|assistant|>"""
 
-PARAMETER stop "<|end_of_text|>"
-PARAMETER stop "<|start_of_role|>"
-# Fits an 8 GB laptop with plenty of room for the app.
+PARAMETER stop "<|end|>"
+PARAMETER stop "<|user|>"
+PARAMETER stop "<|system|>"
+PARAMETER stop "<|endoftext|>"
+# Fits an 8 GB laptop with room for the app.
 PARAMETER num_ctx 8192
 PARAMETER temperature 0.3
 

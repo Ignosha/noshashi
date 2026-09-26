@@ -23,7 +23,7 @@ import {
   type Reasoning,
 } from "@/lib/agent/client";
 import { askNoshx, NOSHX_PREAMBLE, type NoshxStep } from "@/lib/noshx/loop";
-import { referenceBlock, searchKnowledge } from "@/lib/noshx/knowledge";
+import { prewarmKnowledge, referenceBlock, searchKnowledge } from "@/lib/noshx/knowledge";
 import { answerWithCore } from "@/lib/noshx/core/engine";
 import { useBilling } from "@/lib/billing/useEntitlements";
 import {
@@ -227,6 +227,10 @@ export function AgentScene({ data }: { data: XrplState }) {
     },
     [config, setConfig, remember]
   );
+
+  // Index NOSHASHI's pages while the operator reads the screen, so the
+  // first question is answered without waiting for it.
+  useEffect(() => prewarmKnowledge(), []);
 
   // Probe once the saved choice has loaded. Probing before that checked
   // the built-in default (Ollama) and wrote it back over the operator's

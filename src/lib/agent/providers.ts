@@ -232,6 +232,7 @@ export const MODEL_PREFERENCE = [
   "noshx",
   "claude-opus",
   "claude-sonnet",
+  "granite4",
   "phi4-mini",
   "hermes3",
   "hermes",
@@ -253,7 +254,7 @@ export const RECOMMENDED_LOCAL: ReadonlyArray<{ model: string; fits: string; blu
   {
     model: "noshx",
     fits: "8 GB laptops",
-    blurb: "NOSHX's own trained model (about 2.5 GB). Phrases NOSHX Core's readings in natural language and reasons over them.",
+    blurb: "NOSHX's own trained model (about 1 GB, quick on a laptop CPU). Phrases NOSHX Core's readings in natural language and reasons over them.",
     installable: false,
   },
 ];

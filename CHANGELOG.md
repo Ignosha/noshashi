@@ -60,7 +60,10 @@ it read, in the same words the screens use. Product and compliance
 questions are answered with the most relevant sentences from NOSHASHI's
 pages, with their sources, and "which screen" questions name the screens
 that fit and the plan each needs. It answers in milliseconds, works
-offline, needs nothing installed and runs on any laptop.
+offline, needs nothing installed and runs on any laptop. Its knowledge
+of NOSHASHI's pages is compiled when the app is built, so only their text
+ships (about 75 KB compressed), and it is indexed in the background when
+the NOSHX screen opens: the first answer no longer waits for it.
 
 A language model is optional. If one is added and cannot call tools
 itself, NOSHX Core reads the ledger for it. With failover on, any model
@@ -70,9 +73,10 @@ that fails falls back to Core.
 
 A kit to train NOSHX's own language model is in `scripts/noshx-model`:
 training data made entirely from NOSHASHI's own content, a free Google
-Colab notebook, and the Ollama Modelfile. It fine-tunes Microsoft's
-Phi-4-mini (MIT licence, 3.8B) into NOSHX, about 2.5 GB, which runs on an
-8 GB laptop. Local requests use a fixed context size so memory use stays
+Colab notebook, and the Ollama Modelfile. It fine-tunes IBM's Granite 4.0
+1B (Apache 2.0 licence) into NOSHX, about 1 GB, which answers quickly on a
+laptop's CPU. Microsoft's Phi-4-mini (MIT licence, about 2.5 GB) is an
+option for better writing at lower speed. Local requests use a fixed context size so memory use stays
 predictable, and **deep reasoning**, off by default, lets a model think
 before answering (for Claude it raises the reasoning effort).
 
