@@ -129,6 +129,13 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   .q.right .why{display:block;color:var(--ink);background:color-mix(in srgb,var(--go) 12%,transparent)}
   .q.wrong .why{display:block;color:var(--ink);background:color-mix(in srgb,var(--nogo) 12%,transparent)}
   .score{font-size:15px;color:var(--ink);margin-top:14px;min-height:1.5em}
+  .quiznote{font-size:13.5px;color:var(--muted);margin:0 0 4px}
+  details.words{margin:6px 0 2px;font-size:13px}
+  details.words summary{cursor:pointer;color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;width:max-content;max-width:100%}
+  details.words dl{display:grid;grid-template-columns:minmax(90px,170px) 1fr;gap:4px 12px;margin:6px 8px 4px;padding:8px 12px;border-left:2px solid var(--tele);background:color-mix(in srgb,var(--tele) 6%,transparent);border-radius:0 6px 6px 0}
+  details.words dt{color:var(--ink);font-weight:600;font-size:13px}
+  details.words dd{color:var(--muted);font-size:13px}
+  @media (max-width:600px){details.words dl{grid-template-columns:1fr}details.words dd{margin-bottom:6px}}
 
   dl.vocab{display:grid;grid-template-columns:minmax(150px,230px) 1fr;border-top:1px solid var(--rule);max-width:80ch}
   dl.vocab dt,dl.vocab dd{padding:9px 12px 9px 0;border-bottom:1px solid var(--rule);font-size:14px}
@@ -205,7 +212,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     <a href="#xrpl"><i>PART 1 · 12 LESSONS · ~60 MIN</i><b>The XRP Ledger</b><span>Consensus, accounts, keys, tokens, issuer powers, the DEX, AMMs, payments, NFTs, amendments, compliance.</span></a>
     <a href="#app"><i>PART 2 · 7 LESSONS · ~50 MIN</i><b>The NOSHASHI app</b><span>How it works, setup, verdicts and receipts, and every screen explained step by step.</span></a>
     <a href="#workflows"><i>PART 3 · 8 WORKFLOWS</i><b>Putting it to work</b><span>Real tasks from start to finish, from vetting a token to handing an auditor a signed export.</span></a>
-    <a href="#check"><i>PART 4 AND 5</i><b>Knowledge check and word list</b><span>30 questions with explanations, and 100 terms in one searchable list.</span></a>
+    <a href="#check"><i>PART 4 AND 5</i><b>Knowledge check and word list</b><span>55 questions in five rounds, including vocabulary and how it helps institutions, and 110 terms in one searchable list.</span></a>
   </div>
 
   <div class="wrap">
@@ -809,8 +816,9 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <p class="part" id="check">PART 4 · KNOWLEDGE CHECK</p>
       <section>
         <h2>Knowledge check</h2>
-        <p class="mins">30 QUESTIONS IN 3 ROUNDS · YOUR ANSWERS STAY IN YOUR BROWSER</p>
-        <p class="noprint">Answer as many as you like, then press <strong>Check my answers</strong>. Every answer is explained, right or wrong.</p>
+        <p class="mins">55 QUESTIONS IN 5 ROUNDS · YOUR ANSWERS STAY IN YOUR BROWSER</p>
+        <p class="noprint">Answer as many as you like, then press <strong>Check my answers</strong>. Every answer is explained, right or wrong. Stuck on a word? Open <strong>Words used here</strong> under a question for plain definitions from the word list.</p>
+        <p>Rounds 1 to 3 cover the ledger, markets and payments, and the app. Round 4 tests the vocabulary. Round 5 asks how NOSHASHI helps institutions and enterprises: treasuries, compliance teams, desks, payments firms, issuers and auditors.</p>
         <form class="quiz" id="quiz"></form>
         <div class="cta noprint">
           <button class="btn" type="button" id="grade">Check my answers</button>
@@ -895,42 +903,35 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["Which screen tells you who can really move a treasury?", ["Order Book","Control Surface","Inbox","Ledger Sync"], 1, "Control Surface derives minimum signers from weights and flags a master-key bypass."],
     ["You need to check a payment really arrived. Which screen and button?", ["Settlement · READ SETTLEMENT","Passport · GENERATE PASSPORT","Authority · CERTIFY AUTHORITY","Growth"], 0, "Settlement compares requested with delivered."],
     ["Why does every reading carry a ledger index and a SHA-256 digest?", ["Decoration","So anyone can re-check the same moment and prove the record was not changed","To make files bigger","It is required by the Travel Rule"], 1, "The index fixes the moment; the digest proves the contents are unchanged."],
-    ["What does four-eyes approval mean for a policy change?", ["It needs four approvers","A second person must approve before it goes live","It is reviewed by four validators","It lasts four days"], 1, "One person drafts and submits; a different person approves."]
+    ["What does four-eyes approval mean for a policy change?", ["It needs four approvers","A second person must approve before it goes live","It is reviewed by four validators","It lasts four days"], 1, "One person drafts and submits; a different person approves."],
+    ["ROUND 4 · VOCABULARY", "vocab"],
+    ["What is a drop?", ["A token removed by clawback","The smallest unit of XRP: 1 XRP = 1,000,000 drops","A ledger that failed consensus","The fee an issuer charges"], 1, "Balances and fees are recorded in drops. A reserve of 1 XRP is 1,000,000 drops.", 1],
+    ["What is the UNL (Unique Node List)?", ["The validators a server trusts not to collude","A list of banned addresses","Every unfunded offer on the DEX","The tokens NOSHASHI has approved"], 0, "A ledger is validated when 80% of the validators on a server's UNL agree.", 1],
+    ["What are an issuer's obligations?", ["Its legal duties under MiCA","The XRP it keeps in reserve","The total of its tokens held by others: its real circulating supply","Offers it is forced to fill"], 2, "gateway_balances reports them per currency. It is the figure concentration is measured against.", 1],
+    ["What is a regular key?", ["The first key an account ever had","A validator's signing key","The key that opens a permissioned domain","A second key an account nominates to sign for it"], 3, "If a regular key is set, it can sign even when the master key is disabled. That is why blackholing needs both handled.", 1],
+    ["What does Require Auth mean?", ["You need the issuer's approval to hold its token","Every payment needs two signatures","The token can only be sold for XRP","The issuer must approve every trade"], 0, "It is an issuer setting. It is one of the six authority checks, a warning when it is on.", 1],
+    ["What is a transaction's metadata?", ["The memo the sender typed","Its price in US dollars","The record of what it actually did, attached once it is validated","The list of validators that voted"], 2, "Metadata is where delivered_amount lives, which is why NOSHASHI reads it rather than the Amount field.", 1],
+    ["In NOSHASHI, what is provenance?", ["Where an account came from: its age and first funder","The country an issuer is based in","The price history of a token","Who wrote the rules version"], 0, "The Provenance screen traces it with TRACE PROVENANCE, useful before paying a new counterparty.", 1],
+    ["What is a destination tag?", ["A label for NFTs","A number telling a shared account which customer a payment is for","A tag that freezes a payment","The name of a trust line"], 1, "Exchanges hold many customers in one address. Without the right tag, a payment arrives but nobody knows whose it is.", 1],
+    ["What is a credential (XLS-70)?", ["A password for the app","A paid NOSHASHI plan","A validator's licence","An on-ledger proof that an account passed a check"], 3, "An issuer of credentials (for example a KYC provider) records the proof on the ledger. Permissioned domains (XLS-80) can require it.", 1],
+    ["What does selective disclosure mean?", ["Publishing every customer's data","Proving a credential exists without revealing the personal data behind it","Only disclosing profits","Hiding transactions from validators"], 1, "It lets a counterparty confirm a check was passed without receiving the documents.", 1],
+    ["What is the spread?", ["The gap between the best bid and the best ask","How many holders a token has","The AMM trading fee","The time between ledgers"], 0, "A wide spread means trading costs more. It says nothing about how much can be filled; funded depth does.", 1],
+    ["In NOSHASHI, what is an exception?", ["A crash report","A check that was skipped","An approved, recorded override of a NO-GO for a stated reason","A payment that bounced"], 2, "It never erases the NO-GO. The override, its reason and its reviewer are kept alongside it.", 1],
+    ["ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES"],
+    ["A listed company holds XRP in its treasury. Its auditor asks whether the year-end value is defensible. How does NOSHASHI help?", ["It sets the price itself","It measures how much could really be sold in the market at a stated ledger index, so the auditor can re-check the figure","It guarantees the auditor signs off","It moves the XRP into cold storage"], 1, "Auditors need evidence of the principal market. Funded depth stamped with a ledger index is evidence anyone can reproduce."],
+    ["A compliance officer is asked to approve holding a new stablecoin. Which reading answers 'could the issuer freeze or claw back what we hold?'", ["Growth","Ledger Sync","Authority: CERTIFY AUTHORITY reads the issuer's flags and returns GO, HOLD or NO-GO","The HUD"], 2, "Freeze, clawback, Require Auth, key control, transfer fee and concentration are properties of the asset. Screening the people involved cannot see them."],
+    ["An examiner asks a bank to show why a transfer was allowed eight months ago. What does NOSHASHI give it?", ["A screenshot","The receipt: ledger index, rules version, checks and digest, so the decision can be reproduced exactly","A phone number for support","Nothing; the ledger has changed since"], 1, "The ledger index fixes the moment. The digest proves the record was not edited afterwards."],
+    ["Why does four-eyes approval matter to an enterprise?", ["It makes changes faster","No single employee can quietly change the rules that decide what the firm may do","It is needed to install the app","It lowers the price"], 1, "Segregation of duties is a basic control auditors and regulators expect. Drafts can be simulated before anyone approves them."],
+    ["A trading desk is about to take a large position in an XRPL token. What risk does NOSHASHI check that a price chart hides?", ["Whether the logo is official","Whether the listed depth includes unfunded offers, so the way out is far thinner than it looks","The token's age in days","The colour of the chart"], 1, "In the 8 September sample, listed depth was a median 4.4 times funded depth within the band."],
+    ["A payments company receives XRPL payments on behalf of customers. Which two details stop it crediting the wrong amount or the wrong customer?", ["delivered_amount and the destination tag","Sequence and the fee","The currency code and the spread","The UNL and the ledger index"], 0, "Credit delivered_amount, never the Amount field of a partial payment, and match the destination tag to the customer."],
+    ["An enterprise already runs its own case management and alerting. How does NOSHASHI fit in?", ["It replaces them","It does not; it is desktop only","Signed webhooks push events to your systems, and the Compliance API gives read access to verdicts and readings","It emails a spreadsheet each week"], 2, "Webhooks are signed so your systems can prove they came from NOSHASHI."],
+    ["Why is a hash-chained investigation log valuable to a regulated firm?", ["It saves disk space","Entries cannot be quietly edited or removed, so the record of what the team knew, and when, holds up under review","It hides the log from auditors","It is faster to search"], 1, "Each entry carries the fingerprint of the one before. Changing any entry breaks every link after it."],
+    ["A NO-GO blocks a trade the business has a legitimate reason to make. What is the controlled way forward?", ["Turn NOSHASHI off","Edit the receipt","Request an exception; a reviewer approves, rejects or asks for more evidence, and the decision stays with the verdict","Ask the issuer to change its flags"], 2, "Overrides happen in the open, with a reason and a second person, which is what an examiner looks for."],
+    ["A token issuer wants to show institutional buyers exactly what they would be exposed to. What can it share?", ["Its marketing deck","A link to the free authority certificate for its issuer address, which anyone can re-check","Its private keys","Its bank statements"], 1, "The certificate page at /certificate/ runs the same six checks with the ledger index and digest, free and without an account."],
+    ["Which plan is built for regulated teams that need organisation features and unlimited seats?", ["Free","Pro","Institutional","None; each seat is separate"], 2, "Institutional is $4,000 a month. Enterprise and Strategic, from $120,000 a year, are for larger organisations and infrastructure partners."],
+    ["What does answering both questions from one ledger reading save a compliance team?", ["Nothing","Reconciling a screening tool and a market terminal that looked at the ledger at different moments","Hiring an auditor","Paying transaction costs"], 1, "When compliance and liquidity come from the same WebSocket in the same second, the file tells one consistent story."],
+    ["NOSHASHI is in beta. What should an institution take from that today?", ["The readings are invented","It provides information, not financial or legal advice; re-measure a reading before relying on it for a decision","It cannot be installed","Beta means free forever"], 1, "Every build is labelled beta. Every reading is real and stamped with its ledger, so re-checking it is straightforward."]
   ];
-  var form = document.getElementById("quiz"), qs = [];
-  Q.forEach(function(q){
-    if (q.length === 1) { var h = document.createElement("p"); h.className = "quizgroup"; h.textContent = q[0]; form.appendChild(h); return; }
-    var i = qs.length; qs.push(q);
-    var fs = document.createElement("fieldset"); fs.className = "q"; fs.id = "q" + i;
-    var lg = document.createElement("legend"); lg.textContent = (i + 1) + ". " + q[0]; fs.appendChild(lg);
-    q[1].forEach(function(opt, j){
-      var lb = document.createElement("label");
-      var inp = document.createElement("input"); inp.type = "radio"; inp.name = "q" + i; inp.value = j; inp.id = "q" + i + "o" + j;
-      lb.appendChild(inp); lb.appendChild(document.createTextNode(" " + opt)); fs.appendChild(lb);
-    });
-    var why = document.createElement("p"); why.className = "why";
-    why.textContent = "Answer: " + q[1][q[2]] + ". " + q[3]; fs.appendChild(why);
-    form.appendChild(fs);
-  });
-  document.getElementById("grade").addEventListener("click", function(){
-    var right = 0, answered = 0;
-    qs.forEach(function(q, i){
-      var fs = document.getElementById("q" + i), pick = form.querySelector('input[name="q' + i + '"]:checked');
-      fs.classList.remove("right", "wrong");
-      if (!pick) return;
-      answered++;
-      if (Number(pick.value) === q[2]) { right++; fs.classList.add("right"); } else fs.classList.add("wrong");
-    });
-    var s = document.getElementById("score");
-    s.textContent = answered < qs.length
-      ? "You scored " + right + " of " + answered + " answered. " + (qs.length - answered) + " still to answer."
-      : "You scored " + right + " of " + qs.length + "." + (right === qs.length ? " Every answer right." : right >= 24 ? " Strong result. Read the explanations for the ones you missed." : " Revisit the lessons behind the ones you missed, then try again.");
-  });
-  document.getElementById("reset").addEventListener("click", function(){
-    form.reset(); form.querySelectorAll(".q").forEach(function(f){ f.classList.remove("right", "wrong"); });
-    document.getElementById("score").textContent = "";
-  });
-
   var V = [
     ["Account","A place on the ledger that holds XRP and tokens, identified by an address starting with r."],
     ["AccountSet","The transaction that changes an account's settings and flags."],
@@ -1044,6 +1045,77 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["XRPL","The XRP Ledger."]
   ];
   V.sort(function(a, b){ return a[0].toLowerCase().localeCompare(b[0].toLowerCase()); });
+  // Words from the word list that appear in a question, its answer or its
+  // explanation, so a newcomer can read the question without scrolling away.
+  // "Check (payment)" would match the everyday word "check" in every question.
+  var TERMS = V.filter(function(v){ return v[0] !== "Check (payment)"; }).map(function(v){
+    var names = v[0].replace(/\s*\(.*\)$/, "").split(" / ");
+    return { term: v[0], def: v[1], res: names.map(function(n){
+      return new RegExp("(^|[^A-Za-z0-9_-])" + n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(s|es)?(?![A-Za-z0-9_-])", n === n.toUpperCase() || /_/.test(n) ? "" : "i");
+    }) };
+  }).sort(function(a, b){ return b.term.length - a.term.length; });
+  function wordsIn(text){
+    var out = [], taken = text;
+    TERMS.forEach(function(t){
+      if (out.length >= 5) return;
+      if (t.res.some(function(re){ return re.test(taken); })) {
+        out.push(t);
+        t.res.forEach(function(re){ taken = taken.replace(new RegExp(re.source, re.flags + "g"), "$1 "); });
+      }
+    });
+    return out;
+  }
+  var form = document.getElementById("quiz"), qs = [];
+  Q.forEach(function(q){
+    if (q.length <= 2) {
+      var h = document.createElement("p"); h.className = "quizgroup"; h.textContent = q[0]; form.appendChild(h);
+      if (q[1] === "vocab") { var n = document.createElement("p"); n.className = "quiznote"; n.textContent = "Each question is a word from the word list. Pick the meaning that fits."; form.appendChild(n); }
+      return;
+    }
+    var i = qs.length; qs.push(q);
+    var fs = document.createElement("fieldset"); fs.className = "q"; fs.id = "q" + i;
+    var lg = document.createElement("legend"); lg.textContent = (i + 1) + ". " + q[0]; fs.appendChild(lg);
+    q[1].forEach(function(opt, j){
+      var lb = document.createElement("label");
+      var inp = document.createElement("input"); inp.type = "radio"; inp.name = "q" + i; inp.value = j; inp.id = "q" + i + "o" + j;
+      lb.appendChild(inp); lb.appendChild(document.createTextNode(" " + opt)); fs.appendChild(lb);
+    });
+    // Vocabulary questions (flag 1) skip the word help, which would give the answer away.
+    var words = q[4] ? [] : wordsIn(q[0] + " " + q[1][q[2]] + " " + q[3]);
+    if (words.length) {
+      var d = document.createElement("details"); d.className = "words";
+      var sm = document.createElement("summary"); sm.textContent = "Words used here (" + words.length + ")"; d.appendChild(sm);
+      var wl = document.createElement("dl");
+      words.forEach(function(w){
+        var dt = document.createElement("dt"); dt.textContent = w.term;
+        var dd = document.createElement("dd"); dd.textContent = w.def;
+        wl.appendChild(dt); wl.appendChild(dd);
+      });
+      d.appendChild(wl); fs.appendChild(d);
+    }
+    var why = document.createElement("p"); why.className = "why";
+    why.textContent = "Answer: " + q[1][q[2]] + ". " + q[3]; fs.appendChild(why);
+    form.appendChild(fs);
+  });
+  document.getElementById("grade").addEventListener("click", function(){
+    var right = 0, answered = 0;
+    qs.forEach(function(q, i){
+      var fs = document.getElementById("q" + i), pick = form.querySelector('input[name="q' + i + '"]:checked');
+      fs.classList.remove("right", "wrong");
+      if (!pick) return;
+      answered++;
+      if (Number(pick.value) === q[2]) { right++; fs.classList.add("right"); } else fs.classList.add("wrong");
+    });
+    var s = document.getElementById("score");
+    s.textContent = answered < qs.length
+      ? "You scored " + right + " of " + answered + " answered. " + (qs.length - answered) + " still to answer."
+      : "You scored " + right + " of " + qs.length + "." + (right === qs.length ? " Every answer right." : right >= Math.ceil(qs.length * 0.8) ? " Strong result. Read the explanations for the ones you missed." : " Revisit the lessons behind the ones you missed, then try again.");
+  });
+  document.getElementById("reset").addEventListener("click", function(){
+    form.reset(); form.querySelectorAll(".q").forEach(function(f){ f.classList.remove("right", "wrong"); });
+    document.getElementById("score").textContent = "";
+  });
+
   var dl = document.getElementById("vlist");
   function draw(f){
     dl.textContent = "";
