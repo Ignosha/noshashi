@@ -169,6 +169,17 @@ describe("NOSHX tools", () => {
     expect(result.content).toMatch(/10 free address checks/);
   });
 
+  it("report an unreachable ledger as a failed read and give the free check back", async () => {
+    let refunded = 0;
+    const free = { has: () => false, spendFreeCheck: () => true, refundFreeCheck: () => void refunded++ };
+    // The mocked ledger answers nothing for account_info: the read fails.
+    const result = await runTool("check_address", { address: PAYMENT.Account }, free);
+    expect(result.ok).toBe(false);
+    expect(result.content).toMatch(/could not be reached/);
+    expect(result.content).not.toMatch(/does not exist/);
+    expect(refunded).toBe(1);
+  });
+
   it("say when a result was shortened", () => {
     const long = compactResult({ offers: Array.from({ length: 40 }, (_, i) => i) });
     expect(long).toContain("[25 more items not shown]");
