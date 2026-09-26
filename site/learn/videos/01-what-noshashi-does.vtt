@@ -1,0 +1,105 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:11.644
+This is NOSHASHI: a desktop app for Mac, Windows and Linux that reads the live XRP Ledger, and tells an institution what it needs to know before it moves a token.
+
+2
+00:00:13.344 --> 00:00:17.867
+Anyone holding a token on the XRP Ledger faces two questions.
+
+3
+00:00:18.317 --> 00:00:20.293
+First: am I allowed to move this?
+
+4
+00:00:20.293 --> 00:00:28.919
+That depends on what the issuer can still do, on credentials, on Travel Rule scope, on where the counterparty came from, and on your own policy.
+
+5
+00:00:29.369 --> 00:00:31.595
+Second: could I actually get out of it?
+
+6
+00:00:31.595 --> 00:00:38.159
+That depends on how much of the order book is really funded, on the pools, and on how concentrated the holders are.
+
+7
+00:00:38.609 --> 00:00:44.620
+Compliance tools rarely read the order book, and market terminals rarely read the issuer's flags.
+
+8
+00:00:44.620 --> 00:00:49.019
+NOSHASHI answers both from the same ledger reading, in the same second.
+
+9
+00:00:50.719 --> 00:00:53.774
+Every adjudication ends in one of three verdicts.
+
+10
+00:00:53.774 --> 00:00:55.519
+GO means every check passed.
+
+11
+00:00:55.969 --> 00:01:01.089
+HOLD means a warning-level check did not pass, or something needs a person to review it.
+
+12
+00:01:01.539 --> 00:01:03.818
+NO-GO means a blocking check failed.
+
+13
+00:01:03.818 --> 00:01:07.299
+Do not move until it is resolved, or formally excepted.
+
+14
+00:01:07.749 --> 00:01:10.129
+Each check reports one of five states.
+
+15
+00:01:10.129 --> 00:01:16.517
+Insufficient data is an abstention, never a pass: NOSHASHI would rather say it cannot tell than guess.
+
+16
+00:01:18.217 --> 00:01:28.009
+Every verdict produces a receipt: the ledger index it was read at, the rules version, every check's outcome, and a SHA-256 digest over all of it.
+
+17
+00:01:28.459 --> 00:01:38.443
+Anyone who recomputes the digest later gets the same fingerprint, so a compliance file can prove what was known, and when, without anyone having to trust NOSHASHI.
+
+18
+00:01:40.143 --> 00:01:48.399
+It is built for compliance officers screening assets and settlements, and for trading desks that need to know which positions they could really exit.
+
+19
+00:01:48.849 --> 00:01:52.847
+Treasury teams use it to show auditors who controls the treasury.
+
+20
+00:01:52.847 --> 00:01:56.721
+Token issuers use it to see their token the way holders see it.
+
+21
+00:01:57.171 --> 00:02:01.587
+Auditors get evidence stamped with a ledger index that they can reproduce.
+
+22
+00:02:01.587 --> 00:02:05.107
+And anyone can check an address before paying it, for free.
+
+23
+00:02:06.807 --> 00:02:12.823
+You can start on the free plan: ten address checks a month, Ledger Sync, and the free tools on the website.
+
+24
+00:02:13.273 --> 00:02:17.223
+NOSHASHI is in beta, at version one point zero point nine.
+
+25
+00:02:17.223 --> 00:02:25.327
+It gives information, not financial or legal advice, and every reading carries its ledger index so you can re-check it.
+
+26
+00:02:25.777 --> 00:02:30.769
+The full course, the knowledge check and the word list are at noshashi dot app slash learn.

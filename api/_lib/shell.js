@@ -40,7 +40,7 @@ export const NAV = [
   { href: "/progress/", label: "Progress", key: "progress", i18n: "nav.progress" },
   { href: "/status/", label: "Status", key: "status", i18n: "nav.status", optional: true },
   { href: "/research/", label: "Findings", i18n: "nav.findings", optional: true },
-  { href: "/guide/", label: "XRP guide", i18n: "nav.guide", optional: true },
+  { href: "/learn/", label: "Learn", i18n: "nav.learn", optional: true },
   // `wide`: these two made the header 188px too wide from 1200 to 1480.
   // They drop out first; the pricing section and footer still link both.
   { href: "/enterprise/", label: "Enterprise", i18n: "nav.enterprise", optional: true, wide: true },
@@ -60,6 +60,7 @@ export const FOOTER_LINKS = [
   { href: "/progress/", label: "Progress" },
   { href: "/status/", label: "Status" },
   { href: "/research/", label: "Findings" },
+  { href: "/learn/", label: "Learn NOSHASHI (course)" },
   { href: "/guide/", label: "Plain-language guide" },
   { href: "/pricing/", label: "Pricing" },
   { href: "/enterprise/", label: "Enterprise" },

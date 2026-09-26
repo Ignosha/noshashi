@@ -1268,6 +1268,7 @@ async function buildSitemap(docs = []) {
     ...docs.map((s) => [`/docs/${s.slug}/`, "monthly", "0.6"]),
     ["/progress/", "weekly", "0.8"],
     ["/status/", "daily", "0.8"],
+    ["/learn/", "monthly", "0.9"],
     ["/guide/", "monthly", "0.8"],
     ["/research/", "monthly", "0.8"],
     ["/contact/", "monthly", "0.7"],

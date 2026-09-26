@@ -1,0 +1,161 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:07.036
+A quick tour of the desktop app, in sidebar order, with every button named exactly as it appears on screen.
+
+2
+00:00:08.736 --> 00:00:10.540
+Overview summarises the app.
+
+3
+00:00:10.540 --> 00:00:18.528
+Mission Control shows live mainnet telemetry: the latest validated ledger, network health, fee pressure and the gate status.
+
+4
+00:00:18.978 --> 00:00:21.376
+Open it before relying on any reading.
+
+5
+00:00:21.376 --> 00:00:26.552
+If the ledger number is climbing every few seconds, you are connected and current.
+
+6
+00:00:26.552 --> 00:00:29.645
+If it stops, readings are stale until it resumes.
+
+7
+00:00:31.345 --> 00:00:32.932
+Verification is the gate.
+
+8
+00:00:32.932 --> 00:00:39.661
+Enter the account, and optionally a destination and amount, run it, and read the verdict, then each check.
+
+9
+00:00:39.661 --> 00:00:41.883
+Copy the receipt into your records.
+
+10
+00:00:42.333 --> 00:00:45.262
+Provenance traces where a counterparty came from.
+
+11
+00:00:45.262 --> 00:00:51.357
+Paste the address and press Trace provenance to see its real age and the account that first funded it.
+
+12
+00:00:51.807 --> 00:00:56.738
+Credentials lists the on-ledger credentials an account holds and who issued them.
+
+13
+00:00:56.738 --> 00:01:01.791
+Domain Grid shows permissioned domains, their rules, and which amendments are live.
+
+14
+00:01:03.491 --> 00:01:06.900
+Exposure Analysis puts a position's risks in one view.
+
+15
+00:01:06.900 --> 00:01:11.129
+Set your jurisdiction first, so the Travel Rule threshold is right.
+
+16
+00:01:11.579 --> 00:01:14.314
+Portfolio and Radar watches several wallets.
+
+17
+00:01:14.314 --> 00:01:19.536
+Enter an address and a label, press Add to book, and the radar keeps re-checking it.
+
+18
+00:01:19.986 --> 00:01:22.866
+Order Book takes a currency code and an issuer.
+
+19
+00:01:22.866 --> 00:01:29.117
+Press Read this book to see listed and funded depth, the unfunded share, the spread and the mid price.
+
+20
+00:01:29.567 --> 00:01:36.777
+Pool Governance shows who votes an A M M pool's fee, on what share of its L P tokens, and who holds the auction slot.
+
+21
+00:01:38.477 --> 00:01:41.326
+Control Surface answers who can move a treasury.
+
+22
+00:01:41.326 --> 00:01:48.269
+Press Read control surface to see the master key, the signer list, the minimum signers and what is locked in reserve.
+
+23
+00:01:48.719 --> 00:01:51.482
+Issuance shows a token from the issuer's side.
+
+24
+00:01:51.482 --> 00:01:57.189
+If too few holder lines could be read, it withholds the concentration figure rather than guess.
+
+25
+00:01:57.639 --> 00:01:59.964
+Authority runs the six issuer checks.
+
+26
+00:01:59.964 --> 00:02:04.551
+Press Certify authority for the verdict, the ledger index and the digest.
+
+27
+00:02:05.001 --> 00:02:09.208
+Passport packages an asset's posture into a signed record.
+
+28
+00:02:09.208 --> 00:02:14.067
+Press Generate passport, then copy it as JSON or CSV, or export it.
+
+29
+00:02:15.767 --> 00:02:19.853
+Audit Trail is a wallet's history with compliance details attached.
+
+30
+00:02:19.853 --> 00:02:23.085
+Settlement shows what a transaction really delivered.
+
+31
+00:02:23.535 --> 00:02:26.991
+Ledger and Policy holds your adjudication history.
+
+32
+00:02:26.991 --> 00:02:38.468
+Step through it with previous and next, draft and simulate policy changes, open investigations, and press Export for a file with a SHA-256 chain-of-custody signature.
+
+33
+00:02:40.168 --> 00:02:42.825
+Check an Address is free, ten times a month.
+
+34
+00:02:42.825 --> 00:02:47.293
+Remember that nothing recorded against an address is not the same as safe.
+
+35
+00:02:47.743 --> 00:02:50.646
+Inbox reads tokens strangers have sent you.
+
+36
+00:02:50.646 --> 00:02:57.599
+A familiar ticker from an issuer with no obligations is an impersonation, and is flagged as uncashable.
+
+37
+00:02:58.049 --> 00:03:02.636
+Token Rights reads what an N F T's issuer can still do after you own it.
+
+38
+00:03:03.086 --> 00:03:08.633
+Ledger Sync compares what four public servers report right now, free and without an account.
+
+39
+00:03:09.083 --> 00:03:17.788
+And the Agent and the Ledger Garden let you explore: walk from issuer to asset to holder to evidence, and ask the agent about what you find.
+
+40
+00:03:17.788 --> 00:03:21.456
+The full reference for every screen is in lesson seventeen.

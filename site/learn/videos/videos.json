@@ -1,0 +1,51 @@
+[
+  {
+    "id": "01-what-noshashi-does",
+    "title": "What NOSHASHI does",
+    "blurb": "The two questions it answers, the three verdicts, and the receipt behind every reading.",
+    "lesson": "l13",
+    "secs": 152
+  },
+  {
+    "id": "02-xrpl-basics",
+    "title": "XRP Ledger basics",
+    "blurb": "Consensus, accounts and reserves, transactions and result codes, tokens and trust lines.",
+    "lesson": "l1",
+    "secs": 155
+  },
+  {
+    "id": "03-issuer-powers",
+    "title": "What an issuer can still do to your tokens",
+    "blurb": "Freeze, clawback, Require Auth, transfer fees and key control, with three real certificates.",
+    "lesson": "l5",
+    "secs": 169
+  },
+  {
+    "id": "04-funded-depth",
+    "title": "Listed depth versus funded depth",
+    "blurb": "Why an order book can look far deeper than it is, with six real pairs measured on 8 September 2026.",
+    "lesson": "l7",
+    "secs": 148
+  },
+  {
+    "id": "05-payments",
+    "title": "Payments: what really arrived",
+    "blurb": "Partial payments, delivered_amount and destination tags, with a real case measured on 28 August 2026.",
+    "lesson": "l9",
+    "secs": 109
+  },
+  {
+    "id": "06-for-institutions",
+    "title": "How NOSHASHI helps institutions and enterprises",
+    "blurb": "Treasuries, compliance teams, desks, payments firms, issuers and auditors, plus the organisation controls.",
+    "lesson": "l18",
+    "secs": 146
+  },
+  {
+    "id": "07-app-tour",
+    "title": "The app, screen by screen",
+    "blurb": "Every section of the desktop app, what it is for and which button to press.",
+    "lesson": "l17",
+    "secs": 202
+  }
+]
