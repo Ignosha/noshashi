@@ -1,0 +1,133 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:05.708
+Everything NOSHASHI reads sits on a few basic ideas about the XRP Ledger.
+
+2
+00:00:05.708 --> 00:00:07.697
+Here they are, one at a time.
+
+3
+00:00:09.397 --> 00:00:13.152
+There is no miner and no single company deciding what is true.
+
+4
+00:00:13.602 --> 00:00:19.426
+Instead, independent servers called validators vote on which transactions go into the next ledger.
+
+5
+00:00:19.876 --> 00:00:22.832
+Each server trusts a list of validators, its U N L.
+
+6
+00:00:22.832 --> 00:00:25.615
+When at least eighty percent of that list agree,
+
+7
+00:00:26.065 --> 00:00:27.517
+the ledger is validated.
+
+8
+00:00:27.517 --> 00:00:29.755
+It is final, and it can never change.
+
+9
+00:00:30.205 --> 00:00:35.463
+A new ledger closes every three to five seconds, each with a higher ledger index.
+
+10
+00:00:35.463 --> 00:00:39.293
+That index is how NOSHASHI stamps the exact moment it read.
+
+11
+00:00:40.993 --> 00:00:44.961
+An account is a place on the ledger that holds XRP and tokens.
+
+12
+00:00:44.961 --> 00:00:49.761
+Its address starts with the letter r, like Bitstamp's issuing account here.
+
+13
+00:00:50.211 --> 00:00:52.323
+Control comes from a secret key.
+
+14
+00:00:52.323 --> 00:00:57.669
+Whoever holds the key owns the account, which is why NOSHASHI never asks for one.
+
+15
+00:00:57.669 --> 00:00:59.385
+It only reads public data.
+
+16
+00:00:59.835 --> 00:01:11.835
+Every account also keeps some XRP locked as a reserve: currently one XRP to exist, plus zero point two XRP for each object it owns, such as a trust line or an offer.
+
+17
+00:01:11.835 --> 00:01:15.835
+So a balance is not the same as what can actually move.
+
+18
+00:01:17.535 --> 00:01:23.627
+Every change is a transaction: a payment, an offer, a new trust line, a changed setting.
+
+19
+00:01:23.627 --> 00:01:28.820
+Each pays a tiny fee in XRP, which is destroyed rather than paid to anyone.
+
+20
+00:01:29.270 --> 00:01:31.446
+A result starting with tes means success.
+
+21
+00:01:31.896 --> 00:01:36.973
+A result starting with tec means it failed, but it was still recorded, and the fee is gone.
+
+22
+00:01:37.423 --> 00:01:40.950
+The answer the server gives at first is only tentative.
+
+23
+00:01:40.950 --> 00:01:48.517
+The final result is fixed in the transaction's metadata once the ledger is validated, and that is what NOSHASHI reads.
+
+24
+00:01:50.217 --> 00:01:52.027
+Any account can issue a token.
+
+25
+00:01:52.027 --> 00:01:57.577
+To hold one, you open a trust line to its issuer, which records your limit and your balance.
+
+26
+00:01:58.027 --> 00:02:01.898
+Anyone can use the code U S D, so the name proves nothing.
+
+27
+00:02:01.898 --> 00:02:06.837
+Always ask who issued it: the issuer address is the token's real identity.
+
+28
+00:02:07.287 --> 00:02:12.991
+The ledger reports each issuer's obligations, the total of its tokens that others hold.
+
+29
+00:02:12.991 --> 00:02:15.351
+That is the real circulating supply.
+
+30
+00:02:17.051 --> 00:02:21.119
+New features, like clawback or credentials, arrive as amendments.
+
+31
+00:02:21.119 --> 00:02:27.377
+An amendment needs at least eighty percent of validators to support it, continuously, for two weeks.
+
+32
+00:02:27.827 --> 00:02:30.228
+Then it switches on for everyone at once.
+
+33
+00:02:30.228 --> 00:02:34.269
+NOSHASHI's Domain Grid shows which amendments are enabled on mainnet.

@@ -1,0 +1,117 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:05.319
+The second question NOSHASHI answers is: could you actually get out of a position?
+
+2
+00:00:05.319 --> 00:00:09.319
+The answer is in the order book, but not in the number most tools show.
+
+3
+00:00:11.019 --> 00:00:15.007
+The XRP Ledger has had a built-in exchange since twenty twelve.
+
+4
+00:00:15.007 --> 00:00:22.223
+Anyone can post an offer, and all the offers for one pair form an order book: bids on one side, asks on the other.
+
+5
+00:00:22.223 --> 00:00:28.427
+The average of the best bid and best ask is the mid price, and the gap between them is the spread.
+
+6
+00:00:30.127 --> 00:00:32.233
+Here is the catch most tools miss.
+
+7
+00:00:32.233 --> 00:00:37.376
+An offer stays on the book even after its owner no longer has the funds to fill it.
+
+8
+00:00:37.376 --> 00:00:39.855
+It is still listed, but it cannot trade.
+
+9
+00:00:40.305 --> 00:00:42.782
+Say three offers each list ten thousand.
+
+10
+00:00:42.782 --> 00:00:48.667
+The first owner holds ten thousand, the second holds five hundred, and the third holds nothing.
+
+11
+00:00:49.117 --> 00:00:51.198
+Listed depth says thirty thousand.
+
+12
+00:00:51.198 --> 00:00:55.911
+Funded depth, what owners can actually deliver, is ten thousand five hundred.
+
+13
+00:00:55.911 --> 00:01:00.317
+Try to sell twenty thousand into that book and most of it will not fill.
+
+14
+00:01:02.017 --> 00:01:03.546
+NOSHASHI is not guessing.
+
+15
+00:01:03.546 --> 00:01:12.166
+When a server returns a book, any offer whose owner cannot cover it carries an extra field, taker gets funded, showing what they really have.
+
+16
+00:01:12.166 --> 00:01:16.140
+NOSHASHI adds up those funded amounts instead of the listed ones.
+
+17
+00:01:17.840 --> 00:01:28.394
+Here are six real pairs, measured on the eighth of September twenty twenty-six at ledger one hundred six million, eight hundred fifty thousand, two hundred sixty-six.
+
+18
+00:01:28.394 --> 00:01:33.925
+The ratio is listed depth divided by funded depth, within ten percent of the mid price.
+
+19
+00:01:34.375 --> 00:01:42.141
+The deep stablecoin books are close to honest: Bitstamp and GateHub dollars are at one point zero and one point one times.
+
+20
+00:01:42.591 --> 00:01:44.704
+The long tail is where the gap lives.
+
+21
+00:01:44.704 --> 00:01:53.385
+The Sologenic book listed about two and a half thousand times more than was funded, and the Bitstamp bitcoin book had nothing funded in the band at all.
+
+22
+00:01:53.835 --> 00:01:56.907
+The median across the six was four point four times.
+
+23
+00:01:58.607 --> 00:02:00.232
+Three honest disclosures.
+
+24
+00:02:00.232 --> 00:02:05.626
+The ten percent band is a parameter we chose, and a wider band gives a smaller gap.
+
+25
+00:02:06.076 --> 00:02:11.665
+Automated market maker pools are left out, so where a pool exists, the real exit is better.
+
+26
+00:02:12.115 --> 00:02:15.358
+And a server returns at most sixty price levels of a book.
+
+27
+00:02:15.808 --> 00:02:17.593
+All three push the gap upward.
+
+28
+00:02:17.593 --> 00:02:21.996
+Books change every few seconds, so re-measure before you quote any figure.
+
+29
+00:02:21.996 --> 00:02:26.517
+In the app, the Order Book screen does this with one button: Read this book.

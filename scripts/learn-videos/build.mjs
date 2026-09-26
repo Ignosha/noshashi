@@ -153,7 +153,7 @@ function page(video, tl) {
   .list li{font-size:22px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px 20px}
   .list.two{grid-template-columns:1fr 1fr}.list.two li{font-size:19px}
   .list em{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;margin-right:12px}
-  .t{border-collapse:collapse;width:100%;font-size:19px}
+  .t{border-collapse:separate;border-spacing:0;width:100%;font-size:19px}
   .t th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.16em;color:var(--faint);font-weight:400;padding:0 18px 10px 0}
   .t td{padding:11px 18px 11px 0;border-top:1px solid var(--rule);color:var(--muted);vertical-align:top}
   .t td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}

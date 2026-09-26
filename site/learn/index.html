@@ -148,6 +148,19 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   details.deep[open] summary{margin-bottom:10px}
   details.deep p,details.deep li{font-size:14px}
 
+  .vids{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin:18px 0 8px}
+  .vid{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;scroll-margin-top:86px}
+  .vid video{display:block;width:100%;aspect-ratio:16/9;background:#08100B}
+  .vid figcaption{padding:12px 16px 14px;font-size:13.5px;color:var(--muted);line-height:1.55}
+  .vid figcaption b{color:var(--ink);font-size:14.5px}
+  .vid figcaption .mono{font-size:11px;color:var(--faint);margin-left:4px}
+  .printonly{display:none}
+  .watch{margin:-6px 0 16px}
+  .watch a{font-size:13.5px;text-decoration:none;border:1px solid var(--rule);border-radius:99px;padding:5px 12px;display:inline-block}
+  .watch a:hover{border-color:var(--brand)}
+  ul.links{list-style:none;margin-left:0}
+  ul.links li{padding:9px 0;border-bottom:1px solid var(--rule)}
+  ul.links span{display:block;font-size:13px;color:var(--faint)}
   footer{border-top:1px solid var(--rule);padding:34px 0;font-size:12px;color:var(--faint)}
   footer a{color:var(--muted)}
   :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
@@ -163,6 +176,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
   @media print{
     header,aside,.cta,.filter,.noprint,footer,#support-launcher{display:none!important}
+    .printonly{display:block}
     .wrap{display:block}
     body{background:#fff;color:#111}
     article p,article li,.feature dd,dl.vocab dd,.v span,.kv td{color:#333}
@@ -203,6 +217,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     </p>
     <div class="cta">
       <a class="btn" href="#l1">Start the course</a>
+      <a class="btn ghost" href="#videos">Watch the videos</a>
       <a class="btn ghost" href="/learn/noshashi-course.pdf">Download everything as a PDF</a>
       <a class="btn ghost" href="/downloads/">Get the app</a>
     </div>
@@ -217,6 +232,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 
   <div class="wrap">
     <aside>
+      <p>START HERE</p>
+      <a href="#videos">Videos (7)</a>
       <p>PART 1 · THE XRP LEDGER</p>
       <a href="#l1">1 · How the ledger agrees</a>
       <a href="#l2">2 · Accounts, keys, reserves</a>
@@ -250,12 +267,85 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     </aside>
 
     <article>
+<!-- ===================== VIDEOS ===================== -->
+      <p class="part" id="videos">START HERE · VIDEOS</p>
+      <section>
+        <h2>Watch first: 7 short narrated videos</h2>
+        <p class="mins">7 VIDEOS · ABOUT 18 MINUTES IN ALL · CAPTIONS ON</p>
+        <p>Each video covers one idea from the course, with a voiceover and captions. Every figure in them is a real reading already quoted in the lessons, with its ledger index and date. Where a screen needs a live ledger connection, the video explains the screen rather than showing invented results.</p>
+        <div class="vids noprint">
+          <figure class="vid" id="v-01-what-noshashi-does">
+            <video controls preload="none" playsinline poster="/learn/videos/01-what-noshashi-does.jpg">
+              <source src="/learn/videos/01-what-noshashi-does.mp4" type="video/mp4">
+              <track kind="captions" src="/learn/videos/01-what-noshashi-does.vtt" srclang="en" label="English" default>
+            </video>
+            <figcaption><b>1 · What NOSHASHI does</b> <span class="mono">2:32</span><br>The two questions it answers, the three verdicts, and the receipt behind every reading. <a href="#l13">Read the lesson</a> · <a href="/learn/videos/01-what-noshashi-does.vtt">Transcript</a></figcaption>
+          </figure>
+          <figure class="vid" id="v-02-xrpl-basics">
+            <video controls preload="none" playsinline poster="/learn/videos/02-xrpl-basics.jpg">
+              <source src="/learn/videos/02-xrpl-basics.mp4" type="video/mp4">
+              <track kind="captions" src="/learn/videos/02-xrpl-basics.vtt" srclang="en" label="English" default>
+            </video>
+            <figcaption><b>2 · XRP Ledger basics</b> <span class="mono">2:35</span><br>Consensus, accounts and reserves, transactions and result codes, tokens and trust lines. <a href="#l1">Read the lesson</a> · <a href="/learn/videos/02-xrpl-basics.vtt">Transcript</a></figcaption>
+          </figure>
+          <figure class="vid" id="v-03-issuer-powers">
+            <video controls preload="none" playsinline poster="/learn/videos/03-issuer-powers.jpg">
+              <source src="/learn/videos/03-issuer-powers.mp4" type="video/mp4">
+              <track kind="captions" src="/learn/videos/03-issuer-powers.vtt" srclang="en" label="English" default>
+            </video>
+            <figcaption><b>3 · What an issuer can still do to your tokens</b> <span class="mono">2:49</span><br>Freeze, clawback, Require Auth, transfer fees and key control, with three real certificates. <a href="#l5">Read the lesson</a> · <a href="/learn/videos/03-issuer-powers.vtt">Transcript</a></figcaption>
+          </figure>
+          <figure class="vid" id="v-04-funded-depth">
+            <video controls preload="none" playsinline poster="/learn/videos/04-funded-depth.jpg">
+              <source src="/learn/videos/04-funded-depth.mp4" type="video/mp4">
+              <track kind="captions" src="/learn/videos/04-funded-depth.vtt" srclang="en" label="English" default>
+            </video>
+            <figcaption><b>4 · Listed depth versus funded depth</b> <span class="mono">2:28</span><br>Why an order book can look far deeper than it is, with six real pairs measured on 8 September 2026. <a href="#l7">Read the lesson</a> · <a href="/learn/videos/04-funded-depth.vtt">Transcript</a></figcaption>
+          </figure>
+          <figure class="vid" id="v-05-payments">
+            <video controls preload="none" playsinline poster="/learn/videos/05-payments.jpg">
+              <source src="/learn/videos/05-payments.mp4" type="video/mp4">
+              <track kind="captions" src="/learn/videos/05-payments.vtt" srclang="en" label="English" default>
+            </video>
+            <figcaption><b>5 · Payments: what really arrived</b> <span class="mono">1:49</span><br>Partial payments, delivered_amount and destination tags, with a real case measured on 28 August 2026. <a href="#l9">Read the lesson</a> · <a href="/learn/videos/05-payments.vtt">Transcript</a></figcaption>
+          </figure>
+          <figure class="vid" id="v-06-for-institutions">
+            <video controls preload="none" playsinline poster="/learn/videos/06-for-institutions.jpg">
+              <source src="/learn/videos/06-for-institutions.mp4" type="video/mp4">
+              <track kind="captions" src="/learn/videos/06-for-institutions.vtt" srclang="en" label="English" default>
+            </video>
+            <figcaption><b>6 · How NOSHASHI helps institutions and enterprises</b> <span class="mono">2:26</span><br>Treasuries, compliance teams, desks, payments firms, issuers and auditors, plus the organisation controls. <a href="#l18">Read the lesson</a> · <a href="/learn/videos/06-for-institutions.vtt">Transcript</a></figcaption>
+          </figure>
+          <figure class="vid" id="v-07-app-tour">
+            <video controls preload="none" playsinline poster="/learn/videos/07-app-tour.jpg">
+              <source src="/learn/videos/07-app-tour.mp4" type="video/mp4">
+              <track kind="captions" src="/learn/videos/07-app-tour.vtt" srclang="en" label="English" default>
+            </video>
+            <figcaption><b>7 · The app, screen by screen</b> <span class="mono">3:22</span><br>Every section of the desktop app, what it is for and which button to press. <a href="#l17">Read the lesson</a> · <a href="/learn/videos/07-app-tour.vtt">Transcript</a></figcaption>
+          </figure>
+        </div>
+        <ol class="printonly"><li>1 · What NOSHASHI does (2:32): noshashi.app/learn/videos/01-what-noshashi-does.mp4</li><li>2 · XRP Ledger basics (2:35): noshashi.app/learn/videos/02-xrpl-basics.mp4</li><li>3 · What an issuer can still do to your tokens (2:49): noshashi.app/learn/videos/03-issuer-powers.mp4</li><li>4 · Listed depth versus funded depth (2:28): noshashi.app/learn/videos/04-funded-depth.mp4</li><li>5 · Payments: what really arrived (1:49): noshashi.app/learn/videos/05-payments.mp4</li><li>6 · How NOSHASHI helps institutions and enterprises (2:26): noshashi.app/learn/videos/06-for-institutions.mp4</li><li>7 · The app, screen by screen (3:22): noshashi.app/learn/videos/07-app-tour.mp4</li></ol>
+
+        <h3>More videos from the XRPL community</h3>
+        <p>Not made by NOSHASHI. These open on YouTube, the XRPL Learning Portal and XRPL Commons, and are the best free places to go deeper on the ledger itself.</p>
+        <ul class="links">
+          <li><a href="https://www.youtube.com/playlist?list=PLJQ55Tj1hIVZtJ_JdTvSum2qMTsedWkNi" rel="noopener" target="_blank">Intro to the XRP Ledger</a> <span>YouTube playlist · a video series on the ledger's key concepts (goes with lessons 1 to 4)</span></li>
+          <li><a href="https://learn.xrpl.org/course/intro-to-the-xrpl/" rel="noopener" target="_blank">Intro to the XRPL</a> <span>XRPL Learning Portal · free course: the ledger's history, how it works, key features</span></li>
+          <li><a href="https://learn.xrpl.org/course/deep-dive-into-xrpl-defi/lesson/order-books-and-the-xrpl/" rel="noopener" target="_blank">Order books on the XRPL</a> <span>XRPL Learning Portal · part of the free "Deep dive into XRPL DeFi" course (goes with lessons 7 and 8)</span></li>
+          <li><a href="https://academy.xrpl-commons.org/journeys/xrpl-online-dev-training-june-2026/modules/intro-to-xrpl" rel="noopener" target="_blank">Introduction to the XRP Ledger</a> <span>XRPL Commons Academy · accounts, tokens, the DEX and consensus</span></li>
+          <li><a href="https://www.youtube.com/channel/UCwlHiotQWku7DztcnH3zrzw" rel="noopener" target="_blank">XRPL Commons</a> <span>YouTube channel · short tutorials, each on one transaction type</span></li>
+          <li><a href="https://www.youtube.com/playlist?list=PLl-QsmXvjodqeHPgq1UrKVcRPoNJe12Wv" rel="noopener" target="_blank">XRP Ledger Apex 2024</a> <span>YouTube playlist · talks from the XRPL developer conference</span></li>
+        </ul>
+        <p>The official reference pages behind the most important lessons: <a href="https://xrpl.org/docs/concepts/tokens/fungible-tokens/clawing-back-tokens" rel="noopener" target="_blank">clawback</a>, <a href="https://xrpl.org/docs/concepts/tokens/decentralized-exchange" rel="noopener" target="_blank">the DEX</a>, <a href="https://xrpl.org/docs/concepts/tokens/decentralized-exchange/automated-market-makers" rel="noopener" target="_blank">AMMs</a>, <a href="https://xrpl.org/partial-payments.html" rel="noopener" target="_blank">partial payments</a> and <a href="https://xrpl.org/docs/concepts/tokens/decentralized-exchange/permissioned-domains" rel="noopener" target="_blank">permissioned domains</a>.</p>
+      </section>
+
 <!-- ===================== PART 1 ===================== -->
       <p class="part" id="xrpl">PART 1 · THE XRP LEDGER</p>
 
       <section id="l1">
         <h2>1 · How the ledger agrees on the truth</h2>
         <p class="mins">ABOUT 6 MINUTES</p>
+        <p class="watch noprint"><a href="#v-02-xrpl-basics">▶ Watch video 2: XRP Ledger basics (2:35)</a></p>
         <p>The <strong>XRP Ledger (XRPL)</strong> is a public database, run since 2012, that keeps one shared record of who owns what. Thousands of servers around the world keep identical copies. Anyone can read it. Nobody, including its creators, can quietly change it.</p>
         <h3>Ledgers, one after another</h3>
         <p>The record moves forward in steps. Every 3 to 5 seconds the network produces a new <strong>ledger</strong>: a complete snapshot of every account and balance, plus the transactions that changed things since the last one. Each ledger has a number, its <strong>ledger index</strong>, which only ever goes up. At the time of writing it is past 107 million.</p>
@@ -338,6 +428,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <section id="l5">
         <h2>5 · What an issuer can still do to your tokens</h2>
         <p class="mins">ABOUT 8 MINUTES · THE MOST IMPORTANT LESSON</p>
+        <p class="watch noprint"><a href="#v-03-issuer-powers">▶ Watch video 3: What an issuer can still do to your tokens (2:49)</a></p>
         <p>Issuers can turn on powers, stored as <strong>flags</strong> on their account and settings on each trust line. They are public, but almost no wallet shows them. They decide whether a token is really yours.</p>
         <div class="scroll"><table class="kv">
           <tr><th>POWER</th><th>LEDGER NAME</th><th>WHAT IT MEANS FOR A HOLDER</th></tr>
@@ -383,6 +474,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <section id="l7">
         <h2>7 · The DEX and order books</h2>
         <p class="mins">ABOUT 8 MINUTES</p>
+        <p class="watch noprint"><a href="#v-04-funded-depth">▶ Watch video 4: Listed depth versus funded depth (2:28)</a></p>
         <p>The XRPL has had a built-in exchange, the <strong>DEX</strong>, since 2012. Anyone can post an <strong>offer</strong> with OfferCreate, for example "sell 100 USD.Bitstamp for 190 XRP". All offers for one pair form an <strong>order book</strong>: bids on one side, asks on the other. The best prices meet in the middle; the average of the best bid and best ask is the <strong>mid price</strong>, and the gap is the <strong>spread</strong>.</p>
         <p>When a new offer matches an existing one, they <strong>cross</strong> and trade. Token-to-token trades can be <strong>auto-bridged</strong> through XRP when that gives a better price.</p>
         <h3>Listed depth versus funded depth</h3>
@@ -427,6 +519,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <section id="l9">
         <h2>9 · Payments in depth</h2>
         <p class="mins">ABOUT 7 MINUTES</p>
+        <p class="watch noprint"><a href="#v-05-payments">▶ Watch video 5: Payments: what really arrived (1:49)</a></p>
         <h3>Partial payments</h3>
         <p>A Payment's <strong>Amount</strong> field says how much should arrive. But if the sender sets the <strong>partial payment</strong> flag (<code>tfPartialPayment</code>), the Amount becomes only a <strong>maximum</strong>. The payment can deliver far less and still finish with <code>tesSUCCESS</code>.</p>
         <p>The authoritative figure is <strong>delivered_amount</strong> in the transaction's metadata. The XRPL's own documentation tells applications to credit that. Exchanges that credited Amount instead have been drained: attackers sent "large" payments that delivered almost nothing and withdrew the difference.</p>
@@ -497,6 +590,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <section id="l13">
         <h2>13 · What NOSHASHI is</h2>
         <p class="mins">ABOUT 4 MINUTES</p>
+        <p class="watch noprint"><a href="#v-01-what-noshashi-does">▶ Watch video 1: What NOSHASHI does (2:32)</a></p>
         <p><strong>NOSHASHI</strong> is a desktop app for macOS, Windows and Linux that reads the live XRP Ledger and answers the two compliance questions about any account, token, pool or payment, from the same ledger reading:</p>
         <ol>
           <li><strong>Am I allowed to move this?</strong> Issuer powers, credentials, permissioned domains, Travel Rule scope, counterparty provenance and your own policy rules.</li>
@@ -573,6 +667,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <section id="l17">
         <h2>17 · Every screen, step by step</h2>
         <p class="mins">ABOUT 25 MINUTES · KEEP IT AS A REFERENCE</p>
+        <p class="watch noprint"><a href="#v-07-app-tour">▶ Watch video 7: The app, screen by screen (3:22)</a></p>
         <p>In sidebar order. Button names are shown <span class="btnlabel">LIKE THIS</span>, exactly as they appear in the app. <span class="tag free">FREE</span> marks screens that work without a paid plan.</p>
 
         <h3>Overview</h3>
@@ -685,6 +780,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <section id="l18">
         <h2>18 · For organisations and developers</h2>
         <p class="mins">ABOUT 5 MINUTES</p>
+        <p class="watch noprint"><a href="#v-06-for-institutions">▶ Watch video 6: How NOSHASHI helps institutions and enterprises (2:26)</a></p>
         <h3>Organisation policy with four-eyes approval</h3>
         <p>An organisation can share one policy. A change is saved as a <strong>draft</strong>, can be <strong>simulated</strong> against past verdicts to see what it would have changed, and goes <strong>pending</strong> when submitted. A second person must approve it before it is active (<strong>four-eyes</strong>). Every step is logged.</p>
         <h3>Exceptions and evidence requests</h3>

@@ -1,0 +1,113 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:02.850
+NOSHASHI is built for institutions.
+
+2
+00:00:02.850 --> 00:00:08.380
+Here is how it helps six kinds of team, and the controls an organisation gets around them.
+
+3
+00:00:10.080 --> 00:00:15.346
+A treasury team holding XRP needs its year-end value to stand up to the auditor.
+
+4
+00:00:15.346 --> 00:00:21.534
+Funded depth, stamped with a ledger index, is evidence of what the market could really absorb.
+
+5
+00:00:21.534 --> 00:00:24.693
+Control Surface shows who can move the treasury.
+
+6
+00:00:25.143 --> 00:00:31.513
+A compliance officer approving a new token needs to know whether the issuer can freeze it or claw it back.
+
+7
+00:00:31.513 --> 00:00:38.903
+The Authority screen answers in one reading, and the Verification gate runs a settlement through the organisation's policy.
+
+8
+00:00:39.353 --> 00:00:44.556
+A trading desk needs to know whether it could exit at size before it takes the position.
+
+9
+00:00:44.556 --> 00:00:49.167
+The Order Book and Exposure screens show the funded depth, not the listed one.
+
+10
+00:00:49.617 --> 00:00:54.118
+A payments company needs to credit what really arrived, to the right customer.
+
+11
+00:00:54.118 --> 00:00:57.062
+Settlement shows the delivered amount and the flag.
+
+12
+00:00:57.512 --> 00:01:01.372
+An issuer wants to show buyers exactly what they are exposed to.
+
+13
+00:01:01.372 --> 00:01:05.533
+It can share a Passport, or a link to its free authority certificate.
+
+14
+00:01:05.983 --> 00:01:12.853
+And an auditor can recompute every receipt's digest, so the figures are reproducible rather than taken on trust.
+
+15
+00:01:14.553 --> 00:01:18.993
+Around this, an organisation gets the controls an examiner looks for.
+
+16
+00:01:18.993 --> 00:01:26.265
+Policy changes are drafted, simulated against past verdicts, and only go live when a second person approves them.
+
+17
+00:01:26.715 --> 00:01:31.399
+When a no go must be overridden for a good reason, it goes through an exception.
+
+18
+00:01:31.399 --> 00:01:37.488
+A reviewer can approve, reject, or ask for more evidence first, and the decision stays with the verdict.
+
+19
+00:01:37.938 --> 00:01:40.422
+Investigations keep a hash-chained log.
+
+20
+00:01:40.422 --> 00:01:46.663
+Each entry carries the fingerprint of the one before, so nothing can be quietly edited or removed.
+
+21
+00:01:47.113 --> 00:01:54.025
+Signed webhooks push events to your own systems, and the Compliance API gives them read access to verdicts and readings.
+
+22
+00:01:55.725 --> 00:01:56.647
+It starts free.
+
+23
+00:01:56.647 --> 00:02:01.933
+Pro gives a desk every screen, at seven hundred forty-nine dollars per seat per month.
+
+24
+00:02:02.383 --> 00:02:09.930
+Institutional covers regulated teams with unlimited seats and the organisation features, at four thousand dollars a month.
+
+25
+00:02:09.930 --> 00:02:14.693
+Enterprise and Strategic start at one hundred twenty thousand dollars a year.
+
+26
+00:02:15.143 --> 00:02:16.597
+NOSHASHI is in beta.
+
+27
+00:02:16.597 --> 00:02:20.379
+It gives information, not financial or legal advice.
+
+28
+00:02:20.379 --> 00:02:24.743
+Current details are on the pricing page at noshashi dot app.

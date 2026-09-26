@@ -1,0 +1,89 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:05.758
+A payment that finishes with tes success did not necessarily deliver what it said.
+
+2
+00:00:05.758 --> 00:00:08.103
+Here is why, and what to read instead.
+
+3
+00:00:09.803 --> 00:00:13.056
+A payment's Amount field says how much should arrive.
+
+4
+00:00:13.056 --> 00:00:18.152
+But if the sender sets the partial payment flag, the Amount becomes only a maximum.
+
+5
+00:00:18.152 --> 00:00:21.344
+The payment can deliver far less, and still succeed.
+
+6
+00:00:21.794 --> 00:00:26.624
+The figure to trust is delivered amount, in the transaction's metadata.
+
+7
+00:00:26.624 --> 00:00:31.319
+The XRP Ledger's own documentation tells applications to credit that.
+
+8
+00:00:31.319 --> 00:00:35.469
+Exchanges that credited the Amount instead have been drained.
+
+9
+00:00:37.169 --> 00:00:42.726
+Here is a real case NOSHASHI measured on the twenty-eighth of August twenty twenty-six.
+
+10
+00:00:42.726 --> 00:00:48.155
+The payment stated nine hundred ninety-nine thousand, three hundred thirty-two L R C.
+
+11
+00:00:48.605 --> 00:00:51.828
+It delivered three thousand, nine hundred fifty-eight.
+
+12
+00:00:51.828 --> 00:00:53.619
+About zero point four percent.
+
+13
+00:00:54.069 --> 00:00:56.010
+The result was still tes success.
+
+14
+00:00:56.010 --> 00:01:01.834
+Any system crediting the stated figure would have over-credited by roughly two hundred fifty times.
+
+15
+00:01:02.284 --> 00:01:08.215
+In the same sample, three of two hundred twenty-three consecutive payments carried the partial payment flag.
+
+16
+00:01:09.915 --> 00:01:14.052
+Exchanges and custodians hold many customers in one address.
+
+17
+00:01:14.052 --> 00:01:18.397
+The destination tag tells them which customer a payment is for.
+
+18
+00:01:18.397 --> 00:01:21.776
+A missing tag is a common cause of lost deposits.
+
+19
+00:01:22.226 --> 00:01:27.457
+Paths let a payment convert currencies on the way, through order books and pools.
+
+20
+00:01:27.457 --> 00:01:31.655
+And escrow locks funds until a time passes or a condition is met.
+
+21
+00:01:33.355 --> 00:01:39.649
+In NOSHASHI, open Settlement, paste the sixty-four character transaction hash, and press Read settlement.
+
+22
+00:01:40.099 --> 00:01:48.397
+You see the type, the sender, the result, whether the partial payment flag was set, the requested amount, the delivered amount, and the fee that was burned.

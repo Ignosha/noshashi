@@ -1,0 +1,141 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:04.227
+Issuers can switch on powers over the tokens they issue.
+
+2
+00:00:04.227 --> 00:00:08.574
+The powers are public on the ledger, but almost no wallet shows them.
+
+3
+00:00:08.574 --> 00:00:11.345
+They decide whether a token is really yours.
+
+4
+00:00:13.045 --> 00:00:18.406
+An issuer can freeze one holder's trust line, so that holder can only send the token back.
+
+5
+00:00:18.406 --> 00:00:21.920
+Or it can freeze every holder at once with a global freeze.
+
+6
+00:00:22.370 --> 00:00:26.679
+A deep freeze goes further: a frozen holder can neither send nor receive.
+
+7
+00:00:27.129 --> 00:00:31.058
+An issuer can also give freezing up for good by setting No Freeze.
+
+8
+00:00:31.058 --> 00:00:33.081
+It can never be switched back off.
+
+9
+00:00:33.531 --> 00:00:38.502
+Require Auth means you need the issuer's approval before you can hold the token at all.
+
+10
+00:00:38.952 --> 00:00:42.455
+Clawback lets the issuer take tokens back out of your account.
+
+11
+00:00:42.455 --> 00:00:48.104
+It can only be switched on before the issuer has any trust lines, so for that token it is permanent.
+
+12
+00:00:48.554 --> 00:00:53.845
+And a transfer fee charges a percentage every time holders send the token to each other.
+
+13
+00:00:55.545 --> 00:00:58.300
+The powers matter less than who can use them.
+
+14
+00:00:58.300 --> 00:01:03.566
+An account can be signed for by its master key, by a regular key, or by a signer list.
+
+15
+00:01:04.016 --> 00:01:07.502
+A signer list gives each person a weight and sets a quorum.
+
+16
+00:01:07.502 --> 00:01:12.997
+With weights three, two, two, one and one, and a quorum of five, just two signers are enough.
+
+17
+00:01:12.997 --> 00:01:14.533
+Count weights, not people.
+
+18
+00:01:14.983 --> 00:01:21.249
+And if the master key is still enabled, one person holding it can bypass the signer list completely.
+
+19
+00:01:21.249 --> 00:01:23.943
+NOSHASHI flags this as a master-key bypass.
+
+20
+00:01:24.393 --> 00:01:28.506
+An issuer whose keys are all disabled or unusable is blackholed.
+
+21
+00:01:28.506 --> 00:01:34.676
+Nobody can ever sign for it again, so its settings are frozen in time, for better and for worse.
+
+22
+00:01:36.376 --> 00:01:43.096
+Here are three real certificates, read from validated mainnet on the twenty-fourth of September twenty twenty-six.
+
+23
+00:01:43.546 --> 00:01:45.927
+Bitstamp and GateHub both score no go.
+
+24
+00:01:45.927 --> 00:01:51.439
+In each case a single regular key can sign for the issuer, which fails a blocking check.
+
+25
+00:01:51.889 --> 00:01:53.568
+That is not an accusation.
+
+26
+00:01:53.568 --> 00:01:58.474
+Keeping freeze rights is normal, and often required, for a regulated issuer.
+
+27
+00:01:58.474 --> 00:02:04.284
+The certificate simply states what the issuer can still do, so a holder decides knowingly.
+
+28
+00:02:04.734 --> 00:02:07.759
+Sologenic has set No Freeze and is blackholed.
+
+29
+00:02:07.759 --> 00:02:16.702
+It scores hold, not go, only because it charges a small transfer fee, which is a warning, and its supply concentration was not measured.
+
+30
+00:02:18.402 --> 00:02:20.813
+The Authority screen runs six checks.
+
+31
+00:02:20.813 --> 00:02:27.851
+Two are blocking: the token must not be globally frozen right now, and no single key may control the issuer.
+
+32
+00:02:27.851 --> 00:02:30.327
+Fail either, and the verdict is no go.
+
+33
+00:02:30.777 --> 00:02:38.372
+The other four are warnings: freeze not surrendered, permission needed to hold, a transfer fee, and concentrated supply.
+
+34
+00:02:38.372 --> 00:02:40.271
+Any failed warning gives hold.
+
+35
+00:02:40.721 --> 00:02:47.825
+You can run the same six checks on any issuer for free, without an account, on the certificate page at noshashi dot app.
