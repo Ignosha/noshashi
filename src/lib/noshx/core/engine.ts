@@ -81,14 +81,18 @@ export function compose(tool: string, value: unknown): string {
     case "check_address": {
       const r = value as CounterpartyReport;
       const copy = VERDICT_COPY[r.verdict];
+      // exists is false only when the address was malformed or unread;
+      // a never-funded address comes back with its own finding.
       return [
-        `Address check for ${r.address}${stamp(r.ledgerIndex)}: ${copy.label}. ${r.headline}`,
+        `Address check for ${r.address}${stamp(r.ledgerIndex)}: ${copy.label}.${r.headline === copy.label ? "" : ` ${r.headline}`}`,
         r.exists
           ? `Balance ${r.balanceXrp.toLocaleString("en-US")} XRP${r.domain ? `, claims the domain ${r.domain} (claimed, not verified)` : ""}${r.isIssuer ? `, issues ${r.issuedCurrencies.join(", ") || "tokens"}` : ""}.`
-          : "The account does not exist on the ledger.",
+          : "",
         findingsText(r.findings),
         "This reports what the ledger publishes. Nothing recorded against an address is not the same as safe.",
-      ].join("\n");
+      ]
+        .filter(Boolean)
+        .join("\n");
     }
     case "certify_authority": {
       const c = value as AuthorityCertificate;

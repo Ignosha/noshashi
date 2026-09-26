@@ -34,6 +34,8 @@ export type ToolContext = {
   has: (feature: string) => boolean;
   /** Counts a free-plan address check; false when the month's checks are used up. */
   spendFreeCheck: () => boolean;
+  /** Gives back a counted check whose read never reached the ledger. */
+  refundFreeCheck?: () => void;
 };
 
 export type NoshxTool = {
@@ -112,12 +114,21 @@ export const NOSHX_TOOLS: NoshxTool[] = [
     input_schema: schema({ address: addr("Classic address, r…") }),
     feature: null,
     screen: "Check an Address",
-    run: (input, context) => {
+    run: async (input, context) => {
       const target = address(input);
-      if (!context.has("portfolios") && !context.spendFreeCheck()) {
+      const free = !context.has("portfolios");
+      if (free && !context.spendFreeCheck()) {
         throw new ToolInputError("This month's 10 free address checks are used up. Pro includes unlimited checks.");
       }
-      return checkCounterparty(target);
+      const report = await checkCounterparty(target);
+      // No ledger reply at all: a failed read, not a finding about the
+      // address. Saying anything about it (such as "does not exist") would
+      // be a claim the ledger never made, and it should not cost a check.
+      if (report.verdict === "unknown" && !report.exists && report.findings.length === 0) {
+        if (free) context.refundFreeCheck?.();
+        throw new Error("The ledger could not be reached, so nothing about this address is known yet. Try again in a moment.");
+      }
+      return report;
     },
   },
   {

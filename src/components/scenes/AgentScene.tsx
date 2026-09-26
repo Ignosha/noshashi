@@ -313,6 +313,13 @@ export function AgentScene({ data }: { data: XrplState }) {
     setChecks(next);
     return true;
   };
+  const refundFreeCheck = () => {
+    const current = checksRef.current;
+    if (current.month !== monthKey() || current.count === 0) return;
+    const next = { month: current.month, count: current.count - 1 };
+    checksRef.current = next;
+    setChecks(next);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -485,7 +492,7 @@ export function AgentScene({ data }: { data: XrplState }) {
       const onStep = (step: NoshxStep) => patch((turn) => ({ ...turn, steps: [...(turn.steps ?? []), step] }));
       // NOSHX Core answers by itself: no model, in both modes.
       if (findProvider(target.providerId).api === "noshx") {
-        const core = await answerWithCore(prompt, { has, spendFreeCheck }, onStep);
+        const core = await answerWithCore(prompt, { has, spendFreeCheck, refundFreeCheck }, onStep);
         patch((turn) => ({ ...turn, steps: turn.steps ?? core.steps, content: core.text }));
         return core.text;
       }
@@ -494,7 +501,7 @@ export function AgentScene({ data }: { data: XrplState }) {
           config: target,
           system: history[0].content,
           messages: history.slice(1),
-          context: { has, spendFreeCheck },
+          context: { has, spendFreeCheck, refundFreeCheck },
           signal: controller.signal,
           reasoning,
           onStep: (step) => patch((turn) => ({ ...turn, steps: [...(turn.steps ?? []), step] })),
@@ -505,7 +512,7 @@ export function AgentScene({ data }: { data: XrplState }) {
         }
         // The model cannot call tools, so NOSHX Core reads the ledger for
         // it and the model phrases the answer from those readings.
-        const core = await answerWithCore(prompt, { has, spendFreeCheck }, onStep);
+        const core = await answerWithCore(prompt, { has, spendFreeCheck, refundFreeCheck }, onStep);
         if (core.facts) {
           history[0] = {
             ...history[0],
