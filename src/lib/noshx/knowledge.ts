@@ -192,10 +192,17 @@ const STOP = new Set(
   "a an and are as at be but by can do does for from has have how i if in is it its me my of on or our so that the their them then there these this to was we what when where which who why will with you your".split(" ")
 );
 
+/** Irregular forms, so "sent" finds "sending" and "held" finds "hold". */
+const IRREGULAR: Record<string, string> = {
+  sent: "send", sending: "send", sends: "send", paid: "pay", paying: "pay", bought: "buy", sold: "sell",
+  held: "hold", holding: "hold", frozen: "freeze", froze: "freeze", freezing: "freeze", data: "data",
+  costs: "cost", priced: "price", pricing: "price", prices: "price",
+};
+
 export function tokens(text: string): string[] {
   return (text.toLowerCase().match(/[a-z0-9][a-z0-9_-]*/g) ?? [])
     .filter((t) => !STOP.has(t) && t.length > 1)
-    .map((t) => (t.length > 4 ? t.replace(/(ies|es|s|ing|ed)$/, (m) => (m === "ies" ? "y" : "")) : t));
+    .map((t) => IRREGULAR[t] ?? (t.length > 4 ? t.replace(/(ies|es|s|ing|ed)$/, (m) => (m === "ies" ? "y" : "")) : t));
 }
 
 type Index = {
@@ -232,7 +239,9 @@ export function search(index: Index, query: string, limit = 5): Hit[] {
   if (terms.length === 0) return [];
   const n = index.passages.length;
   const k1 = 1.4;
-  const b = 0.72;
+  // Moderate length normalisation: a plan's long feature list should not
+  // lose to a one-line mention of the same words.
+  const b = 0.55;
   const idf = (t: string) => {
     const df = index.df.get(t) ?? 0;
     return Math.log(1 + (n - df + 0.5) / (df + 0.5));
@@ -267,7 +276,11 @@ export function knowledgeIndex(): Promise<Index> {
     const passages = appPassages();
     for (const [file, load] of Object.entries(PAGES)) {
       const html = await load();
-      passages.push(...pageSections(file, html));
+      // Release notes say what changed, not what the product is; they
+      // rank below the pages that describe it.
+      const sections = pageSections(file, html);
+      if (file.includes("/docs/release-notes/")) for (const section of sections) section.weight = 0.45;
+      passages.push(...sections);
       if (file.endsWith("/site/learn/index.html")) passages.push(...learnScriptPassages(html));
     }
     return buildIndex(passages);

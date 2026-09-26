@@ -71,7 +71,7 @@ export const CAPABILITIES: Capability[] = [
     id: "agent",
     title: "NOSHX, the compliance agent",
     blurb:
-      "Reads the live ledger with the app's own read-only tools and explains what it finds, on a local model (nothing leaves the machine) or a hosted one with your API key.",
+      "Reads the live ledger with the app's own read-only tools and explains what it finds. Runs on NOSHX Core, its own engine with no outside model, and can add the trained NOSHX model or a hosted one.",
     maturity: "live",
     scene: "NOSHX",
   },

@@ -50,13 +50,31 @@ provider's own host; the window can store, check or clear a key but not
 read one back. A named provider's key is only ever sent to that provider,
 a custom endpoint must use HTTPS, and local models never receive a key.
 
-### Runs well on an 8 GB laptop
+### NOSHX Core: its own engine, no outside model
 
-The runtime panel recommends qwen3.5:4b for 8 GB of memory and qwen3.5:9b
-for 16 GB or more, and installs either through Ollama with one click and a
-progress bar. Local requests use a fixed context size so memory use stays
-predictable. **Deep reasoning**, off by default, lets the model think
-before answering; for Claude it raises the reasoning effort.
+NOSHX now runs on **NOSHX Core** by default: NOSHASHI's own engine, with
+no language model at all. It works out what is being asked (addresses,
+transaction hashes, currency codes, and what you want to know about
+them), runs the matching ledger readers, and writes the answer from what
+it read, in the same words the screens use. Product and compliance
+questions are answered with the most relevant sentences from NOSHASHI's
+pages, with their sources, and "which screen" questions name the screens
+that fit and the plan each needs. It answers in milliseconds, works
+offline, needs nothing installed and runs on any laptop.
+
+A language model is optional. If one is added and cannot call tools
+itself, NOSHX Core reads the ledger for it. With failover on, any model
+that fails falls back to Core.
+
+### The NOSHX model
+
+A kit to train NOSHX's own language model is in `scripts/noshx-model`:
+training data made entirely from NOSHASHI's own content, a free Google
+Colab notebook, and the Ollama Modelfile. It fine-tunes Microsoft's
+Phi-4-mini (MIT licence, 3.8B) into NOSHX, about 2.5 GB, which runs on an
+8 GB laptop. Local requests use a fixed context size so memory use stays
+predictable, and **deep reasoning**, off by default, lets a model think
+before answering (for Claude it raises the reasoning effort).
 
 ### Pricing
 

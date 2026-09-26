@@ -11,7 +11,10 @@
  * crosses the network boundary.
  */
 
-export type ProviderApi = "ollama" | "openai" | "anthropic";
+export type ProviderApi = "ollama" | "openai" | "anthropic" | "noshx";
+
+/** NOSHX Core's address: it is part of the app, not a server. */
+export const NOSHX_CORE_URL = "noshx://core";
 
 export type Provider = {
   id: string;
@@ -32,16 +35,30 @@ export type Provider = {
 
 export const PROVIDERS: Provider[] = [
   {
+    id: "noshx",
+    name: "NOSHX Core",
+    blurb:
+      "The default. NOSHASHI's own engine, with no outside model: it reads the ledger and NOSHASHI's pages and writes the answer itself. Instant, offline, free.",
+    api: "noshx",
+    local: true,
+    free: true,
+    defaultBaseUrl: NOSHX_CORE_URL,
+    requiresKey: false,
+    autodetect: false,
+    setupHint: "Built in. Nothing to install.",
+    docsUrl: "https://www.noshashi.app/docs/ai/",
+  },
+  {
     id: "ollama",
     name: "Ollama",
-    blurb: "The default. Local, free, one command to install a model.",
+    blurb: "Runs a language model on this machine, including the trained NOSHX model. Local and free.",
     api: "ollama",
     local: true,
     free: true,
     defaultBaseUrl: "http://localhost:11434",
     requiresKey: false,
     autodetect: true,
-    setupHint: "Install Ollama, then press INSTALL beside a recommended model below (or run: ollama pull qwen3.5:4b).",
+    setupHint: "Install Ollama, then add the NOSHX model (see Training NOSHX in the docs) or any model with: ollama pull <model>.",
     docsUrl: "https://ollama.com/download",
   },
   {
@@ -206,21 +223,18 @@ export function normalizeEndpoint(baseUrl: string): string {
 }
 
 /**
- * Preference order when the operator has not chosen a model. Small,
- * instruction-following models beat large chat models for this job: the
- * facts come from NOSHX's tools and the product's pages, so the model
- * needs to reason and call tools well, not to know the world. Qwen3.5
- * leads the local list because it calls tools and can think, at a size
- * an 8 GB laptop runs.
+ * Preference order when the operator has not chosen a model. The facts
+ * come from NOSHX's tools and the product's pages, so the model needs to
+ * reason and phrase well, not to know the world. The trained NOSHX model
+ * leads the local list when it is installed.
  */
 export const MODEL_PREFERENCE = [
+  "noshx",
   "claude-opus",
   "claude-sonnet",
-  "qwen3.5",
-  "qwen3",
+  "phi4-mini",
   "hermes3",
   "hermes",
-  "qwen2.5",
   "llama3.2",
   "llama3.1",
   "llama3",
@@ -229,19 +243,20 @@ export const MODEL_PREFERENCE = [
   "gemma2",
 ];
 
-/** Local models NOSHX recommends, smallest first. Names are Ollama library tags. */
-export const RECOMMENDED_LOCAL = [
+/**
+ * The local model NOSHX recommends: its own. It is trained from
+ * NOSHASHI's pages (scripts/noshx-model) and added to Ollama as "noshx",
+ * so it cannot be downloaded from here until it is published; the panel
+ * says how to add it instead.
+ */
+export const RECOMMENDED_LOCAL: ReadonlyArray<{ model: string; fits: string; blurb: string; installable: boolean }> = [
   {
-    model: "qwen3.5:4b",
+    model: "noshx",
     fits: "8 GB laptops",
-    blurb: "The default. Calls NOSHX's tools, can think step by step, and leaves room for the rest of the machine.",
+    blurb: "NOSHX's own trained model (about 2.5 GB). Phrases NOSHX Core's readings in natural language and reasons over them.",
+    installable: false,
   },
-  {
-    model: "qwen3.5:9b",
-    fits: "16 GB or more",
-    blurb: "Stronger reasoning on long or tricky questions, at about twice the memory and time.",
-  },
-] as const;
+];
 
 export type AgentConfig = {
   providerId: string;
@@ -252,6 +267,7 @@ export type AgentConfig = {
 };
 
 export function defaultConfig(): AgentConfig {
+  // NOSHX Core: always available, nothing to install, nothing leaves the machine.
   const provider = PROVIDERS[0];
   return {
     providerId: provider.id,
@@ -264,6 +280,7 @@ export function defaultConfig(): AgentConfig {
 /** A remote endpoint must be TLS — never ship a key over plaintext. */
 export function isEndpointSafe(baseUrl: string): { ok: boolean; reason?: string } {
   const candidate = baseUrl.trim();
+  if (candidate === NOSHX_CORE_URL) return { ok: true };
   if (!candidate) {
     return { ok: false, reason: "Enter a local runtime endpoint." };
   }
@@ -296,6 +313,7 @@ function isLoopbackHost(hostname: string): boolean {
  * and has to be described as one.
  */
 export function isOnDeviceEndpoint(baseUrl: string): boolean {
+  if (baseUrl.startsWith("noshx:")) return true;
   try {
     return isLoopbackHost(new URL(normalizeEndpoint(baseUrl)).hostname);
   } catch {

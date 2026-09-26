@@ -251,23 +251,38 @@ export function compactResult(value: unknown): string {
     : text;
 }
 
+export type RawToolResult = { ok: true; value: unknown } | { ok: false; error: string; gated?: boolean };
+
+/** Run one tool and keep its full report (NOSHX Core composes from it). */
+export async function runToolRaw(
+  name: string,
+  input: Record<string, unknown>,
+  context: ToolContext
+): Promise<RawToolResult> {
+  const tool = findTool(name);
+  if (!tool) return { ok: false, error: `No tool named ${name}.` };
+  if (tool.feature && !context.has(tool.feature)) {
+    return { ok: false, gated: true, error: `${tool.screen} needs a Pro plan or higher.` };
+  }
+  try {
+    return { ok: true, value: await tool.run(input ?? {}, context) };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "The read failed." };
+  }
+}
+
 /** Run one tool call; failures come back as text for the model, never as a throw. */
 export async function runTool(
   name: string,
   input: Record<string, unknown>,
   context: ToolContext
 ): Promise<{ ok: boolean; content: string }> {
-  const tool = findTool(name);
-  if (!tool) return { ok: false, content: `No tool named ${name}.` };
-  if (tool.feature && !context.has(tool.feature)) {
-    return {
-      ok: false,
-      content: `${tool.screen} needs a Pro plan or higher. Tell the operator it is available after upgrading in Pricing; do not guess the answer.`,
-    };
-  }
-  try {
-    return { ok: true, content: compactResult(await tool.run(input ?? {}, context)) };
-  } catch (error) {
-    return { ok: false, content: error instanceof Error ? error.message : "The read failed." };
-  }
+  const result = await runToolRaw(name, input, context);
+  if (result.ok) return { ok: true, content: compactResult(result.value) };
+  return {
+    ok: false,
+    content: result.gated
+      ? `${result.error} Tell the operator it is available after upgrading in Pricing; do not guess the answer.`
+      : result.error,
+  };
 }
