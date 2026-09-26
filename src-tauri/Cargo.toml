@@ -27,6 +27,12 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 url = "2"
 sha2 = "0.10"
+# Model requests (model_proxy.rs). The same reqwest the updater already
+# builds, with its TLS choice: rustls over ring, no second crypto stack.
+reqwest = { version = "0.13", default-features = false, features = ["json", "stream", "rustls-no-provider", "http2", "system-proxy"] }
+rustls = { version = "0.23", default-features = false, features = ["ring"] }
+tokio = { version = "1", features = ["sync", "macros"] }
+futures-util = { version = "0.3", default-features = false }
 
 # Desktop only: the menu bar tray and its HUD, the global accelerator,
 # launch at login and in-place updates have no iOS equivalent (iOS updates

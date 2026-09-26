@@ -187,7 +187,7 @@ export const PROVIDERS: Provider[] = [
     requiresKey: true,
     autodetect: false,
     setupHint:
-      "The key is kept in the OS keyring and read only for the duration of each request.",
+      "The key is kept in the OS keyring and added to each request by the desktop app; the app window never reads it back.",
     docsUrl: "https://openrouter.ai/docs",
   },
 ];

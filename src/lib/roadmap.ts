@@ -69,11 +69,11 @@ export const CAPABILITIES: Capability[] = [
   },
   {
     id: "agent",
-    title: "On-device compliance analyst",
+    title: "NOSHX, the compliance agent",
     blurb:
-      "A local model that explains verdicts and the rule set, grounded in live state. Nothing is transmitted off the machine.",
+      "Reads the live ledger with the app's own read-only tools and explains what it finds, on a local model (nothing leaves the machine) or a hosted one with your API key.",
     maturity: "live",
-    scene: "Agent",
+    scene: "NOSHX",
   },
   {
     id: "menubar",

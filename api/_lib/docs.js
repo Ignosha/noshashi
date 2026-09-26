@@ -207,6 +207,11 @@ ${table(["Screen", "Plan", "What it establishes"], ref.scenes.filter((s) => !NOT
 <h2>Providers</h2>
 ${table(["Provider", "Runs", "Cost to you", "Key"], ref.providers.map((p) => [`<a href="${esc(p.docsUrl)}">${esc(p.name)}</a>`, p.local ? "On this device" : "Hosted", p.free ? "Free" : "Provider pricing", p.requiresKey ? "Required" : "Not needed"]))}
 <p>A custom OpenAI-compatible endpoint can also be configured. ${esc(ref.limits.find((l) => /AI provider/.test(l)) ?? "")}</p>
+<h2>NOSHX</h2>
+<p>NOSHX is the agent on the NOSHX screen. It answers a question by reading the live ledger through the app's own read-only tools (issuer authority, order-book depth, settlements, control surfaces, provenance, pools, issuance, the address check, claims, NFT rights and ledger status), then explains what it read. It cannot sign, submit or move anything. Each tool carries the same plan requirement as the screen it mirrors, and address checks on the Free plan count against the same monthly allowance. Its reasoning is the chosen model's; its figures come from the ledger. A model that cannot call tools answers from the state it is given, and says so.</p>
+<p>The runtime can be switched at any time between a local model and a hosted one; each provider remembers its own endpoint and model. With failover on, a runtime that cannot be reached is replaced for that answer by the last one that worked, and the answer says which.</p>
+<h2>Where API keys go</h2>
+<p>A provider key is kept in the operating system keyring. In the desktop app, model requests are made by the app itself rather than by its window: the key goes from the keyring to the provider's own host over TLS, and the window can store, check or clear a key but never read one back. A key for a named provider is only ever sent to that provider's API host, a custom endpoint must use HTTPS, and local runtimes never receive a key.</p>
 <h2>Secrets never reach a model</h2>
 <p>A message containing a valid XRPL seed, recognised by its checksum, is refused before any request is made.</p>
 <h2>Oversight</h2>${list(ref.oversight)}`,

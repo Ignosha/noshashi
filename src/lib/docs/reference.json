@@ -31,9 +31,9 @@
       "summary": "wallet history, filterable, exportable to CSV."
     },
     {
-      "name": "Agent",
+      "name": "NOSHX",
       "plan": "Free",
-      "summary": "this assistant, with an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant."
+      "summary": "this assistant, NOSHASHI's agent. It reads the live ledger with read-only tools (authority, order book, settlement, control surface, provenance, pools, issuance, address check, claims, NFT rights, ledger status), each gated like its screen, and runs on a local model or a hosted one chosen in the runtime panel, with optional failover. It has an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant."
     },
     {
       "name": "Portfolio & Radar",
