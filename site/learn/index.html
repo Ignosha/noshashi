@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Learn NOSHASHI — the course</title>
+<meta name="description" content="A free, plain-language course: how the XRP Ledger works, what NOSHASHI reads from it, how to use every screen in the desktop app, a knowledge check and a word list.">
+<link rel="canonical" href="https://noshashi.app/learn/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
+<style>
+  :root{--shell:min(1180px,92vw)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ground);color:var(--ink);
+    font-family:"Space Grotesk",-apple-system,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.68}
+  a{color:var(--brand)}
+  .shell{width:var(--shell);margin:0 auto}
+  .mono,code{font-family:"IBM Plex Mono",monospace}
+  code{font-size:.9em;color:var(--ink);background:var(--elevated);padding:1px 5px;border-radius:4px}
+  header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
+    background:color-mix(in srgb,var(--ground) 82%,transparent);border-bottom:1px solid var(--rule)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:62px;gap:16px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+  .brand span{font-weight:600;letter-spacing:.2em;font-size:14px}
+  .navlinks{display:flex;gap:18px;flex-wrap:wrap}
+  .navlinks a{font-size:12px;color:var(--muted);text-decoration:none}
+  .navlinks a:hover{color:var(--ink)}
+
+  .hero{padding:64px 0 36px;max-width:72ch}
+  .kick{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.22em;color:var(--faint)}
+  h1{font-size:clamp(30px,4.4vw,46px);letter-spacing:-.03em;margin:14px 0 16px;line-height:1.12;text-wrap:balance}
+  .lede{color:var(--muted);font-size:17px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+  .btn{display:inline-flex;align-items:center;gap:9px;background:var(--brand);color:var(--on-brand);
+    padding:11px 20px;font-size:12px;font-weight:600;text-decoration:none;border-radius:var(--r);border:1px solid var(--brand);cursor:pointer;font-family:inherit}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+
+  .path{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:8px 0 48px}
+  .path a{display:block;text-decoration:none;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:16px 18px}
+  .path a:hover{border-color:var(--brand)}
+  .path b{display:block;color:var(--ink);font-size:14px;margin-bottom:4px}
+  .path span{color:var(--muted);font-size:13px}
+  .path i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--faint)}
+
+  .wrap{display:grid;grid-template-columns:230px 1fr;gap:48px;padding-bottom:90px;align-items:start}
+  aside{position:sticky;top:86px;max-height:calc(100vh - 110px);overflow:auto}
+  aside p{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;color:var(--faint);margin:16px 0 8px}
+  aside p:first-child{margin-top:0}
+  aside a{display:block;font-size:12.5px;color:var(--muted);text-decoration:none;padding:5px 0 5px 12px;border-left:2px solid transparent}
+  aside a:hover{color:var(--ink);border-left-color:var(--brand)}
+
+  article{min-width:0}
+  article section{margin-bottom:52px;scroll-margin-top:86px}
+  .part{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--brand);margin:8px 0 22px;padding-top:8px;border-top:1px solid var(--rule)}
+  article h2{font-size:24px;letter-spacing:-.02em;margin-bottom:6px;text-wrap:balance}
+  .mins{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);letter-spacing:.1em;margin-bottom:16px}
+  article h3{font-size:15.5px;margin:26px 0 8px;color:var(--ink)}
+  article p{color:var(--muted);font-size:15px;max-width:70ch;margin-bottom:14px}
+  article strong{color:var(--ink);font-weight:600}
+  article ul,article ol{margin:0 0 16px 20px;max-width:70ch;color:var(--muted);font-size:14.5px}
+  article li{margin-bottom:7px}
+  .card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:20px 22px;margin:16px 0}
+  .card .t,.analogy .t,.try .t{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;margin-bottom:8px}
+  .card .t{color:var(--faint)}
+  .card p:last-child{margin-bottom:0}
+  .analogy{border-left:2px solid var(--tele);background:color-mix(in srgb,var(--tele) 6%,transparent);border-radius:0 var(--r) var(--r) 0;padding:16px 20px;margin:16px 0}
+  .analogy .t{color:var(--tele)}
+  .analogy p{color:var(--ink);margin-bottom:0;font-size:14.5px}
+  .try{border:1px dashed var(--rule);border-radius:var(--r);padding:14px 18px;margin:14px 0}
+  .try .t{color:var(--brand)}
+  .try ol{margin-bottom:0}
+  .takeaway{font-size:14px;color:var(--ink);background:var(--elevated);border-radius:var(--r);padding:12px 16px;margin-top:14px;max-width:70ch}
+  .takeaway b{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--brand);margin-right:8px}
+
+  .verdict{display:grid;gap:8px;margin:14px 0}
+  .v{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:12px 16px}
+  .v b{font-family:"IBM Plex Mono",monospace;font-size:12.5px;min-width:140px}
+  .v span{color:var(--muted);font-size:14px}
+  .go b{color:var(--go)} .hold b{color:var(--hold)} .nogo b{color:var(--nogo)} .neutral b{color:var(--muted)}
+
+  .scroll{overflow-x:auto;margin:14px 0}
+  .kv{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+  .kv th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--faint);font-weight:500;padding:0 14px 10px 0}
+  .kv td{padding:10px 14px 10px 0;border-top:1px solid var(--rule);color:var(--muted);vertical-align:top}
+  .kv td:first-child{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:12.5px;white-space:nowrap}
+
+  .feature{border:1px solid var(--rule);border-radius:var(--r);padding:18px 20px;margin:12px 0;background:var(--surface)}
+  .feature h4{font-size:14.5px;color:var(--ink);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .feature h4 small{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--faint);font-weight:400}
+  .feature p{font-size:14px;margin:6px 0 0}
+  .feature .how{color:var(--ink)}
+  .tag{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.12em;padding:2px 7px;border-radius:99px;border:1px solid var(--rule);color:var(--muted)}
+  .tag.free{color:var(--go);border-color:color-mix(in srgb,var(--go) 45%,transparent)}
+
+  .quiz{display:grid;gap:14px}
+  .q{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:18px 20px}
+  .q legend{font-size:14.5px;color:var(--ink);margin-bottom:10px;font-weight:600}
+  .q label{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);padding:6px 8px;border-radius:6px;cursor:pointer}
+  .q label:hover{background:var(--elevated)}
+  .q input{margin-top:5px;accent-color:var(--brand)}
+  .q .why{font-size:13.5px;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+  .q.right .why{display:block;color:var(--ink);background:color-mix(in srgb,var(--go) 12%,transparent)}
+  .q.wrong .why{display:block;color:var(--ink);background:color-mix(in srgb,var(--nogo) 12%,transparent)}
+  .score{font-size:15px;color:var(--ink);margin-top:14px;min-height:1.5em}
+
+  dl.vocab{display:grid;grid-template-columns:minmax(150px,220px) 1fr;gap:0;border-top:1px solid var(--rule);max-width:78ch}
+  dl.vocab dt,dl.vocab dd{padding:10px 12px 10px 0;border-bottom:1px solid var(--rule);font-size:14px}
+  dl.vocab dt{color:var(--ink);font-weight:600}
+  dl.vocab dd{color:var(--muted)}
+  .filter{width:100%;max-width:420px;padding:10px 12px;border-radius:var(--r);border:1px solid var(--rule);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;margin-bottom:14px}
+
+  details.deep{border:1px solid var(--rule);border-radius:var(--r);padding:12px 18px;margin:10px 0;background:var(--surface)}
+  details.deep summary{cursor:pointer;color:var(--ink);font-weight:600;font-size:14.5px}
+  details.deep[open] summary{margin-bottom:10px}
+
+  footer{border-top:1px solid var(--rule);padding:34px 0;font-size:12px;color:var(--faint)}
+  footer a{color:var(--muted)}
+  :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;gap:20px}
+    aside{position:static;max-height:none}
+    .navlinks{display:none}
+    dl.vocab{grid-template-columns:1fr}
+    dl.vocab dt{border-bottom:0;padding-bottom:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  @media print{
+    header,aside,.cta,.filter,.noprint,footer{display:none!important}
+    .wrap{display:block}
+    body{background:#fff;color:#111}
+    article p,article li,.feature p,dl.vocab dd,.v span,.kv td{color:#333}
+    details.deep{display:block}
+    details.deep>*{display:block}
+    .q .why{display:block;background:#f1f5f1;color:#111}
+    section{break-inside:auto}
+    .feature,.card,.q,.v{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async">
+      <span>NOSHASHI</span>
+    </a>
+    <nav class="navlinks" aria-label="Course">
+      <a href="#xrpl">XRPL basics</a>
+      <a href="#app">The app</a>
+      <a href="#check">Knowledge check</a>
+      <a href="#vocab">Word list</a>
+      <a href="/">Home</a>
+    </nav>
+  </div>
+</header>
+
+<div class="shell">
+  <div class="hero">
+    <p class="kick">LEARN · FREE · NO PRIOR KNOWLEDGE NEEDED</p>
+    <h1>Learn NOSHASHI, and the XRP Ledger underneath it</h1>
+    <p class="lede">
+      A short course in plain language. Part one explains the parts of the XRP Ledger that
+      matter here. Part two walks through every screen in the NOSHASHI desktop app and how
+      to use it. Then check what you learned, and keep the word list for later.
+    </p>
+    <div class="cta">
+      <a class="btn" href="#m1">Start the course</a>
+      <a class="btn ghost" href="/learn/noshashi-course.pdf">Download everything as a PDF</a>
+      <a class="btn ghost" href="/downloads/">Get the app</a>
+    </div>
+  </div>
+
+  <div class="path">
+    <a href="#xrpl"><i>PART 1 · 6 LESSONS</i><b>The XRP Ledger</b><span>Accounts, tokens, issuers, order books, payments, compliance words.</span></a>
+    <a href="#app"><i>PART 2 · 6 LESSONS</i><b>The NOSHASHI app</b><span>What it is, getting started, and every screen explained.</span></a>
+    <a href="#check"><i>PART 3</i><b>Knowledge check</b><span>15 questions. Answers explained as you go.</span></a>
+    <a href="#vocab"><i>PART 4</i><b>Word list</b><span>Every term on this page, in one searchable list.</span></a>
+  </div>
+
+  <div class="wrap">
+    <aside>
+      <p>PART 1 · XRP LEDGER</p>
+      <a href="#m1">1 · The ledger in one minute</a>
+      <a href="#m2">2 · Tokens and issuers</a>
+      <a href="#m3">3 · What an issuer can still do</a>
+      <a href="#m4">4 · Trading on the ledger</a>
+      <a href="#m5">5 · Payments that say more than they deliver</a>
+      <a href="#m6">6 · Compliance words</a>
+      <p>PART 2 · NOSHASHI</p>
+      <a href="#m7">7 · What NOSHASHI is</a>
+      <a href="#m8">8 · Getting started</a>
+      <a href="#m9">9 · Reading a verdict</a>
+      <a href="#m10">10 · Every screen, explained</a>
+      <a href="#m11">11 · Free tools on this website</a>
+      <a href="#m12">12 · Plans, trust and what's next</a>
+      <p>PART 3 AND 4</p>
+      <a href="#check">Knowledge check</a>
+      <a href="#vocab">Word list</a>
+      <a href="#deep">Under the hood</a>
+    </aside>
+
+    <article>
+      <p class="part" id="xrpl">PART 1 · THE XRP LEDGER</p>
+
+      <section id="m1">
+        <h2>1 · The ledger in one minute</h2>
+        <p class="mins">ABOUT 3 MINUTES</p>
+        <p>The <strong>XRP Ledger (XRPL)</strong> is a public database that thousands of computers keep identical copies of. It records who owns what, and every change to that. Anyone can read it, and nobody can quietly edit it.</p>
+        <p>Every few seconds the network agrees on a new version, called a <strong>ledger</strong>, numbered one after another. Once enough trusted servers (called <strong>validators</strong>) agree on it, it becomes a <strong>validated ledger</strong> and cannot change. NOSHASHI only reads validated ledgers, and every reading carries the <strong>ledger index</strong> (its number) so anyone can check the same moment later.</p>
+        <div class="analogy"><p class="t">THINK OF IT LIKE</p><p>A shared notebook that the whole world can read, where a new page is added every few seconds and old pages can never be torn out.</p></div>
+        <h3>Accounts and XRP</h3>
+        <p>An <strong>account</strong> is an address on the ledger. Addresses start with the letter <code>r</code>, for example <code>rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B</code>. Whoever holds the account's secret <strong>key</strong> can sign transactions for it.</p>
+        <p><strong>XRP</strong> is the ledger's own currency. Every account must keep a small amount of XRP locked as a <strong>reserve</strong>, which stops people filling the ledger with junk accounts.</p>
+        <p class="takeaway"><b>KEY IDEA</b>The ledger is public and final. Anything NOSHASHI tells you, you could check yourself at the same ledger index.</p>
+      </section>
+
+      <section id="m2">
+        <h2>2 · Tokens and issuers</h2>
+        <p class="mins">ABOUT 4 MINUTES</p>
+        <p>Besides XRP, the ledger carries <strong>tokens</strong>: digital dollars, euros, gold, shares and more. A token is created by an <strong>issuer</strong>, an account that promises the token is worth something, for example a stablecoin company promising one token equals one US dollar.</p>
+        <p>To hold a token you first open a <strong>trust line</strong> to its issuer. A trust line is a one-to-one link that says "I accept up to this much of your token." Your balance of that token lives on the trust line.</p>
+        <div class="analogy"><p class="t">THINK OF IT LIKE</p><p>A gift card. The card is only worth something because the shop that issued it promises to honour it, and the shop set the rules printed on the back.</p></div>
+        <p>That is the key point: <strong>a token is only as good as its issuer, and the issuer sets rules on it.</strong> Two tokens can both be called "USD" and be issued by completely different accounts. The name (the <strong>currency code</strong>) is not owned by anyone; the issuer address is what matters.</p>
+        <p class="takeaway"><b>KEY IDEA</b>Always ask "who issued this?" before "what is it called?"</p>
+      </section>
+
+      <section id="m3">
+        <h2>3 · What an issuer can still do to your tokens</h2>
+        <p class="mins">ABOUT 5 MINUTES</p>
+        <p>Issuers can switch on powers, called <strong>flags</strong>, on their account. These powers are public. Most wallets never show them. They are the first thing NOSHASHI reads.</p>
+        <div class="scroll"><table class="kv">
+          <tr><th>POWER</th><th>WHAT IT MEANS FOR A HOLDER</th></tr>
+          <tr><td>Freeze</td><td>The issuer can freeze your trust line so you cannot send the token on.</td></tr>
+          <tr><td>Global freeze</td><td>The issuer freezes every holder at once. The token stops moving for everyone.</td></tr>
+          <tr><td>Deep freeze</td><td>A stronger freeze (amendment XLS-77): a frozen holder can neither send nor receive the token.</td></tr>
+          <tr><td>No Freeze</td><td>The issuer has permanently given up freezing. This can never be undone, so holders are protected from freezes.</td></tr>
+          <tr><td>Require Auth</td><td>You need the issuer's permission before you can hold the token at all.</td></tr>
+          <tr><td>Clawback</td><td>The issuer can take tokens back out of your account. It must be switched on before any tokens exist, so it is a permanent feature of that token.</td></tr>
+          <tr><td>Transfer fee</td><td>The issuer takes a percentage every time holders send the token to each other. The issuer can change it.</td></tr>
+        </table></div>
+        <h3>Who controls the issuer?</h3>
+        <p>An account can be signed for by its <strong>master key</strong>, by a <strong>regular key</strong> (a second key it nominates), or by a <strong>signer list</strong> (multi-signature: several people must agree). If one single key can sign for an issuer, one person or one stolen key can use every power above. An issuer that has disabled its master key and set its regular key to an address nobody controls is <strong>blackholed</strong>: nobody can ever act on it again.</p>
+        <p>None of this is good or bad by itself. A regulated stablecoin is usually expected to keep freeze and clawback. What matters is that you know before you hold it.</p>
+        <p class="takeaway"><b>KEY IDEA</b>A token can be yours on paper and still be frozen or taken back. The rules are on the ledger if you read them.</p>
+      </section>
+
+      <section id="m4">
+        <h2>4 · Trading on the ledger</h2>
+        <p class="mins">ABOUT 5 MINUTES</p>
+        <p>The XRPL has a built-in exchange, the <strong>DEX</strong> (decentralised exchange). People post <strong>offers</strong> ("I will sell 100 USD for 190 XRP"). All the offers for a pair form an <strong>order book</strong>. The amount on offer is called <strong>depth</strong>.</p>
+        <p>Here is the catch. An offer stays on the book even after the person who posted it no longer has the money to fill it. Those are <strong>unfunded offers</strong>. So the depth you see (<strong>listed depth</strong>) can be much bigger than the depth anyone could actually trade against (<strong>funded depth</strong>). The ledger reports this: <code>book_offers</code> returns a field called <code>taker_gets_funded</code> when an owner cannot cover their offer.</p>
+        <div class="card"><p class="t">A REAL MEASUREMENT · LEDGER 106,850,266 · 8 SEP 2026</p>
+          <p>On the Bitstamp USD book, funded depth within 10% of the mid price matched listed depth (1.0×). On the SOLO book, 94.7% of listed depth came from offers nobody could fill. The median across six pairs was 4.4×. Method notes: the 10% band is a parameter we chose, AMM pools are left out, and the ledger returns at most 60 price levels. Re-measure before quoting; books change constantly.</p></div>
+        <h3>AMM pools</h3>
+        <p>An <strong>AMM</strong> (automated market maker, amendment XLS-30) is a pool holding two assets that trades automatically at a price set by the pool's balance. People who add money get <strong>LP tokens</strong>. LP token holders vote on the pool's <strong>trading fee</strong>, and one account can win the <strong>auction slot</strong>, which gives it discounted trading.</p>
+        <p class="takeaway"><b>KEY IDEA</b>Listed depth is an advert. Funded depth is what you can actually get out at.</p>
+      </section>
+
+      <section id="m5">
+        <h2>5 · Payments that say more than they deliver</h2>
+        <p class="mins">ABOUT 3 MINUTES</p>
+        <p>A payment on the XRPL has an <strong>Amount</strong> field. If the sender sets the <strong>partial payment</strong> flag, the Amount becomes a maximum, not a promise. The payment can still show success (<code>tesSUCCESS</code>) while delivering only a fraction.</p>
+        <p>The number to trust is <strong>delivered_amount</strong>, in the transaction's result. XRPL's own documentation says to credit that. Systems that credited the Amount instead have been drained this way.</p>
+        <div class="card"><p class="t">A REAL CASE NOSHASHI MEASURED · 28 AUG 2026</p>
+          <p>Amount said 999,332.87. delivered_amount said 3,958.64, about 0.4%. The transaction succeeded. In the same sample, 3 of 223 consecutive payments carried the partial-payment flag.</p></div>
+        <p>Two more payment words: a <strong>destination tag</strong> is a number that tells a shared account (like an exchange) which customer a payment is for, and <strong>escrow</strong> locks XRP until a time or condition is met.</p>
+        <p class="takeaway"><b>KEY IDEA</b>Check what a payment delivered, not what it asked for.</p>
+      </section>
+
+      <section id="m6">
+        <h2>6 · Compliance words, made simple</h2>
+        <p class="mins">ABOUT 4 MINUTES</p>
+        <ul>
+          <li><strong>Compliance</strong>: following the laws and rules that apply to moving money.</li>
+          <li><strong>KYC / AML</strong>: Know Your Customer and Anti-Money-Laundering: checking who people are and stopping criminal money.</li>
+          <li><strong>Travel Rule (FATF Recommendation 16)</strong>: above a threshold, sender and receiver details must travel with a transfer between providers. NOSHASHI tells you when a transfer is in scope for your jurisdiction's threshold.</li>
+          <li><strong>Amendment</strong>: a change to the XRPL's rules. It only switches on after most validators vote for it for two weeks.</li>
+          <li><strong>Permissioned domains (XLS-80)</strong>: areas of the ledger where only approved accounts can take part.</li>
+          <li><strong>Credentials (XLS-70)</strong>: on-ledger proofs that an account has passed a check (for example KYC), which can be shown selectively.</li>
+          <li><strong>Counterparty</strong>: whoever is on the other side of your transaction.</li>
+          <li><strong>Concentration</strong>: how much of something a few holders own. NOSHASHI measures it with the Herfindahl-Hirschman Index (HHI).</li>
+        </ul>
+        <p class="takeaway"><b>KEY IDEA</b>Compliance on the XRPL is two questions: am I allowed to move this, and could I actually get out of it?</p>
+      </section>
+
+      <p class="part" id="app">PART 2 · THE NOSHASHI APP</p>
+
+      <section id="m7">
+        <h2>7 · What NOSHASHI is</h2>
+        <p class="mins">ABOUT 3 MINUTES</p>
+        <p><strong>NOSHASHI</strong> is a desktop app (macOS, Windows and Linux) that reads the live XRP Ledger and answers two questions about any account, token or payment, from the same ledger reading:</p>
+        <ol>
+          <li><strong>Am I allowed to move this?</strong> The compliance side: issuer powers, credentials, Travel Rule, counterparty checks.</li>
+          <li><strong>Could I actually get out of it?</strong> The market side: funded order-book depth, AMM pools, concentration.</li>
+        </ol>
+        <p>It reads validated mainnet only. Nothing is estimated or made up: where a figure cannot be established, the app says so instead of showing zero. Every result carries the ledger index and a <strong>SHA-256 digest</strong>, a fingerprint anyone can recompute to prove the record was not changed.</p>
+        <div class="card"><p class="t">STATUS</p><p>NOSHASHI is in <strong>beta</strong> (version 1.0.9). Every build is labelled beta. It is for information, not financial or legal advice.</p></div>
+      </section>
+
+      <section id="m8">
+        <h2>8 · Getting started</h2>
+        <p class="mins">ABOUT 3 MINUTES</p>
+        <ol>
+          <li>Go to <a href="/downloads/">Downloads</a> and pick your system: <code>.dmg</code> for Mac (Apple Silicon or Intel), <code>.msi</code> or <code>.exe</code> for Windows, <code>.deb</code>, <code>.rpm</code> or <code>.AppImage</code> for Linux.</li>
+          <li>Install and open it. The landing screen shows a live view of the ledger; continue into the console.</li>
+          <li>The left sidebar holds every screen, grouped into sections: Overview, Adjudication, Markets &amp; Exposure, Treasury &amp; Issuance, Record, Intelligence, Public and Growth.</li>
+          <li>Start with <strong>Check an Address</strong> (free): paste any address that starts with <code>r</code> and read what the ledger says about it.</li>
+          <li>Updates arrive in the app under <strong>Settings › Updates</strong>, so you install once.</li>
+        </ol>
+        <p>No crypto is needed to use it. You never have to connect a wallet or share a secret key; NOSHASHI only reads public data.</p>
+      </section>
+
+      <section id="m9">
+        <h2>9 · Reading a verdict</h2>
+        <p class="mins">ABOUT 3 MINUTES</p>
+        <p>When NOSHASHI checks something, it gives one overall verdict, and a result for every individual check that led to it.</p>
+        <div class="verdict">
+          <div class="v go"><b>GO</b><span>Every check passed. Nothing on the ledger stands in the way.</span></div>
+          <div class="v hold"><b>HOLD</b><span>Something needs a person to look before moving. Not a no, a "check first".</span></div>
+          <div class="v nogo"><b>NO-GO</b><span>A blocking check failed. Do not move until it is resolved.</span></div>
+        </div>
+        <p>Each individual check shows one of five states:</p>
+        <div class="verdict">
+          <div class="v go"><b>PASS</b><span>The check was run and was satisfied.</span></div>
+          <div class="v nogo"><b>FAIL</b><span>The check was run and was not satisfied.</span></div>
+          <div class="v hold"><b>REVIEW</b><span>The result needs a human decision.</span></div>
+          <div class="v neutral"><b>INSUFFICIENT_DATA</b><span>The ledger did not give enough to decide. This is an abstention, never a pass.</span></div>
+          <div class="v neutral"><b>NOT_APPLICABLE</b><span>The check does not apply to this case.</span></div>
+        </div>
+        <p>Every verdict names the exact rule that decided it, and comes with a <strong>receipt</strong>: the ledger index, the rules version and a SHA-256 digest.</p>
+      </section>
+
+      <section id="m10">
+        <h2>10 · Every screen, explained</h2>
+        <p class="mins">ABOUT 12 MINUTES · USE IT AS A REFERENCE</p>
+        <p>Screens are listed in the order of the app's sidebar. "Free" marks the ones anyone can use without a plan.</p>
+
+        <h3>Overview</h3>
+        <div class="feature"><h4>Overview <small>HOME</small></h4><p>What NOSHASHI is, what it does, and what is coming. Start here if you are new.</p></div>
+        <div class="feature"><h4>Mission Control <small>CONTROL</small></h4><p>Live mainnet telemetry: the latest validated ledger, network health, and the wallet gate. <span class="how">Use it to see at a glance that the app is connected and current before relying on any reading.</span></p></div>
+
+        <h3>Adjudication: "am I allowed to move this?"</h3>
+        <div class="feature"><h4>Verification <small>GATE</small></h4><p>Run a settlement through the compliance gate and get GO / HOLD / NO-GO with a receipt. <span class="how">Enter the sender, receiver, asset and amount, then run the check. Read the verdict, then open each check to see which rule decided it.</span></p></div>
+        <div class="feature"><h4>Provenance</h4><p>How old an account is and which account first funded it, so you know where a counterparty came from. <span class="how">Paste the counterparty's address.</span></p></div>
+        <div class="feature"><h4>Credentials</h4><p>The XLS-70 credential registry: which on-ledger credentials an account holds, with selective disclosure.</p></div>
+        <div class="feature"><h4>Domain Grid</h4><p>XLS-80 permissioned domains and their policy state: who is allowed in, under which rules.</p></div>
+
+        <h3>Markets &amp; Exposure: "could I get out of it?"</h3>
+        <div class="feature"><h4>Exposure Analysis <small>RISK</small></h4><p>Issuer freeze rights, Travel Rule scope and counterparty concentration for a position, in one view.</p></div>
+        <div class="feature"><h4>Portfolio &amp; Radar <small>DESK</small></h4><p>Watch several wallets at once, with a compliance radar that flags changes. <span class="how">Add the wallets you care about; the radar keeps checking them.</span></p></div>
+        <div class="feature"><h4>Order Book</h4><p>How much of a book's quoted depth is backed by someone who still holds the asset: listed versus funded depth. <span class="how">Choose the pair, then compare the two depth figures and the unfunded share.</span></p></div>
+        <div class="feature"><h4>Pool Governance <small>AMM</small></h4><p>Who votes an AMM pool's fee, on what share of its liquidity, and who holds the discounted auction slot.</p></div>
+
+        <h3>Treasury &amp; Issuance</h3>
+        <div class="feature"><h4>Control Surface <small>TREASURY</small></h4><p>Who can move a treasury: signers, quorum (the minimum that must agree, from summed signing weights), master-key bypass and locked reserve. <span class="how">Paste the treasury address and read how many keys it really takes.</span></p></div>
+        <div class="feature"><h4>Issuance</h4><p>Holder concentration and enforcement history for any token, seen from the issuer's side. If too little of the supply can be read to support a figure, it withholds the figure.</p></div>
+        <div class="feature"><h4>Authority</h4><p>What the issuer of an asset can still do to it (freeze, clawback, single-key control, transfer fee), digested so the reading can be re-checked. The same check powers the free certificate on this website.</p></div>
+        <div class="feature"><h4>Passport</h4><p>A signed, portable record of an asset's posture (authority, freeze rights, concentration) you can hand to someone else.</p></div>
+
+        <h3>Record</h3>
+        <div class="feature"><h4>Audit Trail <small>HISTORY</small></h4><p>A wallet's history with compliance details attached, ready to export.</p></div>
+        <div class="feature"><h4>Settlement</h4><p>What a transaction actually delivered, not what it requested: catches partial payments. <span class="how">Paste a transaction hash and compare Amount with delivered_amount.</span></p></div>
+        <div class="feature"><h4>Ledger &amp; Policy <small>WORKSTATION</small></h4><p>Your history of verdicts, your organisation's policy (your own thresholds and rules, with drafts, approval and an audit log), investigations (cases) and a signed export for auditors.</p></div>
+
+        <h3>Intelligence</h3>
+        <div class="feature"><h4>Agent</h4><p>An AI analyst and support desk that runs on your own device by default. Modes include Compliance, Support, Observer (watches for changes and can open an investigation in one click) and Governance. You can also connect a remote provider with your own key.</p></div>
+        <div class="feature"><h4>Ledger Garden</h4><p>A visual way to walk issuer → asset → holder → transaction → evidence, then ask the agent about what you found.</p></div>
+
+        <h3>Public tools</h3>
+        <div class="feature"><h4>Check an Address <span class="tag free">FREE</span></h4><p>Read what the ledger publishes about any account before you pay it. The best first screen for anyone.</p></div>
+        <div class="feature"><h4>Inbox <small>CLAIMS</small></h4><p>Unsolicited tokens or claims sent to an account, and whether they really exist. A currency code can be copied by anyone, so an impersonated ticker from an issuer with nothing behind it is flagged as uncashable.</p></div>
+        <div class="feature"><h4>Token Rights <small>NFT</small></h4><p>What an NFT's issuer can still do after you own it: burn it, change what it points to, block resale or take a cut of every sale. Read from the NFT's ID itself.</p></div>
+        <div class="feature"><h4>Ledger Sync <span class="tag free">FREE</span></h4><p>What four public servers each report, and where they disagree. Disagreement is shown, not hidden.</p></div>
+        <div class="feature"><h4>Learn</h4><p>Short animated explainers inside the app: the gate, freeze rights, book depth and the address check.</p></div>
+
+        <h3>Growth, account and settings</h3>
+        <div class="feature"><h4>Growth</h4><p>Drafts for posts and pitches built only from figures the app actually measured, each with its date. You post them yourself.</p></div>
+        <div class="feature"><h4>Pricing, Account and Settings</h4><p>Plans and checkout; your subscription, two-factor authentication and API keys; appearance, notifications, the global shortcut and updates.</p></div>
+        <div class="feature"><h4>Menu-bar HUD <small>macOS</small></h4><p>A small live panel in the Mac menu bar with a ticker, opened by a global keyboard shortcut.</p></div>
+      </section>
+
+      <section id="m11">
+        <h2>11 · Free tools on this website</h2>
+        <p class="mins">ABOUT 2 MINUTES</p>
+        <ul>
+          <li><a href="/certificate/">Authority certificate</a>: paste any issuer address and get a free, re-checkable reading of what it can still do, with the ledger index and digest.</li>
+          <li><a href="/misread/">Misread cases</a>: real examples where a quick reading of the ledger gives the wrong answer.</li>
+          <li><a href="/research/">Research</a> and <a href="/docs/">Docs</a>: methods, evidence and the Compliance API.</li>
+          <li><a href="/guide/">Plain-language guide</a>: a shorter introduction to the same ideas.</li>
+        </ul>
+      </section>
+
+      <section id="m12">
+        <h2>12 · Plans, trust and what's next</h2>
+        <p class="mins">ABOUT 3 MINUTES</p>
+        <div class="scroll"><table class="kv">
+          <tr><th>PLAN</th><th>FOR</th><th>PRICE</th></tr>
+          <tr><td>Free</td><td>One address, the public tools</td><td>$0</td></tr>
+          <tr><td>Pro</td><td>A desk: every screen, per seat</td><td>$749 / seat / month</td></tr>
+          <tr><td>Institutional</td><td>Regulated teams, unlimited seats</td><td>$4,000 / month</td></tr>
+          <tr><td>Enterprise · Strategic</td><td>Larger organisations</td><td>From $120,000 / year</td></tr>
+        </table></div>
+        <p>See <a href="/pricing/">Pricing</a> for the current details.</p>
+        <h3>Why you can trust a reading</h3>
+        <ul>
+          <li>Every reading names its ledger index, so anyone can check the same moment.</li>
+          <li>Every record carries a SHA-256 digest; change one character and the digest changes.</li>
+          <li>The app can hash its own program file, so you can confirm you are running the published build.</li>
+          <li>The code is public on GitHub.</li>
+        </ul>
+        <h3>Coming next</h3>
+        <p>Opt-in crash reporting, a phone-sized layout, translations into seven languages, and an iPhone and iPad build (it already compiles; see the <a href="https://github.com/Ignosha/noshashi/blob/main/docs/IOS.md">iOS notes</a>).</p>
+      </section>
+
+      <p class="part" id="check">PART 3 · KNOWLEDGE CHECK</p>
+      <section>
+        <h2>Knowledge check</h2>
+        <p class="mins">15 QUESTIONS · YOUR ANSWERS STAY IN YOUR BROWSER</p>
+        <p class="noprint">Pick an answer for each question, then press <strong>Check my answers</strong>. Each answer is explained.</p>
+        <form class="quiz" id="quiz"></form>
+        <div class="cta noprint">
+          <button class="btn" type="button" id="grade">Check my answers</button>
+          <button class="btn ghost" type="button" id="reset">Start again</button>
+        </div>
+        <p class="score" id="score" aria-live="polite"></p>
+      </section>
+
+      <p class="part" id="vocab">PART 4 · WORD LIST</p>
+      <section>
+        <h2>Word list</h2>
+        <p class="mins">EVERY TERM IN THIS COURSE, A TO Z</p>
+        <input class="filter noprint" id="vfilter" type="search" placeholder="Search the word list" aria-label="Search the word list">
+        <dl class="vocab" id="vlist"></dl>
+      </section>
+
+      <section id="deep">
+        <h2>Under the hood</h2>
+        <p class="mins">FOR THE CURIOUS · OPEN ANY PANEL</p>
+        <details class="deep"><summary>How NOSHASHI is built</summary>
+          <p>The desktop app is built with Tauri 2: a Rust core with a React and TypeScript interface. It talks to public XRPL servers directly over WebSocket and checks four of them against each other. Accounts, plans and shared organisation features (policies, investigations, webhooks) run on Supabase edge functions. This website is a static site on Vercel with a few server functions, such as the free certificate.</p></details>
+        <details class="deep"><summary>The ledger calls it reads</summary>
+          <p><code>account_info</code> (flags and keys), <code>account_lines</code> (trust lines), <code>gateway_balances</code> (an issuer's obligations per currency), <code>book_offers</code> (order books, with <code>taker_gets_funded</code>), <code>amm_info</code> (pools), <code>tx</code> (a transaction and its <code>delivered_amount</code>) and <code>ledger</code> (the validated ledger index).</p></details>
+        <details class="deep"><summary>For organisations</summary>
+          <p>Organisation policies with a pending state and four-eyes approval (two people must agree), exceptions with an evidence request step, shared investigations with a hash-chained case log, signed webhooks for events, and a read-only Compliance API.</p></details>
+        <details class="deep"><summary>Release history</summary>
+          <p>0.1–0.3: first public builds. 1.0.4–1.0.7: the gate, receipts, policy and investigations. 1.0.8: the Observer, one-click issuer investigation, five-state checks, evidence requests and the live garden. 1.0.9: screens that clipped now scroll, and groundwork for iOS. Full notes are in the <a href="/progress/">progress log</a>.</p></details>
+      </section>
+    </article>
+  </div>
+</div>
+
+<footer>
+  <div class="shell">
+    © 2026 NOSHASHI Labs · <a href="/">Home</a> · <a href="/guide/">Guide</a> · <a href="/pricing/">Pricing</a> ·
+    <a href="/status/">Status</a> · <a href="/contact/">Contact</a> · <a href="/legal/">Legal &amp; accessibility</a><br>
+    Nothing here is financial or legal advice. All builds are beta.
+  </div>
+</footer>
+
+<script>
+(function(){
+  var Q = [
+    ["What makes a ledger 'validated'?", ["It is older than a day","Enough trusted validators agreed on it, so it cannot change","NOSHASHI approved it","It contains only XRP payments"], 1, "A ledger is validated once enough validators agree on it. After that it is final, which is why NOSHASHI only reads validated ledgers."],
+    ["Two tokens are both called USD. What tells them apart?", ["Their price","The issuer address","The colour in your wallet","Nothing, they are the same"], 1, "Anyone can use the currency code USD. The issuer address is what identifies a token."],
+    ["What must you open before you can hold an issued token?", ["An escrow","A trust line to the issuer","An AMM pool","A signer list"], 1, "A trust line says you accept the issuer's token, and your balance lives on it."],
+    ["An issuer has set No Freeze. What does that mean?", ["It can freeze whenever it likes","It has permanently given up the power to freeze","The token is frozen now","Only XRP can be frozen"], 1, "No Freeze is permanent. Holders of that issuer's tokens cannot be frozen."],
+    ["Which power lets an issuer take tokens back out of your account?", ["Transfer fee","Require Auth","Clawback","Destination tag"], 2, "Clawback. It must be switched on before any tokens exist, so it is a permanent property of that token."],
+    ["What is a blackholed issuer?", ["One that has been hacked","One nobody can ever sign for again","One with no holders","One that charges no fee"], 1, "Its master key is disabled and its regular key points at an address nobody controls, so nobody can act on it."],
+    ["What is an unfunded offer?", ["An offer with no price","An offer still on the book although its owner cannot fill it","An offer in XRP","A cancelled offer"], 1, "Offers stay listed after the owner stops holding the asset. They make the book look deeper than it is."],
+    ["Listed depth is 1,000,000 but funded depth is 50,000. How much could you realistically trade against?", ["1,000,000","50,000","950,000","Nothing"], 1, "Only funded depth is backed by someone who can deliver."],
+    ["A payment shows tesSUCCESS. Which figure tells you what actually arrived?", ["Amount","delivered_amount","The fee","The ledger index"], 1, "With the partial-payment flag, Amount is only a maximum. delivered_amount is what arrived."],
+    ["What does the Travel Rule require?", ["Payments must be slow","Sender and receiver details travel with transfers above a threshold","Every token must be frozen","Only XRP can be sent abroad"], 1, "FATF Recommendation 16 requires originator and beneficiary information above a threshold. NOSHASHI tells you when a transfer is in scope."],
+    ["What are the two questions NOSHASHI answers?", ["Price and volume","Am I allowed to move this, and could I actually get out of it?","Who owns XRP, and when to buy","Which wallet is fastest"], 1, "Compliance and exit liquidity, from the same ledger reading."],
+    ["A check shows INSUFFICIENT_DATA. How should you treat it?", ["As a pass","As a fail","As an abstention: the ledger did not give enough to decide","As a bug"], 2, "It is never a pass. The app would rather say it cannot tell than guess."],
+    ["Which screen shows who can really move a treasury?", ["Order Book","Control Surface","Inbox","Ledger Sync"], 1, "Control Surface derives the real quorum from signing weights and flags a master key that can bypass a signer list."],
+    ["Which screen catches a partial payment?", ["Settlement","Pool Governance","Passport","Growth"], 0, "Settlement compares what was requested with what was delivered."],
+    ["Why does every NOSHASHI reading include a ledger index and a SHA-256 digest?", ["For decoration","So anyone can re-check the same moment and prove the record was not changed","To make files bigger","Because the law says so"], 1, "The ledger index fixes the moment; the digest is a fingerprint that changes if anything in the record changes."]
+  ];
+  var form = document.getElementById("quiz");
+  Q.forEach(function(q, i){
+    var fs = document.createElement("fieldset"); fs.className = "q"; fs.id = "q" + i;
+    var lg = document.createElement("legend"); lg.textContent = (i + 1) + ". " + q[0]; fs.appendChild(lg);
+    q[1].forEach(function(opt, j){
+      var lb = document.createElement("label");
+      var inp = document.createElement("input"); inp.type = "radio"; inp.name = "q" + i; inp.value = j; inp.id = "q" + i + "o" + j;
+      lb.appendChild(inp); lb.appendChild(document.createTextNode(" " + opt)); fs.appendChild(lb);
+    });
+    var why = document.createElement("p"); why.className = "why";
+    why.textContent = "Answer: " + q[1][q[2]] + ". " + q[3]; fs.appendChild(why);
+    form.appendChild(fs);
+  });
+  document.getElementById("grade").addEventListener("click", function(){
+    var right = 0, answered = 0;
+    Q.forEach(function(q, i){
+      var fs = document.getElementById("q" + i), pick = form.querySelector('input[name="q' + i + '"]:checked');
+      fs.classList.remove("right", "wrong");
+      if (!pick) return;
+      answered++;
+      if (Number(pick.value) === q[2]) { right++; fs.classList.add("right"); } else fs.classList.add("wrong");
+    });
+    var s = document.getElementById("score");
+    s.textContent = answered < Q.length
+      ? "You scored " + right + " of " + answered + " answered. " + (Q.length - answered) + " still to answer."
+      : "You scored " + right + " of " + Q.length + "." + (right === Q.length ? " Every answer right." : " Read the explanations for the ones you missed.");
+  });
+  document.getElementById("reset").addEventListener("click", function(){
+    form.reset(); form.querySelectorAll(".q").forEach(function(f){ f.classList.remove("right", "wrong"); });
+    document.getElementById("score").textContent = "";
+  });
+
+  var V = [
+    ["Account","An address on the ledger, starting with r, controlled by whoever holds its key."],
+    ["Amendment","A change to the XRPL's rules, switched on after most validators support it for two weeks."],
+    ["AML","Anti-Money-Laundering: rules to stop criminal money moving."],
+    ["AMM","Automated market maker: a pool of two assets that trades automatically (XLS-30)."],
+    ["Auction slot","A place in an AMM pool that gives one account discounted trading for a time."],
+    ["Blackholed","An account nobody can sign for again, because its keys lead nowhere."],
+    ["Clawback","An issuer power to take tokens back from a holder. Must be enabled before issuing."],
+    ["Compliance","Following the laws and rules that apply to moving money."],
+    ["Concentration","How much of an asset a few holders own. NOSHASHI uses the HHI to measure it."],
+    ["Counterparty","Whoever is on the other side of a transaction."],
+    ["Credential","An on-ledger proof that an account passed a check (XLS-70)."],
+    ["Currency code","A token's name, like USD. Anyone can use any code, so it proves nothing on its own."],
+    ["Deep freeze","A freeze where the holder can neither send nor receive the token (XLS-77)."],
+    ["delivered_amount","The amount a payment actually delivered. The figure to trust."],
+    ["Depth","How much is on offer in an order book."],
+    ["Destination tag","A number that tells a shared account which customer a payment is for."],
+    ["DEX","The decentralised exchange built into the XRPL."],
+    ["Digest (SHA-256)","A fingerprint of a record. Change anything and the digest changes."],
+    ["Escrow","XRP locked until a time or condition is met."],
+    ["Flag","A setting on an account that switches a power on or off."],
+    ["Freeze","An issuer power to stop a holder sending its token on."],
+    ["Funded depth","Depth backed by owners who can actually deliver."],
+    ["Global freeze","An issuer freezing every holder of its tokens at once."],
+    ["HHI","Herfindahl-Hirschman Index: a standard measure of concentration."],
+    ["HOLD","A verdict meaning a person should look before moving."],
+    ["Issuer","The account that creates a token and sets its rules."],
+    ["KYC","Know Your Customer: checking who someone is."],
+    ["Ledger","One numbered version of the XRPL's shared record, produced every few seconds."],
+    ["Ledger index","The number of a ledger. Fixes a reading to a moment anyone can re-check."],
+    ["Listed depth","All the depth shown on a book, including offers nobody can fill."],
+    ["LP token","A token received for adding money to an AMM pool; it carries a fee vote."],
+    ["Mainnet","The real, live XRP Ledger, as opposed to test networks."],
+    ["Master key","The original key of an account. It can be disabled."],
+    ["Multi-signature","Several keys must sign together; set with a signer list."],
+    ["NFT","A unique token. Its issuer may keep rights over it after sale."],
+    ["No Freeze","A permanent promise by an issuer never to freeze."],
+    ["NO-GO","A verdict meaning a blocking check failed."],
+    ["GO","A verdict meaning every check passed."],
+    ["Offer","A posted order to trade one asset for another on the DEX."],
+    ["Order book","All the offers for one trading pair."],
+    ["Partial payment","A payment whose Amount is only a maximum; it may deliver less."],
+    ["Permissioned domain","An area of the ledger only approved accounts can use (XLS-80)."],
+    ["Quorum","The minimum signing weight needed to act for an account."],
+    ["Receipt","NOSHASHI's record of a verdict: ledger index, rules version and digest."],
+    ["Regular key","A second key an account nominates to sign for it."],
+    ["Require Auth","The issuer must approve you before you can hold its token."],
+    ["Reserve","XRP every account must keep locked, to prevent junk accounts."],
+    ["Signer list","The list of keys and weights for multi-signature."],
+    ["Stablecoin","A token meant to keep a steady value, such as one US dollar."],
+    ["tesSUCCESS","The result code for a successful transaction. It does not mean the full Amount arrived."],
+    ["Token","An asset on the XRPL other than XRP, created by an issuer."],
+    ["Transfer fee","A percentage an issuer takes when holders send its token to each other."],
+    ["Travel Rule","FATF Recommendation 16: sender and receiver details must travel with transfers above a threshold."],
+    ["Trust line","The link you open to an issuer to hold its token."],
+    ["Unfunded offer","An offer still on the book although its owner cannot fill it."],
+    ["Validated ledger","A ledger enough validators agreed on. It is final."],
+    ["Validator","A server that votes on which ledger is the true next one."],
+    ["XRP","The XRP Ledger's own currency."],
+    ["XRPL","The XRP Ledger."]
+  ];
+  V.sort(function(a, b){ return a[0].toLowerCase().localeCompare(b[0].toLowerCase()); });
+  var dl = document.getElementById("vlist");
+  function draw(f){
+    dl.textContent = "";
+    V.forEach(function(v){
+      if (f && (v[0] + " " + v[1]).toLowerCase().indexOf(f) < 0) return;
+      var dt = document.createElement("dt"); dt.textContent = v[0];
+      var dd = document.createElement("dd"); dd.textContent = v[1];
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+  }
+  draw("");
+  document.getElementById("vfilter").addEventListener("input", function(e){ draw(e.target.value.trim().toLowerCase()); });
+})();
+</script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/i18n.js" defer></script>
+</body>
+</html>
