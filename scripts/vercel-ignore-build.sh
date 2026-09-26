@@ -23,7 +23,7 @@ changed=$(git diff --name-only "$base" HEAD 2>/dev/null) || exit 1
 # or a manual redeploy): always build it.
 [ -z "$changed" ] && exit 1
 
-app_only='^(\.claude/|outreach/|src-tauri/|src/components/|src/App\.tsx$|src/main\.tsx$|src/lib/.*\.tsx?$|src/.*__tests__/|tests/|\.github/|supabase/|frontend/|backend/|index\.html$|vite\.config\.mts$|vite\.noshx\.ts$|docs/IOS\.md$|HANDOFF\.md$|scripts/i18n-wip/|scripts/learn-videos/|scripts/noshx-model/)'
+app_only='^(\.claude/|outreach/|src-tauri/|src/components/|src/App\.tsx$|src/main\.tsx$|src/lib/.*\.tsx?$|src/.*__tests__/|tests/|\.github/|supabase/|frontend/|backend/|index\.html$|vite\.config\.mts$|vite\.noshx\.ts$|docs/IOS\.md$|HANDOFF\.md$|scripts/i18n-wip/|scripts/learn-videos/|scripts/noshx-model/|deploy/app-preview/)'
 
 if printf '%s\n' "$changed" | grep -qvE "$app_only"; then
   exit 1
