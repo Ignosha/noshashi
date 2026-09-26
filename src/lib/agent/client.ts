@@ -5,16 +5,19 @@ import {
   normalizeEndpoint,
   type AgentConfig,
 } from "./providers";
-import { getProviderKey } from "./keys";
+import { hasProviderKey } from "./keys";
 import { containsLedgerSeed, SecretInMessageError } from "./secrets";
+import { modelCall, TransportError } from "./transport";
 
 /**
  * One agent transport for every runtime.
  *
- * Two wire formats cover the entire field: Ollama's native API and the
- * OpenAI chat-completions shape that LM Studio, llama.cpp, Jan, vLLM,
- * OpenRouter, Groq and Together all speak. Everything above this module
- * is provider-agnostic as a result.
+ * Three wire formats cover the field: Ollama's native API, the OpenAI
+ * chat-completions shape that LM Studio, llama.cpp, Jan, vLLM,
+ * OpenRouter, Groq and Together all speak, and Anthropic's Messages API.
+ * Everything above this module is provider-agnostic as a result. The
+ * requests themselves leave through ./transport.ts, which in the desktop
+ * app means Rust, where the API key is added.
  */
 
 export type ChatMessage = {
@@ -36,36 +39,69 @@ export class AgentUnavailableError extends Error {
 }
 
 const PROBE_TIMEOUT_MS = 2500;
+/** Hosted model lists are slower than a local socket. */
+const HOSTED_PROBE_TIMEOUT_MS = 10_000;
 
-/** Sampling temperature for conversation turns. Low: the agent explains a fixed rule set. */
+/** Sampling temperature for local runtimes. Low: the agent explains a fixed rule set. */
 export const CHAT_TEMPERATURE = 0.3;
-/** Output cap sent to Anthropic, which requires one. Other runtimes use their own default. */
-export const ANTHROPIC_MAX_TOKENS = 2048;
+/**
+ * Output cap sent to Anthropic, which requires one. Generous, because a
+ * capped answer stops mid-sentence; the other runtimes use their own.
+ */
+export const ANTHROPIC_MAX_TOKENS = 16_000;
 /** Earlier turns re-sent with each question, for continuity without blowing the window. */
 export const HISTORY_TURNS = 6;
+/**
+ * Context window asked of a local runtime. Ollama's own default is too
+ * small for NOSHX's grounding plus retrieved pages, and each doubling
+ * costs memory an 8 GB laptop does not have spare; 8K fits both.
+ */
+export const LOCAL_CONTEXT_TOKENS = 8192;
 
-async function fetchWithTimeout(
-  url: string,
-  init: RequestInit = {},
-  timeoutMs = PROBE_TIMEOUT_MS
-): Promise<Response> {
-  const controller = new AbortController();
-  const timer = window.setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    return await fetch(url, { ...init, signal: init.signal ?? controller.signal });
-  } finally {
-    window.clearTimeout(timer);
+/**
+ * "fast" answers straight away; "deep" lets the model think first. On a
+ * laptop running a small local model the difference is seconds per
+ * answer, so fast is the default and deep is the operator's choice.
+ */
+export type Reasoning = "fast" | "deep";
+
+/** Claude models that take an effort setting. */
+function takesEffort(model: string): boolean {
+  return /^claude-(opus-5|opus-4-[678]|sonnet-5|fable-5)/.test(model);
+}
+
+/**
+ * Per-provider request options for the reasoning setting. Ollama takes
+ * `think` (a model without thinking rejects it, and the request is made
+ * again without); Claude takes an effort level.
+ */
+export function reasoningOptions(config: AgentConfig, reasoning: Reasoning): Record<string, unknown> {
+  const api = findProvider(config.providerId).api;
+  if (api === "ollama") return { think: reasoning === "deep" };
+  if (api === "anthropic" && reasoning === "deep" && takesEffort(config.model)) {
+    return { output_config: { effort: "high" } };
   }
+  return {};
 }
 
-/** Strip a trailing slash so path joins never double up. */
-function base(url: string): string {
-  return normalizeEndpoint(url);
+/** True when a runtime refused a request because of the `think` option. */
+export function refusedThink(status: number, body: string): boolean {
+  return status === 400 && /think/i.test(body);
 }
 
-function apiBase(config: AgentConfig): string {
+/**
+ * Whether to send a sampling temperature. Current Claude models reject
+ * one outright (400), as do OpenAI's reasoning models, which is what made
+ * switching to a hosted model fail on the first message. Hosted models
+ * run at their own defaults; local runtimes keep the low setting.
+ */
+export function sendsTemperature(config: AgentConfig): boolean {
+  return findProvider(config.providerId).local;
+}
+
+export function apiBase(config: AgentConfig): string {
   const provider = findProvider(config.providerId);
-  const endpoint = base(config.baseUrl);
+  const endpoint = normalizeEndpoint(config.baseUrl);
   if (provider.api === "ollama") return endpoint.replace(/\/v1$/, "");
   if (provider.local && provider.api === "openai" && new URL(endpoint).pathname === "/") {
     return `${endpoint}/v1`;
@@ -73,84 +109,93 @@ function apiBase(config: AgentConfig): string {
   return endpoint;
 }
 
-/**
- * Auth headers for a provider. Local runtimes need none; hosted ones
- * take the key from the OS keyring at call time.
- */
-async function authHeaders(config: AgentConfig): Promise<Record<string, string>> {
+/** Turn a transport failure or an HTTP error into one plain sentence. */
+export function describeFailure(status: number, body: string, config: AgentConfig): string {
   const provider = findProvider(config.providerId);
-  if (!provider.requiresKey) return {};
-
-  const key = await getProviderKey(provider.id);
-  if (!key) {
-    throw new AgentUnavailableError(
-      `${provider.name} needs an API key. Add one in the runtime panel — it is stored in the OS keyring.`
-    );
+  let detail = "";
+  try {
+    const parsed = JSON.parse(body) as Record<string, any>;
+    detail = String(parsed.error?.message ?? parsed.error ?? parsed.message ?? "");
+  } catch {
+    detail = body.slice(0, 200);
   }
-
-  if (provider.api === "anthropic") {
-    return {
-      "x-api-key": key,
-      "anthropic-version": "2023-06-01",
-      // Anthropic requires this to be explicit for browser-origin calls.
-      "anthropic-dangerous-direct-browser-access": "true",
-    };
+  if (status === 401 || status === 403) {
+    return `${provider.name} refused the API key (${status}). Check it in the runtime panel.`;
   }
-  return { Authorization: `Bearer ${key}` };
+  if (status === 404) {
+    return `${provider.name} does not know "${config.model || "that endpoint"}" (404).${detail ? ` ${detail}` : ""}`;
+  }
+  if (status === 429) {
+    return `${provider.name} is rate limiting this key (429). Wait a moment, or switch runtime.`;
+  }
+  return `${provider.name} replied ${status}.${detail ? ` ${detail}` : ""}`;
 }
 
-export async function listModels(config: AgentConfig): Promise<AgentModel[]> {
-  const provider = findProvider(config.providerId);
+async function call(
+  config: AgentConfig,
+  path: string,
+  init: { method: "GET" | "POST"; body?: unknown; stream?: boolean; onChunk?: (t: string) => void; signal?: AbortSignal; timeoutMs?: number; headers?: Record<string, string> }
+) {
   const safety = isEndpointSafe(config.baseUrl);
   if (!safety.ok) throw new AgentUnavailableError(safety.reason!);
+  try {
+    return await modelCall({ config, url: `${apiBase(config)}${path}`, ...init });
+  } catch (error) {
+    if (error instanceof TransportError) throw new AgentUnavailableError(error.message);
+    throw error;
+  }
+}
 
-  const headers = await authHeaders(config);
+/**
+ * Whether a provider can be used right now without a network call:
+ * a hosted provider with no key stored is not usable, and saying so is
+ * better than a request that fails with 401.
+ */
+export async function missingKey(config: AgentConfig): Promise<string | null> {
+  const provider = findProvider(config.providerId);
+  if (!provider.requiresKey) return null;
+  if (await hasProviderKey(provider.id).catch(() => false)) return null;
+  return `${provider.name} needs an API key. Paste it below and press SEAL; it is kept in the OS keyring.`;
+}
 
-  if (provider.api === "anthropic") {
-    const response = await fetchWithTimeout(`${apiBase(config)}/models`, { headers });
-    if (!response.ok) {
-      throw new AgentUnavailableError(`Anthropic replied ${response.status}.`);
-    }
-    const payload = (await response.json()) as { data?: Array<Record<string, any>> };
-    return (payload.data ?? []).map((model) => ({
-      name: String(model.id ?? ""),
-      sizeBytes: 0,
-      detail: String(model.display_name ?? ""),
-    }));
+export async function listModels(config: AgentConfig, signal?: AbortSignal): Promise<AgentModel[]> {
+  const provider = findProvider(config.providerId);
+  const missing = await missingKey(config);
+  if (missing) throw new AgentUnavailableError(missing);
+
+  const timeoutMs = provider.local ? PROBE_TIMEOUT_MS : HOSTED_PROBE_TIMEOUT_MS;
+  const path = provider.api === "ollama" ? "/api/tags" : "/models";
+  const reply = await call(config, path, { method: "GET", signal, timeoutMs });
+  if (reply.status < 200 || reply.status >= 300) {
+    throw new AgentUnavailableError(describeFailure(reply.status, reply.body, config));
+  }
+
+  let payload: Record<string, any>;
+  try {
+    payload = JSON.parse(reply.body);
+  } catch {
+    throw new AgentUnavailableError(`${provider.name} answered, but not with a model list.`);
   }
 
   if (provider.api === "ollama") {
-    const response = await fetchWithTimeout(`${apiBase(config)}/api/tags`);
-    if (!response.ok) {
-      throw new AgentUnavailableError(`Runtime replied ${response.status}.`);
-    }
-    const payload = (await response.json()) as { models?: Array<Record<string, any>> };
-    return (payload.models ?? []).map((model) => ({
+    return ((payload.models ?? []) as Array<Record<string, any>>).map((model) => ({
       name: String(model.name ?? ""),
       sizeBytes: Number(model.size ?? 0),
       detail: String(model.details?.parameter_size ?? model.details?.family ?? ""),
     }));
   }
-
-  const response = await fetchWithTimeout(`${apiBase(config)}/models`, { headers });
-  if (!response.ok) {
-    throw new AgentUnavailableError(`Runtime replied ${response.status}.`);
-  }
-  const payload = (await response.json()) as { data?: Array<Record<string, any>> };
-  return (payload.data ?? []).map((model) => ({
+  return ((payload.data ?? []) as Array<Record<string, any>>).map((model) => ({
     name: String(model.id ?? ""),
     sizeBytes: 0,
-    detail: String(model.owned_by ?? ""),
+    detail: String(model.display_name ?? model.owned_by ?? ""),
   }));
 }
 
-/** Best available model, honouring the small-instruct preference order. */
+/** Best available model, honouring the preference order. */
 export function pickModel(models: AgentModel[]): string | null {
   if (models.length === 0) return null;
   for (const preferred of MODEL_PREFERENCE) {
-    const match = models.find((model) =>
-      model.name.toLowerCase().includes(preferred)
-    );
+    const match = models.find((model) => model.name.toLowerCase().includes(preferred));
     if (match) return match.name;
   }
   return models[0].name;
@@ -162,9 +207,7 @@ export function pickModel(models: AgentModel[]): string | null {
  * machine — the operator has to opt in to anything else.
  */
 export async function autodetect(): Promise<AgentConfig | null> {
-  const candidates = (await import("./providers")).PROVIDERS.filter(
-    (provider) => provider.autodetect
-  );
+  const candidates = (await import("./providers")).PROVIDERS.filter((provider) => provider.autodetect);
 
   const probes = candidates.flatMap((provider) => {
     const endpoints = new Set([provider.defaultBaseUrl]);
@@ -174,12 +217,7 @@ export async function autodetect(): Promise<AgentConfig | null> {
 
     return [...endpoints].map(async (baseUrl) => {
       try {
-        const config: AgentConfig = {
-          providerId: provider.id,
-          baseUrl,
-          model: "",
-          hasStoredKey: false,
-        };
+        const config: AgentConfig = { providerId: provider.id, baseUrl, model: "", hasStoredKey: false };
         const models = await listModels(config);
         if (models.length === 0) return null;
         return { ...config, model: pickModel(models) ?? "" };
@@ -194,126 +232,178 @@ export async function autodetect(): Promise<AgentConfig | null> {
   return results.find((result): result is AgentConfig => result !== null) ?? null;
 }
 
+/**
+ * Reads a streamed completion in any of the three formats. Ollama emits
+ * newline-delimited JSON, the OpenAI shape and Anthropic emit server-sent
+ * events; all are read line by line because a chunk can end mid-frame.
+ */
+export function streamParser(onToken: (token: string) => void) {
+  let buffer = "";
+  let full = "";
+
+  const handle = (line: string) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("event:") || trimmed.startsWith(":")) return;
+    const payload = trimmed.startsWith("data:") ? trimmed.slice(5).trim() : trimmed;
+    if (payload === "[DONE]") return;
+
+    let frame: Record<string, any>;
+    try {
+      frame = JSON.parse(payload);
+    } catch {
+      return; // A malformed frame is not worth ending a good stream over.
+    }
+    if (frame.error || frame.type === "error") {
+      const error = frame.error;
+      throw new AgentUnavailableError(
+        typeof error === "string" ? error : (error?.message ?? "The runtime reported an error.")
+      );
+    }
+    // Ollama: message.content · OpenAI: choices[0].delta.content ·
+    // Anthropic: delta.text on a text_delta (thinking deltas are skipped).
+    const token =
+      frame.message?.content ??
+      frame.choices?.[0]?.delta?.content ??
+      (frame.type === "content_block_delta" && frame.delta?.type === "text_delta" ? frame.delta.text : "") ??
+      "";
+    if (token) {
+      full += token;
+      onToken(token);
+    }
+  };
+
+  return {
+    push(text: string) {
+      buffer += text;
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines) handle(line);
+    },
+    end(): string {
+      if (buffer) handle(buffer);
+      buffer = "";
+      return full;
+    },
+  };
+}
+
 export type ChatOptions = {
   config: AgentConfig;
   messages: ChatMessage[];
   onToken: (token: string) => void;
   signal?: AbortSignal;
   temperature?: number;
+  reasoning?: Reasoning;
 };
 
-/**
- * Stream a completion. Ollama emits newline-delimited JSON and the
- * OpenAI shape emits server-sent events; both are read line-by-line
- * because a network chunk can split a frame in half.
- */
+/** The request body for a streamed chat, shaped for the provider's API. */
+export function chatBody(config: AgentConfig, messages: ChatMessage[], temperature: number, reasoning: Reasoning = "fast") {
+  const provider = findProvider(config.providerId);
+  const withTemperature = sendsTemperature(config);
+  const extra = reasoningOptions(config, reasoning);
+
+  if (provider.api === "anthropic") {
+    // The system prompt stays out of the message list, and a token budget is required.
+    return {
+      model: config.model,
+      max_tokens: ANTHROPIC_MAX_TOKENS,
+      system: messages.find((message) => message.role === "system")?.content,
+      messages: messages.filter((message) => message.role !== "system"),
+      stream: true,
+      ...extra,
+    };
+  }
+  if (provider.api === "ollama") {
+    return {
+      model: config.model,
+      messages,
+      stream: true,
+      ...extra,
+      options: { num_ctx: LOCAL_CONTEXT_TOKENS, ...(withTemperature ? { temperature } : {}) },
+    };
+  }
+  return { model: config.model, messages, stream: true, ...(withTemperature ? { temperature } : {}) };
+}
+
+export function chatPath(config: AgentConfig): string {
+  const api = findProvider(config.providerId).api;
+  return api === "anthropic" ? "/messages" : api === "ollama" ? "/api/chat" : "/chat/completions";
+}
+
+/** Stream a completion, token by token. */
 export async function chatStream({
   config,
   messages,
   onToken,
   signal,
   temperature = CHAT_TEMPERATURE,
+  reasoning = "fast",
 }: ChatOptions): Promise<string> {
   // Before anything else: a message carrying a ledger secret is never
   // sent, to a local model or a hosted one. See ./secrets.ts.
   for (const message of messages) {
     if (message.role !== "system" && (await containsLedgerSeed(message.content))) throw new SecretInMessageError();
   }
-  const provider = findProvider(config.providerId);
-  const safety = isEndpointSafe(config.baseUrl);
-  if (!safety.ok) throw new AgentUnavailableError(safety.reason!);
   if (!config.model) throw new AgentUnavailableError("No model selected.");
 
-  const headers = {
-    "Content-Type": "application/json",
-    ...(await authHeaders(config)),
-  };
-
-  // Anthropic keeps the system prompt out of the message list and needs
-  // an explicit token budget, so its request is shaped separately.
-  const isAnthropic = provider.api === "anthropic";
-  const systemPrompt = messages.find((message) => message.role === "system")?.content;
-  const conversation = messages.filter((message) => message.role !== "system");
-
-  const url = isAnthropic
-    ? `${apiBase(config)}/messages`
-    : provider.api === "ollama"
-      ? `${apiBase(config)}/api/chat`
-      : `${apiBase(config)}/chat/completions`;
-
-  const body = isAnthropic
-    ? {
-        model: config.model,
-        max_tokens: ANTHROPIC_MAX_TOKENS,
-        system: systemPrompt,
-        messages: conversation,
-        stream: true,
-        temperature,
-      }
-    : provider.api === "ollama"
-      ? { model: config.model, messages, stream: true, options: { temperature } }
-      : { model: config.model, messages, stream: true, temperature };
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-    signal,
-  });
-
-  if (!response.ok || !response.body) {
-    throw new AgentUnavailableError(
-      `Runtime replied ${response.status}. Is "${config.model}" available on ${provider.name}?`
-    );
+  const parser = streamParser(onToken);
+  const send = (body: Record<string, unknown>) =>
+    call(config, chatPath(config), { method: "POST", body, stream: true, onChunk: (text) => parser.push(text), signal });
+  const body = chatBody(config, messages, temperature, reasoning) as Record<string, unknown>;
+  let reply = await send(body);
+  if ("think" in body && refusedThink(reply.status, reply.body)) {
+    // A model without a thinking mode: ask again without the option.
+    const { think: _omit, ...plain } = body;
+    reply = await send(plain);
   }
+  if (reply.status < 200 || reply.status >= 300) {
+    throw new AgentUnavailableError(describeFailure(reply.status, reply.body, config));
+  }
+  return parser.end();
+}
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
+export type PullProgress = { status: string; completed?: number; total?: number };
+
+/**
+ * Download a model into a local Ollama, reporting progress. The runtime
+ * streams one JSON object per line; an `error` field ends the pull.
+ */
+export async function pullModel(
+  config: AgentConfig,
+  model: string,
+  onProgress: (progress: PullProgress) => void,
+  signal?: AbortSignal
+): Promise<void> {
+  if (findProvider(config.providerId).api !== "ollama") {
+    throw new AgentUnavailableError("Models can be installed from here into Ollama only.");
+  }
   let buffer = "";
-  let full = "";
-
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-
-      // OpenAI-compatible streams prefix every frame with "data: ".
-      const payload = trimmed.startsWith("data:") ? trimmed.slice(5).trim() : trimmed;
-      if (payload === "[DONE]") continue;
-
-      try {
-        const frame = JSON.parse(payload) as Record<string, any>;
-        if (frame.error) {
-          throw new AgentUnavailableError(
-            typeof frame.error === "string"
-              ? frame.error
-              : (frame.error.message ?? "Runtime error")
-          );
-        }
-        // Ollama: message.content · OpenAI: choices[0].delta.content
-        // Anthropic: delta.text on a content_block_delta event
-        const token =
-          frame.message?.content ??
-          frame.choices?.[0]?.delta?.content ??
-          (frame.type === "content_block_delta" ? frame.delta?.text : "") ??
-          "";
-        if (token) {
-          full += token;
-          onToken(token);
-        }
-      } catch (error) {
-        if (error instanceof AgentUnavailableError) throw error;
-        // A malformed frame is not worth ending a good stream over.
-      }
+  let failure: string | null = null;
+  const handle = (line: string) => {
+    if (!line.trim()) return;
+    try {
+      const frame = JSON.parse(line) as Record<string, any>;
+      if (frame.error) failure = String(frame.error);
+      else onProgress({ status: String(frame.status ?? ""), completed: frame.completed, total: frame.total });
+    } catch {
+      /* partial or malformed line */
     }
+  };
+  const reply = await call(config, "/api/pull", {
+    method: "POST",
+    body: { model, stream: true },
+    stream: true,
+    signal,
+    onChunk: (text) => {
+      buffer += text;
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      lines.forEach(handle);
+    },
+  });
+  handle(buffer);
+  if (reply.status < 200 || reply.status >= 300) {
+    throw new AgentUnavailableError(describeFailure(reply.status, reply.body, config));
   }
-
-  return full;
+  if (failure) throw new AgentUnavailableError(`Ollama could not install ${model}: ${failure}`);
 }

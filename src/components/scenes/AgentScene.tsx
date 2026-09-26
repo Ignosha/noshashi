@@ -17,11 +17,17 @@ import {
   HISTORY_TURNS,
   listModels,
   pickModel,
+  pullModel,
   type AgentModel,
   type ChatMessage,
+  type Reasoning,
 } from "@/lib/agent/client";
+import { askNoshx, NOSHX_PREAMBLE, type NoshxStep } from "@/lib/noshx/loop";
+import { referenceBlock, searchKnowledge } from "@/lib/noshx/knowledge";
+import { useBilling } from "@/lib/billing/useEntitlements";
 import {
   PROVIDERS,
+  RECOMMENDED_LOCAL,
   defaultConfig,
   findProvider,
   isEndpointSafe,
@@ -62,7 +68,21 @@ type Turn = {
   error?: boolean;
   /** Output of the deterministic policy simulation, not of the model. */
   simulation?: boolean;
+  /** NOSHX's ledger reads for this answer, in the order they finished. */
+  steps?: NoshxStep[];
+  /** Set when this answer came from a failover runtime. */
+  via?: string;
 };
+
+/** The last endpoint and model used with each provider, so switching back restores them. */
+type Profiles = Record<string, { baseUrl: string; model: string; okAt?: number }>;
+
+/** Free-plan address checks, shared with the Check an Address screen. */
+const FREE_CHECKS_PER_MONTH = 10;
+function monthKey() {
+  const d = new Date();
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
 
 let turnId = 0;
 
@@ -78,7 +98,16 @@ export function AgentScene({ data }: { data: XrplState }) {
   const { push } = useToast();
 
   const [mode, setMode] = useState<AgentMode>("compliance");
-  const [config, setConfig] = useSetting<AgentConfig>("agent.config", defaultConfig());
+  const [config, setConfig, configLoaded] = useSetting<AgentConfig>("agent.config", defaultConfig());
+  const [profiles, setProfiles, profilesLoaded] = useSetting<Profiles>("agent.profiles", {});
+  const [failover, setFailover] = useSetting<boolean>("agent.failover", true);
+  const [reasoning, setReasoning] = useSetting<Reasoning>("agent.reasoning", "fast");
+  // Answered at all (even with no models), as opposed to unreachable.
+  const [reachable, setReachable] = useState(false);
+  const [installing, setInstalling] = useState<{ model: string; status: string; percent: number | null } | null>(null);
+  const [checks, setChecks] = useSetting<{ month: string; count: number }>("public.checks", { month: monthKey(), count: 0 });
+  const [endpointDraft, setEndpointDraft] = useState<string | null>(null);
+  const { has } = useBilling();
   const [models, setModels] = useState<AgentModel[]>([]);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const [showRuntimePicker, setShowRuntimePicker] = useState(false);
@@ -117,62 +146,165 @@ export function AgentScene({ data }: { data: XrplState }) {
     mode: AiUseRecord["mode"],
     messages: ChatMessage[],
     response: string,
-    outcome: AiUseRecord["outcome"]
+    outcome: AiUseRecord["outcome"],
+    used: AgentConfig = config
   ) =>
-    void recordFor({ at: new Date().toISOString(), mode, config, messages, response, outcome })
+    void recordFor({ at: new Date().toISOString(), mode, config: used, messages, response, outcome })
       .then(useLog.append)
       .catch(() => undefined);
 
+  // Remember what worked per provider, so switching back is one click.
+  const remember = useCallback(
+    (next: AgentConfig, ok: boolean) => {
+      setProfiles({
+        ...profiles,
+        [next.providerId]: { baseUrl: next.baseUrl, model: next.model, okAt: ok ? Date.now() : profiles[next.providerId]?.okAt },
+      });
+    },
+    [profiles, setProfiles]
+  );
+
+  // Each probe gets a number; a slower, older probe that answers after a
+  // newer one must not overwrite the operator's newer choice.
+  const probeSeq = useRef(0);
+
   const probe = useCallback(
-    async (target?: AgentConfig) => {
+    async (target?: AgentConfig, options: { allowAutodetect?: boolean } = {}) => {
+      const seq = ++probeSeq.current;
+      const current = () => seq === probeSeq.current;
       const active = target ?? config;
+      const activeProvider = findProvider(active.providerId);
       const started = performance.now();
       setProbing(true);
       setRuntimeError(null);
       try {
         const found = await listModels(active);
+        if (!current()) return;
+        setReachable(true);
         setModels(found);
         if (found.length === 0) {
-          setRuntimeError(
-            `${findProvider(active.providerId).name} is reachable but exposes no models. ${findProvider(active.providerId).setupHint}`
-          );
+          setRuntimeError(`${activeProvider.name} is reachable but exposes no models. ${activeProvider.setupHint}`);
           return;
         }
-        if (!active.model || !found.some((entry) => entry.name === active.model)) {
-          setConfig({ ...active, model: pickModel(found) ?? "" });
-        } else if (target) {
-          setConfig(active);
-        }
+        const model =
+          active.model && found.some((entry) => entry.name === active.model) ? active.model : (pickModel(found) ?? "");
+        const next = { ...active, model };
+        setConfig(next);
+        remember(next, true);
       } catch (error) {
+        if (!current()) return;
+        setReachable(false);
         setModels([]);
-        // Nothing at the configured endpoint — look for any local runtime
-        // before telling the operator it is broken.
-        const discovered = await autodetect();
-        if (discovered) {
-          setConfig(discovered);
-          const found = await listModels(discovered).catch(() => []);
-          setModels(found);
-          setRuntimeError(null);
-          return;
+        // Only at startup, and only when a local runtime was configured, is
+        // it right to go looking for another local runtime. An explicit
+        // choice, above all a hosted one, is never silently replaced: that
+        // replacement is what made switching look stuck.
+        if (options.allowAutodetect && activeProvider.local) {
+          const discovered = await autodetect();
+          if (!current()) return;
+          if (discovered) {
+            setReachable(true);
+            setConfig(discovered);
+            remember(discovered, true);
+            setModels(await listModels(discovered).catch(() => []));
+            setRuntimeError(null);
+            return;
+          }
         }
         setRuntimeError(
           error instanceof Error
-            ? `${error.message.replace(/[.!?]?$/, ".")} Tried ${active.baseUrl}.`
+            ? `${error.message.replace(/[.!?]?$/, ".")}${activeProvider.requiresKey ? "" : ` Tried ${active.baseUrl}.`}`
             : "No model runtime reachable."
         );
       } finally {
-        setProbeMs(Math.round(performance.now() - started));
-        setProbing(false);
+        if (current()) {
+          setProbeMs(Math.round(performance.now() - started));
+          setProbing(false);
+        }
       }
     },
-    [config, setConfig]
+    [config, setConfig, remember]
   );
 
-  // Probe once on mount; `probe` changes with config so it is not a dep.
+  // Probe once the saved choice has loaded. Probing before that checked
+  // the built-in default (Ollama) and wrote it back over the operator's
+  // saved runtime on every launch.
+  const probedOnLoad = useRef(false);
   useEffect(() => {
-    void probe();
+    // Profiles too: the first probe records one, and must not overwrite
+    // the saved set before it has been read.
+    if (!configLoaded || !profilesLoaded || probedOnLoad.current) return;
+    probedOnLoad.current = true;
+    void probe(undefined, { allowAutodetect: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [configLoaded, profilesLoaded]);
+
+  /** Switch runtime, restoring the endpoint and model last used with it. */
+  const switchTo = (providerId: string, baseUrl?: string) => {
+    const entry = findProvider(providerId);
+    const saved = profiles[providerId];
+    const next: AgentConfig = {
+      providerId,
+      baseUrl: baseUrl ?? saved?.baseUrl ?? entry.defaultBaseUrl,
+      model: baseUrl ? "" : (saved?.model ?? ""),
+      hasStoredKey: false,
+    };
+    abortRef.current?.abort();
+    setConfig(next);
+    setModels([]);
+    setEndpointDraft(null);
+    void probe(next);
+  };
+
+  /** Download a recommended model into the local Ollama, then use it. */
+  const install = async (model: string) => {
+    if (installing) return;
+    setInstalling({ model, status: "starting", percent: null });
+    try {
+      await pullModel(config, model, (progress) =>
+        setInstalling({
+          model,
+          status: progress.status,
+          percent: progress.total ? Math.round(((progress.completed ?? 0) / progress.total) * 100) : null,
+        })
+      );
+      push({ title: "MODEL INSTALLED", body: `${model} is ready on this machine.`, tone: "go" });
+      const next = { ...config, model };
+      setConfig(next);
+      void probe(next);
+    } catch (error) {
+      push({ title: "INSTALL FAILED", body: error instanceof Error ? error.message : "Ollama did not finish the download.", tone: "no-go" });
+    } finally {
+      setInstalling(null);
+    }
+  };
+
+  /** Another runtime that worked before, for failover. Local first: it is free and private. */
+  const failoverTarget = (): AgentConfig | null => {
+    const candidates = Object.entries(profiles)
+      .filter(([id, profile]) => id !== config.providerId && profile.model && profile.okAt)
+      .sort(([a, pa], [b, pb]) => {
+        const la = findProvider(a).local ? 1 : 0;
+        const lb = findProvider(b).local ? 1 : 0;
+        return lb - la || (pb.okAt ?? 0) - (pa.okAt ?? 0);
+      });
+    const [id, profile] = candidates[0] ?? [];
+    return id && profile ? { providerId: id, baseUrl: profile.baseUrl, model: profile.model, hasStoredKey: false } : null;
+  };
+
+  // Address checks NOSHX makes on the free plan count against the same
+  // monthly allowance as the Check an Address screen.
+  // A ref, because one answer can run several checks before a re-render.
+  const checksRef = useRef(checks);
+  checksRef.current = checks;
+  const spendFreeCheck = () => {
+    const used = checksRef.current.month === monthKey() ? checksRef.current.count : 0;
+    if (used >= FREE_CHECKS_PER_MONTH) return false;
+    const next = { month: monthKey(), count: used + 1 };
+    checksRef.current = next;
+    setChecks(next);
+    return true;
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -253,13 +385,22 @@ export function AgentScene({ data }: { data: XrplState }) {
     if (mode === "support" && !ready) {
       const matches = findAnswers(prompt);
       const best = matches[0];
+      // No model: answer from the index, which holds the help answers and
+      // every product page, ranked on their full text. The two closest
+      // passages are shown with where each comes from.
+      const pages = await searchKnowledge(prompt, 2).catch(() => []);
       setTurns((prev) => [
         ...prev,
         { id: ++turnId, role: "user", content: prompt },
         {
           id: ++turnId,
           role: "assistant",
-          content: best ? best.answer.answer : fallbackAnswer(prompt),
+          content:
+            pages.length > 0
+              ? pages.map((page) => `${page.text}\n— ${page.title} · ${page.source}`).join("\n\n")
+              : best
+                ? best.answer.answer
+                : fallbackAnswer(prompt),
         },
       ]);
       setDraft("");
@@ -293,6 +434,7 @@ export function AgentScene({ data }: { data: XrplState }) {
       role: "assistant",
       content: "",
       streaming: true,
+      steps: mode === "compliance" ? [] : undefined,
     };
     setTurns((prev) => [...prev, userTurn, ...(simTurn ? [simTurn] : []), assistantTurn]);
     setDraft("");
@@ -301,65 +443,100 @@ export function AgentScene({ data }: { data: XrplState }) {
     const controller = new AbortController();
     abortRef.current = controller;
 
+    const patch = (update: (turn: Turn) => Turn) =>
+      setTurns((prev) => prev.map((turn) => (turn.id === assistantTurn.id ? update(turn) : turn)));
+
+    // The product's own pages for this question. A local model gets a
+    // smaller slice so the whole prompt fits its context on a laptop.
+    const hits = await searchKnowledge(prompt, 5).catch(() => []);
+    const reference = referenceBlock(hits, provider.local ? 4500 : 12000);
+    const grounding =
+      buildSystemPrompt(mode, data, boundary, buildPolicyBrief(activePolicy, ledgerEntries[0] ?? null)) +
+      (simText ? `\n\n${simText}` : "") +
+      (reference ? `\n\n${reference}` : "");
     // Send the last few turns for continuity without blowing the window.
+    const earlier: ChatMessage[] = turns
+      .filter((turn) => !turn.simulation && !turn.error && turn.content)
+      .slice(-HISTORY_TURNS)
+      .map((turn) => ({ role: turn.role, content: turn.content }));
+    // A conversation sent to a model starts with the operator's turn.
+    while (earlier[0]?.role === "assistant") earlier.shift();
     const history: ChatMessage[] = [
-      {
-        role: "system",
-        content:
-          buildSystemPrompt(mode, data, boundary, buildPolicyBrief(activePolicy, ledgerEntries[0] ?? null)) +
-          (simText ? `\n\n${simText}` : ""),
-      },
-      ...turns.filter((turn) => !turn.simulation).slice(-HISTORY_TURNS).map((turn) => ({
-        role: turn.role,
-        content: turn.content,
-      })),
+      { role: "system", content: mode === "compliance" ? `${NOSHX_PREAMBLE}\n\n${grounding}` : grounding },
+      ...earlier,
       { role: "user", content: prompt },
     ];
 
-    let response = "";
-    try {
+    // One attempt on a given runtime. NOSHX (compliance mode) reads the
+    // ledger through tools; support mode streams a plain answer.
+    const attempt = async (target: AgentConfig): Promise<string> => {
+      if (mode === "compliance") {
+        const result = await askNoshx({
+          config: target,
+          system: history[0].content,
+          messages: history.slice(1),
+          context: { has, spendFreeCheck },
+          signal: controller.signal,
+          reasoning,
+          onStep: (step) => patch((turn) => ({ ...turn, steps: [...(turn.steps ?? []), step] })),
+        });
+        if (result.usedTools) {
+          patch((turn) => ({ ...turn, content: result.text }));
+          return result.text;
+        }
+        // The model cannot call tools: answer from the grounding alone.
+      }
+      let streamed = "";
       await chatStream({
-        config,
+        config: target,
         messages: history,
         signal: controller.signal,
+        reasoning,
         onToken: (token: string) => {
-          response += token;
-          setTurns((prev) =>
-            prev.map((turn) =>
-              turn.id === assistantTurn.id
-                ? { ...turn, content: turn.content + token }
-                : turn
-            )
-          );
+          streamed += token;
+          patch((turn) => ({ ...turn, content: turn.content + token }));
         },
       });
-      setTurns((prev) =>
-        prev.map((turn) =>
-          turn.id === assistantTurn.id ? { ...turn, streaming: false } : turn
-        )
-      );
-      recordUse(mode, history, response, "complete");
+      return streamed;
+    };
+
+    let response = "";
+    let used = config;
+    try {
+      try {
+        response = await attempt(config);
+      } catch (error) {
+        // Seamless failover: when this runtime cannot be reached or refuses
+        // the request, and nothing has been shown yet, ask the runtime that
+        // last worked instead, and say so.
+        const fallback = failover && !controller.signal.aborted && error instanceof AgentUnavailableError ? failoverTarget() : null;
+        if (!fallback) throw error;
+        used = fallback;
+        const reason = error instanceof Error ? error.message : "request failed";
+        patch((turn) => ({ ...turn, content: "", steps: turn.steps ? [] : undefined, via: findProvider(fallback.providerId).name }));
+        push({
+          title: `SWITCHED TO ${findProvider(fallback.providerId).name.toUpperCase()}`,
+          body: `${provider.name} failed: ${reason}`,
+          tone: "hold",
+        });
+        response = await attempt(fallback);
+        setConfig(fallback);
+        remember(fallback, true);
+        setModels(await listModels(fallback).catch(() => []));
+        setRuntimeError(null);
+      }
+      patch((turn) => ({ ...turn, streaming: false }));
+      recordUse(mode, history, response, "complete", used);
     } catch (error) {
       const aborted = controller.signal.aborted;
-      recordUse(mode, history, response, aborted ? "stopped" : "error");
+      recordUse(mode, history, response, aborted ? "stopped" : "error", used);
       const message = aborted
         ? "Generation stopped."
         : error instanceof Error
           ? error.message
           : "The agent could not complete that request.";
 
-      setTurns((prev) =>
-        prev.map((turn) =>
-          turn.id === assistantTurn.id
-            ? {
-                ...turn,
-                streaming: false,
-                error: !aborted,
-                content: turn.content || message,
-              }
-            : turn
-        )
-      );
+      patch((turn) => ({ ...turn, streaming: false, error: !aborted, content: turn.content || message }));
 
       if (!aborted) {
         push({ title: "AGENT ERROR", body: message, tone: "no-go" });
@@ -404,9 +581,9 @@ export function AgentScene({ data }: { data: XrplState }) {
     <div className="flex h-full min-w-0 flex-col gap-3 p-4">
       <SceneHeader
         index="07"
-        kicker={`${boundary.onDevice ? "ON-DEVICE" : "REMOTE"} ANALYST · ${provider.name.toUpperCase()} · ADVISORY ONLY`}
-        title="COMPLIANCE AGENT"
-        sub={`A model grounded in live ledger state and the real policy rule set. It explains verdicts; it never issues them. ${boundary.statement}`}
+        kicker={`NOSHX · ${boundary.onDevice ? "ON-DEVICE" : "REMOTE"} · ${provider.name.toUpperCase()} · ADVISORY ONLY`}
+        title="NOSHX"
+        sub={`NOSHASHI's agent. It reads the live ledger through the app's own tools and explains what it finds; it never issues a verdict or moves anything. Switch between a local model and a hosted one at any time. ${boundary.statement}`}
         status={ready ? (boundary.onDevice ? "go" : "hold") : probing ? "hold" : "no-go"}
         statusLabel={probing ? "PROBING" : ready ? (boundary.onDevice ? "LOCAL RUNTIME" : "REMOTE RUNTIME") : "RUNTIME DOWN"}
         right={
@@ -426,7 +603,7 @@ export function AgentScene({ data }: { data: XrplState }) {
               }}
             >
               <TabsList>
-                <TabsTrigger value="compliance">COMPLIANCE</TabsTrigger>
+                <TabsTrigger value="compliance">NOSHX</TabsTrigger>
                 <TabsTrigger value="support">SUPPORT</TabsTrigger>
                 <TabsTrigger value="observer">
                   OBSERVER{observerAlerts ? ` · ${observerAlerts}` : ""}
@@ -478,7 +655,7 @@ export function AgentScene({ data }: { data: XrplState }) {
         ) : (
         /* Conversation */
         <Panel
-          label={mode === "compliance" ? "COMPLIANCE ANALYST" : "SUPPORT DESK"}
+          label={mode === "compliance" ? "NOSHX · LIVE LEDGER ANALYST" : "SUPPORT DESK"}
           corners
           className="col-span-3 min-h-0 min-w-0"
           bodyClassName="flex min-h-0 min-w-0 flex-col p-0"
@@ -503,20 +680,31 @@ export function AgentScene({ data }: { data: XrplState }) {
             {runtimeError && turns.length === 0 && mode !== "support" ? (
               <EmptyState
                 icon={<NovaBolt size={16} />}
-                title="LOCAL RUNTIME NOT DETECTED"
+                title={
+                  provider.requiresKey && !keyStored
+                    ? `ADD YOUR ${provider.name.toUpperCase()} API KEY`
+                    : provider.local
+                      ? "LOCAL RUNTIME NOT DETECTED"
+                      : `${provider.name.toUpperCase()} NOT REACHABLE`
+                }
                 body={runtimeError}
                 action={
                   <div className="flex flex-col items-center gap-2">
                     <Button size="sm" variant="outline" onClick={() => void probe()}>
-                      RETRY DETECTION
+                      {provider.local ? "RETRY DETECTION" : "TRY AGAIN"}
                     </Button>
+                    {failoverTarget() && (
+                      <Button size="sm" variant="outline" onClick={() => switchTo(failoverTarget()!.providerId)}>
+                        USE {findProvider(failoverTarget()!.providerId).name.toUpperCase()} INSTEAD
+                      </Button>
+                    )}
                     <a
                       href={provider.docsUrl}
                       target="_blank"
                       rel="noreferrer noopener"
                       className="stencil text-[8px] tracking-[0.2em] text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
                     >
-                      INSTALL {provider.name.toUpperCase()}
+                      {provider.local ? "INSTALL" : "OPEN"} {provider.name.toUpperCase()}{provider.local ? "" : " DOCS"}
                     </a>
                   </div>
                 }
@@ -532,12 +720,12 @@ export function AgentScene({ data }: { data: XrplState }) {
                 </motion.div>
                 <div className="max-w-[420px]">
                   <p className="display text-[13px] font-[700] tracking-[0.1em] text-foreground">
-                    ASK THE GRID
+                    {mode === "compliance" ? "ASK NOSHX" : "ASK THE GRID"}
                   </p>
                   <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-                    The agent can see the live ledger, this wallet's credentials and
-                    the full domain rule set. It explains verdicts — it never issues
-                    them.
+                    {mode === "compliance"
+                      ? "NOSHX reads the live ledger with NOSHASHI's own tools: issuer authority, order-book depth, settlements, control surfaces, provenance and more. Name an address, issuer, pair or transaction hash. Its reasoning is the model's; its figures come from the ledger."
+                      : "The agent can see the live ledger, this wallet's credentials and the full domain rule set. It explains verdicts — it never issues them."}
                   </p>
                 </div>
                 <div className="grid w-full max-w-[520px] grid-cols-2 gap-2">
@@ -586,6 +774,34 @@ export function AgentScene({ data }: { data: XrplState }) {
                             SIMULATION · COMPUTED BY THE POLICY ENGINE · NOT MODEL OUTPUT
                           </p>
                         )}
+                        {turn.via && (
+                          <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-hold">
+                            ANSWERED BY {turn.via.toUpperCase()} · FAILOVER
+                          </p>
+                        )}
+                        {turn.steps && turn.steps.length > 0 && (
+                          <ul className="mb-1.5 space-y-0.5 border-l border-border pl-2">
+                            {turn.steps.map((step, index) => (
+                              <li key={index} className="mono-font text-[9px] leading-snug text-muted-foreground">
+                                {step.kind === "tool" ? (
+                                  <>
+                                    <span className={step.ok ? "text-go" : "text-no-go"}>{step.ok ? "READ" : "FAILED"}</span>{" "}
+                                    {step.name}
+                                    {Object.values(step.input).length > 0 && ` · ${Object.values(step.input).map(String).join(" · ")}`}
+                                    {!step.ok && ` — ${step.summary}`}
+                                  </>
+                                ) : (
+                                  <span className="text-hold">{step.text}</span>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {turn.streaming && turn.content.length === 0 && turn.steps && (
+                          <span className="mono-font block text-[8px] tracking-[0.2em] text-muted-foreground">
+                            NOSHX IS READING THE LEDGER…
+                          </span>
+                        )}
                         <p
                           className={cn(
                             "selectable whitespace-pre-wrap break-words leading-relaxed",
@@ -632,8 +848,10 @@ export function AgentScene({ data }: { data: XrplState }) {
                   mode === "support"
                     ? "Ask anything about the console — this works without an AI runtime"
                     : ready
-                      ? "Ask about a verdict, a credential, a domain rule…"
-                      : "Start a model runtime to enable the compliance analyst"
+                      ? mode === "compliance"
+                        ? "Ask NOSHX: \"Can the issuer of USD rvYAf… freeze my balance?\" or paste a transaction hash"
+                        : "Ask about a verdict, a credential, a domain rule…"
+                      : "Pick a runtime in the panel on the right to enable NOSHX"
                 }
                 className="min-w-0 flex-1 resize-none border border-input bg-transparent px-3 py-2 text-[11.5px] leading-relaxed text-foreground placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
               />
@@ -682,6 +900,31 @@ export function AgentScene({ data }: { data: XrplState }) {
                 label="ENDPOINT"
                 value={config.baseUrl.replace(/^https?:\/\//, "")}
               />
+              {endpointDraft === null ? (
+                <button
+                  onClick={() => setEndpointDraft(config.baseUrl)}
+                  className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  EDIT ENDPOINT
+                </button>
+              ) : (
+                <div className="mb-1.5 flex gap-1.5">
+                  <Input
+                    value={endpointDraft}
+                    onChange={(event) => setEndpointDraft(event.target.value)}
+                    aria-label="Runtime endpoint"
+                    className="mono-font h-7 text-[10px]"
+                  />
+                  <Button
+                    size="sm"
+                    disabled={!isEndpointSafe(endpointDraft).ok}
+                    title={isEndpointSafe(endpointDraft).reason}
+                    onClick={() => switchTo(config.providerId, endpointDraft.trim())}
+                  >
+                    APPLY
+                  </Button>
+                </div>
+              )}
               <DataRow label="MODELS" value={models.length} />
               <DataRow
                 label="LAST CHECK"
@@ -714,15 +957,8 @@ export function AgentScene({ data }: { data: XrplState }) {
                   <button
                     key={entry.id}
                     onClick={() => {
-                      const next = {
-                        providerId: entry.id,
-                        baseUrl: entry.defaultBaseUrl,
-                        model: "",
-                        hasStoredKey: false,
-                      };
-                      setConfig(next);
                       setShowRuntimePicker(false);
-                      void probe(next);
+                      switchTo(entry.id);
                     }}
                     className={cn(
                       "flex w-full items-start gap-2 border px-2 py-1.5 text-left transition-colors",
@@ -772,8 +1008,9 @@ export function AgentScene({ data }: { data: XrplState }) {
                   {provider.name.toUpperCase()} API KEY
                 </Eyebrow>
                 <p className="mb-2 text-[9px] leading-relaxed text-muted-foreground">
-                  Sealed in the OS keyring, scoped to this provider. Never written
-                  to a preferences file or browser storage.
+                  Sealed in the OS keyring, scoped to this provider, and only ever
+                  sent to {provider.id === "custom" ? "your custom endpoint" : new URL(provider.defaultBaseUrl).host}.
+                  The app adds it to each request itself; this window never reads it back.
                 </p>
                 <div className="flex gap-1.5">
                   <Input
@@ -886,6 +1123,78 @@ export function AgentScene({ data }: { data: XrplState }) {
                 {testingRuntime ? "TESTING…" : "TEST MODEL"}
               </Button>
             </div>
+            <label className="mt-2.5 flex cursor-pointer items-start gap-2 text-[9px] leading-snug text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={failover}
+                onChange={(event) => setFailover(event.target.checked)}
+                className="mt-0.5 accent-current"
+              />
+              <span>
+                <span className="stencil block text-[8px] tracking-[0.2em] text-foreground">FAILOVER</span>
+                If this runtime fails, answer with the last one that worked
+                {failoverTarget() ? ` (${findProvider(failoverTarget()!.providerId).name} · ${failoverTarget()!.model})` : ""} and say so.
+              </span>
+            </label>
+            <label className="mt-2 flex cursor-pointer items-start gap-2 text-[9px] leading-snug text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={reasoning === "deep"}
+                onChange={(event) => setReasoning(event.target.checked ? "deep" : "fast")}
+                className="mt-0.5 accent-current"
+              />
+              <span>
+                <span className="stencil block text-[8px] tracking-[0.2em] text-foreground">DEEP REASONING</span>
+                Let the model think before it answers. Better on hard questions; on a laptop model it adds seconds to each answer.
+              </span>
+            </label>
+
+            {provider.api === "ollama" && (
+              <div className="inset-row mt-3 p-2.5">
+                <Eyebrow className="mb-1.5">RECOMMENDED LOCAL MODELS</Eyebrow>
+                <div className="space-y-1.5">
+                  {RECOMMENDED_LOCAL.map((entry) => {
+                    const installed = models.some((m) => m.name === entry.model || m.name === `${entry.model}:latest`);
+                    const active = config.model === entry.model;
+                    const busyHere = installing?.model === entry.model;
+                    return (
+                      <div key={entry.model} className="border border-border px-2 py-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="mono-font min-w-0 flex-1 truncate text-[9.5px] text-foreground">{entry.model}</span>
+                          <span className="stencil shrink-0 text-[7.5px] tracking-[0.16em] text-telemetry">{entry.fits.toUpperCase()}</span>
+                        </div>
+                        <p className="mt-0.5 text-[8.5px] leading-snug text-muted-foreground">{entry.blurb}</p>
+                        <div className="mt-1">
+                          {busyHere ? (
+                            <p className="mono-font text-[8.5px] text-hold">
+                              {installing!.status.toUpperCase()}
+                              {installing!.percent !== null ? ` · ${installing!.percent}%` : ""}
+                            </p>
+                          ) : installed ? (
+                            <button
+                              disabled={active}
+                              onClick={() => setConfig({ ...config, model: entry.model })}
+                              className="stencil text-[8px] tracking-[0.2em] text-go disabled:opacity-60"
+                            >
+                              {active ? "IN USE" : "USE THIS MODEL"}
+                            </button>
+                          ) : (
+                            <button
+                              disabled={Boolean(installing) || !reachable}
+                              onClick={() => void install(entry.model)}
+                              title={reachable ? undefined : "Start Ollama first"}
+                              className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2 disabled:opacity-40"
+                            >
+                              INSTALL
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </Panel>
 
           {mode === "support" && (
@@ -965,7 +1274,7 @@ export function AgentScene({ data }: { data: XrplState }) {
             {[
               { icon: <NovaShield size={11} />, text: "Never adjudicates — the deterministic engine decides." },
               { icon: <NovaVault size={11} />, text: "Will not send a message containing an XRPL secret seed, to any model." },
-              { icon: <NovaBolt size={11} />, text: "Answers only from live state; no invented rules." },
+              { icon: <NovaBolt size={11} />, text: "Figures come from read-only ledger tools; it cannot sign or move anything." },
               {
                 icon: <NovaTerminal size={11} />,
                 text: boundary.onDevice

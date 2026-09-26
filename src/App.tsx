@@ -262,9 +262,9 @@ const SCENES: SceneDef[] = [
   },
   {
     id: "agent",
-    label: "AGENT",
-    title: "COMPLIANCE AGENT",
-    hint: "On-device analyst and support desk",
+    label: "NOSHX",
+    title: "NOSHX",
+    hint: "AI agent that reads the live ledger, on a local or hosted model",
     icon: <NovaEye size={15} />,
     digit: "7",
     group: "primary",

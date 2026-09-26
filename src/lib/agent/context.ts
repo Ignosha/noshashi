@@ -125,7 +125,7 @@ export function buildSystemPrompt(
       "- Credentials (Cmd+4): XLS-70 objects held by the wallet, and which domains they unlock. Free.",
       "- Domain Grid (Cmd+5): XLS-80 permissioned domains and their rule sets. Free.",
       "- Audit Trail (Cmd+6): wallet history, filterable, exportable to CSV. Free.",
-      "- Agent (Cmd+7): this assistant, with an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant. Free.",
+      "- NOSHX (Cmd+7): this assistant, NOSHASHI's agent. It reads the live ledger with read-only tools (authority, order book, settlement, control surface, provenance, pools, issuance, address check, claims, NFT rights, ledger status), each gated like its screen, answers questions about NOSHASHI itself from the product's own pages (features, screens, plans, docs, trust, legal), and runs on a local model (qwen3.5:4b recommended for an 8 GB laptop, installed from the runtime panel) or a hosted one, with optional failover and a deep reasoning switch. It has an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant. Free.",
       "- Portfolio & Radar (Cmd+8): multi-wallet surveillance and the compliance radar. Requires Desk.",
       "- Exposure Analysis (Cmd+9): issuer freeze rights, Travel Rule scope, counterparty concentration. Requires Desk.",
       "- Ledger & Policy (Cmd+0): local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export. Requires Desk.",
@@ -190,10 +190,10 @@ export function buildSystemPrompt(
 
 export const SUGGESTED_PROMPTS: Record<AgentMode, string[]> = {
   compliance: [
+    "Can Bitstamp's USD issuer freeze or claw back what I hold?",
+    "We are a regulated custodian. Which NOSHASHI plan and screens do we need?",
+    "How does NOSHASHI help with the Travel Rule, and what does it not cover?",
     "Why did the last gate check come back NO-GO?",
-    "What exactly is this wallet's reserve requirement right now?",
-    "Which domains could this wallet enter today, and what is missing for the rest?",
-    "Explain the difference between XLS-70 credentials and XLS-80 domains.",
   ],
   support: [
     "How do I export an audit trail for my accountant?",

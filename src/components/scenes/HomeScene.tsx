@@ -669,6 +669,7 @@ function sceneIdFor(scene: string): string {
     "Audit Trail": "history",
     "Exposure Analysis": "risk",
     "Ledger & Policy": "workstation",
+    NOSHX: "agent",
     Agent: "agent",
   };
   return map[scene] ?? "control";

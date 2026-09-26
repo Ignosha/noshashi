@@ -15,6 +15,8 @@
 use std::fs;
 use std::io::Read;
 
+mod model_proxy;
+
 use sha2::{Digest, Sha256};
 
 use tauri::{AppHandle, Manager};
@@ -264,11 +266,12 @@ fn verify_integrity(app: AppHandle) -> Result<IntegrityReport, String> {
 
 /// Model-provider API keys, one keyring entry per provider.
 ///
-/// Unlike the compliance secret, these are readable by the front end:
-/// the request to the provider is made from the web view, so the key has
-/// to reach it. The keyring still buys real protection — the value never
-/// lands in a preferences file, a log, or browser storage, and it is
-/// scoped per provider so revoking one does not disturb another.
+/// Like the compliance secret, these are written and cleared from the UI
+/// but never read back into the web view: model requests are made in
+/// model_proxy.rs, which takes the key from here and puts it on the TLS
+/// connection itself. The value never lands in a preferences file, a
+/// log, browser storage or JavaScript, and each provider has its own
+/// entry so revoking one does not disturb another.
 fn provider_entry(provider: &str) -> Result<keyring::Entry, String> {
     // Keep the account name a strict slug so a caller cannot smuggle
     // separators into the keyring namespace.
@@ -292,9 +295,9 @@ fn store_provider_key(provider: String, key: String) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-#[tauri::command]
-fn get_provider_key(provider: String) -> Result<Option<String>, String> {
-    match provider_entry(&provider)?.get_password() {
+/// Read by model_proxy.rs only; deliberately not a command.
+pub(crate) fn provider_key(provider: &str) -> Result<Option<String>, String> {
+    match provider_entry(provider)?.get_password() {
         Ok(value) => Ok(Some(value)),
         Err(keyring::Error::NoEntry) => Ok(None),
         Err(error) => Err(error.to_string()),
@@ -303,7 +306,7 @@ fn get_provider_key(provider: String) -> Result<Option<String>, String> {
 
 #[tauri::command]
 fn has_provider_key(provider: String) -> Result<bool, String> {
-    Ok(get_provider_key(provider)?.is_some())
+    Ok(provider_key(&provider)?.is_some())
 }
 
 #[tauri::command]
@@ -522,9 +525,10 @@ pub fn run() {
             set_tray_title,
             verify_integrity,
             store_provider_key,
-            get_provider_key,
             has_provider_key,
             clear_provider_key,
+            model_proxy::model_request,
+            model_proxy::model_cancel,
             updater_configured
         ]);
 
