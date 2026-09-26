@@ -10,6 +10,7 @@ import { readClaims } from "@/lib/desk/claims";
 import { readNft } from "@/lib/desk/nft";
 import { readSync } from "@/lib/net/sync";
 import { fetchLedger } from "@/lib/xrpl/client";
+import { searchKnowledge } from "./knowledge";
 
 /**
  * What NOSHX can do: read the live XRP Ledger through the same readers
@@ -71,6 +72,21 @@ const schema = (
 const addr = (description: string) => ({ type: "string", description });
 
 export const NOSHX_TOOLS: NoshxTool[] = [
+  {
+    name: "search_noshashi",
+    description:
+      "Search NOSHASHI's own pages and help: every app screen and button, features, plans and prices, the Learn course and word list, docs (API, webhooks, receipts, policies, security, enterprise), trust, legal and privacy. Use it for any question about the product, what a customer should use, or how NOSHASHI handles compliance. Returns passages with their page address.",
+    input_schema: schema({ query: { type: "string", description: "What to look up, in plain words" } }),
+    feature: null,
+    screen: "NOSHASHI pages",
+    run: async (input) => {
+      const query = String(input.query ?? "").trim();
+      if (!query) throw new ToolInputError("query is empty.");
+      const hits = await searchKnowledge(query, 6);
+      if (hits.length === 0) return "Nothing in NOSHASHI's pages matches that. Say so rather than guess.";
+      return hits.map((hit) => ({ title: hit.title, source: hit.source, text: hit.text }));
+    },
+  },
   {
     name: "ledger_status",
     description:

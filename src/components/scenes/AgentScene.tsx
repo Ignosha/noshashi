@@ -17,13 +17,17 @@ import {
   HISTORY_TURNS,
   listModels,
   pickModel,
+  pullModel,
   type AgentModel,
   type ChatMessage,
+  type Reasoning,
 } from "@/lib/agent/client";
 import { askNoshx, NOSHX_PREAMBLE, type NoshxStep } from "@/lib/noshx/loop";
+import { referenceBlock, searchKnowledge } from "@/lib/noshx/knowledge";
 import { useBilling } from "@/lib/billing/useEntitlements";
 import {
   PROVIDERS,
+  RECOMMENDED_LOCAL,
   defaultConfig,
   findProvider,
   isEndpointSafe,
@@ -97,6 +101,10 @@ export function AgentScene({ data }: { data: XrplState }) {
   const [config, setConfig, configLoaded] = useSetting<AgentConfig>("agent.config", defaultConfig());
   const [profiles, setProfiles, profilesLoaded] = useSetting<Profiles>("agent.profiles", {});
   const [failover, setFailover] = useSetting<boolean>("agent.failover", true);
+  const [reasoning, setReasoning] = useSetting<Reasoning>("agent.reasoning", "fast");
+  // Answered at all (even with no models), as opposed to unreachable.
+  const [reachable, setReachable] = useState(false);
+  const [installing, setInstalling] = useState<{ model: string; status: string; percent: number | null } | null>(null);
   const [checks, setChecks] = useSetting<{ month: string; count: number }>("public.checks", { month: monthKey(), count: 0 });
   const [endpointDraft, setEndpointDraft] = useState<string | null>(null);
   const { has } = useBilling();
@@ -172,6 +180,7 @@ export function AgentScene({ data }: { data: XrplState }) {
       try {
         const found = await listModels(active);
         if (!current()) return;
+        setReachable(true);
         setModels(found);
         if (found.length === 0) {
           setRuntimeError(`${activeProvider.name} is reachable but exposes no models. ${activeProvider.setupHint}`);
@@ -184,6 +193,7 @@ export function AgentScene({ data }: { data: XrplState }) {
         remember(next, true);
       } catch (error) {
         if (!current()) return;
+        setReachable(false);
         setModels([]);
         // Only at startup, and only when a local runtime was configured, is
         // it right to go looking for another local runtime. An explicit
@@ -193,6 +203,7 @@ export function AgentScene({ data }: { data: XrplState }) {
           const discovered = await autodetect();
           if (!current()) return;
           if (discovered) {
+            setReachable(true);
             setConfig(discovered);
             remember(discovered, true);
             setModels(await listModels(discovered).catch(() => []));
@@ -243,6 +254,29 @@ export function AgentScene({ data }: { data: XrplState }) {
     setModels([]);
     setEndpointDraft(null);
     void probe(next);
+  };
+
+  /** Download a recommended model into the local Ollama, then use it. */
+  const install = async (model: string) => {
+    if (installing) return;
+    setInstalling({ model, status: "starting", percent: null });
+    try {
+      await pullModel(config, model, (progress) =>
+        setInstalling({
+          model,
+          status: progress.status,
+          percent: progress.total ? Math.round(((progress.completed ?? 0) / progress.total) * 100) : null,
+        })
+      );
+      push({ title: "MODEL INSTALLED", body: `${model} is ready on this machine.`, tone: "go" });
+      const next = { ...config, model };
+      setConfig(next);
+      void probe(next);
+    } catch (error) {
+      push({ title: "INSTALL FAILED", body: error instanceof Error ? error.message : "Ollama did not finish the download.", tone: "no-go" });
+    } finally {
+      setInstalling(null);
+    }
   };
 
   /** Another runtime that worked before, for failover. Local first: it is free and private. */
@@ -351,13 +385,22 @@ export function AgentScene({ data }: { data: XrplState }) {
     if (mode === "support" && !ready) {
       const matches = findAnswers(prompt);
       const best = matches[0];
+      // No model: answer from the index, which holds the help answers and
+      // every product page, ranked on their full text. The two closest
+      // passages are shown with where each comes from.
+      const pages = await searchKnowledge(prompt, 2).catch(() => []);
       setTurns((prev) => [
         ...prev,
         { id: ++turnId, role: "user", content: prompt },
         {
           id: ++turnId,
           role: "assistant",
-          content: best ? best.answer.answer : fallbackAnswer(prompt),
+          content:
+            pages.length > 0
+              ? pages.map((page) => `${page.text}\n— ${page.title} · ${page.source}`).join("\n\n")
+              : best
+                ? best.answer.answer
+                : fallbackAnswer(prompt),
         },
       ]);
       setDraft("");
@@ -403,9 +446,14 @@ export function AgentScene({ data }: { data: XrplState }) {
     const patch = (update: (turn: Turn) => Turn) =>
       setTurns((prev) => prev.map((turn) => (turn.id === assistantTurn.id ? update(turn) : turn)));
 
+    // The product's own pages for this question. A local model gets a
+    // smaller slice so the whole prompt fits its context on a laptop.
+    const hits = await searchKnowledge(prompt, 5).catch(() => []);
+    const reference = referenceBlock(hits, provider.local ? 4500 : 12000);
     const grounding =
       buildSystemPrompt(mode, data, boundary, buildPolicyBrief(activePolicy, ledgerEntries[0] ?? null)) +
-      (simText ? `\n\n${simText}` : "");
+      (simText ? `\n\n${simText}` : "") +
+      (reference ? `\n\n${reference}` : "");
     // Send the last few turns for continuity without blowing the window.
     const earlier: ChatMessage[] = turns
       .filter((turn) => !turn.simulation && !turn.error && turn.content)
@@ -429,6 +477,7 @@ export function AgentScene({ data }: { data: XrplState }) {
           messages: history.slice(1),
           context: { has, spendFreeCheck },
           signal: controller.signal,
+          reasoning,
           onStep: (step) => patch((turn) => ({ ...turn, steps: [...(turn.steps ?? []), step] })),
         });
         if (result.usedTools) {
@@ -442,6 +491,7 @@ export function AgentScene({ data }: { data: XrplState }) {
         config: target,
         messages: history,
         signal: controller.signal,
+        reasoning,
         onToken: (token: string) => {
           streamed += token;
           patch((turn) => ({ ...turn, content: turn.content + token }));
@@ -1086,6 +1136,65 @@ export function AgentScene({ data }: { data: XrplState }) {
                 {failoverTarget() ? ` (${findProvider(failoverTarget()!.providerId).name} · ${failoverTarget()!.model})` : ""} and say so.
               </span>
             </label>
+            <label className="mt-2 flex cursor-pointer items-start gap-2 text-[9px] leading-snug text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={reasoning === "deep"}
+                onChange={(event) => setReasoning(event.target.checked ? "deep" : "fast")}
+                className="mt-0.5 accent-current"
+              />
+              <span>
+                <span className="stencil block text-[8px] tracking-[0.2em] text-foreground">DEEP REASONING</span>
+                Let the model think before it answers. Better on hard questions; on a laptop model it adds seconds to each answer.
+              </span>
+            </label>
+
+            {provider.api === "ollama" && (
+              <div className="inset-row mt-3 p-2.5">
+                <Eyebrow className="mb-1.5">RECOMMENDED LOCAL MODELS</Eyebrow>
+                <div className="space-y-1.5">
+                  {RECOMMENDED_LOCAL.map((entry) => {
+                    const installed = models.some((m) => m.name === entry.model || m.name === `${entry.model}:latest`);
+                    const active = config.model === entry.model;
+                    const busyHere = installing?.model === entry.model;
+                    return (
+                      <div key={entry.model} className="border border-border px-2 py-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="mono-font min-w-0 flex-1 truncate text-[9.5px] text-foreground">{entry.model}</span>
+                          <span className="stencil shrink-0 text-[7.5px] tracking-[0.16em] text-telemetry">{entry.fits.toUpperCase()}</span>
+                        </div>
+                        <p className="mt-0.5 text-[8.5px] leading-snug text-muted-foreground">{entry.blurb}</p>
+                        <div className="mt-1">
+                          {busyHere ? (
+                            <p className="mono-font text-[8.5px] text-hold">
+                              {installing!.status.toUpperCase()}
+                              {installing!.percent !== null ? ` · ${installing!.percent}%` : ""}
+                            </p>
+                          ) : installed ? (
+                            <button
+                              disabled={active}
+                              onClick={() => setConfig({ ...config, model: entry.model })}
+                              className="stencil text-[8px] tracking-[0.2em] text-go disabled:opacity-60"
+                            >
+                              {active ? "IN USE" : "USE THIS MODEL"}
+                            </button>
+                          ) : (
+                            <button
+                              disabled={Boolean(installing) || !reachable}
+                              onClick={() => void install(entry.model)}
+                              title={reachable ? undefined : "Start Ollama first"}
+                              className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2 disabled:opacity-40"
+                            >
+                              INSTALL
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </Panel>
 
           {mode === "support" && (

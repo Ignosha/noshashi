@@ -19,17 +19,18 @@ vi.mock("@/lib/xrpl/client", async (original) => ({
   }),
 }));
 
-type Reply = { status: number; body: string };
+type Reply = { status: number; body: string; chunks?: string[] };
 const replies: Reply[] = [];
 const sent: Array<{ url: string; body: any; headers?: Record<string, string> }> = [];
 
 vi.mock("@/lib/agent/transport", () => ({
   TransportError: class TransportError extends Error {},
-  modelCall: vi.fn(async (call: { url: string; body?: unknown; headers?: Record<string, string> }) => {
+  modelCall: vi.fn(async (call: { url: string; body?: unknown; headers?: Record<string, string>; onChunk?: (t: string) => void }) => {
     sent.push({ url: call.url, body: JSON.parse(JSON.stringify(call.body ?? null)), headers: call.headers });
     const next = replies.shift();
     if (!next) throw new Error("no scripted reply left");
-    return next;
+    next.chunks?.forEach((chunk) => call.onChunk?.(chunk));
+    return { status: next.status, body: next.body };
   }),
 }));
 
@@ -134,7 +135,9 @@ describe("NOSHX on OpenAI-compatible and Ollama runtimes", () => {
     expect(result.text).toBe("Done.");
     expect(sent[0].url).toBe("http://localhost:11434/api/chat");
     expect(sent[0].body.stream).toBe(false);
-    expect(sent[0].body.options).toEqual({ temperature: 0.3 });
+    // A fixed 8K context and no thinking by default: what an 8 GB laptop affords.
+    expect(sent[0].body.options).toEqual({ num_ctx: 8192, temperature: 0.3 });
+    expect(sent[0].body.think).toBe(false);
     expect(sent[1].body.messages.at(-1)).toMatchObject({ role: "tool", tool_name: "read_settlement" });
   });
 
@@ -176,5 +179,45 @@ describe("NOSHX tools", () => {
     expect(isToolsUnsupported(400, '{"error":"model does not support tools"}')).toBe(true);
     expect(isToolsUnsupported(404, "No endpoints found that support tool use")).toBe(true);
     expect(isToolsUnsupported(401, "invalid api key")).toBe(false);
+  });
+});
+
+describe("reasoning on a laptop model", () => {
+  it("asks again without `think` when the model has no thinking mode", async () => {
+    replies.push(
+      { status: 400, body: JSON.stringify({ error: '"llama3.2" does not support thinking' }) },
+      ok({ message: { content: "Plain answer." } })
+    );
+    const result = await askNoshx({ config: { ...ollama, model: "llama3.2" }, system: "sys", messages: question, context: everything, reasoning: "deep" });
+    expect(result.text).toBe("Plain answer.");
+    expect(sent[0].body.think).toBe(true);
+    expect(sent[1].body).not.toHaveProperty("think");
+  });
+
+  it("raises effort on Claude only when deep reasoning is on", async () => {
+    replies.push(ok({ stop_reason: "end_turn", content: [{ type: "text", text: "a" }] }), ok({ stop_reason: "end_turn", content: [{ type: "text", text: "b" }] }));
+    await askNoshx({ config: anthropic, system: "sys", messages: question, context: everything, reasoning: "deep" });
+    await askNoshx({ config: anthropic, system: "sys", messages: question, context: everything });
+    expect(sent[0].body.output_config).toEqual({ effort: "high" });
+    expect(sent[1].body).not.toHaveProperty("output_config");
+  });
+});
+
+describe("installing a laptop model", () => {
+  it("reports Ollama's pull progress and fails loudly on an error line", async () => {
+    const { pullModel } = await import("@/lib/agent/client");
+    const progress: Array<{ status: string; completed?: number; total?: number }> = [];
+    replies.push({
+      status: 200,
+      body: "",
+      chunks: ['{"status":"pulling manifest"}\n{"status":"pulling 9f1c","total":100,"comp', 'leted":40}\n{"status":"success"}\n'],
+    });
+    await pullModel(ollama, "qwen3.5:4b", (p) => progress.push(p));
+    expect(sent[0]).toMatchObject({ url: "http://localhost:11434/api/pull", body: { model: "qwen3.5:4b", stream: true } });
+    expect(progress.map((p) => p.status)).toEqual(["pulling manifest", "pulling 9f1c", "success"]);
+    expect(progress[1]).toMatchObject({ total: 100, completed: 40 });
+
+    replies.push({ status: 200, body: "", chunks: ['{"error":"pull model manifest: file does not exist"}\n'] });
+    await expect(pullModel(ollama, "qwen3.5:404b", () => undefined)).rejects.toThrow(/could not install qwen3.5:404b/);
   });
 });

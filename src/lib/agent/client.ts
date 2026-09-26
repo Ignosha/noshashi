@@ -51,6 +51,43 @@ export const CHAT_TEMPERATURE = 0.3;
 export const ANTHROPIC_MAX_TOKENS = 16_000;
 /** Earlier turns re-sent with each question, for continuity without blowing the window. */
 export const HISTORY_TURNS = 6;
+/**
+ * Context window asked of a local runtime. Ollama's own default is too
+ * small for NOSHX's grounding plus retrieved pages, and each doubling
+ * costs memory an 8 GB laptop does not have spare; 8K fits both.
+ */
+export const LOCAL_CONTEXT_TOKENS = 8192;
+
+/**
+ * "fast" answers straight away; "deep" lets the model think first. On a
+ * laptop running a small local model the difference is seconds per
+ * answer, so fast is the default and deep is the operator's choice.
+ */
+export type Reasoning = "fast" | "deep";
+
+/** Claude models that take an effort setting. */
+function takesEffort(model: string): boolean {
+  return /^claude-(opus-5|opus-4-[678]|sonnet-5|fable-5)/.test(model);
+}
+
+/**
+ * Per-provider request options for the reasoning setting. Ollama takes
+ * `think` (a model without thinking rejects it, and the request is made
+ * again without); Claude takes an effort level.
+ */
+export function reasoningOptions(config: AgentConfig, reasoning: Reasoning): Record<string, unknown> {
+  const api = findProvider(config.providerId).api;
+  if (api === "ollama") return { think: reasoning === "deep" };
+  if (api === "anthropic" && reasoning === "deep" && takesEffort(config.model)) {
+    return { output_config: { effort: "high" } };
+  }
+  return {};
+}
+
+/** True when a runtime refused a request because of the `think` option. */
+export function refusedThink(status: number, body: string): boolean {
+  return status === 400 && /think/i.test(body);
+}
 
 /**
  * Whether to send a sampling temperature. Current Claude models reject
@@ -256,12 +293,14 @@ export type ChatOptions = {
   onToken: (token: string) => void;
   signal?: AbortSignal;
   temperature?: number;
+  reasoning?: Reasoning;
 };
 
 /** The request body for a streamed chat, shaped for the provider's API. */
-export function chatBody(config: AgentConfig, messages: ChatMessage[], temperature: number) {
+export function chatBody(config: AgentConfig, messages: ChatMessage[], temperature: number, reasoning: Reasoning = "fast") {
   const provider = findProvider(config.providerId);
   const withTemperature = sendsTemperature(config);
+  const extra = reasoningOptions(config, reasoning);
 
   if (provider.api === "anthropic") {
     // The system prompt stays out of the message list, and a token budget is required.
@@ -271,10 +310,17 @@ export function chatBody(config: AgentConfig, messages: ChatMessage[], temperatu
       system: messages.find((message) => message.role === "system")?.content,
       messages: messages.filter((message) => message.role !== "system"),
       stream: true,
+      ...extra,
     };
   }
   if (provider.api === "ollama") {
-    return { model: config.model, messages, stream: true, ...(withTemperature ? { options: { temperature } } : {}) };
+    return {
+      model: config.model,
+      messages,
+      stream: true,
+      ...extra,
+      options: { num_ctx: LOCAL_CONTEXT_TOKENS, ...(withTemperature ? { temperature } : {}) },
+    };
   }
   return { model: config.model, messages, stream: true, ...(withTemperature ? { temperature } : {}) };
 }
@@ -291,6 +337,7 @@ export async function chatStream({
   onToken,
   signal,
   temperature = CHAT_TEMPERATURE,
+  reasoning = "fast",
 }: ChatOptions): Promise<string> {
   // Before anything else: a message carrying a ledger secret is never
   // sent, to a local model or a hosted one. See ./secrets.ts.
@@ -300,15 +347,63 @@ export async function chatStream({
   if (!config.model) throw new AgentUnavailableError("No model selected.");
 
   const parser = streamParser(onToken);
-  const reply = await call(config, chatPath(config), {
-    method: "POST",
-    body: chatBody(config, messages, temperature),
-    stream: true,
-    onChunk: (text) => parser.push(text),
-    signal,
-  });
+  const send = (body: Record<string, unknown>) =>
+    call(config, chatPath(config), { method: "POST", body, stream: true, onChunk: (text) => parser.push(text), signal });
+  const body = chatBody(config, messages, temperature, reasoning) as Record<string, unknown>;
+  let reply = await send(body);
+  if ("think" in body && refusedThink(reply.status, reply.body)) {
+    // A model without a thinking mode: ask again without the option.
+    const { think: _omit, ...plain } = body;
+    reply = await send(plain);
+  }
   if (reply.status < 200 || reply.status >= 300) {
     throw new AgentUnavailableError(describeFailure(reply.status, reply.body, config));
   }
   return parser.end();
+}
+
+export type PullProgress = { status: string; completed?: number; total?: number };
+
+/**
+ * Download a model into a local Ollama, reporting progress. The runtime
+ * streams one JSON object per line; an `error` field ends the pull.
+ */
+export async function pullModel(
+  config: AgentConfig,
+  model: string,
+  onProgress: (progress: PullProgress) => void,
+  signal?: AbortSignal
+): Promise<void> {
+  if (findProvider(config.providerId).api !== "ollama") {
+    throw new AgentUnavailableError("Models can be installed from here into Ollama only.");
+  }
+  let buffer = "";
+  let failure: string | null = null;
+  const handle = (line: string) => {
+    if (!line.trim()) return;
+    try {
+      const frame = JSON.parse(line) as Record<string, any>;
+      if (frame.error) failure = String(frame.error);
+      else onProgress({ status: String(frame.status ?? ""), completed: frame.completed, total: frame.total });
+    } catch {
+      /* partial or malformed line */
+    }
+  };
+  const reply = await call(config, "/api/pull", {
+    method: "POST",
+    body: { model, stream: true },
+    stream: true,
+    signal,
+    onChunk: (text) => {
+      buffer += text;
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      lines.forEach(handle);
+    },
+  });
+  handle(buffer);
+  if (reply.status < 200 || reply.status >= 300) {
+    throw new AgentUnavailableError(describeFailure(reply.status, reply.body, config));
+  }
+  if (failure) throw new AgentUnavailableError(`Ollama could not install ${model}: ${failure}`);
 }

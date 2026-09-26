@@ -41,7 +41,7 @@ export const PROVIDERS: Provider[] = [
     defaultBaseUrl: "http://localhost:11434",
     requiresKey: false,
     autodetect: true,
-    setupHint: "ollama serve, then: ollama pull hermes3",
+    setupHint: "Install Ollama, then press INSTALL beside a recommended model below (or run: ollama pull qwen3.5:4b).",
     docsUrl: "https://ollama.com/download",
   },
   {
@@ -207,12 +207,17 @@ export function normalizeEndpoint(baseUrl: string): string {
 
 /**
  * Preference order when the operator has not chosen a model. Small,
- * instruction-following models beat large chat models for this job:
- * the agent explains a fixed rule set, it does not need world knowledge.
+ * instruction-following models beat large chat models for this job: the
+ * facts come from NOSHX's tools and the product's pages, so the model
+ * needs to reason and call tools well, not to know the world. Qwen3.5
+ * leads the local list because it calls tools and can think, at a size
+ * an 8 GB laptop runs.
  */
 export const MODEL_PREFERENCE = [
   "claude-opus",
   "claude-sonnet",
+  "qwen3.5",
+  "qwen3",
   "hermes3",
   "hermes",
   "qwen2.5",
@@ -223,6 +228,20 @@ export const MODEL_PREFERENCE = [
   "phi3",
   "gemma2",
 ];
+
+/** Local models NOSHX recommends, smallest first. Names are Ollama library tags. */
+export const RECOMMENDED_LOCAL = [
+  {
+    model: "qwen3.5:4b",
+    fits: "8 GB laptops",
+    blurb: "The default. Calls NOSHX's tools, can think step by step, and leaves room for the rest of the machine.",
+  },
+  {
+    model: "qwen3.5:9b",
+    fits: "16 GB or more",
+    blurb: "Stronger reasoning on long or tricky questions, at about twice the memory and time.",
+  },
+] as const;
 
 export type AgentConfig = {
   providerId: string;

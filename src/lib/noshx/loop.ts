@@ -4,8 +4,12 @@ import {
   apiBase,
   CHAT_TEMPERATURE,
   describeFailure,
+  LOCAL_CONTEXT_TOKENS,
+  reasoningOptions,
+  refusedThink,
   sendsTemperature,
   type ChatMessage,
+  type Reasoning,
 } from "@/lib/agent/client";
 import { findProvider, isEndpointSafe, type AgentConfig } from "@/lib/agent/providers";
 import { modelCall, TransportError } from "@/lib/agent/transport";
@@ -41,6 +45,8 @@ export type NoshxRun = {
   context: ToolContext;
   onStep?: (step: NoshxStep) => void;
   signal?: AbortSignal;
+  /** "fast" by default; "deep" lets the model think before it answers. */
+  reasoning?: Reasoning;
 };
 
 export type NoshxResult = {
@@ -66,7 +72,9 @@ export const NOSHX_PREAMBLE = [
   "You have read-only tools that query the live ledger through NOSHASHI's own readers. Use them whenever a question turns on the current state of an account, issuer, order book, pool or transaction, and call several in one turn when they are independent.",
   "Every figure you state must come from a tool result or from the facts below, and should carry the ledger index it was read at when the result gives one. If a tool fails or is not available on the operator's plan, say so; never fill the gap with a guess.",
   "You explain; you do not adjudicate. NOSHASHI's deterministic engine issues verdicts. You cannot sign, submit or move anything, and you never ask for a secret key or seed.",
-  "Be direct and specific. Lead with the answer, then the evidence.",
+  "You also answer anything about NOSHASHI itself: its screens, buttons and features, plans and prices, the website's pages, the API and webhooks, security and privacy, and which tools a customer should use for their situation. Answer those from the NOSHASHI REFERENCE passages you are given, or call search_noshashi for more, and name the page (its address) or the screen so the customer can read on. If the product does not do something, say so plainly.",
+  "For compliance and institutional questions (KYC, AML, the Travel Rule, MiCA, credentials, audit evidence, treasury controls), explain the concept clearly, then say which NOSHASHI screen or tool addresses it and what it does not cover. You give information, not legal advice.",
+  "Think the question through before answering. Be direct and specific. Lead with the answer, then the evidence.",
 ].join("\n");
 
 function toolDefsAnthropic() {
@@ -139,6 +147,7 @@ async function anthropicLoop(run: NoshxRun, steps: NoshxStep[]): Promise<string>
       system: run.system,
       tools: toolDefsAnthropic(),
       messages,
+      ...reasoningOptions(config, run.reasoning ?? "fast"),
       ...(fallbacks ? { fallbacks: "default" } : {}),
     };
     const reply = await post(config, "/messages", body, run.signal, fallbacks ? { "anthropic-beta": "server-side-fallback-2026-07-01" } : undefined);
@@ -193,12 +202,26 @@ async function openAiStyleLoop(run: NoshxRun, steps: NoshxStep[]): Promise<strin
     ...run.messages.filter((m) => m.role !== "system").map((m) => ({ role: m.role, content: m.content })),
   ];
   const temperature = sendsTemperature(config) ? CHAT_TEMPERATURE : undefined;
+  let think = ollama;
 
   for (let step = 0; step < MAX_STEPS; step++) {
     const body = ollama
-      ? { model: config.model, messages, tools: toolDefsOpenAi(), stream: false, ...(temperature !== undefined ? { options: { temperature } } : {}) }
+      ? {
+          model: config.model,
+          messages,
+          tools: toolDefsOpenAi(),
+          stream: false,
+          ...(think ? reasoningOptions(config, run.reasoning ?? "fast") : {}),
+          options: { num_ctx: LOCAL_CONTEXT_TOKENS, ...(temperature !== undefined ? { temperature } : {}) },
+        }
       : { model: config.model, messages, tools: toolDefsOpenAi(), ...(temperature !== undefined ? { temperature } : {}) };
     const reply = await post(config, ollama ? "/api/chat" : "/chat/completions", body, run.signal);
+    if (think && refusedThink(reply.status, reply.body)) {
+      // A model without a thinking mode: ask again without the option.
+      think = false;
+      step--;
+      continue;
+    }
     if (reply.status < 200 || reply.status >= 300) {
       if (isToolsUnsupported(reply.status, reply.body)) throw new ToolsUnsupported();
       throw new AgentUnavailableError(describeFailure(reply.status, reply.body, config));
