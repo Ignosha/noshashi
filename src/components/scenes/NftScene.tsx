@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { shortAddress } from "@/lib/xrpl/client";
 import { readNft, nftFindings, type NftReport } from "@/lib/desk/nft";
-import { TraceButton } from "@/lib/nav/handoff";
+import { TraceButton, useClaimedSubject } from "@/lib/nav/handoff";
 import { cn } from "@/lib/utils";
 
 /**
@@ -30,6 +30,13 @@ export function NftScene() {
   const [report, setReport] = useState<NftReport | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // A token id handed over (from a Learn lab) is filled in for the operator to read.
+  useClaimedSubject("nft", (subject) => {
+    setQuery(subject.value);
+    setReport(null);
+    setError(null);
+  });
 
   const run = async () => {
     const id = query.trim();

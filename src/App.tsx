@@ -312,7 +312,7 @@ const SCENES: SceneDef[] = [
     id: "learn",
     label: "LEARN",
     title: "LEARN",
-    hint: "Short animated explainers — the gate, freeze rights, book depth, the address check",
+    hint: "Hands-on labs with spaced review, plus short animated explainers",
     icon: <NovaEye size={15} />,
     digit: "",
     group: "primary",
@@ -1107,7 +1107,7 @@ function ConsoleApp() {
                     ) : scene === "growth" ? (
                       <GrowthScene data={data} />
                     ) : scene === "learn" ? (
-                      <LearnScene />
+                      <LearnScene onNavigate={goTo} />
                     ) : scene === "plans" ? (
                       <PlansScene onSignIn={openAuth} />
                     ) : scene === "account" ? (

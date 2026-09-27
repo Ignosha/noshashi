@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Hands-on labs
+
+LEARN opens on seven hands-on labs. Each step sends you to the real screen,
+with a real mainnet address or token already filled in, says what to look
+for, and asks one question about what you saw. Questions you answer right
+come back for review a day later, then after 3, 7, 16 and 35 days, so what
+you learn stays learned; a missed one comes back the next day. Every fact a
+lab states is checked by test against mainnet replies recorded in the
+repository. Check an Address and Token Rights now accept an address or
+token handed over from another screen, filled in for you to run.
+
+The ledger-misread case about multi-signature quorums now opens Control
+Surface, the screen that reads signer lists, instead of Mission Control.
+
 ### Support tickets
 
 NOSHX has a TICKETS tab. Signed-in customers open a ticket with a

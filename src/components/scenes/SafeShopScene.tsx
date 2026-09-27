@@ -16,6 +16,7 @@ import {
   VERDICT_COPY,
   type CounterpartyReport,
 } from "@/lib/public/counterparty";
+import { useClaimedSubject } from "@/lib/nav/handoff";
 import { cn } from "@/lib/utils";
 
 /** What a free operator gets each month before the meter bites. */
@@ -57,6 +58,15 @@ export function SafeShopScene({ onUpgrade }: { onUpgrade: () => void }) {
   const thisMonth = usage.month === monthKey() ? usage.count : 0;
   const remaining = Math.max(0, FREE_CHECKS_PER_MONTH - thisMonth);
   const blocked = !unlimited && remaining === 0;
+
+  // An address handed over (from a Learn lab) is filled in, not checked:
+  // a check spends one of the month's free checks, so the operator presses
+  // CHECK themselves.
+  useClaimedSubject("safeshop", (subject) => {
+    setQuery(subject.value);
+    setReport(null);
+    setError(null);
+  });
 
   const run = async () => {
     if (!query.trim() || busy || blocked) return;

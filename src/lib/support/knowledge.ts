@@ -29,6 +29,13 @@ export const KNOWLEDGE: Answer[] = [
     keywords: ["support", "ticket", "contact", "help", "human", "person", "email", "issue", "bug", "report", "problem"],
   },
   {
+    id: "labs",
+    question: "How do I learn to use NOSHASHI?",
+    answer:
+      "Open LEARN and choose Hands-on labs. Each lab takes you through a real screen: TAKE ME TO opens it with a real mainnet address or token already filled in, the step says what to look for, and one question checks what you saw. Every question you answer right joins your review deck and comes back a day later, then after 3, 7, 16 and 35 days; a missed one comes back tomorrow. REVIEW on the Labs page shows what is due. There are seven labs: checking an address, NFT rights, the inbox, the verification gate, ledger sync, NOSHX, and multi-signature treasuries (that one needs Pro for its screen). Progress is kept on this device.",
+    keywords: ["learn", "lab", "labs", "tutorial", "training", "course", "how", "use", "onboarding", "review", "practice", "quiz", "remember"],
+  },
+  {
     id: "no-go",
     question: "Why did my check come back NO-GO?",
     answer:
