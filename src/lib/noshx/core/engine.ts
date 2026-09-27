@@ -166,7 +166,10 @@ function sentences(text: string): string[] {
   return text
     .replace(/^Q: .*$/m, "")
     .replace(/^A: /m, "")
-    .split(/(?<=[.!?])\s+|\n+/)
+    // No lookbehind: WebKit before Safari 16.4, which the macOS app runs
+    // on, cannot parse one, and the whole screen would fail to load.
+    .replace(/([.!?])\s+/g, "$1\n")
+    .split(/\n+/)
     .map((s) => s.trim())
     .filter((s) => s.length > 25 && !/^[|·—-]/.test(s));
 }

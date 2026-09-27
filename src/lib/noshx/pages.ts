@@ -55,7 +55,8 @@ function pieces(text: string, size = 1100): string[] {
   if (text.length <= size * 1.3) return [text];
   const out: string[] = [];
   let current = "";
-  for (const sentence of text.split(/(?<=[.!?])\s+/)) {
+  // No lookbehind (see sentences() in core/engine.ts): this file also ships in the app.
+  for (const sentence of text.replace(/([.!?])\s+/g, "$1\n").split("\n")) {
     if (current && current.length + sentence.length > size) {
       out.push(current.trim());
       current = "";
