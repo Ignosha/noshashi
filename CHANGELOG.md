@@ -1,22 +1,6 @@
 # Changelog
 
-## Unreleased
-
-### NOSHX answers support on the website
-
-The support console on every noshashi.app page is now NOSHX. It runs NOSHX
-Core in the visitor's browser, so questions are not sent to NOSHASHI and
-nothing costs money to answer: product questions are answered from the
-site's support answers and published pages with links to them, and a
-question naming an XRPL address, NFT id or transaction is read from the
-live ledger with the app's own readers (address checks share the free
-allowance of 10 a month). The server's reference answers remain as a
-fallback when the engine cannot load. A bot reply is no longer cut off at
-a fixed height.
-
-In the app, NOSHX Core no longer repeats a sentence that two pages share,
-and on the Free plan a question about an issuer's freeze right is answered
-from the free address check instead of only pointing at Pro.
+## 1.0.12
 
 ### Hands-on labs
 
@@ -42,6 +26,22 @@ new message once the project's email is configured. Tickets are private
 between the customer and support, messages cannot be edited or deleted,
 and a ticket containing a secret seed is refused before it is sent. The
 Support chat can carry an unanswered question straight into a new ticket.
+
+### NOSHX answers support on the website
+
+The support console on every noshashi.app page is now NOSHX. It runs NOSHX
+Core in the visitor's browser, so questions are not sent to NOSHASHI and
+nothing costs money to answer: product questions are answered from the
+site's support answers and published pages with links to them, and a
+question naming an XRPL address, NFT id or transaction is read from the
+live ledger with the app's own readers (address checks share the free
+allowance of 10 a month). The server's reference answers remain as a
+fallback when the engine cannot load. A bot reply is no longer cut off at
+a fixed height.
+
+In the app, NOSHX Core no longer repeats a sentence that two pages share,
+and on the Free plan a question about an issuer's freeze right is answered
+from the free address check instead of only pointing at Pro.
 
 ## 1.0.11
 
