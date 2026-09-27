@@ -22,6 +22,13 @@ export type Answer = {
 
 export const KNOWLEDGE: Answer[] = [
   {
+    id: "ticket",
+    question: "How do I contact support or open a ticket?",
+    answer:
+      "Open NOSHX, choose TICKETS, then NEW TICKET. Give it a subject, a topic and a priority, and describe what happened; the app version and platform are attached unless you untick them. Support replies in the same thread, and you are emailed when they do. Tickets are private to you and NOSHASHI support, and you need to be signed in. From the Support chat, OPEN A TICKET WITH SUPPORT carries your question into a new ticket. Never paste a secret key or seed: a ticket that contains one is refused before it is sent.",
+    keywords: ["support", "ticket", "contact", "help", "human", "person", "email", "issue", "bug", "report", "problem"],
+  },
+  {
     id: "no-go",
     question: "Why did my check come back NO-GO?",
     answer:
