@@ -144,6 +144,16 @@ export function search(index: Index, query: string, limit = 5): Hit[] {
 }
 
 let loading: Promise<Index> | null = null;
+let extra: Passage[] = [];
+
+/**
+ * Add passages that only one surface carries, such as the website's own
+ * support answers. Rebuilds the index on next use.
+ */
+export function extendKnowledge(passages: Passage[]): void {
+  extra = passages;
+  loading = null;
+}
 
 /**
  * Built once, on first use; later calls reuse it. The pages' passages
@@ -151,7 +161,7 @@ let loading: Promise<Index> | null = null;
  * loads their text and indexes it.
  */
 export function knowledgeIndex(): Promise<Index> {
-  loading ??= import("virtual:noshx-pages").then(({ default: pages }) => buildIndex([...appPassages(), ...pages]));
+  loading ??= import("virtual:noshx-pages").then(({ default: pages }) => buildIndex([...appPassages(), ...extra, ...pages]));
   return loading;
 }
 

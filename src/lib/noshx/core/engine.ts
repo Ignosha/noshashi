@@ -185,10 +185,16 @@ export function answerFromPages(question: string, hits: Hit[]): string {
   const terms = new Set(tokens(question));
   const top = hits[0];
 
-  const direct = /^(Help ›|Learn NOSHASHI › Knowledge check|Pricing ›)/.test(top.title);
+  // A passage that is itself an answer (help, the knowledge check, a
+  // plan) is quoted whole when it is the best hit or a close second: a
+  // page that repeats the same help answer can outrank the answer itself.
+  const DIRECT = /^(Help ›|Support ›|Learn NOSHASHI › Knowledge check|Pricing ›)/;
+  const direct = hits.slice(0, 2).find((hit) => DIRECT.test(hit.title) && hit.score >= top.score * 0.85);
   if (direct) {
-    const text = top.text.replace(/^Q: .*\nA: /, "");
-    return `${text}\n\nSource: ${top.title} · ${top.source}`;
+    let text = direct.text.replace(/^Q: .*\nA: /, "");
+    // Help passages lead with their question, which the title already carries.
+    if (/^(Help|Support) ›/.test(direct.title)) text = text.split("\n").slice(1).join("\n") || text;
+    return `${text}\n\nSource: ${direct.title} · ${direct.source}`;
   }
 
   // Word list: answer with the matching definition.
@@ -204,9 +210,15 @@ export function answerFromPages(question: string, hits: Hit[]): string {
       return { hit, sentence, position, score: overlap / Math.sqrt(words.length + 1) + (rank === 0 ? 0.3 : 0) - position * 0.01 };
     })
   );
+  // The same sentence can appear on two pages (docs quote the help); say it once.
+  const said = new Set<string>();
   const chosen = scored
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
+    .filter((s) => {
+      const key = s.sentence.toLowerCase().replace(/\s+/g, " ");
+      return !said.has(key) && said.add(key);
+    })
     .slice(0, 4);
   if (chosen.length === 0) return `${top.text.slice(0, 600)}\n\nSource: ${top.title} · ${top.source}`;
 
@@ -251,6 +263,16 @@ export async function answerWithCore(
   const results = await Promise.all(
     p.calls.map(async (call) => {
       const result = await runToolRaw(call.tool, call.input, context);
+      // Without the plan for the issuer checks, the free address check
+      // still reads the issuer's freeze right, fee and flags.
+      const alreadyChecked = p.calls.some((c) => c.tool === "check_address" && c.input.address === call.input.issuer);
+      if (result.ok === false && result.gated && call.tool === "certify_authority" && typeof call.input.issuer === "string" && !alreadyChecked) {
+        const free = await runToolRaw("check_address", { address: call.input.issuer }, context);
+        if (free.ok) {
+          record({ kind: "tool", name: "check_address", input: { address: call.input.issuer }, ok: true, summary: "read" });
+          return { call: { ...call, tool: "check_address", input: { ...call.input, address: call.input.issuer } as Record<string, unknown> }, result: free, gatedFrom: call };
+        }
+      }
       // A 64-character hash that is not a transaction may be an NFT.
       if (!result.ok && call.tool === "read_settlement" && !result.gated) {
         const nft = await runToolRaw("read_token_rights", { token_id: call.input.hash }, context);
@@ -271,9 +293,14 @@ export async function answerWithCore(
   );
 
   const readings: string[] = [];
-  for (const { call, result } of results) {
+  for (const entry of results) {
+    const { call, result } = entry;
     const screen = findTool(call.tool)?.screen ?? call.tool;
-    if (result.ok) readings.push(compose(call.tool, result.value));
+    if (result.ok && "gatedFrom" in entry) {
+      readings.push(
+        `${compose(call.tool, result.value)}\n\nThat is the free address check. The six issuer checks with a GO/HOLD/NO-GO certificate need Pro in the app, and are free on the website without an account: https://www.noshashi.app/certificate/`
+      );
+    } else if (result.ok) readings.push(compose(call.tool, result.value));
     else if (result.gated) {
       readings.push(
         call.tool === "certify_authority"

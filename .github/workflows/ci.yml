@@ -96,6 +96,11 @@ jobs:
       - name: Brand mark is regenerated
         run: npm run check:brand
 
+      # site/assets/noshx/ is NOSHX Core built for the website's support
+      # console; the site deploys without packages, so the build is committed.
+      - name: Website NOSHX is rebuilt
+        run: npm run check:noshx-web
+
       - name: Tests
         run: npm test
 
