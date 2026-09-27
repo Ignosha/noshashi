@@ -33,6 +33,7 @@ import {
   defaultConfig,
   findProvider,
   isEndpointSafe,
+  sanitizeConfig,
   type AgentConfig,
 } from "@/lib/agent/providers";
 import { useSetting } from "@/lib/store";
@@ -79,6 +80,19 @@ type Turn = {
 /** The last endpoint and model used with each provider, so switching back restores them. */
 type Profiles = Record<string, { baseUrl: string; model: string; okAt?: number }>;
 
+/** Saved per-provider profiles, keeping only well-formed entries for known providers. */
+function sanitizeProfiles(raw: unknown): Profiles {
+  if (!raw || typeof raw !== "object") return {};
+  const out: Profiles = {};
+  for (const [id, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!PROVIDERS.some((p) => p.id === id) || !value || typeof value !== "object") continue;
+    const v = value as Record<string, unknown>;
+    if (typeof v.baseUrl !== "string" || !v.baseUrl.trim()) continue;
+    out[id] = { baseUrl: v.baseUrl, model: typeof v.model === "string" ? v.model : "", okAt: typeof v.okAt === "number" ? v.okAt : undefined };
+  }
+  return out;
+}
+
 /** Free-plan address checks, shared with the Check an Address screen. */
 const FREE_CHECKS_PER_MONTH = 10;
 function monthKey() {
@@ -100,14 +114,27 @@ export function AgentScene({ data }: { data: XrplState }) {
   const { push } = useToast();
 
   const [mode, setMode] = useState<AgentMode>("compliance");
-  const [config, setConfig, configLoaded] = useSetting<AgentConfig>("agent.config", defaultConfig());
-  const [profiles, setProfiles, profilesLoaded] = useSetting<Profiles>("agent.profiles", {});
-  const [failover, setFailover] = useSetting<boolean>("agent.failover", true);
-  const [reasoning, setReasoning] = useSetting<Reasoning>("agent.reasoning", "fast");
+  // Saved settings are sanitized as they are read: a malformed value from
+  // an older build or a partial write must not take the screen down.
+  const [savedConfig, setConfig, configLoaded] = useSetting<AgentConfig>("agent.config", defaultConfig());
+  const config = useMemo(() => sanitizeConfig(savedConfig), [savedConfig]);
+  const [savedProfiles, setProfiles, profilesLoaded] = useSetting<Profiles>("agent.profiles", {});
+  const profiles = useMemo(() => sanitizeProfiles(savedProfiles), [savedProfiles]);
+  const [savedFailover, setFailover] = useSetting<boolean>("agent.failover", true);
+  const failover = savedFailover !== false;
+  const [savedReasoning, setReasoning] = useSetting<Reasoning>("agent.reasoning", "fast");
+  const reasoning: Reasoning = savedReasoning === "deep" ? "deep" : "fast";
   // Answered at all (even with no models), as opposed to unreachable.
   const [reachable, setReachable] = useState(false);
   const [installing, setInstalling] = useState<{ model: string; status: string; percent: number | null } | null>(null);
-  const [checks, setChecks] = useSetting<{ month: string; count: number }>("public.checks", { month: monthKey(), count: 0 });
+  const [savedChecks, setChecks] = useSetting<{ month: string; count: number }>("public.checks", { month: monthKey(), count: 0 });
+  const checks = useMemo(
+    () =>
+      savedChecks && typeof savedChecks === "object" && typeof savedChecks.month === "string" && Number.isFinite(savedChecks.count)
+        ? savedChecks
+        : { month: monthKey(), count: 0 },
+    [savedChecks]
+  );
   const [endpointDraft, setEndpointDraft] = useState<string | null>(null);
   const { has } = useBilling();
   const [models, setModels] = useState<AgentModel[]>([]);
@@ -213,6 +240,24 @@ export function AgentScene({ data }: { data: XrplState }) {
             return;
           }
         }
+        // At startup, a saved runtime that is not running (Ollama closed,
+        // a hosted key gone) must not leave NOSHX disabled: with failover on,
+        // NOSHX Core answers. The saved profile is kept, so switching back
+        // is one click once the runtime is running again.
+        if (options.allowAutodetect && failover && active.providerId !== "noshx") {
+          const core: AgentConfig = { providerId: "noshx", baseUrl: NOSHX_CORE_URL, model: "noshx-core", hasStoredKey: false };
+          const found = await listModels(core).catch(() => []);
+          if (!current()) return;
+          setReachable(true);
+          setModels(found);
+          setConfig(core);
+          push({
+            title: "NOSHX CORE IS ANSWERING",
+            body: `${activeProvider.name} did not answer${activeProvider.requiresKey ? "" : ` at ${active.baseUrl}`}. Switch back in the runtime panel once it is running.`,
+            tone: "hold",
+          });
+          return;
+        }
         setRuntimeError(
           error instanceof Error
             ? `${error.message.replace(/[.!?]?$/, ".")}${activeProvider.requiresKey ? "" : ` Tried ${active.baseUrl}.`}`
@@ -225,7 +270,7 @@ export function AgentScene({ data }: { data: XrplState }) {
         }
       }
     },
-    [config, setConfig, remember]
+    [config, setConfig, remember, failover, push]
   );
 
   // Index NOSHASHI's pages while the operator reads the screen, so the

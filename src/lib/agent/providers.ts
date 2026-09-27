@@ -278,6 +278,26 @@ export function defaultConfig(): AgentConfig {
   };
 }
 
+/**
+ * A saved runtime choice, made safe to use. The setting is read back from
+ * disk (or browser storage), where an older build, a partial write or a
+ * hand edit can leave it malformed; a missing baseUrl used to take the
+ * whole NOSHX screen down. Anything unusable falls back to the provider's
+ * own default, and an unknown provider to NOSHX Core.
+ */
+export function sanitizeConfig(raw: unknown): AgentConfig {
+  const value = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const known = typeof value.providerId === "string" && PROVIDERS.some((p) => p.id === value.providerId);
+  if (!known) return defaultConfig();
+  const provider = findProvider(value.providerId as string);
+  return {
+    providerId: provider.id,
+    baseUrl: typeof value.baseUrl === "string" && value.baseUrl.trim() ? value.baseUrl : provider.defaultBaseUrl,
+    model: typeof value.model === "string" ? value.model : "",
+    hasStoredKey: value.hasStoredKey === true,
+  };
+}
+
 /** A remote endpoint must be TLS — never ship a key over plaintext. */
 export function isEndpointSafe(baseUrl: string): { ok: boolean; reason?: string } {
   const candidate = baseUrl.trim();

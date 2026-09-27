@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.0.11
+
+### NOSHX opens on every Mac
+
+On Macs whose system browser engine predates Safari 16.4, the NOSHX
+screen showed "NOSHX failed to render". NOSHX Core's sentence splitter
+used a pattern that engine cannot read, so the whole screen failed to
+load. The pattern is gone, and a test now fails the build if one comes
+back anywhere in the app.
+
+### Saved settings can no longer break NOSHX
+
+The runtime choice saved by an earlier version is checked as it is read.
+A missing endpoint or an unknown runtime falls back to a safe default
+instead of stopping the screen.
+
+### NOSHX Core answers when your saved model is not running
+
+If the runtime you chose last time is not running when the app opens
+(Ollama closed, for example), NOSHX no longer sits disabled. With
+failover on, NOSHX Core answers and a notice says so. Your choice is
+kept, so switching back is one click once the runtime is running.
+
 ## 1.0.10
 
 ### NOSHX, the compliance agent
