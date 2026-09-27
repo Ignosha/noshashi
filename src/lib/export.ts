@@ -1,4 +1,5 @@
 import { isTauri } from "./env";
+import { recordExport } from "./org/workstationContext";
 
 /**
  * Save a generated text file (the audit trail) to disk.
@@ -13,6 +14,8 @@ export async function saveTextFile(
   contents: string,
   mimeType = "text/csv"
 ): Promise<string> {
+  // Every export is recorded in the organization's audit log (name, size, SHA-256).
+  void recordExport(filename, new TextEncoder().encode(contents));
   if (isTauri) {
     const { invoke } = await import("@tauri-apps/api/core");
     return await invoke<string>("export_text_file", { filename, contents });
@@ -34,6 +37,7 @@ export async function saveBinaryFile(
   filename: string,
   contents: Uint8Array
 ): Promise<string> {
+  void recordExport(filename, contents);
   if (isTauri) {
     const { invoke } = await import("@tauri-apps/api/core");
     return await invoke<string>("export_binary_file", {

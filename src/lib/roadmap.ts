@@ -172,7 +172,7 @@ export const CAPABILITIES: Capability[] = [
     title: "Regulator read-only seat",
     blurb:
       "A scoped, time-boxed console an examiner can open directly — no custody, no PII, full receipt lineage.",
-    maturity: "planned",
+    maturity: "live",
   },
 ];
 
@@ -331,7 +331,7 @@ export const TIERS: Tier[] = [
       "Signed audit export (chain-of-custody)",
       "Offline adjudication from captured state",
       "Compliance API with webhooks",
-      "White-labelled wallet",
+      "White-label console and reports",
       "Regulator read-only seats",
       "Published SLA and named support",
     ],
@@ -401,10 +401,10 @@ export const REVENUE_STREAMS: RevenueStream[] = [
   },
   {
     id: "white-label",
-    name: "White-label wallet",
+    name: "White-label console and reports",
     model: "License",
     unit: "annual",
-    note: "The programmable compliance wallet under the institution's own brand, with their domain registry preloaded.",
+    note: "The console and the reports it exports under the institution's own name and colour. NOSHASHI holds no keys, so there is no wallet to brand; what carries the brand is the record.",
   },
   {
     id: "diligence",
@@ -450,7 +450,7 @@ export const MILESTONES: Array<{
   {
     phase: "PHASE 04",
     window: "Weeks 25–40",
-    goal: "Institution tier, white-label wallet, published SLA, first regulator seats.",
+    goal: "Institution tier, white-label console and reports, published SLA, first regulator seats.",
     unlocks: "Contract sizes that justify an enterprise motion.",
   },
 ];

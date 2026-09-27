@@ -116,6 +116,9 @@ export const PERMISSION_LABELS = {
   approveException: "Decide an exception (not their own)",
   manageMembers: "Manage members",
   readAudit: "Read the audit log",
+  manageSeats: "Grant and revoke examiner seats",
+  setBrand: "Set the white-label brand",
+  recordAudit: "Record exports, alerts and scheduled runs",
 };
 
 /** Scenes that are settings, commerce or help rather than readings of the ledger. */
@@ -304,13 +307,21 @@ ${renderMarkdown(docs.security)}`,
     {
       slug: "enterprise",
       title: "Enterprise",
-      intro: "Organizations, roles, four-eyes governance and the audit trail — what is built today.",
+      intro: "Organizations, roles, four-eyes governance, examiner seats, white-label, monitoring and the audit trail — what is built today.",
       sources: ["src/lib/org/governance.ts", "src/lib/org/webhooks.ts", "src/lib/trust/boundary.json"],
       body: `
 <p>An organization shares policies, exceptions, investigations, webhooks and API receipts among its members. The server decides every permission; the table below is the same permission table the app uses to explain a refusal.</p>
 <h2>Roles</h2>
 ${table(["Role", ...ref.permissions.map((p) => PERMISSION_LABELS[p] ?? p)], ref.roles.map((r) => [esc(r.role), ...ref.permissions.map((p) => (r.permissions.includes(p) ? "✓" : "—"))]))}
 <h2>Oversight</h2>${list(ref.oversight)}
+<h2 id="regulator-seats">Regulator seats</h2>
+<p>An owner, admin or compliance member can give an examiner a read-only seat for 1 to 180 days (Institutional and above). The examiner signs in with their own NOSHASHI account and reads the organization's policies, exceptions, investigations and audit log; every write the server offers refuses them. The seat stops working at its end date without anyone acting, because membership itself honours the expiry, and each visit is written to the audit log (at most once every 30 minutes). Granting, extending and revoking a seat are audit entries too.</p>
+<h2 id="white-label">White-label console and reports</h2>
+<p>An owner or admin can set the organization's display name and accent colour. Members then see that name at the top of the console, credited as running on NOSHASHI, and it is printed on the reports they export: "Prepared for …" on the signed audit export and the asset passport PDF. NOSHASHI holds no keys, so there is no wallet to brand; what carries the brand is the record.</p>
+<h2 id="audit-log">What the audit log records</h2>
+<p>The server records governance itself: policy drafts, submissions and activations, exceptions and their decisions, investigations, webhooks, members, seats and the brand. A member's workstation adds what only it sees, under the member's own identity: every file exported (name, size and SHA-256), every verdict recorded, changes to the monitoring schedule and alert rules, each scheduled stress run, and each custom alert that fired. Examiners and viewers read the log and cannot add to it. Nothing in it can be edited or deleted by anyone.</p>
+<h2 id="monitoring">Scheduled monitoring and custom alerts</h2>
+<p>PORTFOLIO &amp; RADAR › MONITOR re-runs the redemption stress test for every wallet in the book every 1 to 24 hours while the app is open, with the same readers and model as the Risk screen, and keeps the last 30 readings per wallet. Alert rules test those readings (recovery ratio, freezable share, days to exit, trapped value, mark value, frozen and freezable positions) with conditions joined by ALL or ANY, scoped to every wallet or chosen ones, with a cooldown. A rule sends to the console, a desktop notification, or the organization's webhooks as the signed event <code>custom_alert</code>. A figure that could not be measured never triggers a rule.</p>
 <h2>Integrations</h2>
 <p>Organization API keys record receipts as the organization's (<a href="/docs/api/">API</a>). Governance events are delivered to your endpoints with a signature (<a href="/docs/webhooks/">Webhooks</a>).</p>
 <p>Plans and contract terms are on the <a href="/enterprise/">Enterprise</a> and <a href="/pricing/">pricing</a> pages. ${esc(ref.limits.find((l) => /certification/.test(l)) ?? "")}</p>`,

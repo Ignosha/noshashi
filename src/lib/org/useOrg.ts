@@ -12,6 +12,7 @@ import {
   listGovernanceAudit,
   listMemberships,
   listPolicies,
+  recordRegulatorSession,
   verifiedActive,
   type AuditRow,
   type DirectoryEntry,
@@ -68,6 +69,8 @@ function set(next: OrgState) {
 
 async function loadOrg(membership: Membership): Promise<OrgData> {
   const id = membership.organizationId;
+  // An examiner's visit is recorded by the server (at most every 30 minutes).
+  if (membership.role === "regulator") void recordRegulatorSession(id);
   const [policies, directory, exceptions, cases] = await Promise.all([listPolicies(id), listDirectory(id), listExceptions(id), listOrgCases(id)]);
   const audit = can.readAudit(membership.role) ? await listGovernanceAudit(id) : null;
   return { membership, policies, directory, exceptions, audit, cases, active: await verifiedActive(policies), loadedAt: new Date().toISOString() };

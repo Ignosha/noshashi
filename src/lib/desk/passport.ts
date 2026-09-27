@@ -328,7 +328,12 @@ function escapePdfText(text: string): string {
     .replace(/\)/g, "\\)");
 }
 
-export function passportToPdf(passport: AssetPassport): Uint8Array {
+/**
+ * `preparedFor` is the organization's white-label line ("Prepared for Acme
+ * Custody"). It is printed under the title and is not part of the passport's
+ * digest: the record is the same whoever prints it.
+ */
+export function passportToPdf(passport: AssetPassport, preparedFor?: string | null): Uint8Array {
   const objects: string[] = [];
   const push = (obj: string) => objects.push(obj);
 
@@ -340,8 +345,12 @@ export function passportToPdf(passport: AssetPassport): Uint8Array {
   contentLines.push("/F1 14 Tf");
   contentLines.push("72 740 Td");
   contentLines.push(`(${escapePdfText("Asset Passport")}) Tj`);
-  contentLines.push("0 -20 Td");
   contentLines.push("/F1 10 Tf");
+  if (preparedFor) {
+    contentLines.push("0 -16 Td");
+    contentLines.push(`(${escapePdfText(preparedFor)}) Tj`);
+  }
+  contentLines.push("0 -20 Td");
 
   const addLine = (label: string, value: string) => {
     contentLines.push("0 -14 Td");

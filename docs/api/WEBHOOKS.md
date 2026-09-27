@@ -17,6 +17,7 @@ mode) → **WEBHOOKS**.
 | `investigation_created` | a shared investigation opened |
 | `investigation_resolved` | a shared investigation closed |
 | `receipt_created` | an API verification recorded against the organization |
+| `custom_alert` | one of the organization's alert rules fired on a scheduled stress run (Institutional); `data.state` holds the rule, the condition, the wallet and the measured values |
 | `ping` | a test delivery requested from the app |
 
 Events come only from server records (the append-only audit log and API

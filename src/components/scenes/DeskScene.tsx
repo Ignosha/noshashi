@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MonitorPanel } from "./MonitorPanel";
 import { shortAddress } from "@/lib/xrpl/client";
 import { usePortfolio, deriveAlerts, type DeskAlert } from "@/lib/desk/portfolio";
 import { useToast } from "@/lib/toast";
@@ -68,7 +69,7 @@ function DeskBody() {
     usePortfolio();
   const { push } = useToast();
 
-  const [view, setView] = useState<"book" | "radar">("book");
+  const [view, setView] = useState<"book" | "radar" | "monitor">("book");
   const [address, setAddress] = useState("");
   const [label, setLabel] = useState("");
   const [adding, setAdding] = useState(false);
@@ -174,18 +175,19 @@ function DeskBody() {
 
       <div className="grid min-h-0 flex-1 grid-cols-5 gap-3">
         <Panel
-          label={view === "book" ? "THE BOOK" : "COMPLIANCE RADAR"}
+          label={view === "book" ? "THE BOOK" : view === "radar" ? "COMPLIANCE RADAR" : "SCHEDULED MONITORING"}
           corners
           className="col-span-3 min-h-0"
           bodyClassName="min-h-0 overflow-y-auto p-0"
           right={
             <div className="flex items-center gap-2">
-              <Tabs value={view} onValueChange={(value) => setView(value as "book" | "radar")}>
+              <Tabs value={view} onValueChange={(value) => setView(value as "book" | "radar" | "monitor")}>
                 <TabsList>
                   <TabsTrigger value="book">BOOK</TabsTrigger>
                   <TabsTrigger value="radar">
                     RADAR{alerts.length > 0 ? ` ·${alerts.length}` : ""}
                   </TabsTrigger>
+                  <TabsTrigger value="monitor">MONITOR</TabsTrigger>
                 </TabsList>
               </Tabs>
               <Button size="sm" variant="outline" onClick={() => void refresh()}>
@@ -286,7 +288,7 @@ function DeskBody() {
                   </table>
                 )}
               </motion.div>
-            ) : (
+            ) : view === "radar" ? (
               <motion.div
                 key="radar"
                 initial={{ opacity: 0 }}
@@ -338,6 +340,10 @@ function DeskBody() {
                     ))}
                   </div>
                 )}
+              </motion.div>
+            ) : (
+              <motion.div key="monitor" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <MonitorPanel wallets={wallets} />
               </motion.div>
             )}
           </AnimatePresence>

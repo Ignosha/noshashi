@@ -58,7 +58,7 @@ export type DocsSources = {
   edgeFunctions: string[];
 };
 
-const ROLES: MemberRole[] = ["owner", "admin", "compliance", "risk", "analyst", "viewer", "api"];
+const ROLES: MemberRole[] = ["owner", "admin", "compliance", "risk", "analyst", "viewer", "api", "regulator"];
 
 /** The console reference: "- Name (Cmd+N): what it does. Requires Desk." */
 export function scenesOf(context: string): DocsScene[] {

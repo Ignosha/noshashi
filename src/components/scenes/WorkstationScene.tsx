@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { shortAddress } from "@/lib/xrpl/client";
 import { saveTextFile } from "@/lib/export";
+import { preparedFor } from "@/lib/org/workstationContext";
 import { useLedger, summariseWallets, ledgerToCsv, signContent } from "@/lib/desk/ledger";
 import { EvidencePanel } from "@/components/scenes/EvidencePanel";
 import { SimulationPanel } from "@/components/scenes/SimulationPanel";
@@ -149,7 +150,8 @@ function WorkstationBody({
       const sig = await signContent(csv);
       // The signature is written into the file's own footer as well, so a
       // recipient can verify without being handed a separate string.
-      const withFooter = `${csv}\n# NOSHASHI audit export\n# records=${entries.length}\n# generated=${new Date().toISOString()}\n# sha256(body)=${sig}\n`;
+      const prepared = preparedFor();
+      const withFooter = `${csv}\n# NOSHASHI audit export\n${prepared ? `# ${prepared}\n` : ""}# records=${entries.length}\n# generated=${new Date().toISOString()}\n# sha256(body)=${sig}\n`;
       const stamp = new Date().toISOString().slice(0, 10);
       const dest = await saveTextFile(`noshashi-audit-${stamp}.csv`, withFooter);
       setSignature(sig);
