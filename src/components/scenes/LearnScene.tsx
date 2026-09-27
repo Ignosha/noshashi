@@ -9,6 +9,14 @@ import { TUTORIALS, type Tutorial } from "@/lib/tutorials";
 import { usePrefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { MisreadPanel } from "./MisreadPanel";
+import { LabsPanel, dueCount, useLabProgress } from "./LabsPanel";
+import { LABS } from "@/lib/learn/labs";
+import { labStatus } from "@/lib/learn/labProgress";
+import type { SceneId } from "@/App";
+
+type Pane = "labs" | "tutorial" | "misread";
+/** Which pane was open, kept for the session so a lab's "take me there" round trip comes back to it. */
+let rememberedPane: Pane = "labs";
 
 /**
  * LearnScene — the animated explainers.
@@ -24,13 +32,21 @@ import { MisreadPanel } from "./MisreadPanel";
  * autoplaying motion at somebody who has asked for none is not a trade
  * worth making.
  */
-export function LearnScene() {
+export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => void }) {
   const reduced = usePrefersReducedMotion();
   const [active, setActive] = useState<Tutorial>(TUTORIALS[0]);
   const [beat, setBeat] = useState(0);
   const [playing, setPlaying] = useState(false);
-  /** The misread cases replace the player while they are open. */
-  const [misread, setMisread] = useState(false);
+  /** Labs, the player, or the misread cases: one fills the right-hand side. */
+  const [pane, setPaneState] = useState<Pane>(rememberedPane);
+  const setPane = (next: Pane) => {
+    rememberedPane = next;
+    setPaneState(next);
+  };
+  const misread = pane === "misread";
+  const [labProgress, setLabProgress] = useLabProgress();
+  const due = dueCount(labProgress);
+  const labsDone = LABS.filter((l) => labStatus(l, labProgress).complete).length;
 
   const timerRef = useRef<number | null>(null);
 
@@ -43,7 +59,7 @@ export function LearnScene() {
 
   const select = useCallback((t: Tutorial) => {
     clear();
-    setMisread(false);
+    setPane("tutorial");
     setActive(t);
     setBeat(0);
     setPlaying(false);
@@ -76,18 +92,45 @@ export function LearnScene() {
     <div className="flex h-full min-w-0 flex-col gap-3 p-4">
       <SceneHeader
         index="12"
-        kicker="GUIDED EXPLAINERS · NOTHING HERE IS A ROADMAP"
+        kicker="HANDS-ON LABS · GUIDED EXPLAINERS · NOTHING HERE IS A ROADMAP"
         title="LEARN"
-        sub="Four short explainers covering what the gate does, why a balance can stop being yours, why a price can be false, and what the public address check will not tell you."
+        sub="Hands-on labs that walk you through the real screens with real mainnet data and bring the key points back for review, plus four short explainers and the ways the ledger gets misread."
         status="go"
-        statusLabel={`${TUTORIALS.length} EXPLAINERS`}
+        statusLabel={due > 0 ? `${due} TO REVIEW` : `${LABS.length} LABS · ${TUTORIALS.length} EXPLAINERS`}
       />
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
+      <div className="grid min-h-0 flex-1 auto-rows-max grid-cols-1 gap-3 overflow-y-auto lg:auto-rows-auto lg:grid-cols-5 lg:overflow-visible">
         {/* Chooser */}
-        <div className="flex min-h-0 flex-col gap-2 lg:col-span-2">
+        <div className="flex flex-col gap-2 lg:col-span-2 lg:min-h-0 lg:overflow-y-auto">
+          <button
+            onClick={() => {
+              clear();
+              setPlaying(false);
+              setPane("labs");
+            }}
+            aria-current={pane === "labs" ? "true" : undefined}
+            className={cn("inset-row w-full px-3.5 py-3 text-left transition-colors", pane === "labs" && "border-brand/50 bg-brand/10")}
+          >
+            <div className="flex items-baseline gap-2">
+              <span className={cn("text-[12.5px] font-medium", pane === "labs" ? "text-brand" : "text-foreground")}>
+                Hands-on labs
+              </span>
+              {due > 0 && (
+                <span className="rounded-[3px] bg-brand px-1.5 font-mono text-[8px] tracking-[0.14em] text-primary-foreground">
+                  {due} DUE
+                </span>
+              )}
+              <span className="ml-auto font-mono text-[9px] text-faint">
+                {labsDone}/{LABS.length} DONE
+              </span>
+            </div>
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              Do it on the real screens, answer one question per step, and review it as it fades.
+            </p>
+          </button>
+
           {TUTORIALS.map((t) => {
-            const on = !misread && t.id === active.id;
+            const on = pane === "tutorial" && t.id === active.id;
             return (
               <button
                 key={t.id}
@@ -122,7 +165,7 @@ export function LearnScene() {
             onClick={() => {
               clear();
               setPlaying(false);
-              setMisread(true);
+              setPane("misread");
             }}
             aria-current={misread ? "true" : undefined}
             className={cn("inset-row w-full px-3.5 py-3 text-left transition-colors", misread && "border-brand/50 bg-brand/10")}
@@ -148,13 +191,15 @@ export function LearnScene() {
           </Panel>
         </div>
 
-        {/* Player, or the misread cases in its place */}
-        {misread ? (
+        {/* Labs, the player, or the misread cases in its place */}
+        {pane === "labs" ? (
+          <LabsPanel progress={labProgress} setProgress={setLabProgress} onNavigate={onNavigate} />
+        ) : misread ? (
           <MisreadPanel />
         ) : (
         <Panel
           label={active.title.toUpperCase()}
-          className="relative min-h-0 lg:col-span-3"
+          className="relative lg:col-span-3 lg:min-h-0"
           bodyClassName="flex min-h-0 flex-col p-0"
           right={
             !reduced && (

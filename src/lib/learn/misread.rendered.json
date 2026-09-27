@@ -77,7 +77,7 @@
       "refLabel": "signer list owner"
     },
     "module": "src/lib/desk/control.ts",
-    "scene": "control"
+    "scene": "treasury"
   },
   {
     "id": "absent",

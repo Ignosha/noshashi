@@ -125,7 +125,7 @@ export function misreadCases(): MisreadCase[] {
       why: "XRPL compares a multi-signature quorum against the sum of signing weights, not the number of signers. The number that describes control is the fewest signers who can reach the quorum.",
       evidence: { ledger: recorded.quorum.ledger, ref: q.Owner, refLabel: "signer list owner" },
       module: "src/lib/desk/control.ts",
-      scene: "control",
+      scene: "treasury",
     },
     {
       id: "absent",

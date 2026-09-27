@@ -6,7 +6,7 @@ import { useHandoff } from "@/lib/nav/handoff";
 const CASES = misreadCases();
 
 /** Scenes that take the handed-over value and read it at once. */
-const READS_ON_ARRIVAL = new Set(["settlement", "control", "provenance", "book"]);
+const READS_ON_ARRIVAL = new Set(["settlement", "treasury", "provenance", "book"]);
 
 /**
  * THE LEDGER CAN BE TRANSPARENT AND STILL BE MISREAD.
@@ -19,7 +19,7 @@ const READS_ON_ARRIVAL = new Set(["settlement", "control", "provenance", "book"]
 export function MisreadPanel() {
   const handOff = useHandoff();
   return (
-    <Panel label="THE LEDGER CAN BE TRANSPARENT AND STILL BE MISREAD" className="min-h-0 lg:col-span-3" bodyClassName="min-h-0 overflow-y-auto p-3">
+    <Panel label="THE LEDGER CAN BE TRANSPARENT AND STILL BE MISREAD" className="lg:col-span-3 lg:min-h-0" bodyClassName="p-3 lg:min-h-0 lg:overflow-y-auto">
       <p className="text-[11px] leading-relaxed text-muted-foreground">
         Six real replies from XRPL mainnet, each read two ways. The right-hand column is not written for this page: it is what
         NOSHASHI&apos;s own code returns for the recorded reply, and a test pins it.

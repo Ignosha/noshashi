@@ -84,7 +84,7 @@ function ControlBody() {
   };
 
   // A address handed over from another scene is read straight away.
-  useClaimedSubject("control", (subject) => {
+  useClaimedSubject("treasury", (subject) => {
     void run(subject.value);
   });
 
