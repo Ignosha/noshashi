@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Support tickets
+
+NOSHX has a TICKETS tab. Signed-in customers open a ticket with a
+subject, a topic, a priority and a description, and follow the thread in
+the app; NOSHASHI support answers every ticket from an inbox on the same
+screen, and sets status and priority. The other side is emailed on each
+new message once the project's email is configured. Tickets are private
+between the customer and support, messages cannot be edited or deleted,
+and a ticket containing a secret seed is refused before it is sent. The
+Support chat can carry an unanswered question straight into a new ticket.
+
 ## 1.0.11
 
 ### NOSHX opens on every Mac

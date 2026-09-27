@@ -790,9 +790,14 @@
     "noshashi-password",
     "noshashi-policy-activate",
     "noshashi-stripe-webhook",
+    "noshashi-support-notify",
     "noshashi-verify"
   ],
   "troubleshooting": [
+    {
+      "question": "How do I contact support or open a ticket?",
+      "answer": "Open NOSHX, choose TICKETS, then NEW TICKET. Give it a subject, a topic and a priority, and describe what happened; the app version and platform are attached unless you untick them. Support replies in the same thread, and you are emailed when they do. Tickets are private to you and NOSHASHI support, and you need to be signed in. From the Support chat, OPEN A TICKET WITH SUPPORT carries your question into a new ticket. Never paste a secret key or seed: a ticket that contains one is refused before it is sent."
+    },
     {
       "question": "Why did my check come back NO-GO?",
       "answer": "NO-GO means at least one blocking rule failed, and the Verification scene names which one. In practice it is almost always one of three things: the account holds none of the XLS-70 credentials the target domain requires (most mainnet accounts hold none yet), the transfer exceeds the domain's per-settlement ceiling, or the balance does not clear the XRPL owner reserve of 1 XRP plus 0.2 XRP per owned object. Open the verdict and read the row marked BLOCK — the detail line states the exact number that failed."

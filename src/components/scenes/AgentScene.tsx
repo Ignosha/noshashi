@@ -45,6 +45,7 @@ import {
 import { CONTACT } from "@/lib/brand";
 import { dataBoundary, recordFor, useAiUseLog, type AiUseRecord } from "@/lib/agent/governance";
 import { AgentGovernance } from "./AgentGovernance";
+import { SupportTickets } from "./SupportTickets";
 import { useLedger } from "@/lib/desk/ledger";
 import { useGoverningPolicy } from "@/lib/org/useOrg";
 import { buildPolicyBrief, parseWhatIf, simulationFact } from "@/lib/agent/policyContext";
@@ -151,7 +152,9 @@ export function AgentScene({ data }: { data: XrplState }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
-  const [view, setView] = useState<"chat" | "governance" | "observer">("chat");
+  const [view, setView] = useState<"chat" | "governance" | "observer" | "tickets">("chat");
+  // A Support-chat question carried into a new ticket when the operator asks for one.
+  const [ticketDraft, setTicketDraft] = useState<string | undefined>(undefined);
   const observer = useObserver();
   const observerAlerts = observer.log.filter((o) => o.severity !== "info").length;
   const useLog = useAiUseLog();
@@ -677,13 +680,14 @@ export function AgentScene({ data }: { data: XrplState }) {
                   setMode(value);
                   setView("chat");
                 } else {
-                  setView(value as "observer" | "governance");
+                  setView(value as "observer" | "governance" | "tickets");
                 }
               }}
             >
               <TabsList>
                 <TabsTrigger value="compliance">NOSHX</TabsTrigger>
                 <TabsTrigger value="support">SUPPORT</TabsTrigger>
+                <TabsTrigger value="tickets">TICKETS</TabsTrigger>
                 <TabsTrigger value="observer">
                   OBSERVER{observerAlerts ? ` · ${observerAlerts}` : ""}
                 </TabsTrigger>
@@ -700,7 +704,16 @@ export function AgentScene({ data }: { data: XrplState }) {
       />
 
       <div className="grid min-h-0 min-w-0 flex-1 grid-cols-4 gap-3">
-        {view === "observer" ? (
+        {view === "tickets" ? (
+          <Panel
+            label="SUPPORT TICKETS · PRIVATE BETWEEN YOU AND NOSHASHI SUPPORT"
+            corners
+            className="col-span-3 min-h-0 min-w-0"
+            bodyClassName="min-h-0 overflow-hidden p-0"
+          >
+            <SupportTickets draftFromChat={ticketDraft} onDraftUsed={() => setTicketDraft(undefined)} />
+          </Panel>
+        ) : view === "observer" ? (
           <Panel
             label="OBSERVER · WHAT CHANGED ON THE LEDGER FOR THE WALLETS YOU WATCH"
             corners
@@ -944,6 +957,21 @@ export function AgentScene({ data }: { data: XrplState }) {
                 SEND
               </Button>
             </div>
+            {mode === "support" && turns.some((t) => t.role === "user") && (
+              <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
+                <span>Not answered?</span>
+                <button
+                  onClick={() => {
+                    const lastQuestion = [...turns].reverse().find((t) => t.role === "user")?.content;
+                    setTicketDraft(lastQuestion);
+                    setView("tickets");
+                  }}
+                  className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2"
+                >
+                  OPEN A TICKET WITH SUPPORT
+                </button>
+              </div>
+            )}
             <div className="mt-1.5 flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-[9px] text-muted-foreground">
                 <Kbd keys="enter" /> send
