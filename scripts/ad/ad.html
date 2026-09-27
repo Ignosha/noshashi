@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NOSHASHI · 15s ad</title>
+<style>
+  @font-face { font-family: "Grotesk"; src: url("../../public/fonts/space-grotesk-600-latin.woff2") format("woff2"); font-weight: 600; }
+  @font-face { font-family: "Grotesk"; src: url("../../public/fonts/space-grotesk-500-latin.woff2") format("woff2"); font-weight: 500; }
+  @font-face { font-family: "Plex"; src: url("../../public/fonts/ibm-plex-mono-500-latin.woff2") format("woff2"); font-weight: 500; }
+  :root {
+    --ink: #08100b;      /* the app's dark ground */
+    --deep: #0d1a12;
+    --matcha: #9fe463;   /* the site's CTA green */
+    --leaf: #1d6630;
+    --paper: #e6f2e4;
+    --amber: #f2b33d;
+    --red: #ff5a4f;
+  }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: radial-gradient(120% 80% at 50% 45%, #10231a 0%, var(--ink) 60%); font-family: "Grotesk", sans-serif; color: var(--paper); }
+  canvas { position: absolute; inset: 0; }
+  .layer { position: absolute; inset: 0; }
+  .word { position: absolute; left: 0; right: 0; text-align: center; font-weight: 600; letter-spacing: -0.03em; line-height: 0.9; will-change: transform, opacity; }
+  .mono { font-family: "Plex", monospace; font-weight: 500; letter-spacing: 0.08em; }
+  .chip { position: absolute; left: 50%; top: 50%; padding: 24px 34px; border: 3px solid var(--matcha); border-radius: 999px; background: rgba(8, 16, 11, 0.82); font-size: 46px; font-weight: 600; white-space: nowrap; color: var(--paper); }
+  .card { position: absolute; left: 50%; top: 50%; width: 760px; height: 760px; margin: -380px 0 0 -380px; border-radius: 48px; display: grid; place-items: center; font-size: 210px; font-weight: 600; letter-spacing: -0.04em; backface-visibility: hidden; }
+  .ticket { position: absolute; left: 90px; right: 90px; top: 520px; border: 3px solid rgba(159, 228, 99, 0.55); border-radius: 36px; padding: 56px 56px 64px; background: rgba(8, 16, 11, 0.86); }
+  .ticket .row { display: flex; justify-content: space-between; align-items: baseline; font-size: 40px; margin-top: 30px; color: #b8cdb6; }
+  .ticket .row b { color: var(--paper); font-weight: 600; font-family: "Grotesk", sans-serif; letter-spacing: 0; }
+  .stamp { position: absolute; right: 36px; top: -170px; width: 220px; height: 220px; border-radius: 50%; border: 10px solid var(--matcha); color: var(--matcha); display: grid; place-items: center; font-size: 96px; font-weight: 600; background: var(--ink); }
+  #wipe { position: absolute; inset: 0; pointer-events: none; }
+  .foot { position: absolute; left: 0; right: 0; bottom: 120px; text-align: center; font-size: 30px; color: #8fa88c; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1080" height="1920"></canvas>
+  <div class="layer" id="s1"></div>
+  <div class="layer" id="s2"></div>
+  <div class="layer" id="s3" style="perspective: 1800px"></div>
+  <div class="layer" id="s4"></div>
+  <div class="layer" id="s5"></div>
+  <canvas id="wipe" width="1080" height="1920"></canvas>
+</div>
+<script>
+/*
+ * NOSHASHI · 15-second vertical ad. Deterministic: seek(t) draws the frame
+ * at t seconds, so scripts/ad/render.mjs can screenshot every frame and the
+ * picture always lands on the soundtrack's beats (120 BPM, 0.5 s a beat).
+ *
+ *   TYPE   0.0–3.0  every payment asks a question
+ *   FORM   3.0–6.0  the questions orbit a turning shape
+ *   SPACE  6.0–9.5  a tunnel of ledger rings; the verdict flips GO/HOLD/NO-GO
+ *   TIME   9.5–12.5 a real mainnet payment, read and stamped
+ *   LOGO  12.5–15.0 the mark blooms; NOSHASHI
+ *
+ * The payment in TIME is real: XRPL mainnet ledger 107,193,471, the one
+ * the app's tests are built on (src/lib/desk/__tests__/fixtures).
+ */
+const W = 1080, H = 1920, CX = W / 2, CY = H / 2;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const easeIn = (x) => x * x * x;
+const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const back = (x) => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const el = (parent, cls, html, style = "") => { const d = document.createElement("div"); d.className = cls; d.innerHTML = html; d.style.cssText = style; parent.appendChild(d); return d; };
+
+// ── 3D meshes ───────────────────────────────────────────────────────────
+const phi = (1 + Math.sqrt(5)) / 2;
+const icoV = [[-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0], [0, -1, phi], [0, 1, phi], [0, -1, -phi], [0, 1, -phi], [phi, 0, -1], [phi, 0, 1], [-phi, 0, -1], [-phi, 0, 1]];
+const icoE = [];
+for (let i = 0; i < 12; i++) for (let j = i + 1; j < 12; j++) {
+  const d = Math.hypot(...icoV[i].map((v, k) => v - icoV[j][k]));
+  if (Math.abs(d - 2) < 0.01) icoE.push([i, j]);
+}
+function torusPoints(R, r, n, m) {
+  const rings = [];
+  for (let i = 0; i < n; i++) {
+    const u = (i / n) * Math.PI * 2, ring = [];
+    for (let j = 0; j <= m; j++) {
+      const v = (j / m) * Math.PI * 2;
+      ring.push([(R + r * Math.cos(v)) * Math.cos(u), r * Math.sin(v), (R + r * Math.cos(v)) * Math.sin(u)]);
+    }
+    rings.push(ring);
+  }
+  return rings;
+}
+const torus = torusPoints(1.25, 0.45, 26, 28);
+function rot([x, y, z], ax, ay, az) {
+  let c = Math.cos(ax), s = Math.sin(ax); [y, z] = [y * c - z * s, y * s + z * c];
+  c = Math.cos(ay); s = Math.sin(ay); [x, z] = [x * c + z * s, -x * s + z * c];
+  c = Math.cos(az); s = Math.sin(az); [x, y] = [x * c - y * s, x * s + y * c];
+  return [x, y, z];
+}
+const proj = ([x, y, z], scale, cx = CX, cy = CY, dist = 6) => { const f = dist / (dist + z); return [cx + x * scale * f, cy + y * scale * f, f]; };
+
+// ── Scene DOM ───────────────────────────────────────────────────────────
+const S1_WORDS = [
+  { text: "EVERY", at: 0.1, y: 520, size: 230 },
+  { text: "PAYMENT", at: 0.6, y: 770, size: 200, color: "var(--matcha)" },
+  { text: "ASKS", at: 1.1, y: 1030, size: 230 },
+  { text: "A QUESTION.", at: 1.6, y: 1270, size: 150 },
+].map((w) => ({ ...w, node: el($("s1"), "word", w.text, `top:${w.y}px;font-size:${w.size}px;color:${w.color || "var(--paper)"}`) }));
+
+const QUESTIONS = ["Can the issuer freeze it?", "Is the order book real?", "Did it actually arrive?", "Who controls the account?"]
+  .map((q, i) => ({ q, i, node: el($("s2"), "chip", q) }));
+const s2Title = el($("s2"), "word", "Ask the ledger.", "top:260px;font-size:110px");
+
+const VERDICTS = [
+  { text: "GO", fg: "var(--ink)", bg: "var(--matcha)" },
+  { text: "HOLD", fg: "var(--ink)", bg: "var(--amber)" },
+  { text: "NO-GO", fg: "#fff", bg: "var(--red)" },
+].map((v) => ({ ...v, node: el($("s3"), "card", v.text, `color:${v.fg};background:${v.bg};font-size:${v.text.length > 3 ? 170 : 230}px`) }));
+const s3Cap = el($("s3"), "word", "Checked<br>before it’s signed.", "top:1480px;font-size:92px");
+const s3Top = el($("s3"), "word mono", "EVERY SETTLEMENT · ADJUDICATED", "top:300px;font-size:34px;color:var(--matcha)");
+
+const s4Head = el($("s4"), "word mono", "LIVE XRPL MAINNET · A REAL PAYMENT", "top:320px;font-size:32px;color:var(--matcha)");
+const ticket = el($("s4"), "ticket", `
+  <div class="mono" style="font-size:34px;color:#8fa88c">VALIDATED LEDGER</div>
+  <div id="ledger" style="font-size:132px;font-weight:600;letter-spacing:-0.02em;margin-top:6px">107,193,471</div>
+  <div class="row mono"><span>TYPE</span><b>Payment</b></div>
+  <div class="row mono"><span>RESULT</span><b>tesSUCCESS</b></div>
+  <div class="row mono"><span>DELIVERED</span><b id="delivered">287.022082836 DIP</b></div>
+  <div class="row mono"><span>TX</span><b style="font-family:Plex,monospace;font-size:34px">017808F0…9C24CE</b></div>
+  <div class="stamp" id="stamp">GO</div>`);
+const s4Cap = el($("s4"), "word", "Answered in seconds.<br><span style='color:var(--matcha)'>With a receipt</span><br>an auditor can verify.", "top:1330px;font-size:80px;line-height:1.05");
+
+const logo = el($("s5"), "", `<img src="../../public/icon.png" style="width:100%;height:100%;display:block;mix-blend-mode:screen;-webkit-mask-image:radial-gradient(circle at 50% 50%,#000 55%,transparent 71%);mask-image:radial-gradient(circle at 50% 50%,#000 55%,transparent 71%)" />`, `position:absolute;left:${CX - 330}px;top:430px;width:660px;height:660px`);
+const wordmark = el($("s5"), "word", "NOSHASHI", "top:1140px;font-size:168px;letter-spacing:0.02em");
+const tagline = el($("s5"), "word", "Compliance for the XRP Ledger.", "top:1350px;font-size:58px;font-weight:500;color:#cfe3cc");
+const cta = el($("s5"), "word mono", "FREE TO START · NOSHASHI.APP", "top:1490px;font-size:40px;color:var(--matcha)");
+const foot = el($("stage"), "foot mono", "", "");
+
+// ── Frame ───────────────────────────────────────────────────────────────
+const bg = $("bg").getContext("2d"), wipe = $("wipe").getContext("2d");
+const show = (node, on) => { node.style.display = on ? "" : "none"; };
+
+function drawIco(ctx, t, scale, alpha, cx = CX, cy = CY) {
+  const pts = icoV.map((v) => proj(rot(v, t * 0.7, t * 1.1, t * 0.3), scale, cx, cy));
+  ctx.lineWidth = 4; ctx.lineCap = "round";
+  for (const [a, b] of icoE) {
+    const depth = (pts[a][2] + pts[b][2]) / 2;
+    ctx.strokeStyle = `rgba(159,228,99,${alpha * clamp((depth - 0.7) * 1.8, 0.15, 1)})`;
+    ctx.beginPath(); ctx.moveTo(pts[a][0], pts[a][1]); ctx.lineTo(pts[b][0], pts[b][1]); ctx.stroke();
+  }
+  ctx.fillStyle = `rgba(230,242,228,${alpha})`;
+  for (const p of pts) { ctx.beginPath(); ctx.arc(p[0], p[1], 7 * p[2], 0, Math.PI * 2); ctx.fill(); }
+}
+function drawTorus(ctx, t, scale, alpha, morph) {
+  ctx.lineWidth = 2.5;
+  for (const ring of torus) {
+    ctx.beginPath();
+    ring.forEach((p, j) => {
+      const q = proj(rot(p.map((v) => v * morph), 1.1 + t * 0.4, t * 0.9, 0), scale);
+      j ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]);
+    });
+    ctx.strokeStyle = `rgba(159,228,99,${alpha * 0.55})`;
+    ctx.stroke();
+  }
+}
+function drawTunnel(ctx, t, alpha) {
+  // XRPL-style ripple rings flying toward the viewer: SPACE.
+  for (let i = 0; i < 14; i++) {
+    const z = ((i / 14) + t * 0.35) % 1;
+    const depth = 0.08 + z * z * 1.6;
+    const r = 120 + depth * 900;
+    const a = alpha * clamp(1 - z * 0.9) * clamp(z * 6);
+    ctx.strokeStyle = `rgba(159,228,99,${a * 0.8})`;
+    ctx.lineWidth = 2 + depth * 10;
+    ctx.beginPath(); ctx.ellipse(CX, CY - 60, r, r * 0.92, t * 0.3 + i * 0.4, 0, Math.PI * 2); ctx.stroke();
+  }
+}
+function drawClock(ctx, t, alpha) {
+  // TIME: a ledger-close sweep (a ledger closes every 3–5 s).
+  const cx = CX, cy = 900, r = 470;
+  ctx.strokeStyle = `rgba(159,228,99,${0.18 * alpha})`; ctx.lineWidth = 3;
+  for (let k = 0; k < 60; k++) {
+    const a = (k / 60) * Math.PI * 2, len = k % 5 ? 14 : 34;
+    ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); ctx.lineTo(cx + Math.cos(a) * (r - len), cy + Math.sin(a) * (r - len)); ctx.stroke();
+  }
+  const sweep = -Math.PI / 2 + t * 2.2;
+  const grad = ctx.createConicGradient(sweep - 1.2, cx, cy);
+  grad.addColorStop(0, "rgba(159,228,99,0)"); grad.addColorStop(0.19, `rgba(159,228,99,${0.22 * alpha})`); grad.addColorStop(0.2, "rgba(159,228,99,0)");
+  ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+}
+function drawBloomParticles(ctx, t, alpha) {
+  for (let i = 0; i < 70; i++) {
+    const a = i * 2.39996 + t * 0.25, d = 160 + ((i * 53) % 520) * easeOut(clamp(t * 0.9));
+    const x = CX + Math.cos(a) * d, y = 760 + Math.sin(a) * d * 1.05;
+    ctx.fillStyle = `rgba(159,228,99,${alpha * (0.25 + 0.5 * ((i * 17) % 10) / 10)})`;
+    ctx.beginPath(); ctx.arc(x, y, 3 + (i % 4), 0, Math.PI * 2); ctx.fill();
+  }
+}
+function swirl(t, at, dur, color) {
+  // A spiral wipe: the transition between scenes, on the downbeat.
+  const p = prog(t, at - dur / 2, at + dur / 2);
+  if (p <= 0 || p >= 1) return;
+  const cover = p < 0.5 ? easeIn(p * 2) : 1 - easeOut((p - 0.5) * 2);
+  wipe.save(); wipe.translate(CX, CY); wipe.rotate(p * Math.PI * 2.2);
+  for (let arm = 0; arm < 6; arm++) {
+    wipe.rotate(Math.PI / 3);
+    wipe.beginPath(); wipe.moveTo(0, 0);
+    for (let s = 0; s <= 40; s++) {
+      const th = (s / 40) * Math.PI * 0.9, rr = (s / 40) * 1400 * (0.2 + cover);
+      wipe.lineTo(Math.cos(th) * rr, Math.sin(th) * rr);
+    }
+    wipe.lineTo(0, 0);
+    wipe.fillStyle = arm % 2 ? color : "#0d1a12";
+    wipe.globalAlpha = clamp(cover * 1.4);
+    wipe.fill();
+  }
+  wipe.restore();
+}
+
+function seek(t) {
+  bg.clearRect(0, 0, W, H); wipe.clearRect(0, 0, W, H);
+  const beat = (t % 0.5) / 0.5, pulse = Math.exp(-beat * 6);
+
+  // TYPE ─────────────────────────────────────
+  const in1 = t < 3.25;
+  show($("s1"), in1);
+  if (in1) {
+    drawIco(bg, t, 150 + pulse * 10, 0.28);
+    for (const w of S1_WORDS) {
+      const p = prog(t, w.at, w.at + 0.32), out = prog(t, 2.7, 3.05);
+      const s = lerp(2.6, 1, back(p)) * (1 - out * 0.4), sk = (1 - easeOut(p)) * -14;
+      w.node.style.opacity = p > 0 ? 1 - out : 0;
+      w.node.style.transform = `translateX(${out * (w.at * 700 - 700)}px) scale(${s}) skewX(${sk}deg)`;
+      w.node.style.filter = `blur(${(1 - p) * 10}px)`;
+    }
+  }
+
+  // FORM ─────────────────────────────────────
+  const in2 = t >= 2.9 && t < 6.3;
+  show($("s2"), in2);
+  if (in2) {
+    const p = prog(t, 2.9, 3.4), morph = easeInOut(prog(t, 4.2, 5.2));
+    if (morph < 1) drawIco(bg, t, (230 + pulse * 18) * easeOut(p), 1 - morph);
+    if (morph > 0) drawTorus(bg, t, 260 * morph + pulse * 10, morph, 1);
+    s2Title.style.opacity = easeOut(prog(t, 3.1, 3.5));
+    s2Title.style.transform = `translateY(${(1 - easeOut(prog(t, 3.1, 3.5))) * 60}px)`;
+    for (const c of QUESTIONS) {
+      const born = 3.2 + c.i * 0.5, q = easeOut(prog(t, born, born + 0.4));
+      const ang = c.i * (Math.PI / 2) + (t - 3) * 0.9;
+      const x = Math.cos(ang) * 150, z = Math.sin(ang), y = (c.i - 1.5) * 190 + Math.sin(ang) * 40;
+      const sc = (0.78 + (z + 1) * 0.16) * q;
+      c.node.style.opacity = q * (0.55 + (z + 1) * 0.225);
+      c.node.style.zIndex = z > 0 ? 3 : 1;
+      c.node.style.transform = `translate(-50%,-50%) translate(${x}px, ${y}px) scale(${sc})`;
+    }
+  }
+  swirl(t, 3.0, 0.5, "#9fe463");
+
+  // SPACE ────────────────────────────────────
+  const in3 = t >= 5.9 && t < 9.7;
+  show($("s3"), in3);
+  if (in3) {
+    drawTunnel(bg, t, easeOut(prog(t, 5.9, 6.4)) * (1 - prog(t, 9.3, 9.7)));
+    VERDICTS.forEach((v, i) => {
+      v.node.style.zIndex = String(i + 1);
+      const local = t - 6.25 - i * 0.75;
+      const flipIn = easeOut(clamp(local / 0.25)), flipOut = i < 2 ? easeIn(clamp((local - 0.75) / 0.12)) : 0;
+      const visible = local >= 0 && (i === 2 || local < 0.87);
+      const ry = (1 - flipIn) * -90 + flipOut * 90;
+      v.node.style.display = visible && local > -0.01 ? "" : "none";
+      v.node.style.transform = `rotateY(${ry}deg) scale(${1 + pulse * 0.03})`;
+      v.node.style.boxShadow = `0 30px ${80 + pulse * 60}px rgba(0,0,0,0.45)`;
+    });
+    // After the three verdicts, settle on GO and pull back.
+    if (t >= 8.5) {
+      const out = easeIn(prog(t, 8.5, 8.68)), k = easeOut(prog(t, 8.68, 9.0));
+      VERDICTS.forEach((v, i) => (v.node.style.display = (i === 2 && out < 1) || (i === 0 && out >= 1) ? "" : "none"));
+      VERDICTS[2].node.style.transform = `rotateY(${out * 90}deg)`;
+      VERDICTS[0].node.style.transform = `rotateY(${(1 - k) * -90}deg) scale(${lerp(1, 0.66, easeInOut(prog(t, 8.8, 9.2)))}) translateY(${-easeInOut(prog(t, 8.8, 9.2)) * 140}px)`;
+    }
+    s3Cap.style.opacity = easeOut(prog(t, 6.6, 7.0)) * (1 - prog(t, 9.3, 9.6));
+    s3Top.style.opacity = easeOut(prog(t, 6.2, 6.6)) * (1 - prog(t, 9.3, 9.6));
+    s3Cap.style.transform = `translateY(${(1 - easeOut(prog(t, 6.6, 7.0))) * 80}px)`;
+  }
+  swirl(t, 6.0, 0.6, "#9fe463");
+
+  // TIME ─────────────────────────────────────
+  const in4 = t >= 9.4 && t < 12.7;
+  show($("s4"), in4);
+  if (in4) {
+    const a = easeOut(prog(t, 9.4, 9.9)) * (1 - prog(t, 12.3, 12.6));
+    drawClock(bg, t, a);
+    s4Head.style.opacity = a;
+    ticket.style.opacity = a;
+    ticket.style.transform = `translateY(${(1 - easeOut(prog(t, 9.4, 9.9))) * 200}px) rotate(${(1 - easeOut(prog(t, 9.4, 9.9))) * -4}deg)`;
+    // The ledger index rolls up to the real one.
+    const roll = easeOut(prog(t, 9.55, 10.5));
+    $("ledger").textContent = Math.round(lerp(107193000, 107193471, roll)).toLocaleString("en-US");
+    const typed = "287.022082836 DIP", n = Math.round(typed.length * prog(t, 10.4, 11.0));
+    $("delivered").textContent = typed.slice(0, Math.max(1, n));
+    const st = prog(t, 11.0, 11.25);
+    $("stamp").style.opacity = st > 0 ? 1 : 0;
+    $("stamp").style.transform = `scale(${lerp(2.4, 1, back(st))}) rotate(${lerp(-40, -12, easeOut(st))}deg)`;
+    s4Cap.style.opacity = easeOut(prog(t, 11.2, 11.6)) * (1 - prog(t, 12.3, 12.6));
+    s4Cap.style.transform = `translateY(${(1 - easeOut(prog(t, 11.2, 11.6))) * 60}px)`;
+  }
+  swirl(t, 9.5, 0.5, "#1d6630");
+
+  // LOGO ─────────────────────────────────────
+  const in5 = t >= 12.3;
+  show($("s5"), in5);
+  if (in5) {
+    const p = prog(t, 12.4, 13.1);
+    drawBloomParticles(bg, t - 12.4, easeOut(p));
+    logo.style.opacity = easeOut(p);
+    logo.style.transform = `scale(${lerp(0.2, 1, back(p)) * (1 + pulse * 0.02)}) rotate(${(1 - easeOut(p)) * -120}deg)`;
+    logo.style.filter = `drop-shadow(0 0 ${40 + pulse * 40}px rgba(159,228,99,0.5))`;
+    const w = easeOut(prog(t, 13.0, 13.5));
+    wordmark.style.opacity = w;
+    wordmark.style.letterSpacing = `${lerp(0.4, 0.02, w)}em`;
+    tagline.style.opacity = easeOut(prog(t, 13.4, 13.8));
+    cta.style.opacity = easeOut(prog(t, 13.8, 14.2));
+    cta.style.transform = `translateY(${(1 - easeOut(prog(t, 13.8, 14.2))) * 30}px)`;
+  }
+  swirl(t, 12.5, 0.5, "#9fe463");
+
+  // A small, honest source line under the real-payment scene.
+  foot.textContent = in4 && t > 10 ? "Recorded from XRPL mainnet · ledger 107,193,471" : "";
+  foot.style.opacity = in4 ? easeOut(prog(t, 10, 10.4)) * (1 - prog(t, 12.3, 12.6)) : 0;
+}
+window.seek = seek;
+window.ready = Promise.all([document.fonts.ready, new Promise((r) => { const i = logo.querySelector("img"); i.complete ? r() : (i.onload = r); })]);
+seek(0);
+</script>
+</body>
+</html>
