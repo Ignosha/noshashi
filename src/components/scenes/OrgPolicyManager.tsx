@@ -17,12 +17,16 @@ import { DEFAULT_RULES } from "@/lib/desk/rules";
 import { describeParams, diffParams, validateParams, type PolicyError, type PolicyParams } from "@/lib/desk/institutional";
 import { simulatePolicy } from "@/lib/desk/simulate";
 import { useToast } from "@/lib/toast";
+import { useBilling } from "@/lib/billing/useEntitlements";
 import { sendNativeNotification } from "@/lib/notifications";
 import { shortAddress } from "@/lib/xrpl/client";
 import { cn } from "@/lib/utils";
 import {
   activatePolicy,
   addMember,
+  grantRegulatorSeat,
+  revokeRegulatorSeat,
+  setOrgBrand,
   can,
   createDraft,
   createOrganization,
@@ -152,6 +156,13 @@ export function OrgBar() {
           </button>
         )}
       </div>
+      {org.data?.membership.role === "regulator" && (
+        <p role="status" className="mt-1.5 border-l-2 border-telemetry pl-2 text-[9.5px] leading-snug text-foreground">
+          READ-ONLY EXAMINER SEAT · You can read this organization's policies, exceptions, investigations and audit trail and change
+          nothing. The seat ends {org.data.membership.expiresAt ? new Date(org.data.membership.expiresAt).toLocaleString() : "soon"};
+          your visits are recorded in the audit trail.
+        </p>
+      )}
       {org.selectedId === null && (
         <p className="mt-1.5 text-[9.5px] leading-snug text-muted-foreground">
           Workstation policy: one operator, kept on this device, no second approval. Its verdicts are not
@@ -776,9 +787,9 @@ function MembersPanel({ data, refresh, push }: { data: OrgData; refresh: () => P
 
   return (
     <section>
-      <Eyebrow className="mb-2">MEMBERS · {data.directory.length}</Eyebrow>
+      <Eyebrow className="mb-2">MEMBERS · {data.directory.filter((m) => m.role !== "regulator").length}</Eyebrow>
       <div className="space-y-0.5">
-        {data.directory.map((m) => (
+        {data.directory.filter((m) => m.role !== "regulator").map((m) => (
           <p key={m.accountId} className="mono-font text-[9.5px] text-muted-foreground">
             <span className="text-foreground">{m.displayName || m.email}</span>
             {m.displayName ? ` · ${m.email}` : ""} · <span className="stencil text-[8px] tracking-[0.18em]">{m.role.toUpperCase()}</span>
@@ -803,7 +814,126 @@ function MembersPanel({ data, refresh, push }: { data: OrgData; refresh: () => P
         </div>
       )}
       {failure && <div className="mt-2"><Refusal failure={failure} /></div>}
+      <SeatsPanel data={data} refresh={refresh} push={push} />
+      <BrandPanel data={data} refresh={refresh} push={push} />
     </section>
+  );
+}
+
+/* ── Regulator seats ──────────────────────────────────────────────── */
+
+const SEAT_TERMS = [7, 30, 90, 180];
+
+function SeatsPanel({ data, refresh, push }: { data: OrgData; refresh: () => Promise<void>; push: ReturnType<typeof useToast>["push"] }) {
+  const { has } = useBilling();
+  const [email, setEmail] = useState("");
+  const [days, setDays] = useState(30);
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<ServerFailure | null>(null);
+  const seats = data.directory.filter((m) => m.role === "regulator");
+  const manage = can.manageSeats(data.membership.role) && has("regulator_seats");
+
+  const grant = async () => {
+    setBusy(true);
+    setFailure(null);
+    try {
+      const r = await grantRegulatorSeat(data.membership.organizationId, email, days);
+      if (!r.ok) return setFailure(r);
+      await refresh();
+      push({ title: "EXAMINER SEAT GRANTED", body: `${email.trim()} · read-only for ${days} days`, tone: "info" });
+      setEmail("");
+    } finally {
+      setBusy(false);
+    }
+  };
+  const revoke = async (accountId: string, who: string) => {
+    setFailure(null);
+    const r = await revokeRegulatorSeat(data.membership.organizationId, accountId);
+    if (!r.ok) return setFailure(r);
+    await refresh();
+    push({ title: "EXAMINER SEAT REVOKED", body: who, tone: "info" });
+  };
+
+  if (!manage && seats.length === 0) return null;
+  return (
+    <div className="mt-4">
+      <Eyebrow className="mb-2">REGULATOR SEATS · {seats.length}</Eyebrow>
+      <p className="text-[9px] leading-snug text-muted-foreground">
+        An examiner reads this organization's policies, exceptions, investigations and audit trail, and can change nothing.
+        The seat ends on its date without anyone acting; every visit is written to the audit trail.
+      </p>
+      <div className="mt-1.5 space-y-0.5">
+        {seats.map((m) => (
+          <p key={m.accountId} className="mono-font flex items-center gap-2 text-[9.5px] text-muted-foreground">
+            <span className="text-foreground">{m.displayName || m.email}</span>
+            <span>· ENDS {m.expiresAt ? new Date(m.expiresAt).toLocaleDateString() : "—"}</span>
+            {manage && (
+              <button type="button" className="text-[8.5px] tracking-[0.14em] hover:text-no-go" onClick={() => void revoke(m.accountId, m.displayName || m.email)}>
+                REVOKE
+              </button>
+            )}
+          </p>
+        ))}
+      </div>
+      {manage && (
+        <div className="mt-2 flex flex-wrap items-end gap-2">
+          <Field label="EXAMINER · EMAIL">
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="examiner@regulator.gov" className="h-7 w-60 text-[11px]" />
+          </Field>
+          <Field label="FOR">
+            <select aria-label="Seat length" value={days} onChange={(e) => setDays(Number(e.target.value))} className="mono-font h-7 rounded border border-border bg-background px-1 text-[10px] text-foreground">
+              {SEAT_TERMS.map((d) => <option key={d} value={d}>{d} DAYS</option>)}
+            </select>
+          </Field>
+          <Button size="sm" variant="outline" disabled={busy || !/.+@.+\..+/.test(email.trim())} onClick={() => void grant()}>GRANT SEAT</Button>
+        </div>
+      )}
+      {failure && <div className="mt-2"><Refusal failure={failure} /></div>}
+    </div>
+  );
+}
+
+/* ── White-label ──────────────────────────────────────────────────── */
+
+function BrandPanel({ data, refresh, push }: { data: OrgData; refresh: () => Promise<void>; push: ReturnType<typeof useToast>["push"] }) {
+  const { has } = useBilling();
+  const [name, setName] = useState(data.membership.brand.name ?? "");
+  const [accent, setAccent] = useState(data.membership.brand.accent ?? "");
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<ServerFailure | null>(null);
+  if (!can.setBrand(data.membership.role) || !has("white_label")) return null;
+
+  const save = async () => {
+    setBusy(true);
+    setFailure(null);
+    try {
+      const r = await setOrgBrand(data.membership.organizationId, name, accent);
+      if (!r.ok) return setFailure(r);
+      await refresh();
+      push({ title: "BRAND SAVED", body: name.trim() || "NOSHASHI default", tone: "info" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mt-4">
+      <Eyebrow className="mb-2">WHITE-LABEL</Eyebrow>
+      <p className="text-[9px] leading-snug text-muted-foreground">
+        Your organization's name and colour on the console header and on the reports your members export. Leave both empty for NOSHASHI's own.
+      </p>
+      <div className="mt-2 flex flex-wrap items-end gap-2">
+        <Field label="DISPLAY NAME">
+          <Input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="Acme Custody Compliance" className="h-7 w-60 text-[11px]" />
+        </Field>
+        <Field label="ACCENT">
+          <Input value={accent} onChange={(e) => setAccent(e.target.value)} placeholder="#1A7F5A" className="h-7 w-24 font-mono text-[11px]" />
+        </Field>
+        {/^#[0-9A-Fa-f]{6}$/.test(accent) && <span aria-hidden className="mb-1 h-5 w-5 rounded-sm border border-border" style={{ background: accent }} />}
+        <Button size="sm" variant="outline" disabled={busy || (accent !== "" && !/^#[0-9A-Fa-f]{6}$/.test(accent))} onClick={() => void save()}>SAVE BRAND</Button>
+      </div>
+      {failure && <div className="mt-2"><Refusal failure={failure} /></div>}
+    </div>
   );
 }
 
@@ -819,6 +949,16 @@ const AUDIT_WORDS: Record<string, string> = {
   "exception.approved": "EXCEPTION APPROVED",
   "exception.rejected": "EXCEPTION REJECTED",
   "organization.created": "ORGANIZATION CREATED",
+  "organization.brand_changed": "BRAND CHANGED",
+  "regulator.seat_granted": "EXAMINER SEAT GRANTED",
+  "regulator.seat_extended": "EXAMINER SEAT EXTENDED",
+  "regulator.seat_revoked": "EXAMINER SEAT REVOKED",
+  "regulator.session_opened": "EXAMINER OPENED THE RECORD",
+  "export.created": "EXPORT CREATED",
+  "settings.changed": "SETTINGS CHANGED",
+  "adjudication.recorded": "ADJUDICATION RECORDED",
+  "alert.triggered": "CUSTOM ALERT FIRED",
+  "stress.scheduled_run": "SCHEDULED STRESS RUN",
 };
 
 function AuditPanel({ data }: { data: OrgData }) {

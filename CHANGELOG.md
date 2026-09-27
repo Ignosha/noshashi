@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased
+
+### Institutional: every listed feature now exists
+
+- **Regulator seats.** Owners, admins and compliance members give an
+  examiner a read-only seat for 1 to 180 days. The examiner reads the
+  organization's policies, exceptions, investigations and audit trail and
+  can change nothing; the seat ends on its date by itself, and every visit
+  is recorded in the audit trail.
+- **Scheduled monitoring.** PORTFOLIO & RADAR › MONITOR re-runs the
+  redemption stress test for every wallet in the book every 1 to 24 hours
+  and keeps the readings, with a trend per wallet.
+- **Custom alert logic.** Your own rules over those readings (recovery
+  ratio, freezable share, days to exit, trapped value, frozen positions),
+  joined by ALL or ANY, sent to the console, the desktop, or your webhooks
+  as the signed event `custom_alert`.
+- **White-label console and reports.** Your organization's name and colour
+  at the top of the console and on exported audit files and passports.
+- **A complete audit log.** Every export (with its SHA-256), recorded
+  verdict, monitoring setting change, scheduled run and fired alert is now
+  written to the organization's append-only audit log.
+- The server now checks the organization's plan itself before granting a
+  seat, setting a brand or recording a paid action.
+
 ## 1.0.12
 
 ### Hands-on labs

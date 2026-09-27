@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { recordAdjudication } from "@/lib/org/workstationContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { SceneHeader } from "./SceneHeader";
 import { PatternField } from "@/components/nova/brand/BrandPattern";
@@ -178,6 +179,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
           policyResults: results ?? undefined,
         });
       void append(entry);
+      void recordAdjudication(entry);
       const gateRun: GateRun = { receipt: result, results, measurements, entry };
       setRun(gateRun);
       setLog((prev) => [gateRun, ...prev].slice(0, 12));

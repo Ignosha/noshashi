@@ -415,7 +415,8 @@ function ExportSection({ passport }: { passport: AssetPassport }) {
 async function exportPassport(passport: AssetPassport) {
   const json = passportToJson(passport);
   const csv = passportToCsv(passport);
-  const pdf = passportToPdf(passport);
+  const { preparedFor } = await import("@/lib/org/workstationContext");
+  const pdf = passportToPdf(passport, preparedFor());
   const base = `passport-${passport.asset.currency ?? passport.asset.issuer.slice(0, 8)}`;
   const stamp = passport.generatedAt.slice(0, 10);
 

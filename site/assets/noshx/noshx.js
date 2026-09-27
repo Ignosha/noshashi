@@ -201,7 +201,7 @@ async function Ke(e) {
     ) : t;
   }
 }
-async function Ve(e) {
+async function Ye(e) {
   return ((await b("account_objects", {
     account: e,
     ledger_index: "validated",
@@ -218,7 +218,7 @@ async function Ve(e) {
     expiration: s.Expiration ? Number(s.Expiration) : void 0
   }));
 }
-async function Ye(e, t = 40) {
+async function Ve(e, t = 40) {
   try {
     return ((await b("account_tx", {
       account: e,
@@ -398,9 +398,9 @@ async function rt(e) {
       ]
     };
   const [a, r, o] = await Promise.all([
-    Ve(t).catch(() => []),
+    Ye(t).catch(() => []),
     nt(t).catch(() => []),
-    Ye(t, at).catch(() => [])
+    Ve(t, at).catch(() => [])
   ]), i = await st(t).catch(() => null), u = Object.keys(i?.obligations ?? {}).length > 0 ? await Te(t).catch(() => {
   }) : void 0;
   return it({
@@ -707,17 +707,17 @@ async function gt(e) {
   const n = t.account_data ?? {}, s = Number(n.Sequence ?? 0);
   let a;
   try {
-    const T = await b("server_info", {}), P = String(T.info?.complete_ledgers ?? ""), L = Number(P.split("-")[0]);
-    Number.isFinite(L) && (a = L);
+    const T = await b("server_info", {}), L = String(T.info?.complete_ledgers ?? ""), P = Number(L.split("-")[0]);
+    Number.isFinite(P) && (a = P);
   } catch {
   }
   let r;
   const o = [];
   let i = !1, c;
   for (let T = 0; T < ee; T += 1) {
-    let P;
+    let L;
     try {
-      P = await b("account_tx", {
+      L = await b("account_tx", {
         account: e,
         ledger_index_min: -1,
         ledger_index_max: -1,
@@ -730,8 +730,8 @@ async function gt(e) {
       T > 0 && (i = !0);
       break;
     }
-    const L = P.transactions ?? [];
-    if (r || (r = L[0]), o.push(...L), c = P.marker, !c) break;
+    const P = L.transactions ?? [];
+    if (r || (r = P[0]), o.push(...P), c = L.marker, !c) break;
     T === ee - 1 && (i = !0);
   }
   const d = r?.tx_json ?? r?.tx ?? {}, u = Number(r?.ledger_index ?? d.ledger_index ?? 0) || void 0, f = Number(d.date), l = Number.isFinite(f) ? new Date((f + _e) * 1e3) : void 0, h = d.TransactionType ? String(d.TransactionType) : void 0, g = h === "Payment" && d.Destination === e && d.Account !== e, m = g ? String(d.Account) : void 0, y = d.Amount ?? d.DeliverMax, p = g && typeof y == "string" ? Number(y) / 1e6 : void 0, $ = u === void 0 ? void 0 : ft(s, u), w = u !== void 0 && a !== void 0 && a > ut && u <= a, O = l ? Math.floor((Date.now() - l.getTime()) / 864e5) : void 0;
@@ -1219,7 +1219,7 @@ function Et(e) {
   const a = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((r, o) => a[r.severity] - a[o.severity]);
 }
-const ie = 250, Pt = 400, Lt = 262144, Rt = 4194304, Ct = 2097152;
+const ie = 250, Lt = 400, Pt = 262144, Rt = 4194304, Ct = 2097152;
 function Dt(e) {
   const t = e.reduce((n, s) => n + s, 0);
   return t <= 0 ? 0 : e.reduce((n, s) => n + (s / t * 100) ** 2, 0);
@@ -1243,7 +1243,7 @@ async function xe(e, t) {
       h = await b("account_lines", {
         account: e,
         ledger_index: "validated",
-        limit: Pt,
+        limit: Lt,
         ...c ? { marker: c } : {}
       });
     } catch (g) {
@@ -1297,7 +1297,7 @@ async function xe(e, t) {
     linesWalked: i.length,
     truncated: u,
     walkError: f,
-    requiresAuth: (r & Lt) !== 0,
+    requiresAuth: (r & Pt) !== 0,
     canFreeze: (r & Ct) === 0,
     globalFreeze: (r & Rt) !== 0,
     ledgerIndex: Number(n.ledger_index ?? 0),
@@ -1525,7 +1525,7 @@ function jt(e) {
   const o = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((i, c) => o[i.severity] - o[c.severity]);
 }
-const Wt = 1, Gt = 2, Kt = 8, Vt = 16, Yt = 5, de = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
+const Wt = 1, Gt = 2, Kt = 8, Yt = 16, Vt = 5, de = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
 function Qt(e) {
   let t = 0n;
   for (const s of e) t = t << 8n | BigInt(s);
@@ -1564,7 +1564,7 @@ async function en(e) {
     tokenId: t,
     issuer: await Zt(t.slice(8, 48)),
     burnable: (n & Wt) !== 0,
-    mutable: (n & Vt) !== 0,
+    mutable: (n & Yt) !== 0,
     transferable: (n & Kt) !== 0,
     onlyXrp: (n & Gt) !== 0,
     // TransferFee is in units of 0.001%, so 5000 is 5%.
@@ -1631,7 +1631,7 @@ function sn(e) {
     action: "Do not value it against comparable tokens that can be resold."
   }), n.transferFeePct > 0 && t.push({
     id: "transfer-fee",
-    severity: n.transferFeePct >= Yt ? "warn" : "info",
+    severity: n.transferFeePct >= Vt ? "warn" : "info",
     title: `The issuer takes ${n.transferFeePct.toFixed(3)}% of every resale`,
     detail: `A transfer fee is deducted by the issuer each time this token changes hands, on top of anything a marketplace charges. At this rate a round trip costs ${(n.transferFeePct * 2).toFixed(3)}% before any price movement.`
   }), n.onlyXrp && t.push({
@@ -2064,6 +2064,18 @@ const Tn = [
     keywords: ["learn", "lab", "labs", "tutorial", "training", "course", "how", "use", "onboarding", "review", "practice", "quiz", "remember"]
   },
   {
+    id: "regulator-seat",
+    question: "How do I give an examiner or regulator access?",
+    answer: "In an organization on Institutional or above, an owner, admin or compliance member opens POLICY › MEMBERS › REGULATOR SEATS, enters the examiner's email (they need their own NOSHASHI account) and chooses 7, 30, 90 or 180 days. The examiner can read the organization's policies, exceptions, investigations and audit trail and cannot change anything. The seat ends on its date without anyone acting, can be revoked at any time, and every visit the examiner makes is written to the audit trail.",
+    keywords: ["regulator", "examiner", "auditor", "seat", "read-only", "readonly", "access", "supervisor", "inspection"]
+  },
+  {
+    id: "monitoring",
+    question: "How do I monitor my book on a schedule and set my own alerts?",
+    answer: "Open PORTFOLIO & RADAR › MONITOR (Institutional). Turn the schedule on, choose every 1, 4, 6, 12 or 24 hours and a scenario, and every wallet in the book is stress-tested with the same model as the Risk screen while the app is open. Under ALERT RULES, create a rule from conditions such as recovery ratio below 60% or freezable share above 25%, joined by ALL or ANY, for every wallet or chosen ones, and send it to the console, a desktop notification or your organization's webhooks (event custom_alert). Runs and alerts are recorded in the organization's audit log.",
+    keywords: ["monitor", "monitoring", "schedule", "scheduled", "alert", "alerts", "rule", "rules", "threshold", "stress", "notify", "webhook"]
+  },
+  {
     id: "no-go",
     question: "Why did my check come back NO-GO?",
     answer: "NO-GO means at least one blocking rule failed, and the Verification scene names which one. In practice it is almost always one of three things: the account holds none of the XLS-70 credentials the target domain requires (most mainnet accounts hold none yet), the transfer exceeds the domain's per-settlement ceiling, or the balance does not clear the XRPL owner reserve of 1 XRP plus 0.2 XRP per owned object. Open the verdict and read the row marked BLOCK — the detail line states the exact number that failed.",
@@ -2246,10 +2258,10 @@ const Tn = [
       "Signed audit export — SHA-256 chain-of-custody for examiners",
       "Offline adjudication — run on a segregated network from captured state",
       "Compliance API keys and webhooks",
-      "White-labelled wallet",
-      "Regulator read-only seats",
+      "White-label console and reports — your name and colour on the console and on exports",
+      "Regulator read-only seats — time-boxed examiner access, every visit logged",
       "100,000 API verifications included",
-      "99.9% uptime SLA with service credits",
+      "99.9% uptime SLA with service credits, set in the MSA",
       "Dedicated onboarding and a named support contact",
       "Invoice, ACH, wire, NET-30 — MSA required"
     ],
@@ -2458,24 +2470,24 @@ function En(e) {
   Oe = e, R = null;
 }
 function Ee() {
-  return R ?? (R = import("./pages-RBNonDxZ.js").then(({ default: e }) => Fn([...xn(), ...Oe, ...e]))), R;
+  return R ?? (R = import("./pages-D8DncmSC.js").then(({ default: e }) => Fn([...xn(), ...Oe, ...e]))), R;
 }
-function Pn() {
+function Ln() {
   if (R) return;
   const e = () => {
     Ee();
   };
   typeof requestIdleCallback == "function" ? requestIdleCallback(e, { timeout: 1500 }) : setTimeout(e, 0);
 }
-async function Pe(e, t = 5) {
+async function Le(e, t = 5) {
   return On(await Ee(), e, t);
 }
-const Ln = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/, Rn = /^[0-9A-Fa-f]{64}$/;
+const Pn = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/, Rn = /^[0-9A-Fa-f]{64}$/;
 class C extends Error {
 }
 function N(e, t = "address") {
   const n = String(e[t] ?? "").trim();
-  if (!Ln.test(n)) throw new C(`${t} must be a classic XRPL address starting with r.`);
+  if (!Pn.test(n)) throw new C(`${t} must be a classic XRPL address starting with r.`);
   return n;
 }
 function me(e, t) {
@@ -2493,7 +2505,7 @@ const S = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     run: async (e) => {
       const t = String(e.query ?? "").trim();
       if (!t) throw new C("query is empty.");
-      const n = await Pe(t, 6);
+      const n = await Le(t, 6);
       return n.length === 0 ? "Nothing in NOSHASHI's pages matches that. Say so rather than guess." : n.map((s) => ({ title: s.title, source: s.source, text: s.text }));
     }
   },
@@ -2610,11 +2622,11 @@ const S = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     run: (e) => xe(N(e, "issuer"))
   }
 ];
-function Le(e) {
+function Pe(e) {
   return Cn.find((t) => t.name === e);
 }
 async function B(e, t, n) {
-  const s = Le(e);
+  const s = Pe(e);
   if (!s) return { ok: !1, error: `No tool named ${e}.` };
   if (s.feature && !n.has(s.feature))
     return { ok: !1, gated: !0, error: `${s.screen} needs a Pro plan or higher.` };
@@ -2879,11 +2891,11 @@ function be(e, t) {
       return "";
   }
 }
-function Vn(e) {
+function Yn(e) {
   return e.replace(/^Q: .*$/m, "").replace(/^A: /m, "").replace(/([.!?])\s+/g, `$1
 `).split(/\n+/).map((t) => t.trim()).filter((t) => t.length > 25 && !/^[|·—-]/.test(t));
 }
-function Yn(e, t) {
+function Vn(e, t) {
   if (t.length === 0) return "";
   const n = new Set(x(e)), s = t[0], a = /^(Help ›|Support ›|Learn NOSHASHI › Knowledge check|Pricing ›)/, r = t.slice(0, 2).find((l) => a.test(l.title) && l.score >= s.score * 0.85);
   if (r) {
@@ -2902,7 +2914,7 @@ Source: ${r.title} · ${r.source}`;
 Source: NOSHASHI word list · ${s.source}`;
   }
   const o = t.slice(0, 3).flatMap(
-    (l, h) => Vn(l.text).map((g, m) => {
+    (l, h) => Yn(l.text).map((g, m) => {
       const y = x(g), p = y.filter(($) => n.has($)).length;
       return { hit: l, sentence: g, position: m, score: p / Math.sqrt(y.length + 1) + (h === 0 ? 0.3 : 0) - m * 0.01 };
     })
@@ -2950,7 +2962,7 @@ async function Qn(e, t, n) {
     })
   ), i = [];
   for (const f of o) {
-    const { call: l, result: h } = f, g = Le(l.tool)?.screen ?? l.tool;
+    const { call: l, result: h } = f, g = Pe(l.tool)?.screen ?? l.tool;
     h.ok && "gatedFrom" in f ? i.push(
       `${be(l.tool, h.value)}
 
@@ -2961,8 +2973,8 @@ That is the free address check. The six issuer checks with a GO/HOLD/NO-GO certi
   }
   let c = "";
   if (s.knowledge) {
-    const f = await Pe(e, 5).catch(() => []);
-    if (r({ kind: "tool", name: "search_noshashi", input: { query: e.slice(0, 60) }, ok: f.length > 0, summary: f.length ? `${f.length} passages` : "nothing matched" }), c = Yn(e, f), Wn.test(e)) {
+    const f = await Le(e, 5).catch(() => []);
+    if (r({ kind: "tool", name: "search_noshashi", input: { query: e.slice(0, 60) }, ok: f.length > 0, summary: f.length ? `${f.length} passages` : "nothing matched" }), c = Vn(e, f), Wn.test(e)) {
       const l = Gn(e);
       l.length > 0 && (c += `${c ? `
 
@@ -2985,7 +2997,7 @@ const E = {
   security: "security@noshashi.app",
   privacy: "privacy@noshashi.app",
   form: "/contact/"
-}, Y = [
+}, V = [
   {
     id: "what",
     keywords: ["what", "noshashi", "do", "product", "about", "purpose", "explain", "is"],
@@ -3143,7 +3155,7 @@ function j(e) {
 }
 function Zn(e) {
   const t = j(e);
-  return t.length ? Y.map((n) => {
+  return t.length ? V.map((n) => {
     const s = new Set(n.keywords), a = new Set(j(n.q)), r = new Set(j(n.a));
     let o = 0;
     for (const i of t)
@@ -3239,10 +3251,10 @@ const K = () => Math.max(os().count, ze), cs = {
     return e >= He ? !1 : (ke(e + 1), !0);
   },
   refundFreeCheck: () => ke(Math.max(0, K() - 1))
-}, V = "Support › ";
+}, Y = "Support › ";
 En(
-  Y.map((e) => ({
-    title: `${V}${e.q}`,
+  V.map((e) => ({
+    title: `${Y}${e.q}`,
     source: "noshashi.app support",
     text: `${e.q}
 ${e.a}`,
@@ -3258,7 +3270,7 @@ function ds(e) {
   let s;
   for (const a of t[1].split("; ")) {
     const r = a.lastIndexOf(" · "), o = r >= 0 ? a.slice(0, r) : a, i = r >= 0 ? a.slice(r + 3) : "";
-    o.startsWith(V) && (s = o.slice(V.length));
+    o.startsWith(Y) && (s = o.slice(Y.length));
     const c = /^https:\/\/www\.noshashi\.app(\/[^\s]*)?$/.exec(i);
     if (!c) continue;
     const d = c[1] ?? "/";
@@ -3288,7 +3300,7 @@ async function hs(e, t) {
     });
     if (!o.facts && !r)
       return { text: es(n).text, steps: a, links: [W], related: [], source: "none" };
-    const { body: i, links: c, support: d } = ds(o.text), u = d ? Y.find((h) => h.q === d) : void 0, f = i.includes("https://www.noshashi.app/certificate/") ? [{ label: "Free issuer certificate", href: "/certificate/" }] : [], l = [...u?.links ?? [], ...f, ...c];
+    const { body: i, links: c, support: d } = ds(o.text), u = d ? V.find((h) => h.q === d) : void 0, f = i.includes("https://www.noshashi.app/certificate/") ? [{ label: "Free issuer certificate", href: "/certificate/" }] : [], l = [...u?.links ?? [], ...f, ...c];
     return {
       text: i,
       steps: a,
@@ -3319,7 +3331,7 @@ const ls = {
   certify_authority: "the issuer",
   ledger_status: "the latest ledger",
   ledger_sync: "the public servers"
-}, fs = () => Math.max(0, He - K()), gs = () => Pn();
+}, fs = () => Math.max(0, He - K()), gs = () => Ln();
 export {
   hs as ask,
   fs as checksLeft,

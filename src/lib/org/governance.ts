@@ -25,11 +25,20 @@ import type { LedgerEntry } from "@/lib/desk/ledger";
  * every write is followed by a fresh read, and nothing is set locally.
  */
 
-export type MemberRole = "owner" | "admin" | "analyst" | "compliance" | "risk" | "viewer" | "api";
+export type MemberRole = "owner" | "admin" | "analyst" | "compliance" | "risk" | "viewer" | "api" | "regulator";
 
-export type Membership = { organizationId: string; name: string; slug: string; role: MemberRole };
+export type Membership = {
+  organizationId: string;
+  name: string;
+  slug: string;
+  role: MemberRole;
+  /** Set for a regulator seat: when it ends. */
+  expiresAt: string | null;
+  /** White-label: the organization's own name and accent, when it has set them. */
+  brand: { name: string | null; accent: string | null };
+};
 
-export type DirectoryEntry = { accountId: string; email: string; displayName: string | null; role: MemberRole };
+export type DirectoryEntry = { accountId: string; email: string; displayName: string | null; role: MemberRole; expiresAt: string | null };
 
 export type OrgPolicyStatus = "draft" | "pending" | "active" | "archived";
 
@@ -128,7 +137,12 @@ export const can = {
   requestException: (r: MemberRole | null) => r !== null && AUTHORS.includes(r),
   approveException: (r: MemberRole | null) => r !== null && APPROVERS.includes(r),
   manageMembers: (r: MemberRole | null) => r === "owner" || r === "admin",
-  readAudit: (r: MemberRole | null) => r !== null && [...APPROVERS, "risk"].includes(r),
+  readAudit: (r: MemberRole | null) => r !== null && [...APPROVERS, "risk", "regulator"].includes(r),
+  /** Grant and revoke examiner seats. */
+  manageSeats: (r: MemberRole | null) => r !== null && APPROVERS.includes(r),
+  setBrand: (r: MemberRole | null) => r === "owner" || r === "admin",
+  /** Record workstation actions (exports, alerts, scheduled runs) in the audit log. */
+  recordAudit: (r: MemberRole | null) => r !== null && AUTHORS.includes(r),
 };
 
 /* ── Server outcomes ──────────────────────────────────────────────── */
@@ -151,6 +165,14 @@ const RPC_OUTCOMES: Record<string, { title: string; message: string }> = {
   NOT_AWAITING_EVIDENCE: { title: "NOT AWAITING EVIDENCE", message: "No reviewer has asked for more evidence on this exception." },
   NOTE_REQUIRED: { title: "NOTE REQUIRED", message: "Explain what the evidence shows, in at least 10 characters." },
   EVIDENCE_REQUIRED: { title: "EVIDENCE REQUIRED", message: "Add at least one reference: a link, a transaction hash, an account or a document digest." },
+  FEATURE_NOT_IN_PLAN: { title: "NOT IN YOUR PLAN", message: "The organization's plan does not include this. It is part of Institutional and above." },
+  INVALID_TERM: { title: "INVALID TERM", message: "A seat lasts between 1 and 180 days." },
+  ALREADY_MEMBER: { title: "ALREADY A MEMBER", message: "That person already works in this organization. An examiner seat is for someone from outside it." },
+  SELF: { title: "NOT FOR YOURSELF", message: "You cannot give yourself an examiner seat." },
+  USE_REGULATOR_SEAT: { title: "USE AN EXAMINER SEAT", message: "Examiners are added under REGULATOR SEATS, with an end date." },
+  ACCENT_INVALID: { title: "INVALID COLOUR", message: "Give the accent as a hex colour such as #1A7F5A." },
+  NAME_INVALID: { title: "INVALID NAME", message: "The display name can be at most 80 characters." },
+  RATE_LIMITED: { title: "TOO MANY RECORDS", message: "More than 120 records a minute from one person. Try again shortly." },
 };
 
 export function failureOf(code: string, fallback: { title: string; message: string }): ServerFailure {
@@ -349,12 +371,27 @@ const db = () => supabase().schema("noshashi");
 export async function listMemberships(accountId: string): Promise<Membership[]> {
   const { data, error } = await db()
     .from("organization_members")
-    .select("organization_id, role, organizations(name, slug)")
+    .select("organization_id, role, expires_at, organizations(name, slug, brand_name, brand_accent)")
     .eq("account_id", accountId);
   if (error) throw new Error(supabaseErrorMessage(error));
-  return (data ?? []).map((row) => {
-    const r = row as unknown as { organization_id: string; role: MemberRole; organizations: { name: string; slug: string } | null };
-    return { organizationId: r.organization_id, role: r.role, name: r.organizations?.name ?? "—", slug: r.organizations?.slug ?? "" };
+  const now = Date.now();
+  return (data ?? []).flatMap((row) => {
+    const r = row as unknown as {
+      organization_id: string;
+      role: MemberRole;
+      expires_at: string | null;
+      organizations: { name: string; slug: string; brand_name: string | null; brand_accent: string | null } | null;
+    };
+    // An expired seat is not a membership (the server agrees: it refuses every read).
+    if (r.expires_at && Date.parse(r.expires_at) <= now) return [];
+    return [{
+      organizationId: r.organization_id,
+      role: r.role,
+      name: r.organizations?.name ?? "—",
+      slug: r.organizations?.slug ?? "",
+      expiresAt: r.expires_at,
+      brand: { name: r.organizations?.brand_name ?? null, accent: r.organizations?.brand_accent ?? null },
+    }];
   });
 }
 
@@ -371,8 +408,8 @@ export async function listPolicies(organizationId: string): Promise<OrgPolicy[]>
 export async function listDirectory(organizationId: string): Promise<DirectoryEntry[]> {
   const { data, error } = await db().rpc("org_member_directory", { p_org: organizationId });
   if (error) throw new Error(supabaseErrorMessage(error));
-  return ((data ?? []) as Array<{ account_id: string; email: string; display_name: string | null; role: MemberRole }>).map((r) => ({
-    accountId: r.account_id, email: r.email, displayName: r.display_name, role: r.role,
+  return ((data ?? []) as Array<{ account_id: string; email: string; display_name: string | null; role: MemberRole; expires_at?: string | null }>).map((r) => ({
+    accountId: r.account_id, email: r.email, displayName: r.display_name, role: r.role, expiresAt: r.expires_at ?? null,
   }));
 }
 
@@ -544,3 +581,42 @@ export const createOrganization = (name: string, slug: string) =>
 
 export const addMember = (organizationId: string, email: string, role: MemberRole) =>
   rpcDone("add_org_member_by_email", { p_org: organizationId, p_email: email, p_role: role }, "ADD MEMBER");
+
+/* ── Examiner seats, white-label and workstation audit records ────── */
+
+export const grantRegulatorSeat = (organizationId: string, email: string, days: number) =>
+  rpcDone("grant_regulator_seat", { p_org: organizationId, p_email: email.trim(), p_days: days }, "SEAT");
+
+export const revokeRegulatorSeat = (organizationId: string, accountId: string) =>
+  rpcDone("revoke_regulator_seat", { p_org: organizationId, p_account: accountId }, "REVOKE");
+
+/** Called when an examiner opens the organization; the server records the visit. */
+export const recordRegulatorSession = (organizationId: string) =>
+  rpcDone("record_regulator_session", { p_org: organizationId }, "SESSION");
+
+export const setOrgBrand = (organizationId: string, name: string, accent: string) =>
+  rpcDone("set_org_brand", { p_org: organizationId, p_name: name, p_accent: accent }, "BRAND");
+
+export type WorkstationAuditAction =
+  | "export.created"
+  | "settings.changed"
+  | "adjudication.recorded"
+  | "alert.triggered"
+  | "stress.scheduled_run";
+
+/**
+ * Append a workstation action to the organization's append-only audit log.
+ * "alert.triggered" is also delivered to the organization's webhooks as
+ * the signed event "custom_alert".
+ */
+export const appendOrgAudit = (
+  organizationId: string,
+  action: WorkstationAuditAction,
+  entity: { type: string; id: string },
+  state: Record<string, unknown>
+) =>
+  rpcDone(
+    "append_org_audit",
+    { p_org: organizationId, p_action: action, p_entity_type: entity.type, p_entity_id: entity.id, p_state: state },
+    "AUDIT"
+  );

@@ -384,3 +384,27 @@ export function deriveAlerts(snapshots: WalletSnapshot[]): DeskAlert[] {
   const rank = { critical: 0, warn: 1, info: 2 };
   return alerts.sort((a, b) => rank[a.severity] - rank[b.severity]);
 }
+
+/**
+ * The wallets in an account's book, read outside a screen (the scheduled
+ * stress runner). The same first-created book the Portfolio screen shows.
+ */
+export async function readPortfolioWallets(accountId: string): Promise<PortfolioWallet[]> {
+  const db = supabase().schema("noshashi");
+  const { data: book, error: bookError } = await db
+    .from("portfolios")
+    .select("id")
+    .eq("account_id", accountId)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (bookError) throw new Error(supabaseErrorMessage(bookError));
+  if (!book?.id) return [];
+  const { data, error } = await db
+    .from("portfolio_wallets")
+    .select("id, address, label")
+    .eq("portfolio_id", book.id)
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(supabaseErrorMessage(error));
+  return (data ?? []).map((row) => ({ id: row.id as string, address: row.address as string, label: (row.label as string | null) ?? null }));
+}

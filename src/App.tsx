@@ -138,6 +138,8 @@ import type { Status } from "@/lib/xrpl/types";
 import { DOMAIN_REGISTRY, evaluatePolicy } from "@/lib/policy";
 import { HandoffProvider } from "@/lib/nav/handoff";
 import { ObserverRunner } from "@/lib/agent/useObserver";
+import { StressScheduleRunner } from "@/lib/desk/stressSchedule";
+import { OrgContextSync, useWorkstationOrg } from "@/lib/org/workstationContext";
 
 export type SceneId =
   | "home"
@@ -831,6 +833,8 @@ function ConsoleApp() {
     <TooltipProvider delayDuration={220}>
       <HandoffProvider onNavigate={goTo} currentScene={scene}>
       <ObserverRunner />
+      <StressScheduleRunner />
+      <OrgContextSync />
       <div className="scanlines vignette relative flex h-full w-full overflow-hidden bg-background text-foreground">
         <SkipLink />
         <Announcer
@@ -906,11 +910,7 @@ function ConsoleApp() {
               >
                 <NovaLogo size={24} animated={false} tone="color" />
                 {railOpen && (
-                  <span
-                    className="display truncate text-[13px] font-[600] tracking-[0.26em] text-foreground"
-                  >
-                    NOSHASHI
-                  </span>
+                  <BrandName />
                 )}
               </button>
             </div>
@@ -1292,5 +1292,29 @@ function RailAction({
         {hint ? `${label} · ${hint}` : label}
       </TooltipContent>
     </Tooltip>
+  );
+}
+
+/**
+ * The name at the top of the rail. With a white-label brand set by the
+ * organization (Institutional), its name leads and NOSHASHI is credited
+ * beneath; its accent draws the rule under the name.
+ */
+function BrandName() {
+  const { brand } = useWorkstationOrg();
+  if (!brand.name) {
+    return <span className="display truncate text-[13px] font-[600] tracking-[0.26em] text-foreground">NOSHASHI</span>;
+  }
+  return (
+    <span className="flex min-w-0 flex-col leading-tight">
+      <span
+        className="truncate text-[12px] font-[600] tracking-[0.04em] text-foreground"
+        style={brand.accent ? { borderBottom: `2px solid ${brand.accent}`, paddingBottom: 1 } : undefined}
+        title={brand.name}
+      >
+        {brand.name}
+      </span>
+      <span className="font-mono text-[7.5px] tracking-[0.22em] text-faint">ON NOSHASHI</span>
+    </span>
   );
 }

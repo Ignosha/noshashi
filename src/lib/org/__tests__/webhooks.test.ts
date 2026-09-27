@@ -8,7 +8,9 @@ import { verifyNoshashiSignature } from "@/lib/org/webhookSignature";
 const root = resolve(import.meta.dirname, "../../../..");
 const sql = readFileSync(resolve(root, "supabase/migrations/20260924010000_org_webhooks.sql"), "utf8");
 // The newest migration that redefines the allowed events is the one in force.
-const events = readFileSync(resolve(root, "supabase/migrations/20260924120000_exception_evidence_requests.sql"), "utf8");
+// Since 20260927180100 the list lives in one function, webhook_event_names(),
+// which both the table check and the creating function use.
+const events = readFileSync(resolve(root, "supabase/migrations/20260927180100_institutional_features.sql"), "utf8");
 
 describe("webhook addresses — the form explains what the server refuses", () => {
   // The refusals below were each confirmed against the live database function.
@@ -28,13 +30,18 @@ describe("webhook addresses — the form explains what the server refuses", () =
   }
 
   it("the app's event list is exactly the server's, in the table check and in the creating function", () => {
-    const lists = [...events.matchAll(/events <@ array\[([\s\S]*?)\]::text\[\]/g)].map((m) => m[1].match(/'([a-z_]+)'/g)!.map((s) => s.slice(1, -1)).sort());
-    expect(lists).toHaveLength(2);
-    for (const serverEvents of lists) expect(WEBHOOK_EVENTS.map((e) => e.id).sort()).toEqual(serverEvents);
+    const fn = /function noshashi\.webhook_event_names\(\)[\s\S]*?select array\[([\s\S]*?)\]::text\[\]/.exec(events);
+    expect(fn).not.toBeNull();
+    const serverEvents = fn![1].match(/'([a-z_]+)'/g)!.map((s) => s.slice(1, -1)).sort();
+    expect(WEBHOOK_EVENTS.map((e) => e.id).sort()).toEqual(serverEvents);
+    // Both enforcement points read that one list.
+    expect(events).toMatch(/events <@ noshashi\.webhook_event_names\(\)\)/);
+    expect(events).toMatch(/p_events <@ noshashi\.webhook_event_names\(\)/);
   });
 
   it("every event the audit trigger emits is one a webhook may subscribe to", () => {
-    const emitted = [...events.matchAll(/when '[a-z_.]+' then '([a-z_]+)'/g)].map((m) => m[1]);
+    const trigger = /function noshashi\.webhook_from_audit\(\)[\s\S]*?\$\$;/.exec(events)![0];
+    const emitted = [...trigger.matchAll(/when '[a-z_.]+' then '([a-z_]+)'/g)].map((m) => m[1]);
     expect(emitted.length).toBeGreaterThan(5);
     for (const ev of emitted) expect(WEBHOOK_EVENTS.map((e) => e.id), ev).toContain(ev);
   });
