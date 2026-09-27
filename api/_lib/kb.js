@@ -106,6 +106,15 @@ export const ENTRIES = [
     links: [{ label: "Legal", href: "/legal/" }],
   },
   {
+    id: "which-plan",
+    // Mirrors each plan's audience and price in src/lib/billing/catalog.ts;
+    // src/site/__tests__/noshx-web.test.ts fails if they drift apart.
+    keywords: ["which", "plan", "right", "choose", "suit", "custodian", "custodians", "exchange", "venue", "desk", "fund", "team", "institution", "bank"],
+    q: "Which plan is right for me?",
+    a: "Free is for individuals and single desks. Pro ($749 per seat per month) is for trading desks and funds. Institutional ($4,000 a month) is for regulated venues and custodians. Enterprise ($10,000 a month) is for institutional teams operating at scale. Strategic Infrastructure ($20,850 a month) is for institutions building their own XRPL intelligence layer. The pricing page lists what each one includes.",
+    links: [{ label: "Compare plans", href: "/pricing/" }],
+  },
+  {
     id: "billing",
     keywords: ["refund", "cancel", "billing", "invoice", "stripe", "card", "renew", "charge", "payment", "unsubscribe", "subscription", "subscribe"],
     q: "How do billing, cancellation and refunds work?",

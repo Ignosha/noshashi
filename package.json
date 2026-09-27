@@ -13,6 +13,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "site:build": "node scripts/build-site.mjs",
+    "site:noshx": "vite build --config vite.noshx-web.config.mts",
     "site:dev": "node scripts/build-site.mjs && node scripts/dev-site.mjs",
     "email:preview": "node scripts/send-update.mjs --headline \"Preview\" || true",
     "email:send": "node scripts/send-update.mjs",
@@ -27,7 +28,8 @@
     "check:functions": "cd supabase/functions && deno check */index.ts",
     "check:brand": "node scripts/gen-brand.mjs --check",
     "check:garden": "node scripts/build-garden-field.mjs --check",
-    "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg"
+    "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg",
+    "check:noshx-web": "npm run -s site:noshx && git diff --exit-code --stat site/assets/noshx && test -z \"$(git status --porcelain site/assets/noshx)\""
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
