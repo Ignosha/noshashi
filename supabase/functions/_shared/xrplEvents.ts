@@ -298,7 +298,34 @@ export type DepositConfig = {
   requireTag: boolean;
   /** XRP-denominated deposits at or above this need originator information (Travel Rule). 0 = off. */
   travelRuleXrp: number;
+  /** Addresses the institution pays or is paid by; a sender imitating one of them is address poisoning. */
+  trustedCounterparties: string[];
 };
+
+/** An address on a published sanctions list (noshashi.sanctioned_addresses). */
+export type SanctionEntry = {
+  address: string;
+  list: string;
+  entityNumber: number | null;
+  entityName: string;
+  program: string | null;
+  sourceUrl: string;
+};
+
+/**
+ * Address poisoning: an attacker makes an address whose first and last
+ * characters match one the victim uses, then sends it dust so it sits in
+ * the history next to the real one, waiting to be copied. Returns the
+ * known address `address` imitates, or null. Wallets show the first and
+ * last few characters, so four at each end is what an attacker matches.
+ */
+export function lookalikeOf(address: string, known: Iterable<string>, ends = 4): string | null {
+  for (const k of known) {
+    if (k === address || k.length < ends * 2 + 1) continue;
+    if (k.slice(0, ends + 1) === address.slice(0, ends + 1) && k.slice(-ends) === address.slice(-ends)) return k;
+  }
+  return null;
+}
 
 export type ScreeningInput = {
   event: XrplEvent;
@@ -309,6 +336,10 @@ export type ScreeningInput = {
   chain: FundingHop[];
   /** The ledger the screening ran at; the sender is aged at the payment's own ledger when it has one. */
   currentLedger: number;
+  /** Sanctions-list entries for any account in the chain, by address. */
+  sanctions?: Record<string, SanctionEntry>;
+  /** The organization's other watched addresses, which a poisoning sender would imitate. */
+  knownAddresses?: string[];
 };
 
 export type ScreeningFinding = {
@@ -424,13 +455,45 @@ export function screenDeposit(input: ScreeningInput): Screening {
     }
   });
 
+  // 4b. Sanctions: the sender, or who funded it up to three hops back,
+  // is on a published sanctions list.
+  const sanctions = input.sanctions ?? {};
+  chain.forEach((hop, i) => {
+    const hit = sanctions[hop.account];
+    if (!hit) return;
+    findings.push({
+      id: `sanctioned_hop_${i}`,
+      severity: "critical",
+      title: i === 0
+        ? `The sender is on the ${hit.list} list: ${hit.entityName}`
+        : `Funded ${i} hop${i === 1 ? "" : "s"} back by an address on the ${hit.list} list: ${hit.entityName}`,
+      detail: `${chain.slice(0, i + 1).map((h) => h.account).join(" ← ")}: ${hop.account} is listed under ${hit.entityName}${hit.entityNumber ? ` (entry ${hit.entityNumber}` : " ("}${hit.program ? `, program ${hit.program}` : ""}). Source: ${hit.sourceUrl}. Do not credit it; escalate to your sanctions officer, who decides on blocking and reporting.`,
+    });
+  });
+
+  // 4c. Address poisoning: a sender that imitates an address this organization uses.
+  const sender0 = chain[0]?.account ?? event.counterparty;
+  if (sender0) {
+    const known = new Set([...(config.trustedCounterparties ?? []), ...(input.knownAddresses ?? [])]);
+    const imitated = lookalikeOf(sender0, known);
+    if (imitated) {
+      const dust = delivered && delivered.currency === "XRP" && delivered.value < 1;
+      findings.push({
+        id: "address_poisoning",
+        severity: dust ? "critical" : "warn",
+        title: `Address poisoning: the sender imitates ${imitated.slice(0, 6)}…${imitated.slice(-4)}`,
+        detail: `${sender0} shares the first and last characters of ${imitated}, an address this organization uses, but is a different account.${dust ? " It sent a token amount so it sits in the history next to the real one, waiting to be copied into a withdrawal." : ""} Never copy an address from transaction history; take it from your own records.`,
+      });
+    }
+  }
+
   // 5. Travel Rule scope.
   if (config.travelRuleXrp > 0 && delivered && delivered.currency === "XRP" && delivered.value >= config.travelRuleXrp) {
     findings.push({ id: "travel_rule", severity: "info", title: "In Travel Rule scope", detail: `${formatAmount(delivered)} is at or above your threshold of ${config.travelRuleXrp.toLocaleString("en-US")} XRP. Collect the originator's information before crediting.` });
   }
 
   const worst = findings.some((f) => f.severity === "critical") ? "hold" : findings.some((f) => f.severity === "warn") ? "review" : "clear";
-  const counterfeit = findings.some((f) => f.id === "counterfeit" || f.id === "issuer_frozen");
+  const counterfeit = findings.some((f) => f.id === "counterfeit" || f.id === "issuer_frozen" || f.id.startsWith("sanctioned_hop_"));
   return { verdict: worst, credit: counterfeit || !delivered ? null : delivered, findings };
 }
 
@@ -488,5 +551,14 @@ export function sanitizeDepositConfig(raw: unknown): DepositConfig {
     ? (x.denylist as unknown[]).filter((a): a is string => typeof a === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(a)).slice(0, 5000)
     : [];
   const travel = Number(x.travelRuleXrp);
-  return { acceptedIssuers: accepted, denylist, requireTag: x.requireTag !== false, travelRuleXrp: Number.isFinite(travel) && travel > 0 ? travel : 0 };
+  const trusted = Array.isArray(x.trustedCounterparties)
+    ? (x.trustedCounterparties as unknown[]).filter((a): a is string => typeof a === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(a)).slice(0, 500)
+    : [];
+  return {
+    acceptedIssuers: accepted,
+    denylist,
+    requireTag: x.requireTag !== false,
+    travelRuleXrp: Number.isFinite(travel) && travel > 0 ? travel : 0,
+    trustedCounterparties: trusted,
+  };
 }

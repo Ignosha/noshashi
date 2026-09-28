@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 /**
  * The Supabase origin is written down in three places, and they must agree.
  *
- * src/lib/supabase/client.ts holds the URL the client actually calls. Both
+ * src/lib/supabase/project.ts holds the URL the client actually calls. Both
  * Tauri configs allowlist that origin in their Content Security Policy, once
  * over https for REST and auth and once over wss for realtime. Nothing links
  * the three, so changing the backend means remembering all of them.
@@ -24,7 +24,7 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../../../..");
 
-const clientSource = readFileSync(resolve(root, "src/lib/supabase/client.ts"), "utf8");
+const clientSource = readFileSync(resolve(root, "src/lib/supabase/project.ts"), "utf8");
 
 const TAURI_CONFIGS = ["src-tauri/tauri.conf.json", "src-tauri/tauri.demo.conf.json"];
 
@@ -33,7 +33,7 @@ function clientOrigin(): string {
   const match = clientSource.match(/VITE_SUPABASE_URL\s*\?\?\s*"([^"]+)"/);
   if (!match) {
     throw new Error(
-      "Could not find the VITE_SUPABASE_URL fallback in client.ts. If the " +
+      "Could not find the VITE_SUPABASE_URL fallback in project.ts. If the " +
         "fallback was deliberately removed, delete this test with it."
     );
   }

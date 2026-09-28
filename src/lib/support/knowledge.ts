@@ -57,6 +57,42 @@ export const KNOWLEDGE: Answer[] = [
     keywords: ["deposit", "deposits", "screen", "screening", "credit", "partial", "counterfeit", "phishing", "dust", "kyt", "source of funds", "deny list", "travel rule", "exchange"],
   },
   {
+    id: "self-repair",
+    question: "Something is not working. Can NOSHX fix it?",
+    answer:
+      "Tell NOSHX what is wrong (\"it is not working, fix it\") or press SELF-REPAIR in the Support panel. NOSHX checks the mainnet link and reconnects to another public server if it is dropped or silent, compares this computer's clock with the ledger's, renews an expiring sign-in, checks the NOSHASHI server, re-reads your plan, looks at your watched accounts, removes damaged saved settings, checks the help index and whether a newer version is out. It repairs what it can and says what is left and how to fix it. Say \"open a ticket with this report\" to send the report to support, or \"post the report to NSH-1042\" to add it to a ticket.",
+    keywords: ["broken", "not working", "fix", "repair", "self-repair", "diagnose", "troubleshoot", "disconnected", "error", "slow", "stuck", "clock", "signed out"],
+    suggestsDiagnostics: true,
+  },
+  {
+    id: "noshx-tickets",
+    question: "Can NOSHX read, answer and act on my tickets for me?",
+    answer:
+      "Yes, when you are signed in. To open one yourself, see How do I contact support. Ask NOSHX \"show my tickets\" for the list, \"show NSH-1042\" to read a thread with the answer NOSHASHI's own pages give, \"reply to NSH-1042: …\" to add a message, \"resolve NSH-1042\" or \"reopen NSH-1042\", and \"open a ticket: …\" to start one with your app version attached. NOSHX changes a ticket only when your own message asks it to. Support staff can also ask \"answer NSH-1042\" for a reply drafted from the pages, and \"answer NSH-1042 and send it\" to post it.",
+    keywords: ["nsh", "reply", "resolve", "reopen", "noshx", "agent", "status", "thread", "draft"],
+  },
+  {
+    id: "sanctions",
+    question: "Does NOSHASHI check the OFAC sanctions list?",
+    answer:
+      "Yes. Every day NOSHASHI reads the US Treasury's Specially Designated Nationals list (sdn.csv and sdn_comments.csv from treasury.gov) and keeps every XRP Ledger address it names, with the entry number, name and program. Check an Address says when an address is listed, with its source; deposit screening holds a deposit whose sender, or any account that funded it up to three hops back, is listed, and never credits it; the website widget's address check shows it too. An address that is not on the list is not thereby cleared: the list names only addresses OFAC has published.",
+    keywords: ["sanctions", "sanctioned", "ofac", "sdn", "treasury", "blacklist", "blocked", "screening", "aml", "list"],
+  },
+  {
+    id: "address-poisoning",
+    question: "What is address poisoning and does NOSHASHI catch it?",
+    answer:
+      "An attacker creates an address whose first and last characters match one you use, then sends you a tiny payment so it appears in your history next to the real one, hoping you copy it into a withdrawal. Deposit screening flags any sender that starts and ends like one of your watched addresses or your trusted counterparties (set them in the deposit rules), and holds it when it arrived as dust. The website widget's VERIFY ADDRESS check tells your customers whether the address they are about to pay is really yours or a lookalike.",
+    keywords: ["poisoning", "lookalike", "look-alike", "similar address", "vanity", "copy", "history", "scam", "fake address"],
+  },
+  {
+    id: "embed-widget",
+    question: "Can I put NOSHASHI's checks on my own website?",
+    answer:
+      "Yes, on Enterprise and Strategic. In ADJUDICATION › LEDGER WATCH › WEBSITE WIDGET, create a widget: choose its checks (verify that an address is really your deposit address, check any address against the ledger and the OFAC list, and deposit status by transaction hash), pick your deposit address, and list the exact sites it may appear on. Paste the two-line snippet into your page. The widget holds no key, answers only on the sites you list, and never tells a customer why a deposit is under review.",
+    keywords: ["embed", "widget", "website", "white-label", "customer", "snippet", "script", "iframe", "integrate", "site"],
+  },
+  {
     id: "event-feeds",
     question: "How do I get XRPL events into my own systems?",
     answer:

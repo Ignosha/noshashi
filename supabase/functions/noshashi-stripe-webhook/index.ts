@@ -63,6 +63,7 @@ const TIER_FEATURES: Record<string, string[]> = {
     "webhooks", "regulator_seats", "white_label", "sla",
     "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
     "asset_passports", "dedicated_environment", "deposit_screening",
+    "embedded_delivery",
   ],
   strategic: [
     "console", "gate", "agent", "export",
@@ -71,7 +72,7 @@ const TIER_FEATURES: Record<string, string[]> = {
     "webhooks", "regulator_seats", "white_label", "sla",
     "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
     "asset_passports", "dedicated_environment", "deposit_screening",
-    "event_feeds", "custom_schemas",
+    "embedded_delivery", "event_feeds", "custom_schemas",
   ],
 };
 

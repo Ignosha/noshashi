@@ -211,13 +211,14 @@ export const PLANS: Plan[] = [
     emphasis: true,
     features: [
       "Everything in Institutional",
-      "Deposit screening: partial payments, counterfeit tokens, phishing dust and three-hop source of funds, before you credit",
+      "Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit",
+      "Embeddable screening widget for your own site: address verification against poisoning, sanctions and deposit status",
       "Asset passports and issuer intelligence at institutional scope",
       "Portfolio monitoring, counterparty and liquidity intelligence",
       "Deterministic policy engine, adjudication and decision history",
       "Evidence records, hashes, audit exports and review workflow",
       "Institutional API, scoped keys and webhooks",
-      "Dedicated environment options where supported",
+      "Dedicated environment, provisioned per contract",
       "Architecture review and named implementation planning",
     ],
     grants: [
@@ -242,6 +243,7 @@ export const PLANS: Plan[] = [
       "asset_passports",
       "dedicated_environment",
       "deposit_screening",
+      "embedded_delivery",
     ],
   },
   {
@@ -287,6 +289,7 @@ export const PLANS: Plan[] = [
       "asset_passports",
       "dedicated_environment",
       "deposit_screening",
+      "embedded_delivery",
       "event_feeds",
       "custom_schemas",
     ],
@@ -461,6 +464,12 @@ export const FEATURE_CATALOG: Record<
     requires: "enterprise",
     blurb:
       "Isolated compute and storage for your compliance workload, with your own node endpoints and retention policy, scoped and provisioned per contract after architecture review.",
+  },
+  embedded_delivery: {
+    label: "Embeddable screening widget",
+    requires: "enterprise",
+    blurb:
+      "One script tag on your own website: customers check that an address really is yours before they pay (catching lookalike addresses made for address poisoning), check any address against the ledger and the OFAC SDN list, and see whether their deposit has arrived. Allowed only on the sites you list; no key ever reaches the browser.",
   },
   deposit_screening: {
     label: "Deposit screening",

@@ -22,7 +22,14 @@ import {
 } from "@/lib/xrpl/deposit";
 import {
   addWatch,
+  deleteEmbed,
   deleteSchema,
+  embedSnippet,
+  listEmbeds,
+  readSanctionsStatus,
+  saveEmbed,
+  type Embed,
+  type EmbedWidget,
   FEED_ENDPOINT,
   listEvents,
   listSchemas,
@@ -47,12 +54,15 @@ import {
   type SchemaField,
 } from "../../../supabase/functions/_shared/exportSchema.ts";
 import { cn } from "@/lib/utils";
+import { openOrgCase } from "@/lib/org/cases";
+import type { LedgerEntry } from "@/lib/desk/ledger";
 
 const TABS = [
   { id: "screen", label: "SCREEN A DEPOSIT" },
   { id: "watches", label: "WATCHED ACCOUNTS" },
   { id: "events", label: "EVENT FEED" },
   { id: "export", label: "SCHEMAS & EXPORT" },
+  { id: "embed", label: "WEBSITE WIDGET" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -115,7 +125,9 @@ function LedgerWatchBody() {
         ) : tab === "watches" ? (
           <WatchesTab organizationId={membership.organizationId} role={membership.role} />
         ) : tab === "events" ? (
-          <EventsTab organizationId={membership.organizationId} />
+          <EventsTab organizationId={membership.organizationId} role={membership.role} accountId={org.accountId} />
+        ) : tab === "embed" ? (
+          <EmbedTab organizationId={membership.organizationId} role={membership.role} />
         ) : (
           <ExportTab organizationId={membership.organizationId} role={membership.role} />
         )}
@@ -153,7 +165,8 @@ function ScreenTab({ organizationId }: { organizationId: string | null }) {
     if (!isValidAddress(address.trim())) return setError("Enter the deposit address the payment was sent to.");
     setBusy(true);
     try {
-      setResult(await screenTransaction(hash.trim().toUpperCase(), address.trim(), config));
+      const known = organizationId ? (await listWatches(organizationId).catch(() => [])).map((w) => w.address) : [];
+      setResult(await screenTransaction(hash.trim().toUpperCase(), address.trim(), config, known));
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -238,9 +251,11 @@ function ScreeningView({ result }: { result: OnDemandScreening }) {
 function DepositConfigEditor({ value, onChange, disabled }: { value: DepositConfig; onChange: (c: DepositConfig) => void; disabled?: boolean }) {
   const [issuers, setIssuers] = useState(() => issuersText(value));
   const [deny, setDeny] = useState(() => value.denylist.join("\n"));
+  const [trusted, setTrusted] = useState(() => (value.trustedCounterparties ?? []).join("\n"));
   useEffect(() => {
     setIssuers(issuersText(value));
     setDeny(value.denylist.join("\n"));
+    setTrusted((value.trustedCounterparties ?? []).join("\n"));
   }, [value]);
   const commit = (nextIssuers = issuers, nextDeny = deny, patch: Partial<DepositConfig> = {}) => {
     const acceptedIssuers: Record<string, string[]> = {};
@@ -248,7 +263,13 @@ function DepositConfigEditor({ value, onChange, disabled }: { value: DepositConf
       const [code, issuer] = line.trim().split(/\s+/);
       if (code && issuer) acceptedIssuers[code.toUpperCase()] = [...(acceptedIssuers[code.toUpperCase()] ?? []), issuer];
     }
-    onChange(sanitizeDepositConfig({ ...value, ...patch, acceptedIssuers, denylist: nextDeny.split(/[\s,]+/).filter(Boolean) }));
+    onChange(sanitizeDepositConfig({
+      ...value,
+      ...patch,
+      acceptedIssuers,
+      denylist: nextDeny.split(/[\s,]+/).filter(Boolean),
+      trustedCounterparties: trusted.split(/[\s,]+/).filter(Boolean),
+    }));
   };
   return (
     <div className="space-y-1.5 border border-dashed border-border p-2">
@@ -261,6 +282,15 @@ function DepositConfigEditor({ value, onChange, disabled }: { value: DepositConf
         Deny list: addresses you will not take funds from, directly or up to three hops back
         <textarea disabled={disabled} value={deny} onChange={(e) => setDeny(e.target.value)} onBlur={() => commit()} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[9.5px] text-foreground" />
       </label>
+      <label className="block text-[9px] text-muted-foreground">
+        Trusted counterparties: addresses you pay or are paid by. A sender that starts and ends like one of these (or like any address
+        you watch) is flagged as address poisoning.
+        <textarea disabled={disabled} value={trusted} onChange={(e) => setTrusted(e.target.value)} onBlur={() => commit()} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[9.5px] text-foreground" />
+      </label>
+      <p className="text-[9px] text-muted-foreground">
+        Every sender and its funders three hops back are also checked against the US Treasury's OFAC SDN list, refreshed daily from
+        treasury.gov. A listed address holds the deposit.
+      </p>
       <div className="flex flex-wrap items-center gap-3 text-[9.5px] text-foreground">
         <label className="flex items-center gap-1">
           <input type="checkbox" disabled={disabled} checked={value.requireTag} onChange={(e) => commit(issuers, deny, { requireTag: e.target.checked })} />
@@ -403,8 +433,32 @@ function WatchSettings({ watch, busy, onSave }: { watch: Watch; busy: boolean; o
 
 /* ── Event feed ─────────────────────────────────────────────────────── */
 
-function EventsTab({ organizationId }: { organizationId: string }) {
+const CASE_ROLES: MemberRole[] = ["owner", "admin", "compliance", "risk", "analyst"];
+
+/** A held deposit as the verdict a case links to: the sender is the subject, the transaction hash the digest. */
+export function heldDepositEntry(e: LedgerEvent): LedgerEntry {
+  const delivered = (e.data as { delivered?: Amount | null }).delivered;
+  const findings = e.screening?.findings ?? [];
+  return {
+    id: `xrpl-event-${e.id}`,
+    subject: e.counterparty ?? e.address,
+    label: `Deposit to ${e.address}`,
+    domainCode: "DEPOSIT",
+    verdict: "hold",
+    digest: e.txHash,
+    amountXrp: delivered && delivered.currency === "XRP" ? delivered.value : 0,
+    failedRules: findings.filter((f) => f.severity !== "info").map((f) => f.id),
+    checksPassed: findings.filter((f) => f.severity === "info").length,
+    checksTotal: findings.length,
+    latencyMs: 0,
+    at: e.createdAt,
+    offline: false,
+  };
+}
+
+function EventsTab({ organizationId, role, accountId }: { organizationId: string; role: MemberRole; accountId: string | null }) {
   const [events, setEvents] = useState<LedgerEvent[] | null>(null);
+  const [cased, setCased] = useState<Record<number, string>>({});
   const [verdict, setVerdict] = useState<"" | "clear" | "review" | "hold">("");
   const [type, setType] = useState<"" | EventType>("");
   const [error, setError] = useState<string | null>(null);
@@ -470,6 +524,23 @@ function EventsTab({ organizationId }: { organizationId: string }) {
                     </p>
                   ))}
                   {!e.screening && <pre className="mono-font selectable whitespace-pre-wrap break-all text-[8.5px] text-muted-foreground">{JSON.stringify(e.data, null, 1)}</pre>}
+                  {e.verdict === "hold" && accountId && CASE_ROLES.includes(role) && (
+                    cased[e.id] ? (
+                      <p className="mono-font text-[9px] text-go">Case {cased[e.id]} opened. It is in CASES for every member.</p>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          void openOrgCase(organizationId, { entry: heldDepositEntry(e), actor: accountId })
+                            .then((id) => setCased((c) => ({ ...c, [e.id]: id })))
+                            .catch((err) => setError(err instanceof Error ? err.message : String(err)))
+                        }
+                      >
+                        OPEN INVESTIGATION CASE
+                      </Button>
+                    )
+                  )}
                 </div>
               )}
             </div>
@@ -636,5 +707,153 @@ function RetentionEditor({ days, disabled, onSave }: { days: number | null; disa
       days{years}. Older events are removed daily. The audit log is never removed.
       <Button size="sm" variant="outline" disabled={disabled || !valid || n === days} onClick={() => onSave(n)}>SET</Button>
     </div>
+  );
+}
+
+/* ── Website widget ─────────────────────────────────────────────────── */
+
+const EMBED_ROLES: MemberRole[] = ["owner", "admin", "compliance"];
+const WIDGETS: Array<{ id: EmbedWidget; label: string; blurb: string }> = [
+  { id: "verify", label: "Verify address", blurb: "A customer pastes the address they are about to pay; it says whether it is really yours, and names a lookalike (address poisoning)." },
+  { id: "check", label: "Check an address", blurb: "Any address's ledger facts and whether the US Treasury lists it (OFAC SDN)." },
+  { id: "deposit", label: "Deposit status", blurb: "A customer pastes their transaction hash and sees whether it arrived. A deposit under review says only that, never why." },
+];
+
+function EmbedTab({ organizationId, role }: { organizationId: string; role: MemberRole }) {
+  const { has } = useBilling();
+  const [embeds, setEmbeds] = useState<Embed[] | null>(null);
+  const [watches, setWatches] = useState<Watch[]>([]);
+  const [sanctions, setSanctions] = useState<{ listed: number; asOf: string | null } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [draft, setDraft] = useState<{ id?: string; label: string; widgets: EmbedWidget[]; origins: string; depositAddress: string; theme: Embed["theme"]; active: boolean }>({
+    label: "", widgets: ["verify", "check"], origins: "", depositAddress: "", theme: "auto", active: true,
+  });
+  const canEdit = EMBED_ROLES.includes(role) && has("embedded_delivery");
+  const deposits = watches.filter((w) => w.purpose === "deposit");
+
+  const load = useCallback(async () => {
+    try {
+      const [e, w] = await Promise.all([listEmbeds(organizationId), listWatches(organizationId)]);
+      setEmbeds(e);
+      setWatches(w);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+    readSanctionsStatus().then(setSanctions).catch(() => setSanctions(null));
+  }, [organizationId]);
+  useEffect(() => void load(), [load]);
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      await saveEmbed(organizationId, {
+        id: draft.id,
+        label: draft.label,
+        widgets: draft.widgets,
+        allowedOrigins: draft.origins.split(/[\s,]+/).filter(Boolean),
+        depositAddress: draft.depositAddress || null,
+        theme: draft.theme,
+        active: draft.active,
+      });
+      setDraft({ label: "", widgets: ["verify", "check"], origins: "", depositAddress: "", theme: "auto", active: true });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!has("embedded_delivery")) {
+    return (
+      <p className="max-w-[640px] text-[10px] text-muted-foreground">
+        The website widget is part of the Enterprise and Strategic plans: address verification against poisoning, sanctions checks and
+        deposit status for your customers, on your own site, with no key in the browser.
+      </p>
+    );
+  }
+
+  return (
+    <section className="max-w-[760px] space-y-3">
+      <p className="text-[10px] leading-relaxed text-muted-foreground">
+        Put NOSHASHI's checks on your own website with one script tag. The widget answers only on the sites you list, holds no key, and
+        renders in its own shadow root so it cannot touch your page.
+        {sanctions && ` Sanctions: ${sanctions.listed.toLocaleString("en-US")} XRP address${sanctions.listed === 1 ? "" : "es"} on the OFAC SDN list${sanctions.asOf ? `, read from treasury.gov ${utc(sanctions.asOf)}` : ""}.`}
+      </p>
+      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
+
+      {embeds?.map((e) => (
+        <div key={e.id} className="space-y-1 border border-border p-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[10.5px] text-foreground">
+              {e.label} <span className={cn("stencil ml-1 text-[8px] tracking-[0.2em]", e.active ? "text-go" : "text-muted-foreground")}>{e.active ? "LIVE" : "OFF"}</span>
+            </p>
+            {canEdit && (
+              <span className="flex gap-1">
+                <Button size="sm" variant="ghost" onClick={() => setDraft({ id: e.id, label: e.label, widgets: e.widgets, origins: e.allowedOrigins.join("\n"), depositAddress: e.depositAddress ?? "", theme: e.theme, active: e.active })}>EDIT</Button>
+                <Button size="sm" variant="ghost" disabled={busy} onClick={() => void deleteEmbed(e.id).then(load).catch((err) => setError(String(err?.message ?? err)))}>DELETE</Button>
+              </span>
+            )}
+          </div>
+          <p className="text-[9.5px] text-muted-foreground">
+            {e.widgets.map((w) => WIDGETS.find((x) => x.id === w)?.label).join(" · ")} · allowed on {e.allowedOrigins.length ? e.allowedOrigins.join(", ") : "no site yet (add one to switch it on)"}
+          </p>
+          <pre className="mono-font selectable whitespace-pre-wrap break-all border border-dashed border-border p-1.5 text-[9px] text-foreground">{embedSnippet(e.id)}</pre>
+          <Button size="sm" variant="outline" onClick={() => void navigator.clipboard?.writeText(embedSnippet(e.id))}>COPY SNIPPET</Button>
+        </div>
+      ))}
+      {embeds?.length === 0 && <p className="text-[10px] text-muted-foreground">No widget yet.</p>}
+
+      {canEdit && (
+        <div className="space-y-2 border border-border p-2">
+          <Eyebrow>{draft.id ? "EDIT WIDGET" : "NEW WIDGET"}</Eyebrow>
+          <Input value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} placeholder="Name customers see, e.g. Acme Exchange" className="h-7 text-[10px]" />
+          <div className="space-y-1">
+            {WIDGETS.map((w) => (
+              <label key={w.id} className="flex items-start gap-1.5 text-[9.5px] text-foreground">
+                <input
+                  type="checkbox"
+                  checked={draft.widgets.includes(w.id)}
+                  onChange={(e) => setDraft({ ...draft, widgets: e.target.checked ? [...draft.widgets, w.id] : draft.widgets.filter((x) => x !== w.id) })}
+                />
+                <span>
+                  {w.label} <span className="text-muted-foreground">— {w.blurb}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          {(draft.widgets.includes("verify") || draft.widgets.includes("deposit")) && (
+            <select value={draft.depositAddress} onChange={(e) => setDraft({ ...draft, depositAddress: e.target.value })} className="mono-font h-7 w-full border border-border bg-transparent px-1 text-[9.5px] text-foreground">
+              <option value="">{deposits.length ? "Choose your deposit address" : "Watch a deposit address first (WATCHED ACCOUNTS)"}</option>
+              {deposits.map((w) => <option key={w.id} value={w.address}>{w.label ? `${w.label} · ` : ""}{w.address}</option>)}
+            </select>
+          )}
+          <label className="block text-[9px] text-muted-foreground">
+            Sites it may appear on, one origin per line: <span className="mono-font">https://www.example.com</span>
+            <textarea value={draft.origins} onChange={(e) => setDraft({ ...draft, origins: e.target.value })} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[9.5px] text-foreground" />
+          </label>
+          <div className="flex flex-wrap items-center gap-3 text-[9.5px] text-foreground">
+            <label className="flex items-center gap-1">
+              Theme
+              <select value={draft.theme} onChange={(e) => setDraft({ ...draft, theme: e.target.value as Embed["theme"] })} className="h-6 border border-border bg-transparent px-1 text-[9.5px]">
+                <option value="auto">Follows the visitor</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-1">
+              <input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} />
+              Live
+            </label>
+          </div>
+          <div className="flex gap-1.5">
+            <Button size="sm" disabled={busy || !draft.label.trim() || draft.widgets.length === 0} onClick={() => void save()}>{draft.id ? "SAVE" : "CREATE WIDGET"}</Button>
+            {draft.id && <Button size="sm" variant="ghost" onClick={() => setDraft({ label: "", widgets: ["verify", "check"], origins: "", depositAddress: "", theme: "auto", active: true })}>CANCEL</Button>}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }

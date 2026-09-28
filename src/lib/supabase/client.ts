@@ -19,12 +19,9 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * client-csp.test.ts fails when the three drift apart.
  */
 
-export const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL ?? "https://xiurbiwuwcfowqnpmwki.supabase.co";
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "./project";
 
-export const SUPABASE_PUBLISHABLE_KEY =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-  "sb_publishable_5Kk09a9QEwX1iALqmX-w8g_2fLY7tHO";
+export { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL };
 
 let client: SupabaseClient | null = null;
 

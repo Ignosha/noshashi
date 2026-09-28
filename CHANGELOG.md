@@ -1,5 +1,46 @@
 # Changelog
 
+## Unreleased
+
+### Sanctions, address poisoning and a widget for your own site
+
+- **OFAC SDN screening.** Every day NOSHASHI reads the US Treasury's SDN
+  list from treasury.gov and keeps every XRP Ledger address it names.
+  Check an Address reports a listed address with its entry, program and
+  source; deposit screening holds any deposit whose sender, or an account
+  that funded it up to three hops back, is listed, and credits nothing.
+  A failed lookup is reported as unchecked, never as clear.
+- **Address-poisoning detection.** A sender whose address starts and ends
+  like one of your watched addresses or trusted counterparties is flagged,
+  and held when it arrived as dust.
+- **Website widget (Enterprise, Strategic).** One script tag puts three
+  checks on your own site: verify that an address really is your deposit
+  address (naming lookalikes), check any address against the ledger and the
+  OFAC list, and deposit status by transaction hash. It holds no key,
+  answers only on the sites you list, and never tells a customer why a
+  deposit is under review.
+- **Open a case from a held deposit.** A HOLD in the event feed opens an
+  investigation case for the whole organization in one click.
+- **Dedicated environment** is now described as what it is: provisioned
+  per contract.
+
+### NOSHX: tickets and self-repair
+
+- NOSHX reads, answers and acts on support tickets: list them, read a
+  thread with the answer NOSHASHI's pages give, reply, resolve, reopen and
+  open one. It writes only when your own message asks. Support staff can
+  have it draft and send answers.
+- **Self-repair.** Say what is wrong, or press SELF-REPAIR: NOSHX checks
+  and repairs the mainnet link, sign-in, plan, saved settings and more,
+  says what it could not fix and how, and can send the report to support.
+
+### Fixes
+
+- The ledger connection could hang on a socket that was open but silent;
+  it can now be reset and moves to the next public server.
+- Eighteen foreign keys gained indexes, so deleting a watch or webhook no
+  longer scans every event or delivery.
+
 ## 1.0.13
 
 ### Enterprise and Strategic: deposit screening and XRPL event feeds

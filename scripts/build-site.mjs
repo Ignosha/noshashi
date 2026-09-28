@@ -954,7 +954,7 @@ async function buildPricingEnhancement() {
             <li>Deterministic policy engine, adjudication and decision history</li>
             <li>Evidence records, hashes, audit exports and review workflow</li>
             <li>Institutional API, scoped keys and webhooks</li>
-            <li>Dedicated environment options where supported</li>
+            <li>Dedicated environment, provisioned per contract</li>
             <li>Architecture review and named implementation planning</li>
           </ul>
           <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
@@ -973,8 +973,8 @@ async function buildPricingEnhancement() {
             <li>XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API</li>
             <li>Custom export schemas, bulk export and event retention you set</li>
             <li>Custom data integrations for risk, custody, trading and compliance</li>
-            <li>Dedicated environment options where supported</li>
-            <li>Embedded or white-label delivery when contracted</li>
+            <li>Dedicated environment, provisioned per contract</li>
+            <li>Embeddable screening widget for your own site</li>
             <li>Strategic architecture review and integration roadmap</li>
           </ul>
           <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
@@ -1012,14 +1012,15 @@ async function buildPricingEnhancement() {
           <tr class="group"><th scope="rowgroup" colspan="6">Policy, adjudication &amp; evidence</th></tr>
           <tr><th scope="row">Policy engine &amp; adjudication</th><td class="limited">Session only</td><td class="yes">10,000 verdicts</td><td class="yes">Unlimited</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
           <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>
+          <tr><th scope="row">Sanctioned-address screening (OFAC SDN)</th><td class="yes">Address check</td><td class="yes">Address check</td><td class="yes">Address check</td><td class="yes">Deposits &amp; funders</td><td class="yes">Deposits &amp; funders</td></tr>
           <tr><th scope="row">Deposit screening</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
           <tr><th scope="row">Evidence &amp; audit export</th><td class="yes">CSV</td><td class="yes">CSV</td><td class="yes">Signed export</td><td class="contracted">Immutable audit</td><td class="contracted">Data delivery</td></tr>
           <tr><th scope="row">Custom schemas</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="optional">Optional</td><td class="contracted">Included in scope</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">API &amp; delivery</th></tr>
           <tr><th scope="row">API access</th><td class="no">Unavailable</td><td>5,000 / month</td><td>100,000 / month</td><td class="contracted">Institutional API</td><td class="contracted">High-volume API</td></tr>
           <tr><th scope="row">Webhooks &amp; event feeds</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Webhooks</td><td class="contracted">Webhooks</td><td class="contracted">Event feeds</td></tr>
-          <tr><th scope="row">Dedicated environment</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
-          <tr><th scope="row">Embedded / white-label</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Console &amp; reports</td><td class="optional">Optional</td><td class="contracted">Architecture scope</td></tr>
+          <tr><th scope="row">Dedicated environment</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Per contract</td><td class="contracted">Per contract</td><td class="contracted">Per contract</td></tr>
+          <tr><th scope="row">Embedded / white-label</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Console &amp; reports</td><td class="yes">Screening widget</td><td class="yes">Screening widget</td></tr>
           <tr><th scope="row">Architecture review</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="yes">Included</td><td class="contracted">Included</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Governance</th></tr>
           <tr><th scope="row">Regulator access</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Contracted scope</td></tr>

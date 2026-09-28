@@ -210,3 +210,88 @@ export const setRetention = (org: string, days: number) => call("set_event_reten
 
 /** The feed API's address, for the snippets the console shows. */
 export const FEED_ENDPOINT = "https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-xrpl-watch";
+
+// ── Embeds: the organization's screening widget ─────────────────────
+
+export type EmbedWidget = "verify" | "check" | "deposit";
+
+export type Embed = {
+  id: string;
+  label: string;
+  widgets: EmbedWidget[];
+  allowedOrigins: string[];
+  depositAddress: string | null;
+  theme: "auto" | "light" | "dark";
+  active: boolean;
+  createdAt: string;
+};
+
+const EMBED_REFUSALS: Record<string, string> = {
+  FEATURE_NOT_IN_PLAN: "The screening widget is part of the Enterprise and Strategic plans.",
+  INSUFFICIENT_PERMISSIONS: "Owners, admins and compliance manage widgets.",
+  INVALID_LABEL: "Give the widget a name of 1 to 80 characters.",
+  INVALID_WIDGETS: "Choose at least one check.",
+  INVALID_ORIGIN: "Each allowed site must be an exact origin such as https://www.example.com (http only for localhost), up to 20.",
+  DEPOSIT_ADDRESS_NOT_WATCHED: "Address verification and deposit status need one of this organization's watched deposit addresses.",
+  INVALID_THEME: "Choose auto, light or dark.",
+  EMBED_LIMIT: "An organization can have at most 20 widgets.",
+  NOT_FOUND: "No such widget in an organization you belong to.",
+};
+
+async function embedCall(fn: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const { data, error } = await db().rpc(fn, args);
+  if (error) throw new Error(`${supabaseErrorMessage(error)} Nothing was changed.`);
+  const r = data as { ok?: boolean; code?: string } | null;
+  if (r?.ok !== true) throw new Error(EMBED_REFUSALS[String(r?.code)] ?? REFUSALS[String(r?.code)] ?? `Not done (${String(r?.code)}).`);
+  return r as Record<string, unknown>;
+}
+
+export async function listEmbeds(org: string): Promise<Embed[]> {
+  const { data, error } = await db()
+    .from("org_embeds")
+    .select("id, label, widgets, allowed_origins, deposit_address, theme, active, created_at")
+    .eq("organization_id", org)
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(supabaseErrorMessage(error));
+  return (data ?? []).map((r) => ({
+    id: String(r.id),
+    label: String(r.label),
+    widgets: (r.widgets as EmbedWidget[]) ?? [],
+    allowedOrigins: (r.allowed_origins as string[]) ?? [],
+    depositAddress: (r.deposit_address as string | null) ?? null,
+    theme: (r.theme as Embed["theme"]) ?? "auto",
+    active: Boolean(r.active),
+    createdAt: String(r.created_at),
+  }));
+}
+
+export const saveEmbed = (
+  org: string,
+  embed: { id?: string; label: string; widgets: EmbedWidget[]; allowedOrigins: string[]; depositAddress: string | null; theme: Embed["theme"]; active: boolean }
+) =>
+  embedCall("save_org_embed", {
+    p_org: org,
+    p_id: embed.id ?? null,
+    p_label: embed.label,
+    p_widgets: embed.widgets,
+    p_origins: embed.allowedOrigins,
+    p_deposit_address: embed.depositAddress,
+    p_theme: embed.theme,
+    p_active: embed.active,
+  });
+
+export const deleteEmbed = (id: string) => embedCall("delete_org_embed", { p_id: id });
+
+/** What an organization pastes into its own page. */
+export const embedSnippet = (id: string) =>
+  `<div data-noshashi-embed="${id}"></div>\n<script src="https://www.noshashi.app/embed/v1.js" async></script>`;
+
+/** The sanctions list as the server last read it. */
+export async function readSanctionsStatus(): Promise<{ listed: number; asOf: string | null }> {
+  const [{ count, error }, { data: last }] = await Promise.all([
+    db().from("sanctioned_addresses").select("address", { count: "exact", head: true }).is("removed_at", null),
+    db().from("sanctions_refreshes").select("finished_at").eq("status", "ok").order("id", { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  if (error) throw new Error(supabaseErrorMessage(error));
+  return { listed: count ?? 0, asOf: (last?.finished_at as string | null) ?? null };
+}

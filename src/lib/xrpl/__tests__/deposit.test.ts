@@ -10,13 +10,14 @@ import {
   normalizeTx,
   sanitizeDepositConfig,
   screenDeposit,
+  lookalikeOf,
   type Amount,
   type DepositConfig,
   type XrplEvent,
 } from "../deposit";
 import misread from "../../learn/misread.cases.json";
 
-const CONFIG: DepositConfig = { acceptedIssuers: {}, denylist: [], requireTag: true, travelRuleXrp: 0 };
+const CONFIG: DepositConfig = { acceptedIssuers: {}, denylist: [], requireTag: true, travelRuleXrp: 0, trustedCounterparties: [] };
 
 function classifyCase(c: { watched: string; tx: Record<string, unknown>; meta: Record<string, unknown> }): XrplEvent[] {
   return classifyTransaction(c.tx, c.meta, c.watched, Number(c.tx.ledger_index));
@@ -187,6 +188,56 @@ describe("helpers", () => {
   it("sanitizes a stored deposit configuration", () => {
     expect(
       sanitizeDepositConfig({ acceptedIssuers: { usd: ["rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B", "nope"], "bad code!": ["x"] }, denylist: ["x", "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"], travelRuleXrp: -3 })
-    ).toEqual({ acceptedIssuers: { USD: ["rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"] }, denylist: ["rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"], requireTag: true, travelRuleXrp: 0 });
+    ).toEqual({ acceptedIssuers: { USD: ["rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"] }, denylist: ["rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"], requireTag: true, travelRuleXrp: 0, trustedCounterparties: [] });
+  });
+
+  it("finds an address that imitates a known one at both ends, and nothing else", () => {
+    const bitstamp = "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B";
+    // Same first five and last four characters, different account.
+    const imitation = "rvYAfK8pQeW2mTzN4sHuXcJbLdR3s59B";
+    expect(lookalikeOf(imitation, [bitstamp])).toBe(bitstamp);
+    expect(lookalikeOf(bitstamp, [bitstamp])).toBeNull();
+    expect(lookalikeOf("rfWPjcbY5QT2shRFY2SSQHFKPYSMzxaMaN", [bitstamp])).toBeNull();
+  });
+});
+
+describe("sanctions and address poisoning", () => {
+  // The one XRP address on the OFAC SDN list as read from treasury.gov
+  // (sdn_comments.csv, entry 33854), as noshashi.sanctioned_addresses holds it.
+  const CHATEX = {
+    address: "rnXyVQzgxZe7TR1EPzTkGj2jxH4LMJYh66",
+    list: "OFAC SDN",
+    entityNumber: 33854,
+    entityName: "CHATEX",
+    program: "CYBER2",
+    sourceUrl: "https://www.treasury.gov/ofac/downloads/sdn_comments.csv",
+  };
+  const [event] = classifyCase(cases.phishingDust);
+  const sender = "rfWPjcbY5QT2shRFY2SSQHFKPYSMzxaMaN";
+
+  it("holds a deposit whose funder is on the SDN list, and credits nothing", () => {
+    const chain = [
+      { account: sender, fundedBy: CHATEX.address, activatedLedger: 104503131 },
+      { account: CHATEX.address, fundedBy: null, activatedLedger: null },
+    ];
+    const result = screenDeposit({ event, config: { ...CONFIG, requireTag: false }, issuer: null, chain, currentLedger: cases.readAtLedger, sanctions: { [CHATEX.address]: CHATEX } });
+    expect(result.verdict).toBe("hold");
+    expect(result.credit).toBeNull();
+    const hit = result.findings.find((f) => f.id === "sanctioned_hop_1");
+    expect(hit).toMatchObject({ severity: "critical", title: "Funded 1 hop back by an address on the OFAC SDN list: CHATEX" });
+    expect(hit?.detail).toContain("entry 33854, program CYBER2");
+    expect(hit?.detail).toContain("treasury.gov");
+  });
+
+  it("flags a dust sender imitating one of the organization's addresses as address poisoning", () => {
+    const imitated = sender.slice(0, 5) + "Kq8pZ2mTzN4sHuXcJbLdR3s" + sender.slice(-4);
+    const result = screenDeposit({ event, config: { ...CONFIG, requireTag: false, trustedCounterparties: [imitated] }, issuer: null, chain: [], currentLedger: cases.readAtLedger });
+    expect(result.findings.find((f) => f.id === "address_poisoning")).toMatchObject({ severity: "critical" });
+    expect(result.verdict).toBe("hold");
+  });
+
+  it("says nothing about sanctions or poisoning when neither applies", () => {
+    const result = screenDeposit({ event, config: { ...CONFIG, requireTag: false }, issuer: null, chain: [], currentLedger: cases.readAtLedger, sanctions: {} });
+    expect(result.findings.some((f) => f.id.startsWith("sanctioned_") || f.id === "address_poisoning")).toBe(false);
   });
 });

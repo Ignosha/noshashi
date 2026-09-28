@@ -40,6 +40,34 @@ The same events can be pulled with an organization-scoped `nsh_live_` key:
 - `POST /functions/v1/noshashi-xrpl-watch/screen` with
   `{ hash, deposit_address, config? }` — screen one incoming payment.
 
+Screening includes the OFAC SDN list (refreshed daily from treasury.gov):
+a sender or funder on it adds a critical `sanctioned_hop_<n>` finding and
+the deposit is held with nothing to credit. A sender that starts and ends
+like one of the organization's watched addresses or `trustedCounterparties`
+adds `address_poisoning`.
+
+## Sanctions lookup (public)
+
+`GET /functions/v1/noshashi-xrpl-watch/sanctions?addresses=r…,r…` (up to
+50) needs no key and answers any origin:
+
+```json
+{ "list": "OFAC SDN", "listed": 1, "list_as_of": "2026-09-28T04:42:11Z",
+  "hits": [{ "address": "rnXyVQzgxZe7TR1EPzTkGj2jxH4LMJYh66", "entityName": "CHATEX",
+             "entityNumber": 33854, "program": "CYBER2", "list": "OFAC SDN",
+             "sourceUrl": "https://www.treasury.gov/ofac/downloads/sdn_comments.csv" }] }
+```
+
+## Website widget (Enterprise, Strategic)
+
+Created in LEDGER WATCH › WEBSITE WIDGET, which gives the two lines to
+paste: an element carrying `data-noshashi-embed` set to the widget's id,
+and the script `https://www.noshashi.app/embed/v1.js` loaded async. It calls
+`/functions/v1/noshashi-xrpl-watch/embed/{id}/{config|verify|check|deposit}`
+with no key; the server answers only the origins the widget lists, at most
+120 requests a minute per widget, and a deposit under review is shown to
+the customer as `under_review` without its findings.
+
 ## Request
 
 `POST` with `Content-Type: application/json` and these headers:
