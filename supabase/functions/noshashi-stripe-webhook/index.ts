@@ -52,7 +52,7 @@ const TIER_FEATURES: Record<string, string[]> = {
     "authority_certificate", "compliance_api",
     "webhooks", "regulator_seats", "white_label", "sla",
     "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
-    "incident_response", "asset_recovery",
+    "incident_response", "asset_recovery", "proof_of_reserves", "threat_registry",
   ],
   // Contact-sales tiers. Sales creates the subscription with
   // metadata[tier] set, and this table is what that customer receives.
@@ -66,7 +66,8 @@ const TIER_FEATURES: Record<string, string[]> = {
     "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
     "asset_passports", "dedicated_environment", "deposit_screening",
     "embedded_delivery", "incident_response", "forensic_trace",
-    "asset_recovery",
+    "asset_recovery", "proof_of_reserves", "threat_registry", "customer_protection",
+    "withdrawal_screening", "market_surveillance",
   ],
   strategic: [
     "console", "gate", "agent", "export",
@@ -77,7 +78,8 @@ const TIER_FEATURES: Record<string, string[]> = {
     "asset_passports", "dedicated_environment", "deposit_screening",
     "embedded_delivery", "event_feeds", "custom_schemas",
     "incident_response", "forensic_trace", "security_guardian",
-    "asset_recovery",
+    "asset_recovery", "proof_of_reserves", "threat_registry", "customer_protection",
+    "withdrawal_screening", "market_surveillance", "protection_monitoring", "phishing_feed",
   ],
 };
 

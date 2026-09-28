@@ -52,10 +52,10 @@ export function extractEntities(question: string): Entities {
   };
 }
 
-type Rule = { tool: string; label: string; words: RegExp; needs: "address" | "hash" | "none" | "book" };
+type Rule = { tool: string; label: string; words: RegExp; needs: "address" | "hash" | "none" | "book" | "domain" };
 
 /** The input field each address-taking tool expects. */
-const INPUT_KEY: Record<string, string> = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "amm_account" };
+const INPUT_KEY: Record<string, string> = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "amm_account", surveil_market: "issuer", screen_withdrawal: "destination" };
 
 // Order matters only for display; every rule that matches runs.
 const RULES: Rule[] = [
@@ -166,6 +166,48 @@ const RULES: Rule[] = [
     label: "whether the claimed domain is real",
     needs: "address",
     words: /\bdomain\b|\.toml\b|xrp-ledger\.toml|really (belong|owned|theirs|from)|official (account|address|wallet)|is (this|it) (really|actually|the real)|genuine|verified (issuer|account)/i,
+  },
+  {
+    tool: "drainer_check",
+    label: "whether it is being drained now",
+    needs: "address",
+    words: /being (drained|emptied)|drainer|drain(ing)? (right )?now|dust spray|sprayed|spraying/i,
+  },
+  {
+    tool: "emergency_kit",
+    label: "the emergency kit",
+    needs: "address",
+    words: /emergency kit|emergency plan|move everything to (a |my )?cold|sweep (everything|it all) to|(seed|key) (has )?(leaked|been leaked|exposed|been exposed)/i,
+  },
+  {
+    tool: "who_is",
+    label: "who runs the address",
+    needs: "address",
+    words: /which exchange|what exchange|who (runs|owns|operates|controls) (this|that|the) (address|account|wallet)|attribut|where did (it|the (xrp|money|funds)) land/i,
+  },
+  {
+    tool: "scam_registry",
+    label: "the scam registry",
+    needs: "address",
+    words: /scam registry|registry|been reported|reported (as|for)/i,
+  },
+  {
+    tool: "check_link",
+    label: "whether the link is spread by drainers",
+    needs: "domain",
+    words: /phishing|\blink\b|\burl\b|claim (my|the|a|your) (airdrop|gift|reward)|airdrop|giveaway site|is (this|that) (site|website) (safe|legit|real)/i,
+  },
+  {
+    tool: "screen_withdrawal",
+    label: "the withdrawal screened",
+    needs: "address",
+    words: /screen (a |the |this )?withdrawal|withdrawal screen|safe to withdraw|withdraw(al)? to\b/i,
+  },
+  {
+    tool: "surveil_market",
+    label: "manipulation indicators",
+    needs: "address",
+    words: /manipulat|spoof|wash[- ]trad|layering|fake (volume|depth)|market surveillance|surveil/i,
   },
   {
     tool: "ledger_sync",
@@ -317,6 +359,15 @@ export function plan(question: string, options: PlanOptions = {}): Plan {
 
   for (const rule of RULES) {
     if (!rule.words.test(question)) continue;
+    if (rule.tool === "emergency_kit") {
+      if (entities.addresses.length >= 2) add({ tool: rule.tool, input: { address: entities.addresses[0], cold: entities.addresses[1] }, why: rule.label });
+      continue;
+    }
+    if (rule.needs === "domain") {
+      const domains = [...question.matchAll(DOMAIN)].map((m) => m[1].toLowerCase()).filter((d) => !/(^|\.)noshashi\.(com|app)$/.test(d));
+      if (domains[0]) add({ tool: rule.tool, input: { domain: domains[0] }, why: rule.label });
+      continue;
+    }
     if (rule.tool === "verify_domain" && entities.addresses.length === 0) {
       const domains = [...question.replace(/xrp-ledger\.toml/gi, " ").matchAll(DOMAIN)].map((m) => m[1].toLowerCase()).filter((d) => !/(^|\.)noshashi\.com$/.test(d));
       if (domains[0]) add({ tool: rule.tool, input: { domain: domains[0] }, why: rule.label });

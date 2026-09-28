@@ -43,6 +43,32 @@
  *                  reaches the browser, and a customer is never shown a
  *                  screening finding (that would be tipping off).
  *
+ *   POST /withdrawal-screen
+ *                  Screen an outbound payment before it is signed: will it
+ *                  bounce, is the destination new, fresh, a lookalike of a
+ *                  known address, sanctioned or in the scam registry up to
+ *                  three funding hops back. Auth: an organization key
+ *                  (withdrawal_screening, Enterprise and up).
+ *
+ *   GET  /threats?addresses=r…,r…
+ *                  Confirmed scam-registry entries: counts, categories,
+ *                  evidence hashes, never who reported. Public.
+ *
+ *   GET  /phishing?domain=example.com
+ *                  Has the domain been advertised in micro-payment memos on
+ *                  the ledger, and to how many accounts. Public.
+ *   GET  /phishing-feed
+ *                  Every listed domain (phishing_feed, Strategic).
+ *
+ *   GET  /protection/{slug}
+ *                  A public Customer Asset Protection program: reserves,
+ *                  protection fund, published liabilities root and the
+ *                  hash-chained daily attestations. Public, when the
+ *                  program is public and the plan includes it.
+ *   POST /protection/{slug}/attest
+ *                  Attest now (proof_of_reserves). The daily attestation
+ *                  runs by itself: POST /protection-tick from pg_cron.
+ *
  * The rules live in ../_shared/xrplEvents.ts, shared with the console, so a
  * deposit gets the same verdict wherever it is screened. Everything is read
  * live from the public XRPL servers; nothing is estimated. A fact that
@@ -63,13 +89,16 @@ import {
   normalizeTx,
   sanitizeDepositConfig,
   screenDeposit,
+  screenWithdrawal,
   lookalikeOf,
   type DepositConfig,
   type FundingHop,
   type IssuerFacts,
   type SanctionEntry,
+  type ThreatEntry,
   type XrplEvent,
 } from "../_shared/xrplEvents.ts";
+import { assessProtection, digestOf, heldAccountFrom, type HeldAccount } from "../_shared/protection.ts";
 import { applySchema, CONTENT_TYPES, sanitizeFields, serialize, type ExportFormat } from "../_shared/exportSchema.ts";
 
 function createServiceClient(url: string, serviceRoleKey: string) {
@@ -142,6 +171,7 @@ class Reads {
   private issuers = new Map<string, Promise<IssuerFacts | null>>();
   private hops = new Map<string, Promise<FundingHop>>();
   private listed = new Map<string, SanctionEntry | null>();
+  private reported = new Map<string, ThreatEntry | null>();
 
   /** The database, for the sanctions list. Without it nothing is looked up. */
   constructor(private supabase?: ServiceClient) {}
@@ -170,6 +200,30 @@ class Reads {
     const out: Record<string, SanctionEntry> = {};
     for (const a of accounts) {
       const hit = this.listed.get(a);
+      if (hit) out[a] = hit;
+    }
+    return out;
+  }
+
+  /** Confirmed scam-registry entries for these addresses. A failed lookup throws, as for sanctions. */
+  async threats(accounts: string[]): Promise<Record<string, ThreatEntry>> {
+    const missing = [...new Set(accounts)].filter((a) => !this.reported.has(a));
+    if (missing.length && this.supabase) {
+      const { data, error } = await this.supabase.schema("noshashi").rpc("threat_lookup", { p_addresses: missing });
+      if (error) throw error;
+      for (const a of missing) this.reported.set(a, null);
+      for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+        this.reported.set(String(row.address), {
+          address: String(row.address),
+          reports: Number(row.reports),
+          categories: (row.categories as string[] | null) ?? [],
+          firstConfirmed: String(row.first_confirmed),
+        });
+      }
+    }
+    const out: Record<string, ThreatEntry> = {};
+    for (const a of accounts) {
+      const hit = this.reported.get(a);
       if (hit) out[a] = hit;
     }
     return out;
@@ -212,8 +266,9 @@ class Reads {
       delivered?.issuer ? this.issuer(delivered.issuer, delivered.currency) : Promise.resolve(null),
       event.counterparty ? this.chain(event.counterparty) : Promise.resolve([]),
     ]);
-    const sanctions = await this.sanctions(chain.map((h) => h.account));
-    return { ...screenDeposit({ event, config, issuer, chain, currentLedger, sanctions, knownAddresses }), chain };
+    const accounts = chain.map((h) => h.account);
+    const [sanctions, threats] = await Promise.all([this.sanctions(accounts), this.threats(accounts)]);
+    return { ...screenDeposit({ event, config, issuer, chain, currentLedger, sanctions, threats, knownAddresses }), chain };
   }
 }
 
@@ -415,11 +470,15 @@ Deno.serve(async (request: Request): Promise<Response> => {
     if (!url || !key) return json(503, { error: "not_configured" }, requestId);
     const supabase = createServiceClient(url, key);
     const segments = new URL(request.url).pathname.split("/").filter(Boolean);
+    const protectionAt = segments.lastIndexOf("protection");
     const route = segments.pop();
     const authorization = request.headers.get("authorization");
 
     // Public: the sanctions list, from any origin.
     if (route === "sanctions") return await handleSanctions(supabase, request, requestId);
+    // Public: confirmed scam-registry entries, and domains seen in phishing memos.
+    if (route === "threats") return await handleThreats(supabase, request, requestId);
+    if (route === "phishing") return await handlePhishing(supabase, request, requestId);
     // Public: does a domain vouch for an account (xrp-ledger.toml)?
     if (route === "domain-verify") return await handleDomainVerify(request, requestId);
     // The organization's widget: /embed/{id}/{action}.
@@ -442,9 +501,20 @@ Deno.serve(async (request: Request): Promise<Response> => {
       if (!internal) return json(401, { error: "unauthorized" }, requestId);
       return json(200, await tick(supabase), requestId);
     }
+    if (route === "protection-tick" && request.method === "POST") {
+      if (!internal) return json(401, { error: "unauthorized" }, requestId);
+      return json(200, await protectionTick(supabase), requestId);
+    }
 
-    if (route !== "events" && route !== "screen" && route !== "history") {
-      return json(404, { error: "not_found", routes: ["GET /events", "POST /screen", "POST /history"] }, requestId);
+    // Public: a protection program's page. /protection/{slug}
+    if (protectionAt >= 0 && protectionAt === segments.length - 1 && request.method !== "POST") {
+      return await handleProtectionPage(supabase, request, route ?? "", requestId);
+    }
+    const attest = protectionAt >= 0 && protectionAt === segments.length - 2 && route === "attest" && request.method === "POST";
+
+    const ROUTES = ["events", "screen", "history", "withdrawal-screen", "phishing-feed"];
+    if (!attest && !ROUTES.includes(route ?? "")) {
+      return json(404, { error: "not_found", routes: ["GET /events", "POST /screen", "POST /history", "POST /withdrawal-screen", "GET /phishing-feed", "POST /protection/{slug}/attest"] }, requestId);
     }
 
     let org: string | null = null;
@@ -456,6 +526,15 @@ Deno.serve(async (request: Request): Promise<Response> => {
       org = auth.organizationId;
     }
 
+    if (attest) {
+      if (!org) return json(400, { error: "org_key_required" }, requestId);
+      return await handleAttest(supabase, segments[segments.length - 1], org, requestId);
+    }
+    if (route === "withdrawal-screen" && request.method === "POST") return await handleWithdrawalScreen(supabase, request, org, requestId);
+    if (route === "phishing-feed" && request.method === "GET") {
+      if (!org) return json(400, { error: "org_key_required" }, requestId);
+      return await handlePhishingFeed(supabase, request, org, requestId);
+    }
     if (route === "screen" && request.method === "POST") return await handleScreen(supabase, request, org, requestId);
     if (route === "history" && request.method === "POST") return await handleHistory(supabase, request, org, requestId);
     if (route === "events" && request.method === "GET") {
@@ -885,4 +964,234 @@ async function handleEmbed(supabase: ServiceClient, request: Request, id: string
   }
 
   return json(404, { error: "not_found" }, requestId, headers);
+}
+
+// ── Scam registry and phishing links (public lookups) ───────────────
+
+async function handleThreats(supabase: ServiceClient, request: Request, requestId: string): Promise<Response> {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: PUBLIC_CORS });
+  if (request.method !== "GET") return json(405, { error: "method_not_allowed" }, requestId, PUBLIC_CORS);
+  const raw = new URL(request.url).searchParams.get("addresses") ?? "";
+  const addresses = [...new Set(raw.split(",").map((a) => a.trim()).filter(Boolean))];
+  if (!addresses.length || addresses.length > 50 || !addresses.every((a) => ADDRESS_RE.test(a))) {
+    return json(400, { error: "invalid_request", message: "Send ?addresses= with 1 to 50 classic addresses, comma-separated." }, requestId, PUBLIC_CORS);
+  }
+  const { data, error } = await supabase.schema("noshashi").rpc("threat_lookup", { p_addresses: addresses });
+  if (error) throw error;
+  return json(200, {
+    registry: "NOSHASHI shared scam registry: reports from organizations, each with transaction evidence, confirmed by NOSHASHI staff who did not submit them",
+    hits: data ?? [],
+  }, requestId, PUBLIC_CORS);
+}
+
+async function phishingStatus(supabase: ServiceClient): Promise<{ last_ledger_read: number | null; last_read_at: string | null; ledgers_read_24h: number }> {
+  const since = new Date(Date.now() - 86_400_000).toISOString();
+  const [{ data: last, error: e1 }, { count, error: e2 }] = await Promise.all([
+    supabase.schema("noshashi").from("phishing_scans").select("ledger_index, finished_at").eq("status", "ok").order("id", { ascending: false }).limit(1).maybeSingle(),
+    supabase.schema("noshashi").from("phishing_scans").select("id", { count: "exact", head: true }).eq("status", "ok").gte("started_at", since),
+  ]);
+  if (e1) throw e1;
+  if (e2) throw e2;
+  return { last_ledger_read: (last?.ledger_index as number | null) ?? null, last_read_at: (last?.finished_at as string | null) ?? null, ledgers_read_24h: count ?? 0 };
+}
+
+const PHISHING_METHOD = "One validated XRPL mainnet ledger read every minute; every domain named in the memo of an XRP payment under 0.01 XRP is kept with its transaction. A domain is listed once it was sent to at least five different accounts.";
+
+async function handlePhishing(supabase: ServiceClient, request: Request, requestId: string): Promise<Response> {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: PUBLIC_CORS });
+  if (request.method !== "GET") return json(405, { error: "method_not_allowed" }, requestId, PUBLIC_CORS);
+  const domain = normalizeDomain(new URL(request.url).searchParams.get("domain") ?? "");
+  if (!domain) return json(400, { error: "invalid_request", message: "Send ?domain= with a public domain name or a link." }, requestId, PUBLIC_CORS);
+  const { data, error } = await supabase.schema("noshashi").rpc("phishing_domains", { p_domain: domain, p_listed_only: false, p_limit: 20 });
+  if (error) throw error;
+  const rows = (data ?? []) as Array<Record<string, unknown>>;
+  return json(200, {
+    domain,
+    listed: rows.some((r) => r.listed === true),
+    seen: rows.length > 0,
+    sightings: rows,
+    method: PHISHING_METHOD,
+    ...(await phishingStatus(supabase)),
+    note: "Not seen does not mean safe: only a sample of ledgers is read, and links also spread off the ledger.",
+  }, requestId, PUBLIC_CORS);
+}
+
+async function handlePhishingFeed(supabase: ServiceClient, request: Request, org: string, requestId: string): Promise<Response> {
+  if (!(await hasFeature(supabase, org, "phishing_feed"))) {
+    return json(403, { error: "feature_not_enabled", message: "The phishing link feed is part of the Strategic plan. Single lookups are free at GET /phishing?domain=." }, requestId);
+  }
+  const params = new URL(request.url).searchParams;
+  const limit = Math.min(1000, Math.max(1, Number(params.get("limit") ?? 200) || 200));
+  const all = params.get("include") === "unlisted";
+  const { data, error } = await supabase.schema("noshashi").rpc("phishing_domains", { p_domain: null, p_listed_only: !all, p_limit: limit });
+  if (error) throw error;
+  return json(200, { domains: data ?? [], count: (data ?? []).length, method: PHISHING_METHOD, ...(await phishingStatus(supabase)) }, requestId);
+}
+
+// ── Withdrawal screening ────────────────────────────────────────────
+
+async function handleWithdrawalScreen(supabase: ServiceClient, request: Request, org: string | null, requestId: string): Promise<Response> {
+  if (org && !(await hasFeature(supabase, org, "withdrawal_screening"))) {
+    return json(403, { error: "feature_not_enabled", message: "Withdrawal screening is part of the Enterprise plan." }, requestId);
+  }
+  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+  const destination = String(body?.destination ?? "");
+  const tag = body?.destination_tag === undefined || body?.destination_tag === null ? null : Number(body.destination_tag);
+  const amount = body?.amount_xrp === undefined || body?.amount_xrp === null ? null : Number(body.amount_xrp);
+  const list = (v: unknown) => (Array.isArray(v) ? v.filter((a): a is string => typeof a === "string" && ADDRESS_RE.test(a)).slice(0, 500) : []);
+  if (!ADDRESS_RE.test(destination) || (tag !== null && (!Number.isInteger(tag) || tag < 0 || tag > 4294967295)) || (amount !== null && (!Number.isFinite(amount) || amount < 0))) {
+    return json(400, { error: "invalid_request", message: "Send { destination, destination_tag?, amount_xrp?, previous_destinations?, own_addresses? }." }, requestId);
+  }
+  const [validated, info, server] = await Promise.all([
+    validatedLedger(),
+    xrpl("account_info", { account: destination, ledger_index: "validated" }).catch((e) => (e instanceof RippledError && e.code === "actNotFound" ? null : Promise.reject(e))),
+    xrpl("server_info", {}),
+  ]);
+  const reserveBaseXrp = Number(server.info?.validated_ledger?.reserve_base_xrp);
+  if (!Number.isFinite(reserveBaseXrp) || reserveBaseXrp <= 0) throw new Error("The base reserve could not be read.");
+  const reads = new Reads(supabase);
+  const chain = info ? await reads.chain(destination) : [{ account: destination, fundedBy: null, activatedLedger: null }];
+  const accounts = chain.map((h) => h.account);
+  const [sanctions, threats] = await Promise.all([reads.sanctions(accounts), reads.threats(accounts)]);
+  const own = [...list(body?.own_addresses), ...(org ? (await watchedAddresses(supabase, [org])).get(org) ?? [] : [])];
+  const result = screenWithdrawal({
+    destination, destinationTag: tag, amountXrp: amount, destinationInfo: info, chain, currentLedger: validated, reserveBaseXrp,
+    sanctions, threats, previousDestinations: list(body?.previous_destinations), ownAddresses: [...new Set(own)],
+  });
+  return json(200, {
+    source: `XRPL mainnet, validated ledger ${validated}, read live from the public servers`,
+    destination,
+    verdict: result.verdict,
+    findings: result.findings,
+    funding_chain: chain,
+    sanctions_list: await sanctionsStatus(supabase),
+  }, requestId);
+}
+
+// ── Customer Asset Protection ───────────────────────────────────────
+
+type Program = {
+  id: string;
+  organization_id: string;
+  slug: string;
+  name: string;
+  reserve_addresses: string[];
+  fund_addresses: string[];
+  coverage_limit_xrp: number | string;
+  public: boolean;
+};
+
+async function heldAccount(address: string, programAccounts: string[], ledgerIndex: number, closeTime: number): Promise<HeldAccount> {
+  const info = await xrpl("account_info", { account: address, ledger_index: ledgerIndex, signer_lists: true })
+    .catch((e) => (e instanceof RippledError && e.code === "actNotFound" ? null : Promise.reject(e)));
+  const escrows: Reply[] = [];
+  if (info) {
+    let marker: unknown;
+    for (let page = 0; page < 5; page++) {
+      const r = await xrpl("account_objects", { account: address, ledger_index: ledgerIndex, type: "escrow", limit: 400, ...(marker ? { marker } : {}) });
+      escrows.push(...((r.account_objects ?? []) as Reply[]));
+      marker = r.marker;
+      if (!marker) break;
+    }
+    if (marker) throw new Error(`${address} owns more than 2,000 escrows; the attestation would be incomplete.`);
+  }
+  return heldAccountFrom(address, info, escrows, programAccounts, closeTime);
+}
+
+/** Read the program's accounts at one validated ledger and record a hash-chained attestation. */
+async function attestProgram(supabase: ServiceClient, prog: Program): Promise<Record<string, unknown>> {
+  const ledger = await xrpl("ledger", { ledger_index: "validated" });
+  const ledgerIndex = Number(ledger.ledger_index ?? ledger.ledger?.ledger_index);
+  const closeTime = Number(ledger.ledger?.close_time);
+  if (!Number.isFinite(ledgerIndex) || !Number.isFinite(closeTime)) throw new Error("The validated ledger could not be read.");
+  const accounts = [...prog.reserve_addresses, ...prog.fund_addresses];
+  const held: HeldAccount[] = [];
+  for (let i = 0; i < accounts.length; i += 4) {
+    held.push(...(await Promise.all(accounts.slice(i, i + 4).map((a) => heldAccount(a, accounts, ledgerIndex, closeTime)))));
+  }
+  const [{ data: liab, error: e1 }, { data: prev, error: e2 }] = await Promise.all([
+    supabase.schema("noshashi").from("protection_liabilities").select("id, root, total_xrp, customers, as_of").eq("program_id", prog.id).order("id", { ascending: false }).limit(1).maybeSingle(),
+    supabase.schema("noshashi").from("protection_attestations").select("digest").eq("program_id", prog.id).order("id", { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  if (e1) throw e1;
+  if (e2) throw e2;
+  const at = new Date((closeTime + 946_684_800) * 1000).toISOString();
+  const report = assessProtection({
+    name: prog.name,
+    reserveAddresses: prog.reserve_addresses,
+    fundAddresses: prog.fund_addresses,
+    coverageLimitXrp: Number(prog.coverage_limit_xrp),
+    liabilities: liab ? { root: String(liab.root), totalXrp: Number(liab.total_xrp), count: Number(liab.customers), asOf: new Date(String(liab.as_of)).toISOString() } : null,
+  }, held.slice(0, prog.reserve_addresses.length), held.slice(prog.reserve_addresses.length), ledgerIndex, at);
+  const digest = await digestOf(report);
+  const { data: row, error } = await supabase.schema("noshashi").from("protection_attestations").insert({
+    program_id: prog.id,
+    liabilities_id: liab?.id ?? null,
+    ledger_index: ledgerIndex,
+    status: report.status,
+    coverage_ratio: report.coverageRatio,
+    report,
+    digest,
+    previous_digest: (prev?.digest as string | undefined) ?? null,
+  }).select("id, attested_at").single();
+  if (error) throw error;
+  return { id: row.id, attested_at: row.attested_at, digest, previous_digest: prev?.digest ?? null, status: report.status, report };
+}
+
+const PROGRAM_COLUMNS = "id, organization_id, slug, name, reserve_addresses, fund_addresses, coverage_limit_xrp, public";
+
+async function protectionTick(supabase: ServiceClient): Promise<Record<string, unknown>> {
+  const { data, error } = await supabase.schema("noshashi").from("protection_programs").select(PROGRAM_COLUMNS).order("created_at").limit(200);
+  if (error) throw error;
+  let attested = 0;
+  const errors: string[] = [];
+  for (const prog of (data ?? []) as Program[]) {
+    if (!(await hasFeature(supabase, prog.organization_id, "proof_of_reserves"))) continue;
+    try {
+      await attestProgram(supabase, prog);
+      attested += 1;
+    } catch (e) {
+      errors.push(`${prog.slug}: ${e instanceof Error ? e.message : String(e)}`.slice(0, 300));
+    }
+  }
+  if (errors.length) console.error(JSON.stringify({ level: "error", where: "protection-tick", errors }));
+  return { programs: (data ?? []).length, attested, errors: errors.length };
+}
+
+async function handleAttest(supabase: ServiceClient, slug: string, org: string, requestId: string): Promise<Response> {
+  const { data: prog, error } = await supabase.schema("noshashi").from("protection_programs").select(PROGRAM_COLUMNS).eq("slug", slug).maybeSingle();
+  if (error) throw error;
+  if (!prog || prog.organization_id !== org) return json(404, { error: "not_found", message: "No protection program of this organization has that slug." }, requestId);
+  if (!(await hasFeature(supabase, org, "proof_of_reserves"))) {
+    return json(403, { error: "feature_not_enabled", message: "Proof of reserves is part of the Institutional plan." }, requestId);
+  }
+  const { data: last } = await supabase.schema("noshashi").from("protection_attestations").select("attested_at").eq("program_id", prog.id).order("id", { ascending: false }).limit(1).maybeSingle();
+  if (last && Date.now() - Date.parse(String(last.attested_at)) < 10 * 60_000) {
+    return json(429, { error: "rate_limited", message: "One attestation per program every ten minutes; the daily one runs by itself." }, requestId, { "Retry-After": "600" });
+  }
+  return json(200, await attestProgram(supabase, prog as Program), requestId);
+}
+
+async function handleProtectionPage(supabase: ServiceClient, request: Request, slug: string, requestId: string): Promise<Response> {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: PUBLIC_CORS });
+  if (request.method !== "GET") return json(405, { error: "method_not_allowed" }, requestId, PUBLIC_CORS);
+  const notFound = () => json(404, { error: "not_found", message: "No public protection program has that name." }, requestId, PUBLIC_CORS);
+  if (!/^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/.test(slug)) return notFound();
+  const { data: prog, error } = await supabase.schema("noshashi").from("protection_programs").select(PROGRAM_COLUMNS).eq("slug", slug).maybeSingle();
+  if (error) throw error;
+  if (!prog || !prog.public || !(await hasFeature(supabase, prog.organization_id, "customer_protection"))) return notFound();
+  const [{ data: org }, { data: liab }, { data: history, error: e2 }] = await Promise.all([
+    supabase.schema("noshashi").from("organizations").select("name, brand_name").eq("id", prog.organization_id).maybeSingle(),
+    supabase.schema("noshashi").from("protection_liabilities").select("root, total_xrp, customers, as_of, published_at").eq("program_id", prog.id).order("id", { ascending: false }).limit(1).maybeSingle(),
+    supabase.schema("noshashi").from("protection_attestations").select("id, attested_at, ledger_index, status, coverage_ratio, digest, previous_digest, report").eq("program_id", prog.id).order("id", { ascending: false }).limit(30),
+  ]);
+  if (e2) throw e2;
+  const rows = (history ?? []) as Array<Record<string, unknown>>;
+  return json(200, {
+    program: { slug: prog.slug, name: prog.name, institution: org?.brand_name || org?.name || null, reserve_addresses: prog.reserve_addresses, fund_addresses: prog.fund_addresses, coverage_limit_xrp: Number(prog.coverage_limit_xrp) },
+    liabilities: liab ?? null,
+    latest: rows[0] ?? null,
+    history: rows.map(({ report: _report, ...rest }) => rest),
+    not_insurance: "NOSHASHI verifies and publishes what is on the ledger. It does not guarantee deposits or pay claims, and no government scheme stands behind this program.",
+  }, requestId, PUBLIC_CORS);
 }

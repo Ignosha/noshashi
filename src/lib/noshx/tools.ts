@@ -22,6 +22,11 @@ import { checkDeposit, type DepositDiagnosis } from "@/lib/security/depositHelp"
 import { verifyDomain, type DomainAccount, type DomainCheck } from "@/lib/security/domain";
 import { CLUSTER_LIMITS, mapCluster, type Cluster } from "@/lib/security/cluster";
 import { sanctionsFor } from "@/lib/xrpl/sanctions";
+import { readDrainerPatterns, type DrainerPattern } from "@/lib/security/drainer";
+import { emergencyKit, type EmergencyKit } from "@/lib/security/emergency";
+import { attribute, type Attribution } from "@/lib/security/attribution";
+import { surveilIssuer, type SurveillanceReport } from "@/lib/security/surveillance";
+import { checkPhishingLink, screenWithdrawalLive, threatsFor, type PhishingCheck, type ThreatHit, type WithdrawalResult } from "@/lib/security/threats";
 
 /**
  * What NOSHX can do: read the live XRP Ledger through the same readers
@@ -431,6 +436,129 @@ export const NOSHX_TOOLS: NoshxTool[] = [
         ...c.sharedMemos.map((m) => `${m.accounts.length} accounts sent the memo "${m.text.slice(0, 80)}".`),
         ...c.nodes.filter((n) => n.sanction).map((n) => `${n.address} is on the OFAC SDN list (${n.sanction!.entityName}).`),
         "Save the report or open a case from SECURITY CENTER › SCAM CLUSTERS.",
+      ].join("\n");
+    },
+  },
+  {
+    name: "drainer_check",
+    description:
+      "Whether an account is being drained right now, from its latest transactions: keys changed and then value out, a spray of dust payments followed by an AccountDelete, a zero-price NFT offer taken by someone else, or a check cashed at once. Each pattern names its transactions.",
+    input_schema: schema({ address: addr("The account, r…") }),
+    feature: null,
+    screen: "Security Center › Emergency kit",
+    run: (input) => readDrainerPatterns(address(input)),
+    compose: (value) => {
+      const r = value as { patterns: DrainerPattern[]; transactions: number };
+      if (!r.patterns.length) return `No drainer pattern in the last ${r.transactions} transactions.`;
+      return [
+        ...r.patterns.map((p) => `[${p.id.replace(/_/g, " ").toUpperCase()}] ${p.title}. ${p.detail} Evidence: ${p.evidence.map((h) => h.slice(0, 12) + "…").join(", ")}`),
+        "If the account is yours and a pattern is live, prepare the EMERGENCY KIT in the Security Center now.",
+      ].join("\n");
+    },
+  },
+  {
+    name: "emergency_kit",
+    description:
+      "For a compromised account: the ordered, unsigned transactions that save the most: cancel what others can pull (NFT sell offers, checks), move every token and the spendable XRP to a cold account (or AccountDelete when nothing blocks it), then hand signing to a new key.",
+    input_schema: schema({ address: addr("The compromised account, r…"), cold: addr("A cold account the owner controls, r…") }),
+    feature: null,
+    screen: "Security Center › Emergency kit",
+    run: async (input) => emergencyKit(await readHoldings(address(input)), { cold: address(input, "cold") }),
+    compose: (value) => {
+      const k = value as EmergencyKit;
+      return [
+        `Emergency kit for ${k.address} → ${k.cold}: ${k.steps.length} step${k.steps.length === 1 ? "" : "s"}${k.sweepsEverything ? ", sweeping everything in one AccountDelete" : ""}.`,
+        ...k.steps.map((s) => `${s.order}. ${s.title}. ${s.why}${s.caution ? ` Caution: ${s.caution}` : ""} Transaction: ${JSON.stringify(s.tx)}`),
+        ...k.notes,
+        "NOSHASHI never signs: sign each step in your own wallet, in order.",
+      ].join("\n");
+    },
+  },
+  {
+    name: "who_is",
+    description:
+      "Who runs an address: a domain that vouches for it in its xrp-ledger.toml, a domain it merely claims, or the behaviour of an exchange or other service pooling customers' funds (required destination tags). With what to do next, for a theft victim asking an exchange to freeze a deposit.",
+    input_schema: schema({ address: addr("The address, r…") }),
+    feature: null,
+    screen: "Security Center › Who is this?",
+    run: (input) => attribute(address(input)),
+    compose: (value) => {
+      const a = value as Attribution;
+      return [`${a.address}: ${a.name ?? "unnamed"} (${a.kind.replace(/_/g, " ")}, ${a.confidence}).`, ...a.evidence.map((e) => `· ${e}`), a.advice].join("\n");
+    },
+  },
+  {
+    name: "scam_registry",
+    description:
+      "Whether addresses are in the shared scam registry: reports filed by institutions with transaction evidence and confirmed by a NOSHASHI reviewer who did not file them. Categories, how many organizations and since when; never who reported.",
+    input_schema: schema({ address: addr("The address, r…") }),
+    feature: null,
+    screen: "Security Center › Scam registry",
+    run: async (input) => {
+      const a = address(input);
+      const hits = await threatsFor([a]);
+      if (hits === null) throw new Error("The scam registry could not be reached.");
+      return { address: a, hit: hits[a] ?? null };
+    },
+    compose: (value) => {
+      const r = value as { address: string; hit: ThreatHit | null };
+      return r.hit
+        ? `${r.address} is in the scam registry: ${r.hit.categories.join(", ")}, confirmed in ${r.hit.reports} report${r.hit.reports === 1 ? "" : "s"} since ${r.hit.firstConfirmed.slice(0, 10)}.`
+        : `${r.address} has no confirmed report in the scam registry. That is not a clearance.`;
+    },
+  },
+  {
+    name: "check_link",
+    description:
+      "Whether a domain or link has been advertised in XRP dust on the ledger, the way wallet drainers spread their sites: how many accounts it was sent to, by how many senders, when, and a sample memo. Read from a validated ledger every minute.",
+    input_schema: schema({ domain: addr("A domain or link, e.g. example.com") }),
+    feature: null,
+    screen: "Security Center › Scam registry",
+    run: (input) => checkPhishingLink(String(input.domain ?? "")),
+    compose: (value) => {
+      const r = value as PhishingCheck;
+      const top = r.sightings[0];
+      return [
+        r.listed ? `${r.domain} has been sprayed in XRP dust to many accounts: treat it as a phishing site.` : r.seen ? `${r.domain} has appeared in XRP dust memos.` : `${r.domain} has not been seen in XRP dust memos.`,
+        top ? `Sent to ${top.recipients} account${top.recipients === 1 ? "" : "s"} by ${top.senders}, last ${top.last_seen.slice(0, 16).replace("T", " ")}: "${top.sample_memo.slice(0, 120)}".` : "",
+        r.note,
+      ].filter(Boolean).join("\n");
+    },
+  },
+  {
+    name: "screen_withdrawal",
+    description:
+      "Screen an outbound payment before it is signed: will it bounce (missing destination tag, unfunded destination, deposit authorisation), is the destination brand new or hours old, is it OFAC-listed or in the scam registry up to three funding hops back.",
+    input_schema: schema({ destination: addr("The destination, r…"), destination_tag: { type: "number", description: "The destination tag, if any" }, amount_xrp: { type: "number", description: "The amount in XRP, if known" } }, ["destination"]),
+    feature: "withdrawal_screening",
+    screen: "Security Center › Withdrawals",
+    run: (input) => {
+      const tag = Number(input.destination_tag);
+      const amount = Number(input.amount_xrp);
+      return screenWithdrawalLive({ destination: address(input, "destination"), destinationTag: Number.isInteger(tag) ? tag : null, amountXrp: Number.isFinite(amount) && amount > 0 ? amount : null, previousDestinations: [], ownAddresses: [] });
+    },
+    compose: (value) => {
+      const r = value as WithdrawalResult;
+      return [
+        `${r.verdict.toUpperCase()} at validated ledger ${r.ledger.toLocaleString("en-US")}.`,
+        ...(r.unchecked.length ? [`Not checked: ${r.unchecked.join(" and ")} could not be reached.`] : []),
+        ...r.findings.map((f) => `[${f.severity.toUpperCase()}] ${f.title}. ${f.detail}`),
+      ].join("\n");
+    },
+  },
+  {
+    name: "surveil_market",
+    description:
+      "A token issuer's recent order-book history read for manipulation indicators: accounts placing and replacing orders that never fill, one account supplying most of the activity, and trades between accounts funded by the same account. Indicators with numbers, not verdicts.",
+    input_schema: schema({ issuer: addr("The token issuer, r…") }),
+    feature: "market_surveillance",
+    screen: "Security Center › Surveillance",
+    run: (input) => surveilIssuer(address(input, "issuer")),
+    compose: (value) => {
+      const r = value as SurveillanceReport;
+      return [
+        `${r.transactions} transactions of ${r.issuer}, ledgers ${r.ledgers.from.toLocaleString("en-US")}–${r.ledgers.to.toLocaleString("en-US")}, ${r.fills.length} trade${r.fills.length === 1 ? "" : "s"}.`,
+        ...r.findings.map((f) => `[${f.severity.toUpperCase()}] ${f.title}. ${f.detail}`),
       ].join("\n");
     },
   },

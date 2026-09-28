@@ -227,7 +227,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     <a href="#xrpl"><i>PART 1 · 12 LESSONS · ~60 MIN</i><b>The XRP Ledger</b><span>Consensus, accounts, keys, tokens, issuer powers, the DEX, AMMs, payments, NFTs, amendments, compliance.</span></a>
     <a href="#app"><i>PART 2 · 7 LESSONS · ~50 MIN</i><b>The NOSHASHI app</b><span>How it works, setup, verdicts and receipts, and every screen explained step by step.</span></a>
     <a href="#workflows"><i>PART 3 · 8 WORKFLOWS</i><b>Putting it to work</b><span>Real tasks from start to finish, from vetting a token to handing an auditor a signed export.</span></a>
-    <a href="#check"><i>PART 4 AND 5</i><b>Knowledge check and word list</b><span>69 questions in six rounds, including vocabulary, how it helps institutions, and account security and recovery, and 119 terms in one searchable list.</span></a>
+    <a href="#check"><i>PART 4 AND 5</i><b>Knowledge check and word list</b><span>75 questions in six rounds, including vocabulary, how it helps institutions, account security and recovery, and protecting customers' XRP, and 127 terms in one searchable list.</span></a>
   </div>
 
   <div class="wrap">
@@ -258,6 +258,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="#l20">20 · Account security</a>
       <a href="#l21">21 · When an account is emptied</a>
       <a href="#l22">22 · Getting XRP back, and signing safely</a>
+      <a href="#l23">23 · Protecting customers' XRP</a>
       <p>PART 3 · WORKFLOWS</p>
       <a href="#workflows">8 real tasks</a>
       <p>MORE</p>
@@ -915,6 +916,48 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <p class="takeaway"><b>KEY IDEA</b>Nobody can reverse a theft, but you can finish, cancel, cash and clean up what is yours, and refuse to sign what you have not read.</p>
       </section>
 
+      <section id="l23">
+        <h2>23 · Protecting customers' XRP</h2>
+        <p class="mins">ABOUT 9 MINUTES</p>
+        <p>Banks' customers have deposit insurance. Customers of a business that holds XRP for them have nothing like it, and when such a business fails they usually learn too late that the XRP was not there. The XRP Ledger cannot insure anyone, but it can prove a great deal. This lesson covers what an institution can prove to its customers, and the tools that stop XRP leaving to the wrong place.</p>
+        <h3>Proof of reserves, and of liabilities</h3>
+        <p>Reserves alone prove little: a business can show a large balance and owe more. The other half is <strong>liabilities</strong>, what it owes its customers. A <strong>Merkle sum tree</strong> proves that total without revealing anyone's balance:</p>
+        <ul>
+          <li>each customer's balance becomes a leaf, keyed by a hash nobody else can link to them;</li>
+          <li>pairs of leaves are hashed together with their sums, up to a single <strong>root</strong> and a total;</li>
+          <li>the institution publishes only the root, the total and the number of customers;</li>
+          <li>each customer receives the path from their leaf to the root and can check that their balance is counted, and that no branch carries a negative sum (the trick that hides debts).</li>
+        </ul>
+        <p>Reserves divided by that total is the <strong>coverage ratio</strong>. NOSHASHI reads the named reserve accounts from a validated ledger every day and records an attestation, each one hash-chained to the one before, so a changed record shows.</p>
+        <div class="card"><p class="t">REAL NUMBERS, RECORDED FROM MAINNET TODAY</p>
+          <p>The same tree built over the 138 holders of a real issued token (USDB) totals exactly what the ledger itself reports the issuer owes: 33,733,671.32 USDB. Understate one holder's balance and their path no longer reaches the root.</p></div>
+        <h3>A protection fund no single key can move</h3>
+        <p>An institution can also set XRP aside to make customers whole up to a limit each, the way a deposit scheme promises a fixed amount per depositor. The ledger shows whether that fund is real:</p>
+        <ul>
+          <li><strong>locked in escrow</strong> until a date: nobody can move it early;</li>
+          <li><strong>under a signer list</strong> with the master key disabled: several people must sign;</li>
+          <li><strong>behind one key</strong>: whoever holds it can take it, so it counts for nothing.</li>
+        </ul>
+        <p>Ripple's escrow wallet #03 shows the strongest form: 3.3 billion XRP locked in escrows, the account itself under a 4-of-8 signer list.</p>
+        <p><strong>This is verification, not insurance.</strong> NOSHASHI pays no claims, and no government scheme stands behind a program. It shows what is really set aside.</p>
+        <h3>Stopping XRP leaving to the wrong place</h3>
+        <ul>
+          <li><strong>Withdrawal screening</strong> checks a customer's withdrawal before it is signed: whether it will bounce, whether the destination is brand new or hours old (most stolen withdrawals go to fresh accounts), whether it imitates an address the customer used before, and whether it or its funders are OFAC-listed or reported scams.</li>
+          <li><strong>The shared scam registry</strong> holds addresses institutions reported with transaction evidence, each confirmed by a reviewer who did not file it.</li>
+          <li><strong>The phishing link feed</strong> reads a validated ledger every minute and keeps every domain advertised in XRP dust. A real relay sprayed 1-drop payments at 99 accounts, then deleted itself into the next account.</li>
+          <li><strong>The emergency kit</strong> is the ordered set of transactions that saves a compromised account: take back what others can pull, move the value to a cold account, change the keys. Built on tickets, it can be signed today and kept offline.</li>
+          <li><strong>Market surveillance</strong> reads a token's order-book history: one account placed and replaced 171 EUROP orders in minutes and none filled. That makes a book look deeper than it is, whether it is spoofing or an ordinary market maker re-quoting.</li>
+        </ul>
+        <h3>In NOSHASHI</h3>
+        <ul>
+          <li>Free: <strong>EMERGENCY KIT</strong> with the drainer check, <strong>WHO IS THIS?</strong>, and <strong>SCAM REGISTRY</strong> lookups and link checks, in the Security Center and at noshashi.app/protection/ for customers.</li>
+          <li><strong>Institutional</strong>: proof of reserves with customer inclusion proofs, attested daily, and filing reports to the registry.</li>
+          <li><strong>Enterprise</strong>: a protection fund and public page, withdrawal screening, and market surveillance.</li>
+          <li><strong>Strategic</strong>: protection alerts by signed webhook, and the phishing link feed as an API.</li>
+        </ul>
+        <p class="takeaway"><b>KEY IDEA</b>A promise about customers' XRP is worth what the ledger can show: reserves you can read, liabilities each customer can check, and a fund no single key can take.</p>
+      </section>
+
 <!-- ===================== PART 3 ===================== -->
       <p class="part" id="workflows">PART 3 · WORKFLOWS: REAL TASKS, START TO FINISH</p>
 
@@ -1023,7 +1066,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <p class="part" id="check">PART 4 · KNOWLEDGE CHECK</p>
       <section>
         <h2>Knowledge check</h2>
-        <p class="mins">63 QUESTIONS IN 6 ROUNDS · YOUR ANSWERS STAY IN YOUR BROWSER</p>
+        <p class="mins">75 QUESTIONS IN 6 ROUNDS · YOUR ANSWERS STAY IN YOUR BROWSER</p>
         <p class="noprint">Answer as many as you like, then press <strong>Check my answers</strong>. Every answer is explained, right or wrong. Stuck on a word? Open <strong>Words used here</strong> under a question for plain definitions from the word list.</p>
         <p>Rounds 1 to 3 cover the ledger, markets and payments, and the app. Round 4 tests the vocabulary. Round 5 asks how NOSHASHI helps institutions and enterprises: treasuries, compliance teams, desks, payments firms, issuers and auditors. Round 6 covers account security, what to do after a theft, and getting stuck XRP back.</p>
         <form class="quiz" id="quiz"></form>
@@ -1151,7 +1194,13 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["A site asks you to sign a SetRegularKey naming an address you do not recognise. What happens if you sign?", ["Nothing, it only reads","Whoever holds that key can move everything in your account from then on","Your fees go down","The account is deleted"], 1, "PRE-SIGN CHECK answers DO NOT SIGN for exactly this: it is the quickest way to take over an account."],
     ["Your exchange deposit failed with tecDST_TAG_NEEDED. Where is the XRP?", ["At the exchange, unassigned","Still in your account: only the fee was spent","Burned","In escrow"], 1, "A tec result means the payment did nothing but charge its fee. Send again with the tag."],
     ["An account's Domain field says bitstamp.net. What proves it really belongs to Bitstamp?", ["Nothing more is needed","bitstamp.net listing the account in its /.well-known/xrp-ledger.toml","A large balance","An old account age"], 1, "Anyone can write any domain. DOMAIN CHECK reads the site's file and says VERIFIED only when the account is listed."],
-    ["What is the XRP Ledger equivalent of revoking a token approval?", ["There is nothing to revoke","Cancelling what you left open: checks you wrote, NFT sell offers, payment channels, old orders, keys and signers","Deleting your trust lines","Changing your password"], 1, "EXPOSURE AUDIT lists each open permission with the one transaction that revokes it."]
+    ["What is the XRP Ledger equivalent of revoking a token approval?", ["There is nothing to revoke","Cancelling what you left open: checks you wrote, NFT sell offers, payment channels, old orders, keys and signers","Deleting your trust lines","Changing your password"], 1, "EXPOSURE AUDIT lists each open permission with the one transaction that revokes it."],
+    ["An exchange shows a large XRP balance. Why is that not proof customers are safe?", ["It always is","It says nothing about what the exchange owes; proof needs liabilities too","Balances cannot be read","Only validators can check"], 1, "Reserves divided by published liabilities is the coverage ratio. Reserves alone can hide larger debts."],
+    ["What does a customer's inclusion proof let them check?", ["Everyone else's balance","That their own balance is counted in the published total, without seeing anyone else's","The exchange's password","Their seed"], 1, "The path from their leaf to the published root reproduces it only if their balance is in it."],
+    ["A protection fund sits in an account controlled by one key. How much of it is secured?", ["All of it","None: whoever holds that key can move it","Half","It depends on the balance"], 1, "Only XRP locked in escrow, or under a signer list with the master key disabled, is counted as secured."],
+    ["Is NOSHASHI's Customer Asset Protection insurance?", ["Yes, it pays claims","No: it verifies and publishes what is set aside; nobody pays claims and no government scheme stands behind it","Yes, backed by a government","Only on Strategic"], 1, "It gives customers facts they can check, not a guarantee."],
+    ["A customer asks to withdraw to an address created an hour ago. Why screen it?", ["Old addresses are slower","Most stolen withdrawals go to freshly created accounts","New accounts pay more fees","It is illegal"], 1, "WITHDRAWALS flags destinations hours old, and lookalikes of past destinations."],
+    ["An account placed 171 orders on a token in minutes, replaced or cancelled all of them, and none filled. What does that show?", ["Proven fraud","Depth that is constantly re-quoted and never trades: the book looks deeper than it is","A broken ledger","Nothing at all"], 1, "It is an indicator, not a verdict: an ordinary market maker re-quoting looks the same."]
   ];
   var V = [
     ["Account","A place on the ledger that holds XRP and tokens, identified by an address starting with r."],
@@ -1269,6 +1318,14 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["XRPL","The XRP Ledger."],
     ["Address poisoning","Sending someone a tiny payment from a lookalike address, matching the start and end of one they use, so they copy it from their history by mistake."],
     ["AccountDelete","The transaction that deletes an account and sends its remaining XRP to another; thieves use it to sweep throwaway accounts."],
+    ["Proof of reserves","Showing, from the ledger, the XRP an institution holds in the accounts it names for its customers."],
+    ["Merkle sum tree","A tree of hashes and sums over customer balances whose root proves the total without revealing any balance."],
+    ["Inclusion proof","The path from one customer's leaf to the published root, which proves their balance is counted."],
+    ["Coverage ratio","Reserves divided by published customer liabilities; 100% or more means fully backed."],
+    ["Protection fund","XRP set aside to make customers whole up to a per-customer limit, secured only if no single key can move it."],
+    ["Withdrawal screening","Checking an outbound payment before it is signed: will it bounce, and is the destination new, a lookalike, sanctioned or reported."],
+    ["Scam registry","Addresses reported by institutions with transaction evidence and confirmed by an independent reviewer."],
+    ["Quote churn","Orders placed and replaced again and again without filling; it makes an order book look deeper than it is."],
     ["Hardening plan","NOSHASHI's list of unsigned transactions that make an account harder to take over, for the owner to sign in their own wallet."],
     ["Incident dossier","NOSHASHI's plain-text record of a theft trail and recovery paths, with a SHA-256 fingerprint anyone can re-check."],
     ["Seed","The secret an account's keys are derived from. Whoever has it controls the account; no legitimate service ever asks for it."],
