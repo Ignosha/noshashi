@@ -11,8 +11,8 @@ const sql = readFileSync(resolve(root, "supabase/migrations/20260924010000_org_w
 // Since 20260927180100 the list lives in one function, webhook_event_names(),
 // which both the table check and the creating function use.
 const events = readFileSync(resolve(root, "supabase/migrations/20260927180100_institutional_features.sql"), "utf8");
-// 20260927200000 redefines the list (xrpl_event, deposit_screened) and adds the ledger-event trigger.
-const feeds = readFileSync(resolve(root, "supabase/migrations/20260927200000_xrpl_event_feeds.sql"), "utf8");
+// 20260928130000 redefines the list (adds security_alert) and the ledger-event trigger, last.
+const feeds = readFileSync(resolve(root, "supabase/migrations/20260928130000_security_guardian.sql"), "utf8");
 
 describe("webhook addresses — the form explains what the server refuses", () => {
   // The refusals below were each confirmed against the live database function.
@@ -51,7 +51,7 @@ describe("webhook addresses — the form explains what the server refuses", () =
   it("every event the ledger-event trigger emits is one a webhook may subscribe to", () => {
     const trigger = /function noshashi\.webhook_from_xrpl_event\(\)[\s\S]*?\$\$;/.exec(feeds)![0];
     const emitted = [...trigger.matchAll(/webhook_emit\(new\.organization_id, '([a-z_]+)'/g)].map((m) => m[1]);
-    expect(emitted).toEqual(["xrpl_event", "deposit_screened"]);
+    expect(emitted).toEqual(["xrpl_event", "deposit_screened", "security_alert"]);
     for (const ev of emitted) expect(WEBHOOK_EVENTS.map((e) => e.id), ev).toContain(ev);
   });
 });

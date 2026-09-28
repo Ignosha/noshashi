@@ -89,6 +89,8 @@ export const PLANS: Plan[] = [
       "Token rights — check an NFT before you buy it",
       "On-device compliance agent",
       "CSV audit export",
+      "Account security check — who can sign, open doors, key changes, poisoning attempts, and an unsigned hardening plan",
+      "Safe send — check a pasted address against your own for lookalikes before you sign",
       "Binary integrity verification",
       "Community support",
     ],
@@ -124,6 +126,7 @@ export const PLANS: Plan[] = [
       "Wallet explorer — every address ever scanned, sortable by risk",
       "Editable policy rule set — your thresholds, not ours",
       "Issuer drift monitor — native alert the moment an issuer freezes you",
+      "Incident response — follow stolen value hop by hop past the dust, with every recovery path that exists and a SHA-256 dossier for police and exchanges",
       "5,000 API verifications included",
       "Priority support",
     ],
@@ -143,6 +146,7 @@ export const PLANS: Plan[] = [
       // the key have to be granted by the same tier, or one of them is
       // a line on a pricing page that nothing honours.
       "compliance_api",
+      "incident_response",
     ],
   },
   {
@@ -193,6 +197,7 @@ export const PLANS: Plan[] = [
       "audit_log",
       "bulk_monitoring",
       "custom_alert_logic",
+      "incident_response",
     ],
   },
   {
@@ -213,6 +218,7 @@ export const PLANS: Plan[] = [
       "Everything in Institutional",
       "Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit",
       "Embeddable screening widget for your own site: address verification against poisoning, sanctions and deposit status",
+      "Forensic trace — five hops deep, 1,000 transactions an account, straight into an organization investigation case",
       "Asset passports and issuer intelligence at institutional scope",
       "Portfolio monitoring, counterparty and liquidity intelligence",
       "Deterministic policy engine, adjudication and decision history",
@@ -244,6 +250,8 @@ export const PLANS: Plan[] = [
       "dedicated_environment",
       "deposit_screening",
       "embedded_delivery",
+      "incident_response",
+      "forensic_trace",
     ],
   },
   {
@@ -264,6 +272,7 @@ export const PLANS: Plan[] = [
       "High-volume API capacity and contracted burst limits",
       "XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API",
       "Custom export schemas, bulk export and event retention you set",
+      "Security Guardian — signed security_alert webhooks the minute a watched account's keys change or it is deleted, and one-click watching of a theft trail",
       "Architecture review before commitment",
       "Scope documented against the integration",
     ],
@@ -292,6 +301,9 @@ export const PLANS: Plan[] = [
       "embedded_delivery",
       "event_feeds",
       "custom_schemas",
+      "incident_response",
+      "forensic_trace",
+      "security_guardian",
     ],
   },
 ];
@@ -464,6 +476,24 @@ export const FEATURE_CATALOG: Record<
     requires: "enterprise",
     blurb:
       "Isolated compute and storage for your compliance workload, with your own node endpoints and retention policy, scoped and provisioned per contract after architecture review.",
+  },
+  incident_response: {
+    label: "Incident response",
+    requires: "desk",
+    blurb:
+      "When an account is drained: the key changes that preceded it, the stolen value followed hop by hop through payments and AccountDelete sweeps (ignoring the dust thieves spray), what became of every account it reached, every recovery path that actually exists on the XRP Ledger, and a SHA-256 dossier for police, exchanges and issuers.",
+  },
+  forensic_trace: {
+    label: "Forensic trace",
+    requires: "enterprise",
+    blurb:
+      "Incident response at investigator depth: five hops and 1,000 transactions per account, custodial landings and sanctioned addresses named, vanity-address series detected, and the dossier opened as an organization investigation case in one click.",
+  },
+  security_guardian: {
+    label: "Security Guardian",
+    requires: "strategic",
+    blurb:
+      "Server-side takeover alerts: a signed security_alert webhook within a minute of any watched account's regular key or signer list changing, its master key being disabled or re-enabled, or its deletion, and every account in a theft trail watched in one click so you see the moment stolen value moves.",
   },
   embedded_delivery: {
     label: "Embeddable screening widget",

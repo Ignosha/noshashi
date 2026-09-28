@@ -42,6 +42,12 @@ describe("reading the question", () => {
     expect(plan(BITSTAMP).calls.map((c) => c.tool)).toEqual(["check_address"]);
   });
 
+  it("plans the security readers for security and theft questions, and nothing else for a stress question", () => {
+    expect(plan(`Is ${BITSTAMP} secure? Could someone take it over?`).calls.map((c) => c.tool)).toEqual(["security_check"]);
+    expect(plan(`My account ${BITSTAMP} was hacked and drained, can I get my XRP back?`).calls.map((c) => c.tool)).toEqual(["investigate_hack"]);
+    expect(plan(`What is the recovery ratio of ${BITSTAMP} in a stress test?`).calls.map((c) => c.tool)).not.toContain("investigate_hack");
+  });
+
   it("sends product and concept questions to the pages", () => {
     const p = plan("How much does the Institutional plan cost?");
     expect(p.calls).toEqual([]);

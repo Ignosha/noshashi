@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Security Center: cybersecurity for XRP Ledger accounts
+
+- **Account check (free).** Any address graded A to F from what the ledger
+  shows: who can sign (master key, regular key, signer list and the fewest
+  signers that reach quorum), recent key and settings changes, address-
+  poisoning attempts against it, and the doors strangers use (NFT offers,
+  checks, payment channels). The hardening plan is unsigned transactions to
+  review and sign in your own wallet; NOSHASHI never signs.
+- **Safe send (free).** A pasted destination checked against your own
+  address book for lookalikes, against the OFAC list, and for a required
+  destination tag, before you sign.
+- **Incident response (Pro and above).** For a drained account: the key
+  changes before the theft, the value followed hop by hop through payments
+  and AccountDelete sweeps past the dust, what became of every account it
+  reached, every recovery path that exists rated honestly (a validated
+  transaction is never reversible), and a SHA-256 dossier for police,
+  exchanges and issuers. Enterprise traces five hops and opens the dossier
+  as an investigation case.
+- **Security Guardian (Strategic).** A signed `security_alert` webhook
+  within a minute of a watched account's regular key or signer list
+  changing, its master key being disabled or re-enabled, or its deletion;
+  and one click watches every account in a theft trail.
+- NOSHX answers "is my account secure?" and "my account was hacked" from
+  the same readers; LEARN has a new lab, and the website course two new
+  lessons and a sixth quiz round.
+
 ### Sanctions, address poisoning and a widget for your own site
 
 - **OFAC SDN screening.** Every day NOSHASHI reads the US Treasury's SDN

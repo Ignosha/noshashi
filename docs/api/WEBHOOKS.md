@@ -20,6 +20,7 @@ mode) → **WEBHOOKS**.
 | `custom_alert` | one of the organization's alert rules fired on a scheduled stress run (Institutional); `data.state` holds the rule, the condition, the wallet and the measured values |
 | `xrpl_event` | the server watcher reading an event on one of the organization's watched XRPL accounts from a validated ledger (Strategic, or Enterprise for deposit addresses); `data` holds the address, type, tx_hash, ledger_index, ledger_time, counterparty and the event's facts |
 | `deposit_screened` | an incoming payment to a watched deposit address screened before crediting (Enterprise); as `xrpl_event`, plus `verdict` (clear, review, hold) and `screening` (the amount to credit, each finding and the sender's funding chain) |
+| `security_alert` | a watched account's signing keys changed (SetRegularKey, SignerListSet), its master key was disabled or re-enabled, or it was deleted (Strategic, Security Guardian); as `xrpl_event`, plus `reason`. The first move in almost every XRPL account takeover is a new key of the thief's own |
 | `ping` | a test delivery requested from the app |
 
 Events come only from server records: the append-only audit log, API

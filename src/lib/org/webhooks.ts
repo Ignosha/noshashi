@@ -22,6 +22,7 @@ export const WEBHOOK_EVENTS = [
   { id: "custom_alert", label: "One of your alert rules fired (Institutional)" },
   { id: "xrpl_event", label: "Something happened on a watched XRPL account (Strategic)" },
   { id: "deposit_screened", label: "An incoming deposit was screened (Enterprise)" },
+  { id: "security_alert", label: "A watched account's keys changed, or it was deleted (Strategic)" },
 ] as const;
 
 export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number]["id"];

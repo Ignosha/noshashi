@@ -255,6 +255,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="#l17">17 · Every screen, step by step</a>
       <a href="#l18">18 · Organisations and developers</a>
       <a href="#l19">19 · The Agent and Observer</a>
+      <a href="#l20">20 · Account security</a>
+      <a href="#l21">21 · When an account is emptied</a>
       <p>PART 3 · WORKFLOWS</p>
       <a href="#workflows">8 real tasks</a>
       <p>MORE</p>
@@ -804,6 +806,58 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <div class="warn"><p class="t">USE IT WISELY</p><p>The agent explains; the ledger decides. Always confirm important points against the readings and receipts themselves.</p></div>
       </section>
 
+      <section id="l20">
+        <h2>20 · Account security: making an account hard to take over</h2>
+        <p class="mins">ABOUT 7 MINUTES</p>
+        <p>An XRP Ledger account belongs to whoever can sign for it. Nobody at a help desk can reset it, and no transaction can be undone. So security on the XRPL is about one question: <strong>who holds a key that can sign, and how easily could someone else get it?</strong></p>
+        <p>Most accounts are emptied the same way: the secret seed is exposed. It gets typed into a fake wallet or "airdrop claim" site, stored in a cloud note or screenshot, or read off the clipboard by malware. The ledger itself is not broken into.</p>
+        <h3>The four defences, from simplest to strongest</h3>
+        <ul>
+          <li><strong>Keep the master seed offline.</strong> Write it on paper or steel, never in a photo, email or cloud note. Nobody legitimate, including NOSHASHI, ever needs it.</li>
+          <li><strong>Sign with a regular key</strong> held in a hardware wallet (<code>SetRegularKey</code>). Day-to-day signing never touches the master seed. If the regular key leaks, the master key replaces it in one transaction.</li>
+          <li><strong>Require several signers</strong> for a treasury (<code>SignerListSet</code>, for example two of three). One stolen seed can then move nothing. Then disable the master key, or the signer list can be bypassed.</li>
+          <li><strong>Close the doors strangers use.</strong> <code>AccountSet</code> flags can refuse unsolicited NFT offers, checks and payment channels, which is how many phishing links arrive. Deposit Authorisation goes further: only senders you approve can pay you at all.</li>
+        </ul>
+        <h3>Address poisoning</h3>
+        <p>Wallets show only the first and last few characters of an address. An attacker generates an address whose start and end match one you pay, then sends you a tiny amount so the fake sits in your history right next to the real one. The next time you copy "the usual" address from history, you pay the attacker.</p>
+        <div class="card"><p class="t">A REAL EXAMPLE, RECORDED FROM MAINNET</p>
+          <p>The account <code>rfWPjcbY5QT2shRFY2SSQHFKPYSMzxaMaN</code> sent 1-drop payments (0.000001 XRP) with a memo offering a "free XRP gift" at a fake Xaman site. It then swept its balance by <code>AccountDelete</code> into <code>rDS6r59hQ3X95a2jeguAdTRMvC3b5xaMan</code>, which did the same into <code>r3LQQNg7hEdbbNK3w4ykfLRDQWAc7xAmAn</code>, and so on. Every one of them was generated to end in "xaman", the name of a real wallet.</p></div>
+        <h3>In NOSHASHI</h3>
+        <p><strong>SECURITY CENTER › ACCOUNT CHECK</strong> (free) grades any address from A to F. It shows who can sign, recent key and settings changes, poisoning attempts against the account and open doors. It also writes a <strong>hardening plan</strong>: unsigned transactions you review and sign in your own wallet. <strong>SAFE SEND</strong> (free) checks an address you are about to pay against your own address book and names any lookalike.</p>
+        <p class="takeaway"><b>KEY IDEA</b>Your account is exactly as safe as the least protected key that can sign for it. Take addresses from your own records, never from transaction history.</p>
+      </section>
+
+      <section id="l21">
+        <h2>21 · When an account is emptied: what can and cannot be done</h2>
+        <p class="mins">ABOUT 7 MINUTES</p>
+        <div class="warn"><p class="t">THE HARD TRUTH FIRST</p><p>A validated XRP Ledger transaction is final. Validators, Ripple, wallet makers and NOSHASHI cannot reverse it or move funds out of an account without its keys. Anyone offering to "recover" or "reverse" stolen XRP for a fee is running the second half of the scam.</p></div>
+        <h3>What to do in the first hour</h3>
+        <ul>
+          <li><strong>Move anything left</strong> to a brand-new account created on a device that never held the old seed. Whoever has the old key can empty the rest at any moment.</li>
+          <li><strong>Check whether keys were changed.</strong> A thief often adds their own regular key or signer list, so they keep signing even after you notice.</li>
+          <li><strong>Follow the value.</strong> Every movement is public. Trace where it went and where it is now.</li>
+          <li><strong>Report it</strong> to the police with the evidence: transaction hashes, amounts, times and destination tags. In the US that is the FBI's IC3 (ic3.gov); in the UK, Action Fraud.</li>
+        </ul>
+        <h3>The recovery paths that do exist</h3>
+        <ul>
+          <li><strong>A custodial service freezes a deposit.</strong> If stolen value was paid to an exchange (an account that requires destination tags), the exchange can identify and freeze the customer behind that tag if reached quickly, usually with a police reference.</li>
+          <li><strong>A token's issuer freezes or claws back.</strong> Issued tokens are the issuer's obligations. Unless it has given up the right, the issuer can freeze the trust lines holding stolen tokens, and with clawback enabled it can take them back and reissue them.</li>
+          <li><strong>Sanctions and law enforcement.</strong> If the trail reaches a listed address (OFAC SDN), authorities have powers individuals do not.</li>
+        </ul>
+        <h3>How thieves hide the trail, and how it is followed anyway</h3>
+        <p>Thieves spray hundreds of dust payments to bury the real transfers, and move value through throwaway accounts that delete themselves with <code>AccountDelete</code>. A trace that ignores the dust and follows the deletions sees through both. Generated accounts that share an ending (like the "xaman" series above) mark an organised operation.</p>
+        <h3>In NOSHASHI</h3>
+        <p><strong>SECURITY CENTER › INCIDENT RESPONSE</strong> (Pro and above) does this for you:</p>
+        <ul>
+          <li>It reads the key changes that preceded the theft.</li>
+          <li>It follows the value hop by hop through payments and account deletions, past the dust.</li>
+          <li>It says what became of every account the value reached: still holding it, deleted, an exchange, or sanctioned.</li>
+          <li>It rates every recovery path honestly and writes a <strong>dossier with a SHA-256 fingerprint</strong> for police, exchanges and issuers.</li>
+        </ul>
+        <p><strong>Enterprise</strong> traces five hops deep and opens the dossier as an investigation case. <strong>Strategic</strong> adds Guardian: a signed <code>security_alert</code> webhook within a minute of any watched account's keys changing, and one-click watching of every account in a theft trail.</p>
+        <p class="takeaway"><b>KEY IDEA</b>Nothing reverses a validated payment. Speed, evidence and the right request to the right party are what recover funds, when anything can.</p>
+      </section>
+
 <!-- ===================== PART 3 ===================== -->
       <p class="part" id="workflows">PART 3 · WORKFLOWS: REAL TASKS, START TO FINISH</p>
 
@@ -912,9 +966,9 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <p class="part" id="check">PART 4 · KNOWLEDGE CHECK</p>
       <section>
         <h2>Knowledge check</h2>
-        <p class="mins">55 QUESTIONS IN 5 ROUNDS · YOUR ANSWERS STAY IN YOUR BROWSER</p>
+        <p class="mins">63 QUESTIONS IN 6 ROUNDS · YOUR ANSWERS STAY IN YOUR BROWSER</p>
         <p class="noprint">Answer as many as you like, then press <strong>Check my answers</strong>. Every answer is explained, right or wrong. Stuck on a word? Open <strong>Words used here</strong> under a question for plain definitions from the word list.</p>
-        <p>Rounds 1 to 3 cover the ledger, markets and payments, and the app. Round 4 tests the vocabulary. Round 5 asks how NOSHASHI helps institutions and enterprises: treasuries, compliance teams, desks, payments firms, issuers and auditors.</p>
+        <p>Rounds 1 to 3 cover the ledger, markets and payments, and the app. Round 4 tests the vocabulary. Round 5 asks how NOSHASHI helps institutions and enterprises: treasuries, compliance teams, desks, payments firms, issuers and auditors. Round 6 covers account security and what to do after a theft.</p>
         <form class="quiz" id="quiz"></form>
         <div class="cta noprint">
           <button class="btn" type="button" id="grade">Check my answers</button>
@@ -1026,7 +1080,16 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["A token issuer wants to show institutional buyers exactly what they would be exposed to. What can it share?", ["Its marketing deck","A link to the free authority certificate for its issuer address, which anyone can re-check","Its private keys","Its bank statements"], 1, "The certificate page at /certificate/ runs the same six checks with the ledger index and digest, free and without an account."],
     ["Which plan is built for regulated teams that need organisation features and unlimited seats?", ["Free","Pro","Institutional","None; each seat is separate"], 2, "Institutional is $4,000 a month. Enterprise and Strategic, from $120,000 a year, are for larger organisations and infrastructure partners."],
     ["What does answering both questions from one ledger reading save a compliance team?", ["Nothing","Reconciling a screening tool and a market terminal that looked at the ledger at different moments","Hiring an auditor","Paying transaction costs"], 1, "When compliance and liquidity come from the same WebSocket in the same second, the file tells one consistent story."],
-    ["NOSHASHI is in beta. What should an institution take from that today?", ["The readings are invented","It provides information, not financial or legal advice; re-measure a reading before relying on it for a decision","It cannot be installed","Beta means free forever"], 1, "Every build is labelled beta. Every reading is real and stamped with its ledger, so re-checking it is straightforward."]
+    ["NOSHASHI is in beta. What should an institution take from that today?", ["The readings are invented","It provides information, not financial or legal advice; re-measure a reading before relying on it for a decision","It cannot be installed","Beta means free forever"], 1, "Every build is labelled beta. Every reading is real and stamped with its ledger, so re-checking it is straightforward."],
+    ["ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE"],
+    ["How are most XRP Ledger accounts actually emptied?", ["The ledger is hacked","The secret seed is exposed: a fake wallet site, a cloud backup, a screenshot or malware","Validators take the funds","Another account guesses the address"], 1, "The ledger is not broken into. Whoever holds a key that can sign owns the account, so protecting the seed is the whole game."],
+    ["What does a regular key held in a hardware wallet give you?", ["A second copy of your balance","Day-to-day signing without the master seed, and a key you can replace in one transaction if it leaks","Faster payments","Protection from fees"], 1, "The master seed stays offline; if the regular key is ever exposed, the master key sets a new one."],
+    ["A treasury has a 2-of-3 signer list but its master key is still enabled. What is the risk?", ["None","One stolen master seed skips the whole approval","The signers cannot sign","The account is blackholed"], 1, "Disable the master key once the signers are confirmed, or the quorum is optional."],
+    ["What is address poisoning?", ["A virus in your wallet","A lookalike address, matching the start and end of one you use, sent to you so you copy it from history","A frozen trust line","A fake token"], 1, "Always take destinations from your own records. NOSHASHI's SAFE SEND checks a pasted address against your book."],
+    ["Your XRP was stolen an hour ago. What can reverse the payment?", ["Validators, if asked quickly","A recovery service, for a fee","Nothing: validated transactions are final; recovery happens off-ledger","Deleting your account"], 2, "Paid 'recovery' offers are the second half of the scam. Exchanges freezing tagged deposits and issuers freezing their own tokens are the real paths."],
+    ["Stolen XRP reached an account that requires destination tags. Who can help?", ["Nobody","The exchange or service behind it, which can freeze the customer behind that tag if reached quickly","The first validator","NOSHASHI, by reversing it"], 1, "Send the transaction hash, amount, time and tag, ideally with a police reference."],
+    ["Why do thieves send hundreds of 1-drop payments after a theft?", ["To pay fees","To bury the real transfers in noise and spread phishing links","To close the account","To vote on amendments"], 1, "A trace that ignores the dust and follows AccountDelete sweeps sees through it."],
+    ["What does NOSHASHI's hardening plan contain?", ["Your secret key","Unsigned transactions for you to review and sign in your own wallet","A password reset","Nothing, it only scores"], 1, "NOSHASHI reads the ledger and never signs or asks for a key."]
   ];
   var V = [
     ["Account","A place on the ledger that holds XRP and tokens, identified by an address starting with r."],
@@ -1138,7 +1201,13 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["X-address","An address format that packs an address and destination tag together."],
     ["XLS","A numbered proposal for a new XRPL standard, such as XLS-30 for AMMs."],
     ["XRP","The XRP Ledger's own currency."],
-    ["XRPL","The XRP Ledger."]
+    ["XRPL","The XRP Ledger."],
+    ["Address poisoning","Sending someone a tiny payment from a lookalike address, matching the start and end of one they use, so they copy it from their history by mistake."],
+    ["AccountDelete","The transaction that deletes an account and sends its remaining XRP to another; thieves use it to sweep throwaway accounts."],
+    ["Hardening plan","NOSHASHI's list of unsigned transactions that make an account harder to take over, for the owner to sign in their own wallet."],
+    ["Incident dossier","NOSHASHI's plain-text record of a theft trail and recovery paths, with a SHA-256 fingerprint anyone can re-check."],
+    ["Seed","The secret an account's keys are derived from. Whoever has it controls the account; no legitimate service ever asks for it."],
+    ["Security Guardian","NOSHASHI's Strategic alert: a signed security_alert webhook when a watched account's keys change or it is deleted."]
   ];
   V.sort(function(a, b){ return a[0].toLowerCase().localeCompare(b[0].toLowerCase()); });
   // Words from the word list that appear in a question, its answer or its

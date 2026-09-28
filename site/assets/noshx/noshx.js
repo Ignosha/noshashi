@@ -1,43 +1,43 @@
-var We = Object.defineProperty;
-var Ge = (e, t, n) => t in e ? We(e, t, { enumerable: !0, configurable: !0, writable: !0, value: n }) : e[t] = n;
-var k = (e, t, n) => Ge(e, typeof t != "symbol" ? t + "" : t, n);
-function X(e) {
+var ut = Object.defineProperty;
+var ht = (e, t, n) => t in e ? ut(e, t, { enumerable: !0, configurable: !0, writable: !0, value: n }) : e[t] = n;
+var N = (e, t, n) => ht(e, typeof t != "symbol" ? t + "" : t, n);
+function K(e) {
   const t = Number(e) / 1e6;
   return Number.isFinite(t) ? t.toFixed(6).replace(/\.?0+$/, "") : "0";
 }
-function Ne(e) {
+function Be(e) {
   return new Date((e + 946684800) * 1e3);
 }
-function O(e) {
+function P(e) {
   if (!/^[0-9A-F]{40}$/i.test(e)) return e;
   const t = (e.match(/../g) ?? []).map((n) => String.fromCharCode(parseInt(n, 16))).join("").replace(/\0+$/, "").trim();
   return t && /^[\x20-\x7E]+$/.test(t) ? t : e;
 }
-const ee = [
+const ue = [
   "wss://xrplcluster.com",
   "wss://s1.ripple.com",
   "wss://s2.ripple.com"
-], te = 12e3, Ke = 2e4;
-class v extends Error {
+], he = 12e3, gt = 2e4;
+class A extends Error {
   constructor(n, s) {
     super(n);
-    k(this, "code");
+    N(this, "code");
     this.code = s, this.name = "XrplError";
   }
 }
-class Ye {
+class ft {
   constructor() {
-    k(this, "socket", null);
-    k(this, "pending", /* @__PURE__ */ new Map());
-    k(this, "nextId", 1);
-    k(this, "endpointIndex", 0);
-    k(this, "attempt", 0);
-    k(this, "retryTimer", 0);
-    k(this, "connecting", null);
-    k(this, "streamHandlers", /* @__PURE__ */ new Set());
-    k(this, "statusHandlers", /* @__PURE__ */ new Set());
-    k(this, "latencyMs", 0);
-    k(this, "connected", !1);
+    N(this, "socket", null);
+    N(this, "pending", /* @__PURE__ */ new Map());
+    N(this, "nextId", 1);
+    N(this, "endpointIndex", 0);
+    N(this, "attempt", 0);
+    N(this, "retryTimer", 0);
+    N(this, "connecting", null);
+    N(this, "streamHandlers", /* @__PURE__ */ new Set());
+    N(this, "statusHandlers", /* @__PURE__ */ new Set());
+    N(this, "latencyMs", 0);
+    N(this, "connected", !1);
   }
   /** Round-trip time of the most recent successful command. */
   getLatencyMs() {
@@ -61,7 +61,7 @@ class Ye {
       }
     }
     for (const [, n] of this.pending)
-      window.clearTimeout(n.timer), n.reject(new v("Connection reset"));
+      window.clearTimeout(n.timer), n.reject(new A("Connection reset"));
     this.pending.clear();
     try {
       return await this.ensureSocket(), !0;
@@ -83,7 +83,7 @@ class Ye {
   }
   ensureSocket() {
     return this.socket && this.socket.readyState === WebSocket.OPEN ? Promise.resolve(this.socket) : this.connecting ? this.connecting : (this.connecting = new Promise((t, n) => {
-      const s = ee[this.endpointIndex % ee.length];
+      const s = ue[this.endpointIndex % ue.length];
       let a;
       try {
         a = new WebSocket(s);
@@ -94,7 +94,7 @@ class Ye {
       this.socket = a;
       const r = window.setTimeout(() => {
         a.close();
-      }, te);
+      }, he);
       a.onopen = () => {
         window.clearTimeout(r), this.attempt = 0, this.connecting = null, this.setConnected(!0), a.send(
           JSON.stringify({
@@ -108,15 +108,15 @@ class Ye {
       }, a.onclose = () => {
         window.clearTimeout(r), this.connecting = null, this.socket = null, this.setConnected(!1);
         for (const [, o] of this.pending)
-          window.clearTimeout(o.timer), o.reject(new v("Connection closed"));
-        this.pending.clear(), n(new v("Connection closed")), this.scheduleReconnect();
+          window.clearTimeout(o.timer), o.reject(new A("Connection closed"));
+        this.pending.clear(), n(new A("Connection closed")), this.scheduleReconnect();
       };
     }), this.connecting);
   }
   scheduleReconnect() {
     if (this.streamHandlers.size === 0 && this.pending.size === 0) return;
     window.clearTimeout(this.retryTimer), this.endpointIndex += 1, this.attempt += 1;
-    const t = Math.min(Ke, 1e3 * 2 ** Math.min(this.attempt - 1, 4));
+    const t = Math.min(gt, 1e3 * 2 ** Math.min(this.attempt - 1, 4));
     this.retryTimer = window.setTimeout(() => {
       this.ensureSocket().catch(() => {
       });
@@ -134,7 +134,7 @@ class Ye {
       if (!s) return;
       if (window.clearTimeout(s.timer), this.pending.delete(n.id), n.status === "error") {
         s.reject(
-          new v(
+          new A(
             String(n.error_message ?? n.error ?? "Ledger error"),
             String(n.error ?? "")
           )
@@ -152,8 +152,8 @@ class Ye {
     const s = await this.ensureSocket(), a = this.nextId++, r = performance.now();
     return new Promise((o, i) => {
       const c = window.setTimeout(() => {
-        this.pending.delete(a), i(new v(`Timed out: ${t}`));
-      }, te);
+        this.pending.delete(a), i(new A(`Timed out: ${t}`));
+      }, he);
       this.pending.set(a, {
         resolve: (d) => {
           this.latencyMs = Math.max(1, Math.round(performance.now() - r)), o(d);
@@ -169,11 +169,11 @@ class Ye {
     });
   }
 }
-const Ve = new Ye();
+const pt = new ft();
 async function b(e, t = {}) {
-  return Ve.request(e, t);
+  return pt.request(e, t);
 }
-async function Je() {
+async function mt() {
   const [e, t] = await Promise.all([
     b("ledger", { ledger_index: "validated", transactions: !1, expand: !1 }),
     b("fee").catch(() => ({}))
@@ -181,15 +181,15 @@ async function Je() {
   return {
     ledgerIndex: Number(n.ledger_index ?? e.ledger_index ?? 0),
     ledgerHash: String(n.ledger_hash ?? ""),
-    closeTime: Ne(Number(n.close_time ?? 0)).toLocaleString(),
+    closeTime: Be(Number(n.close_time ?? 0)).toLocaleString(),
     validated: !!(e.validated ?? !1),
-    baseFeeXrp: X(Number(t.drops?.base_fee ?? 10)),
-    openLedgerFeeXrp: X(Number(t.drops?.open_ledger_fee ?? 10)),
+    baseFeeXrp: K(Number(t.drops?.base_fee ?? 10)),
+    openLedgerFeeXrp: K(Number(t.drops?.open_ledger_fee ?? 10)),
     queueSize: Number(t.current_queue_size ?? 0),
     txnCount: Number(n.transactions?.length ?? 0)
   };
 }
-function U(e) {
+function Y(e) {
   try {
     if (!e) return;
     const t = Uint8Array.from(
@@ -200,10 +200,10 @@ function U(e) {
     return;
   }
 }
-function Qe(e) {
+function yt(e) {
   return { address: e, balanceXrp: "0.00", sequence: 0, ownerCount: 0, unfunded: !0 };
 }
-async function Ze(e) {
+async function wt(e) {
   try {
     const n = (await b("account_info", {
       account: e,
@@ -214,17 +214,17 @@ async function Ze(e) {
       balanceXrp: (Number(n.Balance ?? 0) / 1e6).toFixed(2),
       sequence: Number(n.Sequence ?? 0),
       ownerCount: Number(n.OwnerCount ?? 0),
-      domain: U(String(n.Domain ?? ""))
+      domain: Y(String(n.Domain ?? ""))
     };
   } catch (t) {
-    if (t instanceof v && t.code === "actNotFound") return Qe(e);
-    throw t instanceof v && t.code === "actMalformed" ? new v(
+    if (t instanceof A && t.code === "actNotFound") return yt(e);
+    throw t instanceof A && t.code === "actMalformed" ? new A(
       "Address failed its base58 checksum — check for a mistyped character.",
       "actMalformed"
     ) : t;
   }
 }
-async function et(e) {
+async function bt(e) {
   return ((await b("account_objects", {
     account: e,
     ledger_index: "validated",
@@ -233,15 +233,15 @@ async function et(e) {
   })).account_objects ?? []).map((s) => ({
     subject: String(s.Subject ?? ""),
     issuer: String(s.Issuer ?? ""),
-    credentialType: U(String(s.CredentialType ?? "")) ?? String(s.CredentialType ?? "UNKNOWN"),
+    credentialType: Y(String(s.CredentialType ?? "")) ?? String(s.CredentialType ?? "UNKNOWN"),
     // XLS-70 marks acceptance with the lsfAccepted flag (0x00010000).
     accepted: (Number(s.Flags ?? 0) & 65536) !== 0,
     revoked: !!(s.Revoked ?? !1),
-    uri: s.URI ? U(String(s.URI)) : void 0,
+    uri: s.URI ? Y(String(s.URI)) : void 0,
     expiration: s.Expiration ? Number(s.Expiration) : void 0
   }));
 }
-async function tt(e, t = 40) {
+async function vt(e, t = 40) {
   try {
     return ((await b("account_tx", {
       account: e,
@@ -251,30 +251,30 @@ async function tt(e, t = 40) {
       forward: !1,
       limit: t
     })).transactions ?? []).map((a) => {
-      const r = a.tx ?? a.tx_json ?? {}, o = a.meta ?? {}, i = o.delivered_amount ?? o.DeliveredAmount, c = typeof i == "string" ? Number(X(i)) : void 0, d = String(r.Account ?? ""), h = String(r.Destination ?? ""), f = d === e ? "out" : h === e ? "in" : "cross", l = Ne(Number(r.date ?? 0));
+      const r = a.tx ?? a.tx_json ?? {}, o = a.meta ?? {}, i = o.delivered_amount ?? o.DeliveredAmount, c = typeof i == "string" ? Number(K(i)) : void 0, d = String(r.Account ?? ""), l = String(r.Destination ?? ""), u = d === e ? "out" : l === e ? "in" : "cross", g = Be(Number(r.date ?? 0));
       return {
         hash: String(r.hash ?? a.hash ?? ""),
         transactionType: String(r.TransactionType ?? "UNKNOWN"),
         result: String(o.TransactionResult ?? "—"),
         ledgerIndex: Number(a.ledger_index ?? r.ledger_index ?? 0),
-        date: l.toLocaleString(),
-        timestamp: l.getTime(),
-        direction: f,
-        counterparty: f === "out" ? h || "—" : d || "—",
+        date: g.toLocaleString(),
+        timestamp: g.getTime(),
+        direction: u,
+        counterparty: u === "out" ? l || "—" : d || "—",
         amountXrp: c,
-        feeXrp: X(String(r.Fee ?? "0"))
+        feeXrp: K(String(r.Fee ?? "0"))
       };
     });
   } catch (n) {
-    if (n instanceof v && n.code === "actNotFound") return [];
+    if (n instanceof A && n.code === "actNotFound") return [];
     throw n;
   }
 }
-function nt(e) {
+function kt(e) {
   return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(e.trim());
 }
-const st = 262144, at = 4194304, it = 2097152, rt = 1048576;
-async function ot(e) {
+const St = 262144, Tt = 4194304, $t = 2097152, At = 1048576;
+async function _t(e) {
   try {
     return ((await b("account_lines", {
       account: e,
@@ -297,11 +297,11 @@ async function ot(e) {
       // resolved from the issuer's own flags below
     }));
   } catch (t) {
-    if (t instanceof v && t.code === "actNotFound") return [];
+    if (t instanceof A && t.code === "actNotFound") return [];
     throw t;
   }
 }
-async function Ie(e) {
+async function We(e) {
   try {
     const n = (await b("account_info", {
       account: e,
@@ -309,11 +309,11 @@ async function Ie(e) {
     })).account_data ?? {}, s = Number(n.Flags ?? 0), a = Number(n.TransferRate ?? 0), r = a > 1e9 ? Math.round((a - 1e9) / 1e9 * 1e4) : 0;
     return {
       address: e,
-      domain: U(String(n.Domain ?? "")),
-      noFreeze: (s & it) !== 0,
-      globalFreeze: (s & at) !== 0,
-      requireAuth: (s & st) !== 0,
-      masterDisabled: (s & rt) !== 0,
+      domain: Y(String(n.Domain ?? "")),
+      noFreeze: (s & $t) !== 0,
+      globalFreeze: (s & Tt) !== 0,
+      requireAuth: (s & St) !== 0,
+      masterDisabled: (s & At) !== 0,
       transferRateBps: r
     };
   } catch (t) {
@@ -328,7 +328,7 @@ async function Ie(e) {
     };
   }
 }
-async function ct(e) {
+async function xt(e) {
   try {
     const t = await b("gateway_balances", {
       account: e,
@@ -352,23 +352,23 @@ async function ct(e) {
     };
   }
 }
-const dt = "https://xiurbiwuwcfowqnpmwki.supabase.co", lt = `${dt}/functions/v1`, ne = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
-async function ut(e, t) {
-  const n = [...new Set(e.filter((s) => ne.test(s)))].slice(0, 50);
+const Nt = "https://xiurbiwuwcfowqnpmwki.supabase.co", It = `${Nt}/functions/v1`, ge = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+async function Ge(e, t) {
+  const n = [...new Set(e.filter((s) => ge.test(s)))].slice(0, 50);
   if (n.length === 0) return { hits: {}, listAsOf: null, listed: 0 };
   try {
-    const s = await fetch(`${lt}/noshashi-xrpl-watch/sanctions?addresses=${n.join(",")}`, {
+    const s = await fetch(`${It}/noshashi-xrpl-watch/sanctions?addresses=${n.join(",")}`, {
       signal: t ?? AbortSignal.timeout(8e3)
     });
     if (!s.ok) return null;
     const a = await s.json(), r = {};
-    for (const o of a.hits ?? []) ne.test(o.address) && (r[o.address] = o);
+    for (const o of a.hits ?? []) ge.test(o.address) && (r[o.address] = o);
     return { hits: r, listAsOf: a.list_as_of ?? null, listed: Number(a.listed ?? 0) };
   } catch {
     return null;
   }
 }
-function ht(e, t) {
+function Et(e, t) {
   if (t === void 0) return null;
   if (t === null)
     return {
@@ -391,21 +391,21 @@ function ht(e, t) {
     detail: `This address is not among the ${t.listed.toLocaleString("en-US")} XRP addresses the US Treasury lists${s}. The list names only addresses OFAC has published; not being on it is not a clearance.`
   };
 }
-function M(e, t) {
-  const n = ht(e.address, t);
+function Q(e, t) {
+  const n = Et(e.address, t);
   if (!n) return e;
   const s = [n, ...e.findings], a = t?.hits[e.address], r = a ? "avoid" : e.verdict;
   return {
     ...e,
     findings: n.severity === "ok" ? [...e.findings, n] : s,
     verdict: r,
-    headline: a ? D.avoid.label : e.headline,
+    headline: a ? B.avoid.label : e.headline,
     sanction: a,
     sanctionsChecked: t !== null,
     sanctionsAsOf: t?.listAsOf ?? null
   };
 }
-const D = {
+const B = {
   clear: {
     label: "NOTHING RECORDED AGAINST IT",
     blurb: "The ledger publishes nothing that would stop you. That is not the same as a recommendation."
@@ -422,12 +422,12 @@ const D = {
     label: "NOT READABLE",
     blurb: "This address could not be read, so nothing about it is being asserted."
   }
-}, ft = 60;
-async function gt(e) {
+}, Ot = 60;
+async function Ft(e) {
   const t = e.trim(), n = {
     address: t,
     verdict: "unknown",
-    headline: D.unknown.label,
+    headline: B.unknown.label,
     findings: [],
     exists: !1,
     funded: !1,
@@ -440,7 +440,7 @@ async function gt(e) {
     ledgerIndex: 0,
     checkedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
-  if (!nt(t))
+  if (!kt(t))
     return {
       ...n,
       findings: [
@@ -454,17 +454,17 @@ async function gt(e) {
       ],
       headline: "NOT A VALID ADDRESS"
     };
-  const [s, a] = await Promise.all([Ze(t).catch(() => null), ut([t])]);
+  const [s, a] = await Promise.all([wt(t).catch(() => null), Ge([t])]);
   if (!s)
-    return a?.hits[t] ? M(n, a) : n;
+    return a?.hits[t] ? Q(n, a) : n;
   if (s.unfunded)
-    return M({
+    return Q({
       ...n,
       exists: !0,
       funded: !1,
       domain: s.domain,
       verdict: "caution",
-      headline: D.caution.label,
+      headline: B.caution.label,
       findings: [
         {
           id: "unfunded",
@@ -476,111 +476,111 @@ async function gt(e) {
       ]
     }, a);
   const [r, o, i] = await Promise.all([
-    et(t).catch(() => []),
-    ot(t).catch(() => []),
-    tt(t, ft).catch(() => [])
-  ]), c = await ct(t).catch(() => null), f = Object.keys(c?.obligations ?? {}).length > 0 ? await Ie(t).catch(() => {
+    bt(t).catch(() => []),
+    _t(t).catch(() => []),
+    vt(t, Ot).catch(() => [])
+  ]), c = await xt(t).catch(() => null), u = Object.keys(c?.obligations ?? {}).length > 0 ? await We(t).catch(() => {
   }) : void 0;
-  return M(
-    pt({
+  return Q(
+    Rt({
       address: t,
       account: s,
       credentials: r,
       lines: o,
       transactions: i,
       obligations: c,
-      posture: f
+      posture: u
     }),
     a
   );
 }
-function pt(e) {
-  const { address: t, account: n, credentials: s, lines: a, transactions: r, obligations: o, posture: i } = e, c = Object.keys(o?.obligations ?? {}), d = c.length > 0, h = [];
-  if (n.domain ? h.push({
+function Rt(e) {
+  const { address: t, account: n, credentials: s, lines: a, transactions: r, obligations: o, posture: i } = e, c = Object.keys(o?.obligations ?? {}), d = c.length > 0, l = [];
+  if (n.domain ? l.push({
     id: "domain",
     severity: "info",
     title: `Claims the domain ${n.domain}`,
     detail: "An account can write any domain it likes into this field. It becomes meaningful only when that domain publishes a matching xrp-ledger.toml naming this address back.",
     action: `Open https://${n.domain}/.well-known/xrp-ledger.toml and confirm this address is listed.`
-  }) : h.push({
+  }) : l.push({
     id: "no-domain",
     severity: "info",
     title: "Claims no domain",
     detail: "The account has not published a domain, so there is no website to check it against. Common for personal wallets, unusual for a business asking to be paid."
   }), s.length > 0) {
-    const p = s.filter((y) => y.accepted && !y.revoked);
-    h.push({
+    const m = s.filter((y) => y.accepted && !y.revoked);
+    l.push({
       id: "credentials",
-      severity: p.length > 0 ? "ok" : "warn",
-      title: p.length > 0 ? `Holds ${p.length} accepted credential${p.length === 1 ? "" : "s"}` : "Holds credentials, but none currently valid",
-      detail: p.length > 0 ? `Someone has attested to this account on-ledger: ${p.map((y) => y.credentialType).join(", ")}. The attestation is only worth as much as the issuer behind it.` : "Every credential attached to this account is either unaccepted or revoked."
+      severity: m.length > 0 ? "ok" : "warn",
+      title: m.length > 0 ? `Holds ${m.length} accepted credential${m.length === 1 ? "" : "s"}` : "Holds credentials, but none currently valid",
+      detail: m.length > 0 ? `Someone has attested to this account on-ledger: ${m.map((y) => y.credentialType).join(", ")}. The attestation is only worth as much as the issuer behind it.` : "Every credential attached to this account is either unaccepted or revoked."
     });
   }
-  d && i && (i.globalFreeze && h.push({
+  d && i && (i.globalFreeze && l.push({
     id: "global-freeze",
     severity: "critical",
     title: "This issuer has frozen everything it issued",
     detail: "lsfGlobalFreeze is set. Every balance of every currency this account issues is immobilised right now — holders cannot send or redeem.",
     action: "Do not buy this issuer's tokens while this flag stands."
-  }), i.noFreeze ? h.push({
+  }), i.noFreeze ? l.push({
     id: "no-freeze",
     severity: "ok",
     title: "This issuer has permanently given up the right to freeze",
     detail: "lsfNoFreeze is set and cannot be undone. It can never immobilise a holder's balance."
-  }) : i.globalFreeze || h.push({
+  }) : i.globalFreeze || l.push({
     id: "can-freeze",
     severity: "warn",
     title: "This issuer can freeze your balance at any time",
     detail: "lsfNoFreeze is not set, so the issuer retains the right to immobilise what it issued — yours included — in a single transaction, without warning.",
     action: "Hold only what you would accept losing access to."
-  }), i.transferRateBps > 0 && h.push({
+  }), i.transferRateBps > 0 && l.push({
     id: "transfer-fee",
     severity: "warn",
     title: `Charges ${i.transferRateBps} basis points to transfer`,
     detail: `Moving this issuer's token costs ${(i.transferRateBps / 100).toFixed(2)}%, taken by the issuer. It is not refundable and it applies every time the token changes hands.`
-  }), i.requireAuth && h.push({
+  }), i.requireAuth && l.push({
     id: "require-auth",
     severity: "info",
     title: "Requires authorisation before you can hold it",
     detail: "You cannot receive this issuance until the issuer explicitly authorises your account. Expect an onboarding step."
-  }), h.push({
+  }), l.push({
     id: "supply",
     severity: "info",
     title: `Issues ${c.length} currenc${c.length === 1 ? "y" : "ies"}`,
-    detail: `Outstanding: ${c.slice(0, 6).map((p) => `${p} ${Math.round(o?.obligations[p] ?? 0).toLocaleString()}`).join(" · ")}`
+    detail: `Outstanding: ${c.slice(0, 6).map((m) => `${m} ${Math.round(o?.obligations[m] ?? 0).toLocaleString()}`).join(" · ")}`
   }));
-  const f = a.filter((p) => p.frozenByIssuer || p.deepFrozenByIssuer);
-  f.length > 0 && h.push({
+  const u = a.filter((m) => m.frozenByIssuer || m.deepFrozenByIssuer);
+  u.length > 0 && l.push({
     id: "freezes-others",
     severity: "warn",
-    title: `Has frozen ${f.length} counterpart${f.length === 1 ? "y" : "ies"}`,
+    title: `Has frozen ${u.length} counterpart${u.length === 1 ? "y" : "ies"}`,
     detail: "This account has used freeze against people it deals with. That may be entirely legitimate — a sanctions response, for instance — but it demonstrates both the willingness and the ability to do it."
   });
-  const l = new Set(
-    r.map((p) => p.counterparty).filter(Boolean)
+  const g = new Set(
+    r.map((m) => m.counterparty).filter(Boolean)
   );
-  r.length === 0 ? h.push({
+  r.length === 0 ? l.push({
     id: "no-history",
     severity: "warn",
     title: "No recent transaction history",
     detail: "The account is funded but nothing recent is visible. A shop asking for payment should have a trail."
-  }) : h.push({
+  }) : l.push({
     id: "history",
     severity: "info",
-    title: `${r.length} recent transactions across ${l.size} counterparties`,
-    detail: l.size <= 2 ? "Almost all activity is with the same one or two addresses, which is unusual for a business." : "Activity is spread across a range of counterparties."
+    title: `${r.length} recent transactions across ${g.size} counterparties`,
+    detail: g.size <= 2 ? "Almost all activity is with the same one or two addresses, which is unusual for a business." : "Activity is spread across a range of counterparties."
   });
-  const u = h.reduce((p, y) => {
-    const m = { critical: 3, warn: 2, info: 1, ok: 0 };
-    return m[y.severity] > m[p] ? y.severity : p;
-  }, "ok"), g = u === "critical" ? "avoid" : u === "warn" ? "caution" : "clear";
+  const f = l.reduce((m, y) => {
+    const p = { critical: 3, warn: 2, info: 1, ok: 0 };
+    return p[y.severity] > p[m] ? y.severity : m;
+  }, "ok"), h = f === "critical" ? "avoid" : f === "warn" ? "caution" : "clear";
   return {
     address: t,
-    verdict: g,
-    headline: D[g].label,
-    findings: h.sort((p, y) => {
-      const m = { critical: 0, warn: 1, info: 2, ok: 3 };
-      return m[p.severity] - m[y.severity];
+    verdict: h,
+    headline: B[h].label,
+    findings: l.sort((m, y) => {
+      const p = { critical: 0, warn: 1, info: 2, ok: 3 };
+      return p[m.severity] - p[y.severity];
     }),
     exists: !0,
     funded: !0,
@@ -596,19 +596,19 @@ function pt(e) {
     checkedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const mt = 946684800;
-function se(e) {
-  return new Date((e + mt) * 1e3);
+const Pt = 946684800;
+function fe(e) {
+  return new Date((e + Pt) * 1e3);
 }
-const yt = 1048576;
-function bt(e, t) {
+const Ct = 1048576;
+function Lt(e, t) {
   const n = e.map((a) => a.weight).sort((a, r) => r - a);
   let s = 0;
   for (let a = 0; a < n.length; a += 1)
     if (s += n[a], s >= t) return a + 1;
   return 1 / 0;
 }
-async function Oe(e) {
+async function Ke(e) {
   const [t, n, s, a] = await Promise.all([
     b("account_info", { account: e, ledger_index: "validated" }),
     b("server_info").catch(() => ({})),
@@ -617,8 +617,8 @@ async function Oe(e) {
       type: "signer_list",
       ledger_index: "validated",
       limit: 10
-    }).catch((m) => ({
-      __unreadable: m instanceof Error ? m.message : String(m)
+    }).catch((p) => ({
+      __unreadable: p instanceof Error ? p.message : String(p)
     })),
     b("account_objects", {
       account: e,
@@ -626,41 +626,41 @@ async function Oe(e) {
       ledger_index: "validated",
       limit: 200
     }).catch(() => ({}))
-  ]), r = t.account_data ?? {}, o = Number(r.Flags ?? 0), i = n.info?.validated_ledger ?? {}, c = (s.account_objects ?? [])[0], d = (c?.SignerEntries ?? []).map((m) => ({
-    account: String(m.SignerEntry?.Account ?? ""),
-    weight: Number(m.SignerEntry?.SignerWeight ?? 0)
-  })).filter((m) => m.account), h = Number(c?.SignerQuorum ?? 0), f = d.reduce((m, A) => m + A.weight, 0), u = (a.account_objects ?? []).filter((m) => typeof m.Amount == "string").map((m) => ({
-    amountXrp: Number(m.Amount) / 1e6,
-    finishAfter: m.FinishAfter !== void 0 ? se(Number(m.FinishAfter)).toISOString() : void 0,
-    cancelAfter: m.CancelAfter !== void 0 ? se(Number(m.CancelAfter)).toISOString() : void 0,
-    destination: m.Destination ? String(m.Destination) : void 0
-  })), g = Number(r.OwnerCount ?? 0), p = Number(i.reserve_base_xrp ?? 1), y = Number(i.reserve_inc_xrp ?? 0.2);
+  ]), r = t.account_data ?? {}, o = Number(r.Flags ?? 0), i = n.info?.validated_ledger ?? {}, c = (s.account_objects ?? [])[0], d = (c?.SignerEntries ?? []).map((p) => ({
+    account: String(p.SignerEntry?.Account ?? ""),
+    weight: Number(p.SignerEntry?.SignerWeight ?? 0)
+  })).filter((p) => p.account), l = Number(c?.SignerQuorum ?? 0), u = d.reduce((p, T) => p + T.weight, 0), f = (a.account_objects ?? []).filter((p) => typeof p.Amount == "string").map((p) => ({
+    amountXrp: Number(p.Amount) / 1e6,
+    finishAfter: p.FinishAfter !== void 0 ? fe(Number(p.FinishAfter)).toISOString() : void 0,
+    cancelAfter: p.CancelAfter !== void 0 ? fe(Number(p.CancelAfter)).toISOString() : void 0,
+    destination: p.Destination ? String(p.Destination) : void 0
+  })), h = Number(r.OwnerCount ?? 0), m = Number(i.reserve_base_xrp ?? 1), y = Number(i.reserve_inc_xrp ?? 0.2);
   return {
     address: e,
-    masterKeyEnabled: (o & yt) === 0,
+    masterKeyEnabled: (o & Ct) === 0,
     regularKey: r.RegularKey ? String(r.RegularKey) : void 0,
     signers: {
       present: d.length > 0,
       unreadable: s.__unreadable ? String(s.__unreadable) : void 0,
-      quorum: h,
+      quorum: l,
       signers: d,
-      totalWeight: f,
-      minimumSigners: d.length > 0 ? bt(d, h) : 0,
-      unilateralSigners: d.filter((m) => h > 0 && m.weight >= h).map((m) => m.account)
+      totalWeight: u,
+      minimumSigners: d.length > 0 ? Lt(d, l) : 0,
+      unilateralSigners: d.filter((p) => l > 0 && p.weight >= l).map((p) => p.account)
     },
-    ownerCount: g,
-    reserveBaseXrp: p,
+    ownerCount: h,
+    reserveBaseXrp: m,
     reserveIncrementXrp: y,
-    reserveLockedXrp: p + g * y,
+    reserveLockedXrp: m + h * y,
     balanceXrp: Number(r.Balance ?? 0) / 1e6,
-    escrows: u,
-    escrowedXrp: u.reduce((m, A) => m + A.amountXrp, 0),
+    escrows: f,
+    escrowedXrp: f.reduce((p, T) => p + T.amountXrp, 0),
     truncated: !!(a.marker || s.marker),
     ledgerIndex: Number(t.ledger_index ?? 0),
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function wt(e) {
+function Dt(e) {
   const t = [];
   if (e.masterKeyEnabled && !e.signers.present && t.push({
     id: "single-key",
@@ -737,13 +737,13 @@ function wt(e) {
   const s = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((a, r) => s[a.severity] - s[r.severity]);
 }
-const Fe = 946684800, vt = 32570, ae = 10;
-function kt(e, t) {
+const Ye = 946684800, Ht = 32570, pe = 10;
+function qt(e, t) {
   const n = [];
   for (const s of e) {
     const a = s.tx_json ?? s.tx ?? s;
     if (a.Account !== t) continue;
-    const r = Number(s.ledger_index ?? a.ledger_index ?? 0), o = Number(a.date), i = Number.isFinite(o) ? new Date((o + Fe) * 1e3) : void 0;
+    const r = Number(s.ledger_index ?? a.ledger_index ?? 0), o = Number(a.date), i = Number.isFinite(o) ? new Date((o + Ye) * 1e3) : void 0;
     if (a.TransactionType === "SetRegularKey") {
       const c = !!a.RegularKey;
       n.push({
@@ -774,32 +774,32 @@ function kt(e, t) {
   }
   return n.sort((s, a) => s.ledgerIndex - a.ledgerIndex);
 }
-function St(e, t) {
+function Xt(e, t) {
   return e >= t ? e - t : Math.max(0, e - 1);
 }
-async function Tt(e) {
+async function zt(e) {
   let t;
   try {
     t = await b("account_info", { account: e, ledger_index: "validated" });
-  } catch (T) {
-    throw T instanceof v && T.code === "actNotFound" ? new Error(
+  } catch (v) {
+    throw v instanceof A && v.code === "actNotFound" ? new Error(
       "That address is not funded, so no account exists for it yet. An XRPL address only becomes an account once someone sends it enough XRP to meet the reserve — until then it has no history to read."
-    ) : T instanceof v && T.code === "actMalformed" ? new Error("That is not a well-formed XRPL address.") : T;
+    ) : v instanceof A && v.code === "actMalformed" ? new Error("That is not a well-formed XRPL address.") : v;
   }
   const n = t.account_data ?? {}, s = Number(n.Sequence ?? 0);
   let a;
   try {
-    const T = await b("server_info", {}), R = String(T.info?.complete_ledgers ?? ""), P = Number(R.split("-")[0]);
-    Number.isFinite(P) && (a = P);
+    const v = await b("server_info", {}), _ = String(v.info?.complete_ledgers ?? ""), x = Number(_.split("-")[0]);
+    Number.isFinite(x) && (a = x);
   } catch {
   }
   let r;
   const o = [];
   let i = !1, c;
-  for (let T = 0; T < ae; T += 1) {
-    let R;
+  for (let v = 0; v < pe; v += 1) {
+    let _;
     try {
-      R = await b("account_tx", {
+      _ = await b("account_tx", {
         account: e,
         ledger_index_min: -1,
         ledger_index_max: -1,
@@ -809,36 +809,36 @@ async function Tt(e) {
         ...c ? { marker: c } : {}
       });
     } catch {
-      T > 0 && (i = !0);
+      v > 0 && (i = !0);
       break;
     }
-    const P = R.transactions ?? [];
-    if (r || (r = P[0]), o.push(...P), c = R.marker, !c) break;
-    T === ae - 1 && (i = !0);
+    const x = _.transactions ?? [];
+    if (r || (r = x[0]), o.push(...x), c = _.marker, !c) break;
+    v === pe - 1 && (i = !0);
   }
-  const d = r?.tx_json ?? r?.tx ?? {}, h = Number(r?.ledger_index ?? d.ledger_index ?? 0) || void 0, f = Number(d.date), l = Number.isFinite(f) ? new Date((f + Fe) * 1e3) : void 0, u = d.TransactionType ? String(d.TransactionType) : void 0, g = u === "Payment" && d.Destination === e && d.Account !== e, p = g ? String(d.Account) : void 0, y = d.Amount ?? d.DeliverMax, m = g && typeof y == "string" ? Number(y) / 1e6 : void 0, A = h === void 0 ? void 0 : St(s, h), w = h !== void 0 && a !== void 0 && a > vt && h <= a, F = l ? Math.floor((Date.now() - l.getTime()) / 864e5) : void 0;
+  const d = r?.tx_json ?? r?.tx ?? {}, l = Number(r?.ledger_index ?? d.ledger_index ?? 0) || void 0, u = Number(d.date), g = Number.isFinite(u) ? new Date((u + Ye) * 1e3) : void 0, f = d.TransactionType ? String(d.TransactionType) : void 0, h = f === "Payment" && d.Destination === e && d.Account !== e, m = h ? String(d.Account) : void 0, y = d.Amount ?? d.DeliverMax, p = h && typeof y == "string" ? Number(y) / 1e6 : void 0, T = l === void 0 ? void 0 : Xt(s, l), w = l !== void 0 && a !== void 0 && a > Ht && l <= a, k = g ? Math.floor((Date.now() - g.getTime()) / 864e5) : void 0;
   return {
     address: e,
     balanceXrp: Number(n.Balance ?? 0) / 1e6,
     ownerCount: Number(n.OwnerCount ?? 0),
     sequence: s,
-    originLedger: h,
-    originDate: l,
-    fundedBy: p,
-    fundingAmountXrp: m,
-    originType: u,
-    approxSentCount: A,
+    originLedger: l,
+    originDate: g,
+    fundedBy: m,
+    fundingAmountXrp: p,
+    originType: f,
+    approxSentCount: T,
     historyIncomplete: w,
     nodeHistoryFrom: a,
-    ageDays: F,
+    ageDays: k,
     lastActivityLedger: Number(n.PreviousTxnLgrSeq ?? 0) || void 0,
-    controlEvents: kt(o, e),
+    controlEvents: qt(o, e),
     controlHistoryPartial: i,
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const At = 30, $t = 365;
-function _t(e) {
+const Ut = 30, Mt = 365;
+function jt(e) {
   const t = [];
   if (e.historyIncomplete ? t.push({
     id: "history-incomplete",
@@ -846,13 +846,13 @@ function _t(e) {
     title: "This account may be older than it appears",
     detail: `The earliest transaction found sits at ledger ${e.originLedger?.toLocaleString()}, which is the edge of what this node retains (from ${e.nodeHistoryFrom?.toLocaleString()}). Anything before that is not missing from the ledger, only from this node — so the age below is a floor, not a measurement.`,
     action: "Query a full-history node before treating the age as established."
-  }) : e.originDate && e.ageDays !== void 0 && (e.ageDays < At ? t.push({
+  }) : e.originDate && e.ageDays !== void 0 && (e.ageDays < Ut ? t.push({
     id: "young-account",
     severity: "warn",
     title: `This account is ${e.ageDays} day${e.ageDays === 1 ? "" : "s"} old`,
     detail: `First seen ${e.originDate.toISOString().slice(0, 10)}. An account this new has no track record — nothing about its history can corroborate or contradict what its operator tells you.`,
     action: "Weight the counterparty's off-ledger identity accordingly."
-  }) : e.ageDays >= $t ? t.push({
+  }) : e.ageDays >= Mt ? t.push({
     id: "established",
     severity: "ok",
     title: `Continuously on the ledger for ${(e.ageDays / 365).toFixed(1)} years`,
@@ -915,22 +915,22 @@ function _t(e) {
   const n = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((s, a) => n[s.severity] - n[a.severity]);
 }
-const xt = 946684800, Nt = 0.5, It = 0.25, q = (e) => typeof e == "string" ? Number(e) / 1e6 : e && typeof e == "object" ? Number(e.value ?? 0) : 0;
-function ie(e, t, n) {
+const Bt = 946684800, Wt = 0.5, Gt = 0.25, W = (e) => typeof e == "string" ? Number(e) / 1e6 : e && typeof e == "object" ? Number(e.value ?? 0) : 0;
+function me(e, t, n) {
   const s = [];
   for (const o of e) {
-    const i = q(o.TakerGets), c = q(o.TakerPays);
+    const i = W(o.TakerGets), c = W(o.TakerPays);
     if (i <= 0 || c <= 0) continue;
-    const d = o.taker_gets_funded !== void 0 ? q(o.taker_gets_funded) : i, h = o.taker_pays_funded !== void 0 ? q(o.taker_pays_funded) : c, f = n ? i / c : c / i;
-    if (!Number.isFinite(f) || f <= 0) continue;
-    const l = n ? c : i, u = n ? h : d, g = Number.isFinite(u) ? Math.max(0, Math.min(u, l)) : 0, p = o.Expiration !== void 0 && Number(o.Expiration) < t;
+    const d = o.taker_gets_funded !== void 0 ? W(o.taker_gets_funded) : i, l = o.taker_pays_funded !== void 0 ? W(o.taker_pays_funded) : c, u = n ? i / c : c / i;
+    if (!Number.isFinite(u) || u <= 0) continue;
+    const g = n ? c : i, f = n ? l : d, h = Number.isFinite(f) ? Math.max(0, Math.min(f, g)) : 0, m = o.Expiration !== void 0 && Number(o.Expiration) < t;
     s.push({
       account: String(o.Account ?? ""),
-      listed: l,
-      fundable: p ? 0 : g,
-      price: f,
-      dead: p || g <= 0,
-      expired: p
+      listed: g,
+      fundable: m ? 0 : h,
+      price: u,
+      dead: m || h <= 0,
+      expired: m
     });
   }
   s.sort((o, i) => n ? i.price - o.price : o.price - i.price);
@@ -944,7 +944,7 @@ function ie(e, t, n) {
     bestPrice: s.find((o) => !o.dead)?.price
   };
 }
-async function Ot(e, t, n = 100) {
+async function Kt(e, t, n = 100) {
   const s = { currency: e, issuer: t }, [a, r, o] = await Promise.all([
     // Bids: someone paying XRP to receive the issued asset.
     b("book_offers", {
@@ -961,25 +961,25 @@ async function Ot(e, t, n = 100) {
       limit: n
     }),
     b("ledger", { ledger_index: "validated" })
-  ]), i = Number(o.ledger?.close_time ?? 0), c = ie(a.offers ?? [], i, !0), d = ie(r.offers ?? [], i, !1), h = /* @__PURE__ */ new Map();
-  for (const u of [...c.offers, ...d.offers])
-    h.set(u.account, (h.get(u.account) ?? 0) + u.listed);
-  const f = c.listedDepth + d.listedDepth, l = [...h.entries()].sort((u, g) => g[1] - u[1]);
+  ]), i = Number(o.ledger?.close_time ?? 0), c = me(a.offers ?? [], i, !0), d = me(r.offers ?? [], i, !1), l = /* @__PURE__ */ new Map();
+  for (const f of [...c.offers, ...d.offers])
+    l.set(f.account, (l.get(f.account) ?? 0) + f.listed);
+  const u = c.listedDepth + d.listedDepth, g = [...l.entries()].sort((f, h) => h[1] - f[1]);
   return {
     pair: `${e}/XRP`,
     currency: e,
     issuer: t,
     bids: c,
     asks: d,
-    makers: h.size,
-    topMakerShare: f > 0 && l[0] ? l[0][1] / f : 0,
-    topMaker: l[0]?.[0],
+    makers: l.size,
+    topMakerShare: u > 0 && g[0] ? g[0][1] / u : 0,
+    topMaker: g[0]?.[0],
     ledgerIndex: Number(o.ledger_index ?? o.ledger?.ledger_index ?? 0),
-    ledgerCloseTime: new Date((i + xt) * 1e3),
+    ledgerCloseTime: new Date((i + Bt) * 1e3),
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function Ft(e) {
+function Yt(e) {
   const t = [], n = (c) => `${(c * 100).toFixed(1)}%`, s = (c) => c.toLocaleString(void 0, { maximumFractionDigits: 2 });
   for (const [c, d] of [
     ["Asks", e.asks],
@@ -994,11 +994,11 @@ function Ft(e) {
       });
       continue;
     }
-    const h = 1 - d.fundedRatio;
-    d.fundedRatio < Nt ? t.push({
+    const l = 1 - d.fundedRatio;
+    d.fundedRatio < Wt ? t.push({
       id: `phantom-${c}`,
-      severity: h > 0.9 ? "critical" : "warn",
-      title: `${n(h)} of ${c.toLowerCase()} depth cannot fill`,
+      severity: l > 0.9 ? "critical" : "warn",
+      title: `${n(l)} of ${c.toLowerCase()} depth cannot fill`,
       detail: `The book advertises ${s(d.listedDepth)} but only ${s(d.fundableDepth)} is backed by an owner who still holds it. ${d.deadOffers} of ${d.offers.length} offers can deliver nothing at all. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it.`,
       action: "Size against the fundable figure. The advertised depth is what you would be quoted and not what you would receive."
     }) : t.push({
@@ -1008,7 +1008,7 @@ function Ft(e) {
       detail: `${s(d.fundableDepth)} of ${s(d.listedDepth)} advertised is backed by owners who still hold it.`
     });
   }
-  e.topMakerShare >= It && e.topMaker && t.push({
+  e.topMakerShare >= Gt && e.topMaker && t.push({
     id: "maker-concentration",
     severity: e.topMakerShare >= 0.5 ? "warn" : "info",
     title: `One account rests ${n(e.topMakerShare)} of the quoted depth`,
@@ -1043,8 +1043,8 @@ function Ft(e) {
   const i = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((c, d) => i[c.severity] - i[d.severity]);
 }
-const Et = 131072;
-function re(e) {
+const Vt = 131072;
+function ye(e) {
   if (typeof e == "string") {
     const t = Number(e);
     return Number.isFinite(t) ? { kind: "xrp", drops: t, value: t / 1e6 } : void 0;
@@ -1059,7 +1059,7 @@ function re(e) {
     } : void 0;
   }
 }
-function z(e) {
+function G(e) {
   if (e.kind === "xrp")
     return `${e.value.toLocaleString(void 0, { maximumFractionDigits: 6 })} XRP`;
   let t = e.currency;
@@ -1069,24 +1069,24 @@ function z(e) {
   }
   return `${e.value.toLocaleString(void 0, { maximumFractionDigits: 10 })} ${t}`;
 }
-function Rt(e, t) {
+function Jt(e, t) {
   return e.kind !== t.kind ? !1 : e.kind === "xrp" ? !0 : e.currency === t.currency && e.issuer === t.issuer;
 }
-async function Pt(e) {
+async function Qt(e) {
   let t;
   try {
     t = await b("tx", { transaction: e.trim() });
   } catch (n) {
-    throw n instanceof v && n.code === "txnNotFound" ? new Error(
+    throw n instanceof A && n.code === "txnNotFound" ? new Error(
       "No transaction with that hash is in this node's history. It may never have existed, or the node may not retain ledgers that far back."
     ) : n;
   }
-  return Lt(t, e);
+  return Zt(t, e);
 }
-function Lt(e, t = "") {
-  const n = e.tx_json ?? e, s = e.meta ?? e.metaData ?? {}, a = String(n.TransactionType ?? "unknown"), r = String(s.TransactionResult ?? "unknown"), o = Number(n.Flags ?? 0), i = a === "Payment" ? re(n.DeliverMax ?? n.Amount) : void 0, c = s.delivered_amount ?? s.DeliveredAmount, d = c === "unavailable", h = d ? void 0 : re(c);
-  let f;
-  return i && h && Rt(i, h) && i.value > 0 && (f = h.value / i.value), {
+function Zt(e, t = "") {
+  const n = e.tx_json ?? e, s = e.meta ?? e.metaData ?? {}, a = String(n.TransactionType ?? "unknown"), r = String(s.TransactionResult ?? "unknown"), o = Number(n.Flags ?? 0), i = a === "Payment" ? ye(n.DeliverMax ?? n.Amount) : void 0, c = s.delivered_amount ?? s.DeliveredAmount, d = c === "unavailable", l = d ? void 0 : ye(c);
+  let u;
+  return i && l && Jt(i, l) && i.value > 0 && (u = l.value / i.value), {
     hash: String(n.hash ?? e.hash ?? t),
     validated: e.validated === !0,
     transactionType: a,
@@ -1097,15 +1097,15 @@ function Lt(e, t = "") {
     ledgerIndex: Number(e.ledger_index ?? n.ledger_index ?? 0) || void 0,
     feeDrops: Number(n.Fee ?? 0),
     requested: i,
-    delivered: h,
+    delivered: l,
     deliveredUnavailable: d,
-    partialFlagSet: (o & Et) !== 0,
-    deliveredFraction: f,
+    partialFlagSet: (o & Vt) !== 0,
+    deliveredFraction: u,
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const oe = 0.999999;
-function Ct(e) {
+const we = 0.999999;
+function en(e) {
   const t = [];
   if (e.validated || t.push({
     id: "not-validated",
@@ -1137,24 +1137,24 @@ function Ct(e) {
       action: "Reconstruct the movement from the affected balances in the metadata before crediting anything."
     }), t;
   if (e.partialFlagSet) {
-    const s = e.deliveredFraction, a = s !== void 0 && s < oe ? 1 / Math.max(s, Number.MIN_VALUE) : void 0;
-    s !== void 0 && s < oe ? t.push({
+    const s = e.deliveredFraction, a = s !== void 0 && s < we ? 1 / Math.max(s, Number.MIN_VALUE) : void 0;
+    s !== void 0 && s < we ? t.push({
       id: "partial-shortfall",
       severity: "critical",
       title: `Only ${(s * 100).toFixed(4)}% of the requested amount arrived`,
-      detail: `This payment is flagged tfPartialPayment and returned ${e.result}. It asked to deliver ${e.requested ? z(e.requested) : "—"} and actually delivered ${e.delivered ? z(e.delivered) : "—"}. Any system that credits the requested figure over-credits by roughly ${a && Number.isFinite(a) ? `${a.toFixed(0)}x` : "an unbounded factor"}.`,
+      detail: `This payment is flagged tfPartialPayment and returned ${e.result}. It asked to deliver ${e.requested ? G(e.requested) : "—"} and actually delivered ${e.delivered ? G(e.delivered) : "—"}. Any system that credits the requested figure over-credits by roughly ${a && Number.isFinite(a) ? `${a.toFixed(0)}x` : "an unbounded factor"}.`,
       action: "Credit delivered_amount. The success code and the requested amount are both true and both irrelevant to what you received."
     }) : t.push({
       id: "partial-full",
       severity: "warn",
       title: "Partial payment permitted, but it delivered in full",
-      detail: `The sender set tfPartialPayment, which allows the ledger to deliver less than requested. This time it delivered ${e.delivered ? z(e.delivered) : "—"}, the full requested amount. The flag is a property of the sender's instruction, not of this outcome.`,
+      detail: `The sender set tfPartialPayment, which allows the ledger to deliver less than requested. This time it delivered ${e.delivered ? G(e.delivered) : "—"}, the full requested amount. The flag is a property of the sender's instruction, not of this outcome.`,
       action: "The same sender can send less next time under the same flag. Read delivered_amount every time."
     });
   } else e.delivered && t.push({
     id: "settled",
     severity: "ok",
-    title: `Settled in full — ${z(e.delivered)}`,
+    title: `Settled in full — ${G(e.delivered)}`,
     detail: `The payment is validated, returned ${e.result}, and is not flagged for partial delivery. The requested and delivered amounts agree.`
   });
   e.destination && e.destination === e.account && t.push({
@@ -1166,15 +1166,15 @@ function Ct(e) {
   const n = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((s, a) => n[s.severity] - n[a.severity]);
 }
-const ce = 1e5, j = 1e3, Ee = 946684800;
-function Ht(e) {
+const be = 1e5, Z = 1e3, Ve = 946684800;
+function tn(e) {
   if (typeof e == "number" && Number.isFinite(e))
-    return new Date((e + Ee) * 1e3);
+    return new Date((e + Ve) * 1e3);
   if (typeof e != "string" || e.length === 0) return null;
   const t = e.replace(/([+-]\d{2})(\d{2})$/, "$1:$2"), n = new Date(t);
   return Number.isNaN(n.getTime()) ? null : n;
 }
-function de(e) {
+function ve(e) {
   if (!e || typeof e != "object") return "XRP";
   const n = String(e.currency ?? "XRP");
   if (n === "XRP") return "XRP";
@@ -1184,7 +1184,7 @@ function de(e) {
   }
   return n;
 }
-async function Dt(e) {
+async function nn(e) {
   const t = "No AMM exists at that address. An AMM account is created by the protocol when a pool is opened — it is not an ordinary wallet, and a wallet address will not resolve here.";
   let n, s;
   try {
@@ -1195,36 +1195,36 @@ async function Dt(e) {
       }),
       b("ledger", { ledger_index: "validated" })
     ]);
-  } catch (l) {
-    throw l instanceof v && (l.code === "actNotFound" || l.code === "actMalformed") ? new Error(t) : l;
+  } catch (g) {
+    throw g instanceof A && (g.code === "actNotFound" || g.code === "actMalformed") ? new Error(t) : g;
   }
   if (!n.amm) throw new Error(t);
-  const a = n.amm, r = Number(s.ledger?.close_time ?? 0), o = new Date((r + Ee) * 1e3), i = a.vote_slots ?? [], c = i.reduce((l, u) => l + Number(u.vote_weight ?? 0), 0), d = i.map((l) => ({
-    account: String(l.account ?? ""),
-    votedFeePct: Number(l.trading_fee ?? 0) / j,
-    weightOfSupply: Number(l.vote_weight ?? 0) / ce,
-    weightOfCast: c > 0 ? Number(l.vote_weight ?? 0) / c : 0
-  })).sort((l, u) => u.weightOfSupply - l.weightOfSupply);
-  let h;
-  const f = a.auction_slot;
-  if (f?.account) {
-    const l = Ht(f.expiration);
-    l && (h = {
-      holder: String(f.account),
-      discountedFeePct: Number(f.discounted_fee ?? 0) / j,
-      expiresAt: l,
-      expired: l.getTime() < o.getTime(),
-      pricePaid: Number(f.price?.value ?? 0),
-      authAccounts: (f.auth_accounts ?? []).map((u) => String(u.account ?? "")).filter(Boolean)
+  const a = n.amm, r = Number(s.ledger?.close_time ?? 0), o = new Date((r + Ve) * 1e3), i = a.vote_slots ?? [], c = i.reduce((g, f) => g + Number(f.vote_weight ?? 0), 0), d = i.map((g) => ({
+    account: String(g.account ?? ""),
+    votedFeePct: Number(g.trading_fee ?? 0) / Z,
+    weightOfSupply: Number(g.vote_weight ?? 0) / be,
+    weightOfCast: c > 0 ? Number(g.vote_weight ?? 0) / c : 0
+  })).sort((g, f) => f.weightOfSupply - g.weightOfSupply);
+  let l;
+  const u = a.auction_slot;
+  if (u?.account) {
+    const g = tn(u.expiration);
+    g && (l = {
+      holder: String(u.account),
+      discountedFeePct: Number(u.discounted_fee ?? 0) / Z,
+      expiresAt: g,
+      expired: g.getTime() < o.getTime(),
+      pricePaid: Number(u.price?.value ?? 0),
+      authAccounts: (u.auth_accounts ?? []).map((f) => String(f.account ?? "")).filter(Boolean)
     });
   }
   return {
     account: String(a.account ?? ""),
-    pair: `${de(a.amount)} / ${de(a.amount2)}`,
-    tradingFeePct: Number(a.trading_fee ?? 0) / j,
-    participation: c / ce,
+    pair: `${ve(a.amount)} / ${ve(a.amount2)}`,
+    tradingFeePct: Number(a.trading_fee ?? 0) / Z,
+    participation: c / be,
     votes: d,
-    auction: h,
+    auction: l,
     lpTokenSupply: Number(a.lp_token?.value ?? 0),
     // Preserved as undefined for XRP: absent means inapplicable, not false.
     assetFrozen: typeof a.asset_frozen == "boolean" ? a.asset_frozen : void 0,
@@ -1234,8 +1234,8 @@ async function Dt(e) {
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const qt = 0.1, zt = 0.5;
-function Xt(e) {
+const sn = 0.1, an = 0.5;
+function rn(e) {
   const t = [], n = (r) => `${(r * 100).toFixed(2)}%`, s = e.votes[0];
   if (e.votes.length === 0 ? t.push({
     id: "no-votes",
@@ -1243,7 +1243,7 @@ function Xt(e) {
     title: "Nobody is voting on this pool's fee",
     detail: `All eight vote slots are empty, so the trading fee sits at ${e.tradingFeePct.toFixed(3)}% by default. The first liquidity provider to cast a vote sets it, at whatever weight they hold.`,
     action: "If you hold LP tokens here, your vote is currently unopposed."
-  }) : s && s.weightOfCast >= zt ? t.push({
+  }) : s && s.weightOfCast >= an ? t.push({
     id: "vote-capture",
     severity: s.weightOfCast >= 0.99 ? "critical" : "warn",
     title: `One account controls ${n(s.weightOfCast)} of the votes cast`,
@@ -1254,7 +1254,7 @@ function Xt(e) {
     severity: "ok",
     title: `Fee votes are spread across ${e.votes.length} providers`,
     detail: `The largest single voter carries ${n(s?.weightOfCast ?? 0)} of weight cast. No one account can move the fee alone.`
-  }), e.participation < qt && e.votes.length > 0 && t.push({
+  }), e.participation < sn && e.votes.length > 0 && t.push({
     id: "thin-participation",
     severity: "warn",
     title: `The fee is set by ${n(e.participation)} of the liquidity`,
@@ -1301,69 +1301,69 @@ function Xt(e) {
   const a = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((r, o) => a[r.severity] - a[o.severity]);
 }
-const le = 250, Ut = 400, Mt = 262144, jt = 4194304, Bt = 2097152;
-function Wt(e) {
+const ke = 250, on = 400, cn = 262144, dn = 4194304, ln = 2097152;
+function un(e) {
   const t = e.reduce((n, s) => n + s, 0);
   return t <= 0 ? 0 : e.reduce((n, s) => n + (s / t * 100) ** 2, 0);
 }
-async function Re(e, t) {
+async function Je(e, t) {
   const [n, s] = await Promise.all([
     b("account_info", { account: e, ledger_index: "validated" }),
     b("gateway_balances", { account: e, ledger_index: "validated" })
   ]), a = n.account_data ?? {}, r = Number(a.Flags ?? 0), o = {};
-  for (const [u, g] of Object.entries(
+  for (const [f, h] of Object.entries(
     s.obligations ?? {}
   )) {
-    const p = Number(g);
-    Number.isFinite(p) && (o[u] = p);
+    const m = Number(h);
+    Number.isFinite(m) && (o[f] = m);
   }
   const i = [];
-  let c, d = 0, h = !1, f;
-  for (; d < le; ) {
-    let u;
+  let c, d = 0, l = !1, u;
+  for (; d < ke; ) {
+    let f;
     try {
-      u = await b("account_lines", {
+      f = await b("account_lines", {
         account: e,
         ledger_index: "validated",
-        limit: Ut,
+        limit: on,
         ...c ? { marker: c } : {}
       });
-    } catch (g) {
-      if (d === 0) throw g;
-      f = g instanceof Error ? g.message : "the walk was interrupted", h = !0;
+    } catch (h) {
+      if (d === 0) throw h;
+      u = h instanceof Error ? h.message : "the walk was interrupted", l = !0;
       break;
     }
-    for (const g of u.lines ?? [])
+    for (const h of f.lines ?? [])
       i.push({
-        account: String(g.account ?? ""),
-        currency: String(g.currency ?? ""),
+        account: String(h.account ?? ""),
+        currency: String(h.currency ?? ""),
         // From the issuer's side a holder's balance is reported negative.
-        held: Math.abs(Number(g.balance ?? 0)),
-        limit: Number(g.limit_peer ?? g.limit ?? 0),
+        held: Math.abs(Number(h.balance ?? 0)),
+        limit: Number(h.limit_peer ?? h.limit ?? 0),
         // Present-and-true, never absent-means-false.
-        frozenByIssuer: g.freeze === !0,
-        authorized: g.authorized === !0
+        frozenByIssuer: h.freeze === !0,
+        authorized: h.authorized === !0
       });
-    if (c = u.marker, d += 1, !c) break;
-    d >= le && (h = !0);
+    if (c = f.marker, d += 1, !c) break;
+    d >= ke && (l = !0);
   }
-  const l = Object.keys(o).map((u) => {
-    const g = i.filter((w) => w.currency === u), p = g.filter((w) => w.held > 0).sort((w, F) => F.held - w.held), y = p.map((w) => w.held), m = y.reduce((w, F) => w + F, 0), A = o[u];
+  const g = Object.keys(o).map((f) => {
+    const h = i.filter((w) => w.currency === f), m = h.filter((w) => w.held > 0).sort((w, k) => k.held - w.held), y = m.map((w) => w.held), p = y.reduce((w, k) => w + k, 0), T = o[f];
     return {
-      currency: u,
-      outstanding: A,
-      observedHeld: m,
-      holders: g.length,
-      activeHolders: p.length,
-      hhi: Wt(y),
-      topHolderPct: m > 0 ? (y[0] ?? 0) / m : 0,
-      topFivePct: m > 0 ? y.slice(0, 5).reduce((w, F) => w + F, 0) / m : 0,
-      frozenSeen: g.filter((w) => w.frozenByIssuer).length,
-      authorizedSeen: g.filter((w) => w.authorized).length,
-      coverage: A > 0 ? m / A : 0,
-      top: p.slice(0, 10)
+      currency: f,
+      outstanding: T,
+      observedHeld: p,
+      holders: h.length,
+      activeHolders: m.length,
+      hhi: un(y),
+      topHolderPct: p > 0 ? (y[0] ?? 0) / p : 0,
+      topFivePct: p > 0 ? y.slice(0, 5).reduce((w, k) => w + k, 0) / p : 0,
+      frozenSeen: h.filter((w) => w.frozenByIssuer).length,
+      authorizedSeen: h.filter((w) => w.authorized).length,
+      coverage: T > 0 ? p / T : 0,
+      top: m.slice(0, 10)
     };
-  }).sort((u, g) => g.outstanding - u.outstanding);
+  }).sort((f, h) => h.outstanding - f.outstanding);
   return {
     issuer: e,
     domain: a.Domain ? (() => {
@@ -1375,19 +1375,19 @@ async function Re(e, t) {
         return;
       }
     })() : void 0,
-    currencies: l,
+    currencies: g,
     linesWalked: i.length,
-    truncated: h,
-    walkError: f,
-    requiresAuth: (r & Mt) !== 0,
-    canFreeze: (r & Bt) === 0,
-    globalFreeze: (r & jt) !== 0,
+    truncated: l,
+    walkError: u,
+    requiresAuth: (r & cn) !== 0,
+    canFreeze: (r & ln) === 0,
+    globalFreeze: (r & dn) !== 0,
     ledgerIndex: Number(n.ledger_index ?? 0),
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const Gt = 2500, ue = 0.95;
-function Kt(e) {
+const hn = 2500, Se = 0.95;
+function gn(e) {
   const t = [];
   e.walkError ? t.push({
     id: "walk-error",
@@ -1404,13 +1404,13 @@ function Kt(e) {
   });
   for (const s of e.currencies) {
     if (s.outstanding <= 0) continue;
-    s.coverage < ue && t.push({
+    s.coverage < Se && t.push({
       id: `coverage-${s.currency}`,
       severity: "warn",
       title: `${s.currency}: holder lines account for only ${(s.coverage * 100).toFixed(1)}% of supply`,
       detail: `gateway_balances reports ${s.outstanding.toLocaleString(void 0, { maximumFractionDigits: 2 })} outstanding, but the holder lines read sum to ${s.observedHeld.toLocaleString(void 0, { maximumFractionDigits: 2 })}. Those come from different commands and should agree, so the gap is holders this walk did not see.`,
       action: "Trust the outstanding figure; treat the holder breakdown as incomplete."
-    }), s.coverage >= ue ? s.hhi >= Gt ? t.push({
+    }), s.coverage >= Se ? s.hhi >= hn ? t.push({
       id: `hhi-${s.currency}`,
       severity: s.hhi >= 5e3 ? "critical" : "warn",
       title: `${s.currency}: holdings are highly concentrated (HHI ${Math.round(s.hhi).toLocaleString()})`,
@@ -1466,7 +1466,7 @@ function Kt(e) {
   const n = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((s, a) => n[s.severity] - n[a.severity]);
 }
-const Yt = /* @__PURE__ */ new Set([
+const fn = /* @__PURE__ */ new Set([
   "USDT",
   "USDC",
   "USD",
@@ -1479,16 +1479,16 @@ const Yt = /* @__PURE__ */ new Set([
   "GBP",
   "TUSD",
   "BUSD"
-]), Vt = 946684800;
-function Jt(e) {
+]), pn = 946684800;
+function mn(e) {
   if (!/^([0-9A-F]{2})+$/i.test(e)) return e;
   const t = (e.match(/../g) ?? []).map((n) => String.fromCharCode(parseInt(n, 16))).join("").replace(/\0+$/, "").trim();
   return t && /^[\x20-\x7E]+$/.test(t) ? t : e;
 }
-function he(e) {
-  return e.kind === "xrp" ? `${e.value.toLocaleString(void 0, { maximumFractionDigits: 6 })} XRP` : `${e.value.toLocaleString(void 0, { maximumFractionDigits: 6 })} ${O(e.currency)}`;
+function Te(e) {
+  return e.kind === "xrp" ? `${e.value.toLocaleString(void 0, { maximumFractionDigits: 6 })} XRP` : `${e.value.toLocaleString(void 0, { maximumFractionDigits: 6 })} ${P(e.currency)}`;
 }
-async function Qt(e) {
+async function yn(e) {
   let t;
   try {
     t = await b("account_objects", {
@@ -1498,7 +1498,7 @@ async function Qt(e) {
       limit: 200
     });
   } catch (r) {
-    throw r instanceof v && r.code === "actNotFound" ? new Error(
+    throw r instanceof A && r.code === "actNotFound" ? new Error(
       "That address is not funded, so it has no account and nothing can be addressed to it yet."
     ) : r;
   }
@@ -1512,34 +1512,34 @@ async function Qt(e) {
         const [c, d] = await Promise.all([
           b("gateway_balances", { account: o.issuer, ledger_index: "validated" }),
           b("account_info", { account: o.issuer, ledger_index: "validated" })
-        ]), h = Number((c.obligations ?? {})[o.currency] ?? 0), f = d.account_data?.Domain;
+        ]), l = Number((c.obligations ?? {})[o.currency] ?? 0), u = d.account_data?.Domain;
         a.set(i, {
-          obligations: Number.isFinite(h) ? h : 0,
-          domain: f ? Jt(String(f)) : void 0
+          obligations: Number.isFinite(l) ? l : 0,
+          domain: u ? mn(String(u)) : void 0
         });
       } catch {
       }
   }
-  return Zt(e, n, a, Number(t.ledger_index ?? 0));
+  return wn(e, n, a, Number(t.ledger_index ?? 0));
 }
-function Zt(e, t, n, s) {
+function wn(e, t, n, s) {
   const a = t.filter((o) => o.Destination === e), r = a.map((o) => {
     const i = o.SendMax, c = typeof i == "object" && i !== null, d = c ? {
       kind: "iou",
       currency: String(i.currency ?? ""),
       issuer: String(i.issuer ?? ""),
       value: Number(i.value ?? 0)
-    } : { kind: "xrp", value: Number(i ?? 0) / 1e6 }, h = c ? `${i.issuer}|${i.currency}` : "", f = n.get(h), l = c ? O(String(i.currency ?? "")) : "XRP";
+    } : { kind: "xrp", value: Number(i ?? 0) / 1e6 }, l = c ? `${i.issuer}|${i.currency}` : "", u = n.get(l), g = c ? P(String(i.currency ?? "")) : "XRP";
     return {
       index: String(o.index ?? ""),
       from: String(o.Account ?? ""),
       amount: d,
       destinationTag: o.DestinationTag !== void 0 ? Number(o.DestinationTag) : void 0,
-      expiration: o.Expiration !== void 0 ? new Date((Number(o.Expiration) + Vt) * 1e3) : void 0,
-      issuerObligations: f?.obligations,
-      issuerOwesNothing: f !== void 0 && f.obligations === 0,
-      borrowedTicker: c && Yt.has(l.toUpperCase()),
-      issuerDomain: f?.domain
+      expiration: o.Expiration !== void 0 ? new Date((Number(o.Expiration) + pn) * 1e3) : void 0,
+      issuerObligations: u?.obligations,
+      issuerOwesNothing: u !== void 0 && u.obligations === 0,
+      borrowedTicker: c && fn.has(g.toUpperCase()),
+      issuerDomain: u?.domain
     };
   });
   return {
@@ -1550,7 +1550,7 @@ function Zt(e, t, n, s) {
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function en(e) {
+function bn(e) {
   const t = [];
   if (e.inbound.length === 0)
     return t.push({
@@ -1561,18 +1561,18 @@ function en(e) {
     }), t;
   const n = e.inbound.filter((i) => i.borrowedTicker && i.issuerOwesNothing);
   for (const i of n) {
-    const c = i.amount.kind === "iou" ? O(i.amount.currency) : "XRP";
+    const c = i.amount.kind === "iou" ? P(i.amount.currency) : "XRP";
     t.push({
       id: `impersonation-${i.index.slice(0, 12)}`,
       severity: "critical",
-      title: `A claim for ${he(i.amount)} that cannot be cashed for anything`,
-      detail: `${i.from} has addressed a check for ${he(i.amount)} to this account. A currency code is not a name anyone owns — any account can issue a token called ${c}, and the ledger renders them identically. This one's issuer has NO obligations outstanding at all, meaning it has never issued a balance to anyone, so there is nothing this check could pay out.${i.issuerDomain ? ` The issuer publishes the domain ${i.issuerDomain}.` : ""}`,
+      title: `A claim for ${Te(i.amount)} that cannot be cashed for anything`,
+      detail: `${i.from} has addressed a check for ${Te(i.amount)} to this account. A currency code is not a name anyone owns — any account can issue a token called ${c}, and the ledger renders them identically. This one's issuer has NO obligations outstanding at all, meaning it has never issued a balance to anyone, so there is nothing this check could pay out.${i.issuerDomain ? ` The issuer publishes the domain ${i.issuerDomain}.` : ""}`,
       action: "Do not visit any domain associated with it and do not enter a wallet key anywhere it leads. The check itself is inert — it cannot move your funds, and ignoring it costs you nothing."
     });
   }
   const s = e.inbound.filter((i) => i.borrowedTicker && !i.issuerOwesNothing);
   for (const i of s) {
-    const c = i.amount.kind === "iou" ? O(i.amount.currency) : "XRP";
+    const c = i.amount.kind === "iou" ? P(i.amount.currency) : "XRP";
     t.push({
       id: `ticker-${i.index.slice(0, 12)}`,
       severity: "warn",
@@ -1607,35 +1607,35 @@ function en(e) {
   const o = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((i, c) => o[i.severity] - o[c.severity]);
 }
-const tn = 1, nn = 2, sn = 8, an = 16, rn = 5, fe = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
-function on(e) {
+const vn = 1, kn = 2, Sn = 8, Tn = 16, $n = 5, $e = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
+function An(e) {
   let t = 0n;
   for (const s of e) t = t << 8n | BigInt(s);
   let n = "";
   for (; t > 0n; )
-    n = fe[Number(t % 58n)] + n, t /= 58n;
+    n = $e[Number(t % 58n)] + n, t /= 58n;
   for (const s of e) {
     if (s !== 0) break;
-    n = fe[0] + n;
+    n = $e[0] + n;
   }
   return n;
 }
-async function ge(e) {
+async function Ae(e) {
   return new Uint8Array(await crypto.subtle.digest("SHA-256", e));
 }
-function cn(e) {
+function _n(e) {
   const t = new Uint8Array(e.length / 2);
   for (let n = 0; n < t.length; n += 1)
     t[n] = parseInt(e.slice(n * 2, n * 2 + 2), 16);
   return t;
 }
-async function dn(e) {
+async function xn(e) {
   const t = new Uint8Array(21);
-  t[0] = 0, t.set(cn(e), 1);
-  const n = (await ge(await ge(t))).slice(0, 4), s = new Uint8Array(25);
-  return s.set(t, 0), s.set(n, 21), on(s);
+  t[0] = 0, t.set(_n(e), 1);
+  const n = (await Ae(await Ae(t))).slice(0, 4), s = new Uint8Array(25);
+  return s.set(t, 0), s.set(n, 21), An(s);
 }
-async function ln(e) {
+async function Nn(e) {
   const t = e.trim().toUpperCase();
   if (!/^[0-9A-F]{64}$/.test(t))
     throw new Error(
@@ -1644,18 +1644,18 @@ async function ln(e) {
   const n = parseInt(t.slice(0, 4), 16), s = parseInt(t.slice(4, 8), 16);
   return {
     tokenId: t,
-    issuer: await dn(t.slice(8, 48)),
-    burnable: (n & tn) !== 0,
-    mutable: (n & an) !== 0,
-    transferable: (n & sn) !== 0,
-    onlyXrp: (n & nn) !== 0,
+    issuer: await xn(t.slice(8, 48)),
+    burnable: (n & vn) !== 0,
+    mutable: (n & Tn) !== 0,
+    transferable: (n & Sn) !== 0,
+    onlyXrp: (n & kn) !== 0,
     // TransferFee is in units of 0.001%, so 5000 is 5%.
     transferFeePct: s / 1e3,
     taxon: parseInt(t.slice(48, 56), 16),
     sequence: parseInt(t.slice(56, 64), 16)
   };
 }
-function un(e) {
+function In(e) {
   return Array.isArray(e) ? e.map((t) => ({
     index: String(t.nft_offer_index ?? ""),
     owner: String(t.owner ?? ""),
@@ -1664,13 +1664,13 @@ function un(e) {
     destination: t.destination ? String(t.destination) : void 0
   })) : [];
 }
-async function hn(e) {
-  const t = await ln(e);
+async function En(e) {
+  const t = await Nn(e);
   let n = !1;
   const s = async (o) => {
     try {
       const i = await b(o, { nft_id: t.tokenId, ledger_index: "validated" });
-      return un(i.offers);
+      return In(i.offers);
     } catch (i) {
       return i?.code !== "objectNotFound" && (n = !0), [];
     }
@@ -1686,7 +1686,7 @@ async function hn(e) {
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function fn(e) {
+function On(e) {
   const t = [], n = e.rights;
   if (n.burnable ? t.push({
     id: "burnable",
@@ -1713,7 +1713,7 @@ function fn(e) {
     action: "Do not value it against comparable tokens that can be resold."
   }), n.transferFeePct > 0 && t.push({
     id: "transfer-fee",
-    severity: n.transferFeePct >= rn ? "warn" : "info",
+    severity: n.transferFeePct >= $n ? "warn" : "info",
     title: `The issuer takes ${n.transferFeePct.toFixed(3)}% of every resale`,
     detail: `A transfer fee is deducted by the issuer each time this token changes hands, on top of anything a marketplace charges. At this rate a round trip costs ${(n.transferFeePct * 2).toFixed(3)}% before any price movement.`
   }), n.onlyXrp && t.push({
@@ -1745,13 +1745,13 @@ function fn(e) {
   const s = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((a, r) => s[a.severity] - s[r.severity]);
 }
-const pe = [
+const _e = [
   "wss://xrplcluster.com",
   "wss://s1.ripple.com",
   "wss://s2.ripple.com",
   "wss://xrpl.ws"
-], gn = 2, pn = 4, Pe = 12e3;
-function mn(e) {
+], Fn = 2, Rn = 4, Qe = 12e3;
+function Pn(e) {
   return new Promise((t) => {
     const n = Date.now();
     let s = !1, a;
@@ -1777,7 +1777,7 @@ function mn(e) {
     }
     const o = window.setTimeout(
       () => r({ url: e, reachable: !1, error: "no response within 12s" }),
-      Pe
+      Qe
     );
     a.onerror = () => {
       window.clearTimeout(o), r({ url: e, reachable: !1, error: "connection refused or blocked" });
@@ -1786,7 +1786,7 @@ function mn(e) {
     }, a.onmessage = (i) => {
       window.clearTimeout(o);
       try {
-        const c = JSON.parse(String(i.data))?.result?.info ?? {}, d = c.validated_ledger ?? {}, h = String(c.complete_ledgers ?? "").split("-")[0];
+        const c = JSON.parse(String(i.data))?.result?.info ?? {}, d = c.validated_ledger ?? {}, l = String(c.complete_ledgers ?? "").split("-")[0];
         r({
           url: e,
           reachable: !0,
@@ -1797,7 +1797,7 @@ function mn(e) {
           version: typeof c.build_version == "string" ? c.build_version : void 0,
           serverState: typeof c.server_state == "string" ? c.server_state : void 0,
           peers: typeof c.peers == "number" ? c.peers : void 0,
-          historyFrom: Number(h) || void 0,
+          historyFrom: Number(l) || void 0,
           amendmentBlocked: typeof c.amendment_blocked == "boolean" ? c.amendment_blocked : void 0
         });
       } catch {
@@ -1806,7 +1806,7 @@ function mn(e) {
     };
   });
 }
-function yn(e) {
+function Cn(e) {
   return new Promise((t) => {
     let n = !1, s;
     const a = (o) => {
@@ -1825,7 +1825,7 @@ function yn(e) {
       a(void 0);
       return;
     }
-    const r = window.setTimeout(() => a(void 0), Pe);
+    const r = window.setTimeout(() => a(void 0), Qe);
     s.onerror = () => {
       window.clearTimeout(r), a(void 0);
     }, s.onopen = () => s.send(JSON.stringify({ id: 1, command: "fee" })), s.onmessage = (o) => {
@@ -1847,10 +1847,10 @@ function yn(e) {
     };
   });
 }
-async function bn() {
+async function Ln() {
   const [e, t] = await Promise.all([
-    Promise.all(pe.map(mn)),
-    yn(pe[0])
+    Promise.all(_e.map(Pn)),
+    Cn(_e[0])
   ]), n = e.filter((s) => s.reachable && typeof s.ledgerSeq == "number").map((s) => s.ledgerSeq);
   return {
     nodes: e,
@@ -1861,7 +1861,7 @@ async function bn() {
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function wn(e) {
+function Dn(e) {
   const t = [], n = e.nodes.length;
   if (e.reachableCount === 0)
     return t.push({
@@ -1880,7 +1880,7 @@ function wn(e) {
     action: "A single unreachable endpoint is routine. All-but-one usually means this machine, not the ledger."
   }), typeof e.leaderSeq == "number") {
     const c = e.nodes.filter(
-      (d) => d.reachable && typeof d.ledgerSeq == "number" && e.leaderSeq - d.ledgerSeq >= pn
+      (d) => d.reachable && typeof d.ledgerSeq == "number" && e.leaderSeq - d.ledgerSeq >= Rn
     );
     c.length > 0 ? t.push({
       id: "node-lag",
@@ -1890,7 +1890,7 @@ function wn(e) {
         (d) => `${d.url} is ${e.leaderSeq - d.ledgerSeq} ledgers back`
       ).join(". ") + ". Ledgers close every three to four seconds, so this is beyond normal cadence.",
       action: "Readings taken from a trailing node describe a ledger that has already moved on."
-    }) : typeof e.spread == "number" && e.spread <= gn && t.push({
+    }) : typeof e.spread == "number" && e.spread <= Fn && t.push({
       id: "in-sync",
       severity: "ok",
       title: `All ${e.reachableCount} reachable nodes agree`,
@@ -1938,32 +1938,32 @@ function wn(e) {
   const i = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((c, d) => i[c.severity] - i[d.severity]);
 }
-function vn(e) {
+function Hn(e) {
   return e.passed ? "PASS" : e.severity === "block" ? "FAIL" : "REVIEW";
 }
-function kn(e) {
-  return e.state ?? vn(e);
+function qn(e) {
+  return e.state ?? Hn(e);
 }
-const Sn = /* @__PURE__ */ new Set(["INSUFFICIENT_DATA", "NOT_APPLICABLE"]);
-function Tn(e) {
-  return e.state && Sn.has(e.state) ? [e.id, e.passed, e.state] : [e.id, e.passed];
+const Xn = /* @__PURE__ */ new Set(["INSUFFICIENT_DATA", "NOT_APPLICABLE"]);
+function zn(e) {
+  return e.state && Xn.has(e.state) ? [e.id, e.passed, e.state] : [e.id, e.passed];
 }
-async function An(e) {
+async function Un(e) {
   const t = new TextEncoder().encode(e), n = await crypto.subtle.digest("SHA-256", t);
   return Array.from(new Uint8Array(n)).map((s) => s.toString(16).padStart(2, "0")).join("").toUpperCase();
 }
-async function $n(e) {
-  return An(
+async function Mn(e) {
+  return Un(
     JSON.stringify({
       kind: e.kind,
       subject: e.subject,
       scope: Object.keys(e.scope).sort().map((t) => [t, e.scope[t]]),
       evaluatedAt: e.evaluatedAt,
-      checks: e.checks.map(Tn)
+      checks: e.checks.map(zn)
     })
   );
 }
-const me = 0.95, _n = /* @__PURE__ */ new Set([
+const xe = 0.95, jn = /* @__PURE__ */ new Set([
   "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
   // ACCOUNT_ZERO
   "rrrrrrrrrrrrrrrrrrrrBZbvji",
@@ -1973,17 +1973,17 @@ const me = 0.95, _n = /* @__PURE__ */ new Set([
   "rrrrrrrrrrrrrrrrrrrn5RM1rHd"
   // rippled's NaN sentinel
 ]);
-function B(e) {
-  return !!e && !_n.has(e);
+function ee(e) {
+  return !!e && !jn.has(e);
 }
-const ye = 2500, be = 2;
-async function xn(e, t = {}) {
+const Ne = 2500, Ie = 2;
+async function Bn(e, t = {}) {
   const n = [], [s, a, r] = await Promise.all([
-    Oe(e).catch((i) => (n.push(`control: ${i instanceof Error ? i.message : String(i)}`), null)),
-    Ie(e).catch((i) => (n.push(`posture: ${i instanceof Error ? i.message : String(i)}`), null)),
+    Ke(e).catch((i) => (n.push(`control: ${i instanceof Error ? i.message : String(i)}`), null)),
+    We(e).catch((i) => (n.push(`posture: ${i instanceof Error ? i.message : String(i)}`), null)),
     // The supply walk is the expensive read, so it is opt-in. When it is
     // skipped the concentration checks abstain rather than assume.
-    t.walkSupply ? Re(e).catch((i) => (n.push(`issuance: ${i instanceof Error ? i.message : String(i)}`), null)) : Promise.resolve(null)
+    t.walkSupply ? Je(e).catch((i) => (n.push(`issuance: ${i instanceof Error ? i.message : String(i)}`), null)) : Promise.resolve(null)
   ]), o = a?.unreadable ? null : a;
   return a?.unreadable && n.push(`posture: ${a.unreadable}`), {
     issuer: e,
@@ -1995,10 +1995,10 @@ async function xn(e, t = {}) {
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function Le(e) {
+function Ze(e) {
   return !e || e.currencies.length === 0 ? null : e.currencies.reduce((t, n) => n.outstanding > t.outstanding ? n : t);
 }
-function Nn(e) {
+function Wn(e) {
   const t = [], { control: n, posture: s } = e;
   if (!s || s.unreadable || !n)
     return t.push({
@@ -2027,7 +2027,7 @@ function Nn(e) {
     passed: !s.requireAuth,
     detail: s.requireAuth ? "lsfRequireAuth is set. The issuer authorises each holder individually, so who may hold this asset is the issuer's decision." : "lsfRequireAuth is clear. Any account may open a line without the issuer's permission."
   });
-  const a = !!n.signers.unreadable, r = !n.masterKeyEnabled && !!n.regularKey && !B(n.regularKey), o = n.signers.present ? n.signers.minimumSigners <= 1 : B(n.regularKey) || n.masterKeyEnabled;
+  const a = !!n.signers.unreadable, r = !n.masterKeyEnabled && !!n.regularKey && !ee(n.regularKey), o = n.signers.present ? n.signers.minimumSigners <= 1 : ee(n.regularKey) || n.masterKeyEnabled;
   t.push({
     id: "NO_UNILATERAL_SIGNER",
     label: "No single key controls the issuer",
@@ -2035,7 +2035,7 @@ function Nn(e) {
     // A signer list that could not be read cannot be ruled out, and an
     // unverifiable absence must not read as an absence.
     passed: !o && !a,
-    detail: a ? `The signer list could not be read (${n.signers.unreadable}), so it cannot be established whether a committee controls this account or one key does. This is an unknown, not a pass.` : n.signers.present ? n.signers.minimumSigners <= 1 ? `A signer list is present, but ${n.signers.unilateralSigners.length || 1} signer reaches the quorum of ${n.signers.quorum} alone. This is a single-key account wearing a committee's clothes.` : `${n.signers.minimumSigners} signers must agree to reach the quorum of ${n.signers.quorum}, derived from summed weights rather than a headcount.` : r ? `The master key is disabled and the regular key is set to ${n.regularKey}, an address whose private key does not exist. The account is blackholed: it can never sign another transaction, so no party can act on this issuance.` : B(n.regularKey) ? `No signer list. The master key is ${n.masterKeyEnabled ? "enabled" : "disabled"} and a regular key is set, so ${n.regularKey} signs for this issuer on its own.` : n.masterKeyEnabled ? "No signer list and no usable regular key, and the master key is enabled. One key signs for this issuer." : "The master key is disabled, no regular key is set and no signer list is present, so the account cannot currently be signed for at all."
+    detail: a ? `The signer list could not be read (${n.signers.unreadable}), so it cannot be established whether a committee controls this account or one key does. This is an unknown, not a pass.` : n.signers.present ? n.signers.minimumSigners <= 1 ? `A signer list is present, but ${n.signers.unilateralSigners.length || 1} signer reaches the quorum of ${n.signers.quorum} alone. This is a single-key account wearing a committee's clothes.` : `${n.signers.minimumSigners} signers must agree to reach the quorum of ${n.signers.quorum}, derived from summed weights rather than a headcount.` : r ? `The master key is disabled and the regular key is set to ${n.regularKey}, an address whose private key does not exist. The account is blackholed: it can never sign another transaction, so no party can act on this issuance.` : ee(n.regularKey) ? `No signer list. The master key is ${n.masterKeyEnabled ? "enabled" : "disabled"} and a regular key is set, so ${n.regularKey} signs for this issuer on its own.` : n.masterKeyEnabled ? "No signer list and no usable regular key, and the master key is enabled. One key signs for this issuer." : "The master key is disabled, no regular key is set and no signer list is present, so the account cannot currently be signed for at all."
   }), s.transferRateBps > 0 && t.push({
     id: "NO_TRANSFER_FEE",
     label: "No issuer transfer fee",
@@ -2043,7 +2043,7 @@ function Nn(e) {
     passed: !1,
     detail: `The issuer charges ${(s.transferRateBps / 100).toFixed(2)}% on every transfer between holders. The rate is set by the issuer and can be changed by them.`
   });
-  const i = Le(e.issuance), c = e.unreadable.find((d) => d.startsWith("issuance:"));
+  const i = Ze(e.issuance), c = e.unreadable.find((d) => d.startsWith("issuance:"));
   if (!e.issuance)
     t.push({
       id: "SUPPLY_CONCENTRATION",
@@ -2064,36 +2064,36 @@ function Nn(e) {
       state: "NOT_APPLICABLE",
       detail: "The issuer reports no outstanding obligations, so there is no supply to measure."
     });
-  else if (i.coverage < me)
+  else if (i.coverage < xe)
     t.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${O(i.currency)} supply concentration`,
+      label: `${P(i.currency)} supply concentration`,
       severity: "warn",
       passed: !1,
       state: "INSUFFICIENT_DATA",
-      detail: `The holder lines read account for ${(i.coverage * 100).toFixed(1)}% of the outstanding ${O(i.currency)}. Below ${me * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`
+      detail: `The holder lines read account for ${(i.coverage * 100).toFixed(1)}% of the outstanding ${P(i.currency)}. Below ${xe * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`
     });
   else {
-    const d = i.hhi >= ye, h = e.issuance.source === "indexer" ? ` Holder balances are from ${e.issuance.sourceName}, not read from the ledger directly; their total was reconciled against the ledger's own obligations to within ${Math.abs(i.coverage - 1) * 100 < 0.01 ? "0.01" : (Math.abs(i.coverage - 1) * 100).toFixed(2)}%, which establishes that none are missing or invented but not that each is attributed correctly.` : " Holder balances were read from validated ledger state.";
+    const d = i.hhi >= Ne, l = e.issuance.source === "indexer" ? ` Holder balances are from ${e.issuance.sourceName}, not read from the ledger directly; their total was reconciled against the ledger's own obligations to within ${Math.abs(i.coverage - 1) * 100 < 0.01 ? "0.01" : (Math.abs(i.coverage - 1) * 100).toFixed(2)}%, which establishes that none are missing or invented but not that each is attributed correctly.` : " Holder balances were read from validated ledger state.";
     t.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${O(i.currency)} supply not concentrated`,
+      label: `${P(i.currency)} supply not concentrated`,
       severity: "warn",
       passed: !d,
-      detail: (d ? `HHI ${Math.round(i.hhi)} over ${i.holders} holders at ${(i.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${i.topHolderPct.toFixed(1)}% and the top five carry ${i.topFivePct.toFixed(1)}%.` : `HHI ${Math.round(i.hhi)} over ${i.holders} holders at ${(i.coverage * 100).toFixed(1)}% coverage, below the ${ye} threshold.`) + h
+      detail: (d ? `HHI ${Math.round(i.hhi)} over ${i.holders} holders at ${(i.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${i.topHolderPct.toFixed(1)}% and the top five carry ${i.topFivePct.toFixed(1)}%.` : `HHI ${Math.round(i.hhi)} over ${i.holders} holders at ${(i.coverage * 100).toFixed(1)}% coverage, below the ${Ne} threshold.`) + l
     });
   }
   return t;
 }
-function In(e, t = {}) {
+function Gn(e, t = {}) {
   return e.some((n) => n.severity === "block" && !n.passed) ? "no-go" : (t.unreadable?.length ?? 0) > 0 ? "insufficient-data" : e.some((n) => !n.passed) ? "hold" : "go";
 }
-async function On(e, t = {}) {
-  const n = await xn(e, t);
-  return Fn(n);
+async function Kn(e, t = {}) {
+  const n = await Bn(e, t);
+  return Yn(n);
 }
-async function Fn(e) {
-  const t = Nn(e), n = In(t, { unreadable: e.unreadable }), s = Le(e.issuance)?.currency, a = e.readAt, r = await $n({
+async function Yn(e) {
+  const t = Wn(e), n = Gn(t, { unreadable: e.unreadable }), s = Ze(e.issuance)?.currency, a = e.readAt, r = await Mn({
     kind: "authority",
     subject: e.issuer,
     // The ledger index is inside the digest because a certificate is a
@@ -2114,7 +2114,7 @@ async function Fn(e) {
       ledgerIndex: e.ledgerIndex,
       verdict: n,
       source: e.issuance?.source ?? "none",
-      rules: be
+      rules: Ie
     },
     checks: t,
     evaluatedAt: a
@@ -2123,16 +2123,16 @@ async function Fn(e) {
     verdict: n,
     issuer: e.issuer,
     currency: s,
-    currencyLabel: s ? O(s) : void 0,
+    currencyLabel: s ? P(s) : void 0,
     checks: t,
     digest: r,
     ledgerIndex: e.ledgerIndex,
     evaluatedAt: a,
     source: e.issuance?.source ?? "none",
-    rulesVersion: be
+    rulesVersion: Ie
   };
 }
-const En = [
+const Vn = [
   {
     id: "ticket",
     question: "How do I contact support or open a ticket?",
@@ -2193,6 +2193,24 @@ const En = [
     question: "Can I put NOSHASHI's checks on my own website?",
     answer: "Yes, on Enterprise and Strategic. In ADJUDICATION › LEDGER WATCH › WEBSITE WIDGET, create a widget: choose its checks (verify that an address is really your deposit address, check any address against the ledger and the OFAC list, and deposit status by transaction hash), pick your deposit address, and list the exact sites it may appear on. Paste the two-line snippet into your page. The widget holds no key, answers only on the sites you list, and never tells a customer why a deposit is under review.",
     keywords: ["embed", "widget", "website", "white-label", "customer", "snippet", "script", "iframe", "integrate", "site"]
+  },
+  {
+    id: "account-security",
+    question: "How do I make my XRP Ledger account harder to hack?",
+    answer: "Open SECURITY CENTER › ACCOUNT CHECK (free) and enter your address, never your seed. NOSHASHI grades the account A to F from what the ledger shows: who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts against you, and the doors strangers can use (NFT offers, checks, payment channels). The hardening plan lists unsigned transactions (for example, sign with a regular key on a hardware wallet, or require two of three signers for a treasury, and refuse unsolicited NFT offers) for you to review and sign in your own wallet. NOSHASHI never signs and never asks for a key.",
+    keywords: ["secure", "security", "hack", "hacked", "protect", "harden", "seed", "regular key", "multisig", "signer", "takeover", "wallet", "safe"]
+  },
+  {
+    id: "hacked-account",
+    question: "My account was hacked or drained. Can I get my XRP back?",
+    answer: "A validated XRP Ledger transaction cannot be reversed by anyone: not validators, not Ripple, not NOSHASHI, and anyone offering a paid 'recovery' is running a second scam. Do this now: move whatever is left to a new account created on a device that never held the old seed, and report it to the police (in the US, ic3.gov; in the UK, Action Fraud). Then open SECURITY CENTER › INCIDENT RESPONSE (Pro and above): it shows the key changes before the theft, follows the value hop by hop past the dust thieves spray, says where it is now, and lists the recovery paths that exist. If it reached an exchange with a destination tag, the exchange can freeze it; if it was an issued token, the issuer may freeze or claw it back. Send them the SHA-256 dossier it writes.",
+    keywords: ["hacked", "stolen", "drained", "lost", "recover", "reverse", "scam", "theft", "thief", "compromised", "get back", "refund", "police"]
+  },
+  {
+    id: "security-guardian",
+    question: "Can NOSHASHI alert us if one of our accounts is being taken over?",
+    answer: "Yes, on Strategic. Watch the accounts in LEDGER WATCH; the server reads them every minute, and when one's regular key or signer list changes, its master key is disabled or re-enabled, or it is deleted, your webhooks receive a signed security_alert within a minute. A takeover almost always starts with the thief adding a key of their own, so this is the earliest warning the ledger gives. SECURITY CENTER › GUARDIAN lists these events, and INCIDENT RESPONSE can watch every account in a theft trail in one click.",
+    keywords: ["alert", "guardian", "takeover", "monitor", "keys changed", "webhook", "security_alert", "watch", "notify"]
   },
   {
     id: "event-feeds",
@@ -2286,7 +2304,7 @@ const En = [
     answer: "No, and we will not pretend otherwise. A GO means the rules you configured passed — it is not legal advice, not a regulatory determination, and it does not discharge an obligation you owe a regulator. The receipt proves a check ran against a stated rule set at a stated time. Anything with legal consequence needs your compliance officer and qualified counsel.",
     keywords: ["legal", "advice", "rely", "compliance", "regulator", "lawyer", "liability", "guarantee"]
   }
-], Rn = [
+], Jn = [
   {
     id: "operator",
     name: "FREE",
@@ -2305,6 +2323,8 @@ const En = [
       "Token rights — check an NFT before you buy it",
       "On-device compliance agent",
       "CSV audit export",
+      "Account security check — who can sign, open doors, key changes, poisoning attempts, and an unsigned hardening plan",
+      "Safe send — check a pasted address against your own for lookalikes before you sign",
       "Binary integrity verification",
       "Community support"
     ],
@@ -2340,6 +2360,7 @@ const En = [
       "Wallet explorer — every address ever scanned, sortable by risk",
       "Editable policy rule set — your thresholds, not ours",
       "Issuer drift monitor — native alert the moment an issuer freezes you",
+      "Incident response — follow stolen value hop by hop past the dust, with every recovery path that exists and a SHA-256 dossier for police and exchanges",
       "5,000 API verifications included",
       "Priority support"
     ],
@@ -2358,7 +2379,8 @@ const En = [
       // this flag every one of those calls answered 403: the quota and
       // the key have to be granted by the same tier, or one of them is
       // a line on a pricing page that nothing honours.
-      "compliance_api"
+      "compliance_api",
+      "incident_response"
     ]
   },
   {
@@ -2408,7 +2430,8 @@ const En = [
       "sso",
       "audit_log",
       "bulk_monitoring",
-      "custom_alert_logic"
+      "custom_alert_logic",
+      "incident_response"
     ]
   },
   {
@@ -2429,6 +2452,7 @@ const En = [
       "Everything in Institutional",
       "Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit",
       "Embeddable screening widget for your own site: address verification against poisoning, sanctions and deposit status",
+      "Forensic trace — five hops deep, 1,000 transactions an account, straight into an organization investigation case",
       "Asset passports and issuer intelligence at institutional scope",
       "Portfolio monitoring, counterparty and liquidity intelligence",
       "Deterministic policy engine, adjudication and decision history",
@@ -2459,7 +2483,9 @@ const En = [
       "asset_passports",
       "dedicated_environment",
       "deposit_screening",
-      "embedded_delivery"
+      "embedded_delivery",
+      "incident_response",
+      "forensic_trace"
     ]
   },
   {
@@ -2480,6 +2506,7 @@ const En = [
       "High-volume API capacity and contracted burst limits",
       "XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API",
       "Custom export schemas, bulk export and event retention you set",
+      "Security Guardian — signed security_alert webhooks the minute a watched account's keys change or it is deleted, and one-click watching of a theft trail",
       "Architecture review before commitment",
       "Scope documented against the integration"
     ],
@@ -2507,26 +2534,29 @@ const En = [
       "deposit_screening",
       "embedded_delivery",
       "event_feeds",
-      "custom_schemas"
+      "custom_schemas",
+      "incident_response",
+      "forensic_trace",
+      "security_guardian"
     ]
   }
-], Pn = [{ name: "Overview", plan: "Free", summary: "what NOSHASHI is and what it reads." }, { name: "Mission Control", plan: "Free", summary: "live mainnet telemetry, wallet gate, policy rule set." }, { name: "Verification", plan: "Free", summary: "describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast." }, { name: "Credentials", plan: "Free", summary: "XLS-70 objects held by the wallet, and which domains they unlock." }, { name: "Domain Grid", plan: "Free", summary: "XLS-80 permissioned domains and their rule sets." }, { name: "Audit Trail", plan: "Free", summary: "wallet history, filterable, exportable to CSV." }, { name: "NOSHX", plan: "Free", summary: "this assistant, NOSHASHI's agent. It reads the live ledger with read-only tools (authority, order book, settlement, control surface, provenance, pools, issuance, address check, claims, NFT rights, ledger status), each gated like its screen, answers questions about NOSHASHI itself from the product's own pages (features, screens, plans, docs, trust, legal), and by default runs on NOSHX Core, NOSHASHI's own engine, which uses no language model: it plans from the question, runs the readers and writes the answer itself. A language model can be added (the trained NOSHX model through Ollama, or a hosted one), with optional failover back to Core and a deep reasoning switch. It has an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant." }, { name: "Portfolio & Radar", plan: "Desk", summary: "multi-wallet surveillance and the compliance radar." }, { name: "Exposure Analysis", plan: "Desk", summary: "issuer freeze rights, Travel Rule scope, counterparty concentration." }, { name: "Ledger & Policy", plan: "Desk", summary: "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export." }, { name: "Check an Address", plan: "Free", summary: "read what the ledger publishes about any account." }, { name: "Token Rights", plan: "Free", summary: "what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly." }, { name: "Inbox", plan: "Free", summary: "every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds." }, { name: "Ledger Sync", plan: "Free", summary: "four public XRPL nodes queried and compared, with disagreement between them treated as the reading." }, { name: "Learn", plan: "Free", summary: "short animated explainers." }, { name: "Settlement", plan: "Desk", summary: "what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question." }, { name: "Ledger Garden", plan: "Desk", summary: "walk the ledger's relationships one validated read at a time — an issuer's assets, an asset's holders (from the first 200 of the issuer's trust lines, in ledger order; Issuance walks them all), an account's holdings and recent transactions, a transaction's settlement evidence — then hand the whole path to this agent as a question." }, { name: "Provenance", plan: "Desk", summary: "how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts." }, { name: "Control Surface", plan: "Desk", summary: "how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable." }, { name: "Order Book", plan: "Desk", summary: "how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill." }, { name: "Pool Governance", plan: "Desk", summary: "who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot." }, { name: "Issuance", plan: "Institution", summary: "holder concentration and enforcement history for an issuer, from the issuer's side." }, { name: "Authority Certificate", plan: "Desk", summary: "what authority an issuer has kept over an asset it issued — whether it can freeze a holder, whether it gave that power up irrevocably (lsfNoFreeze cannot be cleared once set), whether the asset is frozen right now, whether holding it needs the issuer's permission, whether one signer reaches the quorum alone, what it charges on a transfer between holders, and how concentrated the supply is. Each answer is a fact at one named ledger index, and the set is digested with SHA-256 so the same reading can be checked again later. It is NOT a score — no number is composited from the checks — and NOT a legal finding: whether an asset is decentralised or is a security is a determination for an agency applying statutory criteria, which this software does not evaluate. If the supply walk is skipped, or trust-line coverage falls below 95%, the concentration check abstains rather than passing." }, { name: "Ledger Watch", plan: "Free", summary: "screens an incoming payment to a deposit address before it is credited, read live from the ledger — it credits what actually arrived (delivered_amount, never the Amount of a partial payment), holds a familiar ticker whose issuer owes nothing as counterfeit, flags dust carrying a link as a phishing lure, notes a missing destination tag, the issuer's freeze and clawback rights, the Travel Rule threshold, and traces who created the sender and who created them, three hops back, against the organization's deny list. Verdicts are clear, review or hold; what could not be read holds the deposit. Deposit addresses and monitored accounts are read by the server every minute; each event goes to the organization's webhooks (xrpl_event, deposit_screened) and to a JSON/NDJSON feed API with a history endpoint; export schemas shape bulk exports and the feed. Requires Enterprise (deposit screening); monitoring any account, event feeds, custom schemas and retention need Strategic." }, { name: "Asset Passport", plan: "Enterprise", summary: "a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks." }, { name: "Growth", plan: "Free", summary: "platform-native drafts built from measured figures." }, { name: "Pricing", plan: "Free", summary: "plans, checkout and verification credits." }, { name: "Account", plan: "Free", summary: "subscription, two-factor authentication and API keys." }, { name: "Business Plan", plan: "Free", summary: "revenue streams, tiers and sequencing." }, { name: "Legal & Accessibility", plan: "Free", summary: "policies, accessibility statement and contact routes." }, { name: "Trust & Security", plan: "Free", summary: "the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim." }, { name: "Settings", plan: "Free", summary: "appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage." }], Ce = {
-  scenes: Pn
-}, Ln = "https://www.noshashi.app";
-function Cn() {
-  const e = En.map((n) => ({
+], Qn = [{ name: "Overview", plan: "Free", summary: "what NOSHASHI is and what it reads." }, { name: "Mission Control", plan: "Free", summary: "live mainnet telemetry, wallet gate, policy rule set." }, { name: "Verification", plan: "Free", summary: "describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast." }, { name: "Credentials", plan: "Free", summary: "XLS-70 objects held by the wallet, and which domains they unlock." }, { name: "Domain Grid", plan: "Free", summary: "XLS-80 permissioned domains and their rule sets." }, { name: "Audit Trail", plan: "Free", summary: "wallet history, filterable, exportable to CSV." }, { name: "NOSHX", plan: "Free", summary: "this assistant, NOSHASHI's agent. It reads the live ledger with read-only tools (authority, order book, settlement, control surface, provenance, pools, issuance, address check, claims, NFT rights, ledger status), each gated like its screen, answers questions about NOSHASHI itself from the product's own pages (features, screens, plans, docs, trust, legal), and by default runs on NOSHX Core, NOSHASHI's own engine, which uses no language model: it plans from the question, runs the readers and writes the answer itself. A language model can be added (the trained NOSHX model through Ollama, or a hosted one), with optional failover back to Core and a deep reasoning switch. It has an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant." }, { name: "Portfolio & Radar", plan: "Desk", summary: "multi-wallet surveillance and the compliance radar." }, { name: "Exposure Analysis", plan: "Desk", summary: "issuer freeze rights, Travel Rule scope, counterparty concentration." }, { name: "Ledger & Policy", plan: "Desk", summary: "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export." }, { name: "Check an Address", plan: "Free", summary: "read what the ledger publishes about any account." }, { name: "Token Rights", plan: "Free", summary: "what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly." }, { name: "Inbox", plan: "Free", summary: "every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds." }, { name: "Ledger Sync", plan: "Free", summary: "four public XRPL nodes queried and compared, with disagreement between them treated as the reading." }, { name: "Learn", plan: "Free", summary: "short animated explainers." }, { name: "Settlement", plan: "Desk", summary: "what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question." }, { name: "Ledger Garden", plan: "Desk", summary: "walk the ledger's relationships one validated read at a time — an issuer's assets, an asset's holders (from the first 200 of the issuer's trust lines, in ledger order; Issuance walks them all), an account's holdings and recent transactions, a transaction's settlement evidence — then hand the whole path to this agent as a question." }, { name: "Provenance", plan: "Desk", summary: "how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts." }, { name: "Control Surface", plan: "Desk", summary: "how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable." }, { name: "Order Book", plan: "Desk", summary: "how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill." }, { name: "Pool Governance", plan: "Desk", summary: "who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot." }, { name: "Issuance", plan: "Institution", summary: "holder concentration and enforcement history for an issuer, from the issuer's side." }, { name: "Authority Certificate", plan: "Desk", summary: "what authority an issuer has kept over an asset it issued — whether it can freeze a holder, whether it gave that power up irrevocably (lsfNoFreeze cannot be cleared once set), whether the asset is frozen right now, whether holding it needs the issuer's permission, whether one signer reaches the quorum alone, what it charges on a transfer between holders, and how concentrated the supply is. Each answer is a fact at one named ledger index, and the set is digested with SHA-256 so the same reading can be checked again later. It is NOT a score — no number is composited from the checks — and NOT a legal finding: whether an asset is decentralised or is a security is a determination for an agency applying statutory criteria, which this software does not evaluate. If the supply walk is skipped, or trust-line coverage falls below 95%, the concentration check abstains rather than passing." }, { name: "Ledger Watch", plan: "Free", summary: "screens an incoming payment to a deposit address before it is credited, read live from the ledger — it credits what actually arrived (delivered_amount, never the Amount of a partial payment), holds a familiar ticker whose issuer owes nothing as counterfeit, flags dust carrying a link as a phishing lure, notes a missing destination tag, the issuer's freeze and clawback rights, the Travel Rule threshold, and traces who created the sender and who created them, three hops back, against the organization's deny list. Verdicts are clear, review or hold; what could not be read holds the deposit. Deposit addresses and monitored accounts are read by the server every minute; each event goes to the organization's webhooks (xrpl_event, deposit_screened) and to a JSON/NDJSON feed API with a history endpoint; export schemas shape bulk exports and the feed. Requires Enterprise (deposit screening); monitoring any account, event feeds, custom schemas and retention need Strategic." }, { name: "Security Center", plan: "Free", summary: "ACCOUNT CHECK (free) grades any address A to F from who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts and open doors (NFT offers, checks, payment channels), and writes an unsigned hardening plan the owner signs in their own wallet. SAFE SEND (free) checks a pasted destination against the operator's own address book for lookalikes and against the OFAC list. INCIDENT RESPONSE (Pro+; five hops and a case on Enterprise) follows stolen value through payments and AccountDelete sweeps past dust, says where it is, and rates every recovery path; validated transactions are never reversible. GUARDIAN (Strategic) sends security_alert webhooks when a watched account's keys change or it is deleted." }, { name: "Asset Passport", plan: "Enterprise", summary: "a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks." }, { name: "Growth", plan: "Free", summary: "platform-native drafts built from measured figures." }, { name: "Pricing", plan: "Free", summary: "plans, checkout and verification credits." }, { name: "Account", plan: "Free", summary: "subscription, two-factor authentication and API keys." }, { name: "Business Plan", plan: "Free", summary: "revenue streams, tiers and sequencing." }, { name: "Legal & Accessibility", plan: "Free", summary: "policies, accessibility statement and contact routes." }, { name: "Trust & Security", plan: "Free", summary: "the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim." }, { name: "Settings", plan: "Free", summary: "appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage." }], et = {
+  scenes: Qn
+}, Zn = "https://www.noshashi.app";
+function es() {
+  const e = Vn.map((n) => ({
     title: `Help › ${n.question}`,
     source: "NOSHX › Support",
     text: `${n.question}
 ${n.answer}`
   }));
-  for (const n of Rn)
+  for (const n of Jn)
     e.push({
       title: `Pricing › ${n.name}`,
-      source: `${Ln}/pricing/`,
+      source: `${Zn}/pricing/`,
       text: `${n.name} plan, for ${n.audience}. Price (cost): ${n.priceLabel} ${n.cadence}. Includes: ${n.features.join("; ")}.`
     });
-  const t = Ce.scenes;
+  const t = et.scenes;
   for (let n = 0; n < t.length; n += 6)
     e.push({
       title: "App screens",
@@ -2536,9 +2566,9 @@ ${n.answer}`
     });
   return e;
 }
-const Hn = new Set(
+const ts = new Set(
   "a an and are as at be but by can do does for from has have how i if in is it its me my of on or our so that the their them then there these this to was we what when where which who why will with you your".split(" ")
-), Dn = {
+), ns = {
   sent: "send",
   sending: "send",
   sends: "send",
@@ -2557,15 +2587,15 @@ const Hn = new Set(
   pricing: "price",
   prices: "price"
 };
-function x(e) {
-  return (e.toLowerCase().match(/[a-z0-9][a-z0-9_-]*/g) ?? []).filter((t) => !Hn.has(t) && t.length > 1).map((t) => Dn[t] ?? (t.length > 4 ? t.replace(/(ies|es|s|ing|ed)$/, (n) => n === "ies" ? "y" : "") : t));
+function R(e) {
+  return (e.toLowerCase().match(/[a-z0-9][a-z0-9_-]*/g) ?? []).filter((t) => !ts.has(t) && t.length > 1).map((t) => ns[t] ?? (t.length > 4 ? t.replace(/(ies|es|s|ing|ed)$/, (n) => n === "ies" ? "y" : "") : t));
 }
-function qn(e) {
+function ss(e) {
   const t = [], n = [];
   for (const o of e) {
-    const i = x(o.title), c = x(o.text), d = /* @__PURE__ */ new Map();
-    for (const h of i) d.set(h, (d.get(h) ?? 0) + 2);
-    for (const h of c) d.set(h, (d.get(h) ?? 0) + 1);
+    const i = R(o.title), c = R(o.text), d = /* @__PURE__ */ new Map();
+    for (const l of i) d.set(l, (d.get(l) ?? 0) + 2);
+    for (const l of c) d.set(l, (d.get(l) ?? 0) + 1);
     t.push(d), n.push(` ${i.join(" ")} ${c.join(" ")} `);
   }
   const s = t.map((o) => [...o.values()].reduce((i, c) => i + c, 0)), a = /* @__PURE__ */ new Map();
@@ -2573,100 +2603,491 @@ function qn(e) {
   const r = s.reduce((o, i) => o + i, 0) / Math.max(1, s.length);
   return { passages: e, docs: t, sequences: n, lengths: s, df: a, avg: r };
 }
-function zn(e, t, n = 5) {
-  const s = x(t), a = [...new Set(s)], r = s.slice(1).map((l, u) => ` ${s[u]} ${l} `);
+function as(e, t, n = 5) {
+  const s = R(t), a = [...new Set(s)], r = s.slice(1).map((g, f) => ` ${s[f]} ${g} `);
   if (a.length === 0) return [];
-  const o = e.passages.length, i = 1.4, c = 0.55, d = (l) => {
-    const u = e.df.get(l) ?? 0;
-    return Math.log(1 + (o - u + 0.5) / (u + 0.5));
-  }, h = [];
-  e.docs.forEach((l, u) => {
-    let g = 0;
-    for (const p of a) {
-      const y = l.get(p);
-      y && (g += d(p) * y * (i + 1) / (y + i * (1 - c + c * e.lengths[u] / e.avg)));
+  const o = e.passages.length, i = 1.4, c = 0.55, d = (g) => {
+    const f = e.df.get(g) ?? 0;
+    return Math.log(1 + (o - f + 0.5) / (f + 0.5));
+  }, l = [];
+  e.docs.forEach((g, f) => {
+    let h = 0;
+    for (const m of a) {
+      const y = g.get(m);
+      y && (h += d(m) * y * (i + 1) / (y + i * (1 - c + c * e.lengths[f] / e.avg)));
     }
-    for (const p of r)
-      if (e.sequences[u].includes(p)) {
-        const [y, m] = p.trim().split(" ");
-        g += 0.6 * (d(y) + d(m));
+    for (const m of r)
+      if (e.sequences[f].includes(m)) {
+        const [y, p] = m.trim().split(" ");
+        h += 0.6 * (d(y) + d(p));
       }
-    g > 0 && h.push({ ...e.passages[u], score: g * (e.passages[u].weight ?? 1) });
-  }), h.sort((l, u) => u.score - l.score);
-  const f = /* @__PURE__ */ new Set();
-  return h.filter((l) => !f.has(l.title) && f.add(l.title)).slice(0, n);
+    h > 0 && l.push({ ...e.passages[f], score: h * (e.passages[f].weight ?? 1) });
+  }), l.sort((g, f) => f.score - g.score);
+  const u = /* @__PURE__ */ new Set();
+  return l.filter((g) => !u.has(g.title) && u.add(g.title)).slice(0, n);
 }
-let L = null, He = [];
-function Xn(e) {
-  He = e, L = null;
+let U = null, tt = [];
+function is(e) {
+  tt = e, U = null;
 }
-function De() {
-  return L ?? (L = import("./pages-39GJq74p.js").then(({ default: e }) => qn([...Cn(), ...He, ...e]))), L;
+function nt() {
+  return U ?? (U = import("./pages-CjXTLjUb.js").then(({ default: e }) => ss([...es(), ...tt, ...e]))), U;
 }
-function Un() {
-  if (L) return;
+function rs() {
+  if (U) return;
   const e = () => {
-    De();
+    nt();
   };
   typeof requestIdleCallback == "function" ? requestIdleCallback(e, { timeout: 1500 }) : setTimeout(e, 0);
 }
-async function qe(e, t = 5) {
-  return zn(await De(), e, t);
+async function st(e, t = 5) {
+  return as(await nt(), e, t);
 }
-const Mn = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/, jn = /^[0-9A-Fa-f]{64}$/;
-class C extends Error {
+function os(e) {
+  if (!/^[0-9A-F]{40}$/i.test(e)) return e;
+  const t = (e.match(/../g) ?? []).map((n) => String.fromCharCode(parseInt(n, 16))).join("").replace(/\0+$/, "").trim();
+  return t && /^[\x20-\x7E]+$/.test(t) ? t : e;
 }
-function N(e, t = "address") {
+function cs(e, t, n = 4) {
+  for (const s of t)
+    if (!(s === e || s.length < n * 2 + 1) && s.slice(0, n + 1) === e.slice(0, n + 1) && s.slice(-n) === e.slice(-n))
+      return s;
+  return null;
+}
+const ds = 946684800, z = {
+  disableMaster: 1048576,
+  depositAuth: 16777216,
+  disallowIncomingNFTokenOffer: 67108864,
+  disallowIncomingCheck: 134217728,
+  disallowIncomingPayChan: 268435456
+}, L = {
+  disableMaster: 4,
+  disallowIncomingNFTokenOffer: 12,
+  disallowIncomingCheck: 13,
+  disallowIncomingPayChan: 14
+}, Ee = {
+  1: "require a destination tag",
+  2: "require authorisation",
+  3: "disallow XRP",
+  4: "disable the master key",
+  5: "track transaction IDs",
+  6: "no freeze",
+  7: "global freeze",
+  8: "default ripple",
+  9: "deposit authorisation",
+  10: "authorised NFT minter",
+  12: "refuse incoming NFT offers",
+  13: "refuse incoming checks",
+  14: "refuse incoming payment channels",
+  15: "refuse incoming trust lines",
+  16: "allow trust-line clawback"
+}, ls = (e) => typeof e == "number" ? new Date((e + ds) * 1e3).toISOString() : null;
+function us(e) {
+  return /^([0-9A-Fa-f]{2})+$/.test(e) ? new TextDecoder().decode(new Uint8Array((e.match(/../g) ?? []).map((t) => parseInt(t, 16)))) : e;
+}
+function hs(e, t) {
+  const n = e.map((a) => a.weight).sort((a, r) => r - a);
+  let s = 0;
+  for (let a = 0; a < n.length; a++)
+    if (s += n[a], s >= t) return a + 1;
+  return 1 / 0;
+}
+function Oe(e, t, n, s) {
+  const a = t?.account_data ?? null, o = (t?.signer_lists ?? a?.signer_lists ?? [])[0], i = (o?.SignerEntries ?? []).map((y) => ({ account: String(y.SignerEntry?.Account ?? ""), weight: Number(y.SignerEntry?.SignerWeight ?? 0) })).filter((y) => y.account), c = Number(o?.SignerQuorum ?? 0), d = Number(a?.Flags ?? 0), l = [], u = /* @__PURE__ */ new Set(), g = [];
+  let f = 0;
+  for (const y of n) {
+    const p = y.tx_json ?? y.tx ?? y;
+    if ((y.meta ?? {}).TransactionResult !== "tesSUCCESS") continue;
+    const w = Number(y.ledger_index ?? p.ledger_index ?? 0), k = String(p.hash ?? y.hash ?? ""), v = ls(p.date ?? y.date), _ = p.Account === e;
+    switch (p.TransactionType) {
+      case "SetRegularKey":
+        _ && l.push(
+          p.RegularKey ? { kind: "regular_key_set", ledger: w, at: v, hash: k, detail: `Regular key set to ${p.RegularKey}: that key can now sign alone.` } : { kind: "regular_key_removed", ledger: w, at: v, hash: k, detail: "Regular key removed." }
+        );
+        break;
+      case "SignerListSet":
+        if (_) {
+          const x = Number(p.SignerQuorum ?? 0), S = (p.SignerEntries ?? []).length;
+          l.push(
+            x > 0 ? { kind: "signer_list_set", ledger: w, at: v, hash: k, detail: `Signer list set: quorum ${x} across ${S} signer${S === 1 ? "" : "s"}.` } : { kind: "signer_list_removed", ledger: w, at: v, hash: k, detail: "Signer list removed." }
+          );
+        }
+        break;
+      case "AccountSet":
+        _ && (p.SetFlag === L.disableMaster ? l.push({ kind: "master_disabled", ledger: w, at: v, hash: k, detail: "Master key disabled." }) : p.ClearFlag === L.disableMaster ? l.push({ kind: "master_enabled", ledger: w, at: v, hash: k, detail: "Master key re-enabled." }) : typeof p.SetFlag == "number" ? l.push({ kind: "flag_set", ledger: w, at: v, hash: k, detail: `Set: ${Ee[p.SetFlag] ?? `flag ${p.SetFlag}`}.` }) : typeof p.ClearFlag == "number" && l.push({ kind: "flag_cleared", ledger: w, at: v, hash: k, detail: `Cleared: ${Ee[p.ClearFlag] ?? `flag ${p.ClearFlag}`}.` }));
+        break;
+      case "AccountDelete":
+        _ && l.push({ kind: "account_deleted", ledger: w, at: v, hash: k, detail: `Account deleted; its XRP went to ${p.Destination}.` });
+        break;
+      case "Payment":
+        if (_ && typeof p.Destination == "string" && u.add(p.Destination), p.Destination === e && typeof p.Account == "string") {
+          g.push({ from: p.Account, hash: k, ledger: w });
+          const x = typeof p.Amount == "string" ? Number(p.Amount) : NaN;
+          Number.isFinite(x) && x < 1e4 && (f += 1);
+        }
+        break;
+    }
+  }
+  const h = [], m = /* @__PURE__ */ new Set();
+  for (const y of g) {
+    if (u.has(y.from) || m.has(y.from)) continue;
+    const p = cs(y.from, u);
+    p && (m.add(y.from), h.push({ sender: y.from, imitates: p, hash: y.hash, ledger: y.ledger }));
+  }
+  return {
+    address: e,
+    exists: !!a,
+    balanceXrp: a ? Number(a.Balance ?? 0) / 1e6 : 0,
+    flags: d,
+    masterEnabled: (d & z.disableMaster) === 0,
+    regularKey: a?.RegularKey ? String(a.RegularKey) : null,
+    signerList: i.length ? { quorum: c, signers: i, minimumSigners: hs(i, c) } : null,
+    domain: typeof a?.Domain == "string" && a.Domain ? us(a.Domain) : null,
+    ledgerIndex: Number(t?.ledger_index ?? 0),
+    events: l,
+    poisoning: h,
+    dustReceived: f,
+    historyRead: n.length,
+    historyComplete: s
+  };
+}
+async function Fe(e, t = 200) {
+  const n = await b("account_info", { account: e, ledger_index: "validated", signer_lists: !0 }).catch((r) => {
+    if (/actNotFound|not found/i.test(r instanceof Error ? r.message : String(r))) return null;
+    throw r;
+  });
+  if (!n) return Oe(e, null, [], !0);
+  const s = await b("account_tx", { account: e, ledger_index_min: -1, ledger_index_max: -1, forward: !1, limit: t }).catch(() => ({ transactions: [] })), a = s.transactions ?? [];
+  return Oe(e, n, a, !s.marker);
+}
+const Re = { critical: 0, warn: 1, info: 2, ok: 3 }, gs = 864e5;
+function fs(e, t = Date.now()) {
+  const n = [], s = [], a = (h) => (e.flags & h) !== 0;
+  if (!e.exists)
+    return {
+      score: 0,
+      grade: "F",
+      summary: "This account does not exist on the ledger: never funded, or deleted.",
+      findings: [{ id: "not-found", severity: "info", title: "No account at this address", detail: "The validated ledger has no AccountRoot here. If you expected funds, check the address; if it was deleted, its XRP went to the account named in its AccountDelete." }],
+      plan: []
+    };
+  const r = e.signerList;
+  e.masterEnabled && !e.regularKey && !r && n.push({
+    id: "single-key",
+    severity: "warn",
+    title: "One secret key controls everything",
+    detail: `The master key can sign alone and there is no second key or signer list, so anyone who obtains that one secret can move all ${e.balanceXrp.toLocaleString("en-US")} XRP at once. Stolen seeds (phishing sites, cloud backups, screenshots, clipboard malware) are how most XRPL accounts are emptied.`,
+    action: "For a personal wallet: keep the master seed offline and sign day to day with a regular key on a hardware wallet. For a treasury: require several signers."
+  }), e.masterEnabled && e.regularKey && n.push({
+    id: "two-keys",
+    severity: "warn",
+    title: "Two separate keys can each move everything",
+    detail: `Both the master key and the regular key ${e.regularKey} sign alone. Either one leaking loses the account, so the account is only as safe as the less protected of the two.`,
+    action: "If the master seed is not kept offline, disable it once you have confirmed the regular key signs."
+  }), !e.masterEnabled && e.regularKey && !r && n.push({
+    id: "regular-only",
+    severity: "info",
+    title: "A single regular key controls the account",
+    detail: `The master key is disabled and the regular key ${e.regularKey} signs alone. That is a sound setup when that key lives in a hardware wallet or HSM, and a single point of failure when it does not.`
+  }), r && (e.masterEnabled && n.push({
+    id: "bypassable-multisig",
+    severity: "critical",
+    title: "The signer list can be bypassed",
+    detail: `Quorum ${r.quorum} is configured, but the master key still signs alone, so one stolen seed skips every approval.`,
+    action: "Disable the master key once the signers have been confirmed to sign."
+  }), r.minimumSigners === 1 / 0 ? n.push({ id: "quorum-unreachable", severity: "critical", title: "The signers can never reach quorum", detail: `Quorum ${r.quorum} is more than the signers' combined weight. Unless another key exists, nothing can be moved.` }) : r.minimumSigners === 1 ? n.push({ id: "one-signer-enough", severity: "critical", title: "One signer can act alone", detail: `A single signer carries quorum ${r.quorum} by weight, so the list gives no second approval.`, action: "Rebalance weights so no single signer reaches quorum." }) : n.push({ id: "multisig", severity: "ok", title: `At least ${r.minimumSigners} of ${r.signers.length} signers must agree`, detail: `Quorum ${r.quorum}. A thief needs ${r.minimumSigners} separate secrets, usually on separate people's devices.` })), !e.masterEnabled && !e.regularKey && !r && n.push({ id: "blackholed", severity: "info", title: "Nothing can sign for this account", detail: "Master key disabled, no regular key, no signer list: the account is blackholed. Nothing can be stolen from it, and nothing can be moved out of it again." });
+  const o = e.events.filter((h) => h.at && t - Date.parse(h.at) < 30 * gs && h.kind !== "flag_set" && h.kind !== "flag_cleared");
+  o.length && n.push({
+    id: "recent-key-change",
+    severity: "warn",
+    title: `Signing keys changed ${o.length === 1 ? "once" : `${o.length} times`} in the last 30 days`,
+    detail: `${o.map((h) => `${h.at.slice(0, 10)}: ${h.detail}`).join(" ")} Taking over an account usually starts with a new regular key or signer list, so every change should be one you made.`,
+    action: "If you did not make these changes, treat the account as compromised: open Incident Response now."
+  }), e.poisoning.length && n.push({
+    id: "poisoning",
+    severity: "warn",
+    title: `${e.poisoning.length} address-poisoning attempt${e.poisoning.length === 1 ? "" : "s"} against this account`,
+    detail: e.poisoning.slice(0, 5).map((h) => `${h.sender} imitates ${h.imitates}, which this account has paid.`).join(" ") + " They sent you something so the fake appears in your history next to the real one.",
+    action: "Never copy a destination from transaction history. Keep an address book, and check a pasted address against it before signing."
+  }), e.dustReceived >= 3 && n.push({ id: "dust", severity: "info", title: `${e.dustReceived} dust payments received`, detail: "Payments under 0.01 XRP are how links to fake wallets and airdrops reach an account's history. Do not open links that arrive on the ledger." });
+  const c = [
+    [z.disallowIncomingNFTokenOffer, L.disallowIncomingNFTokenOffer, "NFT offers", "Unsolicited NFT offers are a common phishing carrier: their names and images point at fake claim sites."],
+    [z.disallowIncomingCheck, L.disallowIncomingCheck, "checks", "A check someone else created shows up as something to cash; scammers use them as lures."],
+    [z.disallowIncomingPayChan, L.disallowIncomingPayChan, "payment channels", "Unsolicited payment channels clutter the account and are rarely legitimate for a personal wallet."]
+  ].filter(([h]) => !a(h));
+  if (c.length) {
+    n.push({
+      id: "open-doors",
+      severity: "info",
+      title: `Strangers can send this account ${c.map((h) => h[2]).join(", ")}`,
+      detail: "Refusing them costs nothing and removes channels phishing uses. You can still create them yourself."
+    });
+    for (const [, h, m, y] of c)
+      s.push({ id: `refuse-${h}`, title: `Refuse incoming ${m}`, why: y, tx: { TransactionType: "AccountSet", Account: e.address, SetFlag: h } });
+  } else
+    n.push({ id: "doors-closed", severity: "ok", title: "Unsolicited NFT offers, checks and payment channels are refused", detail: "The account has closed the channels phishing usually arrives through." });
+  a(z.depositAuth) && n.push({ id: "deposit-auth", severity: "ok", title: "Only preauthorised senders can pay this account", detail: "Deposit authorisation is on: nothing arrives unless the account approved the sender, which also blocks dust and poisoning." }), e.masterEnabled && !r && (s.unshift({
+    id: "regular-key",
+    title: "Sign day to day with a regular key",
+    why: "A regular key on a hardware wallet does the signing; the master seed goes offline (paper or steel, never a photo or cloud). If the regular key is ever exposed, the master key replaces it in one transaction.",
+    tx: { TransactionType: "SetRegularKey", Account: e.address, RegularKey: "<address of the key on your hardware wallet>" }
+  }), s.splice(1, 0, {
+    id: "signer-list",
+    title: "Or, for a treasury: require two of three signers",
+    why: "Three keys held by different people or devices, any two of which must sign. A single stolen seed can no longer move anything.",
+    tx: {
+      TransactionType: "SignerListSet",
+      Account: e.address,
+      SignerQuorum: 2,
+      SignerEntries: [1, 2, 3].map((h) => ({ SignerEntry: { Account: `<signer ${h} address>`, SignerWeight: 1 } }))
+    },
+    caution: "Test that the signers can sign a small transaction before relying on the list."
+  })), r && e.masterEnabled && s.unshift({
+    id: "disable-master",
+    title: "Disable the master key",
+    why: "So the signer list actually binds: until then one stolen master seed skips the quorum.",
+    tx: { TransactionType: "AccountSet", Account: e.address, SetFlag: L.disableMaster },
+    caution: "Sign it only after a multisigned test transaction has succeeded. If the signers cannot reach quorum, disabling the master key locks the account permanently."
+  }), n.sort((h, m) => Re[h.severity] - Re[m.severity]);
+  const d = n.filter((h) => h.severity === "critical").length, l = n.filter((h) => h.severity === "warn").length, u = Math.max(0, Math.min(100, 100 - d * 30 - l * 12 - c.length * 3 - (r && r.minimumSigners >= 2 && !e.masterEnabled ? -5 : 0))), g = u >= 90 ? "A" : u >= 75 ? "B" : u >= 60 ? "C" : u >= 40 ? "D" : "F", f = d > 0 ? "Serious weaknesses: fix the critical findings before holding meaningful value here." : l > 0 ? "Workable, with changes worth making." : "Well protected by what the ledger can show.";
+  return { score: u, grade: g, summary: f, findings: n, plan: s };
+}
+const ps = 946684800, Pe = 131072, ms = {
+  accountTx: (e, t, n, s) => b("account_tx", { account: e, ledger_index_min: t, ledger_index_max: -1, forward: !0, limit: n, ...s ? { marker: s } : {} }),
+  accountInfo: (e) => b("account_info", { account: e, ledger_index: "validated" }).catch((t) => {
+    if (/actNotFound|not found/i.test(t instanceof Error ? t.message : String(t))) return null;
+    throw t;
+  }),
+  sanctions: async (e) => (await Ge(e))?.hits ?? null
+}, V = {
+  standard: { depth: 2, perAccount: 400 },
+  deep: { depth: 5, perAccount: 1e3 }
+}, ys = (e) => typeof e == "number" ? new Date((e + ps) * 1e3).toISOString() : null;
+function Ce(e) {
+  if (typeof e == "string" && /^\d+$/.test(e)) return { currency: "XRP", issuer: null, value: Number(e) / 1e6 };
+  if (e && typeof e == "object") {
+    const t = e, n = Number(t.value);
+    if (typeof t.currency == "string" && Number.isFinite(n)) return { currency: os(t.currency), issuer: t.issuer ?? null, value: n };
+  }
+  return null;
+}
+function ws(e, t) {
+  const n = t.tx_json ?? t.tx ?? t, s = t.meta ?? {};
+  if (t.validated === !1 || s.TransactionResult !== "tesSUCCESS" || n.Account !== e) return null;
+  const a = {
+    from: e,
+    ledger: Number(t.ledger_index ?? n.ledger_index ?? 0),
+    at: ys(n.date ?? t.date),
+    hash: String(n.hash ?? t.hash ?? ""),
+    destinationTag: typeof n.DestinationTag == "number" ? n.DestinationTag : null
+  }, r = Ce(s.delivered_amount ?? s.DeliveredAmount);
+  if (n.TransactionType === "Payment" && typeof n.Destination == "string" && n.Destination !== e && r)
+    return { ...a, to: n.Destination, kind: "payment", amount: r };
+  if (n.TransactionType === "AccountDelete" && typeof n.Destination == "string" && r)
+    return { ...a, to: n.Destination, kind: "account_delete", amount: r };
+  if (n.TransactionType === "EscrowCreate" && typeof n.Destination == "string") {
+    const o = Ce(n.Amount);
+    if (o) return { ...a, to: n.Destination, kind: "escrow", amount: o };
+  }
+  return null;
+}
+async function bs(e, t) {
+  const n = t.reader ?? ms, s = t.depth ?? V.standard.depth, a = t.perAccount ?? V.standard.perAccount, r = t.minXrp ?? 1, o = /* @__PURE__ */ new Map(), i = [], c = { count: 0, xrp: 0 }, d = [{ address: e, from: t.sinceLedger, depth: 0 }];
+  for (o.set(e, { address: e, depth: 0, status: "source", receivedXrp: 0, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: !1 }); d.length; ) {
+    const { address: h, from: m, depth: y } = d.shift(), p = o.get(h), T = await n.accountInfo(h).catch(() => {
+    });
+    T === void 0 && (p.status = p.status === "source" ? "source" : "unread");
+    const w = T?.account_data;
+    if (w ? (p.balanceXrp = Number(w.Balance ?? 0) / 1e6, typeof w.Domain == "string" && w.Domain && (p.domain = new TextDecoder().decode(new Uint8Array((w.Domain.match(/../g) ?? []).map((v) => parseInt(v, 16))))), p.status !== "source" && (p.status = p.tagged || (Number(w.Flags ?? 0) & Pe) !== 0 ? "custodial" : "holding")) : T === null && p.status !== "source" && (p.status = "deleted"), p.tagged && p.status !== "source" && (p.status = "custodial"), p.status === "custodial") continue;
+    let k;
+    do {
+      const v = await n.accountTx(h, m, Math.min(400, a - p.read), k).catch(() => ({ transactions: [] })), _ = v.transactions ?? [];
+      p.read += _.length;
+      for (const x of _) {
+        const S = ws(h, x);
+        if (!S) continue;
+        if (S.amount.currency === "XRP" && S.amount.value < r && S.kind === "payment") {
+          c.count += 1, c.xrp += S.amount.value;
+          continue;
+        }
+        i.push(S);
+        const le = S.amount.currency === "XRP" ? S.amount.value : 0, D = o.get(S.to);
+        if (D) {
+          D.receivedXrp += le, S.destinationTag !== null && D.status !== "source" && (D.tagged = !0, D.status = "custodial");
+          continue;
+        }
+        const H = S.destinationTag !== null;
+        if (o.set(S.to, { address: S.to, depth: y + 1, status: H ? "custodial" : "holding", receivedXrp: le, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: !1, tagged: H }), !H && y + 1 <= s) {
+          d.push({ address: S.to, from: S.ledger, depth: y + 1 });
+          continue;
+        }
+        const q = o.get(S.to), J = await n.accountInfo(S.to).catch(() => {
+        });
+        if (J === null) q.status = "deleted";
+        else if (J?.account_data) {
+          const X = J.account_data;
+          q.balanceXrp = Number(X.Balance ?? 0) / 1e6, typeof X.Domain == "string" && X.Domain && (q.domain = new TextDecoder().decode(new Uint8Array((X.Domain.match(/../g) ?? []).map((lt) => parseInt(lt, 16))))), q.status = H || (Number(X.Flags ?? 0) & Pe) !== 0 ? "custodial" : "not_followed";
+        } else H || (q.status = "not_followed");
+      }
+      k = v.marker, p.read >= a && k && (p.truncated = !0);
+    } while (k && p.read < a);
+  }
+  const l = [...o.values()], u = await n.sanctions(l.map((h) => h.address)).catch(() => null);
+  for (const h of l) h.sanction = u?.[h.address] ?? null;
+  const g = /* @__PURE__ */ new Map();
+  for (const h of l) {
+    const m = h.address.slice(-4).toLowerCase();
+    g.set(m, [...g.get(m) ?? [], h.address]);
+  }
+  const f = [...g].filter(([, h]) => h.length >= 2).map(([h, m]) => ({ ending: h, accounts: m }));
+  return { root: e, sinceLedger: t.sinceLedger, depthLimit: s, minXrp: r, nodes: l, flows: i, dust: c, vanity: f, sanctionsChecked: u !== null };
+}
+const te = (e) => `${e.value.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${e.currency}${e.issuer ? ` (issuer ${e.issuer})` : ""}`;
+function vs(e, t) {
+  const n = [
+    {
+      id: "finality",
+      title: "No one can reverse a validated XRP Ledger transaction",
+      detail: "There is no chargeback on the XRP Ledger. Validators, Ripple, wallet makers and NOSHASHI cannot move funds out of an account without its keys, and anyone offering to 'recover' or 'reverse' stolen XRP for a fee is running the second half of the scam. What follows are the paths that do exist.",
+      outlook: "not_possible"
+    }
+  ], s = e.nodes.filter((d) => d.status === "custodial");
+  for (const d of s) {
+    const l = e.flows.filter((u) => u.to === d.address);
+    n.push({
+      id: `freeze-${d.address}`,
+      title: `Ask the service behind ${d.address}${d.domain ? ` (${d.domain})` : ""} to freeze the deposit`,
+      detail: `This account requires destination tags, the mark of an exchange or custodial service that credits deposits to customer accounts. The service can identify and freeze the customer who received ${l.map((u) => te(u.amount)).join(" and ") || "the funds"} if you reach it before the funds are withdrawn, usually with a police or court reference. Send it the evidence below.`,
+      outlook: "possible",
+      evidence: l.map((u) => `${u.at ?? `ledger ${u.ledger}`}: ${te(u.amount)} to ${u.to}${u.destinationTag !== null ? ` tag ${u.destinationTag}` : ""}, transaction ${u.hash}`)
+    });
+  }
+  const a = e.flows.filter((d) => d.amount.issuer), r = [...new Set(a.map((d) => d.amount.issuer))];
+  for (const d of r) {
+    const l = a.filter((u) => u.amount.issuer === d);
+    n.push({
+      id: `issuer-${d}`,
+      title: `Ask the issuer ${d} to freeze, or claw back, its ${l[0].amount.currency}`,
+      detail: "Issued tokens are the issuer's obligations. Unless it has given up the right (No Freeze), the issuer can freeze the trust lines now holding its token, and if it enabled clawback it can take the balance back and reissue it. Check the issuer's posture on the Authority screen, then contact it through its published domain with the evidence below.",
+      outlook: "possible",
+      evidence: l.map((u) => `${u.at ?? `ledger ${u.ledger}`}: ${te(u.amount)} from ${u.from} to ${u.to}, transaction ${u.hash}`)
+    });
+  }
+  const o = e.nodes.filter((d) => d.status === "holding" && d.depth > 0 && (d.balanceXrp ?? 0) > 0);
+  o.length && n.push({
+    id: "still-held",
+    title: `${o.length} account${o.length === 1 ? " still holds" : "s still hold"} XRP from the trail`,
+    detail: `${o.map((d) => `${d.address}: ${d.balanceXrp.toLocaleString("en-US")} XRP`).join("; ")}. Nothing on the ledger can move it without that account's key, but law enforcement can act on an identified owner, and Ledger Watch can alert you the moment it moves (and where to).`,
+    outlook: "unlikely"
+  });
+  const i = e.nodes.filter((d) => d.status === "deleted" && d.depth > 0);
+  i.length && n.push({
+    id: "deleted",
+    title: `${i.length} account${i.length === 1 ? " in the trail was" : "s in the trail were"} deleted after use`,
+    detail: "Throwaway accounts that sweep their balance onward with AccountDelete: the value is not in them any more. It is followed to where it went.",
+    outlook: "not_possible"
+  });
+  const c = e.nodes.filter((d) => d.sanction);
+  if (c.length && n.push({
+    id: "sanctioned",
+    title: "The trail reaches an address on the OFAC SDN list",
+    detail: `${c.map((d) => `${d.address} (${d.sanction.entityName})`).join("; ")}. Report it with this dossier; US and allied authorities act on listed parties.`,
+    outlook: "possible"
+  }), t && t.stillHoldsXrp > 0) {
+    const d = t.keyEvents.find((l) => l.kind === "regular_key_set" || l.kind === "signer_list_set");
+    n.push({
+      id: "secure-remaining",
+      title: `Move the remaining ${t.stillHoldsXrp.toLocaleString("en-US")} XRP to a new account now`,
+      detail: `${d ? `The account's keys were changed (${d.detail}) If that was not you, the thief may still sign. ` : ""}Create a new account on a device that never held the old seed, and move what is left while you still can: whoever has the key can empty it at any time. Then never reuse the old seed.`,
+      outlook: "protective"
+    });
+  }
+  return n.push({
+    id: "report",
+    title: "Report it, with this dossier",
+    detail: "File a report with the police where you live (in the US, the FBI's IC3 at ic3.gov; in the UK, Action Fraud) and give them the dossier: exchanges act on law-enforcement requests far faster than on individuals'. Keep the transaction hashes: they are the evidence.",
+    outlook: "possible"
+  }), n;
+}
+function ks(e, t, n) {
+  const s = [], a = n.filter((d) => d.from === e).sort((d, l) => d.ledger - l.ledger), r = a[0], o = t.filter((d) => d.kind === "regular_key_set" || d.kind === "signer_list_set" || d.kind === "master_disabled"), i = r ? o.filter((d) => d.ledger <= r.ledger && r.ledger - d.ledger < 1e5) : [];
+  i.length ? s.push({
+    id: "key-then-drain",
+    severity: "critical",
+    title: "Signing keys changed, then value left",
+    detail: `${i.map((d) => `${d.at?.slice(0, 16).replace("T", " ") ?? `ledger ${d.ledger}`}: ${d.detail}`).join(" ")} Value started leaving at ${r.at?.slice(0, 16).replace("T", " ") ?? `ledger ${r.ledger}`}. An attacker who adds their own key can keep signing after the owner notices.`
+  }) : r && s.push({
+    id: "seed-used",
+    severity: "warn",
+    title: "Value left with no change of keys",
+    detail: "The account's existing key signed the transfers, which usually means the secret seed itself was exposed (a phishing site, a fake wallet, a cloud backup or a screenshot). Anything else secured by that seed is exposed too."
+  });
+  const c = a.filter((d) => d.amount.currency === "XRP").reduce((d, l) => d + l.amount.value, 0);
+  if (a.length) {
+    const d = new Set(a.map((l) => l.to));
+    s.push({
+      id: "outflow",
+      severity: "info",
+      title: `${c.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP left in ${a.length} transfer${a.length === 1 ? "" : "s"} to ${d.size} account${d.size === 1 ? "" : "s"}`,
+      detail: a.slice(0, 5).map((l) => `${l.amount.value.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${l.amount.currency} to ${l.to}${l.kind === "account_delete" ? " (account deleted)" : ""}`).join("; ") + (a.length > 5 ? "; …" : "")
+    });
+  }
+  return a.some((d) => d.kind === "account_delete") && s.push({ id: "deleted", severity: "info", title: "The account was deleted", detail: "Its remaining XRP was swept to the destination of its AccountDelete. The address can be funded again, but its history stays on the ledger." }), s;
+}
+const Ss = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/, Ts = /^[0-9A-Fa-f]{64}$/;
+class M extends Error {
+}
+function O(e, t = "address") {
   const n = String(e[t] ?? "").trim();
-  if (!Mn.test(n)) throw new C(`${t} must be a classic XRPL address starting with r.`);
+  if (!Ss.test(n)) throw new M(`${t} must be a classic XRPL address starting with r.`);
   return n;
 }
-function we(e, t) {
+function Le(e, t) {
   const n = String(e[t] ?? "").trim();
-  if (!jn.test(n)) throw new C(`${t} must be 64 hexadecimal characters.`);
+  if (!Ts.test(n)) throw new M(`${t} must be 64 hexadecimal characters.`);
   return n;
 }
-const S = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required: t, additionalProperties: !1 }), $ = (e) => ({ type: "string", description: e }), Bn = [
+const $ = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required: t, additionalProperties: !1 }), I = (e) => ({ type: "string", description: e }), $s = [
   {
     name: "search_noshashi",
     description: "Search NOSHASHI's own pages and help: every app screen and button, features, plans and prices, the Learn course and word list, docs (API, webhooks, receipts, policies, security, enterprise), trust, legal and privacy. Use it for any question about the product, what a customer should use, or how NOSHASHI handles compliance. Returns passages with their page address.",
-    input_schema: S({ query: { type: "string", description: "What to look up, in plain words" } }),
+    input_schema: $({ query: { type: "string", description: "What to look up, in plain words" } }),
     feature: null,
     screen: "NOSHASHI pages",
     run: async (e) => {
       const t = String(e.query ?? "").trim();
-      if (!t) throw new C("query is empty.");
-      const n = await qe(t, 6);
+      if (!t) throw new M("query is empty.");
+      const n = await st(t, 6);
       return n.length === 0 ? "Nothing in NOSHASHI's pages matches that. Say so rather than guess." : n.map((s) => ({ title: s.title, source: s.source, text: s.text }));
     }
   },
   {
     name: "ledger_status",
     description: "The latest validated XRP Ledger: index, hash, close time, reference fee and open-ledger fee. Call this to stamp an answer with the ledger it describes.",
-    input_schema: S({}),
+    input_schema: $({}),
     feature: null,
     screen: "Mission Control",
-    run: () => Je()
+    run: () => mt()
   },
   {
     name: "ledger_sync",
     description: "What four public XRPL servers each report right now (ledger index, state, fees) and where they disagree.",
-    input_schema: S({}),
+    input_schema: $({}),
     feature: null,
     screen: "Ledger Sync",
-    run: () => bn()
+    run: () => Ln()
   },
   {
     name: "check_address",
     description: "What the ledger publishes about an account before someone pays it: existence, age, destination tag requirement, flags and anything recorded against it. Reports facts, never 'safe'.",
-    input_schema: S({ address: $("Classic address, r…") }),
+    input_schema: $({ address: I("Classic address, r…") }),
     feature: null,
     screen: "Check an Address",
     run: async (e, t) => {
-      const n = N(e), s = !t.has("portfolios");
+      const n = O(e), s = !t.has("portfolios");
       if (s && !t.spendFreeCheck())
-        throw new C("This month's 10 free address checks are used up. Pro includes unlimited checks.");
-      const a = await gt(n);
+        throw new M("This month's 10 free address checks are used up. Pro includes unlimited checks.");
+      const a = await Ft(n);
       if (a.verdict === "unknown" && !a.exists && a.findings.length === 0)
         throw s && t.refundFreeCheck?.(), new Error("The ledger could not be reached, so nothing about this address is known yet. Try again in a moment.");
       return a;
@@ -2675,89 +3096,121 @@ const S = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
   {
     name: "read_claims",
     description: "Tokens and claims other accounts have sent to an address, and whether each is real or an impersonation (a familiar ticker from an issuer with no obligations).",
-    input_schema: S({ address: $("Classic address whose inbox to read") }),
+    input_schema: $({ address: I("Classic address whose inbox to read") }),
     feature: null,
     screen: "Inbox",
-    run: (e) => Qt(N(e))
+    run: (e) => yn(O(e))
   },
   {
     name: "read_token_rights",
     description: "What an NFT's issuer can still do after someone owns it: burnable, transferable, transfer fee, taxon.",
-    input_schema: S({ token_id: $("The 64-character NFTokenID") }),
+    input_schema: $({ token_id: I("The 64-character NFTokenID") }),
     feature: null,
     screen: "Token Rights",
-    run: (e) => hn(we(e, "token_id"))
+    run: (e) => En(Le(e, "token_id"))
   },
   {
     name: "certify_authority",
     description: "The six issuer checks (freeze surrendered, not globally frozen, open holding, no single key controls the issuer, transfer fee, supply concentration) with GO/HOLD/NO-GO, ledger index and SHA-256 digest.",
-    input_schema: S({ issuer: $("Issuer's classic address") }),
+    input_schema: $({ issuer: I("Issuer's classic address") }),
     feature: "authority_certificate",
     screen: "Authority",
-    run: (e) => On(N(e, "issuer"), { walkSupply: !1 })
+    run: (e) => Kn(O(e, "issuer"), { walkSupply: !1 })
   },
   {
     name: "read_provenance",
     description: "Where an account came from: its real age (corrected for the Sequence misreading) and the account that first funded it.",
-    input_schema: S({ address: $("Counterparty address") }),
+    input_schema: $({ address: I("Counterparty address") }),
     feature: "portfolios",
     screen: "Provenance",
-    run: (e) => Tt(N(e))
+    run: (e) => zt(O(e))
   },
   {
     name: "read_book",
     description: "An order book's listed versus funded depth (offers whose owners can really fill them), the unfunded share, spread and mid price. The book is the currency against XRP.",
-    input_schema: S({
+    input_schema: $({
       currency: { type: "string", description: "Currency code, e.g. USD, or a 40-character hex code" },
-      issuer: $("Issuer's classic address")
+      issuer: I("Issuer's classic address")
     }),
     feature: "portfolios",
     screen: "Order Book",
     run: (e) => {
       const t = String(e.currency ?? "").trim();
       if (!/^([A-Za-z0-9]{3}|[0-9A-Fa-f]{40})$/.test(t))
-        throw new C("currency must be a 3-character code or 40 hexadecimal characters.");
-      return Ot(t, N(e, "issuer"));
+        throw new M("currency must be a 3-character code or 40 hexadecimal characters.");
+      return Kt(t, O(e, "issuer"));
     }
   },
   {
     name: "read_settlement",
     description: "What a transaction actually delivered: type, sender, result, whether the partial-payment flag was set, requested versus delivered amount, and the fee burned.",
-    input_schema: S({ hash: $("Transaction hash, 64 hexadecimal characters") }),
+    input_schema: $({ hash: I("Transaction hash, 64 hexadecimal characters") }),
     feature: "portfolios",
     screen: "Settlement",
-    run: (e) => Pt(we(e, "hash"))
+    run: (e) => Qt(Le(e, "hash"))
   },
   {
     name: "read_control_surface",
     description: "Who can move an account's funds: master key status, regular key, signer list and quorum, the fewest signers that reach quorum, master-key bypass, and XRP locked in reserve.",
-    input_schema: S({ address: $("Treasury or issuer address") }),
+    input_schema: $({ address: I("Treasury or issuer address") }),
     feature: "portfolios",
     screen: "Control Surface",
-    run: (e) => Oe(N(e))
+    run: (e) => Ke(O(e))
   },
   {
     name: "read_pool",
     description: "An AMM pool's balances, trading fee, fee votes weighted by LP tokens, and who holds the auction slot.",
-    input_schema: S({ amm_account: $("The AMM pool's own account address") }),
+    input_schema: $({ amm_account: I("The AMM pool's own account address") }),
     feature: "portfolios",
     screen: "Pool Governance",
-    run: (e) => Dt({ ammAccount: N(e, "amm_account") })
+    run: (e) => nn({ ammAccount: O(e, "amm_account") })
   },
   {
     name: "read_issuance",
     description: "A token from the issuer's side: currencies issued, outstanding obligations, holder lines read, the largest holder, concentration, and enforcement history (freezes and clawbacks).",
-    input_schema: S({ issuer: $("Issuer's classic address") }),
+    input_schema: $({ issuer: I("Issuer's classic address") }),
     feature: "portfolios",
     screen: "Issuance",
-    run: (e) => Re(N(e, "issuer"))
+    run: (e) => Je(O(e, "issuer"))
+  },
+  {
+    name: "security_check",
+    description: "How hard an XRP Ledger account is to take over: who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts against it, the doors strangers can use (NFT offers, checks, payment channels), a 0–100 score, and an unsigned hardening plan to sign in the owner's own wallet.",
+    input_schema: $({ address: I("The account to check, r…") }),
+    feature: null,
+    screen: "Security Center",
+    run: async (e) => {
+      const t = await Fe(O(e));
+      return { posture: { ...t, events: t.events.slice(0, 10) }, assessment: fs(t) };
+    }
+  },
+  {
+    name: "investigate_hack",
+    description: "For an account that was drained or hacked: the key changes before it, the stolen value followed hop by hop (payments and AccountDelete sweeps, past the dust), what became of every account it reached, and every recovery path that exists. Validated XRP Ledger transactions cannot be reversed; this says which off-ledger paths apply.",
+    input_schema: $(
+      {
+        address: I("The drained account, r…"),
+        from_ledger: { type: "number", description: "Ledger the incident began at, if known" }
+      },
+      ["address"]
+    ),
+    feature: "incident_response",
+    screen: "Security Center › Incident Response",
+    run: async (e, t) => {
+      const n = O(e), s = await Fe(n, 400), a = Number(e.from_ledger), r = [...s.events].reverse().find((d) => d.kind === "regular_key_set" || d.kind === "signer_list_set"), o = Number.isInteger(a) && a > 0 ? a : r?.ledger ?? Math.max(1, s.ledgerIndex - 21600 * 30), i = t.has("forensic_trace") ? V.deep : V.standard, c = await bs(n, { sinceLedger: o, depth: i.depth, perAccount: i.perAccount });
+      return {
+        signals: ks(n, s.events, c.flows),
+        trace: { ...c, flows: c.flows.slice(0, 40) },
+        options: vs(c, { stillHoldsXrp: s.exists ? s.balanceXrp : 0, keyEvents: s.events })
+      };
+    }
   }
 ];
-function H(e) {
-  return Bn.find((t) => t.name === e);
+function j(e) {
+  return $s.find((t) => t.name === e);
 }
-async function W(e, t, n) {
-  const s = H(e);
+async function ne(e, t, n) {
+  const s = j(e);
   if (!s) return { ok: !1, error: `No tool named ${e}.` };
   if (s.feature && !n.has(s.feature))
     return { ok: !1, gated: !0, error: `${s.screen} needs a Pro plan or higher.` };
@@ -2767,7 +3220,7 @@ async function W(e, t, n) {
     return { ok: !1, error: a instanceof Error ? a.message : "The read failed." };
   }
 }
-const ze = /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/g, Xe = /\b[0-9A-Fa-f]{64}\b/g, Wn = /\b[0-9A-F]{40}\b/g, Gn = /\b[A-Z][A-Z0-9]{2}\b/g, Kn = /* @__PURE__ */ new Set([
+const at = /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/g, it = /\b[0-9A-Fa-f]{64}\b/g, As = /\b[0-9A-F]{40}\b/g, _s = /\b[A-Z][A-Z0-9]{2}\b/g, xs = /* @__PURE__ */ new Set([
   "XRP",
   "AMM",
   "NFT",
@@ -2821,15 +3274,15 @@ const ze = /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/g, Xe = /\b[0-9A-Fa-f]{64}\b/g, Wn 
   "OFAC",
   "MICA"
 ]);
-function Yn(e) {
-  const t = (r) => [...new Set(r)], n = t(e.match(Xe) ?? []).map((r) => r.toUpperCase()), s = (e.match(Wn) ?? []).filter((r) => !n.some((o) => o.includes(r))), a = (e.match(Gn) ?? []).filter((r) => !Kn.has(r));
+function Ns(e) {
+  const t = (r) => [...new Set(r)], n = t(e.match(it) ?? []).map((r) => r.toUpperCase()), s = (e.match(As) ?? []).filter((r) => !n.some((o) => o.includes(r))), a = (e.match(_s) ?? []).filter((r) => !xs.has(r));
   return {
-    addresses: t(e.match(ze) ?? []),
+    addresses: t(e.match(at) ?? []),
     hashes: n,
     currencies: t([...a, ...s])
   };
 }
-const Vn = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "amm_account" }, Jn = [
+const Is = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "amm_account" }, Es = [
   {
     tool: "certify_authority",
     label: "issuer powers",
@@ -2891,6 +3344,18 @@ const Vn = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "a
     words: /sanction|\bofac\b|\bsdn\b|blacklist|\bpay\b|paying|send (to|money|xrp)|safe|scam|legit|trust(worthy)?\b|check (this|the|an|that)? ?(address|account|wallet)|counterparty|risky|who is|is (this|it) (ok|fine|real)|destination tag/i
   },
   {
+    tool: "investigate_hack",
+    label: "what happened to a drained account",
+    needs: "address",
+    words: /hack|hacked|stolen|stole|drain|drained|compromis|emptied|scammed|took my|lost my (xrp|funds|money|tokens)|recover (my|the|stolen|lost)|get (it|my (xrp|funds|money)) back|reverse (a|the|my|this) (transaction|payment|transfer)|trace (the|my|where)|where did (it|my|the) (go|xrp|funds|money)/i
+  },
+  {
+    tool: "security_check",
+    label: "account security",
+    needs: "address",
+    words: /secur|protect|harden|safe(ty)? of (my|this|the) (account|wallet)|takeover|take over|regular key|multi-?sig|lock (down|my)|poison|lookalike|attack/i
+  },
+  {
     tool: "ledger_sync",
     label: "server agreement",
     needs: "none",
@@ -2902,24 +3367,24 @@ const Vn = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "a
     needs: "none",
     words: /ledger (index|status|height|number)|latest ledger|current ledger|network (status|fee|busy)|\bfees? (now|right now|today)|reference fee|is the (network|ledger) (up|live|working)/i
   }
-], Qn = /noshashi|noshx|\bplans?\b|pricing|price|cost|which screen|how (do|can|should) i|what (is|are|does)|explain|difference between|what does .* mean|travel rule|\bkyc\b|\baml\b|mica|webhook|\bapi\b|examiner|auditor/i, Zn = /\bNSH-?\s?(\d{1,9})\b/gi, G = /self[- ]?repair|\brepair\b|diagnos|troubleshoot|health ?check|not working|isn'?t working|doesn'?t work|stopped working|\bbroken\b|won'?t (load|connect|open|start|sign)|can'?t (connect|sign in|log in|load)|keeps? (disconnect|signing me out|failing)|\bfix (it|the app|this|noshashi|my app|yourself|everything)\b|something('?s| is) wrong|check (the app|everything|my setup)/i, es = /\b(my|our|open|active|all|pending|unresolved|resolved|recent|customer|support) tickets?\b|\btickets? (queue|inbox|waiting|list)\b|\blist (the |my |all )?tickets\b|\bany tickets\b|\bshow (me )?(the |my )?tickets\b/i, ts = /\b(open|file|create|raise|start|submit|log) (a |an |new |the )?(support )?(ticket|case with support|support request)\b|\b(contact|tell|email|message) support\b|\breport (a |this |the )?bug\b/i, ve = /\b(with|attach|include|send) (this|the|a|my)? ?(self-?repair |repair |diagnostic )?(report|diagnostics|results)\b/i;
-function ke(e, t) {
+], Os = /noshashi|noshx|\bplans?\b|pricing|price|cost|which screen|how (do|can|should) i|what (is|are|does)|explain|difference between|what does .* mean|travel rule|\bkyc\b|\baml\b|mica|webhook|\bapi\b|examiner|auditor/i, Fs = /\bNSH-?\s?(\d{1,9})\b/gi, se = /self[- ]?repair|\brepair\b|diagnos|troubleshoot|health ?check|not working|isn'?t working|doesn'?t work|stopped working|\bbroken\b|won'?t (load|connect|open|start|sign)|can'?t (connect|sign in|log in|load)|keeps? (disconnect|signing me out|failing)|\bfix (it|the app|this|noshashi|my app|yourself|everything)\b|something('?s| is) wrong|check (the app|everything|my setup)/i, Rs = /\b(my|our|open|active|all|pending|unresolved|resolved|recent|customer|support) tickets?\b|\btickets? (queue|inbox|waiting|list)\b|\blist (the |my |all )?tickets\b|\bany tickets\b|\bshow (me )?(the |my )?tickets\b/i, Ps = /\b(open|file|create|raise|start|submit|log) (a |an |new |the )?(support )?(ticket|case with support|support request)\b|\b(contact|tell|email|message) support\b|\breport (a |this |the )?bug\b/i, De = /\b(with|attach|include|send) (this|the|a|my)? ?(self-?repair |repair |diagnostic )?(report|diagnostics|results)\b/i;
+function He(e, t) {
   const n = e.slice(t);
   return (/^\s*(?::|—|-|,)?\s*(?:saying|say|with|that|and say|telling (?:them|him|her))?\s*[:,]?\s*([\s\S]*)$/i.exec(n)?.[1] ?? "").trim().replace(/^["'“]|["'”]$/g, "").trim();
 }
-function ns(e) {
+function Cs(e) {
   const t = [];
   let n = e;
-  const s = [...e.matchAll(Zn)].map((o) => ({ ref: `NSH-${o[1]}`, index: o.index ?? 0, end: (o.index ?? 0) + o[0].length })), a = /\b(reply|respond|write|add|post|answer back|tell (?:them|the customer))(?: to| on| in)?\s+NSH-?\s?(\d{1,9})\b/i.exec(e);
+  const s = [...e.matchAll(Fs)].map((o) => ({ ref: `NSH-${o[1]}`, index: o.index ?? 0, end: (o.index ?? 0) + o[0].length })), a = /\b(reply|respond|write|add|post|answer back|tell (?:them|the customer))(?: to| on| in)?\s+NSH-?\s?(\d{1,9})\b/i.exec(e);
   if (a) {
-    const o = ke(e, (a.index ?? 0) + a[0].length);
+    const o = He(e, (a.index ?? 0) + a[0].length);
     return o.length >= 10 ? (t.push({ tool: "reply_ticket", input: { ticket: `NSH-${a[2]}`, message: o }, why: "reply to the ticket" }), n = e.slice(0, a.index)) : t.push({ tool: "read_ticket", input: { ticket: `NSH-${a[2]}` }, why: "the ticket to reply to (no message given)" }), { calls: t, rest: n };
   }
-  const r = ts.exec(e);
+  const r = Ps.exec(e);
   if (r) {
-    if (ve.test(e) || G.test(e))
+    if (De.test(e) || se.test(e))
       return t.push({ tool: "self_repair", input: { open_ticket: !0 }, why: "repair, then open a ticket with the report" }), { calls: t, rest: "" };
-    const o = ke(e, (r.index ?? 0) + r[0].length).replace(/^(about|for|regarding|because|that)\s+/i, "");
+    const o = He(e, (r.index ?? 0) + r[0].length).replace(/^(about|for|regarding|because|that)\s+/i, "");
     if (o.length >= 10) {
       const i = (o.split(/[.!?](?:\s|$)|\n/)[0] ?? o).trim().slice(0, 100);
       return t.push({ tool: "open_ticket", input: { subject: i.length >= 4 ? i : o.slice(0, 100), body: o }, why: "open a support ticket" }), { calls: t, rest: e.slice(0, r.index) };
@@ -2928,25 +3393,25 @@ function ns(e) {
   }
   for (const { ref: o } of s) {
     const i = e;
-    /\b(re-?open|not (solved|fixed|resolved))\b/i.test(i) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "open" }, why: "reopen the ticket" }) : /\b(close|resolve|mark (it |this )?(as )?(resolved|solved|done|closed)|it'?s (solved|fixed))\b/i.test(i) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "resolved" }, why: "resolve the ticket" }) : /\bmark (it |this )?(as )?answered\b/i.test(i) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "answered" }, why: "mark the ticket answered" }) : /\b(answer|draft|suggest)\b/i.test(i) ? t.push({ tool: "answer_ticket", input: { ticket: o, send: /\b(send|post|and reply|submit) (it|that|this|the (draft|answer|reply))?\b|\band send\b/i.test(i) }, why: "answer the ticket from NOSHASHI's pages" }) : G.test(i) || ve.test(i) ? t.push({ tool: "self_repair", input: { post_to_ticket: o }, why: "repair and post the report to the ticket" }) : t.push({ tool: "read_ticket", input: { ticket: o }, why: "read the ticket" });
+    /\b(re-?open|not (solved|fixed|resolved))\b/i.test(i) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "open" }, why: "reopen the ticket" }) : /\b(close|resolve|mark (it |this )?(as )?(resolved|solved|done|closed)|it'?s (solved|fixed))\b/i.test(i) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "resolved" }, why: "resolve the ticket" }) : /\bmark (it |this )?(as )?answered\b/i.test(i) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "answered" }, why: "mark the ticket answered" }) : /\b(answer|draft|suggest)\b/i.test(i) ? t.push({ tool: "answer_ticket", input: { ticket: o, send: /\b(send|post|and reply|submit) (it|that|this|the (draft|answer|reply))?\b|\band send\b/i.test(i) }, why: "answer the ticket from NOSHASHI's pages" }) : se.test(i) || De.test(i) ? t.push({ tool: "self_repair", input: { post_to_ticket: o }, why: "repair and post the report to the ticket" }) : t.push({ tool: "read_ticket", input: { ticket: o }, why: "read the ticket" });
   }
   if (s.length) return { calls: t, rest: s.reduceRight((o, i) => o.slice(0, i.index) + o.slice(i.end), e) };
-  if (es.test(e)) {
+  if (Rs.test(e)) {
     const o = /\bresolved\b|\bclosed\b/i.test(e) && !/unresolved/i.test(e) ? "resolved" : /\ball\b/i.test(e) ? "any" : "active";
     return t.push({ tool: "list_tickets", input: { status: o }, why: "the support tickets" }), { calls: t, rest: "" };
   }
-  return G.test(e) && t.push({ tool: "self_repair", input: {}, why: "check and repair the app" }), { calls: t, rest: n };
+  return se.test(e) && t.push({ tool: "self_repair", input: {}, why: "check and repair the app" }), { calls: t, rest: n };
 }
-function Ue(e, t = {}) {
-  const n = t.tickets ? ns(e) : { calls: [], rest: e };
+function rt(e, t = {}) {
+  const n = t.tickets ? Cs(e) : { calls: [], rest: e };
   e = n.rest;
-  const s = Yn(e), a = [...n.calls], r = (i) => {
+  const s = Ns(e), a = [...n.calls], r = (i) => {
     a.some((c) => c.tool === i.tool && JSON.stringify(c.input) === JSON.stringify(i.input)) || a.push(i);
   };
-  for (const i of Jn)
+  for (const i of Es)
     if (i.words.test(e))
       if (i.needs === "address")
-        for (const c of s.addresses) r({ tool: i.tool, input: { [Vn[i.tool] ?? "address"]: c }, why: i.label });
+        for (const c of s.addresses) r({ tool: i.tool, input: { [Is[i.tool] ?? "address"]: c }, why: i.label });
       else if (i.needs === "hash")
         for (const c of s.hashes)
           r({ tool: i.tool, input: i.tool === "read_token_rights" ? { token_id: c } : { hash: c }, why: i.label });
@@ -2959,45 +3424,45 @@ function Ue(e, t = {}) {
     for (const i of s.hashes) r({ tool: "read_settlement", input: { hash: i }, why: "a hash on its own" });
     for (const i of s.addresses) r({ tool: "check_address", input: { address: i }, why: "an address on its own" });
   }
-  const o = a.length === 0 && e.trim().length > 0 || n.calls.length === 0 && Qn.test(e.replace(ze, " ").replace(Xe, " "));
+  const o = a.length === 0 && e.trim().length > 0 || n.calls.length === 0 && Os.test(e.replace(at, " ").replace(it, " "));
   return { calls: a.slice(0, 6), knowledge: o, entities: s, note: n.note };
 }
-const ss = Ce.scenes, as = x("noshashi noshx plan plans need use screen screens help feature which tool tools we our us want get way much many cost price pay"), is = /\bwhich\b|\bwhat (screen|tool|plan|should)|how (do|can|does|should) (i|we|noshashi)|\bhelp\b|\bneed\b|\buse\b|where (do|can)|feature/i;
-function rs(e, t = 3) {
-  const n = new Set(x(e));
-  for (const s of as) n.delete(s);
-  return ss.map((s) => {
-    const a = x(`${s.name} ${s.name} ${s.summary}`), r = a.filter((o) => n.has(o)).length;
+const Ls = et.scenes, Ds = R("noshashi noshx plan plans need use screen screens help feature which tool tools we our us want get way much many cost price pay"), Hs = /\bwhich\b|\bwhat (screen|tool|plan|should)|how (do|can|does|should) (i|we|noshashi)|\bhelp\b|\bneed\b|\buse\b|where (do|can)|feature/i;
+function qs(e, t = 3) {
+  const n = new Set(R(e));
+  for (const s of Ds) n.delete(s);
+  return Ls.map((s) => {
+    const a = R(`${s.name} ${s.name} ${s.summary}`), r = a.filter((o) => n.has(o)).length;
     return { scene: s, score: r / Math.sqrt(a.length + 4) };
   }).filter((s) => s.score > 0.12).sort((s, a) => a.score - s.score).slice(0, t).map((s) => s.scene);
 }
-const Se = { critical: 0, warn: 1, info: 2, ok: 3 }, os = { critical: "✕", warn: "!", info: "·", ok: "✓" };
-function _(e, t = 6) {
-  const n = [...e].sort((s, a) => Se[s.severity] - Se[a.severity]).slice(0, t);
-  return n.length === 0 ? "Nothing notable was recorded." : n.map((s) => `${os[s.severity]} ${s.title}. ${s.detail}${s.action ? ` What to do: ${s.action}` : ""}`).join(`
+const qe = { critical: 0, warn: 1, info: 2, ok: 3 }, Xs = { critical: "✕", warn: "!", info: "·", ok: "✓" };
+function E(e, t = 6) {
+  const n = [...e].sort((s, a) => qe[s.severity] - qe[a.severity]).slice(0, t);
+  return n.length === 0 ? "Nothing notable was recorded." : n.map((s) => `${Xs[s.severity]} ${s.title}. ${s.detail}${s.action ? ` What to do: ${s.action}` : ""}`).join(`
 `);
 }
-const I = (e) => e ? ` (validated ledger ${e.toLocaleString("en-US")})` : "", Te = (e) => e.length > 12 ? `${e.slice(0, 6)}…${e.slice(-4)}` : e;
-function Ae(e, t) {
+const F = (e) => e ? ` (validated ledger ${e.toLocaleString("en-US")})` : "", Xe = (e) => e.length > 12 ? `${e.slice(0, 6)}…${e.slice(-4)}` : e;
+function ze(e, t) {
   switch (e) {
     case "check_address": {
-      const n = t, s = D[n.verdict];
+      const n = t, s = B[n.verdict];
       return [
-        `Address check for ${n.address}${I(n.ledgerIndex)}: ${s.label}.${n.headline === s.label ? "" : ` ${n.headline}`}`,
+        `Address check for ${n.address}${F(n.ledgerIndex)}: ${s.label}.${n.headline === s.label ? "" : ` ${n.headline}`}`,
         n.exists ? `Balance ${n.balanceXrp.toLocaleString("en-US")} XRP${n.domain ? `, claims the domain ${n.domain} (claimed, not verified)` : ""}${n.isIssuer ? `, issues ${n.issuedCurrencies.join(", ") || "tokens"}` : ""}.` : "",
-        _(n.findings),
+        E(n.findings),
         "This reports what the ledger publishes. Nothing recorded against an address is not the same as safe."
       ].filter(Boolean).join(`
 `);
     }
     case "certify_authority": {
       const n = t, s = n.checks.map((a) => {
-        const r = kn(a);
+        const r = qn(a);
         return `${r === "PASS" ? "✓" : r === "FAIL" ? "✕" : "!"} ${a.label} (${a.severity === "block" ? "blocking" : "warning"}): ${r}. ${a.detail}`;
       }).join(`
 `);
       return [
-        `Authority certificate for issuer ${n.issuer}${n.currencyLabel ? ` (${n.currencyLabel})` : ""}${I(n.ledgerIndex)}: ${n.verdict.toUpperCase()}.`,
+        `Authority certificate for issuer ${n.issuer}${n.currencyLabel ? ` (${n.currencyLabel})` : ""}${F(n.ledgerIndex)}: ${n.verdict.toUpperCase()}.`,
         s,
         `Digest ${n.digest.slice(0, 16)}…, so anyone can re-check this reading.`
       ].join(`
@@ -3006,147 +3471,173 @@ function Ae(e, t) {
     case "read_control_surface": {
       const n = t;
       return [
-        `Who controls ${n.address}${I(n.ledgerIndex)}: master key ${n.masterKeyEnabled ? "enabled" : "disabled"}${n.regularKey ? `, regular key ${Te(n.regularKey)}` : ""}${n.signers.present ? `, signer list quorum ${n.signers.quorum} with the fewest signers that reach it being ${n.signers.minimumSigners}` : ", no signer list"}. Balance ${n.balanceXrp.toLocaleString("en-US")} XRP, ${n.reserveLockedXrp.toLocaleString("en-US")} XRP locked in reserve${n.escrowedXrp ? `, ${n.escrowedXrp.toLocaleString("en-US")} XRP in escrow` : ""}.`,
-        _(wt(n))
+        `Who controls ${n.address}${F(n.ledgerIndex)}: master key ${n.masterKeyEnabled ? "enabled" : "disabled"}${n.regularKey ? `, regular key ${Xe(n.regularKey)}` : ""}${n.signers.present ? `, signer list quorum ${n.signers.quorum} with the fewest signers that reach it being ${n.signers.minimumSigners}` : ", no signer list"}. Balance ${n.balanceXrp.toLocaleString("en-US")} XRP, ${n.reserveLockedXrp.toLocaleString("en-US")} XRP locked in reserve${n.escrowedXrp ? `, ${n.escrowedXrp.toLocaleString("en-US")} XRP in escrow` : ""}.`,
+        E(Dt(n))
       ].join(`
 `);
     }
     case "read_provenance": {
       const n = t;
-      return [`Provenance of ${n.address}${n.ageDays !== void 0 ? `, about ${Math.round(n.ageDays).toLocaleString("en-US")} days old` : ""}${n.fundedBy ? `, first funded by ${n.fundedBy}` : ""}:`, _(_t(n))].join(`
+      return [`Provenance of ${n.address}${n.ageDays !== void 0 ? `, about ${Math.round(n.ageDays).toLocaleString("en-US")} days old` : ""}${n.fundedBy ? `, first funded by ${n.fundedBy}` : ""}:`, E(jt(n))].join(`
 `);
     }
     case "read_book": {
       const n = t;
-      return [`Order book${I(n.ledgerIndex)}:`, _(Ft(n))].join(`
+      return [`Order book${F(n.ledgerIndex)}:`, E(Yt(n))].join(`
 `);
     }
     case "read_settlement": {
       const n = t;
       return [
-        `Transaction ${Te(n.hash)}${I(n.ledgerIndex)}: ${n.transactionType}, result ${n.result}${n.validated ? "" : " (not yet validated, so nothing here is final)"}.`,
-        _(Ct(n))
+        `Transaction ${Xe(n.hash)}${F(n.ledgerIndex)}: ${n.transactionType}, result ${n.result}${n.validated ? "" : " (not yet validated, so nothing here is final)"}.`,
+        E(en(n))
       ].join(`
 `);
     }
     case "read_pool": {
       const n = t;
-      return [`AMM pool${I(n.ledgerIndex)}:`, _(Xt(n))].join(`
+      return [`AMM pool${F(n.ledgerIndex)}:`, E(rn(n))].join(`
 `);
     }
     case "read_issuance": {
       const n = t;
-      return [`Issuance${I(n.ledgerIndex)}:`, _(Kt(n))].join(`
+      return [`Issuance${F(n.ledgerIndex)}:`, E(gn(n))].join(`
 `);
     }
     case "read_claims": {
       const n = t;
-      return [`Tokens sent to the account${I(n.ledgerIndex)}:`, _(en(n))].join(`
+      return [`Tokens sent to the account${F(n.ledgerIndex)}:`, E(bn(n))].join(`
 `);
     }
     case "read_token_rights":
-      return ["NFT rights:", _(fn(t))].join(`
+      return ["NFT rights:", E(On(t))].join(`
 `);
     case "ledger_sync":
-      return ["What the public servers report:", _(wn(t))].join(`
+      return ["What the public servers report:", E(Dn(t))].join(`
 `);
     case "ledger_status": {
       const n = t;
       return `Latest validated ledger ${n.ledgerIndex.toLocaleString("en-US")}, closed ${n.closeTime}. Reference fee ${n.baseFeeXrp} XRP; the open ledger is charging ${n.openLedgerFeeXrp} XRP with ${n.queueSize} transactions queued.`;
     }
+    case "security_check": {
+      const { posture: n, assessment: s } = t;
+      if (!n.exists) return `Security check for ${n.address}: there is no account at this address (never funded, or deleted).`;
+      const a = s.plan.length ? `
+Hardening plan (unsigned; review and sign each in your own wallet, NOSHASHI never signs):
+${s.plan.map((r) => `→ ${r.title}: ${JSON.stringify(r.tx)}${r.caution ? ` Before signing: ${r.caution}` : ""}`).join(`
+`)}` : "";
+      return [`Security check for ${n.address}${F(n.ledgerIndex)}: grade ${s.grade}, ${s.score}/100. ${s.summary}`, E(s.findings), a].filter(Boolean).join(`
+`);
+    }
+    case "investigate_hack": {
+      const n = t, s = n.trace.nodes.filter((a) => a.depth > 0).map((a) => `${a.address} (hop ${a.depth}): ${a.status.replace("_", " ")}${a.balanceXrp !== null ? `, ${a.balanceXrp} XRP` : ""}${a.sanction ? `, OFAC SDN ${a.sanction.entityName}` : ""}`);
+      return [
+        `Incident on ${n.trace.root}, traced from ledger ${n.trace.sinceLedger.toLocaleString("en-US")} up to ${n.trace.depthLimit} hops:`,
+        ...n.signals.map((a) => `${a.severity === "critical" ? "✕" : a.severity === "warn" ? "!" : "·"} ${a.title}. ${a.detail}`),
+        s.length ? `Where the value went:
+${s.slice(0, 12).join(`
+`)}` : "",
+        n.trace.dust.count ? `(${n.trace.dust.count} dust payments under ${n.trace.minXrp} XRP were not followed.)` : "",
+        `Recovery paths:
+${n.options.map((a) => `[${a.outlook.replace("_", " ").toUpperCase()}] ${a.title}. ${a.detail}`).join(`
+`)}`,
+        "The full trail and a SHA-256 dossier for police and exchanges are in SECURITY CENTER › INCIDENT RESPONSE."
+      ].filter(Boolean).join(`
+`);
+    }
     default:
-      return H(e)?.compose?.(t) ?? "";
+      return j(e)?.compose?.(t) ?? "";
   }
 }
-function cs(e) {
+function zs(e) {
   return e.replace(/^Q: .*$/m, "").replace(/^A: /m, "").replace(/([.!?])\s+/g, `$1
 `).split(/\n+/).map((t) => t.trim()).filter((t) => t.length > 25 && !/^[|·—-]/.test(t));
 }
-function ds(e, t) {
+function Us(e, t) {
   if (t.length === 0) return "";
-  const n = new Set(x(e)), s = t[0], a = /^(Help ›|Support ›|Learn NOSHASHI › Knowledge check|Pricing ›)/, r = t.slice(0, 2).find((l) => a.test(l.title) && l.score >= s.score * 0.85);
+  const n = new Set(R(e)), s = t[0], a = /^(Help ›|Support ›|Learn NOSHASHI › Knowledge check|Pricing ›)/, r = t.slice(0, 2).find((g) => a.test(g.title) && g.score >= s.score * 0.85);
   if (r) {
-    let l = r.text.replace(/^Q: .*\nA: /, "");
-    return /^(Help|Support) ›/.test(r.title) && (l = l.split(`
+    let g = r.text.replace(/^Q: .*\nA: /, "");
+    return /^(Help|Support) ›/.test(r.title) && (g = g.split(`
 `).slice(1).join(`
-`) || l), `${l}
+`) || g), `${g}
 
 Source: ${r.title} · ${r.source}`;
   }
   if (s.title.startsWith("Learn NOSHASHI › Word list")) {
-    const l = s.text.split(`
-`).find((u) => x(u.split(":")[0]).some((g) => n.has(g)));
-    if (l) return `${l}
+    const g = s.text.split(`
+`).find((f) => R(f.split(":")[0]).some((h) => n.has(h)));
+    if (g) return `${g}
 
 Source: NOSHASHI word list · ${s.source}`;
   }
   const o = t.slice(0, 3).flatMap(
-    (l, u) => cs(l.text).map((g, p) => {
-      const y = x(g), m = y.filter((A) => n.has(A)).length;
-      return { hit: l, sentence: g, position: p, score: m / Math.sqrt(y.length + 1) + (u === 0 ? 0.3 : 0) - p * 0.01 };
+    (g, f) => zs(g.text).map((h, m) => {
+      const y = R(h), p = y.filter((T) => n.has(T)).length;
+      return { hit: g, sentence: h, position: m, score: p / Math.sqrt(y.length + 1) + (f === 0 ? 0.3 : 0) - m * 0.01 };
     })
-  ), i = /* @__PURE__ */ new Set(), c = o.filter((l) => l.score > 0).sort((l, u) => u.score - l.score).filter((l) => {
-    const u = l.sentence.toLowerCase().replace(/\s+/g, " ");
-    return !i.has(u) && i.add(u);
+  ), i = /* @__PURE__ */ new Set(), c = o.filter((g) => g.score > 0).sort((g, f) => f.score - g.score).filter((g) => {
+    const f = g.sentence.toLowerCase().replace(/\s+/g, " ");
+    return !i.has(f) && i.add(f);
   }).slice(0, 4);
   if (c.length === 0) return `${s.text.slice(0, 600)}
 
 Source: ${s.title} · ${s.source}`;
   const d = /* @__PURE__ */ new Map();
-  for (const l of c) d.set(l.hit, [...d.get(l.hit) ?? [], l]);
-  const h = [], f = [];
-  for (const [l, u] of d)
-    h.push(u.sort((g, p) => g.position - p.position).map((g) => g.sentence).join(" ")), f.push(`${l.title} · ${l.source}`);
-  return `${h.join(`
+  for (const g of c) d.set(g.hit, [...d.get(g.hit) ?? [], g]);
+  const l = [], u = [];
+  for (const [g, f] of d)
+    l.push(f.sort((h, m) => h.position - m.position).map((h) => h.sentence).join(" ")), u.push(`${g.title} · ${g.source}`);
+  return `${l.join(`
 
 `)}
 
-Source${f.length > 1 ? "s" : ""}: ${f.join("; ")}`;
+Source${u.length > 1 ? "s" : ""}: ${u.join("; ")}`;
 }
-async function ls(e, t, n) {
-  const s = Ue(e, { tickets: !!H("list_tickets") }), a = [], r = (f) => {
-    a.push(f), n?.(f);
+async function Ms(e, t, n) {
+  const s = rt(e, { tickets: !!j("list_tickets") }), a = [], r = (u) => {
+    a.push(u), n?.(u);
   }, o = await Promise.all(
-    s.calls.map(async (f) => {
-      const l = await W(f.tool, f.input, t), u = s.calls.some((g) => g.tool === "check_address" && g.input.address === f.input.issuer);
-      if (l.ok === !1 && l.gated && f.tool === "certify_authority" && typeof f.input.issuer == "string" && !u) {
-        const g = await W("check_address", { address: f.input.issuer }, t);
-        if (g.ok)
-          return r({ kind: "tool", name: "check_address", input: { address: f.input.issuer }, ok: !0, summary: "read" }), { call: { ...f, tool: "check_address", input: { ...f.input, address: f.input.issuer } }, result: g, gatedFrom: f };
+    s.calls.map(async (u) => {
+      const g = await ne(u.tool, u.input, t), f = s.calls.some((h) => h.tool === "check_address" && h.input.address === u.input.issuer);
+      if (g.ok === !1 && g.gated && u.tool === "certify_authority" && typeof u.input.issuer == "string" && !f) {
+        const h = await ne("check_address", { address: u.input.issuer }, t);
+        if (h.ok)
+          return r({ kind: "tool", name: "check_address", input: { address: u.input.issuer }, ok: !0, summary: "read" }), { call: { ...u, tool: "check_address", input: { ...u.input, address: u.input.issuer } }, result: h, gatedFrom: u };
       }
-      if (!l.ok && f.tool === "read_settlement" && !l.gated) {
-        const g = await W("read_token_rights", { token_id: f.input.hash }, t);
-        if (g.ok)
-          return r({ kind: "tool", name: "read_token_rights", input: { token_id: f.input.hash }, ok: !0, summary: "read" }), { call: { ...f, tool: "read_token_rights" }, result: g };
+      if (!g.ok && u.tool === "read_settlement" && !g.gated) {
+        const h = await ne("read_token_rights", { token_id: u.input.hash }, t);
+        if (h.ok)
+          return r({ kind: "tool", name: "read_token_rights", input: { token_id: u.input.hash }, ok: !0, summary: "read" }), { call: { ...u, tool: "read_token_rights" }, result: h };
       }
       return r({
         kind: "tool",
-        name: f.tool,
-        input: f.input,
-        ok: l.ok,
-        summary: l.ok ? "read" : l.error
-      }), { call: f, result: l };
+        name: u.tool,
+        input: u.input,
+        ok: g.ok,
+        summary: g.ok ? "read" : g.error
+      }), { call: u, result: g };
     })
   ), i = [];
-  for (const f of o) {
-    const { call: l, result: u } = f, g = H(l.tool)?.screen ?? l.tool;
-    u.ok && "gatedFrom" in f ? i.push(
-      `${Ae(l.tool, u.value)}
+  for (const u of o) {
+    const { call: g, result: f } = u, h = j(g.tool)?.screen ?? g.tool;
+    f.ok && "gatedFrom" in u ? i.push(
+      `${ze(g.tool, f.value)}
 
 That is the free address check. The six issuer checks with a GO/HOLD/NO-GO certificate need Pro in the app, and are free on the website without an account: https://www.noshashi.app/certificate/`
-    ) : u.ok ? i.push(Ae(l.tool, u.value)) : u.gated ? i.push(
-      l.tool === "certify_authority" ? `${g}: ${u.error} The same six issuer checks are free on the website, without an account: https://www.noshashi.app/certificate/ (paste ${String(l.input.issuer ?? "the issuer address")}).` : `${g}: ${u.error} It is available after upgrading in Pricing.`
-    ) : H(l.tool)?.compose ? i.push(`${g}: ${u.error}`) : i.push(`${g}: could not be read. ${u.error}`);
+    ) : f.ok ? i.push(ze(g.tool, f.value)) : f.gated ? i.push(
+      g.tool === "certify_authority" ? `${h}: ${f.error} The same six issuer checks are free on the website, without an account: https://www.noshashi.app/certificate/ (paste ${String(g.input.issuer ?? "the issuer address")}).` : `${h}: ${f.error} It is available after upgrading in Pricing.`
+    ) : j(g.tool)?.compose ? i.push(`${h}: ${f.error}`) : i.push(`${h}: could not be read. ${f.error}`);
   }
   let c = "";
   if (s.knowledge) {
-    const f = await qe(e, 5).catch(() => []);
-    if (r({ kind: "tool", name: "search_noshashi", input: { query: e.slice(0, 60) }, ok: f.length > 0, summary: f.length ? `${f.length} passages` : "nothing matched" }), c = ds(e, f), is.test(e)) {
-      const l = rs(e);
-      l.length > 0 && (c += `${c ? `
+    const u = await st(e, 5).catch(() => []);
+    if (r({ kind: "tool", name: "search_noshashi", input: { query: e.slice(0, 60) }, ok: u.length > 0, summary: u.length ? `${u.length} passages` : "nothing matched" }), c = Us(e, u), Hs.test(e)) {
+      const g = qs(e);
+      g.length > 0 && (c += `${c ? `
 
 ` : ""}Where in NOSHASHI:
-${l.map((u) => `→ ${u.name} (${u.plan}): ${u.summary}`).join(`
+${g.map((f) => `→ ${f.name} (${f.plan}): ${f.summary}`).join(`
 `)}`);
     }
   }
@@ -3154,18 +3645,18 @@ ${l.map((u) => `→ ${u.name} (${u.plan}): ${u.summary}`).join(`
   const d = i.join(`
 
 `);
-  let h = [d, c].filter(Boolean).join(`
+  let l = [d, c].filter(Boolean).join(`
 
 `);
-  return h || (h = "I could not find that in NOSHASHI's pages, and the question names nothing I can read from the ledger. Name an address (r…), an issuer and currency, or a 64-character transaction hash, or ask about a NOSHASHI screen, plan or feature."), { text: h, steps: a, plan: s, facts: d };
+  return l || (l = "I could not find that in NOSHASHI's pages, and the question names nothing I can read from the ledger. Name an address (r…), an issuer and currency, or a 64-character transaction hash, or ask about a NOSHASHI screen, plan or feature."), { text: l, steps: a, plan: s, facts: d };
 }
-const E = {
+const C = {
   support: "support@noshashi.app",
   institutions: "institutions@noshashi.app",
   security: "security@noshashi.app",
   privacy: "privacy@noshashi.app",
   form: "/contact/"
-}, Z = [
+}, de = [
   {
     id: "what",
     keywords: ["what", "noshashi", "do", "product", "about", "purpose", "explain", "is"],
@@ -3312,36 +3803,36 @@ const E = {
     id: "contact",
     keywords: ["contact", "email", "human", "sales", "talk", "reach", "help", "support", "someone"],
     q: "How do I reach a person?",
-    a: `The contact form reaches the team directly. For specific routes: ${E.support} for product support, ${E.institutions} for institutional enquiries, ${E.security} for vulnerability reports and ${E.privacy} for data questions.`,
+    a: `The contact form reaches the team directly. For specific routes: ${C.support} for product support, ${C.institutions} for institutional enquiries, ${C.security} for vulnerability reports and ${C.privacy} for data questions.`,
     links: [{ label: "Contact form", href: "/contact/" }]
   }
-], us = new Set(
+], js = new Set(
   "a an the is are was were be been do does did can could would should i you it this that of for to in on at by with my your our we us and or if how what when where why not no yes please tell me about".split(" ")
 );
-function K(e) {
-  return String(e || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((t) => t.length > 1 && !us.has(t));
+function ae(e) {
+  return String(e || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((t) => t.length > 1 && !js.has(t));
 }
-function hs(e) {
-  const t = K(e);
-  return t.length ? Z.map((n) => {
-    const s = new Set(n.keywords), a = new Set(K(n.q)), r = new Set(K(n.a));
+function Bs(e) {
+  const t = ae(e);
+  return t.length ? de.map((n) => {
+    const s = new Set(n.keywords), a = new Set(ae(n.q)), r = new Set(ae(n.a));
     let o = 0;
     for (const i of t)
       s.has(i) ? o += 3 : a.has(i) ? o += 2 : r.has(i) ? o += 0.5 : [...s].some((c) => c.startsWith(i) || i.startsWith(c)) && (o += 1.5);
     return { entry: n, score: o };
   }).filter((n) => n.score > 0).sort((n, s) => s.score - n.score) : [];
 }
-const $e = 3;
-function fs(e) {
-  const t = hs(e), n = t[0];
-  if (!n || n.score < $e)
+const Ue = 3;
+function Ws(e) {
+  const t = Bs(e), n = t[0];
+  if (!n || n.score < Ue)
     return {
       grounded: !1,
       text: "I can answer questions about pricing, downloads and verification, what the paid tiers add, privacy and security posture, billing, and the XRPL data the product reads. I don't have a confident answer to that one — rather than guess, send it to the team and you'll get a real answer.",
-      links: [{ label: "Contact the team", href: E.form }],
+      links: [{ label: "Contact the team", href: C.form }],
       matched: t.slice(0, 3).map((a) => a.entry.id)
     };
-  const s = t.slice(1, 3).filter((a) => a.score > $e * 0.8).map((a) => a.entry.q);
+  const s = t.slice(1, 3).filter((a) => a.score > Ue * 0.8).map((a) => a.entry.q);
   return {
     grounded: !0,
     text: n.entry.a,
@@ -3350,11 +3841,11 @@ function fs(e) {
     matched: [n.entry.id]
   };
 }
-const _e = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz", gs = /\bs[1-9A-HJ-NP-Za-km-z]{24,34}\b/g;
-function ps(e) {
+const Me = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz", Gs = /\bs[1-9A-HJ-NP-Za-km-z]{24,34}\b/g;
+function Ks(e) {
   const t = [0];
   for (const r of e) {
-    const o = _e.indexOf(r);
+    const o = Me.indexOf(r);
     if (o < 0) return null;
     let i = o;
     for (let c = t.length - 1; c >= 0; c -= 1)
@@ -3363,66 +3854,66 @@ function ps(e) {
       t.unshift(i & 255), i >>= 8;
   }
   let n = 0;
-  for (; n < e.length && e[n] === _e[0]; ) n += 1;
+  for (; n < e.length && e[n] === Me[0]; ) n += 1;
   let s = 0;
   for (; s < t.length && t[s] === 0; ) s += 1;
   const a = new Uint8Array(n + t.length - s);
   return a.set(t.slice(s), n), a;
 }
-async function ms(e) {
+async function Ys(e) {
   const t = e.slice(0, e.length - 4), n = await crypto.subtle.digest("SHA-256", t), s = new Uint8Array(await crypto.subtle.digest("SHA-256", n));
   return e.slice(e.length - 4).every((r, o) => r === s[o]);
 }
-async function ys(e) {
-  const t = ps(e);
+async function Vs(e) {
+  const t = Ks(e);
   if (!t) return !1;
   const n = t.length === 21 && t[0] === 33, s = t.length === 23 && t[0] === 1 && t[1] === 225 && t[2] === 75;
-  return !n && !s ? !1 : ms(t);
+  return !n && !s ? !1 : Ys(t);
 }
-async function bs(e) {
-  for (const t of e.matchAll(gs))
-    if (await ys(t[0])) return !0;
+async function Js(e) {
+  for (const t of e.matchAll(Gs))
+    if (await Vs(t[0])) return !0;
   return !1;
 }
-class ws extends Error {
+class Qs extends Error {
   constructor() {
     super(
       "That message contains an XRPL secret seed, so it was not sent. NOSHASHI never needs a seed. Treat this one as exposed: move the funds to a new account and stop using it."
     ), this.name = "SecretInMessageError";
   }
 }
-const Me = 10, je = "noshashi:web.checks", V = () => {
+const ot = 10, ct = "noshashi:web.checks", re = () => {
   const e = /* @__PURE__ */ new Date();
   return `${e.getUTCFullYear()}-${String(e.getUTCMonth() + 1).padStart(2, "0")}`;
 };
-function vs() {
+function Zs() {
   try {
-    const e = JSON.parse(localStorage.getItem(je) ?? "null");
-    if (e && e.month === V() && typeof e.count == "number" && Number.isFinite(e.count))
+    const e = JSON.parse(localStorage.getItem(ct) ?? "null");
+    if (e && e.month === re() && typeof e.count == "number" && Number.isFinite(e.count))
       return { month: e.month, count: Math.max(0, e.count) };
   } catch {
   }
-  return { month: V(), count: 0 };
+  return { month: re(), count: 0 };
 }
-let Be = 0;
-function xe(e) {
-  Be = e;
+let dt = 0;
+function je(e) {
+  dt = e;
   try {
-    localStorage.setItem(je, JSON.stringify({ month: V(), count: e }));
+    localStorage.setItem(ct, JSON.stringify({ month: re(), count: e }));
   } catch {
   }
 }
-const J = () => Math.max(vs().count, Be), ks = {
+const oe = () => Math.max(Zs().count, dt), ea = {
   has: () => !1,
   spendFreeCheck: () => {
-    const e = J();
-    return e >= Me ? !1 : (xe(e + 1), !0);
+    const e = oe();
+    return e >= ot ? !1 : (je(e + 1), !0);
   },
-  refundFreeCheck: () => xe(Math.max(0, J() - 1))
-}, Q = "Support › ";
-Xn(
-  Z.map((e) => ({
-    title: `${Q}${e.q}`,
+  refundFreeCheck: () => je(Math.max(0, oe() - 1))
+}, ce = "Support › ";
+is(
+  de.map((e) => ({
+    title: `${ce}${e.q}`,
     source: "noshashi.app support",
     text: `${e.q}
 ${e.a}`,
@@ -3430,63 +3921,63 @@ ${e.a}`,
     weight: 1.25
   }))
 );
-const Y = { label: "Contact the team", href: E.form };
-function Ss(e) {
+const ie = { label: "Contact the team", href: C.form };
+function ta(e) {
   const t = /\n\nSources?: ([^\n]+)/.exec(e);
   if (!t) return { body: e, links: [] };
   const n = [];
   let s;
   for (const a of t[1].split("; ")) {
     const r = a.lastIndexOf(" · "), o = r >= 0 ? a.slice(0, r) : a, i = r >= 0 ? a.slice(r + 3) : "";
-    o.startsWith(Q) && (s = o.slice(Q.length));
+    o.startsWith(ce) && (s = o.slice(ce.length));
     const c = /^https:\/\/www\.noshashi\.app(\/[^\s]*)?$/.exec(i);
     if (!c) continue;
     const d = c[1] ?? "/";
-    if (n.some((f) => f.href.split("#")[0] === d.split("#")[0])) continue;
-    const h = (o.split(" › ").pop() ?? o).replace(/^NOSHASHI — /, "").trim();
-    n.push({ label: h.length > 38 ? `${h.slice(0, 36)}…` : h, href: d });
+    if (n.some((u) => u.href.split("#")[0] === d.split("#")[0])) continue;
+    const l = (o.split(" › ").pop() ?? o).replace(/^NOSHASHI — /, "").trim();
+    n.push({ label: l.length > 38 ? `${l.slice(0, 36)}…` : l, href: d });
   }
   return { body: e.replace(t[0], ""), links: n.slice(0, 3), support: s };
 }
-async function $s(e, t) {
+async function aa(e, t) {
   const n = String(e ?? "").trim().slice(0, 600);
   if (!n)
     return { text: "Ask a question about NOSHASHI, or paste an XRPL address, token id or transaction hash.", steps: [], links: [], related: [], source: "none" };
-  if (await bs(n))
-    return { text: new ws().message, steps: [], links: [], related: [], source: "refused" };
-  const s = Ue(n).calls.length > 0, a = [];
+  if (await Js(n))
+    return { text: new Qs().message, steps: [], links: [], related: [], source: "refused" };
+  const s = rt(n).calls.length > 0, a = [];
   let r = !1;
   try {
-    const o = await ls(n, ks, (u) => {
-      if (u.kind !== "tool") return;
-      if (u.name === "search_noshashi") {
-        r = u.ok;
+    const o = await Ms(n, ea, (f) => {
+      if (f.kind !== "tool") return;
+      if (f.name === "search_noshashi") {
+        r = f.ok;
         return;
       }
-      const g = { reader: Ts[u.name] ?? u.name, ok: u.ok, summary: u.summary };
-      a.push(g), t?.(g);
+      const h = { reader: na[f.name] ?? f.name, ok: f.ok, summary: f.summary };
+      a.push(h), t?.(h);
     });
     if (!o.facts && !r)
-      return { text: fs(n).text, steps: a, links: [Y], related: [], source: "none" };
-    const { body: i, links: c, support: d } = Ss(o.text), h = d ? Z.find((u) => u.q === d) : void 0, f = i.includes("https://www.noshashi.app/certificate/") ? [{ label: "Free issuer certificate", href: "/certificate/" }] : [], l = [...h?.links ?? [], ...f, ...c];
+      return { text: Ws(n).text, steps: a, links: [ie], related: [], source: "none" };
+    const { body: i, links: c, support: d } = ta(o.text), l = d ? de.find((f) => f.q === d) : void 0, u = i.includes("https://www.noshashi.app/certificate/") ? [{ label: "Free issuer certificate", href: "/certificate/" }] : [], g = [...l?.links ?? [], ...u, ...c];
     return {
       text: i,
       steps: a,
-      links: l.some((u) => u.href === E.form) ? l.slice(0, 4) : [...l.slice(0, 3), Y],
+      links: g.some((f) => f.href === C.form) ? g.slice(0, 4) : [...g.slice(0, 3), ie],
       related: [],
-      source: o.facts ? "ledger" : h ? "support" : "pages"
+      source: o.facts ? "ledger" : l ? "support" : "pages"
     };
   } catch (o) {
     return {
       text: `NOSHX could not finish that: ${o instanceof Error ? o.message : "an unexpected error"}. Try again, or contact the team.`,
       steps: a,
-      links: [Y],
+      links: [ie],
       related: [],
       source: s ? "ledger" : "none"
     };
   }
 }
-const Ts = {
+const na = {
   check_address: "the address",
   read_claims: "the inbox",
   read_token_rights: "the token",
@@ -3499,10 +3990,10 @@ const Ts = {
   certify_authority: "the issuer",
   ledger_status: "the latest ledger",
   ledger_sync: "the public servers"
-}, _s = () => Math.max(0, Me - J()), xs = () => Un();
+}, ia = () => Math.max(0, ot - oe()), ra = () => rs();
 export {
-  $s as ask,
-  _s as checksLeft,
-  xs as prewarm,
-  Ss as splitSources
+  aa as ask,
+  ia as checksLeft,
+  ra as prewarm,
+  ta as splitSources
 };

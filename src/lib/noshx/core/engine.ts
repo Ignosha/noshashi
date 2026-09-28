@@ -11,6 +11,8 @@ import { nftFindings, type NftReport } from "@/lib/desk/nft";
 import { syncFindings, type SyncReport } from "@/lib/net/sync";
 import { checkState } from "@/lib/policy";
 import type { LedgerInfo } from "@/lib/xrpl/types";
+import type { SecurityAssessment, SecurityPosture } from "@/lib/security/hardening";
+import type { RecoveryOption, TakeoverSignal, Trace } from "@/lib/security/incident";
 import { runToolRaw, findTool, type ToolContext } from "../tools";
 import { searchKnowledge, tokens, type Hit } from "../knowledge";
 import type { NoshxStep } from "../loop";
@@ -154,6 +156,28 @@ export function compose(tool: string, value: unknown): string {
     case "ledger_status": {
       const l = value as LedgerInfo;
       return `Latest validated ledger ${l.ledgerIndex.toLocaleString("en-US")}, closed ${l.closeTime}. Reference fee ${l.baseFeeXrp} XRP; the open ledger is charging ${l.openLedgerFeeXrp} XRP with ${l.queueSize} transactions queued.`;
+    }
+    case "security_check": {
+      const { posture: p, assessment: a } = value as { posture: SecurityPosture; assessment: SecurityAssessment };
+      if (!p.exists) return `Security check for ${p.address}: there is no account at this address (never funded, or deleted).`;
+      const plan = a.plan.length
+        ? `\nHardening plan (unsigned; review and sign each in your own wallet, NOSHASHI never signs):\n${a.plan.map((s) => `→ ${s.title}: ${JSON.stringify(s.tx)}${s.caution ? ` Before signing: ${s.caution}` : ""}`).join("\n")}`
+        : "";
+      return [`Security check for ${p.address}${stamp(p.ledgerIndex)}: grade ${a.grade}, ${a.score}/100. ${a.summary}`, findingsText(a.findings), plan].filter(Boolean).join("\n");
+    }
+    case "investigate_hack": {
+      const r = value as { signals: TakeoverSignal[]; trace: Trace; options: RecoveryOption[] };
+      const holding = r.trace.nodes.filter((n) => n.depth > 0).map((n) => `${n.address} (hop ${n.depth}): ${n.status.replace("_", " ")}${n.balanceXrp !== null ? `, ${n.balanceXrp} XRP` : ""}${n.sanction ? `, OFAC SDN ${n.sanction.entityName}` : ""}`);
+      return [
+        `Incident on ${r.trace.root}, traced from ledger ${r.trace.sinceLedger.toLocaleString("en-US")} up to ${r.trace.depthLimit} hops:`,
+        ...r.signals.map((s) => `${s.severity === "critical" ? "✕" : s.severity === "warn" ? "!" : "·"} ${s.title}. ${s.detail}`),
+        holding.length ? `Where the value went:\n${holding.slice(0, 12).join("\n")}` : "",
+        r.trace.dust.count ? `(${r.trace.dust.count} dust payments under ${r.trace.minXrp} XRP were not followed.)` : "",
+        `Recovery paths:\n${r.options.map((o) => `[${o.outlook.replace("_", " ").toUpperCase()}] ${o.title}. ${o.detail}`).join("\n")}`,
+        "The full trail and a SHA-256 dossier for police and exchanges are in SECURITY CENTER › INCIDENT RESPONSE.",
+      ]
+        .filter(Boolean)
+        .join("\n");
     }
     default:
       return findTool(tool)?.compose?.(value) ?? "";

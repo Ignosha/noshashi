@@ -72,6 +72,10 @@ export type EventType =
   | "clawback"
   | "nft"
   | "amm"
+  /** SetRegularKey or SignerListSet: who can sign changed. */
+  | "keys_changed"
+  /** AccountDelete by the watched account. */
+  | "account_deleted"
   /** A transaction between other parties that touched the account only by rippling through it. */
   | "rippled_through"
   | "other";
@@ -79,7 +83,7 @@ export type EventType =
 export const EVENT_TYPES: EventType[] = [
   "payment_in", "payment_out", "payment_self", "trustline_changed", "trustline_frozen", "trustline_unfrozen",
   "account_settings_changed", "offer_created", "offer_cancelled", "check_created", "check_cashed", "check_cancelled",
-  "escrow", "clawback", "nft", "amm", "rippled_through", "other",
+  "escrow", "clawback", "nft", "amm", "keys_changed", "account_deleted", "rippled_through", "other",
 ];
 
 /**
@@ -190,6 +194,32 @@ export function classifyTransaction(tx: Tx, meta: Tx, watched: string, ledgerInd
         sendMax: amountOf(tx.SendMax),
         memos: memosOf(tx),
       },
+    });
+  } else if (type === "AccountDelete") {
+    const delivered = amountOf(meta?.delivered_amount ?? meta?.DeliveredAmount);
+    if (to === watched && from !== watched) {
+      // A sweep into the watched account: incoming value, screened like a payment.
+      events.push({
+        ...base,
+        type: "payment_in",
+        counterparty: from,
+        data: { amount: delivered, delivered, partial: false, destinationTag: typeof tx.DestinationTag === "number" ? tx.DestinationTag : null, sourceTag: null, sendMax: null, memos: memosOf(tx), viaAccountDelete: true },
+      });
+    } else {
+      events.push({ ...base, type: "account_deleted", counterparty: to || null, data: { delivered, destinationTag: typeof tx.DestinationTag === "number" ? tx.DestinationTag : null } });
+    }
+  } else if (type === "SetRegularKey" || type === "SignerListSet") {
+    events.push({
+      ...base,
+      type: "keys_changed",
+      counterparty: null,
+      data: type === "SetRegularKey"
+        ? { change: tx.RegularKey ? "regular_key_set" : "regular_key_removed", regularKey: tx.RegularKey ?? null }
+        : {
+            change: Number(tx.SignerQuorum ?? 0) > 0 ? "signer_list_set" : "signer_list_removed",
+            quorum: Number(tx.SignerQuorum ?? 0),
+            signers: ((tx.SignerEntries ?? []) as Tx[]).map((e) => ({ account: e.SignerEntry?.Account, weight: e.SignerEntry?.SignerWeight })),
+          },
     });
   } else if (type === "TrustSet") {
     const limit = amountOf(tx.LimitAmount);

@@ -120,6 +120,18 @@ const RULES: Rule[] = [
     words: /sanction|\bofac\b|\bsdn\b|blacklist|\bpay\b|paying|send (to|money|xrp)|safe|scam|legit|trust(worthy)?\b|check (this|the|an|that)? ?(address|account|wallet)|counterparty|risky|who is|is (this|it) (ok|fine|real)|destination tag/i,
   },
   {
+    tool: "investigate_hack",
+    label: "what happened to a drained account",
+    needs: "address",
+    words: /hack|hacked|stolen|stole|drain|drained|compromis|emptied|scammed|took my|lost my (xrp|funds|money|tokens)|recover (my|the|stolen|lost)|get (it|my (xrp|funds|money)) back|reverse (a|the|my|this) (transaction|payment|transfer)|trace (the|my|where)|where did (it|my|the) (go|xrp|funds|money)/i,
+  },
+  {
+    tool: "security_check",
+    label: "account security",
+    needs: "address",
+    words: /secur|protect|harden|safe(ty)? of (my|this|the) (account|wallet)|takeover|take over|regular key|multi-?sig|lock (down|my)|poison|lookalike|attack/i,
+  },
+  {
     tool: "ledger_sync",
     label: "server agreement",
     needs: "none",

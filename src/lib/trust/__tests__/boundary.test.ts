@@ -109,7 +109,9 @@ describe("VALIDATED STATE", () => {
           else if (text[end] === "}" && --depth === 0) break;
         }
         const body = text.slice(m.index!, end + 1);
-        if (!/ledger_index:\s*"validated"|ledger_index_min:\s*-1/.test(body)) unpinned.push(`${file}: ${m[1]}`);
+        // A range that ends at ledger_index_max: -1 ends at the latest validated
+        // ledger, whatever it starts at (a forward trace from an incident).
+        if (!/ledger_index:\s*"validated"|ledger_index_min:\s*-1|ledger_index_max:\s*-1/.test(body)) unpinned.push(`${file}: ${m[1]}`);
       }
     }
     expect(unpinned).toEqual([]);
