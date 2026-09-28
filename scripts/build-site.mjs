@@ -1041,6 +1041,67 @@ async function buildProtection() {
   }));
 }
 
+/* ── /releases/1-0-14/ ────────────────────────────────────────────── */
+/*
+ * The 1.0.14 release in plain language, and the goal it serves. Every
+ * line restates a CHANGELOG entry; nothing here is promised ahead of the
+ * code. The protection features are described as verification, never as
+ * insurance, as on /protection/ itself.
+ */
+async function buildRelease1014() {
+  const card = (eyebrow, title, items) =>
+    `<div class="panel"><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2><ul class="proof-list">${items.map((i) => `<li>${i}</li>`).join("")}</ul></div>`;
+  const body = `<div class="page-head"><p class="eyebrow">RELEASE 1.0.14 · THE GOAL</p><h1>Make XRP safer to hold, and easier to trust.</h1><p>People and institutions holding XRP have no deposit guarantee, few ways to stop a theft in progress and no simple way to check that an exchange really holds what it owes. Release 1.0.14 answers each of those with facts read from validated XRP Ledger state, so nobody has to take anyone's word for it, including ours.</p><p><a class="btn" href="/downloads/noshashi-how-this-helps-xrp.pdf">Read the 6-page brief (PDF)</a> <a class="btn ghost" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.14" rel="noopener">Download 1.0.14</a></p></div>
+<section><div class="section-head"><p class="eyebrow">01 / The goal in three lines</p><h2>What this release is for.</h2></div><div class="grid g3">
+<div class="panel"><p class="eyebrow">STOP LOSSES</p><h2>Before and during an attack.</h2><p>Spot a drain as it happens, check a link or an address before you trust it, and get the transactions that save what is left.</p></div>
+<div class="panel"><p class="eyebrow">PROVE BACKING</p><h2>Balances you can check.</h2><p>An institution publishes proof that customer XRP is held, and each customer checks their own balance is counted, from the ledger.</p></div>
+<div class="panel"><p class="eyebrow">SHARE WHAT IS KNOWN</p><h2>One registry, reviewed.</h2><p>Scam reports backed by transaction evidence, confirmed by a reviewer who did not file them, screen deposits and withdrawals for everyone.</p></div>
+</div></section>
+<section><div class="section-head"><p class="eyebrow">02 / What is new, by who it helps</p><h2>In the desktop app and the public API.</h2></div><div class="grid g2">
+${card("FREE · EVERYONE WHO HOLDS XRP", "Protect your own account.", [
+  "<strong>Emergency kit and drainer check:</strong> is the account being drained now, and the ordered, unsigned transactions that save the most. NOSHASHI never signs and never asks for a key.",
+  "<strong>Who is this?</strong> Whether an address belongs to an exchange, from a domain that vouches for it or from how it behaves.",
+  "<strong>Scam registry and phishing link check:</strong> look up an address or a link seen in ledger memos, with no account.",
+  "<strong>Pre-sign check, recover funds, exposure audit, deposit help, domain check</strong> and a graded <strong>account check</strong> in the Security Center.",
+])}
+${card("INSTITUTIONAL", "Proof of reserves.", [
+  "Name the accounts that hold customer XRP and publish one root over customer balances. Only the root, the total and the count leave your machine.",
+  "Each customer gets their own inclusion proof.",
+  "Reserves are read every day at 06:17 UTC and recorded as an attestation, hash-chained to the one before.",
+  "File scam reports with transaction evidence to the shared registry.",
+])}
+${card("ENTERPRISE", "Customer Asset Protection.", [
+  "A protection fund with a per-customer limit. Only XRP locked in escrow, or held under a signer list with the master key disabled, counts as secured.",
+  "A public page at <a href=\"/protection/\">/protection/</a> where customers check their own proof and the latest attestation is recomputed in their browser.",
+  "<strong>Withdrawal screening:</strong> flags a withdrawal that would bounce, goes to a brand-new or lookalike account, or to one a sanctions listing or scam report touches up to three funding hops back.",
+  "<strong>Market surveillance</strong> of the ledger's own order books.",
+])}
+${card("STRATEGIC", "Watched around the clock.", [
+  "A signed <code>protection_alert</code> webhook when reserves fall below published liabilities or the status worsens.",
+  "A <code>protection_attested</code> event for every daily attestation.",
+  "The phishing link feed, as data for your own systems.",
+])}
+</div></section>
+<section><div class="panel"><p class="eyebrow">03 / Read this before relying on it</p><h2>Verification, not insurance.</h2><p>Customer Asset Protection shows, from the ledger, what an institution holds and has set aside. NOSHASHI pays no claims, and no government scheme stands behind it. A validated XRP Ledger transaction cannot be reversed; these tools help you avoid a loss and document one, not undo it.</p></div></section>
+<section><div class="panel"><p class="eyebrow">04 / Go further</p><h2>Where to start.</h2><ul class="proof-list">
+<li><a href="/downloads/noshashi-how-this-helps-xrp.pdf">How NOSHASHI helps XRP</a>, the 6-page brief for beginners and investors</li>
+<li><a href="/protection/">Check an institution's protection page</a></li>
+<li><a href="/learn/#l23">Lesson 23: proving customer balances are backed</a></li>
+<li><a href="/pricing/">Which plan includes what</a></li>
+<li><a href="https://github.com/Ignosha/noshashi/blob/main/CHANGELOG.md" rel="noopener">The full changelog</a></li>
+</ul></div></section>`;
+
+  await write("releases/1-0-14/index.html", renderPage({
+    title: "NOSHASHI 1.0.14 — safer to hold, easier to trust",
+    description:
+      "Release 1.0.14: an emergency kit for drained accounts, a shared scam registry and phishing check, withdrawal screening, "
+      + "and Customer Asset Protection — proof, from the XRP Ledger, that customer XRP is backed. Verification, not insurance.",
+    path: "/releases/1-0-14/",
+    body,
+    structured: [breadcrumb("Release 1.0.14", "/releases/1-0-14/")],
+  }));
+}
+
 /* ── institutional product pages ─────────────────────────────────── */
 const PRODUCT_PAGES = [
   ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Operating evidence</p><h2>Make every decision reviewable.</h2><p>Enterprise brings the same validated-ledger reading used in the public certificate into a governed workflow: the observation, policy result and adjudication remain connected.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p><ul class="proof-list"><li>Evidence attached to each policy result</li><li>Decision history suitable for second-line review</li></ul></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth, while teams retain the context required to act on them.</p><ul class="proof-list"><li>Validated state before interpretation</li><li>Exportable records for internal controls</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p>Architecture and commercial scope are confirmed before any contracted capability is promised.</p><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Trust &amp; security</a></p></div></section>`],
@@ -1466,6 +1527,7 @@ async function buildSitemap(docs = []) {
     // somebody who will never install anything.
     ["/certificate/", "weekly", "0.9"],
     ["/protection/", "weekly", "0.8"],
+    ["/releases/1-0-14/", "monthly", "0.7"],
     ["/pricing/", "monthly", "0.9"],
     ["/enterprise/", "monthly", "0.9"],
     ["/trust/", "monthly", "0.8"],
@@ -1556,6 +1618,7 @@ async function main() {
   await buildContact();
   await buildCertificate();
   await buildProtection();
+  await buildRelease1014();
   await buildPricingEnhancement();
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildTrust();
