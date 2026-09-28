@@ -143,6 +143,7 @@ import { DOMAIN_REGISTRY, evaluatePolicy } from "@/lib/policy";
 import { HandoffProvider } from "@/lib/nav/handoff";
 import { ObserverRunner } from "@/lib/agent/useObserver";
 import { StressScheduleRunner } from "@/lib/desk/stressSchedule";
+import { PersonalGuardianRunner } from "@/lib/security/guardian";
 import { OrgContextSync, useWorkstationOrg } from "@/lib/org/workstationContext";
 
 export type SceneId =
@@ -860,6 +861,7 @@ function ConsoleApp() {
       <HandoffProvider onNavigate={goTo} currentScene={scene}>
       <ObserverRunner />
       <StressScheduleRunner />
+      <PersonalGuardianRunner />
       <OrgContextSync />
       <div className="scanlines vignette relative flex h-full w-full overflow-hidden bg-background text-foreground">
         <SkipLink />

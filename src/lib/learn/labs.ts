@@ -38,6 +38,8 @@ export type LabStep = {
   subject?: string;
   /** What `subject` is, in a few words ("Bitstamp's USD issuer"). */
   subjectLabel?: string;
+  /** The tab of the scene that reads the subject, when the scene has several. */
+  view?: string;
   /** What to look for once there. */
   lookFor: string;
   check: Checkpoint;
@@ -70,6 +72,12 @@ export const LAB_SUBJECTS = {
   nftMutable: "00182710C7DEC772B41E9496AA92D148C4FD64D239AA629847C852FD05B7EEED",
   /** A phishing relay account: sprayed 1-drop dust, then deleted itself into the next account (recorded 2026-09-28; actNotFound). */
   phishingRelay: "rfWPjcbY5QT2shRFY2SSQHFKPYSMzxaMaN",
+  /** Ripple Escrow Wallet #03 in ripple.com's xrp-ledger.toml: ten escrows to itself, recorded at ledger 107,296,847. */
+  rippleEscrow: "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+  /** An NFT trader with 35 open sell offers and four buy offers that had expired, recorded at ledger 107,296,847. */
+  nftTrader: "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+  /** XRP Toolkit's donations account: its Domain names xrptoolkit.com, whose xrp-ledger.toml lists it. */
+  toolkit: "rTooLkitCksh5mQa67eaa2JaWHDBnHkpy",
 } as const;
 
 const S = LAB_SUBJECTS;
@@ -542,6 +550,90 @@ export const LABS: Lab[] = [
           ],
           answer: 0,
           why: "Validated transactions are final. Paid 'recovery' offers are the second half of the scam. INCIDENT RESPONSE follows the value and lists the paths that really exist, with the evidence each needs.",
+        },
+      },
+    ],
+  },
+  {
+    id: "recovery",
+    title: "Get stuck XRP back, close what others could use, and read before you sign",
+    outcome: "Find XRP an account can recover, revoke the permissions it has left open, and recognise the signatures that empty accounts.",
+    minutes: 6,
+    steps: [
+      {
+        id: "escrow",
+        task: "Open SECURITY CENTER › RECOVER FUNDS with Ripple's escrow wallet #03 filled in.",
+        scene: "security",
+        view: "recover",
+        subject: S.rippleEscrow,
+        subjectLabel: "Ripple's escrow wallet #03",
+        lookFor: "Escrows to itself, each maturing on a date, listed as ARRIVING LATER; and AccountDelete blocked while escrows exist.",
+        check: {
+          question: "One of these escrows matures tomorrow. What happens to its XRP then?",
+          options: [
+            "Nothing until someone submits EscrowFinish: an escrow never pays out by itself",
+            "It lands in the account automatically at the FinishAfter time",
+            "It returns to Ripple's treasury",
+          ],
+          answer: 0,
+          why: "FinishAfter only makes finishing possible. RECOVER FUNDS lists a matured escrow with the EscrowFinish to sign, naming the sequence of the EscrowCreate.",
+        },
+      },
+      {
+        id: "expired-offers",
+        task: "Open RECOVER FUNDS for a real NFT trader.",
+        scene: "security",
+        view: "recover",
+        subject: S.nftTrader,
+        subjectLabel: "an NFT trader",
+        lookFor: "Offers that have expired listed as NOW, each freeing 0.2 XRP of reserve, and live sell offers listed as OPTIONAL.",
+        check: {
+          question: "An NFT buy offer expired weeks ago. Does it still cost its owner anything?",
+          options: [
+            "Yes: it still locks 0.2 XRP of owner reserve until someone cancels it",
+            "No: expired objects are removed by the ledger automatically",
+            "Yes: it keeps charging a daily fee",
+          ],
+          answer: 0,
+          why: "Expired offers, checks and escrows stay on the ledger, and keep their reserve, until a transaction removes them.",
+        },
+      },
+      {
+        id: "exposure",
+        task: "Open SECURITY CENTER › EXPOSURE AUDIT for the same trader.",
+        scene: "security",
+        view: "exposure",
+        subject: S.nftTrader,
+        subjectLabel: "an NFT trader",
+        lookFor: "Every open NFT sell offer named with who can take the NFT and at what price, each with an NFTokenCancelOffer to revoke it.",
+        check: {
+          question: "A site asks you to sign an NFTokenCreateOffer selling your NFT for 0 XRP to 'verify ownership'. What is it?",
+          options: [
+            "A giveaway: whoever accepts it takes the NFT for nothing. Do not sign",
+            "A harmless ownership check",
+            "A listing that needs your approval before anyone can accept it",
+          ],
+          answer: 0,
+          why: "PRE-SIGN CHECK answers DO NOT SIGN for a zero-price sell offer, a new regular key or signer list, and an AccountDelete: the signatures that empty accounts.",
+        },
+      },
+      {
+        id: "domain",
+        task: "Open SECURITY CENTER › DOMAIN CHECK with XRP Toolkit's account filled in.",
+        scene: "security",
+        view: "domain",
+        subject: S.toolkit,
+        subjectLabel: "XRP Toolkit's donations account",
+        lookFor: "VERIFIED: the account's Domain names xrptoolkit.com, and xrptoolkit.com lists the account in its xrp-ledger.toml.",
+        check: {
+          question: "Another account sets its Domain to xrptoolkit.com. What will DOMAIN CHECK say?",
+          options: [
+            "UNVERIFIED: the site does not list it, so treat it as impersonation",
+            "VERIFIED, because the Domain field matches",
+            "Nothing: domains cannot be checked",
+          ],
+          answer: 0,
+          why: "Anyone can write any domain into an account. Only the website listing the account back proves the claim.",
         },
       },
     ],

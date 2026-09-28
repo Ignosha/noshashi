@@ -13,6 +13,15 @@ import { fetchLedger } from "@/lib/xrpl/client";
 import { searchKnowledge } from "./knowledge";
 import { assessSecurity, readSecurityPosture } from "@/lib/security/hardening";
 import { recoveryOptions, takeoverSignals, traceFunds, TRACE_LIMITS } from "@/lib/security/incident";
+import { addressesIn, explainTransaction, parseTransaction, type SignExplanation } from "@/lib/security/signInspect";
+import { readHoldings } from "@/lib/security/objects";
+import { recoveryFrom, resolveEscrowSequences, type RecoveryReport } from "@/lib/security/recovery";
+import { exposureFrom, type ExposureReport } from "@/lib/security/exposure";
+import { inventoryFrom, priceInventory, type Inventory } from "@/lib/security/inventory";
+import { checkDeposit, type DepositDiagnosis } from "@/lib/security/depositHelp";
+import { verifyDomain, type DomainAccount, type DomainCheck } from "@/lib/security/domain";
+import { CLUSTER_LIMITS, mapCluster, type Cluster } from "@/lib/security/cluster";
+import { sanctionsFor } from "@/lib/xrpl/sanctions";
 
 /**
  * What NOSHX can do: read the live XRP Ledger through the same readers
@@ -271,6 +280,158 @@ export const NOSHX_TOOLS: NoshxTool[] = [
         trace: { ...trace, flows: trace.flows.slice(0, 40) },
         options: recoveryOptions(trace, { stillHoldsXrp: posture.exists ? posture.balanceXrp : 0, keyEvents: posture.events }),
       };
+    },
+  },
+  {
+    name: "explain_transaction",
+    description:
+      "Before signing: what a transaction really does, from its JSON or the hex blob a site asks you to sign. Decoded locally. Flags new regular keys and signer lists, disabled master keys, AccountDelete, NFTs sold for nothing, partial payments, sanctioned destinations, high fees and links in memos, with a verdict: SAFE-LOOKING, CAREFUL or DO NOT SIGN.",
+    input_schema: schema({ transaction: { type: "string", description: "The transaction JSON, or its hex blob" } }),
+    feature: null,
+    screen: "Security Center › Pre-sign check",
+    run: async (input) => {
+      const { tx, format } = await parseTransaction(String(input.transaction ?? ""));
+      const listed = await sanctionsFor(addressesIn(tx));
+      return explainTransaction(tx, format, { sanctioned: listed?.hits });
+    },
+    compose: (value) => {
+      const r = value as SignExplanation;
+      return [
+        `${r.verdict}. ${r.summary.join(" ")}`,
+        ...r.flags.map((f) => `${f.severity === "danger" ? "✕" : f.severity === "warn" ? "!" : "·"} ${f.text}`),
+        "NOSHASHI never signs: if you go ahead, sign it in your own wallet.",
+      ].join("\n");
+    },
+  },
+  {
+    name: "find_stuck_funds",
+    description:
+      "XRP an account can get back: matured escrows waiting to be finished, expired escrows and payment channels that return when closed, checks written to it and never cashed, and owner reserve locked by old trust lines, orders, NFT offers, preauthorisations and tickets. Each with the unsigned transaction that releases it, and what AccountDelete would return.",
+    input_schema: schema({ address: addr("The account to scan, r…") }),
+    feature: null,
+    screen: "Security Center › Recover funds",
+    run: async (input) => {
+      const h = await readHoldings(address(input));
+      return recoveryFrom(h, await resolveEscrowSequences(h));
+    },
+    compose: (value) => {
+      const r = value as RecoveryReport;
+      if (!r.exists) return `There is no account at ${r.address}.`;
+      const xrp = (n: number) => `${n.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`;
+      return [
+        `Recovery scan of ${r.address} at ledger ${r.ledgerIndex.toLocaleString("en-US")}: ${xrp(r.recoverableNowXrp)} recoverable now, ${xrp(r.optionalReserveXrp)} of reserve you could free by removing objects you no longer need${r.laterXrp ? `, ${xrp(r.laterXrp)} arriving later` : ""}. Balance ${xrp(r.balanceXrp)}, of which ${xrp(r.lockedXrp)} is locked as reserve.`,
+        ...r.items.slice(0, 12).map((i) => `[${i.when.toUpperCase()}] ${i.title}. ${i.detail}${i.tx ? ` Transaction: ${JSON.stringify(i.tx)}` : ""}`),
+        r.items.length > 12 ? `…and ${r.items.length - 12} more in SECURITY CENTER › RECOVER FUNDS.` : "",
+        r.deletion.possible ? `Closing the account with AccountDelete would return ${xrp(r.deletion.returnsXrp)} to an account you own.` : `AccountDelete is blocked by: ${r.deletion.blockers.join(", ")}.`,
+        "Every transaction is unsigned: review and sign it in your own wallet.",
+      ].filter(Boolean).join("\n");
+    },
+  },
+  {
+    name: "audit_exposure",
+    description:
+      "The XRP Ledger's 'revoke approvals': every standing permission that lets someone else take value from an account (checks it wrote, NFT sell offers including zero-price giveaways, funded payment channels, open orders, preauthorisations, regular key, signers, NFT minter, Default Ripple on a non-issuer), each with the unsigned revoking transaction.",
+    input_schema: schema({ address: addr("The account to audit, r…") }),
+    feature: null,
+    screen: "Security Center › Exposure audit",
+    run: async (input) => exposureFrom(await readHoldings(address(input))),
+    compose: (value) => {
+      const r = value as ExposureReport;
+      if (!r.exists) return `There is no account at ${r.address}.`;
+      if (!r.exposures.length) return `Exposure audit of ${r.address} at ledger ${r.ledgerIndex.toLocaleString("en-US")}: nothing open. No one else can take value from it.`;
+      return [
+        `Exposure audit of ${r.address} at ledger ${r.ledgerIndex.toLocaleString("en-US")}: ${r.exposures.length} open permission${r.exposures.length === 1 ? "" : "s"}${r.atRiskXrp ? `, up to ${r.atRiskXrp.toLocaleString("en-US")} XRP others could take` : ""}.`,
+        ...r.exposures.slice(0, 12).map((e) => `[${e.risk.toUpperCase()}] ${e.title}. ${e.detail}${e.revoke ? ` Revoke: ${JSON.stringify(e.revoke)}` : ""}`),
+        "Revoking transactions are unsigned: sign them in your own wallet.",
+      ].join("\n");
+    },
+  },
+  {
+    name: "asset_inventory",
+    description:
+      "Everything an account holds besides XRP: tokens, AMM LP shares, NFTs and value in open orders. On Pro and above each is valued in XRP at the live best bid, AMM spot price or pool share.",
+    input_schema: schema({ address: addr("The account, r…") }),
+    feature: null,
+    screen: "Security Center › Recover funds",
+    run: async (input, context) => {
+      const inventory = inventoryFrom(await readHoldings(address(input)));
+      return context.has("asset_recovery") ? priceInventory(inventory) : inventory;
+    },
+    compose: (value) => {
+      const r = value as Inventory;
+      if (!r.exists) return `There is no account at ${r.address}.`;
+      if (!r.items.length) return `${r.address} holds ${r.xrpBalance.toLocaleString("en-US")} XRP and nothing else.`;
+      return [
+        `${r.address} holds ${r.xrpBalance.toLocaleString("en-US")} XRP and ${r.items.length} other holding${r.items.length === 1 ? "" : "s"}${r.priced ? `, worth about ${r.valuedXrp.toLocaleString("en-US")} XRP at the best bid` : ""}:`,
+        ...r.items.slice(0, 15).map((i) => `· ${i.label}${i.kind === "nft" ? "" : `: ${i.amount.toLocaleString("en-US", { maximumFractionDigits: 6 })}`}${i.valueXrp !== null && r.priced ? ` ≈ ${i.valueXrp.toLocaleString("en-US")} XRP` : ""}${i.note ? ` (${i.note})` : ""}`),
+        r.priced ? "A top-of-book price is an indication; selling a large balance moves it." : "Pro values each holding in XRP at the live best bid.",
+      ].join("\n");
+    },
+  },
+  {
+    name: "deposit_help",
+    description:
+      "A deposit that 'never arrived', explained from its transaction hash: a failed payment (tecDST_TAG_NEEDED, tecNO_DST_INSUF_XRP…) moved nothing but its fee; one that reached an exchange without the right destination tag can be credited by the exchange, with a ready letter and its SHA-256; one sent to a private wallet can only be returned by its owner.",
+    input_schema: schema(
+      { hash: addr("The transaction hash, 64 hexadecimal characters"), expected_tag: { type: "number", description: "The destination tag the person should have used, if known" } },
+      ["hash"]
+    ),
+    feature: null,
+    screen: "Security Center › Deposit help",
+    run: (input) => {
+      const tag = Number(input.expected_tag);
+      return checkDeposit(hash64(input, "hash"), Number.isInteger(tag) ? tag : null);
+    },
+    compose: (value) => {
+      const r = value as DepositDiagnosis;
+      return [
+        `${r.headline}.`,
+        r.explanation,
+        r.steps.length ? r.steps.map((s, i) => `${i + 1}. ${s}`).join("\n") : "",
+        r.letter ? `The letter to send the service (SHA-256 ${r.letter.sha256.slice(0, 16)}…) is in SECURITY CENTER › DEPOSIT HELP:\n${r.letter.text}` : "",
+      ].filter(Boolean).join("\n");
+    },
+  },
+  {
+    name: "verify_domain",
+    description:
+      "Whether an account's claimed Domain is real: the domain must list the account back in https://<domain>/.well-known/xrp-ledger.toml. Given a domain instead, which accounts it vouches for and whether each names it back. Catches accounts impersonating exchanges and issuers.",
+    input_schema: schema({ address: addr("An account, r… (or leave empty and give domain)"), domain: { type: "string", description: "A domain such as example.com" } }, []),
+    feature: null,
+    screen: "Security Center › Domain check",
+    run: (input) => {
+      const a = String(input.address ?? "").trim();
+      if (ADDRESS.test(a)) return verifyDomain({ address: a });
+      const d = String(input.domain ?? "").trim();
+      if (!d) throw new ToolInputError("Give an address or a domain.");
+      return verifyDomain({ domain: d });
+    },
+    compose: (value) => {
+      const r = value as { check: DomainCheck; accounts?: DomainAccount[] };
+      return [
+        `${r.check.status.replace("_", " ").toUpperCase()}: ${r.check.detail}`,
+        ...(r.accounts ?? []).map((a) => `· ${a.address}: ${a.exists === false ? "does not exist" : a.points_back ? "names the domain back" : `does not name it (${a.domain ?? "no domain"})`}`),
+      ].join("\n");
+    },
+  },
+  {
+    name: "map_cluster",
+    description:
+      "From one scam or drainer account, the other accounts the same operation runs: who funded it, accounts it created, where it swept on AccountDelete, shared vanity endings and memos. Services end a branch. Two hops and 40 accounts; four hops and 200 on Enterprise.",
+    input_schema: schema({ address: addr("A known scam account, r…") }),
+    feature: "asset_recovery",
+    screen: "Security Center › Scam clusters",
+    run: (input, context) => mapCluster(address(input), context.has("forensic_trace") ? CLUSTER_LIMITS.deep : CLUSTER_LIMITS.standard),
+    compose: (value) => {
+      const c = value as Cluster;
+      return [
+        `Cluster around ${c.seed}: ${c.nodes.length} accounts, ${c.links.length} links${c.capped ? " (capped)" : ""}.`,
+        ...c.links.slice(0, 12).map((l) => `· ${l.kind === "funded" ? "funded" : "swept (AccountDelete)"} ${l.from} → ${l.to}, ${l.xrp} XRP (${l.hash.slice(0, 12)}…)`),
+        ...c.vanity.map((v) => `${v.accounts.length} accounts end in "${v.ending}": a generated vanity series.`),
+        ...c.sharedMemos.map((m) => `${m.accounts.length} accounts sent the memo "${m.text.slice(0, 80)}".`),
+        ...c.nodes.filter((n) => n.sanction).map((n) => `${n.address} is on the OFAC SDN list (${n.sanction!.entityName}).`),
+        "Save the report or open a case from SECURITY CENTER › SCAM CLUSTERS.",
+      ].join("\n");
     },
   },
 ];

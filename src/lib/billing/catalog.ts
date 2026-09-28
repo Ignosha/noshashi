@@ -91,6 +91,13 @@ export const PLANS: Plan[] = [
       "CSV audit export",
       "Account security check — who can sign, open doors, key changes, poisoning attempts, and an unsigned hardening plan",
       "Safe send — check a pasted address against your own for lookalikes before you sign",
+      "Pre-sign explainer — paste any transaction or blob and see what it really does before you sign (DO NOT SIGN on takeovers and NFT giveaways)",
+      "Stuck funds & reserve recovery — matured escrows, expired channels and checks, and reserve locked in old objects, with the transactions to get it back",
+      "Exposure audit — every check, NFT sell offer, channel, order, key and preauthorisation that lets someone else take value, with a revoke for each",
+      "Wrong-deposit helper — a deposit that 'vanished' explained from its hash, with the letter to the exchange when it arrived without a tag",
+      "Domain impersonation check — does the domain an account claims list it back in its xrp-ledger.toml",
+      "Forgotten-asset inventory — tokens, LP shares, NFTs and open orders an account still holds",
+      "Personal Guardian — native takeover alerts for up to 3 of your own addresses while the app is open",
       "Binary integrity verification",
       "Community support",
     ],
@@ -127,6 +134,8 @@ export const PLANS: Plan[] = [
       "Editable policy rule set — your thresholds, not ours",
       "Issuer drift monitor — native alert the moment an issuer freezes you",
       "Incident response — follow stolen value hop by hop past the dust, with every recovery path that exists and a SHA-256 dossier for police and exchanges",
+      "Asset recovery suite — forgotten assets valued in XRP at the live best bid, recovery and exposure scans across 25 addresses at once, Personal Guardian on 50 addresses",
+      "Scam cluster mapper — the accounts one operation runs, linked by funder, AccountDelete sweeps, vanity endings and shared memos (two hops, 40 accounts)",
       "5,000 API verifications included",
       "Priority support",
     ],
@@ -147,6 +156,7 @@ export const PLANS: Plan[] = [
       // a line on a pricing page that nothing honours.
       "compliance_api",
       "incident_response",
+      "asset_recovery",
     ],
   },
   {
@@ -165,6 +175,7 @@ export const PLANS: Plan[] = [
       "Everything in Pro, unlimited seats",
       "Immutable audit log of every adjudication, export and settings change",
       "Bulk portfolio monitoring — unlimited wallets, scheduled stress runs",
+      "Recovery and exposure scans across up to 500 addresses in one run, exported for the audit file",
       "Custom alert logic — your own thresholds, expressions and destinations",
       "Issuance surveillance — who holds your paper, and how concentrated",
       "Travel Rule (FATF R.16) scoping across every settlement",
@@ -198,6 +209,7 @@ export const PLANS: Plan[] = [
       "bulk_monitoring",
       "custom_alert_logic",
       "incident_response",
+      "asset_recovery",
     ],
   },
   {
@@ -219,6 +231,7 @@ export const PLANS: Plan[] = [
       "Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit",
       "Embeddable screening widget for your own site: address verification against poisoning, sanctions and deposit status",
       "Forensic trace — five hops deep, 1,000 transactions an account, straight into an organization investigation case",
+      "Forensic cluster mapping — four hops and 200 accounts per scam operation, opened as an investigation case",
       "Asset passports and issuer intelligence at institutional scope",
       "Portfolio monitoring, counterparty and liquidity intelligence",
       "Deterministic policy engine, adjudication and decision history",
@@ -252,6 +265,7 @@ export const PLANS: Plan[] = [
       "embedded_delivery",
       "incident_response",
       "forensic_trace",
+      "asset_recovery",
     ],
   },
   {
@@ -272,7 +286,7 @@ export const PLANS: Plan[] = [
       "High-volume API capacity and contracted burst limits",
       "XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API",
       "Custom export schemas, bulk export and event retention you set",
-      "Security Guardian — signed security_alert webhooks the minute a watched account's keys change or it is deleted, and one-click watching of a theft trail",
+      "Security Guardian — signed security_alert webhooks the minute a watched account's keys change or it is deleted, and one-click watching of a theft trail or a whole scam cluster",
       "Architecture review before commitment",
       "Scope documented against the integration",
     ],
@@ -304,6 +318,7 @@ export const PLANS: Plan[] = [
       "incident_response",
       "forensic_trace",
       "security_guardian",
+      "asset_recovery",
     ],
   },
 ];
@@ -488,6 +503,12 @@ export const FEATURE_CATALOG: Record<
     requires: "enterprise",
     blurb:
       "Incident response at investigator depth: five hops and 1,000 transactions per account, custodial landings and sanctioned addresses named, vanity-address series detected, and the dossier opened as an organization investigation case in one click.",
+  },
+  asset_recovery: {
+    label: "Asset recovery suite",
+    requires: "desk",
+    blurb:
+      "The recovery tools at desk scale: every token, LP share and NFT valued in XRP at the live best bid, stuck-funds and exposure scans across a book of addresses at once (25 on Pro, 500 on Institutional and above), Personal Guardian on up to 50 addresses, and the scam cluster mapper: the accounts one operation runs, linked by who funded them, where they swept on deletion, vanity endings and shared memos.",
   },
   security_guardian: {
     label: "Security Guardian",

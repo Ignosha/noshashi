@@ -48,6 +48,25 @@ describe("reading the question", () => {
     expect(plan(`What is the recovery ratio of ${BITSTAMP} in a stress test?`).calls.map((c) => c.tool)).not.toContain("investigate_hack");
   });
 
+  it("plans the recovery and analysis tools", () => {
+    const tools = (q: string) => plan(q).calls.map((c) => c.tool);
+    expect(tools(`Is any XRP stuck in escrows or reserve I could reclaim on ${BITSTAMP}?`)).toContain("find_stuck_funds");
+    expect(tools(`What permissions or open offers could someone use to take value from ${BITSTAMP}? I want to revoke them`)).toEqual(["audit_exposure"]);
+    expect(tools(`What else does ${BITSTAMP} hold? Give me an inventory`)).toEqual(["asset_inventory"]);
+    expect(tools(`My deposit ${PAYMENT.hash} never arrived, I forgot the tag`)).toContain("deposit_help");
+    expect(tools(`Map the cluster of linked accounts around ${BITSTAMP}`)).toEqual(["map_cluster"]);
+    expect(tools(`Does ${BITSTAMP} really belong to the website in its domain field?`)).toEqual(["verify_domain"]);
+    expect(plan("Which accounts does bitstamp.net list in its xrp-ledger.toml domain file?").calls).toEqual([
+      expect.objectContaining({ tool: "verify_domain", input: { domain: "bitstamp.net" } }),
+    ]);
+  });
+
+  it("explains a pasted transaction, and plans nothing from the addresses inside it", () => {
+    const tx = `{"TransactionType":"SetRegularKey","Account":"${BITSTAMP}","RegularKey":"rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ","Fee":"12","Sequence":1}`;
+    const p = plan(`A site asks me to sign this, is it safe? ${tx}`);
+    expect(p.calls).toEqual([expect.objectContaining({ tool: "explain_transaction", input: { transaction: tx } })]);
+  });
+
   it("sends product and concept questions to the pages", () => {
     const p = plan("How much does the Institutional plan cost?");
     expect(p.calls).toEqual([]);

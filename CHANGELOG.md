@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+### Recovery and cybersecurity analysis tools, by tier
+
+- **Free on every plan:**
+  - **Pre-sign check.** Paste any transaction or signing blob and read what
+    it really does before you sign it. It is decoded on the device. It flags
+    new regular keys and signer lists, AccountDelete, NFTs sold for nothing,
+    partial payments, lookalike and OFAC-listed destinations, high fees and
+    links in memos, with a verdict: SAFE-LOOKING, CAREFUL or DO NOT SIGN.
+  - **Recover funds.** Finds matured escrows waiting to be finished, expired
+    escrows and payment channels that return when closed, uncashed checks,
+    and reserve locked in old trust lines, orders, NFT offers,
+    preauthorisations and tickets. Each comes with the unsigned transaction
+    that releases it, plus what AccountDelete would return.
+  - **Exposure audit.** The XRP Ledger's "revoke approvals": every check,
+    NFT sell offer, payment channel, order, key and preauthorisation that
+    lets someone else take value, each with its revoke.
+  - **Deposit help.** A "lost" deposit explained from its hash. When it
+    reached an exchange without the right tag, it writes the letter the
+    exchange needs, with its SHA-256.
+  - **Domain check.** Does the domain an account claims list it back in its
+    `xrp-ledger.toml`? The file is read server-side at the new public
+    `noshashi-xrpl-watch/domain-verify` route.
+  - **Asset inventory.** Tokens, LP shares, NFTs and open orders.
+  - **Personal Guardian.** Native takeover alerts for 3 of your own
+    addresses while the app is open.
+- **Pro and above (`asset_recovery`):**
+  - holdings valued in XRP at the live best bid, AMM spot price or pool share;
+  - recovery and exposure scans across 25 addresses at once (500 on
+    Institutional and above, with CSV export);
+  - Personal Guardian on 50 addresses;
+  - the **scam cluster mapper**, which finds the accounts one operation runs
+    by linking funders, AccountDelete sweeps, vanity endings and shared memos.
+- **Enterprise:** cluster maps four hops and 200 accounts deep, opened as an
+  investigation case.
+- **Strategic:** Security Guardian watches a whole cluster server-side.
+- NOSHX gains seven tools for these, and it explains a transaction pasted
+  into a question.
+
 ### Security Center: cybersecurity for XRP Ledger accounts
 
 - **Account check (free).** Any address graded A to F from what the ledger

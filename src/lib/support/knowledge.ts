@@ -114,6 +114,55 @@ export const KNOWLEDGE: Answer[] = [
     keywords: ["alert", "guardian", "takeover", "monitor", "keys changed", "webhook", "security_alert", "watch", "notify"],
   },
   {
+    id: "personal-guardian",
+    question: "Can I get an alert on my own computer if my wallet is being taken over?",
+    answer:
+      "Yes, free. In SECURITY CENTER › GUARDIAN, add your own addresses under PERSONAL GUARDIAN (3 on Free, 50 on Pro and above). While NOSHASHI is open it reads them every minute and raises a native notification when a new regular key or signer list appears, the master key is switched, the account is deleted, more than your threshold of XRP leaves, or a dust payment or NFT offer with a link arrives. The addresses and alerts stay on your device. For accounts that must be watched when no one has the app open, Strategic's server-side Guardian sends signed webhooks.",
+    keywords: ["notification", "alert me", "personal", "my wallet", "desktop", "guardian", "outflow", "notify", "monitor my"],
+  },
+  {
+    id: "pre-sign-check",
+    question: "A website asks me to sign a transaction. How do I know what it does?",
+    answer:
+      "Paste it into SECURITY CENTER › PRE-SIGN CHECK (free), as JSON or as the hex blob the site shows. It is decoded on your device and explained in plain words, with a verdict: SAFE-LOOKING, CAREFUL or DO NOT SIGN. DO NOT SIGN is given for what empties accounts: a SetRegularKey or SignerListSet that hands signing to someone else, an AccountDelete, an NFT sell offer for zero, or an OFAC-listed or lookalike destination. A transaction is not a secret; a seed is, and no legitimate site ever asks for one.",
+    keywords: ["sign", "signing", "blob", "transaction", "approve", "wallet prompt", "what does this do", "decode", "phishing", "claim", "airdrop"],
+  },
+  {
+    id: "recover-funds",
+    question: "Is any of my XRP stuck, and can I get my reserve back?",
+    answer:
+      "Open SECURITY CENTER › RECOVER FUNDS (free for one address). It reads everything the account owns and lists what comes back. That covers escrows that have matured and are waiting for someone to finish them, and expired escrows and payment channels that return to you when closed. It also covers checks written to you that you never cashed. The owner reserve (0.2 XRP each) locked by empty trust lines, old orders, NFT offers, preauthorisations and unused tickets is listed too. Each item comes with the unsigned transaction that releases it, and the scan says what AccountDelete would return if you closed the account. Pro values every other holding in XRP and scans 25 addresses at once; Institutional scans 500.",
+    keywords: ["stuck", "reserve", "escrow", "payment channel", "check", "reclaim", "unlock", "recover", "trust line", "accountdelete", "forgotten", "free up"],
+  },
+  {
+    id: "exposure-audit",
+    question: "How do I revoke permissions on my XRP Ledger account?",
+    answer:
+      "The XRP Ledger has no token allowances, but it has standing permissions that let someone else take value: checks you wrote, NFT sell offers (a zero-price one gives the NFT away), funded payment channels, open orders, deposit preauthorisations, a regular key, signers and an authorised NFT minter. SECURITY CENTER › EXPOSURE AUDIT (free) lists every one on your account with its risk and the unsigned transaction that revokes it.",
+    keywords: ["revoke", "approval", "approvals", "permission", "allowance", "exposure", "open offer", "nft offer", "check", "cancel"],
+  },
+  {
+    id: "deposit-help",
+    question: "I sent XRP to an exchange and it never arrived. What happened?",
+    answer:
+      "Paste the transaction hash into SECURITY CENTER › DEPOSIT HELP (free). If the payment failed (for example tecDST_TAG_NEEDED), only the fee was spent and the amount is still in your account. If it succeeded without the destination tag, or with the wrong one, the funds are in the exchange's pooled account: only the exchange can credit them, and it usually will when given the facts. NOSHASHI writes that letter, with the hash, ledger, amount, tags and a SHA-256, for you to send from your logged-in account. A payment to a private wallet can only be returned by its owner.",
+    keywords: ["deposit", "never arrived", "missing", "destination tag", "forgot tag", "wrong tag", "exchange", "credited", "lost deposit", "memo"],
+  },
+  {
+    id: "domain-check",
+    question: "How can I tell if an account really belongs to the company it claims?",
+    answer:
+      "An account's Domain field is a claim anyone can write. It is proven only when that website lists the account back in its /.well-known/xrp-ledger.toml. SECURITY CENTER › DOMAIN CHECK (free) reads the file and tells you VERIFIED, UNVERIFIED (treat it as impersonation) or that no file exists. Given a domain instead, it shows which accounts the domain vouches for and whether each names it back.",
+    keywords: ["domain", "toml", "xrp-ledger.toml", "impersonation", "fake exchange", "official", "verify", "belongs", "real account"],
+  },
+  {
+    id: "scam-cluster",
+    question: "Can NOSHASHI find the other accounts a scammer uses?",
+    answer:
+      "Yes, on Pro and above. SECURITY CENTER › SCAM CLUSTERS starts from one known scam account. It finds who funded it, the accounts it created, and where it swept its balance when it deleted itself. It also groups accounts that share a vanity ending or a memo. Exchanges end a branch, so their customers are not pulled in, and every link names its transaction. Pro maps two hops and 40 accounts. Enterprise maps four hops and 200, and opens the report as an investigation case. Strategic watches the whole cluster server-side.",
+    keywords: ["cluster", "scammer", "network", "related accounts", "linked", "operation", "drainer", "vanity", "same person"],
+  },
+  {
     id: "event-feeds",
     question: "How do I get XRPL events into my own systems?",
     answer:

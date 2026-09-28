@@ -294,7 +294,7 @@ function LabRun({
 function GoThere({ step, onNavigate }: { step: LabStep; onNavigate?: (scene: SceneId) => void }) {
   const handOff = useHandoff();
   const [copied, setCopied] = useState(false);
-  const go = () => (step.subject ? handOff({ scene: step.scene, value: step.subject, from: "learn", as: step.subjectLabel }) : onNavigate?.(step.scene));
+  const go = () => (step.subject ? handOff({ scene: step.scene, value: step.subject, from: "learn", as: step.subjectLabel, view: step.view }) : onNavigate?.(step.scene));
   const copy = async () => {
     if (!step.subject) return;
     try {
