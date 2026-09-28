@@ -11,12 +11,17 @@ import { readNft } from "@/lib/desk/nft";
 import { readSync } from "@/lib/net/sync";
 import { fetchLedger } from "@/lib/xrpl/client";
 import { searchKnowledge } from "./knowledge";
+import { assessSecurity, readSecurityPosture } from "@/lib/security/hardening";
+import { recoveryOptions, takeoverSignals, traceFunds, TRACE_LIMITS } from "@/lib/security/incident";
 
 /**
  * What NOSHX can do: read the live XRP Ledger through the same readers
- * the screens use. Every tool is read-only — none signs, submits or
- * moves anything — and each is gated by the same plan feature as the
+ * the screens use. Every ledger tool is read-only — none signs, submits
+ * or moves anything — and each is gated by the same plan feature as the
  * screen it mirrors, so the agent is never a way around the paywall.
+ * The support tools (./ticketTools.ts, registered by the desktop app)
+ * read and write the person's own tickets and run self-repair; they
+ * write only when asked in words.
  *
  * The model chooses which tools to call; the numbers in its answer come
  * from these readers, not from the model.
@@ -36,6 +41,14 @@ export type ToolContext = {
   spendFreeCheck: () => boolean;
   /** Gives back a counted check whose read never reached the ledger. */
   refundFreeCheck?: () => void;
+  /** The operator's own message this turn: ticket writes run only when it asks for one. */
+  request?: string;
+  /** Re-reads the plan from the server (useBilling().refresh), for self-repair. */
+  refreshPlan?: () => Promise<void>;
+  /** The plan tier the app holds now, for self-repair. */
+  tier?: () => string;
+  /** The organization in use, whose watched accounts self-repair checks. */
+  organizationId?: string | null;
 };
 
 export type NoshxTool = {
@@ -47,6 +60,8 @@ export type NoshxTool = {
   /** The screen this mirrors, named for the operator. */
   screen: string;
   run: (input: Record<string, unknown>, context: ToolContext) => Promise<unknown>;
+  /** The result in sentences, for NOSHX Core; the ledger readers are composed in core/engine.ts. */
+  compose?: (value: unknown) => string;
 };
 
 const ADDRESS = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
@@ -218,7 +233,55 @@ export const NOSHX_TOOLS: NoshxTool[] = [
     screen: "Issuance",
     run: (input) => readIssuance(address(input, "issuer")),
   },
+  {
+    name: "security_check",
+    description:
+      "How hard an XRP Ledger account is to take over: who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts against it, the doors strangers can use (NFT offers, checks, payment channels), a 0–100 score, and an unsigned hardening plan to sign in the owner's own wallet.",
+    input_schema: schema({ address: addr("The account to check, r…") }),
+    feature: null,
+    screen: "Security Center",
+    run: async (input) => {
+      const posture = await readSecurityPosture(address(input));
+      return { posture: { ...posture, events: posture.events.slice(0, 10) }, assessment: assessSecurity(posture) };
+    },
+  },
+  {
+    name: "investigate_hack",
+    description:
+      "For an account that was drained or hacked: the key changes before it, the stolen value followed hop by hop (payments and AccountDelete sweeps, past the dust), what became of every account it reached, and every recovery path that exists. Validated XRP Ledger transactions cannot be reversed; this says which off-ledger paths apply.",
+    input_schema: schema(
+      {
+        address: addr("The drained account, r…"),
+        from_ledger: { type: "number", description: "Ledger the incident began at, if known" },
+      },
+      ["address"]
+    ),
+    feature: "incident_response",
+    screen: "Security Center › Incident Response",
+    run: async (input, context) => {
+      const root = address(input);
+      const posture = await readSecurityPosture(root, 400);
+      const given = Number(input.from_ledger);
+      const keyChange = [...posture.events].reverse().find((e) => e.kind === "regular_key_set" || e.kind === "signer_list_set");
+      const since = Number.isInteger(given) && given > 0 ? given : keyChange?.ledger ?? Math.max(1, posture.ledgerIndex - 21_600 * 30);
+      const limits = context.has("forensic_trace") ? TRACE_LIMITS.deep : TRACE_LIMITS.standard;
+      const trace = await traceFunds(root, { sinceLedger: since, depth: limits.depth, perAccount: limits.perAccount });
+      return {
+        signals: takeoverSignals(root, posture.events, trace.flows),
+        trace: { ...trace, flows: trace.flows.slice(0, 40) },
+        options: recoveryOptions(trace, { stillHoldsXrp: posture.exists ? posture.balanceXrp : 0, keyEvents: posture.events }),
+      };
+    },
+  },
 ];
+
+/**
+ * Adds tools that only the desktop app carries (the support tools in
+ * ./ticketTools.ts), so the website's NOSHX build never bundles them.
+ */
+export function registerTools(tools: NoshxTool[]) {
+  for (const tool of tools) if (!NOSHX_TOOLS.some((t) => t.name === tool.name)) NOSHX_TOOLS.push(tool);
+}
 
 export function findTool(name: string): NoshxTool | undefined {
   return NOSHX_TOOLS.find((tool) => tool.name === name);

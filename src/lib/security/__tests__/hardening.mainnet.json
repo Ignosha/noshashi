@@ -1,0 +1,52 @@
+{
+  "note": "Recorded from XRPL mainnet (xrplcluster.com) on 2026-09-28 at validated ledger 107,291,568: account_info with signer_lists for Bitstamp's issuer and a 2-of-3 multisig account, and the multisig account's recent account_tx (newest first). Fields trimmed; values are the ledger's.",
+  "bitstamp_account_info": {
+    "status": "success",
+    "validated": true,
+    "ledger_index": 107291568,
+    "account_data": {
+      "Account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+      "Balance": "412602491965",
+      "Domain": "6269747374616D702E6E6574",
+      "Flags": 10092544,
+      "OwnerCount": 378,
+      "RegularKey": "rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ",
+      "Sequence": 4827,
+      "TransferRate": 1001500000,
+      "LedgerEntryType": "AccountRoot",
+      "PreviousTxnLgrSeq": 107290708,
+      "signer_lists": []
+    }
+  },
+  "multisig_account_info": {
+    "status": "success",
+    "validated": true,
+    "ledger_index": 107291568,
+    "account_data": {
+      "Account": "rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX",
+      "Balance": "1200000",
+      "Flags": 1179648,
+      "OwnerCount": 1,
+      "Sequence": 107178777,
+      "LedgerEntryType": "AccountRoot",
+      "PreviousTxnLgrSeq": 107178779,
+      "signer_lists": [
+        {
+          "LedgerEntryType": "SignerList",
+          "SignerQuorum": 2,
+          "SignerEntries": [
+            { "SignerEntry": { "Account": "rwpQmc2ihyfGWHrvgR8pcS6NMeNBjaAyw", "SignerWeight": 1 } },
+            { "SignerEntry": { "Account": "rUr4CknSyJb79zgvi4c2vpBk8WkgGAkqZL", "SignerWeight": 1 } },
+            { "SignerEntry": { "Account": "rGtDNiHFHNTNSnoeLg5usoRnLx33ABTWhT", "SignerWeight": 1 } }
+          ]
+        }
+      ]
+    }
+  },
+  "multisig_account_tx_back": [
+    { "validated": true, "tx": { "TransactionType": "AccountSet", "Account": "rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX", "SetFlag": 4, "hash": "84B818753F6E8CF6A5ED4FADB73CF129A19196F548F339EB2A82D75CEA4C5A86", "ledger_index": 107178779, "date": 843472081 }, "meta": { "TransactionResult": "tesSUCCESS" } },
+    { "validated": true, "tx": { "TransactionType": "AccountSet", "Account": "rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX", "SetFlag": 1, "hash": "15BB4A8C3C375F7BBCD8FE032885D62753E464BC64563D4A197B271F57BFE114", "ledger_index": 107178777, "date": 843472072 }, "meta": { "TransactionResult": "tesSUCCESS" } },
+    { "validated": true, "tx": { "TransactionType": "SignerListSet", "Account": "rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX", "SignerQuorum": 2, "hash": "3888F11B7CFE1E92E0415FEA9A970DFC7B23FCF6B50FD9C3435459849C9885BB", "ledger_index": 107178777, "date": 843472072, "SignerEntries": [{ "SignerEntry": { "Account": "rUr4CknSyJb79zgvi4c2vpBk8WkgGAkqZL", "SignerWeight": 1 } }, { "SignerEntry": { "Account": "rGtDNiHFHNTNSnoeLg5usoRnLx33ABTWhT", "SignerWeight": 1 } }, { "SignerEntry": { "Account": "rwpQmc2ihyfGWHrvgR8pcS6NMeNBjaAyw", "SignerWeight": 1 } }] }, "meta": { "TransactionResult": "tesSUCCESS" } },
+    { "validated": true, "tx": { "TransactionType": "Payment", "Account": "rD4G6gtD2KwHqsRf7pcyA8r1neUzXT61ix", "Destination": "rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX", "Amount": "1222500", "hash": "838B78170329D46CADF25F2074DE2F5E993F39FBA6C3C51A7332B9D7CADDFF83", "ledger_index": 107178774, "date": 843472062 }, "meta": { "TransactionResult": "tesSUCCESS" } }
+  ]
+}

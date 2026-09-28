@@ -8,6 +8,7 @@
  * one transaction on demand.
  */
 import { rpc } from "./client";
+import { sanctionsFor } from "./sanctions";
 import {
   activationOf,
   classifyTransaction,
@@ -64,7 +65,12 @@ export type OnDemandScreening = {
  * what it delivered, and the sender's funding chain. `depositAddress` is
  * the account the payment was meant for.
  */
-export async function screenTransaction(hash: string, depositAddress: string, config: DepositConfig): Promise<OnDemandScreening> {
+export async function screenTransaction(
+  hash: string,
+  depositAddress: string,
+  config: DepositConfig,
+  knownAddresses: string[] = []
+): Promise<OnDemandScreening> {
   const { tx, meta, ledgerIndex } = normalizeTx((await rpc("tx", { transaction: hash })) as Reply);
   if (tx.TransactionType !== "Payment") throw new Error(`That is a ${tx.TransactionType ?? "unknown"} transaction, not a payment.`);
   if (tx.Destination !== depositAddress) throw new Error(`That payment went to ${tx.Destination}, not to ${depositAddress}.`);
@@ -80,5 +86,12 @@ export async function screenTransaction(hash: string, depositAddress: string, co
       : Promise.resolve(null),
     fundingChain(String(tx.Account)),
   ]);
-  return { event, screening: screenDeposit({ event, config, issuer, chain, currentLedger: ledger }), chain, ledger };
+  const listed = await sanctionsFor(chain.map((h) => h.account));
+  const screening = screenDeposit({ event, config, issuer, chain, currentLedger: ledger, sanctions: listed?.hits ?? {}, knownAddresses: [depositAddress, ...knownAddresses] });
+  if (listed === null) {
+    // Never screened as if the list had been read.
+    screening.findings.push({ id: "sanctions_unchecked", severity: "warn", title: "The sanctions list could not be checked", detail: "The OFAC SDN lookup did not answer, so whether the sender or its funders are listed is unknown. Screen it again before crediting." });
+    if (screening.verdict === "clear") screening.verdict = "review";
+  }
+  return { event, screening, chain, ledger };
 }

@@ -15,6 +15,7 @@ import type {
   TrustLine,
   WalletTransaction,
 } from "@/lib/xrpl/types";
+import { sanctionsFor, type SanctionEntry, type SanctionsResult } from "@/lib/xrpl/sanctions";
 
 /**
  * Counterparty check — the public-facing half of NOSHASHI.
@@ -33,10 +34,12 @@ import type {
  *      publishes and what that implies. A clean account is an account with
  *      nothing recorded against it, which is not the same as a good one,
  *      and the copy says so.
- *   3. It never invents a reputation score. There is no list of "known bad
- *      actors" behind this, because NOSHASHI does not have one and
- *      pretending otherwise would be the worst kind of fabrication — the
- *      kind someone acts on.
+ *   3. It never invents a reputation score. The one list behind it is a
+ *      government's: the US Treasury's OFAC SDN list, read daily from
+ *      treasury.gov, and a hit names the entry and links the source. No
+ *      private "known bad actors" list is used, because NOSHASHI does not
+ *      have one and pretending otherwise would be the worst kind of
+ *      fabrication — the kind someone acts on.
  */
 
 export type CheckSeverity = "critical" | "warn" | "info" | "ok";
@@ -71,9 +74,62 @@ export type CounterpartyReport = {
   issuedCurrencies: string[];
   posture?: IssuerPosture;
   credentials: CredentialRecord[];
+  /** The sanctions-list entry for this address, when it is listed. */
+  sanction?: SanctionEntry;
+  /** Whether the sanctions list was checked, and as of when. */
+  sanctionsChecked: boolean;
+  sanctionsAsOf?: string | null;
   ledgerIndex: number;
   checkedAt: string;
 };
+
+/** The sanctions finding for an address, from a lookup (null when the lookup failed). */
+export function sanctionsFinding(address: string, result: SanctionsResult | null | undefined): CheckFinding | null {
+  if (result === undefined) return null;
+  if (result === null) {
+    return {
+      id: "sanctions-unchecked",
+      severity: "info",
+      title: "Sanctions list not checked",
+      detail: "The OFAC SDN list could not be read just now, so this check says nothing about sanctions. Check again before paying.",
+    };
+  }
+  const hit = result.hits[address];
+  const asOf = result.listAsOf ? ` as of ${result.listAsOf.slice(0, 10)}` : "";
+  if (hit) {
+    return {
+      id: "sanctioned",
+      severity: "critical",
+      title: `On the ${hit.list} sanctions list: ${hit.entityName}`,
+      detail: `The US Treasury lists this exact address under ${hit.entityName}${hit.entityNumber ? ` (entry ${hit.entityNumber}` : " ("}${hit.program ? `, program ${hit.program}` : ""})${asOf}. Source: ${hit.sourceUrl}`,
+      action: "Do not pay it or accept funds from it. US persons are generally prohibited from dealing with listed parties; take legal advice.",
+    };
+  }
+  return {
+    id: "not-sanctioned",
+    severity: "ok",
+    title: "Not on the OFAC SDN list",
+    detail: `This address is not among the ${result.listed.toLocaleString("en-US")} XRP addresses the US Treasury lists${asOf}. The list names only addresses OFAC has published; not being on it is not a clearance.`,
+  };
+}
+
+function withSanctions(report: CounterpartyReport, result: SanctionsResult | null): CounterpartyReport {
+  const finding = sanctionsFinding(report.address, result);
+  if (!finding) return report;
+  const findings = [finding, ...report.findings];
+  const sanction = result?.hits[report.address];
+  // A listed address is SERIOUS SIGNALS whatever else the ledger says, even unread.
+  const verdict: CounterpartyVerdict = sanction ? "avoid" : report.verdict;
+  return {
+    ...report,
+    findings: finding.severity === "ok" ? [...report.findings, finding] : findings,
+    verdict,
+    headline: sanction ? VERDICT_COPY.avoid.label : report.headline,
+    sanction,
+    sanctionsChecked: result !== null,
+    sanctionsAsOf: result?.listAsOf ?? null,
+  };
+}
 
 const VERDICT_COPY: Record<CounterpartyVerdict, { label: string; blurb: string }> = {
   clear: {
@@ -116,6 +172,7 @@ export async function checkCounterparty(
     isIssuer: false,
     issuedCurrencies: [],
     credentials: [],
+    sanctionsChecked: false,
     ledgerIndex: 0,
     checkedAt: new Date().toISOString(),
   };
@@ -137,11 +194,14 @@ export async function checkCounterparty(
     };
   }
 
-  const account = await fetchAccount(address).catch(() => null);
-  if (!account) return base;
+  const [account, sanctions] = await Promise.all([fetchAccount(address).catch(() => null), sanctionsFor([address])]);
+  if (!account) {
+    // Unread by the ledger, but a listed address is still reported.
+    return sanctions?.hits[address] ? withSanctions(base, sanctions) : base;
+  }
 
   if (account.unfunded) {
-    return {
+    return withSanctions({
       ...base,
       exists: true,
       funded: false,
@@ -159,7 +219,7 @@ export async function checkCounterparty(
             "If someone gave you this address as a shop or a payee, confirm it with them another way first.",
         },
       ],
-    };
+    }, sanctions);
   }
 
   // Read the rest in parallel — none of these depend on each other.
@@ -176,15 +236,18 @@ export async function checkCounterparty(
     ? await fetchIssuerPosture(address).catch(() => undefined)
     : undefined;
 
-  return assessCounterparty({
-    address,
-    account,
-    credentials,
-    lines,
-    transactions,
-    obligations,
-    posture,
-  });
+  return withSanctions(
+    assessCounterparty({
+      address,
+      account,
+      credentials,
+      lines,
+      transactions,
+      obligations,
+      posture,
+    }),
+    sanctions
+  );
 }
 
 /** Everything the assessment needs, once the reads are done. */
@@ -377,6 +440,7 @@ export function assessCounterparty(facts: CounterpartyFacts): CounterpartyReport
     issuedCurrencies,
     posture,
     credentials,
+    sanctionsChecked: false,
     ledgerIndex: obligations?.ledgerIndex ?? 0,
     checkedAt: new Date().toISOString(),
   };

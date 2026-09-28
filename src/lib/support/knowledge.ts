@@ -57,6 +57,63 @@ export const KNOWLEDGE: Answer[] = [
     keywords: ["deposit", "deposits", "screen", "screening", "credit", "partial", "counterfeit", "phishing", "dust", "kyt", "source of funds", "deny list", "travel rule", "exchange"],
   },
   {
+    id: "self-repair",
+    question: "Something is not working. Can NOSHX fix it?",
+    answer:
+      "Tell NOSHX what is wrong (\"it is not working, fix it\") or press SELF-REPAIR in the Support panel. NOSHX checks the mainnet link and reconnects to another public server if it is dropped or silent, compares this computer's clock with the ledger's, renews an expiring sign-in, checks the NOSHASHI server, re-reads your plan, looks at your watched accounts, removes damaged saved settings, checks the help index and whether a newer version is out. It repairs what it can and says what is left and how to fix it. Say \"open a ticket with this report\" to send the report to support, or \"post the report to NSH-1042\" to add it to a ticket.",
+    keywords: ["broken", "not working", "fix", "repair", "self-repair", "diagnose", "troubleshoot", "disconnected", "error", "slow", "stuck", "clock", "signed out"],
+    suggestsDiagnostics: true,
+  },
+  {
+    id: "noshx-tickets",
+    question: "Can NOSHX read, answer and act on my tickets for me?",
+    answer:
+      "Yes, when you are signed in. To open one yourself, see How do I contact support. Ask NOSHX \"show my tickets\" for the list, \"show NSH-1042\" to read a thread with the answer NOSHASHI's own pages give, \"reply to NSH-1042: …\" to add a message, \"resolve NSH-1042\" or \"reopen NSH-1042\", and \"open a ticket: …\" to start one with your app version attached. NOSHX changes a ticket only when your own message asks it to. Support staff can also ask \"answer NSH-1042\" for a reply drafted from the pages, and \"answer NSH-1042 and send it\" to post it.",
+    keywords: ["nsh", "reply", "resolve", "reopen", "noshx", "agent", "status", "thread", "draft"],
+  },
+  {
+    id: "sanctions",
+    question: "Does NOSHASHI check the OFAC sanctions list?",
+    answer:
+      "Yes. Every day NOSHASHI reads the US Treasury's Specially Designated Nationals list (sdn.csv and sdn_comments.csv from treasury.gov) and keeps every XRP Ledger address it names, with the entry number, name and program. Check an Address says when an address is listed, with its source; deposit screening holds a deposit whose sender, or any account that funded it up to three hops back, is listed, and never credits it; the website widget's address check shows it too. An address that is not on the list is not thereby cleared: the list names only addresses OFAC has published.",
+    keywords: ["sanctions", "sanctioned", "ofac", "sdn", "treasury", "blacklist", "blocked", "screening", "aml", "list"],
+  },
+  {
+    id: "address-poisoning",
+    question: "What is address poisoning and does NOSHASHI catch it?",
+    answer:
+      "An attacker creates an address whose first and last characters match one you use, then sends you a tiny payment so it appears in your history next to the real one, hoping you copy it into a withdrawal. Deposit screening flags any sender that starts and ends like one of your watched addresses or your trusted counterparties (set them in the deposit rules), and holds it when it arrived as dust. The website widget's VERIFY ADDRESS check tells your customers whether the address they are about to pay is really yours or a lookalike.",
+    keywords: ["poisoning", "lookalike", "look-alike", "similar address", "vanity", "copy", "history", "scam", "fake address"],
+  },
+  {
+    id: "embed-widget",
+    question: "Can I put NOSHASHI's checks on my own website?",
+    answer:
+      "Yes, on Enterprise and Strategic. In ADJUDICATION › LEDGER WATCH › WEBSITE WIDGET, create a widget: choose its checks (verify that an address is really your deposit address, check any address against the ledger and the OFAC list, and deposit status by transaction hash), pick your deposit address, and list the exact sites it may appear on. Paste the two-line snippet into your page. The widget holds no key, answers only on the sites you list, and never tells a customer why a deposit is under review.",
+    keywords: ["embed", "widget", "website", "white-label", "customer", "snippet", "script", "iframe", "integrate", "site"],
+  },
+  {
+    id: "account-security",
+    question: "How do I make my XRP Ledger account harder to hack?",
+    answer:
+      "Open SECURITY CENTER › ACCOUNT CHECK (free) and enter your address, never your seed. NOSHASHI grades the account A to F from what the ledger shows: who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts against you, and the doors strangers can use (NFT offers, checks, payment channels). The hardening plan lists unsigned transactions (for example, sign with a regular key on a hardware wallet, or require two of three signers for a treasury, and refuse unsolicited NFT offers) for you to review and sign in your own wallet. NOSHASHI never signs and never asks for a key.",
+    keywords: ["secure", "security", "hack", "hacked", "protect", "harden", "seed", "regular key", "multisig", "signer", "takeover", "wallet", "safe"],
+  },
+  {
+    id: "hacked-account",
+    question: "My account was hacked or drained. Can I get my XRP back?",
+    answer:
+      "A validated XRP Ledger transaction cannot be reversed by anyone: not validators, not Ripple, not NOSHASHI, and anyone offering a paid 'recovery' is running a second scam. Do this now: move whatever is left to a new account created on a device that never held the old seed, and report it to the police (in the US, ic3.gov; in the UK, Action Fraud). Then open SECURITY CENTER › INCIDENT RESPONSE (Pro and above): it shows the key changes before the theft, follows the value hop by hop past the dust thieves spray, says where it is now, and lists the recovery paths that exist. If it reached an exchange with a destination tag, the exchange can freeze it; if it was an issued token, the issuer may freeze or claw it back. Send them the SHA-256 dossier it writes.",
+    keywords: ["hacked", "stolen", "drained", "lost", "recover", "reverse", "scam", "theft", "thief", "compromised", "get back", "refund", "police"],
+  },
+  {
+    id: "security-guardian",
+    question: "Can NOSHASHI alert us if one of our accounts is being taken over?",
+    answer:
+      "Yes, on Strategic. Watch the accounts in LEDGER WATCH; the server reads them every minute, and when one's regular key or signer list changes, its master key is disabled or re-enabled, or it is deleted, your webhooks receive a signed security_alert within a minute. A takeover almost always starts with the thief adding a key of their own, so this is the earliest warning the ledger gives. SECURITY CENTER › GUARDIAN lists these events, and INCIDENT RESPONSE can watch every account in a theft trail in one click.",
+    keywords: ["alert", "guardian", "takeover", "monitor", "keys changed", "webhook", "security_alert", "watch", "notify"],
+  },
+  {
     id: "event-feeds",
     question: "How do I get XRPL events into my own systems?",
     answer:

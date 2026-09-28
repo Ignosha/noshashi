@@ -68,6 +68,8 @@ export const LAB_SUBJECTS = {
   nftFixed: "00081388EF7C422EF52CEB969960BEF4144D7BC3F862C4679F0C0036059EAF97",
   /** Transferable and mutable, 10% resale fee, issuer rKDFM3xaC3B7ijWkX4iHcMTcLFgxW2dK74. */
   nftMutable: "00182710C7DEC772B41E9496AA92D148C4FD64D239AA629847C852FD05B7EEED",
+  /** A phishing relay account: sprayed 1-drop dust, then deleted itself into the next account (recorded 2026-09-28; actNotFound). */
+  phishingRelay: "rfWPjcbY5QT2shRFY2SSQHFKPYSMzxaMaN",
 } as const;
 
 const S = LAB_SUBJECTS;
@@ -478,6 +480,68 @@ export const LABS: Lab[] = [
           options: ["2: the weight-2 signer and either weight-1 signer", "3: all of them", "1: the weight-2 signer"],
           answer: 0,
           why: "2 + 1 = 3 reaches the quorum. The headcount says three people control the account; the weights say two are enough.",
+        },
+      },
+    ],
+  },
+  {
+    id: "security",
+    title: "Lock down an account, and know what to do if one is emptied",
+    outcome: "Read who can sign for an account, catch a lookalike address before you pay it, and know what can and cannot be done after a theft.",
+    minutes: 5,
+    steps: [
+      {
+        id: "who-signs",
+        task: "Open SECURITY CENTER with a real multi-signature account filled in.",
+        scene: "security",
+        subject: S.multisig,
+        subjectLabel: "a real 2-of-3 multi-signature account",
+        lookFor:
+          "\"At least 2 of 3 signers must agree\", the master key disabled, and a hardening plan of unsigned AccountSet transactions that refuse unsolicited NFT offers, checks and payment channels.",
+        check: {
+          question: "The hardening plan hands you transactions. Who signs them?",
+          options: [
+            "You, in your own wallet. NOSHASHI reads the ledger and never signs or asks for a key",
+            "NOSHASHI signs them for you once you approve",
+            "Anyone with the address can sign them",
+          ],
+          answer: 0,
+          why: "An address is public; a secret key is not. Any site or app that offers to 'secure' your account by taking your seed is stealing it.",
+        },
+      },
+      {
+        id: "lookalike",
+        task: "Open SECURITY CENTER › SAFE SEND and read how it checks a pasted address.",
+        scene: "security",
+        lookFor: "Your own address book, kept on this device, and a check that names any address which starts and ends like one in it but is a different account.",
+        check: {
+          question: "A tiny payment arrives from rDS6r59h…xaMan. You usually pay rDS6r59h…xaMan. What should you do next time you pay?",
+          options: [
+            "Take the address from your own records, never from history: a lookalike can match the start and end and still be a different account",
+            "Copy it from the most recent transaction, since it is the newest",
+            "Nothing: two addresses that start and end the same are the same account",
+          ],
+          answer: 0,
+          why: "Wallets show only the first and last few characters. Address poisoning generates an address matching those and sends dust so it sits in your history, waiting to be copied.",
+        },
+      },
+      {
+        id: "no-reversal",
+        task: "Check a real phishing account that has since disappeared.",
+        scene: "security",
+        subject: S.phishingRelay,
+        subjectLabel: "a real phishing relay account",
+        lookFor:
+          "There is no account at this address any more. It sprayed 1-drop payments carrying a fake 'gift' link, then deleted itself, sweeping its balance by AccountDelete into the next account in a series that all end in \"xaman\".",
+        check: {
+          question: "Someone's XRP was stolen and moved on. What can undo a validated XRP Ledger payment?",
+          options: [
+            "Nothing on the ledger. Recovery happens off-ledger: an exchange freezing a tagged deposit, or a token's issuer freezing or clawing back its own token",
+            "Validators can reverse it if you ask within 24 hours",
+            "A recovery service can, for a fee",
+          ],
+          answer: 0,
+          why: "Validated transactions are final. Paid 'recovery' offers are the second half of the scam. INCIDENT RESPONSE follows the value and lists the paths that really exist, with the evidence each needs.",
         },
       },
     ],

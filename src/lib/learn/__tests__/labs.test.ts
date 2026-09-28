@@ -56,7 +56,7 @@ describe("lab content is well formed", () => {
   });
 
   it("uses only real, well-formed subjects", () => {
-    for (const address of [LAB_SUBJECTS.bitstamp, LAB_SUBJECTS.unfunded, LAB_SUBJECTS.multisig]) {
+    for (const address of [LAB_SUBJECTS.bitstamp, LAB_SUBJECTS.unfunded, LAB_SUBJECTS.multisig, LAB_SUBJECTS.phishingRelay]) {
       expect(isValidAddress(address), address).toBe(true);
     }
     expect(LAB_SUBJECTS.nftFixed).toMatch(/^[0-9A-F]{64}$/);
@@ -134,5 +134,16 @@ describe("lab facts match the recorded mainnet replies", () => {
   it("the NOSHX step asks about the same real token", () => {
     const step = allSteps().find((s) => s.key === "noshx/same-readers")!.step;
     expect(step.subject).toContain(LAB_SUBJECTS.nftFixed);
+  });
+});
+
+describe("the security lab's facts match the recorded mainnet replies", () => {
+  it("the phishing relay deleted itself into the next account of an 'xaman' series", async () => {
+    const relay = (await import("@/lib/security/__tests__/phishing-relay.mainnet.json")).default as unknown as {
+      rfWP_forward_104503690: Array<{ tx: { TransactionType: string; Account: string; Destination?: string } }>;
+    };
+    const sweep = relay.rfWP_forward_104503690.find((r) => r.tx.TransactionType === "AccountDelete");
+    expect(sweep?.tx.Account).toBe(LAB_SUBJECTS.phishingRelay);
+    expect(sweep?.tx.Destination?.toLowerCase().endsWith("xaman")).toBe(true);
   });
 });

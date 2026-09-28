@@ -243,3 +243,16 @@ export async function updateTicket(
 ): Promise<void> {
   await callSupport("update_support_ticket", { p_ticket: ticketId, p_status: change.status ?? null, p_priority: change.priority ?? null });
 }
+
+/** The ticket a reference such as NSH-1042 names, when the caller may see it. */
+export async function findTicket(reference: string | number): Promise<Ticket | null> {
+  const number = typeof reference === "number" ? reference : Number(/(\d{1,9})\s*$/.exec(String(reference).trim())?.[1]);
+  if (!Number.isSafeInteger(number) || number <= 0) return null;
+  const { data, error } = await db()
+    .from("support_tickets")
+    .select("id, number, account_id, subject, category, priority, status, app_version, platform, created_at, last_message_at")
+    .eq("number", number)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data ? ticketFromRow(data as TicketRow) : null;
+}

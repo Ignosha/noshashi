@@ -23,6 +23,20 @@
  *                  deposit configuration when the address is watched.
  *                  Auth: an organization-scoped nsh_live_ key.
  *
+ *   GET  /sanctions?addresses=r…,r…
+ *                  Which of up to 50 addresses are on the OFAC SDN list
+ *                  (noshashi.sanctioned_addresses, refreshed daily from
+ *                  treasury.gov), and as of when. Public: no key, any origin.
+ *
+ *   /embed/{id}/…  The organization's screening widget (site/embed/v1.js):
+ *                  GET config, POST verify (is this really our deposit
+ *                  address?), POST check (an address's ledger facts and
+ *                  sanctions), POST deposit (has my deposit arrived?).
+ *                  Auth: the page's Origin must be one the embed allows,
+ *                  and the organization's plan must include it. No key
+ *                  reaches the browser, and a customer is never shown a
+ *                  screening finding (that would be tipping off).
+ *
  * The rules live in ../_shared/xrplEvents.ts, shared with the console, so a
  * deposit gets the same verdict wherever it is screened. Everything is read
  * live from the public XRPL servers; nothing is estimated. A fact that
@@ -41,9 +55,11 @@ import {
   normalizeTx,
   sanitizeDepositConfig,
   screenDeposit,
+  lookalikeOf,
   type DepositConfig,
   type FundingHop,
   type IssuerFacts,
+  type SanctionEntry,
   type XrplEvent,
 } from "../_shared/xrplEvents.ts";
 import { applySchema, CONTENT_TYPES, sanitizeFields, serialize, type ExportFormat } from "../_shared/exportSchema.ts";
@@ -117,6 +133,39 @@ async function validatedLedger(): Promise<number> {
 class Reads {
   private issuers = new Map<string, Promise<IssuerFacts | null>>();
   private hops = new Map<string, Promise<FundingHop>>();
+  private listed = new Map<string, SanctionEntry | null>();
+
+  /** The database, for the sanctions list. Without it nothing is looked up. */
+  constructor(private supabase?: ServiceClient) {}
+
+  /**
+   * Sanctions-list entries for these addresses. A failed lookup throws:
+   * a deposit is never screened as if the list had been checked.
+   */
+  async sanctions(accounts: string[]): Promise<Record<string, SanctionEntry>> {
+    const missing = [...new Set(accounts)].filter((a) => !this.listed.has(a));
+    if (missing.length && this.supabase) {
+      const { data, error } = await this.supabase.schema("noshashi").rpc("sanctions_lookup", { p_addresses: missing });
+      if (error) throw error;
+      for (const a of missing) this.listed.set(a, null);
+      for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+        this.listed.set(String(row.address), {
+          address: String(row.address),
+          list: String(row.list),
+          entityNumber: row.entity_number === null ? null : Number(row.entity_number),
+          entityName: String(row.entity_name),
+          program: (row.program as string | null) ?? null,
+          sourceUrl: String(row.source_url),
+        });
+      }
+    }
+    const out: Record<string, SanctionEntry> = {};
+    for (const a of accounts) {
+      const hit = this.listed.get(a);
+      if (hit) out[a] = hit;
+    }
+    return out;
+  }
 
   issuer(issuer: string, currency: string): Promise<IssuerFacts | null> {
     const key = `${issuer}|${currency}`;
@@ -149,13 +198,14 @@ class Reads {
     return chain;
   }
 
-  async screen(event: XrplEvent, config: DepositConfig, currentLedger: number) {
+  async screen(event: XrplEvent, config: DepositConfig, currentLedger: number, knownAddresses: string[] = []) {
     const delivered = (event.data as { delivered?: { issuer: string | null; currency: string } | null }).delivered;
     const [issuer, chain] = await Promise.all([
       delivered?.issuer ? this.issuer(delivered.issuer, delivered.currency) : Promise.resolve(null),
       event.counterparty ? this.chain(event.counterparty) : Promise.resolve([]),
     ]);
-    return { ...screenDeposit({ event, config, issuer, chain, currentLedger }), chain };
+    const sanctions = await this.sanctions(chain.map((h) => h.account));
+    return { ...screenDeposit({ event, config, issuer, chain, currentLedger, sanctions, knownAddresses }), chain };
   }
 }
 
@@ -180,6 +230,8 @@ type ReadRequest = {
   config: DepositConfig;
   currentLedger: number;
   reads: Reads;
+  /** The organization's watched addresses, which a poisoning sender would imitate. */
+  knownAddresses?: string[];
 };
 
 /**
@@ -211,7 +263,7 @@ async function readEvents(req: ReadRequest): Promise<{ events: Array<XrplEvent &
       for (const event of classifyTransaction(tx, meta, req.address, ledgerIndex)) {
         if (!wanted.has(event.type)) continue;
         events.push(req.screenDeposits && event.type === "payment_in"
-          ? { ...event, screening: await req.reads.screen(event, req.config, req.currentLedger) }
+          ? { ...event, screening: await req.reads.screen(event, req.config, req.currentLedger, req.knownAddresses) }
           : event);
       }
     }
@@ -224,7 +276,7 @@ async function readEvents(req: ReadRequest): Promise<{ events: Array<XrplEvent &
   return { events, processedTo: Math.max(processedTo, req.fromLedger), complete: false };
 }
 
-async function readWatch(supabase: ServiceClient, watch: Watch, validated: number, reads: Reads): Promise<{ recorded: number; error?: string }> {
+async function readWatch(supabase: ServiceClient, watch: Watch, validated: number, reads: Reads, known: string[]): Promise<{ recorded: number; error?: string }> {
   const record = async (events: unknown[], lastLedger: number | null, error: string | null) => {
     const { data, error: rpcError } = await supabase.schema("noshashi").rpc("xrpl_record_events", {
       p_watch: watch.id, p_events: events, p_last_ledger: lastLedger, p_error: error,
@@ -247,6 +299,7 @@ async function readWatch(supabase: ServiceClient, watch: Watch, validated: numbe
       config: sanitizeDepositConfig(watch.deposit_config),
       currentLedger: validated,
       reads,
+      knownAddresses: known,
     });
     return { recorded: await record(read.events, read.processedTo, null) };
   } catch (error) {
@@ -256,17 +309,30 @@ async function readWatch(supabase: ServiceClient, watch: Watch, validated: numbe
   }
 }
 
+/** Every address each organization watches, for address-poisoning checks. */
+async function watchedAddresses(supabase: ServiceClient, orgs: string[]): Promise<Map<string, string[]>> {
+  const out = new Map<string, string[]>();
+  if (!orgs.length) return out;
+  const { data, error } = await supabase.schema("noshashi").from("xrpl_watches").select("organization_id, address").in("organization_id", orgs);
+  if (error) throw error;
+  for (const row of (data ?? []) as Array<{ organization_id: string; address: string }>) {
+    out.set(row.organization_id, [...(out.get(row.organization_id) ?? []), row.address]);
+  }
+  return out;
+}
+
 async function tick(supabase: ServiceClient): Promise<Record<string, unknown>> {
   const { data, error } = await supabase.schema("noshashi").rpc("xrpl_watches_due", { p_limit: WATCHES_PER_TICK });
   if (error) throw error;
   const watches = (data ?? []) as Watch[];
   if (!watches.length) return { watches: 0 };
   const validated = await validatedLedger();
-  const reads = new Reads();
+  const reads = new Reads(supabase);
+  const known = await watchedAddresses(supabase, [...new Set(watches.map((w) => w.organization_id))]);
   const results: Array<{ recorded: number; error?: string }> = [];
   // Four at a time: the public servers are shared and free.
   for (let i = 0; i < watches.length; i += 4) {
-    results.push(...(await Promise.all(watches.slice(i, i + 4).map((w) => readWatch(supabase, w, validated, reads)))));
+    results.push(...(await Promise.all(watches.slice(i, i + 4).map((w) => readWatch(supabase, w, validated, reads, known.get(w.organization_id) ?? [])))));
   }
   return {
     watches: watches.length,
@@ -340,8 +406,17 @@ Deno.serve(async (request: Request): Promise<Response> => {
     const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!url || !key) return json(503, { error: "not_configured" }, requestId);
     const supabase = createServiceClient(url, key);
-    const route = new URL(request.url).pathname.split("/").filter(Boolean).pop();
+    const segments = new URL(request.url).pathname.split("/").filter(Boolean);
+    const route = segments.pop();
     const authorization = request.headers.get("authorization");
+
+    // Public: the sanctions list, from any origin.
+    if (route === "sanctions") return await handleSanctions(supabase, request, requestId);
+    // The organization's widget: /embed/{id}/{action}.
+    const embedAt = segments.lastIndexOf("embed");
+    if (embedAt >= 0 && segments.length === embedAt + 2) {
+      return await handleEmbed(supabase, request, segments[embedAt + 1], route ?? "", requestId);
+    }
 
     // The watcher's own token (from Vault, via pg_cron).
     const bearer = authorization?.startsWith("Bearer ") ? authorization.slice(7).trim() : "";
@@ -417,7 +492,8 @@ async function handleScreen(supabase: ServiceClient, request: Request, org: stri
   }
   const [event] = classifyTransaction(tx, meta, depositAddress, ledgerIndex);
   const validated = await validatedLedger();
-  const screening = await new Reads().screen(event, config, validated);
+  const known = org ? (await watchedAddresses(supabase, [org])).get(org) ?? [] : [];
+  const screening = await new Reads(supabase).screen(event, config, validated, known);
   return json(200, {
     source: `XRPL mainnet, validated ledger ${validated}, read live from the public servers`,
     event,
@@ -425,7 +501,8 @@ async function handleScreen(supabase: ServiceClient, request: Request, org: stri
     credit: screening.credit,
     findings: screening.findings,
     funding_chain: screening.chain,
-    config_used: { accepted_issuers: config.acceptedIssuers, deny_list_entries: config.denylist.length, require_tag: config.requireTag, travel_rule_xrp: config.travelRuleXrp },
+    config_used: { accepted_issuers: config.acceptedIssuers, deny_list_entries: config.denylist.length, require_tag: config.requireTag, travel_rule_xrp: config.travelRuleXrp, trusted_counterparties: config.trustedCounterparties.length },
+    sanctions_list: await sanctionsStatus(supabase),
   }, requestId);
 }
 
@@ -451,7 +528,8 @@ async function handleHistory(supabase: ServiceClient, request: Request, org: str
   const types = requested.length ? requested : DEFAULT_EVENT_TYPES;
   const read = await readEvents({
     address, fromLedger: from, toLedger: to, types, screenDeposits: screen,
-    config: sanitizeDepositConfig(body?.config ?? {}), currentLedger: validated, reads: new Reads(),
+    config: sanitizeDepositConfig(body?.config ?? {}), currentLedger: validated, reads: new Reads(supabase),
+    knownAddresses: org ? (await watchedAddresses(supabase, [org])).get(org) ?? [] : [],
   });
   return json(200, {
     source: `XRPL mainnet, validated ledgers ${from}–${read.processedTo}, read live from the public servers`,
@@ -515,4 +593,180 @@ async function handleEvents(supabase: ServiceClient, request: Request, org: stri
       "X-Has-More": String(rows.length === limit),
     },
   });
+}
+
+// ── Sanctions (public) ──────────────────────────────────────────────
+
+async function sanctionsStatus(supabase: ServiceClient): Promise<{ list: string; listed: number; list_as_of: string | null; source: string }> {
+  const [{ count, error: countError }, { data: last, error: lastError }] = await Promise.all([
+    supabase.schema("noshashi").from("sanctioned_addresses").select("address", { count: "exact", head: true }).is("removed_at", null),
+    supabase.schema("noshashi").from("sanctions_refreshes").select("finished_at").eq("status", "ok").order("id", { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  if (countError) throw countError;
+  if (lastError) throw lastError;
+  return {
+    list: "OFAC SDN",
+    listed: count ?? 0,
+    list_as_of: (last?.finished_at as string | null) ?? null,
+    source: "https://www.treasury.gov/ofac/downloads/sdn.csv and sdn_comments.csv",
+  };
+}
+
+const PUBLIC_CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, OPTIONS", "Cache-Control": "public, max-age=300" };
+
+async function handleSanctions(supabase: ServiceClient, request: Request, requestId: string): Promise<Response> {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: PUBLIC_CORS });
+  if (request.method !== "GET") return json(405, { error: "method_not_allowed" }, requestId, PUBLIC_CORS);
+  const raw = new URL(request.url).searchParams.get("addresses") ?? "";
+  const addresses = [...new Set(raw.split(",").map((a) => a.trim()).filter(Boolean))];
+  if (!addresses.length || addresses.length > 50 || !addresses.every((a) => ADDRESS_RE.test(a))) {
+    return json(400, { error: "invalid_request", message: "Send ?addresses= with 1 to 50 classic addresses, comma-separated." }, requestId, PUBLIC_CORS);
+  }
+  const hits = await new Reads(supabase).sanctions(addresses);
+  return json(200, { ...(await sanctionsStatus(supabase)), hits: Object.values(hits) }, requestId, PUBLIC_CORS);
+}
+
+// ── The embeddable widget ───────────────────────────────────────────
+
+type Embed = { organization_id: string; label: string; widgets: string[]; deposit_address: string | null; theme: string };
+
+const EMBED_REFUSALS: Record<string, [number, string]> = {
+  NOT_FOUND: [404, "This widget does not exist or is switched off."],
+  ORIGIN_NOT_ALLOWED: [403, "This widget is not allowed on this website. Its owner adds the site's origin in NOSHASHI."],
+  FEATURE_NOT_IN_PLAN: [403, "This widget's organization no longer has it in its plan."],
+  RATE_LIMITED: [429, "Too many checks from this widget just now. Try again in a minute."],
+};
+
+const RIPPLE_EPOCH = 946684800;
+
+async function handleEmbed(supabase: ServiceClient, request: Request, id: string, action: string, requestId: string): Promise<Response> {
+  const origin = request.headers.get("origin") ?? "";
+  // Answered only to the origin the embed allows; everything else gets no CORS headers at all.
+  const cors = (allowed: boolean): Record<string, string> =>
+    allowed ? { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "content-type", "Vary": "Origin" } : { "Vary": "Origin" };
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return json(404, { error: "not_found" }, requestId, cors(false));
+
+  if (request.method === "OPTIONS") {
+    const { data } = await supabase.schema("noshashi").from("org_embeds").select("allowed_origins, active").eq("id", id).maybeSingle();
+    const ok = Boolean(data?.active) && ((data?.allowed_origins as string[] | null) ?? []).includes(origin.toLowerCase());
+    return new Response(null, { status: ok ? 204 : 403, headers: cors(ok) });
+  }
+
+  const { data: admitted, error } = await supabase.schema("noshashi").rpc("embed_admit", { p_id: id, p_origin: origin });
+  if (error) throw error;
+  const admit = admitted as ({ ok: true } & Embed) | { ok: false; code: string };
+  if (!admit.ok) {
+    const [status, message] = EMBED_REFUSALS[admit.code] ?? [403, "Not available."];
+    return json(status, { error: admit.code.toLowerCase(), message }, requestId, cors(admit.code !== "ORIGIN_NOT_ALLOWED" && admit.code !== "NOT_FOUND"));
+  }
+  const embed = admit as Embed;
+  const headers = cors(true);
+
+  if (action === "config" && request.method === "GET") {
+    const status = await sanctionsStatus(supabase);
+    return json(200, {
+      label: embed.label,
+      widgets: embed.widgets,
+      theme: embed.theme,
+      deposit_address: embed.widgets.some((w) => w === "verify" || w === "deposit") ? embed.deposit_address : null,
+      sanctions_list: { list: status.list, list_as_of: status.list_as_of },
+    }, requestId, headers);
+  }
+  if (request.method !== "POST") return json(405, { error: "method_not_allowed" }, requestId, headers);
+  if (!embed.widgets.includes(action)) return json(404, { error: "widget_not_enabled", message: "This widget does not offer that check." }, requestId, headers);
+
+  // Sent as text/plain by the widget so the browser needs no preflight.
+  const body = (await request.text().then((t) => JSON.parse(t)).catch(() => null)) as Record<string, unknown> | null;
+
+  if (action === "verify") {
+    const address = String(body?.address ?? "").trim();
+    if (!ADDRESS_RE.test(address)) return json(400, { error: "invalid_address", message: "That is not a classic XRP Ledger address (r…, 25 to 35 characters)." }, requestId, headers);
+    const real = embed.deposit_address!;
+    if (address === real) {
+      return json(200, { result: "match", message: `This is ${embed.label}'s deposit address.`, address }, requestId, headers);
+    }
+    const imitates = lookalikeOf(address, [real]) !== null;
+    return json(200, {
+      result: imitates ? "lookalike" : "no_match",
+      message: imitates
+        ? `This is NOT ${embed.label}'s address. It starts and ends like it but is a different account: a lookalike made to be copied by mistake (address poisoning). Do not send to it.`
+        : `This is not ${embed.label}'s deposit address. Copy the address from ${embed.label} directly, not from a message or your transaction history.`,
+      address,
+    }, requestId, headers);
+  }
+
+  if (action === "check") {
+    const address = String(body?.address ?? "").trim();
+    if (!ADDRESS_RE.test(address)) return json(400, { error: "invalid_address", message: "That is not a classic XRP Ledger address (r…, 25 to 35 characters)." }, requestId, headers);
+    const reads = new Reads(supabase);
+    const [info, hits, status] = await Promise.all([
+      xrpl("account_info", { account: address, ledger_index: "validated" }).catch((e) => (e instanceof RippledError && e.code === "actNotFound" ? null : Promise.reject(e))),
+      reads.sanctions([address]),
+      sanctionsStatus(supabase),
+    ]);
+    const hit = hits[address];
+    const data = info?.account_data as Record<string, unknown> | undefined;
+    const hop = data ? await reads.hop(address) : null;
+    const facts: string[] = [];
+    if (!data) facts.push("This address has never been funded: it does not exist on the ledger yet.");
+    else {
+      facts.push(`Balance ${(Number(data.Balance) / 1e6).toLocaleString("en-US")} XRP at validated ledger ${Number(info!.ledger_index).toLocaleString("en-US")}.`);
+      if (hop?.activatedLedger) facts.push(`Created in ledger ${hop.activatedLedger.toLocaleString("en-US")}${hop.fundedBy ? `, funded by ${hop.fundedBy}` : ""}.`);
+      if (typeof data.Domain === "string" && data.Domain) {
+        const domain = new TextDecoder().decode(new Uint8Array((data.Domain.match(/../g) ?? []).map((h) => parseInt(h, 16))));
+        facts.push(`Claims the domain ${domain} (claimed, not verified).`);
+      }
+      if ((Number(data.Flags) & 0x00020000) !== 0) facts.push("Requires a destination tag: payments without one are refused.");
+    }
+    return json(200, {
+      address,
+      sanctioned: Boolean(hit),
+      sanction: hit ? { list: hit.list, entity: hit.entityName, entry: hit.entityNumber, program: hit.program, source: hit.sourceUrl } : null,
+      exists: Boolean(data),
+      facts,
+      sanctions_list: { list: status.list, list_as_of: status.list_as_of, listed: status.listed },
+      note: "Facts the XRP Ledger publishes and the US Treasury's OFAC SDN list. Not being listed is not a clearance.",
+    }, requestId, headers);
+  }
+
+  if (action === "deposit") {
+    const hash = String(body?.hash ?? "").trim().toUpperCase();
+    if (!HASH_RE.test(hash)) return json(400, { error: "invalid_hash", message: "Paste the 64-character transaction hash from your wallet." }, requestId, headers);
+    let reply: Reply;
+    try {
+      reply = await xrpl("tx", { transaction: hash });
+    } catch (e) {
+      if (e instanceof RippledError && e.code === "txnNotFound") {
+        return json(200, { status: "not_found", message: "No transaction with that hash is on the ledger yet. If you just sent it, wait a few seconds and check again." }, requestId, headers);
+      }
+      throw e;
+    }
+    const { tx, meta, ledgerIndex } = normalizeTx(reply);
+    if (reply.validated === false) return json(200, { status: "pending", message: "It is on its way: not yet in a validated ledger. Check again in a few seconds." }, requestId, headers);
+    if (tx.TransactionType !== "Payment" || tx.Destination !== embed.deposit_address) {
+      return json(200, { status: "not_a_deposit", message: `That transaction is not a payment to ${embed.label}'s deposit address.` }, requestId, headers);
+    }
+    const [event] = classifyTransaction(tx, meta, embed.deposit_address!, ledgerIndex);
+    const delivered = (event.data as { delivered?: { currency: string; value: number } | null }).delivered ?? null;
+    if (event.result !== "tesSUCCESS") {
+      return json(200, { status: "failed", message: `The ledger recorded ${event.result}: nothing arrived. Nothing was taken from you except the network fee.` }, requestId, headers);
+    }
+    // Screened with the organization's own configuration; the customer sees only whether it needs a look.
+    const { data: watch } = await supabase.schema("noshashi").from("xrpl_watches").select("deposit_config")
+      .eq("organization_id", embed.organization_id).eq("address", embed.deposit_address!).maybeSingle();
+    const known = (await watchedAddresses(supabase, [embed.organization_id])).get(embed.organization_id) ?? [];
+    const screening = await new Reads(supabase).screen(event, sanitizeDepositConfig(watch?.deposit_config), await validatedLedger(), known);
+    return json(200, {
+      status: screening.verdict === "clear" ? "received" : "under_review",
+      delivered,
+      destination_tag: (event.data as { destinationTag?: number | null }).destinationTag ?? null,
+      ledger_index: ledgerIndex,
+      ledger_time: event.rippleTime === null ? null : new Date((event.rippleTime + RIPPLE_EPOCH) * 1000).toISOString(),
+      message: screening.verdict === "clear"
+        ? `Received by ${embed.label}.`
+        : `Received by ${embed.label} and waiting on a routine review before it is credited. You do not need to do anything.`,
+    }, requestId, headers);
+  }
+
+  return json(404, { error: "not_found" }, requestId, headers);
 }

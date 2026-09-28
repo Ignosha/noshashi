@@ -349,7 +349,7 @@ export const TIERS: Tier[] = [
       "Deterministic policy engine, adjudication and decision history",
       "Evidence records, hashes, audit exports and review workflow",
       "Institutional API, scoped keys and webhooks",
-      "Dedicated environment options where supported",
+      "Dedicated environment, provisioned per contract",
       "Architecture review and named implementation planning",
     ],
     emphasis: true,

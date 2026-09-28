@@ -99,6 +99,7 @@ const AccountScene = lazy(() =>
   import("@/components/scenes/AccountScene").then((m) => ({ default: m.AccountScene }))
 );
 import { HomeScene } from "@/components/scenes/HomeScene";
+import { SecurityScene } from "@/components/scenes/SecurityScene";
 import { MissionControlScene } from "@/components/scenes/MissionControlScene";
 import { VerificationScene } from "@/components/scenes/VerificationScene";
 import { CredentialsScene } from "@/components/scenes/CredentialsScene";
@@ -162,6 +163,7 @@ export type SceneId =
   | "authority"
   | "passport"
   | "ledgerwatch"
+  | "security"
   | "amm"
   | "network"
   | "settlement"
@@ -203,6 +205,7 @@ type SceneDef = {
 const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "overview", label: "OVERVIEW", scenes: ["home", "control"] },
   { id: "adjudication", label: "ADJUDICATION", scenes: ["verify", "ledgerwatch", "provenance", "credentials", "domains"] },
+  { id: "security", label: "SECURITY", scenes: ["security"] },
   { id: "markets", label: "MARKETS & EXPOSURE", scenes: ["risk", "desk", "book", "amm"] },
   { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance", "authority", "passport"] },
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
@@ -362,6 +365,15 @@ const SCENES: SceneDef[] = [
     digit: "",
     group: "primary",
     requires: "deposit_screening",
+  },
+  {
+    id: "security",
+    label: "SECURITY CENTER",
+    title: "SECURITY CENTER",
+    hint: "Harden an account against takeover, catch lookalike addresses, and investigate a drained account",
+    icon: <NovaShield size={15} />,
+    digit: "",
+    group: "primary",
   },
   {
     id: "passport",
@@ -1118,6 +1130,8 @@ function ConsoleApp() {
                       <AuthorityScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "ledgerwatch" ? (
                       <LedgerWatchScene onUpgrade={openPlans} onSignIn={openAuth} />
+                    ) : scene === "security" ? (
+                      <SecurityScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "passport" ? (
                       <PassportScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "growth" ? (

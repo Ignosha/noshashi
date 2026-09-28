@@ -452,13 +452,15 @@
           <p class="role">Contracted · architecture and commercial review</p>
           <ul class="spec">
             <li>Everything in Institutional</li>
-            <li>Deposit screening: partial payments, counterfeit tokens, phishing dust and three-hop source of funds, before you credit</li>
+            <li>Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit</li>
             <li>Asset passports and issuer intelligence at institutional scope</li>
             <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
             <li>Deterministic policy engine, adjudication and decision history</li>
             <li>Evidence records, hashes, audit exports and review workflow</li>
             <li>Institutional API, scoped keys and webhooks</li>
-            <li>Dedicated environment options where supported</li>
+            <li>Embeddable screening widget for your own site</li>
+            <li>Forensic trace five hops deep, straight into an investigation case</li>
+            <li>Dedicated environment, provisioned per contract</li>
             <li>Architecture review and named implementation planning</li>
           </ul>
           <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
@@ -477,8 +479,8 @@
             <li>XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API</li>
             <li>Custom export schemas, bulk export and event retention you set</li>
             <li>Custom data integrations for risk, custody, trading and compliance</li>
-            <li>Dedicated environment options where supported</li>
-            <li>Embedded or white-label delivery when contracted</li>
+            <li>Dedicated environment, provisioned per contract</li>
+            <li>Security Guardian: signed alerts the minute a watched account's keys change or it is deleted</li>
             <li>Strategic architecture review and integration roadmap</li>
           </ul>
           <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
@@ -507,17 +509,23 @@
           <tr><th scope="row">Issuer controls &amp; freeze-rights</th><td class="limited">Single address</td><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
           <tr><th scope="row">Liquidity &amp; redemption stress</th><td class="no">Unavailable</td><td class="yes">On demand</td><td class="yes">Scheduled</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
           <tr><th scope="row">Counterparty intelligence</th><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Account security &amp; incident response</th></tr>
+          <tr><th scope="row">Account security check &amp; hardening plan</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Safe send (lookalike &amp; sanctions check)</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Incident response (fund trace, recovery paths, dossier)</th><td class="no">Unavailable</td><td class="yes">2 hops</td><td class="yes">2 hops</td><td class="yes">5 hops + case</td><td class="yes">5 hops + case</td></tr>
+          <tr><th scope="row">Security Guardian (takeover alerts)</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Policy, adjudication &amp; evidence</th></tr>
           <tr><th scope="row">Policy engine &amp; adjudication</th><td class="limited">Session only</td><td class="yes">10,000 verdicts</td><td class="yes">Unlimited</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
           <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>
+          <tr><th scope="row">Sanctioned-address screening (OFAC SDN)</th><td class="yes">Address check</td><td class="yes">Address check</td><td class="yes">Address check</td><td class="yes">Deposits &amp; funders</td><td class="yes">Deposits &amp; funders</td></tr>
           <tr><th scope="row">Deposit screening</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
           <tr><th scope="row">Evidence &amp; audit export</th><td class="yes">CSV</td><td class="yes">CSV</td><td class="yes">Signed export</td><td class="contracted">Immutable audit</td><td class="contracted">Data delivery</td></tr>
           <tr><th scope="row">Custom schemas</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="optional">Optional</td><td class="contracted">Included in scope</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">API &amp; delivery</th></tr>
           <tr><th scope="row">API access</th><td class="no">Unavailable</td><td>5,000 / month</td><td>100,000 / month</td><td class="contracted">Institutional API</td><td class="contracted">High-volume API</td></tr>
           <tr><th scope="row">Webhooks &amp; event feeds</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Webhooks</td><td class="contracted">Webhooks</td><td class="contracted">Event feeds</td></tr>
-          <tr><th scope="row">Dedicated environment</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
-          <tr><th scope="row">Embedded / white-label</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Console &amp; reports</td><td class="optional">Optional</td><td class="contracted">Architecture scope</td></tr>
+          <tr><th scope="row">Dedicated environment</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Per contract</td><td class="contracted">Per contract</td><td class="contracted">Per contract</td></tr>
+          <tr><th scope="row">Embedded / white-label</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Console &amp; reports</td><td class="yes">Screening widget</td><td class="yes">Screening widget</td></tr>
           <tr><th scope="row">Architecture review</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="yes">Included</td><td class="contracted">Included</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Governance</th></tr>
           <tr><th scope="row">Regulator access</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Contracted scope</td></tr>
