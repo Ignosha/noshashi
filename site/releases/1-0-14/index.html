@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>NOSHASHI 1.0.14 — safer to hold, easier to trust</title>
+<meta name="description" content="Release 1.0.14: an emergency kit for drained accounts, a shared scam registry and phishing check, withdrawal screening, and Customer Asset Protection — proof, from the XRP Ledger, that customer XRP is backed. Verification, not insurance.">
+<link rel="canonical" href="https://www.noshashi.app/releases/1-0-14/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/releases/1-0-14/">
+<meta property="og:title" content="NOSHASHI 1.0.14 — safer to hold, easier to trust">
+<meta property="og:description" content="Release 1.0.14: an emergency kit for drained accounts, a shared scam registry and phishing check, withdrawal screening, and Customer Asset Protection — proof, from the XRP Ledger, that customer XRP is backed. Verification, not insurance.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NOSHASHI 1.0.14 — safer to hold, easier to trust">
+<meta name="twitter:description" content="Release 1.0.14: an emergency kit for drained accounts, a shared scam registry and phishing check, withdrawal screening, and Customer Asset Protection — proof, from the XRP Ledger, that customer XRP is backed. Verification, not insurance.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Release 1.0.14","item":"https://www.noshashi.app/releases/1-0-14/"}]}]}</script>
+
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/news/"><span data-i18n="nav.news">Newsroom</span></a>
+      <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
+      <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
+      <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
+      <a class="nav-link optional" href="/learn/"><span data-i18n="nav.learn">Learn</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head"><p class="eyebrow">RELEASE 1.0.14 · THE GOAL</p><h1>Make XRP safer to hold, and easier to trust.</h1><p>People and institutions holding XRP have no deposit guarantee, few ways to stop a theft in progress and no simple way to check that an exchange really holds what it owes. Release 1.0.14 answers each of those with facts read from validated XRP Ledger state, so nobody has to take anyone's word for it, including ours.</p><p><a class="btn" href="/downloads/noshashi-how-this-helps-xrp.pdf">Read the 6-page brief (PDF)</a> <a class="btn ghost" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.14" rel="noopener">Download 1.0.14</a></p></div>
+<section><div class="section-head"><p class="eyebrow">01 / The goal in three lines</p><h2>What this release is for.</h2></div><div class="grid g3">
+<div class="panel"><p class="eyebrow">STOP LOSSES</p><h2>Before and during an attack.</h2><p>Spot a drain as it happens, check a link or an address before you trust it, and get the transactions that save what is left.</p></div>
+<div class="panel"><p class="eyebrow">PROVE BACKING</p><h2>Balances you can check.</h2><p>An institution publishes proof that customer XRP is held, and each customer checks their own balance is counted, from the ledger.</p></div>
+<div class="panel"><p class="eyebrow">SHARE WHAT IS KNOWN</p><h2>One registry, reviewed.</h2><p>Scam reports backed by transaction evidence, confirmed by a reviewer who did not file them, screen deposits and withdrawals for everyone.</p></div>
+</div></section>
+<section><div class="section-head"><p class="eyebrow">02 / What is new, by who it helps</p><h2>In the desktop app and the public API.</h2></div><div class="grid g2">
+<div class="panel"><p class="eyebrow">FREE · EVERYONE WHO HOLDS XRP</p><h2>Protect your own account.</h2><ul class="proof-list"><li><strong>Emergency kit and drainer check:</strong> is the account being drained now, and the ordered, unsigned transactions that save the most. NOSHASHI never signs and never asks for a key.</li><li><strong>Who is this?</strong> Whether an address belongs to an exchange, from a domain that vouches for it or from how it behaves.</li><li><strong>Scam registry and phishing link check:</strong> look up an address or a link seen in ledger memos, with no account.</li><li><strong>Pre-sign check, recover funds, exposure audit, deposit help, domain check</strong> and a graded <strong>account check</strong> in the Security Center.</li></ul></div>
+<div class="panel"><p class="eyebrow">INSTITUTIONAL</p><h2>Proof of reserves.</h2><ul class="proof-list"><li>Name the accounts that hold customer XRP and publish one root over customer balances. Only the root, the total and the count leave your machine.</li><li>Each customer gets their own inclusion proof.</li><li>Reserves are read every day at 06:17 UTC and recorded as an attestation, hash-chained to the one before.</li><li>File scam reports with transaction evidence to the shared registry.</li></ul></div>
+<div class="panel"><p class="eyebrow">ENTERPRISE</p><h2>Customer Asset Protection.</h2><ul class="proof-list"><li>A protection fund with a per-customer limit. Only XRP locked in escrow, or held under a signer list with the master key disabled, counts as secured.</li><li>A public page at <a href="/protection/">/protection/</a> where customers check their own proof and the latest attestation is recomputed in their browser.</li><li><strong>Withdrawal screening:</strong> flags a withdrawal that would bounce, goes to a brand-new or lookalike account, or to one a sanctions listing or scam report touches up to three funding hops back.</li><li><strong>Market surveillance</strong> of the ledger's own order books.</li></ul></div>
+<div class="panel"><p class="eyebrow">STRATEGIC</p><h2>Watched around the clock.</h2><ul class="proof-list"><li>A signed <code>protection_alert</code> webhook when reserves fall below published liabilities or the status worsens.</li><li>A <code>protection_attested</code> event for every daily attestation.</li><li>The phishing link feed, as data for your own systems.</li></ul></div>
+</div></section>
+<section><div class="panel"><p class="eyebrow">03 / Read this before relying on it</p><h2>Verification, not insurance.</h2><p>Customer Asset Protection shows, from the ledger, what an institution holds and has set aside. NOSHASHI pays no claims, and no government scheme stands behind it. A validated XRP Ledger transaction cannot be reversed; these tools help you avoid a loss and document one, not undo it.</p></div></section>
+<section><div class="panel"><p class="eyebrow">04 / Go further</p><h2>Where to start.</h2><ul class="proof-list">
+<li><a href="/downloads/noshashi-how-this-helps-xrp.pdf">How NOSHASHI helps XRP</a>, the 6-page brief for beginners and investors</li>
+<li><a href="/protection/">Check an institution's protection page</a></li>
+<li><a href="/learn/#l23">Lesson 23: proving customer balances are backed</a></li>
+<li><a href="/pricing/">Which plan includes what</a></li>
+<li><a href="https://github.com/Ignosha/noshashi/blob/main/CHANGELOG.md" rel="noopener">The full changelog</a></li>
+</ul></div></section>
+</main>
+<footer>
+  <div class="shell foot">
+    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
+    <div class="foot-links">
+      <a href="/contact/">Contact</a>
+      <a href="/certificate/">Authority certificate</a>
+      <a href="/news/">Newsroom</a>
+      <a href="/progress/">Progress</a>
+      <a href="/status/">Status</a>
+      <a href="/research/">Findings</a>
+      <a href="/learn/">Learn NOSHASHI (course)</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
+      <a href="/misread/">The ledger can be misread</a>
+      <a href="/strategic-infrastructure/">Strategic infrastructure</a>
+      <a href="/developers/">Developers</a>
+      <a href="/docs/">Documentation</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="https://github.com/Ignosha/noshashi">GitHub</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script>
+(function(){
+  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
+  if(!button)return;
+  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
+    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
+    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
+  sync();
+  button.addEventListener("click",function(){
+    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
+    sync();});
+})();
+</script>
+
+</body>
+</html>

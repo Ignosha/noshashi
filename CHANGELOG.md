@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.14
 
 ### Customer Asset Protection and institutional security tools
 

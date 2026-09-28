@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-09-28T18:00:00Z",
+    "kind": "release",
+    "title": "1.0.14: safer to hold XRP, easier to trust who holds it",
+    "body": "An emergency kit for drained accounts, a reviewed scam registry and phishing check, withdrawal screening, and Customer Asset Protection: proof from the XRP Ledger that customer XRP is backed and yours is counted. Verification, not insurance.",
+    "link": "/releases/1-0-14/"
+  },
+  {
     "date": "2026-09-17T12:00:00Z",
     "kind": "milestone",
     "title": "Every download is now labelled BETA",
