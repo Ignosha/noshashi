@@ -28,6 +28,12 @@
  *                  (noshashi.sanctioned_addresses, refreshed daily from
  *                  treasury.gov), and as of when. Public: no key, any origin.
  *
+ *   GET  /domain-verify?address=r…  |  ?domain=example.com
+ *                  Does the domain an account claims list it back in its
+ *                  /.well-known/xrp-ledger.toml (the only proof of a Domain
+ *                  field)? Or: which accounts a domain lists, and whether
+ *                  each names the domain back. Public: no key, any origin.
+ *
  *   /embed/{id}/…  The organization's screening widget (site/embed/v1.js):
  *                  GET config, POST verify (is this really our deposit
  *                  address?), POST check (an address's ledger facts and
@@ -51,6 +57,8 @@ import {
   activationOf,
   classifyTransaction,
   DEFAULT_EVENT_TYPES,
+  domainVerdict,
+  normalizeDomain,
   issuerFactsFrom,
   normalizeTx,
   sanitizeDepositConfig,
@@ -412,6 +420,8 @@ Deno.serve(async (request: Request): Promise<Response> => {
 
     // Public: the sanctions list, from any origin.
     if (route === "sanctions") return await handleSanctions(supabase, request, requestId);
+    // Public: does a domain vouch for an account (xrp-ledger.toml)?
+    if (route === "domain-verify") return await handleDomainVerify(request, requestId);
     // The organization's widget: /embed/{id}/{action}.
     const embedAt = segments.lastIndexOf("embed");
     if (embedAt >= 0 && segments.length === embedAt + 2) {
@@ -624,6 +634,112 @@ async function handleSanctions(supabase: ServiceClient, request: Request, reques
   }
   const hits = await new Reads(supabase).sanctions(addresses);
   return json(200, { ...(await sanctionsStatus(supabase)), hits: Object.values(hits) }, requestId, PUBLIC_CORS);
+}
+
+// ── Domain verification (public) ────────────────────────────────────
+
+const TOML_MAX_BYTES = 256 * 1024;
+
+/**
+ * Read https://<domain>/.well-known/xrp-ledger.toml. Only a public
+ * hostname is ever fetched (normalizeDomain refuses IPs and internal
+ * names), over HTTPS, with one redirect allowed and only to the same
+ * domain or its www. twin, a size cap and a timeout.
+ */
+async function fetchToml(domain: string): Promise<{ text: string | null; error?: string }> {
+  let target = `https://${domain}/.well-known/xrp-ledger.toml`;
+  for (let hop = 0; hop < 2; hop++) {
+    let response: Response;
+    try {
+      response = await fetch(target, { redirect: "manual", headers: { Accept: "application/toml, text/plain, */*" }, signal: AbortSignal.timeout(8000) });
+    } catch (error) {
+      return { text: null, error: error instanceof Error && error.name === "TimeoutError" ? "timed out" : "could not connect" };
+    }
+    if (response.status >= 300 && response.status < 400) {
+      const next = response.headers.get("location");
+      const url = next ? new URL(next, target) : null;
+      const host = url ? normalizeDomain(url.host) : null;
+      const same = host && (host === domain || host === `www.${domain}` || `www.${host}` === domain);
+      if (!url || url.protocol !== "https:" || !same) return { text: null, error: `redirects to ${url?.host ?? "nowhere"}` };
+      target = url.toString();
+      continue;
+    }
+    if (!response.ok) return { text: null, error: `HTTP ${response.status}` };
+    const reader = response.body?.getReader();
+    if (!reader) return { text: null, error: "empty reply" };
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > TOML_MAX_BYTES) {
+        await reader.cancel();
+        return { text: null, error: "file too large" };
+      }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(size);
+    let at = 0;
+    for (const c of chunks) {
+      bytes.set(c, at);
+      at += c.byteLength;
+    }
+    return { text: new TextDecoder().decode(bytes) };
+  }
+  return { text: null, error: "too many redirects" };
+}
+
+function hexToText(hex: unknown): string {
+  if (typeof hex !== "string" || !/^([0-9A-Fa-f]{2})+$/.test(hex)) return "";
+  return new TextDecoder().decode(new Uint8Array((hex.match(/../g) ?? []).map((b) => parseInt(b, 16))));
+}
+
+async function domainOf(address: string): Promise<{ exists: boolean; domain: string | null; raw: string }> {
+  try {
+    const info = await xrpl("account_info", { account: address, ledger_index: "validated" });
+    const raw = hexToText(info.account_data?.Domain);
+    return { exists: true, domain: raw ? normalizeDomain(raw) : null, raw };
+  } catch (error) {
+    if (error instanceof RippledError && error.code === "actNotFound") return { exists: false, domain: null, raw: "" };
+    throw error;
+  }
+}
+
+async function handleDomainVerify(request: Request, requestId: string): Promise<Response> {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: PUBLIC_CORS });
+  if (request.method !== "GET") return json(405, { error: "method_not_allowed" }, requestId, PUBLIC_CORS);
+  const params = new URL(request.url).searchParams;
+  const address = params.get("address")?.trim() ?? "";
+  const domainParam = params.get("domain")?.trim() ?? "";
+  if ((address && !ADDRESS_RE.test(address)) || (!address && !domainParam)) {
+    return json(400, { error: "invalid_request", message: "Send ?address=r… (does its domain vouch for it?) or ?domain=example.com (which accounts does it list, and do they point back?)." }, requestId, PUBLIC_CORS);
+  }
+  const source = "XRPL mainnet account Domain fields (validated ledger) and the domain's /.well-known/xrp-ledger.toml, read live";
+
+  if (address) {
+    const account = await domainOf(address);
+    if (!account.exists) {
+      return json(200, { source, check: { address, domain: null, status: "no_account", listed: [], detail: "No account exists at this address.", tomlUrl: null } }, requestId, PUBLIC_CORS);
+    }
+    if (account.raw && !account.domain) {
+      return json(200, { source, check: { address, domain: account.raw.slice(0, 120), status: "invalid_domain", listed: [], detail: `The account's Domain field ("${account.raw.slice(0, 60)}") is not a public hostname, so nothing can vouch for it.`, tomlUrl: null } }, requestId, PUBLIC_CORS);
+    }
+    const toml = account.domain ? await fetchToml(account.domain) : { text: null };
+    return json(200, { source, check: domainVerdict(address, account.domain, toml) }, requestId, PUBLIC_CORS);
+  }
+
+  const domain = normalizeDomain(domainParam);
+  if (!domain) return json(400, { error: "invalid_domain", message: "Send a public hostname such as example.com." }, requestId, PUBLIC_CORS);
+  const toml = await fetchToml(domain);
+  const check = domainVerdict(null, domain, toml);
+  // Each listed account should name the domain back; an account that does not is listed but not claiming it.
+  const accounts = [];
+  for (const listed of check.listed.slice(0, 20)) {
+    const account = await domainOf(listed).catch(() => null);
+    accounts.push({ address: listed, exists: account?.exists ?? null, domain: account?.domain ?? null, points_back: account ? account.domain === domain || account.domain === `www.${domain}` || `www.${account.domain}` === domain : null });
+  }
+  return json(200, { source, check, accounts }, requestId, PUBLIC_CORS);
 }
 
 // ── The embeddable widget ───────────────────────────────────────────

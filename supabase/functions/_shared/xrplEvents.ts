@@ -592,3 +592,67 @@ export function sanitizeDepositConfig(raw: unknown): DepositConfig {
     trustedCounterparties: trusted,
   };
 }
+
+// ── Domain verification (xrp-ledger.toml) ───────────────────────────
+
+/**
+ * An account's Domain field is a claim anyone can make: a scammer sets
+ * Domain to a real exchange's name. The claim is only proven when that
+ * domain lists the account back in https://<domain>/.well-known/xrp-ledger.toml
+ * under [[ACCOUNTS]] (XLS-26). These read the claim and the file.
+ */
+
+/** A bare host from a Domain field ("https://www.Example.com/path" → "www.example.com"), or null if it is not a public hostname. */
+export function normalizeDomain(raw: string): string | null {
+  const host = raw.trim().replace(/^[a-z][a-z0-9+.-]*:\/\//i, "").split(/[/?#]/)[0].replace(/\.$/, "").toLowerCase();
+  if (host.length > 253 || !/^([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(host)) return null;
+  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal")) return null;
+  return host;
+}
+
+/** The addresses an xrp-ledger.toml lists under [[ACCOUNTS]]. A minimal reader: only what verification needs. */
+export function tomlAccounts(text: string): string[] {
+  const out: string[] = [];
+  let inAccounts = false;
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.replace(/#.*$/, "").trim();
+    if (!line) continue;
+    if (line.startsWith("[")) {
+      inAccounts = /^\[\[\s*ACCOUNTS\s*\]\]$/i.test(line);
+      continue;
+    }
+    if (!inAccounts) continue;
+    const m = line.match(/^address\s*=\s*["']([^"']+)["']/i);
+    if (m && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(m[1]) && !out.includes(m[1])) out.push(m[1]);
+  }
+  return out;
+}
+
+export type DomainCheck = {
+  address: string | null;
+  domain: string | null;
+  /** verified: the domain lists the account back. unverified: the file exists and does not. no_toml: no file could be read. no_domain: the account claims none. */
+  status: "verified" | "unverified" | "no_toml" | "no_domain" | "invalid_domain" | "no_account";
+  /** Addresses the domain's file lists. */
+  listed: string[];
+  detail: string;
+  tomlUrl: string | null;
+};
+
+export function domainVerdict(address: string | null, domain: string | null, toml: { text: string | null; error?: string }): DomainCheck {
+  const tomlUrl = domain ? `https://${domain}/.well-known/xrp-ledger.toml` : null;
+  if (!domain) return { address, domain, status: "no_domain", listed: [], detail: "The account claims no domain. Nothing ties it to a company or website.", tomlUrl };
+  // Single-page sites answer every path with their home page and status 200: that is not a TOML file.
+  if (toml.text !== null && /^\s*</.test(toml.text)) toml = { text: null, error: "the site answers with a web page, not a TOML file" };
+  if (toml.text === null) {
+    return { address, domain, status: "no_toml", listed: [], detail: `${domain} publishes no readable xrp-ledger.toml (${toml.error ?? "not found"}), so the claim cannot be proven either way. Legitimate issuers and exchanges publish one.`, tomlUrl };
+  }
+  const listed = tomlAccounts(toml.text);
+  if (address && listed.includes(address)) {
+    return { address, domain, status: "verified", listed, detail: `${domain} lists ${address} in its xrp-ledger.toml: the domain vouches for the account.`, tomlUrl };
+  }
+  if (address) {
+    return { address, domain, status: "unverified", listed, detail: `${address} claims ${domain}, but ${domain}'s xrp-ledger.toml does not list it${listed.length ? ` (it lists ${listed.length} other account${listed.length === 1 ? "" : "s"})` : ""}. Treat it as impersonation until ${domain} confirms it.`, tomlUrl };
+  }
+  return { address, domain, status: listed.length ? "verified" : "unverified", listed, detail: listed.length ? `${domain} lists ${listed.length} account${listed.length === 1 ? "" : "s"} as its own.` : `${domain}'s xrp-ledger.toml lists no accounts.`, tomlUrl };
+}

@@ -27,17 +27,27 @@ import {
 import type { LedgerEntry } from "@/lib/desk/ledger";
 import { cn } from "@/lib/utils";
 import { useClaimedSubject } from "@/lib/nav/handoff";
+import { ClusterTab, DepositHelpTab, DomainTab, ExposureTab, PersonalGuardian, PreSignTab, RecoverTab } from "./SecurityTools";
 
 /**
  * SECURITY CENTER — cybersecurity for XRP Ledger accounts.
  *
  *   ACCOUNT CHECK  (free)        who can sign, open doors, key changes,
  *                                poisoning attempts, and an unsigned plan
+ *   PRE-SIGN       (free)        what a transaction or blob really does
  *   SAFE SEND      (free)        a pasted destination against your own book
+ *   RECOVER        (free / Pro+) stuck escrows, channels, checks, reserve,
+ *                                and forgotten assets (valued on Pro+)
+ *   EXPOSURE       (free / Pro+) standing permissions, each with a revoke
+ *   DEPOSIT HELP   (free)        a "lost" deposit explained, exchange letter
+ *   DOMAIN CHECK   (free)        does the claimed domain list the account
  *   INCIDENT       (Pro+)        takeover timeline, value followed hop by
  *                                hop, recovery paths, SHA-256 dossier;
  *                                deeper and into a case on Enterprise+
- *   GUARDIAN       (Strategic)   server-side takeover alerts
+ *   SCAM CLUSTERS  (Pro+)        accounts one operation runs; deeper and
+ *                                into a case on Enterprise+, watched on Strategic
+ *   GUARDIAN       (free on this device; server-side on Strategic)
+ *                                takeover alerts
  *
  * NOSHASHI reads; it never signs. Every change is a transaction the owner
  * reviews and signs in their own wallet.
@@ -45,8 +55,14 @@ import { useClaimedSubject } from "@/lib/nav/handoff";
 
 const TABS = [
   { id: "check", label: "ACCOUNT CHECK" },
+  { id: "presign", label: "PRE-SIGN CHECK" },
   { id: "send", label: "SAFE SEND" },
+  { id: "recover", label: "RECOVER FUNDS" },
+  { id: "exposure", label: "EXPOSURE AUDIT" },
+  { id: "deposit", label: "DEPOSIT HELP" },
+  { id: "domain", label: "DOMAIN CHECK" },
   { id: "incident", label: "INCIDENT RESPONSE" },
+  { id: "cluster", label: "SCAM CLUSTERS" },
   { id: "guardian", label: "GUARDIAN" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
@@ -65,16 +81,17 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
   // An address handed over from another screen or a lab is checked straight away.
   const [subject, setSubject] = useState<string | undefined>();
   useClaimedSubject("security", (claimed) => {
-    setTab("check");
+    const view = TABS.find((t) => t.id === claimed.view)?.id;
+    setTab(view ?? "check");
     setSubject(claimed.value);
   });
   return (
     <div className="flex h-full min-w-0 flex-col gap-3 p-4">
       <SceneHeader
         index="33"
-        kicker="ACCOUNT SECURITY · SAFE SEND · INCIDENT RESPONSE · GUARDIAN"
+        kicker="ACCOUNT SECURITY · PRE-SIGN · RECOVERY · INCIDENT RESPONSE · GUARDIAN"
         title="SECURITY CENTER"
-        sub="Harden an XRP Ledger account against takeover, catch lookalike addresses before you sign, and when an account is drained, follow the value and every recovery path that exists. NOSHASHI reads; it never signs."
+        sub="Harden an XRP Ledger account against takeover, read a transaction before you sign it, get back XRP stuck in escrows, channels, checks and reserve, close the permissions others could use, and when an account is drained, follow the value and every recovery path that exists. NOSHASHI reads; it never signs."
         status="go"
         statusLabel="FREE CHECKS"
       />
@@ -97,16 +114,33 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
       <div className="min-h-0 flex-1 overflow-y-auto pr-1">
         {tab === "check" ? (
           <CheckTab key={subject ?? ""} initial={subject} />
+        ) : tab === "presign" ? (
+          <PreSignTab />
         ) : tab === "send" ? (
           <SafeSendTab />
+        ) : tab === "recover" ? (
+          <RecoverTab key={subject ?? ""} initial={subject} onUpgrade={onUpgrade} />
+        ) : tab === "exposure" ? (
+          <ExposureTab key={subject ?? ""} initial={subject} onUpgrade={onUpgrade} />
+        ) : tab === "deposit" ? (
+          <DepositHelpTab />
+        ) : tab === "domain" ? (
+          <DomainTab key={subject ?? ""} initial={subject} />
         ) : tab === "incident" ? (
           <Gated feature="incident_response" onUpgrade={onUpgrade} onSignIn={onSignIn}>
             <IncidentTab />
           </Gated>
-        ) : (
-          <Gated feature="security_guardian" onUpgrade={onUpgrade} onSignIn={onSignIn}>
-            <GuardianTab />
+        ) : tab === "cluster" ? (
+          <Gated feature="asset_recovery" onUpgrade={onUpgrade} onSignIn={onSignIn}>
+            <ClusterTab />
           </Gated>
+        ) : (
+          <div className="space-y-5">
+            <PersonalGuardian onUpgrade={onUpgrade} />
+            <Gated feature="security_guardian" onUpgrade={onUpgrade} onSignIn={onSignIn}>
+              <GuardianTab />
+            </Gated>
+          </div>
         )}
       </div>
     </div>

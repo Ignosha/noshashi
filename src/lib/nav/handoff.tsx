@@ -27,6 +27,8 @@ export type Subject = {
   from?: SceneId;
   /** What the value meant where it came from, e.g. "largest holder". */
   as?: string;
+  /** Which tab of the scene should read it, when the scene has several. */
+  view?: string;
 };
 
 type HandoffContext = {

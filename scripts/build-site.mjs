@@ -956,6 +956,7 @@ async function buildPricingEnhancement() {
             <li>Institutional API, scoped keys and webhooks</li>
             <li>Embeddable screening widget for your own site</li>
             <li>Forensic trace five hops deep, straight into an investigation case</li>
+            <li>Scam cluster mapping four hops deep, 200 accounts, opened as a case</li>
             <li>Dedicated environment, provisioned per contract</li>
             <li>Architecture review and named implementation planning</li>
           </ul>
@@ -976,7 +977,7 @@ async function buildPricingEnhancement() {
             <li>Custom export schemas, bulk export and event retention you set</li>
             <li>Custom data integrations for risk, custody, trading and compliance</li>
             <li>Dedicated environment, provisioned per contract</li>
-            <li>Security Guardian: signed alerts the minute a watched account's keys change or it is deleted</li>
+            <li>Security Guardian: signed alerts the minute a watched account's keys change or it is deleted, for a theft trail or a whole scam cluster</li>
             <li>Strategic architecture review and integration roadmap</li>
           </ul>
           <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
@@ -1016,6 +1017,15 @@ async function buildPricingEnhancement() {
           <tr><th scope="row">Safe send (lookalike &amp; sanctions check)</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
           <tr><th scope="row">Incident response (fund trace, recovery paths, dossier)</th><td class="no">Unavailable</td><td class="yes">2 hops</td><td class="yes">2 hops</td><td class="yes">5 hops + case</td><td class="yes">5 hops + case</td></tr>
           <tr><th scope="row">Security Guardian (takeover alerts)</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Recovery &amp; cybersecurity analysis</th></tr>
+          <tr><th scope="row">Pre-sign transaction explainer</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Stuck funds &amp; reserve recovery</th><td class="limited">1 address</td><td class="yes">25 at once</td><td class="yes">500 at once</td><td class="yes">500 at once</td><td class="yes">500 at once</td></tr>
+          <tr><th scope="row">Exposure audit (revoke checks, offers, channels, keys)</th><td class="limited">1 address</td><td class="yes">25 at once</td><td class="yes">500 at once</td><td class="yes">500 at once</td><td class="yes">500 at once</td></tr>
+          <tr><th scope="row">Wrong-deposit helper &amp; exchange letter</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Domain impersonation check (xrp-ledger.toml)</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Forgotten-asset inventory</th><td class="limited">Listed</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td></tr>
+          <tr><th scope="row">Personal Guardian (on-device alerts)</th><td class="limited">3 addresses</td><td class="yes">50 addresses</td><td class="yes">50 addresses</td><td class="yes">50 addresses</td><td class="yes">50 + server-side</td></tr>
+          <tr><th scope="row">Scam cluster mapper</th><td class="no">Unavailable</td><td class="yes">2 hops, 40 accounts</td><td class="yes">2 hops, 40 accounts</td><td class="yes">4 hops, 200 + case</td><td class="yes">4 hops, 200 + watch</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Policy, adjudication &amp; evidence</th></tr>
           <tr><th scope="row">Policy engine &amp; adjudication</th><td class="limited">Session only</td><td class="yes">10,000 verdicts</td><td class="yes">Unlimited</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
           <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>

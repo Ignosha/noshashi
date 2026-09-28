@@ -227,7 +227,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     <a href="#xrpl"><i>PART 1 · 12 LESSONS · ~60 MIN</i><b>The XRP Ledger</b><span>Consensus, accounts, keys, tokens, issuer powers, the DEX, AMMs, payments, NFTs, amendments, compliance.</span></a>
     <a href="#app"><i>PART 2 · 7 LESSONS · ~50 MIN</i><b>The NOSHASHI app</b><span>How it works, setup, verdicts and receipts, and every screen explained step by step.</span></a>
     <a href="#workflows"><i>PART 3 · 8 WORKFLOWS</i><b>Putting it to work</b><span>Real tasks from start to finish, from vetting a token to handing an auditor a signed export.</span></a>
-    <a href="#check"><i>PART 4 AND 5</i><b>Knowledge check and word list</b><span>55 questions in five rounds, including vocabulary and how it helps institutions, and 110 terms in one searchable list.</span></a>
+    <a href="#check"><i>PART 4 AND 5</i><b>Knowledge check and word list</b><span>69 questions in six rounds, including vocabulary, how it helps institutions, and account security and recovery, and 119 terms in one searchable list.</span></a>
   </div>
 
   <div class="wrap">
@@ -257,6 +257,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="#l19">19 · The Agent and Observer</a>
       <a href="#l20">20 · Account security</a>
       <a href="#l21">21 · When an account is emptied</a>
+      <a href="#l22">22 · Getting XRP back, and signing safely</a>
       <p>PART 3 · WORKFLOWS</p>
       <a href="#workflows">8 real tasks</a>
       <p>MORE</p>
@@ -858,6 +859,62 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <p class="takeaway"><b>KEY IDEA</b>Nothing reverses a validated payment. Speed, evidence and the right request to the right party are what recover funds, when anything can.</p>
       </section>
 
+      <section id="l22">
+        <h2>22 · Getting XRP back, and signing safely</h2>
+        <p class="mins">ABOUT 8 MINUTES</p>
+        <p>Stolen XRP cannot be pulled back, but a lot of XRP is simply <strong>stuck</strong>, waiting for its owner to sign one transaction. And most thefts start with one signature the owner did not understand. This lesson covers both.</p>
+        <h3>XRP you can get back</h3>
+        <ul>
+          <li><strong>Matured escrows.</strong> An escrow does not pay out on its own. Once its FinishAfter time passes, someone must submit <code>EscrowFinish</code>, or the XRP waits forever.</li>
+          <li><strong>Expired escrows and payment channels.</strong> After CancelAfter or an expiry, <code>EscrowCancel</code> or a closing <code>PaymentChannelClaim</code> returns what was never paid out, plus the reserve.</li>
+          <li><strong>Uncashed checks.</strong> A check written to you pays nothing until you submit <code>CheckCash</code>.</li>
+          <li><strong>The owner reserve.</strong> Every object an account owns locks 0.2 XRP: each trust line, DEX order, NFT offer, ticket and preauthorisation. Removing ones you no longer need frees it. Closing an account entirely with <code>AccountDelete</code> returns everything except a 0.2 XRP fee.</li>
+        </ul>
+        <div class="card"><p class="t">REAL EXAMPLES, RECORDED FROM MAINNET TODAY</p>
+          <p>Ripple's escrow wallet #03 (<code>rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn</code>, listed in ripple.com's xrp-ledger.toml) holds ten escrows to itself. The first matures on 1 October 2026 and waits for an <code>EscrowFinish</code>. An NFT trader (<code>rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ</code>) still has four NFT buy offers that expired weeks ago: 0.8 XRP of reserve returns the moment they are cancelled.</p></div>
+        <h3>The XRPL's "revoke approvals"</h3>
+        <p>There are no token allowances on the XRP Ledger, but some things you leave open let others take value later:</p>
+        <ul>
+          <li>a check you wrote (the payee can pull up to its amount);</li>
+          <li>an NFT sell offer (anyone, or its named buyer, can take the NFT at that price; at zero it is a giveaway);</li>
+          <li>a funded payment channel;</li>
+          <li>an old DEX order;</li>
+          <li>a regular key or signer you no longer control.</li>
+        </ul>
+        <p>Each can be cancelled with one transaction.</p>
+        <h3>Read before you sign</h3>
+        <p>A phishing site does not need your seed if you will sign for it. The signatures that empty accounts are:</p>
+        <ul>
+          <li><code>SetRegularKey</code> or <code>SignerListSet</code>, which hand signing power to someone else;</li>
+          <li><code>AccountDelete</code>, which sends everything to its Destination;</li>
+          <li>an <code>NFTokenCreateOffer</code> selling an NFT for nothing.</li>
+        </ul>
+        <p>Decode every request before signing it.</p>
+        <h3>"My deposit never arrived"</h3>
+        <p>A payment that failed moved nothing but its fee. For example, <code>tecDST_TAG_NEEDED</code> means the exchange required a destination tag you did not give, and the XRP is still in your account.</p>
+        <p>A payment that succeeded without the right tag is in the exchange's pooled account. Only the exchange can credit it, and it usually will if you send the transaction hash, the ledger, the amount and your account details.</p>
+        <h3>Is this account really who it says?</h3>
+        <p>Anyone can write "bitstamp.net" in an account's Domain field. The claim is proven only when that website lists the account in its <code>/.well-known/xrp-ledger.toml</code>. XRP Toolkit's donations account names xrptoolkit.com, and xrptoolkit.com lists it back: that is verified.</p>
+        <h3>In NOSHASHI</h3>
+        <p>In <strong>SECURITY CENTER</strong>, these tools are free on every plan:</p>
+        <ul>
+          <li><strong>PRE-SIGN CHECK</strong> gives a verdict on any transaction or blob: SAFE-LOOKING, CAREFUL or DO NOT SIGN.</li>
+          <li><strong>RECOVER FUNDS</strong> lists stuck XRP and reserve, each with its unsigned transaction.</li>
+          <li><strong>EXPOSURE AUDIT</strong> lists every open permission, each with its revoke.</li>
+          <li><strong>DEPOSIT HELP</strong> explains a lost deposit and writes the letter to the exchange.</li>
+          <li><strong>DOMAIN CHECK</strong> verifies an account's claimed domain.</li>
+          <li><strong>PERSONAL GUARDIAN</strong> sends desktop alerts for three of your own addresses.</li>
+        </ul>
+        <p>Paid plans add more:</p>
+        <ul>
+          <li><strong>Pro</strong> values every holding in XRP, scans 25 addresses at once, watches 50 addresses, and maps <strong>SCAM CLUSTERS</strong>: the accounts one operation funds and sweeps.</li>
+          <li><strong>Institutional</strong> scans 500 addresses at once.</li>
+          <li><strong>Enterprise</strong> maps clusters four hops deep, into a case.</li>
+          <li><strong>Strategic</strong> watches a whole cluster server-side.</li>
+        </ul>
+        <p class="takeaway"><b>KEY IDEA</b>Nobody can reverse a theft, but you can finish, cancel, cash and clean up what is yours, and refuse to sign what you have not read.</p>
+      </section>
+
 <!-- ===================== PART 3 ===================== -->
       <p class="part" id="workflows">PART 3 · WORKFLOWS: REAL TASKS, START TO FINISH</p>
 
@@ -968,7 +1025,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <h2>Knowledge check</h2>
         <p class="mins">63 QUESTIONS IN 6 ROUNDS · YOUR ANSWERS STAY IN YOUR BROWSER</p>
         <p class="noprint">Answer as many as you like, then press <strong>Check my answers</strong>. Every answer is explained, right or wrong. Stuck on a word? Open <strong>Words used here</strong> under a question for plain definitions from the word list.</p>
-        <p>Rounds 1 to 3 cover the ledger, markets and payments, and the app. Round 4 tests the vocabulary. Round 5 asks how NOSHASHI helps institutions and enterprises: treasuries, compliance teams, desks, payments firms, issuers and auditors. Round 6 covers account security and what to do after a theft.</p>
+        <p>Rounds 1 to 3 cover the ledger, markets and payments, and the app. Round 4 tests the vocabulary. Round 5 asks how NOSHASHI helps institutions and enterprises: treasuries, compliance teams, desks, payments firms, issuers and auditors. Round 6 covers account security, what to do after a theft, and getting stuck XRP back.</p>
         <form class="quiz" id="quiz"></form>
         <div class="cta noprint">
           <button class="btn" type="button" id="grade">Check my answers</button>
@@ -1089,7 +1146,12 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["Your XRP was stolen an hour ago. What can reverse the payment?", ["Validators, if asked quickly","A recovery service, for a fee","Nothing: validated transactions are final; recovery happens off-ledger","Deleting your account"], 2, "Paid 'recovery' offers are the second half of the scam. Exchanges freezing tagged deposits and issuers freezing their own tokens are the real paths."],
     ["Stolen XRP reached an account that requires destination tags. Who can help?", ["Nobody","The exchange or service behind it, which can freeze the customer behind that tag if reached quickly","The first validator","NOSHASHI, by reversing it"], 1, "Send the transaction hash, amount, time and tag, ideally with a police reference."],
     ["Why do thieves send hundreds of 1-drop payments after a theft?", ["To pay fees","To bury the real transfers in noise and spread phishing links","To close the account","To vote on amendments"], 1, "A trace that ignores the dust and follows AccountDelete sweeps sees through it."],
-    ["What does NOSHASHI's hardening plan contain?", ["Your secret key","Unsigned transactions for you to review and sign in your own wallet","A password reset","Nothing, it only scores"], 1, "NOSHASHI reads the ledger and never signs or asks for a key."]
+    ["What does NOSHASHI's hardening plan contain?", ["Your secret key","Unsigned transactions for you to review and sign in your own wallet","A password reset","Nothing, it only scores"], 1, "NOSHASHI reads the ledger and never signs or asks for a key."],
+    ["An escrow to you matured last week. Why has the XRP not arrived?", ["It was stolen","An escrow never pays out by itself: someone must submit EscrowFinish","Escrows take a month to settle","The issuer froze it"], 1, "RECOVER FUNDS lists matured escrows with the EscrowFinish to sign."],
+    ["A site asks you to sign a SetRegularKey naming an address you do not recognise. What happens if you sign?", ["Nothing, it only reads","Whoever holds that key can move everything in your account from then on","Your fees go down","The account is deleted"], 1, "PRE-SIGN CHECK answers DO NOT SIGN for exactly this: it is the quickest way to take over an account."],
+    ["Your exchange deposit failed with tecDST_TAG_NEEDED. Where is the XRP?", ["At the exchange, unassigned","Still in your account: only the fee was spent","Burned","In escrow"], 1, "A tec result means the payment did nothing but charge its fee. Send again with the tag."],
+    ["An account's Domain field says bitstamp.net. What proves it really belongs to Bitstamp?", ["Nothing more is needed","bitstamp.net listing the account in its /.well-known/xrp-ledger.toml","A large balance","An old account age"], 1, "Anyone can write any domain. DOMAIN CHECK reads the site's file and says VERIFIED only when the account is listed."],
+    ["What is the XRP Ledger equivalent of revoking a token approval?", ["There is nothing to revoke","Cancelling what you left open: checks you wrote, NFT sell offers, payment channels, old orders, keys and signers","Deleting your trust lines","Changing your password"], 1, "EXPOSURE AUDIT lists each open permission with the one transaction that revokes it."]
   ];
   var V = [
     ["Account","A place on the ledger that holds XRP and tokens, identified by an address starting with r."],
@@ -1120,11 +1182,13 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["delivered_amount","The amount a payment actually delivered, in its metadata. The figure to credit."],
     ["Depth","How much is on offer in an order book."],
     ["Destination tag","A number telling a shared account which customer a payment is for."],
+    ["Domain verification","Proof that an account belongs to a website: the site lists the account in its /.well-known/xrp-ledger.toml."],
     ["DEX","The decentralised exchange built into the XRPL."],
     ["Digest (SHA-256)","A fixed-length fingerprint of data. Change anything and the digest changes completely."],
     ["Domain","A web domain an account claims, verifiable against a file on that domain."],
     ["Drops","The smallest unit of XRP: 1 XRP = 1,000,000 drops."],
     ["Escrow","Funds locked until a time passes or a condition is met."],
+    ["EscrowFinish","The transaction that releases a matured escrow. Nothing pays out until someone submits it."],
     ["Exception","An approved, recorded override of a NO-GO for a stated reason."],
     ["Fee pressure","How high transaction costs are running because the network is busy."],
     ["Flag","An on/off setting on an account or trust line."],
@@ -1177,6 +1241,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["Regular key","A second key an account nominates to sign for it."],
     ["Require Auth","An issuer setting: you need its approval to hold its token."],
     ["Reserve","XRP an account must keep locked: a base reserve plus an owner reserve per object."],
+    ["Pre-sign check","Decoding a transaction before signing it, to see what it really does. Most thefts start with a signature the owner did not understand."],
     ["REVIEW","A check state meaning a human decision is needed."],
     ["Selective disclosure","Proving a credential exists without revealing the personal data behind it."],
     ["Sequence","An account's transaction counter, starting at its creation ledger index."],

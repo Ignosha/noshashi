@@ -132,6 +132,42 @@ const RULES: Rule[] = [
     words: /secur|protect|harden|safe(ty)? of (my|this|the) (account|wallet)|takeover|take over|regular key|multi-?sig|lock (down|my)|poison|lookalike|attack/i,
   },
   {
+    tool: "find_stuck_funds",
+    label: "XRP the account can get back",
+    needs: "address",
+    words: /stuck|reclaim|unlock|free (up )?(my |the )?reserve|reserve back|get (back )?(my |the )?reserve|recover(able)? (reserve|xrp|funds)|uncashed|matured|expired (escrow|channel|check)|payment channel|escrow.*(finish|release|claim)|forgotten (xrp|funds)|money (stuck|locked)/i,
+  },
+  {
+    tool: "audit_exposure",
+    label: "permissions others hold",
+    needs: "address",
+    words: /exposure|revoke|approval|permission|allowance|who (else )?can (take|pull|spend|move)|open (offers?|checks?|orders?)|standing (offer|order|check)|give ?away|zero[- ]price/i,
+  },
+  {
+    tool: "asset_inventory",
+    label: "everything the account holds",
+    needs: "address",
+    words: /inventory|what (else )?(do i|does (it|this account)) (own|hold)|forgotten (assets?|tokens?)|holdings|net worth|worth in xrp|value of (my|this|the|its) (tokens|nfts|assets|holdings)|lp (tokens?|shares?) (i|it) hold/i,
+  },
+  {
+    tool: "deposit_help",
+    label: "why a deposit did not arrive",
+    needs: "hash",
+    words: /never arrived|didn'?t arrive|did not arrive|not (arrived|credited)|hasn'?t (arrived|been credited)|missing (deposit|payment)|lost (deposit|payment)|wrong (tag|destination tag|memo)|forgot (the |my )?(destination )?tag|without (a |the )?(destination )?tag|no (destination )?tag|exchange (didn'?t|did not|hasn'?t|won'?t) credit/i,
+  },
+  {
+    tool: "map_cluster",
+    label: "the operation behind the account",
+    needs: "address",
+    words: /cluster|same (operator|scammer|gang|group|person|people)|related accounts|linked accounts|other accounts (of|run by|belonging|owned)|scam (network|ring|operation|gang)|who else (is|are)|sock ?puppet|drainer (network|accounts)/i,
+  },
+  {
+    tool: "verify_domain",
+    label: "whether the claimed domain is real",
+    needs: "address",
+    words: /\bdomain\b|\.toml\b|xrp-ledger\.toml|really (belong|owned|theirs|from)|official (account|address|wallet)|is (this|it) (really|actually|the real)|genuine|verified (issuer|account)/i,
+  },
+  {
     tool: "ledger_sync",
     label: "server agreement",
     needs: "none",
@@ -244,18 +280,48 @@ export type PlanOptions = {
   tickets?: boolean;
 };
 
+/**
+ * A transaction pasted into the question: its JSON (anything in braces
+ * naming a TransactionType) or a serialized blob (hex beginning with the
+ * TransactionType field, 0x12). Returned as written, to be explained.
+ */
+export function transactionIn(question: string): string | null {
+  const open = question.indexOf("{");
+  const close = question.lastIndexOf("}");
+  if (open >= 0 && close > open) {
+    const json = question.slice(open, close + 1);
+    if (/"TransactionType"\s*:/.test(json)) return json;
+  }
+  const blob = /\b12[0-9A-Fa-f]{98,}\b/.exec(question);
+  return blob ? blob[0] : null;
+}
+
+const DOMAIN = /\b((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24})\b/gi;
+
 export function plan(question: string, options: PlanOptions = {}): Plan {
   const ticketPlan: TicketPlan = options.tickets ? planTickets(question) : { calls: [], rest: question };
   // A message being written into a ticket plans nothing but that write.
   question = ticketPlan.rest;
-  const entities = extractEntities(question);
   const calls: PlannedCall[] = [...ticketPlan.calls];
   const add = (call: PlannedCall) => {
     if (!calls.some((c) => c.tool === call.tool && JSON.stringify(c.input) === JSON.stringify(call.input))) calls.push(call);
   };
 
+  // A pasted transaction is explained, and its own addresses and hashes plan nothing else.
+  const pasted = transactionIn(question);
+  if (pasted) {
+    add({ tool: "explain_transaction", input: { transaction: pasted }, why: "what the transaction does if signed" });
+    question = question.replace(pasted, " ");
+  }
+  const entities = extractEntities(question);
+
   for (const rule of RULES) {
     if (!rule.words.test(question)) continue;
+    if (rule.tool === "verify_domain" && entities.addresses.length === 0) {
+      const domains = [...question.replace(/xrp-ledger\.toml/gi, " ").matchAll(DOMAIN)].map((m) => m[1].toLowerCase()).filter((d) => !/(^|\.)noshashi\.com$/.test(d));
+      if (domains[0]) add({ tool: rule.tool, input: { domain: domains[0] }, why: rule.label });
+      continue;
+    }
     if (rule.needs === "address") {
       for (const address of entities.addresses) add({ tool: rule.tool, input: { [INPUT_KEY[rule.tool] ?? "address"]: address }, why: rule.label });
     } else if (rule.needs === "hash") {

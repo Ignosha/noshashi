@@ -1,0 +1,3749 @@
+{
+ "note": "Recorded from XRPL mainnet (s1/s2.ripple.com, xrplcluster.com) on 2026-09-28 via pg_net: Ripple escrow account rB3W\u2026, an NFT trader with thousands of owned objects, a real tecDST_TAG_NEEDED payment and its destination, the sweeper r344K\u2026 that 15 accounts AccountDeleted into during ledgers 107296250-107296329, and two of those accounts first transactions. Rows trimmed to the fields the readers use. TOML files: ripple.com (served application/toml; its TOKENS entry is cut after name) and xrptoolkit.com as read the same day; gatehub.net answered /.well-known/xrp-ledger.toml with its HTML home page (status 200), first lines kept; www.bitstamp.net and bitstamp.net answered 404. Also at ledger 107296904: a DEX trader's objects (trust lines, a ticket, offers), the best XRP bids for RLUSD and the XRP/RLUSD AMM pool, and the exchange's objects (a 2-of-3 signer list).",
+ "ledger": {
+  "ledger": {
+   "close_time": 843930191,
+   "ledger_index": 107296847
+  }
+ },
+ "nft_info": {
+  "status": "success",
+  "validated": true,
+  "ledger_hash": "DFCAEB35A9B97810C66F002CEA96CFF60667A46F76D78001B5D8B148F6D1CC5D",
+  "account_data": {
+   "Flags": 0,
+   "index": "B47106E98A7FA7580B42C817C9BFBC52C5D7B4A33167ABEB3AD7693832E813A4",
+   "Account": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "Balance": "833358301",
+   "Sequence": 103452292,
+   "OwnerCount": 2563,
+   "PreviousTxnID": "F3D19B99B327B5AB582D8E3B40671945F24CC283AD4537568D3B23DE26B064C4",
+   "LedgerEntryType": "AccountRoot",
+   "PreviousTxnLgrSeq": 107296726
+  },
+  "ledger_index": 107296847
+ },
+ "dst_tag_tx": {
+  "Fee": "12",
+  "ctid": "C665360B00650000",
+  "date": 843927931,
+  "hash": "7075F0ED10ABA2A482E2B7F5B6565AFEE90AC43A6FB3B30FAC0473D3E10D486B",
+  "meta": {
+   "AffectedNodes": [
+    {
+     "ModifiedNode": {
+      "FinalFields": {
+       "Flags": 0,
+       "Account": "rEni1epjkJfVXMmMaDDWuz3hFe1mYnqfsk",
+       "Balance": "283146396",
+       "Sequence": 98186578,
+       "OwnerCount": 0
+      },
+      "LedgerIndex": "7E3DB90434070065431DD17F84EA79AF65B7B7D86D5E0FAB49538B7BC7AF6589",
+      "PreviousTxnID": "D0878053933DC5FFEFF2147E74AED4949166EC675AFF64675A7124822A50377C",
+      "PreviousFields": {
+       "Balance": "283146408",
+       "Sequence": 98186577
+      },
+      "LedgerEntryType": "AccountRoot",
+      "PreviousTxnLgrSeq": 107296233
+     }
+    }
+   ],
+   "TransactionIndex": 101,
+   "TransactionResult": "tecDST_TAG_NEEDED"
+  },
+  "Flags": 0,
+  "Amount": "10",
+  "status": "success",
+  "Account": "rEni1epjkJfVXMmMaDDWuz3hFe1mYnqfsk",
+  "Sequence": 98186577,
+  "inLedger": 107296267,
+  "validated": true,
+  "DeliverMax": "10",
+  "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+  "ledger_index": 107296267,
+  "TransactionType": "Payment",
+  "LastLedgerSequence": 107296285
+ },
+ "nft_marker": "7D7822C8CA385120FED32FDC14F93036FF663CF6D7FEC20A1CC2A13815C45ADE,5F3D05F7EAFA412EC7763ABFCD10221019EC33D62DBD1E5A4DE5F4398D65464E",
+ "escrow_info": {
+  "status": "success",
+  "validated": true,
+  "ledger_hash": "2BC7BC64FE7B16586344FD4C764E46A61DEFC123C5BB14AD799237B8610D7673",
+  "account_data": {
+   "Flags": 1048576,
+   "index": "DFEBE58A5232C04871E2DCB1E2D4B35DF668BD9E9A4D69AE8DD6377844FFFE0B",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "Balance": "235360668",
+   "Sequence": 53,
+   "OwnerCount": 16,
+   "PreviousTxnID": "912D7E9D5E9986B1D2714DE2FE4B8BE36BDD3023B5A7BC814176D53DC9409EBD",
+   "LedgerEntryType": "AccountRoot",
+   "PreviousTxnLgrSeq": 106880765
+  },
+  "ledger_index": 107296866
+ },
+ "exchange_tx": [
+  {
+   "tx": {
+    "date": 843927840,
+    "hash": "9F68EEA6661DE615316225BB91B4C57E7EEF12EDB6FA839D5BA2FC00DC65FEB2",
+    "Amount": "2740020",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rDh2NKS7HxdKM4aKRu1X13Bnh2wrfqU8PF",
+    "ledger_index": 107296242,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [
+     {
+      "CreatedNode": {
+       "NewFields": {
+        "Account": "rDh2NKS7HxdKM4aKRu1X13Bnh2wrfqU8PF",
+        "Balance": "2740020",
+        "Sequence": 107296242
+       },
+       "LedgerIndex": "A9172E93961C6B483B6D86AE8453C0FB169F8EBDA77F40C1E3EB96F2D84FC7B6",
+       "LedgerEntryType": "AccountRoot"
+      }
+     }
+    ],
+    "delivered_amount": "2740020",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296242
+  },
+  {
+   "tx": {
+    "date": 843907631,
+    "hash": "8AA2E5F2162726EDD67C070E4B80896DC150BAA1863A1EEE3F10C82E3B1240D1",
+    "Amount": "10",
+    "Account": "rJzpr3FMsGRtL4HjxnzAsKza3xGftbYumN",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107291047,
+    "DestinationTag": 499592,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107291047
+  },
+  {
+   "tx": {
+    "date": 843907601,
+    "hash": "20E7CD65F693C2444F96EDB81CE99523BDD0FCEF8B8527A5FDA006FA7C513FA3",
+    "Amount": "10",
+    "Account": "rEni1epjkJfVXMmMaDDWuz3hFe1mYnqfsk",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107291039,
+    "DestinationTag": 124867324,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107291039
+  },
+  {
+   "tx": {
+    "date": 843907512,
+    "hash": "C8F29E97B3EF3D677531C29B9E386038D814E21CF84270975CE74E93239B78CE",
+    "Amount": "10",
+    "Account": "rJzpr3FMsGRtL4HjxnzAsKza3xGftbYumN",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107291016,
+    "DestinationTag": 544829,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107291016
+  },
+  {
+   "tx": {
+    "date": 843907492,
+    "hash": "68F3386840EF290669345C03A863132D3B9265C1FE2986A3411465EAD65C35D9",
+    "Amount": "339602971",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rJoRXHPU7uNH6GsTxtk3sF5VFKgB8UBaU5",
+    "ledger_index": 107291011,
+    "DestinationTag": 124867324,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "339602971",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107291011
+  },
+  {
+   "tx": {
+    "date": 843753661,
+    "hash": "01B47D992CBA91E00EB7D07ADED91A04209F8358B79003424FA7812EE98F184B",
+    "Amount": "4500000",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rLKVtuCF7KZEJZLnPrfEX59AHEk7VVct9z",
+    "ledger_index": 107251566,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "4500000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107251566
+  },
+  {
+   "tx": {
+    "date": 843712051,
+    "hash": "DFCD479F77E423B8A946C0782383C76FF67300E5463C66E4DEE34EF37DF63FB0",
+    "Amount": "10",
+    "Account": "rf7QoGcRk2aFMSQNY3zt6FsADavoVucLni",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107240849,
+    "DestinationTag": 809677,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107240849
+  },
+  {
+   "tx": {
+    "date": 843712021,
+    "hash": "2AADD01776080000F30C3CC00F0460772516B22EA57D90BE8CDC1F2A56D6F518",
+    "Amount": "10",
+    "Account": "rEni1epjkJfVXMmMaDDWuz3hFe1mYnqfsk",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107240841,
+    "DestinationTag": 31471,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107240841
+  },
+  {
+   "tx": {
+    "date": 843711950,
+    "hash": "6FFD4FD8922A1854709CD8756BCC6BF1B1D1922085501363A127690550C8CADC",
+    "Amount": "10",
+    "Account": "rMmByJCgBXCtMqJLyVkYgGneDXj2DeQtm2",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107240822,
+    "DestinationTag": 966245,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107240822
+  },
+  {
+   "tx": {
+    "date": 843711930,
+    "hash": "A074CCC8C8D6FA220943FA83013BA29A1615365CDA4524A68EEC9DDD25BA7204",
+    "Amount": "338714239",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rMyy5hhJ7arJMn4oik5teEkMbAfkkPHb7d",
+    "ledger_index": 107240817,
+    "DestinationTag": 31471,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "338714239",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107240817
+  },
+  {
+   "tx": {
+    "date": 843711181,
+    "hash": "5C77D2CA178423E80513386DE465D0E9376542E8A59002C6F3F3D748FED3838A",
+    "Amount": "1000000000",
+    "Account": "rfodXP2bvRhgArwgLSNLDzrHavz8pjBTGc",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107240626,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1000000000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107240626
+  },
+  {
+   "tx": {
+    "date": 843703912,
+    "hash": "586DE79FC0D8C67321B7943344FE875D834642C25E4CDD01E898EA8E73B8D308",
+    "Amount": "10",
+    "Account": "rBadHTPHCN8LqYXJsws6ooPBWGS2KsTC9o",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107238757,
+    "DestinationTag": 194314,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107238757
+  },
+  {
+   "tx": {
+    "date": 843703892,
+    "hash": "CF5930B5CA53ABC899F2BCF9126F078624A192F1177AB59C98739BFD22C4AD1B",
+    "Amount": "11839837",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rBCekuhMkpyERWbpqQ88NirmzxR569cfJW",
+    "ledger_index": 107238752,
+    "DestinationTag": 3123448648,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "11839837",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107238752
+  },
+  {
+   "tx": {
+    "date": 843677810,
+    "hash": "9F124411E7F132EA28EA4FFF0D7D904C089ED90E00B61E954BFA67C6E87B102E",
+    "Amount": "10",
+    "Account": "rBadHTPHCN8LqYXJsws6ooPBWGS2KsTC9o",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107232029,
+    "DestinationTag": 112569,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107232029
+  },
+  {
+   "tx": {
+    "date": 843677781,
+    "hash": "6DC2B4AE5EBDE0B9B7157E64E71ADBAD83282266CF24D80910EBFCCCBE8665FE",
+    "Amount": "25909501",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rBCekuhMkpyERWbpqQ88NirmzxR569cfJW",
+    "ledger_index": 107232022,
+    "DestinationTag": 3123448648,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "25909501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107232022
+  },
+  {
+   "tx": {
+    "date": 843652910,
+    "hash": "B00777E93097FFADD92E62E8A013DDB961DA418D6166CE1AC1EEE757B70AFF9C",
+    "Amount": "10",
+    "Account": "rNzocJ9L3AV9XFnEGJejBFqR6Vw56F7rY",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107225632,
+    "DestinationTag": 214304,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107225632
+  },
+  {
+   "tx": {
+    "date": 843652891,
+    "hash": "FB99E21EBCD14677EF3672CFA09FD0C210B5026AAB49CB689CCAAA1B081BEAE1",
+    "Amount": "6485495",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rNxp4h8apvRis6mJf9Sh8C6iRxfrDWN7AV",
+    "ledger_index": 107225628,
+    "DestinationTag": 498846039,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "6485495",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107225628
+  },
+  {
+   "tx": {
+    "date": 843569180,
+    "hash": "DB5C4B564DC2CEF829A3FA7CCBCFC2695BF9677BC5EFD730D1316475E59ADE54",
+    "Amount": "10",
+    "Account": "rss7Vw3oNN6qheasqV4ErJRYE8hEwwFcq6",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107203948,
+    "DestinationTag": 270511,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107203948
+  },
+  {
+   "tx": {
+    "date": 843569141,
+    "hash": "F30FC7E0F2D0AEE2ACEE0970DE43240991F91FDA9277F2B31AF4BC5D27097602",
+    "Amount": "10",
+    "Account": "rEni1epjkJfVXMmMaDDWuz3hFe1mYnqfsk",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107203939,
+    "DestinationTag": 52828491,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107203939
+  },
+  {
+   "tx": {
+    "date": 843569051,
+    "hash": "2B7FEEDD1180AD8E2CE09E2E533815E952C0C13DBABA48752A38A7186AD32D65",
+    "Amount": "10",
+    "Account": "rss7Vw3oNN6qheasqV4ErJRYE8hEwwFcq6",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107203916,
+    "DestinationTag": 237564,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107203916
+  },
+  {
+   "tx": {
+    "date": 843569032,
+    "hash": "F120AECE85D04DA175D6A32A6D54723D7F002D0057BAECED233B2DA45EEC1AA2",
+    "Amount": "112777289",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rsLhARi6MUDM1ZruPtuAPLYTovz5X8j2sv",
+    "ledger_index": 107203911,
+    "DestinationTag": 52828491,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "112777289",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107203911
+  },
+  {
+   "tx": {
+    "date": 843545722,
+    "hash": "5766AD8A8A878CC1FABB90436C3FFFD2A04634540E28FE919D5732EA42883557",
+    "Amount": "10",
+    "Account": "rwLCaBLPKcE55pjgmEicUYTtXHr8VawD9Z",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107197839,
+    "DestinationTag": 314706,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107197839
+  },
+  {
+   "tx": {
+    "date": 843545701,
+    "hash": "827651B2F80DA8045D70C1A4F6AF8B17FD89DFFABB6325BCA8C048DC94CE6981",
+    "Amount": "14530595",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rwWr7KUZ3ZFwzgaDGjKBysADByzxvohQ3C",
+    "ledger_index": 107197833,
+    "DestinationTag": 3182950,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "14530595",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107197833
+  },
+  {
+   "tx": {
+    "date": 843529430,
+    "hash": "91909AE02C30CE3781BE5DB81C62C5DDEA166C0A7146992FFF9E06DB89CB634A",
+    "Amount": "10",
+    "Account": "rss7Vw3oNN6qheasqV4ErJRYE8hEwwFcq6",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107193621,
+    "DestinationTag": 388578,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107193621
+  },
+  {
+   "tx": {
+    "date": 843529401,
+    "hash": "C9F170FD4A1CBE0DD6E3B2084D7D820CD4E07352A8ACE994ADDEE6D688A4D71C",
+    "Amount": "74742026",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rsLhARi6MUDM1ZruPtuAPLYTovz5X8j2sv",
+    "ledger_index": 107193614,
+    "DestinationTag": 52828491,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "74742026",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107193614
+  },
+  {
+   "tx": {
+    "date": 843406402,
+    "hash": "A804A1EA1F1E2890F0D63C164B32E4199466F34FB41B7F51F03015B426367B4E",
+    "Amount": "893955",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "r9C4v6MPfj6P8XfRVUfGaKZ5LShAyeZH1u",
+    "ledger_index": 107161782,
+    "DestinationTag": 704030556,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "893955",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107161782
+  },
+  {
+   "tx": {
+    "date": 843310701,
+    "hash": "FAD3D759052A50F75801D7FE64F7D05AC57E40537212394839F2253C2B2C57D7",
+    "Amount": "10",
+    "Account": "rwLCaBLPKcE55pjgmEicUYTtXHr8VawD9Z",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107137034,
+    "DestinationTag": 965305,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107137034
+  },
+  {
+   "tx": {
+    "date": 843310681,
+    "hash": "47FC4DCD45D99071329AC3C35D0D64F2B0D7BBC20BD439FC65792BE6768E3531",
+    "Amount": "2598275",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rwyQp3eC5j6AumcptZhfmiXAykpeswZKeJ",
+    "ledger_index": 107137029,
+    "DestinationTag": 1417577,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "2598275",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107137029
+  },
+  {
+   "tx": {
+    "date": 843140501,
+    "hash": "5739565871C319A5A5C83C55D8884185E82C931E4E195B4288A50E0764CDBF7A",
+    "Amount": "10",
+    "Account": "rBadHTPHCN8LqYXJsws6ooPBWGS2KsTC9o",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107092784,
+    "DestinationTag": 881168,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107092784
+  },
+  {
+   "tx": {
+    "date": 843140490,
+    "hash": "690EF605D87393651B78031E6FA9905E983CB3419E1D4DBCB444FAD1CAF0979B",
+    "Amount": "17405858",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rBCekuhMkpyERWbpqQ88NirmzxR569cfJW",
+    "ledger_index": 107092780,
+    "DestinationTag": 3123448648,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "17405858",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107092780
+  },
+  {
+   "tx": {
+    "date": 843121810,
+    "hash": "5A2A49E5AADC7D24E1102863350B170DE6A7FFF369B3A121F0CFB0797C7578FF",
+    "Amount": "10",
+    "Account": "rKnp6Gg9w1EyHgLY6c7GdeixdxCct846tu",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107087938,
+    "DestinationTag": 832996,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107087938
+  },
+  {
+   "tx": {
+    "date": 843121780,
+    "hash": "397E100A5CF70BA50470A967B4C2455DEA52DAD6B06493CEE4812B3A5907FC8B",
+    "Amount": "10",
+    "Account": "rEni1epjkJfVXMmMaDDWuz3hFe1mYnqfsk",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107087930,
+    "DestinationTag": 832721196,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107087930
+  },
+  {
+   "tx": {
+    "date": 843121690,
+    "hash": "E7B8DFD7E4C52F2CC3E5B928428B406A162D8CE99DEF33283503DB3D7BD83259",
+    "Amount": "10",
+    "Account": "rKnp6Gg9w1EyHgLY6c7GdeixdxCct846tu",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107087907,
+    "DestinationTag": 904193,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107087907
+  },
+  {
+   "tx": {
+    "date": 843121671,
+    "hash": "337A081C1267CE50C248A7B1D47A914C373DC93BB51395B9453A1E667FBA22FF",
+    "Amount": "6263730",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rKoePMg1MnWu19E38fqUji4eX6qNgdoTAr",
+    "ledger_index": 107087903,
+    "DestinationTag": 832721196,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "6263730",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107087903
+  },
+  {
+   "tx": {
+    "date": 843079872,
+    "hash": "804086DF2428B5B2F3ED3277C7D94D94502731C5F2F5F273CAFA17D03AE10373",
+    "Amount": "58928900",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rLKVtuCF7KZEJZLnPrfEX59AHEk7VVct9z",
+    "ledger_index": 107077070,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "58928900",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107077070
+  },
+  {
+   "tx": {
+    "date": 843036082,
+    "hash": "DF40EFBA3FA42EA4BC7625F40003B2D5BB248775FE44F17C381649BED4F1420F",
+    "Amount": "10",
+    "Account": "rKnp6Gg9w1EyHgLY6c7GdeixdxCct846tu",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107065747,
+    "DestinationTag": 602414,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107065747
+  },
+  {
+   "tx": {
+    "date": 843036061,
+    "hash": "A88DB5FCF690B5A0A4FF6ABE900BF37225D85326F211493C23D45991442D35E4",
+    "Amount": "10",
+    "Account": "rEni1epjkJfVXMmMaDDWuz3hFe1mYnqfsk",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107065741,
+    "DestinationTag": 23,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107065741
+  },
+  {
+   "tx": {
+    "date": 843035970,
+    "hash": "13FBA7AA4360693CF51DBC2430C0C6C09A7D34AFDBE92B840AB99EC3E1F7EDAD",
+    "Amount": "10",
+    "Account": "rKnp6Gg9w1EyHgLY6c7GdeixdxCct846tu",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107065717,
+    "DestinationTag": 704632,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107065717
+  },
+  {
+   "tx": {
+    "date": 843035942,
+    "hash": "1E4AD2CF7C8E3212D0DE670A62029D02AC6CE2AA77034F08EA9E08707DDD7B92",
+    "Amount": "22500000",
+    "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "Destination": "rKLVmGZ5WycjadNJK598i8CxXaGkHZ6in7",
+    "ledger_index": 107065711,
+    "DestinationTag": 23,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "22500000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107065711
+  },
+  {
+   "tx": {
+    "date": 843035731,
+    "hash": "C2F88E80C92F20F7B87DD6AF63C863306C093CED8A53B377A4FE419F0EF42462",
+    "Amount": "10",
+    "Account": "rKnp6Gg9w1EyHgLY6c7GdeixdxCct846tu",
+    "Destination": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+    "ledger_index": 107065656,
+    "DestinationTag": 584351,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107065656
+  }
+ ],
+ "nft_objects": [
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "3ADFDAABEDA4B97D442D3C8A7984741D4102BCCBF32E07A53800F080B8A4F53E",
+   "Amount": "14000000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5F804D51BE061CB523",
+   "OwnerNode": "304",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "F6182D9A44BA700C6CD7C836FB9A757C50BDEBAF8400B2A2A2E4C322BC1D4B26",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 103982571
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "586FDF60A1133164C38B4B5F1B8B694ED8CE7FD97D9C19D3C173CBB575811DA7",
+   "Amount": "14000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F6591185DE01BB05CBD820",
+   "OwnerNode": "304",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "DA53C442BCC0F99928A1D183E89CD133DD3369C663B607AA5EE255535D4E4147",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 103982533
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "6F359D5F8EE8B914150F4CA49AC0C5DE6F432576873B4AAD5F40A4BA013192AE",
+   "Amount": "21000000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD2295E130105DE9465",
+   "OwnerNode": "3ac",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "DC23F09D503813950A081830BEC8FF842510C6F7DF98C192912859E7B06C4ACB",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104063645
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "166FC01C267E026F0EBD2A79190DB2AD289048021EEEB446807A95C0E6A4802A",
+   "Amount": "48000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F659118D59628805CBDBED",
+   "OwnerNode": "53a",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "1888FA763A0DF4500A78E36427C5ADC05D75990EFB057B858BD19A87CE37E607",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104280809
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "B08B158E89B84551F351482C816DFFA26E2A682E50C0EBA6657C05C887BD5F98",
+   "Amount": "21900000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F65911AC529EA205CBDE07",
+   "OwnerNode": "566",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "7F5054E8AF54D49A3473D79FF12CD2FC09C7A5F069F041E99A30A5926DEBA3DE",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104305039
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "3689C90D85A4C4B08481404B9CE4715550CA08711CD332575704F2AB5FBAC830",
+   "Amount": "8500000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5FBDC2309E061CB403",
+   "OwnerNode": "8af",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "A4AAB37CE14423BB2567992F2206CDD2A49B5E9AC6CC222A16140FCEC56537A9",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104671559
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "E4577A990B35554B65E771F1D3415C0DE1056D5907BA89EC93AAB4EA498E10F8",
+   "Amount": "8500000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5FB1FA2C0B061CB270",
+   "OwnerNode": "8af",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "8235F35C9088D38DD302012412FCB709DB5686C3A3060BBCA0A48842D26CABA4",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104671551
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "E506DBE3D23C0E0ED1CD73D7D272EE081B29C4C27B65E3465D8279A7F31AD215",
+   "Amount": "8500000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5FE62B8B3A061CB29F",
+   "OwnerNode": "8af",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "887799E3788E83FF3F9FA8E7AA31E0490BC733F5A665A715062DE4A26729203A",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104671554
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "F6A21B064091BE576AC372A188F9F3464303E04E4B5B415681350EDA593FF41C",
+   "Amount": "8500000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5F9A7C50BE061CB423",
+   "OwnerNode": "8af",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "DD4398648BBDC525A77956EE70E6C4321FF5AFA09FC627D0B32D61B51F5EE28D",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104671562
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "583BB2AA6CD44EEA6513E3070D0508BF61B3A4AE59FEC52861FAB5493939EAE7",
+   "Amount": "69000000",
+   "NFTokenID": "00181388208AE9E5739668CEE25874F9BBE7EB2452EC4B8DA521F7A006370806",
+   "OwnerNode": "911",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "EE37094EC5227C7584DAB86ED065A546A9C0931982624BCCFE4232B2AAD1F405",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104706137
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "2125A3D9870222F601F782C670C389B79F3363F33E751516E1E130C8BF44E39B",
+   "Amount": "6500000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD247D9B5C705DE912B",
+   "OwnerNode": "af7",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "5538B11DBCC0FCB5D37FA5C2E57F55CD1908DC82EC33BEC0C41B4C8EF8137A30",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 104989118
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "D0F579D851635E2C0934EFE301C77E546A26AD40FEF8831E4EBD59759B7C844A",
+   "Amount": "32000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F65911518003BB05CBDA20",
+   "OwnerNode": "e46",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "30F2CAA14894598A8579794E52C541CC8F5E95468F7C58F97B9C8B4B81D2B98B",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105312242
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "C88B41AB42111FB3A7A680B7E712526EF8D81A9FD12795D821B5AB4E761F38FF",
+   "Amount": "30000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F6591182D3A06605CBDBCB",
+   "OwnerNode": "e4f",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "502018769CFD75C8590388F7A1C1EC1E966BE5EA14C0BC274593C41C9CC93C3A",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105358858
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "36415B5CDDBE40B6B2D0150FFE211C443185E8DC3599E5CF65C36AA29C09FFB0",
+   "Amount": "22000000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5FCB6481EE061CB553",
+   "OwnerNode": "f32",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "E874F5ADEAA1EAF589299DDCC2971ECF3554947B6642992A91A47CA9978B7174",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105426256
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "7239A042D9A0DE78AB323D2BFF3B6470120F1221ED2BC90ED71FEF1ED4E15218",
+   "Amount": "19000000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5F7BEE801F061CB284",
+   "OwnerNode": "f32",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "40FE084ABCB8C3C426C0A4302E2C1C87E1E2DE2F2ECCE550E8735025FF30D5F9",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105426244
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "BD7C183ABA379D69A90DE2A5420E92F3DE9B52B9A07B722E6DE001C62E40C869",
+   "Amount": "14000000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5F9558D602061CB567",
+   "OwnerNode": "f32",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "B6D699262F5F98D0236F920B958E6A92BF084E0101F53EF402804212E0BE589F",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105426238
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "D8BA5276F9388DD903F914B217B294D76991F732802B47F22FBB0C397640C7FC",
+   "Amount": "10000000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD24463E8F705DE945B",
+   "OwnerNode": "f32",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "6A274B75C2703AAE21659BCFD3E52793520627B9078FD46349007BC3CBDD27C8",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105426215
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "7F0231DA6B544007B209248CD055FC093C0A664E1CD8CEAF7537156414327204",
+   "Amount": "48000000",
+   "NFTokenID": "00181388208AE9E5739668CEE25874F9BBE7EB2452EC4B8DABC6817906370ADD",
+   "OwnerNode": "108a",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "BE0835B0A522E07640314581ACEF5B4F777D9F35F6B80A2D423DE06C7C4996E2",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105543114
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "4227FA3A2409D51275EE2E5BDCFD019E90C0B5185CF13ED27C2611817601FEE8",
+   "Amount": "28000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F659119353B43A05CBDB9F",
+   "OwnerNode": "1477",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "F9926AB7667017086F7AE58A4F8E709825C07E6E8A729BDB0108AEC31D2E7967",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105885130
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "726E2401E0C99A3979316FE18ED319782D09327478DD3C77C8F4841B1BABFAF5",
+   "Amount": "28000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F65911F3CFA65005CBD7B5",
+   "OwnerNode": "1477",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "1F0295F4A05CF9BA45A44FD4466A9B09BC505115E470D6105049644C6385258B",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105885126
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "D5A44124E45E40EC7162A913A59E1CD8344AAAF52783DCBF5586D799A8351295",
+   "Amount": "28000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F659118B13AA5005CBDBB5",
+   "OwnerNode": "1477",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "B98F941586281E82F7635DF491C39DBDC2D5D8BA864B50EB593EDECBD36904DB",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105885132
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "071B2D22A743B7C1D3A12A278B669953A91C87B7BF22A30AB447A66D067350EE",
+   "Amount": "5300000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5F32F06956061CB4BB",
+   "OwnerNode": "149d",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "7405ACB05BD5441D22A369BF84B8C3B1B43CAA3056A46441F78843B30FC299BC",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105897191
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "32AB3EA71B9B26CB831008CA50F090C1B0F5C651D9D524EAC7459657D351814A",
+   "Amount": "6500000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD2CCB12B5D05DE90C1",
+   "OwnerNode": "14be",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "A62B9E3D51B14C3A5CDFE95486E90434E9ED5832C14EC08F7F930353172F16B7",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105910605
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "8F86AD31D8C2821F81E88FDEE48989D33655681D6DE8C5EA156AF22564B3C940",
+   "Amount": "68000000",
+   "NFTokenID": "00081388EF7C422EF52CEB969960BEF4144D7BC3F862C4676DCA9164059EB2C5",
+   "OwnerNode": "14e8",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "6A69FEA853FFDCF939BE9828A767F846E8F041AFCC8034CF079A26F910D1D546",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 105922918
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "9E6AE31723A56CCA2D745B956863B9038166D210A559B3BB00D6D31AA9CEF95F",
+   "Amount": "3800000",
+   "NFTokenID": "00181F40ADEB1F9F4AE8BC62F84A2DD733640CB5F6777F5F3FE88281061CB2E6",
+   "OwnerNode": "16a2",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "0F9DC44444095B7C8160CF3BC9E20A106A3DB0343AAB645DB07559B01B3768BE",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106056573
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "0E68C35DF9D6795D35E7DD7BC4C5541562D29095A788E629B3E8199D25E9B081",
+   "Amount": "9500000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD2BA2A2BFB05DE935F",
+   "OwnerNode": "16a3",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "D5FFABFCE7B9D73F4519F05CDAD0DFF6F952755F4AA38330BC3234ACBF80C29C",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106056597
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "74FEDCBB19E3A06CB00F7828A5E8DAAA707F61F20257CB5467826AA101FEA1C9",
+   "Amount": "6100000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD2767C2EBF05DE9223",
+   "OwnerNode": "16a3",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "D329548F9E22B4D3D406ACF942BBC17634B0D73379E41381DF01EE633A2C5BCA",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106056610
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "81FBA29F55849E82FE479CEB4353C03684CA57DFB6342C37B24BF5BC264C8ED5",
+   "Amount": "32000000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD25D2406B505DE9419",
+   "OwnerNode": "16a3",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "7BE8B08CD7FC014B152ADE7FF1F0BF1AE6C75452D6E00823438AAB5208E018C5",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106056602
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "A9296807B76BA125F76BBC6979355A1BFF7D3AF578A563C4FC9E9F7BE4FC26B1",
+   "Amount": "6100000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD22F19980905DE916D",
+   "OwnerNode": "16a3",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "E5F2596FBAEFE3F176964E4803D7E5763B2F06A63202BBE6AC02BEA30D7EAE0F",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106056592
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "7E0391D6598C9FC11C2B04F8A102E22AC874152495E06E01EAA8EBDD6E4F89CC",
+   "Amount": "14900000",
+   "NFTokenID": "00081388EF7C422EF52CEB969960BEF4144D7BC3F862C467423279B9059EAE22",
+   "OwnerNode": "19f0",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "1496F9A7431C48720BF6BBAB25F183AE8044D9B81948E61B6D69DFE260DE308F",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106348624
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "CAE00750778C4205C5714698854E8511A3B5C922F29104F77449CE4C0E86E8FD",
+   "Amount": "48000000",
+   "NFTokenID": "00081388EF7C422EF52CEB969960BEF4144D7BC3F862C46754CBA6FC059EB05D",
+   "OwnerNode": "1b69",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "EDAFDBE83C602F92BBCF10D41D262B70C4EDD94A274742FC0E2FE73D5DD8940E",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106471473
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "E220F77DAFAC29019A8EFDEBD2496BECEEC1FB1CB78C88E80A472D5867D09030",
+   "Amount": "29000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F6591187B84E7805CBD7DD",
+   "OwnerNode": "1f75",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "FD7E4C89379445BACF4C8AA90B5AF4FA2386FD4E03AFBE60A951D76DD9C58C65",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106749584
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "3909CC5834AB68C615D6194E22B62FA17F93E4AF188596A0DC0222E7676421EF",
+   "Amount": "29000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F65911F58F821505CBDE7A",
+   "OwnerNode": "1f76",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "65DAE316439ACB7D75C57250DEF65C1E6EDAB79D84B886E3E548D902170927C2",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106749591
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "BDBC946D40C349E3D0F1E4EBB85906A61334C2D1EED2C73C04BA64C3950C2525",
+   "Amount": "29000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F65911F29F91B805CBDB1D",
+   "OwnerNode": "1f76",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "5F9D38946D4DBC856456A4410D90E75D06461C8382ECDD0CF902FB8A5EA23425",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106749588
+  },
+  {
+   "Flags": 1,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "D632412A563553D3B4B48AC047C0F064623E48B2EB922CB304F68A6D6C0B1825",
+   "Amount": "29000000",
+   "NFTokenID": "0008271068A0E6F504732B8741A31D6A7965EED1A1F6591127E6948705CBDEEC",
+   "OwnerNode": "1f76",
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "B2A8A43B697342C4D2967F97D09AD508DC7C54BB7BCDB140116C1492241C9FBD",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106749594
+  },
+  {
+   "Flags": 0,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "6E0C8EC936A376AB20182BA057B061CC263D9D5191A30FA28D7D4B5522375549",
+   "Amount": "400000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD2C471217305DE90D7",
+   "OwnerNode": "1f8d",
+   "Expiration": 841936598,
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "1F3BD107148CA834FD4A29ABEAA9642CF283E90A3F377CFB28CB62D8A8345B9D",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106758565
+  },
+  {
+   "Flags": 0,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "075F8507007F48B0BB9B568C57E3CDF6C73742A9BA0DEF3CF45B287823292D07",
+   "Amount": "400000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD2A3445AF805DE935E",
+   "OwnerNode": "1f8e",
+   "Expiration": 841937088,
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "35550DA283579F4242F2C1B366A2163995C3F7120773EE3E041FC21133703FFE",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106758692
+  },
+  {
+   "Flags": 0,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "2C3B266E4AA19409ACD56948A5DEC6C614DD7F5039095CEB3DAAB1A4979DC002",
+   "Amount": "400000",
+   "NFTokenID": "00181B587984EC8F8DB8C631C7558BAFA002D2E0C5577FD2B03C742505DE9189",
+   "OwnerNode": "1f8e",
+   "Expiration": 841936942,
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "71E9E831501C8F37B610A307C44FA810DA67BA960847E859FEE64808D50837CA",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106758654
+  },
+  {
+   "Flags": 0,
+   "Owner": "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
+   "index": "4E97EB90828EE6BE7D7181C8ACA9067129FEB90A7AD3F9BE742DB85BB1197B0D",
+   "Amount": "176790000",
+   "NFTokenID": "00181388208AE9E5739668CEE25874F9BBE7EB2452EC4B8DE5092D8B063704EF",
+   "OwnerNode": "1f8e",
+   "Expiration": 841940166,
+   "Destination": "rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC",
+   "PreviousTxnID": "B51AA903946F9B4E8347DD2A48BC0E75308924DF55D8AB92745B52C3559845C3",
+   "LedgerEntryType": "NFTokenOffer",
+   "NFTokenOfferNode": "0",
+   "PreviousTxnLgrSeq": 106759485
+  }
+ ],
+ "server_info": {
+  "info": {
+   "validated_ledger": {
+    "age": 0,
+    "seq": 107296847,
+    "hash": "DFCAEB35A9B97810C66F002CEA96CFF60667A46F76D78001B5D8B148F6D1CC5D",
+    "base_fee_xrp": 1e-05,
+    "reserve_inc_xrp": 0.2,
+    "reserve_base_xrp": 1
+   }
+  }
+ },
+ "sweeper_info": {
+  "status": "success",
+  "validated": true,
+  "ledger_hash": "DFCAEB35A9B97810C66F002CEA96CFF60667A46F76D78001B5D8B148F6D1CC5D",
+  "account_data": {
+   "Flags": 0,
+   "index": "7B15FF7AD21A90BC1428606FE31A76980A0152BA84DB76A071B674F2301A9DFF",
+   "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+   "Balance": "874582520313",
+   "Sequence": 107143088,
+   "OwnerCount": 0,
+   "PreviousTxnID": "F6C4CC8BB775E6360CF53F5B7F72954E46B69480338DF377AB41154589E42A25",
+   "LedgerEntryType": "AccountRoot",
+   "PreviousTxnLgrSeq": 107296847
+  },
+  "ledger_index": 107296847
+ },
+ "toolkit_info": {
+  "status": "success",
+  "validated": true,
+  "ledger_hash": "F158D3101334BDD3213F8A87CF0A817EEDC9DBBEE0E4CDE05EC493274E59E37B",
+  "account_data": {
+   "Flags": 1048576,
+   "index": "F778EDE9B63771B15690A1E2F3AE5F898F319E6E8F5C3DCF6D3B38FB3515F5DB",
+   "Domain": "787270746F6F6C6B69742E636F6D",
+   "Account": "rTooLkitCksh5mQa67eaa2JaWHDBnHkpy",
+   "Balance": "356669164",
+   "Sequence": 188,
+   "EmailHash": "1135E101F3DF3AF11D6646D52A8C0B1F",
+   "MessageKey": "020000000000000000000000002668205FDDBA084C796A59525CFE7F84298ACDEF",
+   "OwnerCount": 2,
+   "RegularKey": "rpmPi9RBAQfnEe52gGuxBfRhYKG8drxaMi",
+   "urlgravatar": "http://www.gravatar.com/avatar/1135e101f3df3af11d6646d52a8c0b1f",
+   "PreviousTxnID": "99B285382923B26885B34D2E15484E6B7F273CB72FBAB7394AF4C7FF1E937ACB",
+   "LedgerEntryType": "AccountRoot",
+   "PreviousTxnLgrSeq": 106531353
+  },
+  "ledger_index": 107296877
+ },
+ "escrow_create": {
+  "hash": "4D299BDCD9FD44C8680A401DF405E0C29DC4CBF7BB6789E053947D6A260D27CD",
+  "Amount": "100000000000000",
+  "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+  "Sequence": 45,
+  "FinishAfter": 859852800,
+  "TransactionType": "EscrowCreate"
+ },
+ "exchange_info": {
+  "status": "success",
+  "validated": true,
+  "ledger_hash": "2BC7BC64FE7B16586344FD4C764E46A61DEFC123C5BB14AD799237B8610D7673",
+  "account_data": {
+   "Flags": 1179648,
+   "index": "112FCA9DFE87E95903864860A208F00419DF5B8FE2C08CD0264F1D62873340C7",
+   "Account": "rBpXtXVs5b2HjApREMyrT2zhTCQ2fHwWF5",
+   "Balance": "559216200",
+   "Sequence": 11688,
+   "OwnerCount": 5,
+   "PreviousTxnID": "9F68EEA6661DE615316225BB91B4C57E7EEF12EDB6FA839D5BA2FC00DC65FEB2",
+   "LedgerEntryType": "AccountRoot",
+   "PreviousTxnLgrSeq": 107296242
+  },
+  "ledger_index": 107296866
+ },
+ "escrow_objects": [
+  {
+   "Flags": 0,
+   "index": "08E0D69321CDC6E2ED3D20E2DA421505C08952927B4E41E6DA31A0BF9BE07972",
+   "Amount": "100000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 859852800,
+   "PreviousTxnID": "4D299BDCD9FD44C8680A401DF405E0C29DC4CBF7BB6789E053947D6A260D27CD",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 84301535
+  },
+  {
+   "Flags": 0,
+   "index": "0990B0368BD8390D0C75D2C262AED1335E01055CC0A12E054EAEDAD3533DBD41",
+   "Amount": "300000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 844128000,
+   "PreviousTxnID": "D5ADB2E85FB62DADEB2F52F1A0C8911FC66CBFB4CA3F6FBA9CFA151F0B240A47",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 78128474
+  },
+  {
+   "Flags": 0,
+   "index": "2BC6FA6ADDB99C7D499C8DFCC160FAF6B13B6A7657F8F17938AC14773D730029",
+   "Amount": "200000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 862444800,
+   "PreviousTxnID": "763B5FE488A2597CD21DB8B34DFEA812C25020D82FD08458101FAF2A5420787E",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 84301552
+  },
+  {
+   "Flags": 0,
+   "index": "2DAA63EB59A5F92E0A89A2A786B9622FF340C8822CE448E331B33C207D7EABC3",
+   "Amount": "200000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 844128000,
+   "PreviousTxnID": "9C74E1022703633A909FFF1713D43672B666DA9E50ECA4DDF8D8F28C6426DD0E",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 78812160
+  },
+  {
+   "Flags": 0,
+   "index": "41434D21604A71573599B35FB0B998E20222ADBC3346BA7319D651A8B9895EC4",
+   "Amount": "500000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 865123200,
+   "PreviousTxnID": "0AFCBEEDB8231921C869CF89B941D50F61AF00E274805AD8CEC36682C1C2C883",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 85682194
+  },
+  {
+   "Flags": 0,
+   "index": "4732AF9FB696DC7E984B4D1F7E0355C239C5B6A3D204F89293C8F4FDEB9EF2CD",
+   "Amount": "100000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 849398400,
+   "PreviousTxnID": "0F0B7844AAD817AB6B4B8486B820DFEFE0DA06DD063087A70F3AE16467E95F95",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 80849209
+  },
+  {
+   "Flags": 0,
+   "index": "551B3AC0B6185AC830D6F7EBBAFABE6BFA5475AC2E51B365C14121B046886167",
+   "Amount": "400000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 859852800,
+   "PreviousTxnID": "91D307445E33E596689D763F10E4188A9900764E3870B7FB3180A38044B8F8EB",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 83622389
+  },
+  {
+   "Flags": 0,
+   "index": "7A445526F7D07FE10C726FABD97529CE8D1BD90D4D3F33B50D087BA52156DA6C",
+   "Amount": "500000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 846806400,
+   "PreviousTxnID": "862DD074020C4B170BED9EC3934245299C25AC156EB42ADD2D45F45323299A0C",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 79482653
+  },
+  {
+   "Flags": 0,
+   "index": "818E6DC00910D689645B6A6625F211A12787EE4A149E89F24C9474DDFD2CD81A",
+   "Amount": "500000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 857174400,
+   "PreviousTxnID": "68EFFA3045EE70840602B15C72AE63D2FB1987E5108D638C3EE629917EAA4980",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 82923350
+  },
+  {
+   "Flags": 0,
+   "index": "93388821361CB6A599370550EED4F9E3A362448A6AB533D3CAD19EF45A6733F1",
+   "Amount": "500000000000000",
+   "Account": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "OwnerNode": "0",
+   "Destination": "rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn",
+   "FinishAfter": 854755200,
+   "PreviousTxnID": "D3F1E5F1C7D84FC8CB4DF2BA37110839FCD5F15ADA95CA4C64C238F8CE249E82",
+   "LedgerEntryType": "Escrow",
+   "PreviousTxnLgrSeq": 82247827
+  }
+ ],
+ "swept_first_rL2m": [
+  {
+   "tx": {
+    "date": 805175010,
+    "hash": "C15A9152FEDB7C43B29DD4080E2F5838EF68E058EAA651A2FF0483B9B886139B",
+    "Amount": "10000000",
+    "Account": "rs8JaMBBjg61Bj8mC4bjdmQEeCMGqhzcCA",
+    "Destination": "rL2mDm6wGTbWnULK6TJirFQJR2ytkavSiN",
+    "ledger_index": 97304232,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [
+     {
+      "CreatedNode": {
+       "NewFields": {
+        "Account": "rL2mDm6wGTbWnULK6TJirFQJR2ytkavSiN",
+        "Balance": "10000000",
+        "Sequence": 97304232
+       },
+       "LedgerIndex": "33DDEF7F810FD407C36F9293DBB7BFDD0AD13369486FE09939E629435C50DC95",
+       "LedgerEntryType": "AccountRoot"
+      }
+     }
+    ],
+    "delivered_amount": "10000000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97304232
+  },
+  {
+   "tx": {
+    "date": 805175021,
+    "hash": "ADCEE51910FA27728048E8A30C478B8DCE7A4BA6B9E4640570999320715A912A",
+    "Amount": "1",
+    "Account": "rss7Vw3oNN6qheasqV4ErJRYE8hEwwFcq6",
+    "Destination": "rL2mDm6wGTbWnULK6TJirFQJR2ytkavSiN",
+    "ledger_index": 97304236,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97304236
+  },
+  {
+   "tx": {
+    "date": 805176061,
+    "hash": "B7D376650165F1CAF4EBBF0988678ED3B652B4B7CD0DA6DB17CAAB97C08B73BC",
+    "Amount": "8995001",
+    "Account": "rL2mDm6wGTbWnULK6TJirFQJR2ytkavSiN",
+    "Destination": "rHroT9qGY6bYLFo2zLW2tkHLTwMp3dY174",
+    "ledger_index": 97304503,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "8995001",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97304503
+  },
+  {
+   "tx": {
+    "date": 805176080,
+    "hash": "4460306F57432806A442C7DD10E1B3C619C2B4C315C500304F9BC3F18A489DE8",
+    "Amount": "1",
+    "Account": "rHcWmKpDf4GJiJjuCyXfTwCMqhWsjzecN9",
+    "Destination": "rL2mDm6wGTbWnULK6TJirFQJR2ytkavSiN",
+    "ledger_index": 97304507,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97304507
+  },
+  {
+   "tx": {
+    "date": 805452811,
+    "hash": "DD56D6E7EF607871A956C4C04080FCFAFAC2C366088D71B76E100F99DFB47FFC",
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "46656573202868747470733A2F2F73637773797374656D2E636F6D29",
+       "MemoType": "74657874"
+      }
+     }
+    ],
+    "Amount": "10",
+    "Account": "ra4oM7sVAcdic5ztHihTp9KFAEWY3C2Mfp",
+    "Destination": "rL2mDm6wGTbWnULK6TJirFQJR2ytkavSiN",
+    "ledger_index": 97375378,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97375378
+  },
+  {
+   "tx": {
+    "date": 843927980,
+    "hash": "6AC09D048846D878B22D2AC94DF8E8DA40733794CC0B6DC41340642929760135",
+    "Account": "rL2mDm6wGTbWnULK6TJirFQJR2ytkavSiN",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296279,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800011",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296279
+  }
+ ],
+ "swept_first_rsu9": [
+  {
+   "tx": {
+    "date": 806503110,
+    "hash": "FAB9148CF26831A9127D7F17E8195746F0FBA2DC8C0243A03FC3EA9F973F3BC5",
+    "Amount": "10040000",
+    "Account": "rMvCasZ9cohYrSZRNYPTZfoaaSUQMfgQ8G",
+    "Destination": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "ledger_index": 97644732,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [
+     {
+      "CreatedNode": {
+       "NewFields": {
+        "Account": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+        "Balance": "10040000",
+        "Sequence": 97644732
+       },
+       "LedgerIndex": "363B6F62D73562BCE584DF81447445A7C803191146D87E2542B615180012E14E",
+       "LedgerEntryType": "AccountRoot"
+      }
+     }
+    ],
+    "delivered_amount": "10040000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97644732
+  },
+  {
+   "tx": {
+    "date": 806503130,
+    "hash": "22E47059B187989C86ECA15B00CFF5868AD0408F8696B1D69BB4C78EDA3A2E69",
+    "Amount": "1",
+    "Account": "rMmByJCgBXCtMqJLyVkYgGneDXj2DeQtm2",
+    "Destination": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "ledger_index": 97644737,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97644737
+  },
+  {
+   "tx": {
+    "date": 806504461,
+    "hash": "BCAE5E5851EB4984B0715D4253A6ADDED887B1CDFC6DB4B44486F84000779A7E",
+    "Amount": "9035001",
+    "Account": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "Destination": "rHroT9qGY6bYLFo2zLW2tkHLTwMp3dY174",
+    "ledger_index": 97645078,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "9035001",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97645078
+  },
+  {
+   "tx": {
+    "date": 806504482,
+    "hash": "1F73F41363942125CB61BEB007290F4BB16E4CD75E3AD616C77CB108CDAF9B6B",
+    "Amount": "1",
+    "Account": "rHcWmKpDf4GJiJjuCyXfTwCMqhWsjzecN9",
+    "Destination": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "ledger_index": 97645084,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97645084
+  },
+  {
+   "tx": {
+    "date": 806513051,
+    "hash": "39B683827C671D8B13DC28D9D2BA90CC0CB898434F7C88226F126970C499A190",
+    "Amount": "1500000",
+    "Account": "rMvCasZ9cohYrSZRNYPTZfoaaSUQMfgQ8G",
+    "Destination": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "ledger_index": 97647278,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1500000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97647278
+  },
+  {
+   "tx": {
+    "date": 806513071,
+    "hash": "7137A306F6A069646357225B08B3A7FA3BA73837FACA90A8FA43B31A00A715C2",
+    "Amount": "1",
+    "Account": "rMmByJCgBXCtMqJLyVkYgGneDXj2DeQtm2",
+    "Destination": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "ledger_index": 97647283,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97647283
+  },
+  {
+   "tx": {
+    "date": 806513981,
+    "hash": "DC271EEA32FCBD67308FA4EEAE0785DBFB57A298347016AB713940F2BE2FCB4E",
+    "Amount": "1600000",
+    "Account": "rMvCasZ9cohYrSZRNYPTZfoaaSUQMfgQ8G",
+    "Destination": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "ledger_index": 97647517,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1600000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97647517
+  },
+  {
+   "tx": {
+    "date": 806514000,
+    "hash": "365A93E1B3BA15172002F00487C6BB2F1BB646E0AD5CE1665889831201B68042",
+    "Amount": "1",
+    "Account": "rMmByJCgBXCtMqJLyVkYgGneDXj2DeQtm2",
+    "Destination": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "ledger_index": 97647521,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 97647521
+  },
+  {
+   "tx": {
+    "date": 843927971,
+    "hash": "7D09221EE31FB091216B2CC0F292E8791A9FF25587DE9975C6628E4C88C69798",
+    "Account": "rsu9FUc3i2Di7KHGcmWMvRZUeHsK5dwneU",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296277,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "3900003",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296277
+  }
+ ],
+ "sweeper_tx_newest": [
+  {
+   "tx": {
+    "date": 843930191,
+    "hash": "F6C4CC8BB775E6360CF53F5B7F72954E46B69480338DF377AB41154589E42A25",
+    "Account": "rw2oFga6VXvWqKdbGmLrZ5JE8uboQZFDzW",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296847,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797510",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296847
+  },
+  {
+   "tx": {
+    "date": 843930190,
+    "hash": "C660778BAE16251D81E29C4952ED0ECCD6365059B8FF68566D8C7743775A1B69",
+    "Account": "rpvuwY1byWj6BnES3cGubMgpZ84VofmHFm",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296846,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797510",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296846
+  },
+  {
+   "tx": {
+    "date": 843930190,
+    "hash": "F0D6DE1720DC5A44A84B8FA1335188493E9C3B0E6A5E00E8CC67C37BDDBAC3BA",
+    "Account": "r98vmDepuJxMjVNKQsExjXv8FfEExXpVsX",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296846,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797510",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296846
+  },
+  {
+   "tx": {
+    "date": 843930181,
+    "hash": "84D5A4115E67BA9C9A56C682F0B25786CF84BE1359790369AA975B6C945A9BCF",
+    "Account": "rwRTuVKD6d1nyc78fxp8Pbz2gAyv4cLPuM",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296845,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797510",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296845
+  },
+  {
+   "tx": {
+    "date": 843930181,
+    "hash": "A90B5FBC21FF8B62D55D91B2FDABB3E08C3C5DBF9C2A456852B7A0F433C0C48B",
+    "Account": "rfd8d63fwEUmTmo15vE13EkSnHDSJQUGAG",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296845,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797510",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296845
+  },
+  {
+   "tx": {
+    "date": 843930180,
+    "hash": "0D28B1D51A9D50A485ABF1AE2C19431463D1C3211768B84019FB8461951A439D",
+    "Account": "rwWmkS9FYgunZTfavxjyAGnXS2ijT2pxmP",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296844,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296844
+  },
+  {
+   "tx": {
+    "date": 843930180,
+    "hash": "E218D485C7B65B5CE71845248772226EBA4A1045C5E75A8BE94E2CE575520B60",
+    "Account": "rLnFQt4Xy1gd6XWuKNCewQ5WUXzueyJ3qK",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296844,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797510",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296844
+  },
+  {
+   "tx": {
+    "date": 843930180,
+    "hash": "727C1DA42CABB7D0E45242A2F8B1D5C77EDECDF94A86DFDD731446911583148A",
+    "Account": "rDY91F3KY3kxqdnFHBep9FV4yvLdYtEZa7",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296844,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296844
+  },
+  {
+   "tx": {
+    "date": 843930172,
+    "hash": "5761540ECAF12B247D69BF175B764288E32C21A196F940DED2D50EB91847DBA4",
+    "Account": "rLW64h9sAQzKuAgH4dFydf8DBADfcJ3jcb",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296843,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296843
+  },
+  {
+   "tx": {
+    "date": 843930172,
+    "hash": "37906B9031E0548692121BBAAFBA642ED2807E9DD2CABCAFAE80AC74CC6C9B42",
+    "Account": "rUdampAi7JtwxbschYKJ1edGWNiLRGCvws",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296843,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296843
+  },
+  {
+   "tx": {
+    "date": 843930171,
+    "hash": "3D86C6FCAA5DF2DCED2D8B08E802AEF611C14E567355E7A01CFCC0B375C73931",
+    "Account": "rNgXVqGWPg9LkqNvjooiG5cyMVvbHFyYDG",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296842,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296842
+  },
+  {
+   "tx": {
+    "date": 843930171,
+    "hash": "35728C31B66B10523828C6F7071058F35B8FE013821F1E5E3DD194CDE82FAE39",
+    "Account": "rsMwnx2fEH3o4YKxXZJMzTakahwVDEVw8j",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296842,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296842
+  },
+  {
+   "tx": {
+    "date": 843930170,
+    "hash": "ABDF8F444A538804400E9B3B58365D9111362DA259197DB86E7AC689B93F6767",
+    "Account": "rLfXPTTnRnmfMZa9ygAt5Lu2wdthqmQBwY",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296841,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296841
+  },
+  {
+   "tx": {
+    "date": 843930161,
+    "hash": "7F8E4A7188445AAAFC7E18DF79D2FB01E9775B3619F9F33C0456E4118F0723A9",
+    "Account": "rLgPm3bKgEXvjdpS9ETqbH44vbqvQdgf9E",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296840,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797502",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296840
+  },
+  {
+   "tx": {
+    "date": 843930161,
+    "hash": "EDF02A4A5A9356B7863C4AE129CC976081EC65B46974BC471AD8A77AF6A2CF14",
+    "Account": "rnJCUPfKU8F2SYuZo714dLECAjXBjRHgkS",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296840,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296840
+  },
+  {
+   "tx": {
+    "date": 843930161,
+    "hash": "1F20A0E971A3486D2E859297CE78AC3B3B2E0E2F119B59D6F47BB17906EE08EB",
+    "Account": "r3YBvPhDj31pBgbnB1Na8DAuJd1y6vZYyB",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296840,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296840
+  },
+  {
+   "tx": {
+    "date": 843930160,
+    "hash": "F0CAF83754DB22DB2936404C8DDBB321424C2548A76E017DF826CBA4AF7F9C42",
+    "Account": "rSEmqSmawyGYmeNCzKKYScTeq2f1Kk8dM",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296839,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296839
+  },
+  {
+   "tx": {
+    "date": 843930160,
+    "hash": "AE67A1962DA737FE986F7B351D177054ECBB329DA37963BF380EB280CE670224",
+    "Account": "rPtEihUFJ3Ust3d2Vdv8pXbADfddubAxN2",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296839,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296839
+  },
+  {
+   "tx": {
+    "date": 843930160,
+    "hash": "A24AD7318ACDF9DE952BF58E25774B297E8D946F896B350689677B7DDE38241B",
+    "Account": "rGLLk2ZSEFvxQT8WzU813fPXV36az83Nzz",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296839,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296839
+  },
+  {
+   "tx": {
+    "date": 843930152,
+    "hash": "8CCECC3A2BC83C82D87B6FCA508169BFD9F1A6F494A8866E6B84126F6DB7C00B",
+    "Account": "rLPd9DwNB6K4UnPc7FMTqWRN3koJXKV2WP",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296838,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296838
+  },
+  {
+   "tx": {
+    "date": 843930152,
+    "hash": "91036F7D49E518127AA018549FB120B46CD4E87C0DD0666AB272C1E1D01E1B8F",
+    "Account": "rfAmKyDbu3bVkAt5nERmrLKQ7uEuxK4KuJ",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296838,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296838
+  },
+  {
+   "tx": {
+    "date": 843930151,
+    "hash": "4A4F1474DA184B701784553EE5CA124477D38B426958FA421A60984E0032BA1E",
+    "Account": "rP1UTft8vzx2n75NC15BGTBaD1PXxUhHgt",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296837,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296837
+  },
+  {
+   "tx": {
+    "date": 843930150,
+    "hash": "580A46EF5D5BD61B56C3A61C401BFD3FE3075B23EA6B3CEB7F61A77E01FDACA3",
+    "Account": "rPe7sksMFG3pRgVajn5u55CNzh2XTfFGeP",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296836,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296836
+  },
+  {
+   "tx": {
+    "date": 843930150,
+    "hash": "045A189872714ECF2E6AB4AE88E9B197C2A82015487525E3269CDD2FC95AC5A7",
+    "Account": "rNU42nJRvvmwCPNDExQeE8jrkUTksnEjaS",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296836,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296836
+  },
+  {
+   "tx": {
+    "date": 843930150,
+    "hash": "3B388C21B53B013BA815C5C7A794F53A253DEE1022B2F3DB478BFD0972521C76",
+    "Account": "rajdSuja7r9VqHS6qyWPXT945kWrmTsfXK",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296836,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296836
+  },
+  {
+   "tx": {
+    "date": 843930141,
+    "hash": "852AE6896E675F583306D55B12F3222CF3E451FE4D0E5C55D7DB60E49DA1A8F4",
+    "Account": "rGyYHa6xhswZS8nv77zxkykLhCZX5tduBo",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296835,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296835
+  },
+  {
+   "tx": {
+    "date": 843930141,
+    "hash": "021478F9853CD348B76FCE7428565570217607130158E1A66D11BBE530803B5F",
+    "Account": "rG1NMaEWbbxkJmWi7ay5ywBkVA6S8n9uHX",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296835,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296835
+  },
+  {
+   "tx": {
+    "date": 843930140,
+    "hash": "75BE506F00E56C2D9287790F118F7027AB642D1175D02B7AD991CED3D76F2114",
+    "Account": "rPN3QaQ62bmHf5D432s5tb3C1nFebmEXbW",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296834,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296834
+  },
+  {
+   "tx": {
+    "date": 843930052,
+    "hash": "C9BEA610EF996860C1DB2B1B64AAC3C4BE8CD7E4EF5B188FE127A4FC434A6684",
+    "Account": "rfLAEpGXn6ZpnapNYDA8Mw8wbmFHwFev8d",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296812,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296812
+  },
+  {
+   "tx": {
+    "date": 843930052,
+    "hash": "5831A9F83A028030FFB4053634CB5003AF1F1AFF19830F3DE95548B35F1DD289",
+    "Account": "rQJEraxkhFfr7p8sZDMmHYitNKJV2G2uXx",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296812,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296812
+  },
+  {
+   "tx": {
+    "date": 843930052,
+    "hash": "2C02996FC47371C8EFE671B8A9FB689479AF606828B8B37D68F2A6CBBFC9F19E",
+    "Account": "rM5ArJbkZgiwaHsaiLoyxrJHJzi6VDEV66",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296812,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296812
+  },
+  {
+   "tx": {
+    "date": 843930052,
+    "hash": "0745C128622596BFEA2FB12250EC55FD6862C281AD23AF498664122C76AAAC07",
+    "Account": "rGr2umDDD1LWcRbjWBjAP9wx3bGZ1vchsy",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296812,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296812
+  },
+  {
+   "tx": {
+    "date": 843930052,
+    "hash": "B4AECA1B3D3596F742A33AB3A3954CAE9B9F106BCC7DCC023A6420FF9028E5B9",
+    "Account": "rDBDQzQDPzk629KRXhkynPZFkKzu3HENnj",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296812,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296812
+  },
+  {
+   "tx": {
+    "date": 843930031,
+    "hash": "C2930902BA6B67440ED8182680EF6CBE1EA41924760A4A11C127881B26EBB8DB",
+    "Account": "rKaLgFxaZ2QYdhCGJYzYoVmJ8H6Nc8dHvW",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296806,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "797501",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296806
+  },
+  {
+   "tx": {
+    "date": 843929270,
+    "hash": "7437711A4A99CD7578638AE048C8AD242C2E1F04E1E6228C5A01EACD71CB54A6",
+    "Amount": "10",
+    "Account": "rMmByJCgBXCtMqJLyVkYgGneDXj2DeQtm2",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296610,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296610
+  },
+  {
+   "tx": {
+    "date": 843929270,
+    "hash": "F49EC6077FB1AFDA74068D53751D8D29BFCF16FF9CE702654B59E3324D3568ED",
+    "Amount": "10",
+    "Account": "r4D1JmzMJLqe4oXk4LhukfAQN8f2fcSDhv",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296610,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296610
+  },
+  {
+   "tx": {
+    "date": 843929251,
+    "hash": "C619D77BC97733A6AD8BBCC9C31BEB8C37B6861D794133F5C2DA84C6A06A13E9",
+    "Amount": "1792500",
+    "Account": "rMZR8uVWLfi2RLe8wbq5drxcbhBxmRtbQr",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296605,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1792500",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296605
+  },
+  {
+   "tx": {
+    "date": 843929251,
+    "hash": "06D4DD2E26D6FB9B0F9D8F30E4C51E8233005C0300AD6F365B8ABD8D3EEBE440",
+    "Amount": "1838021",
+    "Account": "r4LMvRvpFiaLWPUubqCdQe8KA5DMrvsAmr",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296605,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1838021",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296605
+  },
+  {
+   "tx": {
+    "date": 843928071,
+    "hash": "4D94B07BFAB534751CB12EAD85FCCC1AAB9BB621950F9BBBD457BA1AA2D7BBEE",
+    "Account": "rwcjnrUmN2dTKJRh4Zoo3ajim4MJKABB73",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296302,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296302
+  },
+  {
+   "tx": {
+    "date": 843928070,
+    "hash": "BE987E483CBF7ABFFA61CED8362934F893E26D29160BF237E3320E758FAB853D",
+    "Account": "r9wdNKUFwmYzfagunTgWCmMCq3dnJGSVLP",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296301,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "4800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296301
+  },
+  {
+   "tx": {
+    "date": 843928070,
+    "hash": "630EF93E49C2C55AC2118B582C84524A470694E4ADFA79D00B70C82C6C272B8B",
+    "Account": "rMts1sK9kjFvZCAMQFt8ErUZ6XBbkZnQiE",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296301,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296301
+  },
+  {
+   "tx": {
+    "date": 843928070,
+    "hash": "C49320622DD35DBCAD2B2FADC5DB33ACB23AE125584131A5CB94616EDF2BA733",
+    "Account": "rHk6Mca27VkuAtJQWoPh7taMQebux7ugrL",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296301,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800030",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296301
+  },
+  {
+   "tx": {
+    "date": 843928061,
+    "hash": "2EE964FBC32FAD893213B8D47357DD61F4B4822E6F4CDA05FDBAC89870D1663D",
+    "Account": "rpz772aME9ieBdVPgzE6vqpU78ax3VgxYn",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296300,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296300
+  },
+  {
+   "tx": {
+    "date": 843928061,
+    "hash": "87AAA85B94DF45928BEE6631C721DB909CA8DC564B0FF4008E59E36DAE66F4B6",
+    "Account": "rPgEB3Ugv2ffwkpy6nyL9PLDPzgd2EKoCv",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296300,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800030",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296300
+  },
+  {
+   "tx": {
+    "date": 843928061,
+    "hash": "D64F3DB896748CB6263FAFD1CAD85DAF8DD2DBE266AF994564F180C826A21977",
+    "Account": "rLndoBBn4H1kgsTrNYi3SRUHDCpjfCMAjG",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296300,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296300
+  },
+  {
+   "tx": {
+    "date": 843928061,
+    "hash": "C14C18B30DE7B39933D959D813B72FE63A49272528F076DBBCE42ED7B7304CE4",
+    "Account": "rMUzsQ3r358N6EpXBm1RDa1G4GtRZumXPz",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296300,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800030",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296300
+  },
+  {
+   "tx": {
+    "date": 843928060,
+    "hash": "B96B6B5F34C710C2631B6448410440D2B892C8C11E515B30437276593AB10A76",
+    "Account": "rsqupnUzZXfmtEmCsVJmurLCksjfPBNrCA",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296299,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296299
+  },
+  {
+   "tx": {
+    "date": 843928052,
+    "hash": "1D7D6168DB1A8F2BFE971011E12714C9F57CC2B074580943440586E5BF871DC4",
+    "Account": "rEH2WZbyvcHdKYPpeviN1YTvGLqYjgscmW",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296298,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296298
+  },
+  {
+   "tx": {
+    "date": 843928051,
+    "hash": "AA08C87257184A4F8F3BCD48FBEC95DFAE41CFAC745B35930D90795FA60943A0",
+    "Account": "rBpfDDHaLkF2QHmz47EsNGBEjRrJ9pf4jK",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296297,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800013",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296297
+  },
+  {
+   "tx": {
+    "date": 843928050,
+    "hash": "D0D3C6F63F8332A875A1CBAAFDA4CA2F903744CC26C2CD2D6F8A7B11BF8CA6E0",
+    "Account": "rKf6FfCoemaemg8GGrC5JVQgWqgjgb62H9",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296296,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800019",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296296
+  },
+  {
+   "tx": {
+    "date": 843928041,
+    "hash": "0E0C615A89B9462F49B8FD13CED6065D34E2AC7164616CB7679AC6678C3EC7D7",
+    "Account": "rhBhseaRaRb8io1iR2nwM3HSUpHstqy6eL",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296295,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "1372567",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296295
+  },
+  {
+   "tx": {
+    "date": 843928040,
+    "hash": "9A36D3FCAF48B08813E1EAEDDE4BCB3520D793350D24A51F90FA42D0CD1C2BAA",
+    "Account": "r4Zej3u72wJ3Yp4MG5N64YAbs79as3VTbF",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296294,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800016",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296294
+  },
+  {
+   "tx": {
+    "date": 843928040,
+    "hash": "145B9A650BE8610BF2ABDDC8FFEC830EBDA31E72CA56449ACF79FC8C20871AE1",
+    "Account": "r3Nap1Jqd398UeASEr2ziJbAgnCJXYxUEX",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296294,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800020",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296294
+  },
+  {
+   "tx": {
+    "date": 843928040,
+    "hash": "FED157D200B10E928A4105C85B1BB94D876058C8E7B22C1CB2D54522E31C18D7",
+    "Account": "raxSJzYucKokTHGRvSsvhbqDVe7tDbUd6E",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296294,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800012",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296294
+  },
+  {
+   "tx": {
+    "date": 843928032,
+    "hash": "2AE2207F4AC5E34FAB6D3AAD0AD7B7C0E43C4475499BC151BC44D0454D31E3F8",
+    "Account": "raX11iW72inRh9rEFSXqyimNDJZSpJJdfP",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296293,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296293
+  },
+  {
+   "tx": {
+    "date": 843928032,
+    "hash": "DB39112502F21D166D5AABD8C357968AD027380992A573279F7339DD34DC9ACB",
+    "Account": "rf9GsqnAh8X1NzLNwpTVoaGTgb2TSKKEjm",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296293,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296293
+  },
+  {
+   "tx": {
+    "date": 843928031,
+    "hash": "DCFB0C2C58CE5CD8E17955E5B2ACFE116AF2F4EB12A5D499161FCE7DA16B9A11",
+    "Account": "rsPsWhYPJLxaksmSQCkYybokXfyVwuDm5A",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296292,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800001",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296292
+  },
+  {
+   "tx": {
+    "date": 843928031,
+    "hash": "DF17D4589DD8D970354C5D8F7C6F7A56069950551EBA18D3C8EFB0717F4A63FF",
+    "Account": "rEPdVudukMkrAZfWLsudCrcDinrq4b8BUg",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296292,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800002",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296292
+  },
+  {
+   "tx": {
+    "date": 843928031,
+    "hash": "9D5E249126BE07DB5BAAAA9F0A291A760C96054EA8D9BD5C0D543DBBE7213A5B",
+    "Account": "rG5pSBFyYnDDtiaSB4GkVSzzp4opSJ5ciq",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296292,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800001",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296292
+  },
+  {
+   "tx": {
+    "date": 843928031,
+    "hash": "033F9981F9CCC5F408265D3697DB2D50FC03A2EEE4FA6F2C7D9E677D98D0EA34",
+    "Account": "rMsYvabgcVSbyNmQHGS7NictJvkLuu2sW9",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107296292,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "800010",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107296292
+  }
+ ],
+ "sweeper_tx_oldest": [
+  {
+   "tx": {
+    "date": 843333910,
+    "hash": "33F916C64B6FB082144E997FCB518BBE3003F3EC19E92A1D753CE52060D873CD",
+    "Amount": "4992500",
+    "Account": "rHroT9qGY6bYLFo2zLW2tkHLTwMp3dY174",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107143025,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [
+     {
+      "CreatedNode": {
+       "NewFields": {
+        "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+        "Balance": "4992500",
+        "Sequence": 107143025
+       },
+       "LedgerIndex": "7B15FF7AD21A90BC1428606FE31A76980A0152BA84DB76A071B674F2301A9DFF",
+       "LedgerEntryType": "AccountRoot"
+      }
+     }
+    ],
+    "delivered_amount": "4992500",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107143025
+  },
+  {
+   "tx": {
+    "date": 843333921,
+    "hash": "114B883DE5FD39A440635C0908801E059D033C26E018EE6D643C0A3A094F2A9E",
+    "Amount": "10",
+    "Account": "rHcWmKpDf4GJiJjuCyXfTwCMqhWsjzecN9",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107143029,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107143029
+  },
+  {
+   "tx": {
+    "date": 843335040,
+    "hash": "960CEE87B21E84FBC3979B235B8B8783475998D9A0206911BC60DEBEFE3318C7",
+    "Account": "rHroT9qGY6bYLFo2zLW2tkHLTwMp3dY174",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107143317,
+    "DestinationTag": 0,
+    "TransactionType": "AccountDelete"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "946672617141",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107143317
+  },
+  {
+   "tx": {
+    "date": 843336041,
+    "hash": "FDDEE591766BEC101352664CAD6EAD94AFA8E6B47787D31C1D5D2D7C85B0CA03",
+    "Amount": "3398992510",
+    "Account": "rfLAEpGXn6ZpnapNYDA8Mw8wbmFHwFev8d",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107143577,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "3398992510",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107143577
+  },
+  {
+   "tx": {
+    "date": 843336060,
+    "hash": "96FF268C0D14D3E34E0B3CD055E209C70DEF1983CB2F253B5902BAA72C656BCF",
+    "Amount": "10",
+    "Account": "rf7QoGcRk2aFMSQNY3zt6FsADavoVucLni",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107143582,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107143582
+  },
+  {
+   "tx": {
+    "date": 843336812,
+    "hash": "07CF33103CC4527E5B98FA0669A8EBB1273A7238C0491429DB7E06EEF0F6B2B6",
+    "Amount": "4815875000",
+    "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "Destination": "rEDtiZ8couvNMi97Z89CHBQeiTnEK6ArBx",
+    "ledger_index": 107143777,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "4815875000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107143777
+  },
+  {
+   "tx": {
+    "date": 843336841,
+    "hash": "B8B173A153F9D0596E374EDC53AF526411D9C9A88DCEC26FF83858A50A3B6FDB",
+    "Amount": "10",
+    "Account": "rEPak6n2CEsQmowqsTMnkooskcLaGW9MzE",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107143784,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107143784
+  },
+  {
+   "tx": {
+    "date": 843349640,
+    "hash": "F4A1B86331CC5405020D61C0260F6C3D31D04C3200D0D1690E90F682813EBFA6",
+    "Amount": "20995000",
+    "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "Destination": "rQrHU4iuz8TVjddmhVdCxznPp2tmVH3vzt",
+    "ledger_index": 107147083,
+    "DestinationTag": 131,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "20995000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107147083
+  },
+  {
+   "tx": {
+    "date": 843349660,
+    "hash": "9D224DDE9705488DC5F77FD3CC1DCF69E7437E709877A4035FA5F017C8F79CC2",
+    "Amount": "10",
+    "Account": "rQpV2q4jVfVd6q4tqcL1Age5XrrEMojynM",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107147088,
+    "DestinationTag": 261104,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107147088
+  },
+  {
+   "tx": {
+    "date": 843358342,
+    "hash": "EA67C16627182B88F72DFFA8771AB94859AAD048C81CE31EE47B043E5E0F12EF",
+    "Amount": "24545000",
+    "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "Destination": "rMLv1AFf4VSsJvZSz8R12SoVELDpUygqFq",
+    "ledger_index": 107149333,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "24545000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107149333
+  },
+  {
+   "tx": {
+    "date": 843358370,
+    "hash": "96304141EDAD60708503D0F3816E93ECC691C1C80642C7AEE8F616A13445A999",
+    "Amount": "10",
+    "Account": "rMmByJCgBXCtMqJLyVkYgGneDXj2DeQtm2",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107149339,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107149339
+  },
+  {
+   "tx": {
+    "date": 843359671,
+    "hash": "EAE566E581C351B31095365BABB7A9723D2A3AC339F34B931E56207AB1CE465D",
+    "Amount": "85590691",
+    "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "Destination": "rfxMW4jrs4mV275ywfjw3LHwRGmHVCXtiN",
+    "ledger_index": 107149676,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "85590691",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107149676
+  },
+  {
+   "tx": {
+    "date": 843359702,
+    "hash": "0A6DBA2463AA614DBD52A7AA973CB9729D61367E30414E14FDD3E518A5FEE7B8",
+    "Amount": "10",
+    "Account": "rf7QoGcRk2aFMSQNY3zt6FsADavoVucLni",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107149684,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107149684
+  },
+  {
+   "tx": {
+    "date": 843360902,
+    "hash": "44C412D385856CCB5881DCB16D0993D98E45FD946AE67B3E2062001B2A597BD7",
+    "Amount": "22995000",
+    "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "Destination": "rLaPotbvgxsiyHrxf97WNQo92uCnDFDUCd",
+    "ledger_index": 107149995,
+    "DestinationTag": 192619,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "22995000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107149995
+  },
+  {
+   "tx": {
+    "date": 843360930,
+    "hash": "770D23EBAE220DC1F31E77EEB11B31B02AECBAACDE5D44063631EC634E34E7ED",
+    "Amount": "10",
+    "Account": "rLBSbJgwwVbbrf9eLcK23mWeVSDQwV8kYj",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107150001,
+    "DestinationTag": 598422,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107150001
+  },
+  {
+   "tx": {
+    "date": 843361241,
+    "hash": "6181B98C89949BE1F713D3D799DA7F1169429044C2CF6427C80B1F1DBB879EB8",
+    "Amount": "105458535",
+    "Account": "rQJEraxkhFfr7p8sZDMmHYitNKJV2G2uXx",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107150082,
+    "DestinationTag": 0,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "105458535",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107150082
+  },
+  {
+   "tx": {
+    "date": 843361261,
+    "hash": "7C0D65EFD31E9802FFCEE6A0A5104E3A61C3AA5F24D9323933B45A6ADBA76F3C",
+    "Amount": "10",
+    "Account": "rQpV2q4jVfVd6q4tqcL1Age5XrrEMojynM",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107150087,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107150087
+  },
+  {
+   "tx": {
+    "date": 843367461,
+    "hash": "F0DF0854C63F70CBACF0355EB980B1F6CF5A005DCD601DA6EAB07131B0B904C2",
+    "Amount": "99995000",
+    "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "Destination": "rUz66K3bxJFPmypghbr5K8tEMwqt1ZCqE",
+    "ledger_index": 107151697,
+    "DestinationTag": 455239880,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "99995000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107151697
+  },
+  {
+   "tx": {
+    "date": 843367481,
+    "hash": "857754483A3E15B5A08AC70EE27C6C4B1B786FCF3B2FFBA01D47A67E8D2D29B8",
+    "Amount": "10",
+    "Account": "rUbt82cnFDjcet7MybRZ9NhN1istJ3qYbm",
+    "Destination": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "ledger_index": 107151702,
+    "DestinationTag": 301425,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "10",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107151702
+  },
+  {
+   "tx": {
+    "date": 843367632,
+    "hash": "4BE30F79A6F0EA264B04730FF664777B4F3C594896F8213B0C5264905F9CFEE4",
+    "Amount": "2299995000",
+    "Account": "r344KxkFu8aBLsH1qjnKztsmzwERn696Zn",
+    "Destination": "rUz66K3bxJFPmypghbr5K8tEMwqt1ZCqE",
+    "ledger_index": 107151742,
+    "DestinationTag": 455239880,
+    "TransactionType": "Payment"
+   },
+   "meta": {
+    "AffectedNodes": [],
+    "delivered_amount": "2299995000",
+    "TransactionResult": "tesSUCCESS"
+   },
+   "validated": true,
+   "ledger_index": 107151742
+  }
+ ],
+ "toml_ripple_com": "[METADATA]\nmodified = 2022-05-19T14:09:02.000Z\n\n[ORGANIZATION]\nname=\"Ripple\"\nwebsite=\"https://ripple.com\"\ntwitter=\"@ripple\"\n\n[[PRINCIPALS]]\nname = \"Ripple XRP Ledger Operations Team\"\nemail = \"xrpl-ops@ripple.com\"\n\n[[VALIDATORS]]\npublic_key = \"nHU4bLE3EmSqNwfL4AP1UZeTNPrSPPP6FXLKXo2uqfHuvBQxDVKd\"\nattestation = \"C8EB7DB8B51B5CDD86732A089BF0B1C6497F4F00BC39FFF34032630D6D43C08F03751917E9C140157E6A3AB7C62A88DF3B2FFF93E90A6C3E3A752492A8ADFC09\"\nowner_country = \"US\"\nserver_country = \"US\"\nnetwork = \"main\"\nunl = \"https://vl.ripple.com\"\n\n[[VALIDATORS]]\npublic_key = \"nHUon2tpyJEHHYGmxqeGu37cvPYHzrMtUNQFVdCgGNvEkjmCpTqK\"\nowner_country = \"US\"\nserver_country = \"SG\"\nnetwork = \"main\"\nunl = \"https://vl.ripple.com\"\n\n[[VALIDATORS]]\npublic_key = \"nHUUrjuEMtvzzTsiW2xKinUt7Jd83QFqYgfy3Feb7Hq1EJyoxoSz\"\nowner_country = \"US\"\nserver_country = \"US\"\nnetwork = \"main\"\nunl = \"https://vl.ripple.com\"\n\n[[VALIDATORS]]\npublic_key = \"nHU2Y1mLGDvTbc2dpvpkQ16qdeTKv2aJwGJHFySSB9U3jkTmj4CA\"\nowner_country = \"US\"\nserver_country = \"AU\"\nnetwork = \"main\"\nunl = \"https://vl.ripple.com\"\n\n[[SERVERS]]\npeer = \"s1.ripple.com\"\nws = \"wss://s1.ripple.com/\"\nrpc = \"https://s1.ripple.com:51234/\"\nnetwork = \"main\"\nport = 51235\n\n[[SERVERS]]\npeer = \"s2.ripple.com\"\nws = \"wss://s2.ripple.com/\"\nrpc = \"https://s2.ripple.com:51234/\"\nnetwork = \"main\"\nport = 51235\n\n[[ACCOUNTS]]\naddress = \"r9NpyVfLfUG8hatuCCHKzosyDtKnBdsEN3\"\ndesc = \"Ripple Escrow Wallet #01\"\n\n[[ACCOUNTS]]\naddress = \"r9UUEXn3cx2seufBkDa8F86usfjWM6HiYp\"\ndesc = \"Ripple Escrow Wallet #02\"\n\n[[ACCOUNTS]]\naddress = \"rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn\"\ndesc = \"Ripple Escrow Wallet #03\"\n\n[[ACCOUNTS]]\naddress = \"rDdXiA3M4mYTQ4cFpWkVXfc2UaAXCFWeCK\"\ndesc = \"Ripple Escrow Wallet #04\"\n\n[[ACCOUNTS]]\naddress = \"rKDvgGUsNPZxsgmoemfrgXPS2Not4co2op\"\ndesc = \"Ripple Escrow Wallet #05\"\n\n[[ACCOUNTS]]\naddress = \"rKwJaGmB5Hz24Qs2iyCaTdUuL1WsEXUWy5\"\ndesc = \"Ripple Escrow Wallet #06\"\n\n[[ACCOUNTS]]\naddress = \"rN8pqRwLYuuvY7pUHurybPC8P6rLqVsu6o\"\ndesc = \"Ripple Escrow Wallet #07\"\n\n[[ACCOUNTS]]\naddress = \"rNASJdZjY9dToHnNURi3HAUku3duPwbtD1\"\ndesc = \"Ripple Escrow Wallet #08\"\n\n[[ACCOUNTS]]\naddress = \"rU9qmGM4Y6WWDhiNzkwVKBwwatcoE7YL1T\"\ndesc = \"Ripple Escrow Wallet #09\"\n\n[[ACCOUNTS]]\naddress = \"rfWPPQBYqYmoFMdVnjzXCagJbz5uajSBXL\"\ndesc = \"Ripple Escrow Wallet #10\"\n\n[[ACCOUNTS]]\naddress = \"rh2EsAe2xVE71ZBjx7oEL2zpD4zmSs3sY9\"\ndesc = \"Ripple Escrow Wallet #11\"\n\n[[ACCOUNTS]]\naddress = \"rhEwsCWDCVxDiKxGJAKM6VuXC8EFtJP5gQ\"\ndesc = \"Ripple Escrow Wallet #12\"\n\n[[ACCOUNTS]]\naddress = \"rncKvRcdDq9hVJpdLdTcKoxsS3NSkXsvfM\"\ndesc = \"Ripple Escrow Wallet #13\"\n\n[[ACCOUNTS]]\naddress = \"rp6aTJmW3nq1aKt3Jmuz4DPRxksT5PBjpH\"\ndesc = \"Ripple Escrow Wallet #14\"\n\n[[ACCOUNTS]]\naddress = \"rsjFB8mPWqiZgPUaVh8XYqdfa59PE2d5LG\"\ndesc = \"Ripple Escrow Wallet #15\"\n\n[[ACCOUNTS]]\naddress = \"rw2hzLZgiQ9q62KCuaTWuFHWfiX7JWg3wY\"\ndesc = \"Ripple Escrow Wallet #16\"\n\n[[ACCOUNTS]]\naddress = \"rDqGA2GfveHypDguQ1KXrJzYymFZmKxEsF\"\ndesc = \"Ripple Escrow Wallet #17\"\n\n[[ACCOUNTS]]\naddress = \"rGKHDyj4L6pc7DzRB6LWCR4YfZfzXj2Bdh\"\ndesc = \"Ripple Escrow Wallet #18\"\n\n[[ACCOUNTS]]\naddress = \"rHGfmgv54kpc3QCZGRXEQKUhLPndbasbQr\"\ndesc = \"Ripple Escrow Wallet #19\"\n\n[[ACCOUNTS]]\naddress = \"rMhkqz3DeU7GUUJKGZofusbrTwZe6bDyb1\"\ndesc = \"Ripple Escrow Wallet #20\"\n\n[[ISSUERS]]\naddress = \"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De\"\nname = \"RLUSD\"\n\n[[TOKENS]]\nissuer = \"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De\"\ncurrency = \"RLUSD\"\nname = \"Ripple USD\"\n",
+ "toml_xrptoolkit_com": "[METADATA]\nmodified = 2021-12-07T00:00:00.000Z\n\n[[PRINCIPALS]]\nname = \"XRP Toolkit\"\ntwitter = \"@xrptoolkit\"\n\n[[ACCOUNTS]]\ndesc = \"XRP Toolkit donations\"\naddress = \"rTooLkitCksh5mQa67eaa2JaWHDBnHkpy\"\nnetwork = \"main\"\n",
+ "gatehub_net_toml_reply_start": "<!doctype html>\n<html lang=\"en\">\n<head>\n<!--\n  _____       _       _    _       _\n",
+ "rlusd_amm": {
+  "amm": {
+   "amount": "1609228046184",
+   "account": "rhWTXC2m2gGGA9WozUaoMm6kLAVPb1tcS3",
+   "amount2": {
+    "value": "2405003.610648497",
+    "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+    "currency": "524C555344000000000000000000000000000000"
+   },
+   "lp_token": {
+    "value": "1670660483.487486",
+    "issuer": "rhWTXC2m2gGGA9WozUaoMm6kLAVPb1tcS3",
+    "currency": "03B245BE580EC4F4386A751C084489EC4B514A2F"
+   },
+   "vote_slots": [
+    {
+     "account": "rJ4XeEzorvsQp6un4h9CjtANEsB3Qcc8iA",
+     "trading_fee": 300,
+     "vote_weight": 3129
+    },
+    {
+     "account": "rDu4vMpZU5WcwVME6oorzSov4DMLWXUEDf",
+     "trading_fee": 0,
+     "vote_weight": 2079
+    },
+    {
+     "account": "rHq1hgWYgaiG9ycudXHoMbqGdJi75UTfzt",
+     "trading_fee": 200,
+     "vote_weight": 3751
+    },
+    {
+     "account": "rETg9RYxRAxgNjm33Q4tAWceKKVoMcpM7",
+     "trading_fee": 200,
+     "vote_weight": 3751
+    },
+    {
+     "account": "rnEQs55pWyvEfWXkjMCD2TNzCQ1uS7SBGS",
+     "trading_fee": 200,
+     "vote_weight": 3751
+    },
+    {
+     "account": "rwCdTmuSML5TizAMTAZFKC5ppkdxT5j24k",
+     "trading_fee": 200,
+     "vote_weight": 3751
+    },
+    {
+     "account": "rPGWzwfRvyan7NsZ3G5M3TrC9QLFrTXLr2",
+     "trading_fee": 300,
+     "vote_weight": 329
+    },
+    {
+     "account": "rUaf9PLELm2gtui2pEivv7k9Xbue5c6yJ3",
+     "trading_fee": 200,
+     "vote_weight": 3751
+    }
+   ],
+   "trading_fee": 197,
+   "auction_slot": {
+    "price": {
+     "value": "131482.3939333034",
+     "issuer": "rhWTXC2m2gGGA9WozUaoMm6kLAVPb1tcS3",
+     "currency": "03B245BE580EC4F4386A751C084489EC4B514A2F"
+    },
+    "account": "r4uKh2rHuarMZdAgSBYqqicX7MxPBegttw",
+    "expiration": "2026-03-02T17:05:00+0000",
+    "auth_accounts": [
+     {
+      "account": "rNy92d5CrBQ1eC5HUokq1LDfcuLPvTfh4X"
+     },
+     {
+      "account": "rJrFQCQKgUJwG6bnDLyX33ea4DwWcjk6P3"
+     },
+     {
+      "account": "rGDuzDRHd7MEPHLykPt6Z2CkQuvBcDrdQZ"
+     },
+     {
+      "account": "rBJpahxkPrMenKYzKBKEFNGsd7KpBTPL5P"
+     }
+    ],
+    "time_interval": 20,
+    "discounted_fee": 19
+   },
+   "asset2_frozen": false
+  },
+  "status": "success",
+  "validated": true,
+  "ledger_index": 107296904
+ },
+ "rlusd_book": {
+  "offers": [
+   {
+    "Flags": 65536,
+    "index": "B978D673A9E6F1B33F0BE8666558079A64D1FC63F3205340A49B95149B3F9B49",
+    "Account": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+    "quality": "0.000001493680132651377",
+    "BookNode": "0",
+    "Sequence": 103436517,
+    "OwnerNode": "0",
+    "TakerGets": "9098134",
+    "TakerPays": {
+     "value": "13.589702",
+     "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+     "currency": "524C555344000000000000000000000000000000"
+    },
+    "Expiration": 843931335,
+    "owner_funds": "21285382",
+    "BookDirectory": "54123B870896F4964184D7042DB75D78913D3E377BFC4ECA4F054E7E81B6F971",
+    "PreviousTxnID": "4B2C46091F91365DD90DB0B5EC3165A0177C40D1FCB18B8239441F44E7B1DF67",
+    "LedgerEntryType": "Offer",
+    "PreviousTxnLgrSeq": 107296903
+   },
+   {
+    "Flags": 65536,
+    "index": "C22D5EC572DED42AFC94009603CD4391599CC4CBD701BBE77C979601CFC5933D",
+    "Account": "rwnJpjMn18m7xdF3whfGtQaPZRCS2ijhQ4",
+    "quality": "0.000001493935622761038",
+    "BookNode": "0",
+    "Sequence": 103478020,
+    "OwnerNode": "0",
+    "TakerGets": "13617639",
+    "TakerPays": {
+     "value": "20.343876",
+     "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+     "currency": "524C555344000000000000000000000000000000"
+    },
+    "Expiration": 843931335,
+    "owner_funds": "30073264",
+    "BookDirectory": "54123B870896F4964184D7042DB75D78913D3E377BFC4ECA4F054EB9FE1CAA4E",
+    "PreviousTxnID": "0B146D595CC9D63F06A8E31358A257CAC27E035E436C9392B8AE005970F66962",
+    "LedgerEntryType": "Offer",
+    "PreviousTxnLgrSeq": 107296903
+   },
+   {
+    "Flags": 65536,
+    "index": "B75794DA86C5DA77AD69B8BE5FAB1F8DABDD8DED408FAFC11D753A79608E1564",
+    "Account": "rD8VchnJEJ5AEYEQzFW5KHQMemwi6HvzjV",
+    "quality": "0.000001494077804111982",
+    "BookNode": "0",
+    "Sequence": 103502741,
+    "OwnerNode": "0",
+    "TakerGets": "4333190",
+    "TakerPays": {
+     "value": "6.474123",
+     "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+     "currency": "524C555344000000000000000000000000000000"
+    },
+    "Expiration": 843931335,
+    "owner_funds": "12669106",
+    "BookDirectory": "54123B870896F4964184D7042DB75D78913D3E377BFC4ECA4F054EDB18C7E86E",
+    "PreviousTxnID": "674CA738430DFBDCAE719DDBB74A7217501CC4F9C55B2D3144C0000937964CC9",
+    "LedgerEntryType": "Offer",
+    "PreviousTxnLgrSeq": 107296904
+   }
+  ],
+  "status": "success",
+  "ledger_index": 107296904
+ },
+ "trader_info": {
+  "status": "success",
+  "validated": true,
+  "account_data": {
+   "Flags": 0,
+   "index": "2B7EE4494372DAAEE9226010B426EFDF3B563DFA7257046F73AE3F31D142D1A9",
+   "Account": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+   "Balance": "24085382",
+   "Sequence": 103436521,
+   "OwnerCount": 9,
+   "TicketCount": 1,
+   "PreviousTxnID": "D36598E70E19C7C0B341FEF4080028EDF553FA18F315C01B751F54F6036AFB68",
+   "LedgerEntryType": "AccountRoot",
+   "PreviousTxnLgrSeq": 107296904
+  },
+  "ledger_index": 107296904
+ },
+ "trader_objects": [
+  {
+   "Flags": 1114112,
+   "index": "051190234529919313997A76B3F390AFFC892FCA3B1475CB8785A6E124742743",
+   "Balance": {
+    "value": "0",
+    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "currency": "5853474400000000000000000000000000000000"
+   },
+   "LowNode": "0",
+   "HighNode": "7",
+   "LowLimit": {
+    "value": "10000",
+    "issuer": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+    "currency": "5853474400000000000000000000000000000000"
+   },
+   "HighLimit": {
+    "value": "0",
+    "issuer": "rK67JczCpaYXVtfw3qJVmqwpSfa1bYTptw",
+    "currency": "5853474400000000000000000000000000000000"
+   },
+   "PreviousTxnID": "652A882C383D8E867233F4706845A07B0A8A57FC5CAA11EEB73559688F75EB1E",
+   "LedgerEntryType": "RippleState",
+   "PreviousTxnLgrSeq": 107251934
+  },
+  {
+   "Flags": 1114112,
+   "index": "1EF515A3E6E58FB8EE08712E359C66D934658FF80124B43810FC09CEB3F2703F",
+   "Balance": {
+    "value": "4",
+    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "currency": "4555524F50000000000000000000000000000000"
+   },
+   "LowNode": "0",
+   "HighNode": "2a",
+   "LowLimit": {
+    "value": "10000",
+    "issuer": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+    "currency": "4555524F50000000000000000000000000000000"
+   },
+   "HighLimit": {
+    "value": "0",
+    "issuer": "rMkEuRii9w9uBMQDnWV5AA43gvYZR9JxVK",
+    "currency": "4555524F50000000000000000000000000000000"
+   },
+   "PreviousTxnID": "3A8FA204B4BFCCFBDFD8B0B69C0E3362D9C52DE44A090C5A3151324D11147F70",
+   "LedgerEntryType": "RippleState",
+   "PreviousTxnLgrSeq": 107257228
+  },
+  {
+   "Flags": 0,
+   "index": "6E80608E81EB2A14E2491506D9CBBEBED172B99BF070929E114FC00976714521",
+   "Account": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+   "OwnerNode": "0",
+   "PreviousTxnID": "4D5D09E9D3431E939A254113A8B324D8E88C5728EAE60557DD0B325E8D383492",
+   "TicketSequence": 103436520,
+   "LedgerEntryType": "Ticket",
+   "PreviousTxnLgrSeq": 107296904
+  },
+  {
+   "Flags": 65536,
+   "index": "726F2429EF39CA2582CFDD42CEB8579E48C096CF4D45E18301FF980AA4E0A446",
+   "Balance": {
+    "value": "8.908228",
+    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "currency": "5553444300000000000000000000000000000000"
+   },
+   "LowNode": "0",
+   "HighNode": "1e1",
+   "LowLimit": {
+    "value": "10000",
+    "issuer": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+    "currency": "5553444300000000000000000000000000000000"
+   },
+   "HighLimit": {
+    "value": "0",
+    "issuer": "rGm7WCVp9gb4jZHWTEtGUr4dd74z2XuWhE",
+    "currency": "5553444300000000000000000000000000000000"
+   },
+   "PreviousTxnID": "4B201C6723F2F160319219E64ACB1FC0DC88C3BD98A3907BABD4B4061DC52438",
+   "LedgerEntryType": "RippleState",
+   "PreviousTxnLgrSeq": 107257141
+  },
+  {
+   "Flags": 65536,
+   "index": "B978D673A9E6F1B33F0BE8666558079A64D1FC63F3205340A49B95149B3F9B49",
+   "Account": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+   "BookNode": "0",
+   "Sequence": 103436517,
+   "OwnerNode": "0",
+   "TakerGets": "9098134",
+   "TakerPays": {
+    "value": "13.589702",
+    "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+    "currency": "524C555344000000000000000000000000000000"
+   },
+   "Expiration": 843931335,
+   "BookDirectory": "54123B870896F4964184D7042DB75D78913D3E377BFC4ECA4F054E7E81B6F971",
+   "PreviousTxnID": "4B2C46091F91365DD90DB0B5EC3165A0177C40D1FCB18B8239441F44E7B1DF67",
+   "LedgerEntryType": "Offer",
+   "PreviousTxnLgrSeq": 107296903
+  },
+  {
+   "Flags": 65536,
+   "index": "C1B33D660589262EA9C73BB9BA4AF056E912DA9F657B81820B5ED70D081314B3",
+   "Account": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+   "BookNode": "0",
+   "Sequence": 103436516,
+   "OwnerNode": "0",
+   "TakerGets": {
+    "value": "0.573573",
+    "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+    "currency": "524C555344000000000000000000000000000000"
+   },
+   "TakerPays": "384548",
+   "Expiration": 843932005,
+   "BookDirectory": "CFEC8953D22B1B50F20F46ECBCD51990A26BDB71951ED8265A17D1A4BD9F0951",
+   "PreviousTxnID": "D36598E70E19C7C0B341FEF4080028EDF553FA18F315C01B751F54F6036AFB68",
+   "LedgerEntryType": "Offer",
+   "PreviousTxnLgrSeq": 107296904
+  },
+  {
+   "Flags": 2228224,
+   "index": "CA278E9DF6354062F00B7AE69CEB755E67D26278306B436A545CD6EFFAF69545",
+   "Balance": {
+    "value": "0",
+    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "currency": "5553444200000000000000000000000000000000"
+   },
+   "LowNode": "4",
+   "HighNode": "0",
+   "LowLimit": {
+    "value": "0",
+    "issuer": "rB3y9EPnq1ZrZP3aXgfyfdXQThzdXMrLMc",
+    "currency": "5553444200000000000000000000000000000000"
+   },
+   "HighLimit": {
+    "value": "10000",
+    "issuer": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+    "currency": "5553444200000000000000000000000000000000"
+   },
+   "PreviousTxnID": "53CDB441F4F545FCB7D73C0CFAD96975C9F9E8FCEFE239C341537612442A9584",
+   "LedgerEntryType": "RippleState",
+   "PreviousTxnLgrSeq": 107251933
+  },
+  {
+   "Flags": 65536,
+   "index": "E40A1558DC7638FF795B2D8D10C59F8624C52988A254D51EA4A92700F14E4F68",
+   "Balance": {
+    "value": "2.674791808739159",
+    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "currency": "524C555344000000000000000000000000000000"
+   },
+   "LowNode": "0",
+   "HighNode": "b70",
+   "LowLimit": {
+    "value": "1000",
+    "issuer": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+    "currency": "524C555344000000000000000000000000000000"
+   },
+   "HighLimit": {
+    "value": "0",
+    "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+    "currency": "524C555344000000000000000000000000000000"
+   },
+   "PreviousTxnID": "EFC0C6BCB4B56BF4469FB47C2AB7C0A0ADD8A687505E4F596508BB6B35500013",
+   "LedgerEntryType": "RippleState",
+   "PreviousTxnLgrSeq": 107296888
+  },
+  {
+   "Flags": 65536,
+   "index": "E66C03DB471948E95217179A358889F7320DA7681D4B2C75A247EEFFCEED3186",
+   "Account": "rBtVeRQ8NWUjco5scoivCQbUe7Lbdbb7Me",
+   "BookNode": "0",
+   "Sequence": 103436518,
+   "OwnerNode": "0",
+   "TakerGets": {
+    "value": "0.381443",
+    "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+    "currency": "524C555344000000000000000000000000000000"
+   },
+   "TakerPays": "255712",
+   "Expiration": 843931335,
+   "BookDirectory": "CFEC8953D22B1B50F20F46ECBCD51990A26BDB71951ED8265A17D1138B43F5E1",
+   "PreviousTxnID": "8C224AE1BC3944C6246634D1BBC1B14DB6171099939D243F5EC2BB2A01E08E7F",
+   "LedgerEntryType": "Offer",
+   "PreviousTxnLgrSeq": 107296904
+  }
+ ],
+ "exchange_objects": [
+  {
+   "Flags": 0,
+   "index": "A3200539A83CD5DB1514F916A7EA37E145D8096D2B4EF4DC4C769B7421FCF7E6",
+   "OwnerNode": "0",
+   "SignerListID": 0,
+   "SignerQuorum": 2,
+   "PreviousTxnID": "0A96C86ED42B6C55E3F7CB5CD9A8C022CDCA4C5AA06AFA88278D58C213D034E5",
+   "SignerEntries": [
+    {
+     "SignerEntry": {
+      "Account": "r3t1ECoJiAkKWZEYstRubfNVnCw7bCBreC",
+      "SignerWeight": 1
+     }
+    },
+    {
+     "SignerEntry": {
+      "Account": "rJyBXLdpZMouP6Hx3VfXn4WoeAKBfAAv4q",
+      "SignerWeight": 1
+     }
+    },
+    {
+     "SignerEntry": {
+      "Account": "rLvCfnfRxvc5Qd4UFNfqqvt53LREDWsLuo",
+      "SignerWeight": 1
+     }
+    }
+   ],
+   "LedgerEntryType": "SignerList",
+   "PreviousTxnLgrSeq": 43278042
+  }
+ ]
+}
