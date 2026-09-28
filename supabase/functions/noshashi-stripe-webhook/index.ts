@@ -62,7 +62,7 @@ const TIER_FEATURES: Record<string, string[]> = {
     "authority_certificate", "compliance_api",
     "webhooks", "regulator_seats", "white_label", "sla",
     "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
-    "asset_passports", "dedicated_environment",
+    "asset_passports", "dedicated_environment", "deposit_screening",
   ],
   strategic: [
     "console", "gate", "agent", "export",
@@ -70,7 +70,7 @@ const TIER_FEATURES: Record<string, string[]> = {
     "authority_certificate", "compliance_api",
     "webhooks", "regulator_seats", "white_label", "sla",
     "sso", "audit_log", "bulk_monitoring", "custom_alert_logic",
-    "asset_passports", "dedicated_environment",
+    "asset_passports", "dedicated_environment", "deposit_screening",
     "event_feeds", "custom_schemas",
   ],
 };

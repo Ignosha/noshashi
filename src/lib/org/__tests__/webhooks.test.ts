@@ -11,6 +11,8 @@ const sql = readFileSync(resolve(root, "supabase/migrations/20260924010000_org_w
 // Since 20260927180100 the list lives in one function, webhook_event_names(),
 // which both the table check and the creating function use.
 const events = readFileSync(resolve(root, "supabase/migrations/20260927180100_institutional_features.sql"), "utf8");
+// 20260927200000 redefines the list (xrpl_event, deposit_screened) and adds the ledger-event trigger.
+const feeds = readFileSync(resolve(root, "supabase/migrations/20260927200000_xrpl_event_feeds.sql"), "utf8");
 
 describe("webhook addresses — the form explains what the server refuses", () => {
   // The refusals below were each confirmed against the live database function.
@@ -30,7 +32,7 @@ describe("webhook addresses — the form explains what the server refuses", () =
   }
 
   it("the app's event list is exactly the server's, in the table check and in the creating function", () => {
-    const fn = /function noshashi\.webhook_event_names\(\)[\s\S]*?select array\[([\s\S]*?)\]::text\[\]/.exec(events);
+    const fn = /function noshashi\.webhook_event_names\(\)[\s\S]*?select array\[([\s\S]*?)\]::text\[\]/.exec(feeds);
     expect(fn).not.toBeNull();
     const serverEvents = fn![1].match(/'([a-z_]+)'/g)!.map((s) => s.slice(1, -1)).sort();
     expect(WEBHOOK_EVENTS.map((e) => e.id).sort()).toEqual(serverEvents);
@@ -43,6 +45,13 @@ describe("webhook addresses — the form explains what the server refuses", () =
     const trigger = /function noshashi\.webhook_from_audit\(\)[\s\S]*?\$\$;/.exec(events)![0];
     const emitted = [...trigger.matchAll(/when '[a-z_.]+' then '([a-z_]+)'/g)].map((m) => m[1]);
     expect(emitted.length).toBeGreaterThan(5);
+    for (const ev of emitted) expect(WEBHOOK_EVENTS.map((e) => e.id), ev).toContain(ev);
+  });
+
+  it("every event the ledger-event trigger emits is one a webhook may subscribe to", () => {
+    const trigger = /function noshashi\.webhook_from_xrpl_event\(\)[\s\S]*?\$\$;/.exec(feeds)![0];
+    const emitted = [...trigger.matchAll(/webhook_emit\(new\.organization_id, '([a-z_]+)'/g)].map((m) => m[1]);
+    expect(emitted).toEqual(["xrpl_event", "deposit_screened"]);
     for (const ev of emitted) expect(WEBHOOK_EVENTS.map((e) => e.id), ev).toContain(ev);
   });
 });

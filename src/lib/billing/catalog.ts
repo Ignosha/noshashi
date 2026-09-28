@@ -211,6 +211,7 @@ export const PLANS: Plan[] = [
     emphasis: true,
     features: [
       "Everything in Institutional",
+      "Deposit screening: partial payments, counterfeit tokens, phishing dust and three-hop source of funds, before you credit",
       "Asset passports and issuer intelligence at institutional scope",
       "Portfolio monitoring, counterparty and liquidity intelligence",
       "Deterministic policy engine, adjudication and decision history",
@@ -240,6 +241,7 @@ export const PLANS: Plan[] = [
       "custom_alert_logic",
       "asset_passports",
       "dedicated_environment",
+      "deposit_screening",
     ],
   },
   {
@@ -258,8 +260,8 @@ export const PLANS: Plan[] = [
     features: [
       "Everything in Enterprise",
       "High-volume API capacity and contracted burst limits",
-      "XRPL event feeds, webhooks and machine-readable delivery",
-      "Custom schemas, retention and bulk export design",
+      "XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API",
+      "Custom export schemas, bulk export and event retention you set",
       "Architecture review before commitment",
       "Scope documented against the integration",
     ],
@@ -284,6 +286,7 @@ export const PLANS: Plan[] = [
       "custom_alert_logic",
       "asset_passports",
       "dedicated_environment",
+      "deposit_screening",
       "event_feeds",
       "custom_schemas",
     ],
@@ -459,17 +462,23 @@ export const FEATURE_CATALOG: Record<
     blurb:
       "Isolated compute and storage for your compliance workload, with your own node endpoints and retention policy, scoped and provisioned per contract after architecture review.",
   },
+  deposit_screening: {
+    label: "Deposit screening",
+    requires: "enterprise",
+    blurb:
+      "Every incoming payment to your deposit addresses judged before it is credited: what actually arrived (never the Amount of a partial payment), whether the token is real or a counterfeit ticker, whether a drop of dust is carrying a phishing link, and who funded the sender three hops back against your own deny list.",
+  },
   event_feeds: {
     label: "XRPL event feeds",
     requires: "strategic",
     blurb:
-      "Machine-readable streams of issuer flag changes, trust-line and domain updates, delivered to your endpoint. Transport, delivery guarantees and volume are fixed in the contract rather than promised here.",
+      "Up to 100 accounts per organization read from validated ledgers every minute: payments, trust-line freezes, settings and issuer flag changes, clawbacks and more, as signed webhooks and as a cursor-paged JSON/NDJSON feed, with a history API to backfill any range.",
   },
   custom_schemas: {
     label: "Custom schemas & bulk export",
     requires: "strategic",
     blurb:
-      "Define your own record shapes for adjudications, receipts and portfolio state. Bulk export on your schedule with your schema, your encryption, your retention.",
+      "Your own record shapes for ledger events and the audit log (adjudications, exports, settings changes), applied to bulk exports from the console and to the feed API, which your systems pull on their own schedule. Event history is kept for as long as you set, from 7 days to 10 years.",
   },
 };
 

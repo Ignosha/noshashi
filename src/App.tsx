@@ -80,6 +80,9 @@ const ControlScene = lazy(() =>
 const AuthorityScene = lazy(() =>
   import("@/components/scenes/AuthorityScene").then((m) => ({ default: m.AuthorityScene }))
 );
+const LedgerWatchScene = lazy(() =>
+  import("@/components/scenes/LedgerWatchScene").then((m) => ({ default: m.LedgerWatchScene }))
+);
 const PassportScene = lazy(() =>
   import("@/components/scenes/PassportScene").then((m) => ({ default: m.PassportScene }))
 );
@@ -158,6 +161,7 @@ export type SceneId =
   | "issuance"
   | "authority"
   | "passport"
+  | "ledgerwatch"
   | "amm"
   | "network"
   | "settlement"
@@ -198,7 +202,7 @@ type SceneDef = {
  */
 const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "overview", label: "OVERVIEW", scenes: ["home", "control"] },
-  { id: "adjudication", label: "ADJUDICATION", scenes: ["verify", "provenance", "credentials", "domains"] },
+  { id: "adjudication", label: "ADJUDICATION", scenes: ["verify", "ledgerwatch", "provenance", "credentials", "domains"] },
   { id: "markets", label: "MARKETS & EXPOSURE", scenes: ["risk", "desk", "book", "amm"] },
   { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance", "authority", "passport"] },
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
@@ -348,6 +352,16 @@ const SCENES: SceneDef[] = [
     digit: "",
     group: "primary",
     requires: "authority_certificate",
+  },
+  {
+    id: "ledgerwatch",
+    label: "LEDGER WATCH",
+    title: "LEDGER WATCH",
+    hint: "Screen deposits before you credit them; watch accounts every minute with signed webhooks and a feed",
+    icon: <NovaShield size={15} />,
+    digit: "",
+    group: "primary",
+    requires: "deposit_screening",
   },
   {
     id: "passport",
@@ -1102,6 +1116,8 @@ function ConsoleApp() {
                       <IssuanceScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "authority" ? (
                       <AuthorityScene onUpgrade={openPlans} onSignIn={openAuth} />
+                    ) : scene === "ledgerwatch" ? (
+                      <LedgerWatchScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "passport" ? (
                       <PassportScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "growth" ? (
