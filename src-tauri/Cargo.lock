@@ -2430,7 +2430,7 @@ dependencies = [
 
 [[package]]
 name = "noshashi"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "futures-util",
  "keyring",
