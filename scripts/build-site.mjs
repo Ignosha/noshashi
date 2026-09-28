@@ -869,6 +869,178 @@ async function buildCertificate() {
   }));
 }
 
+/* ── /protection/ ─────────────────────────────────────────────────── */
+/*
+ * Customer Asset Protection: an institution's public page. What a deposit
+ * guarantee scheme gives depositors, as ledger facts a customer can check
+ * without trusting the institution or NOSHASHI: the reserve accounts and
+ * their balances, the protection fund and who can move it, the published
+ * liabilities root, and each daily attestation hash-chained to the one
+ * before. The latest attestation's digest is recomputed in the reader's
+ * browser, and a customer's own inclusion proof is checked there too.
+ *
+ * The page must never read as insurance. It says so where the status is.
+ */
+async function buildProtection() {
+  const api = "https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-xrpl-watch/protection/";
+  const head = `<style>
+.prot-form{display:flex;gap:10px;flex-wrap:wrap;max-width:620px;margin-bottom:22px}
+.prot-form input{flex:1;min-width:220px}
+.prot-status{border:1px solid var(--rule);border-radius:var(--r);padding:20px 22px;margin-bottom:14px}
+.prot-status .tag{font:10px "IBM Plex Mono",monospace;letter-spacing:.2em;text-transform:uppercase}
+.prot-status h2{font-size:20px;margin:8px 0}
+.prot-status.go{border-left:3px solid var(--go)} .prot-status.go .tag{color:var(--go)}
+.prot-status.hold{border-left:3px solid var(--hold)} .prot-status.hold .tag{color:var(--hold)}
+.prot-status.nogo{border-left:3px solid var(--nogo)} .prot-status.nogo .tag{color:var(--nogo)}
+.prot-status.unknown{border-left:3px solid var(--muted)} .prot-status.unknown .tag{color:var(--muted)}
+.prot-mono{font:11px "IBM Plex Mono",monospace;color:var(--faint);word-break:break-all;line-height:1.7}
+.prot-find{border-top:1px solid var(--rule);padding:10px 0}
+.prot-find b{font:10px "IBM Plex Mono",monospace;letter-spacing:.16em;margin-right:8px}
+.prot-find .critical{color:var(--nogo)} .prot-find .warn{color:var(--hold)} .prot-find .ok{color:var(--go)} .prot-find .info{color:var(--muted)}
+.prot-proof textarea{width:100%;min-height:90px;font:11px "IBM Plex Mono",monospace}
+</style>`;
+  const body = `<div class="page-head">
+  <p class="eyebrow">Customer Asset Protection</p>
+  <h1>Is my balance backed?</h1>
+  <p>An institution that holds its customers' XRP can prove, from the XRP Ledger, that the balances it owes are
+     backed by the accounts it names, that yours is counted, and what it has set aside to make customers whole
+     if it fails. NOSHASHI reads the ledger every day and publishes what it finds. Check it here; nothing below
+     asks you to trust the institution or NOSHASHI.</p>
+</div>
+
+<section>
+  <form class="prot-form" id="prot-form" novalidate>
+    <input id="prot-slug" type="text" spellcheck="false" autocomplete="off" placeholder="Program name, e.g. acme-custody" maxlength="48" aria-label="Program name">
+    <button class="btn" type="submit" id="prot-run">Show the program</button>
+  </form>
+  <p class="form-status" id="prot-say" role="status" aria-live="polite"></p>
+  <div id="prot-out" hidden></div>
+
+  <div class="panel prot-proof" style="margin-top:22px">
+    <p class="num">CHECK THAT YOUR BALANCE IS COUNTED</p>
+    <p>Your institution sends you one line of its proofs file. Paste it with your customer id. The check runs in
+       this browser: your id and balance are not sent anywhere.</p>
+    <input id="proof-id" type="text" placeholder="Your customer id, exactly as your institution gave it" style="margin:10px 0;width:100%">
+    <textarea id="proof-json" placeholder='{"customer":"…","proof":{"ref":"…","amount":"…","path":[…],"root":{…},"salt":"…"}}'></textarea>
+    <p><button class="btn ghost" type="button" id="proof-run">Check my proof</button></p>
+    <p class="form-status" id="proof-say" role="status" aria-live="polite"></p>
+  </div>
+
+  <div class="grid g2" style="margin-top:14px">
+    <div class="panel">
+      <p class="num">WHAT THIS IS NOT</p>
+      <p><strong>It is not insurance.</strong> NOSHASHI does not guarantee deposits and does not pay claims, and
+         no government scheme stands behind a program shown here. It verifies and publishes what is on the ledger:
+         what the institution holds, what it owes, and what it has locked away for its customers.</p>
+    </div>
+    <div class="panel">
+      <p class="num">HOW TO READ IT</p>
+      <p><strong>Backed</strong> compares the XRP in the named reserve accounts with the total the institution
+         published as owed. <strong>Secured</strong> counts only protection-fund XRP no single key can move: locked in
+         escrow until a date, or held under a signer list with the master key disabled.</p>
+    </div>
+  </div>
+</section>`;
+  const script = `<script>
+(function(){
+  var API=${JSON.stringify(api)};
+  var form=document.getElementById("prot-form"),slug=document.getElementById("prot-slug"),out=document.getElementById("prot-out"),sayEl=document.getElementById("prot-say");
+  function say(t,tone){sayEl.textContent=t||"";sayEl.setAttribute("data-tone",tone||"");}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function xrp(n){return Number(n).toLocaleString("en-US",{maximumFractionDigits:6})+" XRP";}
+  function hex(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");}
+  function sha(text){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(text)).then(hex);}
+  /* The same canonical JSON as supabase/functions/_shared/protection.ts: sorted keys, no whitespace. */
+  function canonical(v){
+    if(Array.isArray(v))return "["+v.map(canonical).join(",")+"]";
+    if(v&&typeof v==="object")return "{"+Object.keys(v).sort().map(function(k){return JSON.stringify(k)+":"+canonical(v[k]);}).join(",")+"}";
+    return JSON.stringify(v===undefined?null:v);
+  }
+  var TONE={fully_backed:"go",partially_backed:"hold",under_backed:"nogo",unproven:"unknown"};
+  var WORD={fully_backed:"FULLY BACKED",partially_backed:"PARTLY BACKED",under_backed:"UNDER-BACKED",unproven:"NOT PROVEN"};
+  function render(b){
+    var p=b.program,l=b.latest,r=l&&l.report;
+    var html='<div class="prot-status '+(l?TONE[l.status]:"unknown")+'"><span class="tag">'+(l?WORD[l.status]:"NO ATTESTATION YET")+'</span>'+
+      '<h2>'+esc(p.name)+(p.institution?' · '+esc(p.institution):'')+'</h2>'+
+      (r?'<p>'+xrp(r.reservesXrp)+' in '+p.reserve_addresses.length+' reserve account'+(p.reserve_addresses.length===1?'':'s')+
+        (r.liabilitiesXrp!==null?' against '+xrp(r.liabilitiesXrp)+' owed to '+Number(r.customers).toLocaleString("en-US")+' customers':'')+
+        (p.fund_addresses.length?'. Protection fund '+xrp(r.fundXrp)+', of which '+xrp(r.fundSecuredXrp)+' no single key can move; limit '+xrp(p.coverage_limit_xrp)+' per customer':'')+'.</p>':'')+
+      '<p class="prot-mono">'+(l?'ATTESTED '+esc(l.attested_at)+' · VALIDATED LEDGER '+esc(l.ledger_index)+'<br>DIGEST '+esc(l.digest)+' <span id="prot-digest"></span>':'')+'</p>'+
+      '<p class="prot-mono">'+esc(b.not_insurance)+'</p></div>';
+    if(b.liabilities)html+='<div class="panel"><p class="num">PUBLISHED LIABILITIES</p><p class="prot-mono">ROOT '+esc(b.liabilities.root)+'<br>TOTAL '+xrp(b.liabilities.total_xrp)+' · '+esc(b.liabilities.customers)+' CUSTOMERS · BALANCES AS OF '+esc(b.liabilities.as_of)+'</p></div>';
+    if(r){html+='<div class="panel" style="margin-top:14px"><p class="num">FINDINGS</p>';
+      r.findings.forEach(function(f){html+='<div class="prot-find"><b class="'+esc(f.severity)+'">'+esc(f.severity.toUpperCase())+'</b>'+esc(f.title)+'<p>'+esc(f.detail)+'</p></div>';});
+      html+='</div>';}
+    html+='<div class="panel" style="margin-top:14px"><p class="num">RESERVE AND FUND ACCOUNTS</p><p class="prot-mono">'+
+      p.reserve_addresses.map(function(a){return 'RESERVE '+esc(a);}).concat(p.fund_addresses.map(function(a){return 'FUND '+esc(a);})).join("<br>")+'</p></div>';
+    if(b.history&&b.history.length){
+      var chain=true;for(var i=0;i<b.history.length-1;i++){if(b.history[i].previous_digest!==b.history[i+1].digest)chain=false;}
+      html+='<div class="panel" style="margin-top:14px"><p class="num">ATTESTATION HISTORY · '+(chain?'CHAIN INTACT':'CHAIN BROKEN')+'</p><p class="prot-mono">'+
+        b.history.map(function(h){return esc(h.attested_at.slice(0,16).replace("T"," "))+' · '+esc(WORD[h.status])+(h.coverage_ratio!==null?' · '+(Number(h.coverage_ratio)*100).toFixed(2)+'%':'')+' · '+esc(h.digest.slice(0,16))+'…';}).join("<br>")+'</p></div>';
+    }
+    out.innerHTML=html;out.hidden=false;
+    if(r)sha(canonical(r)).then(function(d){var el=document.getElementById("prot-digest");if(el)el.textContent=d.toUpperCase()===l.digest?"· RECOMPUTED IN THIS BROWSER: MATCHES":"· RECOMPUTED IN THIS BROWSER: DOES NOT MATCH";});
+  }
+  function load(name){
+    if(!/^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/.test(name)){say("A program name is lower-case letters, digits and hyphens.","bad");return;}
+    say("Reading…","busy");out.hidden=true;
+    fetch(API+encodeURIComponent(name)).then(function(r){return r.json().then(function(b){return {ok:r.ok,body:b};});})
+      .then(function(x){if(!x.ok){say(x.body.message||"Not found.","bad");return;}say("");render(x.body);})
+      .catch(function(){say("Could not reach the server. Try again shortly.","bad");});
+  }
+  form.addEventListener("submit",function(e){e.preventDefault();load((slug.value||"").trim().toLowerCase());});
+  try{var p=new URLSearchParams(location.search).get("p");if(p){slug.value=p;load(p);}}catch(e){}
+
+  /* Inclusion proof: the same hashing as the tree the institution built. */
+  var proofSay=document.getElementById("proof-say");
+  function psay(t,tone){proofSay.textContent=t;proofSay.setAttribute("data-tone",tone||"");}
+  document.getElementById("proof-run").addEventListener("click",function(){
+    var line,id=(document.getElementById("proof-id").value||"").trim();
+    try{line=JSON.parse(document.getElementById("proof-json").value);}catch(e){psay("That is not the line from your proofs file.","bad");return;}
+    var proof=line.proof||line;
+    if(!proof||!proof.path||!proof.root||!proof.salt){psay("That line has no proof in it.","bad");return;}
+    sha(proof.salt+"|"+id).then(function(ref){
+      if(ref!==proof.ref){psay("This proof is not for that customer id.","bad");return null;}
+      var node={hash:null,sum:BigInt(proof.amount)};
+      return sha("noshashi-pol-leaf-v1|"+proof.ref+"|"+proof.amount).then(function(h){
+        node.hash=h;
+        var chain=Promise.resolve(node);
+        proof.path.forEach(function(step){
+          chain=chain.then(function(n){
+            var s={hash:step.hash,sum:BigInt(step.sum)};
+            if(s.sum<0n)throw new Error("negative");
+            var L=step.side==="right"?n:s,R=step.side==="right"?s:n;
+            return sha("noshashi-pol-node-v1|"+L.hash+"|"+L.sum+"|"+R.hash+"|"+R.sum).then(function(h){return {hash:h,sum:L.sum+R.sum};});
+          });
+        });
+        return chain;
+      });
+    }).then(function(root){
+      if(!root)return;
+      var ok=root.hash===String(proof.root.hash).toLowerCase()&&root.sum.toString()===String(proof.root.sum);
+      var published=document.querySelector(".prot-mono")&&out.textContent.indexOf(proof.root.hash)>=0;
+      psay(ok?("Your balance of "+(Number(BigInt(proof.amount))/1e6).toLocaleString("en-US")+" XRP is counted in a tree whose root is "+proof.root.hash.slice(0,16)+"…"+(published?", the root this program published.":". Load the program above to compare it with the published root.")):"This proof does not lead to its root: your balance is not counted as stated.",ok?"ok":"bad");
+    }).catch(function(){psay("A branch of the proof carries a negative total: debts could be hidden there.","bad");});
+  });
+})();
+</script>`;
+
+  await write("protection/index.html", renderPage({
+    title: "Customer Asset Protection — is my balance backed?",
+    description:
+      "Check, from the XRP Ledger, that an institution's customer balances are backed by the accounts it names, that yours is counted, "
+      + "and what it has set aside to make customers whole. Attested daily and hash-chained. Verification, not insurance.",
+    path: "/protection/",
+    body,
+    head,
+    structured: [
+      breadcrumb("Customer Asset Protection", "/protection/"),
+      { "@type": "WebApplication", name: "NOSHASHI Customer Asset Protection", applicationCategory: "FinanceApplication", url: `${ORIGIN}/protection/`, offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+    ],
+    scripts: script,
+  }));
+}
+
 /* ── institutional product pages ─────────────────────────────────── */
 const PRODUCT_PAGES = [
   ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Operating evidence</p><h2>Make every decision reviewable.</h2><p>Enterprise brings the same validated-ledger reading used in the public certificate into a governed workflow: the observation, policy result and adjudication remain connected.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p><ul class="proof-list"><li>Evidence attached to each policy result</li><li>Decision history suitable for second-line review</li></ul></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth, while teams retain the context required to act on them.</p><ul class="proof-list"><li>Validated state before interpretation</li><li>Exportable records for internal controls</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p>Architecture and commercial scope are confirmed before any contracted capability is promised.</p><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Trust &amp; security</a></p></div></section>`],
@@ -949,6 +1121,9 @@ async function buildPricingEnhancement() {
           <ul class="spec">
             <li>Everything in Institutional</li>
             <li>Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit</li>
+            <li>Withdrawal screening: bounces, brand-new and hours-old destinations, lookalikes of past destinations, OFAC and the scam registry three hops back, before you sign</li>
+            <li>Customer Asset Protection: a protection fund with a per-customer limit, verified on the ledger and published on a page your customers can check (verification, not insurance)</li>
+            <li>Market surveillance: re-quoted orders that never fill, concentration and trades between accounts of one funder</li>
             <li>Asset passports and issuer intelligence at institutional scope</li>
             <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
             <li>Deterministic policy engine, adjudication and decision history</li>
@@ -978,6 +1153,7 @@ async function buildPricingEnhancement() {
             <li>Custom data integrations for risk, custody, trading and compliance</li>
             <li>Dedicated environment, provisioned per contract</li>
             <li>Security Guardian: signed alerts the minute a watched account's keys change or it is deleted, for a theft trail or a whole scam cluster</li>
+            <li>Protection alerts: a signed webhook the day reserves fall below customer balances, and the phishing link feed as an API</li>
             <li>Strategic architecture review and integration roadmap</li>
           </ul>
           <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
@@ -1026,6 +1202,16 @@ async function buildPricingEnhancement() {
           <tr><th scope="row">Forgotten-asset inventory</th><td class="limited">Listed</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td></tr>
           <tr><th scope="row">Personal Guardian (on-device alerts)</th><td class="limited">3 addresses</td><td class="yes">50 addresses</td><td class="yes">50 addresses</td><td class="yes">50 addresses</td><td class="yes">50 + server-side</td></tr>
           <tr><th scope="row">Scam cluster mapper</th><td class="no">Unavailable</td><td class="yes">2 hops, 40 accounts</td><td class="yes">2 hops, 40 accounts</td><td class="yes">4 hops, 200 + case</td><td class="yes">4 hops, 200 + watch</td></tr>
+          <tr><th scope="row">Emergency kit &amp; drainer check</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Exchange attribution (who is this?)</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Phishing link check</th><td class="yes">Lookup</td><td class="yes">Lookup</td><td class="yes">Lookup</td><td class="yes">Lookup</td><td class="yes">Lookup + feed API</td></tr>
+          <tr><th scope="row">Shared scam registry</th><td class="limited">Lookup</td><td class="limited">Lookup</td><td class="yes">Lookup + report</td><td class="yes">Lookup + report</td><td class="yes">Lookup + report</td></tr>
+          <tr><th scope="row">Withdrawal screening</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Market surveillance</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Customer Asset Protection · verification, not insurance</th></tr>
+          <tr><th scope="row">Proof of reserves &amp; customer inclusion proofs</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Attested daily</td><td class="yes">Attested daily</td><td class="yes">Attested daily</td></tr>
+          <tr><th scope="row">Protection fund &amp; public page</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Protection alerts (signed webhook)</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Policy, adjudication &amp; evidence</th></tr>
           <tr><th scope="row">Policy engine &amp; adjudication</th><td class="limited">Session only</td><td class="yes">10,000 verdicts</td><td class="yes">Unlimited</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
           <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>
@@ -1279,6 +1465,7 @@ async function buildSitemap(docs = []) {
     // argued from, and the only one that answers a question for
     // somebody who will never install anything.
     ["/certificate/", "weekly", "0.9"],
+    ["/protection/", "weekly", "0.8"],
     ["/pricing/", "monthly", "0.9"],
     ["/enterprise/", "monthly", "0.9"],
     ["/trust/", "monthly", "0.8"],
@@ -1368,6 +1555,7 @@ async function main() {
   await buildProgress({ feed, release, releases });
   await buildContact();
   await buildCertificate();
+  await buildProtection();
   await buildPricingEnhancement();
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildTrust();

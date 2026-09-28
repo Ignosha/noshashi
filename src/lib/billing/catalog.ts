@@ -210,6 +210,8 @@ export const PLANS: Plan[] = [
       "custom_alert_logic",
       "incident_response",
       "asset_recovery",
+      "proof_of_reserves",
+      "threat_registry",
     ],
   },
   {
@@ -266,6 +268,11 @@ export const PLANS: Plan[] = [
       "incident_response",
       "forensic_trace",
       "asset_recovery",
+      "proof_of_reserves",
+      "threat_registry",
+      "customer_protection",
+      "withdrawal_screening",
+      "market_surveillance",
     ],
   },
   {
@@ -319,6 +326,13 @@ export const PLANS: Plan[] = [
       "forensic_trace",
       "security_guardian",
       "asset_recovery",
+      "proof_of_reserves",
+      "threat_registry",
+      "customer_protection",
+      "withdrawal_screening",
+      "market_surveillance",
+      "protection_monitoring",
+      "phishing_feed",
     ],
   },
 ];
@@ -509,6 +523,48 @@ export const FEATURE_CATALOG: Record<
     requires: "desk",
     blurb:
       "The recovery tools at desk scale: every token, LP share and NFT valued in XRP at the live best bid, stuck-funds and exposure scans across a book of addresses at once (25 on Pro, 500 on Institutional and above), Personal Guardian on up to 50 addresses, and the scam cluster mapper: the accounts one operation runs, linked by who funded them, where they swept on deletion, vanity endings and shared memos.",
+  },
+  proof_of_reserves: {
+    label: "Proof of reserves",
+    requires: "institution",
+    blurb:
+      "Prove customer balances are backed without showing anyone the balances: a Merkle sum tree built on your own machine (only its root, total and count are published), each customer given the path that proves their balance is counted, and the reserve accounts you name read from a validated ledger and attested daily, hash-chained.",
+  },
+  customer_protection: {
+    label: "Customer Asset Protection",
+    requires: "enterprise",
+    blurb:
+      "A protection fund with a per-customer limit, verified on the ledger: how much is locked in escrow or held under a signer list no single key can satisfy, how much of the promise it covers, and a public page your customers can check their own inclusion on. Verification, not insurance: NOSHASHI pays no claims.",
+  },
+  protection_monitoring: {
+    label: "Protection monitoring",
+    requires: "strategic",
+    blurb:
+      "A signed protection_alert webhook whenever an attestation finds reserves below customer balances, liabilities unpublished, or a status worse than the day before.",
+  },
+  withdrawal_screening: {
+    label: "Withdrawal screening",
+    requires: "enterprise",
+    blurb:
+      "Every outbound payment checked before it is signed: whether it would bounce (missing tag, unfunded destination, deposit authorisation), whether the destination is brand new, hours old, a lookalike of an address the customer used before, OFAC-listed or in the scam registry up to three funding hops back.",
+  },
+  threat_registry: {
+    label: "Shared scam registry",
+    requires: "institution",
+    blurb:
+      "Report a scam address with the transactions that prove it. NOSHASHI staff who did not submit it review every report; confirmed entries screen deposits and withdrawals for every organization, shown as counts and categories, never who reported.",
+  },
+  phishing_feed: {
+    label: "Phishing link feed",
+    requires: "strategic",
+    blurb:
+      "Every domain advertised in micro-payment memos on the XRP Ledger, read from a validated ledger every minute, with the transactions behind each listing, as an API feed for your own blocklists. Single lookups are free.",
+  },
+  market_surveillance: {
+    label: "Market surveillance",
+    requires: "enterprise",
+    blurb:
+      "An issuer's order-book history read for manipulation indicators: accounts re-quoting orders that never fill, one account supplying most of the activity, and trades between accounts funded by the same account, each with the numbers and transactions behind it.",
   },
   security_guardian: {
     label: "Security Guardian",

@@ -333,7 +333,7 @@
           <li>Token rights — check an NFT before you buy it</li>
           <li>On-device compliance agent</li>
           <li>CSV audit export</li>
-          <li><strong>Security Center</strong> — account check, pre-sign check, safe send, stuck-funds and reserve recovery, exposure audit, deposit help, domain check, and Personal Guardian on 3 addresses</li>
+          <li><strong>Security Center</strong> — account check, pre-sign check, safe send, stuck-funds and reserve recovery, exposure audit, deposit help, domain check, emergency kit and drainer check, who-is-this, scam registry and phishing link lookups, and Personal Guardian on 3 addresses</li>
           <li>Binary integrity verification</li>
           <li>Community support</li>
         </ul>
@@ -424,6 +424,8 @@
           <li>Bulk portfolio monitoring — unlimited wallets, stress runs on a schedule</li>
           <li>Custom alert logic — your own thresholds, expressions and destinations</li>
           <li>Recovery and exposure scans across 500 addresses in one run, exported for the audit file</li>
+          <li>Proof of reserves: customer balances proven backed by the accounts you name, each customer given their own inclusion proof, attested daily and hash-chained</li>
+          <li>Report scam addresses to the shared registry that screens every organization's deposits and withdrawals</li>
           <li>Compliance API keys and webhooks</li>
           <li>Issuance surveillance — who holds your paper, and how concentrated</li>
           <li>Travel Rule (FATF R.16) scoping across every settlement</li>
@@ -456,6 +458,9 @@
           <ul class="spec">
             <li>Everything in Institutional</li>
             <li>Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit</li>
+            <li>Withdrawal screening: bounces, brand-new and hours-old destinations, lookalikes of past destinations, OFAC and the scam registry three hops back, before you sign</li>
+            <li>Customer Asset Protection: a protection fund with a per-customer limit, verified on the ledger and published on a page your customers can check (verification, not insurance)</li>
+            <li>Market surveillance: re-quoted orders that never fill, concentration and trades between accounts of one funder</li>
             <li>Asset passports and issuer intelligence at institutional scope</li>
             <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
             <li>Deterministic policy engine, adjudication and decision history</li>
@@ -485,6 +490,7 @@
             <li>Custom data integrations for risk, custody, trading and compliance</li>
             <li>Dedicated environment, provisioned per contract</li>
             <li>Security Guardian: signed alerts the minute a watched account's keys change or it is deleted, for a theft trail or a whole scam cluster</li>
+            <li>Protection alerts: a signed webhook the day reserves fall below customer balances, and the phishing link feed as an API</li>
             <li>Strategic architecture review and integration roadmap</li>
           </ul>
           <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
@@ -527,6 +533,16 @@
           <tr><th scope="row">Forgotten-asset inventory</th><td class="limited">Listed</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td><td class="yes">Valued in XRP</td></tr>
           <tr><th scope="row">Personal Guardian (on-device alerts)</th><td class="limited">3 addresses</td><td class="yes">50 addresses</td><td class="yes">50 addresses</td><td class="yes">50 addresses</td><td class="yes">50 + server-side</td></tr>
           <tr><th scope="row">Scam cluster mapper</th><td class="no">Unavailable</td><td class="yes">2 hops, 40 accounts</td><td class="yes">2 hops, 40 accounts</td><td class="yes">4 hops, 200 + case</td><td class="yes">4 hops, 200 + watch</td></tr>
+          <tr><th scope="row">Emergency kit &amp; drainer check</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Exchange attribution (who is this?)</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Phishing link check</th><td class="yes">Lookup</td><td class="yes">Lookup</td><td class="yes">Lookup</td><td class="yes">Lookup</td><td class="yes">Lookup + feed API</td></tr>
+          <tr><th scope="row">Shared scam registry</th><td class="limited">Lookup</td><td class="limited">Lookup</td><td class="yes">Lookup + report</td><td class="yes">Lookup + report</td><td class="yes">Lookup + report</td></tr>
+          <tr><th scope="row">Withdrawal screening</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Market surveillance</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Customer Asset Protection · verification, not insurance</th></tr>
+          <tr><th scope="row">Proof of reserves &amp; customer inclusion proofs</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Attested daily</td><td class="yes">Attested daily</td><td class="yes">Attested daily</td></tr>
+          <tr><th scope="row">Protection fund &amp; public page</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Protection alerts (signed webhook)</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Policy, adjudication &amp; evidence</th></tr>
           <tr><th scope="row">Policy engine &amp; adjudication</th><td class="limited">Session only</td><td class="yes">10,000 verdicts</td><td class="yes">Unlimited</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
           <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>

@@ -111,7 +111,9 @@ describe("VALIDATED STATE", () => {
         const body = text.slice(m.index!, end + 1);
         // A range that ends at ledger_index_max: -1 ends at the latest validated
         // ledger, whatever it starts at (a forward trace from an incident).
-        if (!/ledger_index:\s*"validated"|ledger_index_min:\s*-1|ledger_index_max:\s*-1/.test(body)) unpinned.push(`${file}: ${m[1]}`);
+        // `validatedIndex` is by convention the index of a ledger just read as
+        // "validated", so several accounts are read at the same one.
+        if (!/ledger_index:\s*"validated"|ledger_index:\s*validatedIndex\b|ledger_index_min:\s*-1|ledger_index_max:\s*-1/.test(body)) unpinned.push(`${file}: ${m[1]}`);
       }
     }
     expect(unpinned).toEqual([]);

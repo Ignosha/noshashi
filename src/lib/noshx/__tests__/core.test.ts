@@ -48,6 +48,21 @@ describe("reading the question", () => {
     expect(plan(`What is the recovery ratio of ${BITSTAMP} in a stress test?`).calls.map((c) => c.tool)).not.toContain("investigate_hack");
   });
 
+  it("plans the institutional security tools", () => {
+    const tools = (q: string) => plan(q).calls.map((c) => c.tool);
+    const COLD = "rTooLkitCksh5mQa67eaa2JaWHDBnHkpy";
+    expect(tools(`Is ${BITSTAMP} being drained right now?`)).toContain("drainer_check");
+    expect(plan(`My seed leaked. Build the emergency kit for ${BITSTAMP} to move everything to cold ${COLD}`).calls).toContainEqual(
+      expect.objectContaining({ tool: "emergency_kit", input: { address: BITSTAMP, cold: COLD } })
+    );
+    expect(tools(`Emergency kit for ${BITSTAMP}`)).not.toContain("emergency_kit");
+    expect(tools(`Which exchange runs ${BITSTAMP}?`)).toContain("who_is");
+    expect(tools(`Has ${BITSTAMP} been reported to the scam registry?`)).toContain("scam_registry");
+    expect(plan("Is xaman.la a phishing link? It says claim your airdrop").calls).toEqual([expect.objectContaining({ tool: "check_link", input: { domain: "xaman.la" } })]);
+    expect(plan(`Screen a withdrawal to ${BITSTAMP}`).calls).toContainEqual(expect.objectContaining({ tool: "screen_withdrawal", input: { destination: BITSTAMP } }));
+    expect(plan(`Is anyone spoofing or wash trading the token of ${BITSTAMP}?`).calls).toContainEqual(expect.objectContaining({ tool: "surveil_market", input: { issuer: BITSTAMP } }));
+  });
+
   it("plans the recovery and analysis tools", () => {
     const tools = (q: string) => plan(q).calls.map((c) => c.tool);
     expect(tools(`Is any XRP stuck in escrows or reserve I could reclaim on ${BITSTAMP}?`)).toContain("find_stuck_funds");

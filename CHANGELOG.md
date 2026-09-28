@@ -2,6 +2,53 @@
 
 ## Unreleased
 
+### Customer Asset Protection and institutional security tools
+
+- **Customer Asset Protection** (verification, not insurance: NOSHASHI pays
+  no claims and no government scheme stands behind it):
+  - **Institutional (`proof_of_reserves`):** name the accounts that hold your
+    customers' XRP and publish the root of a Merkle sum tree over customer
+    balances, built in the app from your own export. Only the root, the
+    total and the count leave the machine. Each customer gets their own
+    inclusion proof. The reserves are read from a validated ledger every day
+    at 06:17 UTC and recorded as an attestation, hash-chained to the one
+    before.
+  - **Enterprise (`customer_protection`):** a protection fund with a
+    per-customer limit. Only XRP locked in escrow, or held under a signer
+    list with the master key disabled, counts as secured. The program can
+    have a public page at `/protection/?p=<name>`, where customers check
+    their own proof and the latest digest is recomputed in their browser.
+  - **Strategic (`protection_monitoring`):** a signed `protection_alert`
+    webhook when reserves fall below published liabilities or the status
+    worsens. Every attestation also emits `protection_attested`.
+- **Free on every plan:**
+  - **Emergency kit and drainer check.** Is the account being drained now
+    (keys changed then value out, dust spray then AccountDelete, zero-price
+    NFT offer taken, check cashed at once)? Then the ordered unsigned
+    transactions that save the most, optionally on tickets to sign today and
+    keep offline. The XRP sweep leaves the kit's fees and the reserve of
+    unused tickets behind, so it cannot fail for want of either.
+  - **Who is this?** Exchange attribution: a domain that vouches for the
+    address, a domain it only claims, or the behaviour of a pooled service.
+  - **Scam registry and phishing link lookups**, at the public
+    `/threats` and `/phishing` routes.
+- **Institutional (`threat_registry`):** file scam reports with transaction
+  evidence. NOSHASHI staff review them, and a reviewer can never confirm a
+  report they filed. Confirmed entries screen deposits and withdrawals.
+- **Enterprise:**
+  - **Withdrawal screening (`withdrawal_screening`)** in the app and at
+    `POST /withdrawal-screen`. It flags a withdrawal that would bounce, a
+    destination that is brand new, hours old or imitates a past one, and an
+    OFAC listing or scam report on the destination or up to three funding
+    hops back.
+  - **Market surveillance (`market_surveillance`):** re-quoted orders that
+    never fill, concentration, and trades between accounts of one funder.
+- **Strategic (`phishing_feed`):** every listed domain as an API feed. The
+  feed reads one validated ledger a minute and keeps domains advertised in
+  XRP dust memos. A domain is listed once it has reached five accounts.
+- NOSHX gains seven tools for these. Learn gains lesson 23, six questions
+  and eight terms.
+
 ### Recovery and cybersecurity analysis tools, by tier
 
 - **Free on every plan:**

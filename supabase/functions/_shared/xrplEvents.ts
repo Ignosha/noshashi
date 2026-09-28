@@ -370,6 +370,8 @@ export type ScreeningInput = {
   sanctions?: Record<string, SanctionEntry>;
   /** The organization's other watched addresses, which a poisoning sender would imitate. */
   knownAddresses?: string[];
+  /** Confirmed entries in the shared scam registry, by address. */
+  threats?: Record<string, ThreatEntry>;
 };
 
 export type ScreeningFinding = {
@@ -502,6 +504,17 @@ export function screenDeposit(input: ScreeningInput): Screening {
   });
 
   // 4c. Address poisoning: a sender that imitates an address this organization uses.
+  const threats = input.threats ?? {};
+  chain.forEach((hop, i) => {
+    const t = threats[hop.account];
+    if (!t) return;
+    findings.push({
+      id: `reported_hop_${i}`,
+      severity: i === 0 ? "critical" : "warn",
+      title: i === 0 ? `The sender is in the scam registry (${t.categories.join(", ")})` : `Funded ${i} hop${i === 1 ? "" : "s"} back by an account in the scam registry`,
+      detail: `${hop.account}: ${threatText(t)}`,
+    });
+  });
   const sender0 = chain[0]?.account ?? event.counterparty;
   if (sender0) {
     const known = new Set([...(config.trustedCounterparties ?? []), ...(input.knownAddresses ?? [])]);
@@ -655,4 +668,104 @@ export function domainVerdict(address: string | null, domain: string | null, tom
     return { address, domain, status: "unverified", listed, detail: `${address} claims ${domain}, but ${domain}'s xrp-ledger.toml does not list it${listed.length ? ` (it lists ${listed.length} other account${listed.length === 1 ? "" : "s"})` : ""}. Treat it as impersonation until ${domain} confirms it.`, tomlUrl };
   }
   return { address, domain, status: listed.length ? "verified" : "unverified", listed, detail: listed.length ? `${domain} lists ${listed.length} account${listed.length === 1 ? "" : "s"} as its own.` : `${domain}'s xrp-ledger.toml lists no accounts.`, tomlUrl };
+}
+
+// ── Shared scam registry ────────────────────────────────────────────
+
+/** An address other organizations reported, with evidence, and NOSHASHI reviewers confirmed. */
+export type ThreatEntry = {
+  address: string;
+  /** How many organizations' reports were confirmed. */
+  reports: number;
+  categories: string[];
+  firstConfirmed: string;
+};
+
+export const THREAT_CATEGORIES = ["phishing", "drainer", "scam_token", "impersonation", "fraud", "ransomware", "mixer", "other"] as const;
+
+export const threatText = (t: ThreatEntry) =>
+  `confirmed in ${t.reports} report${t.reports === 1 ? "" : "s"} to the shared scam registry (${t.categories.join(", ")}) since ${t.firstConfirmed.slice(0, 10)}. Reports carry transaction evidence and are reviewed before they count.`;
+
+// ── Withdrawal screening ────────────────────────────────────────────
+
+export type WithdrawalInput = {
+  destination: string;
+  destinationTag: number | null;
+  amountXrp: number | null;
+  /** account_info of the destination, or null when it does not exist. */
+  destinationInfo: Tx | null;
+  /** The destination, then who funded it, then who funded them. */
+  chain: FundingHop[];
+  currentLedger: number;
+  reserveBaseXrp: number;
+  sanctions?: Record<string, SanctionEntry>;
+  threats?: Record<string, ThreatEntry>;
+  /** Destinations this customer has withdrawn to before. */
+  previousDestinations?: string[];
+  /** The institution's own addresses. */
+  ownAddresses?: string[];
+};
+
+export type WithdrawalScreening = { verdict: "clear" | "review" | "hold"; findings: ScreeningFinding[] };
+
+/**
+ * Screen an outbound payment before it is signed: the mirror of deposit
+ * screening, for the withdrawal a customer (or someone with their login)
+ * has requested. Pure.
+ */
+export function screenWithdrawal(input: WithdrawalInput): WithdrawalScreening {
+  const findings: ScreeningFinding[] = [];
+  const data = (input.destinationInfo?.account_data ?? null) as Tx | null;
+  const flags = Number(data?.Flags ?? 0);
+  const to = input.destination;
+
+  if (!data) {
+    if (input.amountXrp !== null && input.amountXrp < input.reserveBaseXrp) {
+      findings.push({ id: "will_fail_reserve", severity: "critical", title: "The payment will fail: the destination does not exist", detail: `${to} is not a funded account, and ${input.amountXrp} XRP is below the ${input.reserveBaseXrp} XRP needed to create it (tecNO_DST_INSUF_XRP).` });
+    } else {
+      findings.push({ id: "new_destination_account", severity: "warn", title: "The payment would create a brand-new account", detail: `${to} does not exist yet. Withdrawals to never-used addresses are common in account takeovers; confirm with the customer.` });
+    }
+  } else {
+    if ((flags & 0x00020000) !== 0 && input.destinationTag === null) {
+      findings.push({ id: "will_fail_tag", severity: "critical", title: "The payment will fail: the destination requires a tag", detail: `${to} refuses payments without a destination tag (tecDST_TAG_NEEDED). Ask the customer for the tag their exchange gave them.` });
+    }
+    if ((flags & 0x01000000) !== 0) {
+      findings.push({ id: "deposit_auth", severity: "warn", title: "The destination only accepts preauthorised senders", detail: "Unless it has preauthorised the sending account, the payment will fail (tecNO_PERMISSION)." });
+    }
+  }
+
+  const own = input.ownAddresses ?? [];
+  const previous = input.previousDestinations ?? [];
+  const imitated = lookalikeOf(to, [...previous, ...own]);
+  if (imitated) {
+    findings.push({
+      id: "address_poisoning",
+      severity: "critical",
+      title: `Lookalike destination: it imitates ${imitated.slice(0, 6)}…${imitated.slice(-4)}`,
+      detail: `${to} starts and ends like ${imitated}, ${own.includes(imitated) ? "one of your own addresses" : "an address this customer has withdrawn to before"}, but is a different account. This is how address poisoning steals withdrawals. Hold it and confirm with the customer.`,
+    });
+  } else if (previous.length && !previous.includes(to)) {
+    findings.push({ id: "first_withdrawal_here", severity: "info", title: "First withdrawal to this destination", detail: "The customer has not withdrawn here before." });
+  }
+
+  const hop0 = input.chain[0];
+  if (data && hop0?.activatedLedger !== null && hop0?.activatedLedger !== undefined && input.currentLedger - hop0.activatedLedger < NEW_SENDER_LEDGERS) {
+    const hours = Math.max(1, Math.round(((input.currentLedger - hop0.activatedLedger) * 4) / 3600));
+    findings.push({ id: "fresh_destination", severity: "warn", title: `The destination is about ${hours} hour${hours === 1 ? "" : "s"} old`, detail: `${to} was created in ledger ${hop0.activatedLedger.toLocaleString("en-US")}, funded by ${hop0.fundedBy ?? "an unknown account"}. Freshly created destinations receive most stolen withdrawals.` });
+  }
+
+  const sanctions = input.sanctions ?? {};
+  input.chain.forEach((hop, i) => {
+    const hit = sanctions[hop.account];
+    if (hit) findings.push({ id: `sanctioned_hop_${i}`, severity: "critical", title: i === 0 ? `The destination is on the ${hit.list} list: ${hit.entityName}` : `The destination was funded ${i} hop${i === 1 ? "" : "s"} back by a listed address: ${hit.entityName}`, detail: `${hop.account}. Do not send; escalate to your sanctions officer. Source: ${hit.sourceUrl}.` });
+  });
+  const threats = input.threats ?? {};
+  input.chain.forEach((hop, i) => {
+    const t = threats[hop.account];
+    if (t) findings.push({ id: `reported_hop_${i}`, severity: i === 0 ? "critical" : "warn", title: i === 0 ? `The destination is in the scam registry (${t.categories.join(", ")})` : `The destination was funded ${i} hop${i === 1 ? "" : "s"} back by a reported account`, detail: `${hop.account}: ${threatText(t)}` });
+  });
+  if (own.includes(to)) findings.push({ id: "own_address", severity: "info", title: "The destination is one of your own addresses", detail: "An internal transfer." });
+
+  const verdict = findings.some((f) => f.severity === "critical") ? "hold" : findings.some((f) => f.severity === "warn") ? "review" : "clear";
+  return { verdict, findings };
 }

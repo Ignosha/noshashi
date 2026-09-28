@@ -28,6 +28,7 @@ import type { LedgerEntry } from "@/lib/desk/ledger";
 import { cn } from "@/lib/utils";
 import { useClaimedSubject } from "@/lib/nav/handoff";
 import { ClusterTab, DepositHelpTab, DomainTab, ExposureTab, PersonalGuardian, PreSignTab, RecoverTab } from "./SecurityTools";
+import { AttributionTab, EmergencyTab, ProtectionTab, RegistryTab, SurveillanceTab, WithdrawalTab } from "./InstitutionalTools";
 
 /**
  * SECURITY CENTER — cybersecurity for XRP Ledger accounts.
@@ -48,6 +49,14 @@ import { ClusterTab, DepositHelpTab, DomainTab, ExposureTab, PersonalGuardian, P
  *                                into a case on Enterprise+, watched on Strategic
  *   GUARDIAN       (free on this device; server-side on Strategic)
  *                                takeover alerts
+ *   EMERGENCY KIT  (free)        drainer patterns, and the ordered unsigned
+ *                                transactions that save a compromised account
+ *   WHO IS THIS?   (free)        exchange attribution
+ *   SCAM REGISTRY  (lookups free; filing Institutional+) and phishing links
+ *   WITHDRAWALS    (Enterprise+) outbound payment screening
+ *   SURVEILLANCE   (Enterprise+) order-book manipulation indicators
+ *   ASSET PROTECTION (Institutional+; fund and public page Enterprise+)
+ *                                proof of reserves and liabilities, attested daily
  *
  * NOSHASHI reads; it never signs. Every change is a transaction the owner
  * reviews and signs in their own wallet.
@@ -64,6 +73,12 @@ const TABS = [
   { id: "incident", label: "INCIDENT RESPONSE" },
   { id: "cluster", label: "SCAM CLUSTERS" },
   { id: "guardian", label: "GUARDIAN" },
+  { id: "emergency", label: "EMERGENCY KIT" },
+  { id: "whois", label: "WHO IS THIS?" },
+  { id: "registry", label: "SCAM REGISTRY" },
+  { id: "withdrawal", label: "WITHDRAWALS" },
+  { id: "surveillance", label: "SURVEILLANCE" },
+  { id: "protection", label: "ASSET PROTECTION" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -129,6 +144,24 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
         ) : tab === "incident" ? (
           <Gated feature="incident_response" onUpgrade={onUpgrade} onSignIn={onSignIn}>
             <IncidentTab />
+          </Gated>
+        ) : tab === "emergency" ? (
+          <EmergencyTab key={subject ?? ""} initial={subject} />
+        ) : tab === "whois" ? (
+          <AttributionTab key={subject ?? ""} initial={subject} />
+        ) : tab === "registry" ? (
+          <RegistryTab onUpgrade={onUpgrade} />
+        ) : tab === "withdrawal" ? (
+          <Gated feature="withdrawal_screening" onUpgrade={onUpgrade} onSignIn={onSignIn}>
+            <WithdrawalTab />
+          </Gated>
+        ) : tab === "surveillance" ? (
+          <Gated feature="market_surveillance" onUpgrade={onUpgrade} onSignIn={onSignIn}>
+            <SurveillanceTab />
+          </Gated>
+        ) : tab === "protection" ? (
+          <Gated feature="proof_of_reserves" onUpgrade={onUpgrade} onSignIn={onSignIn}>
+            <ProtectionTab onUpgrade={onUpgrade} />
           </Gated>
         ) : tab === "cluster" ? (
           <Gated feature="asset_recovery" onUpgrade={onUpgrade} onSignIn={onSignIn}>
