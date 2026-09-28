@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.13
 
 ### Enterprise and Strategic: deposit screening and XRPL event feeds
 
