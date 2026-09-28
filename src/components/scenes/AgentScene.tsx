@@ -25,6 +25,10 @@ import {
 import { askNoshx, NOSHX_PREAMBLE, type NoshxStep } from "@/lib/noshx/loop";
 import { prewarmKnowledge, referenceBlock, searchKnowledge } from "@/lib/noshx/knowledge";
 import { answerWithCore } from "@/lib/noshx/core/engine";
+import { registerTicketTools } from "@/lib/noshx/ticketTools";
+import { planTickets } from "@/lib/noshx/core/plan";
+import type { ToolContext } from "@/lib/noshx/tools";
+import { repairReportText, runSelfRepair } from "@/lib/support/selfRepair";
 import { useBilling } from "@/lib/billing/useEntitlements";
 import {
   NOSHX_CORE_URL,
@@ -47,7 +51,7 @@ import { dataBoundary, recordFor, useAiUseLog, type AiUseRecord } from "@/lib/ag
 import { AgentGovernance } from "./AgentGovernance";
 import { SupportTickets } from "./SupportTickets";
 import { useLedger } from "@/lib/desk/ledger";
-import { useGoverningPolicy } from "@/lib/org/useOrg";
+import { useGoverningPolicy, useOrg } from "@/lib/org/useOrg";
 import { buildPolicyBrief, parseWhatIf, simulationFact } from "@/lib/agent/policyContext";
 import { useClaimedSubject } from "@/lib/nav/handoff";
 import { clearProviderKey, hasProviderKey, storeProviderKey } from "@/lib/agent/keys";
@@ -62,6 +66,9 @@ import { SPRING } from "@/lib/motion";
 import { containsLedgerSeed, SecretInMessageError } from "@/lib/agent/secrets";
 import { useObserver } from "@/lib/agent/useObserver";
 import { ObserverPanel } from "./ObserverPanel";
+
+// NOSHX in the app can read, answer and act on support tickets and run self-repair.
+registerTicketTools();
 
 type Turn = {
   id: number;
@@ -137,7 +144,11 @@ export function AgentScene({ data }: { data: XrplState }) {
     [savedChecks]
   );
   const [endpointDraft, setEndpointDraft] = useState<string | null>(null);
-  const { has } = useBilling();
+  const { has, refresh: refreshPlan, entitlement } = useBilling();
+  const org = useOrg();
+  // Read after a plan refresh, which updates state before the next render.
+  const tierRef = useRef(entitlement.tier);
+  tierRef.current = entitlement.tier;
   const [models, setModels] = useState<AgentModel[]>([]);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const [showRuntimePicker, setShowRuntimePicker] = useState(false);
@@ -436,6 +447,15 @@ export function AgentScene({ data }: { data: XrplState }) {
 
   const send = async (text: string) => {
     const prompt = text.trim();
+    const toolContext: ToolContext = {
+      has,
+      spendFreeCheck,
+      refundFreeCheck,
+      request: prompt,
+      refreshPlan,
+      tier: () => tierRef.current,
+      organizationId: org.selectedId,
+    };
     if (!prompt || busy) return;
 
     // A ledger secret is never echoed into the transcript or sent to a
@@ -538,9 +558,12 @@ export function AgentScene({ data }: { data: XrplState }) {
     // ledger through tools; support mode streams a plain answer.
     const attempt = async (target: AgentConfig): Promise<string> => {
       const onStep = (step: NoshxStep) => patch((turn) => ({ ...turn, steps: [...(turn.steps ?? []), step] }));
-      // NOSHX Core answers by itself: no model, in both modes.
-      if (findProvider(target.providerId).api === "noshx") {
-        const core = await answerWithCore(prompt, { has, spendFreeCheck, refundFreeCheck }, onStep);
+      // NOSHX Core answers by itself: no model, in both modes. Ticket and
+      // self-repair requests always go to Core, whatever runtime is chosen:
+      // they act on the person's account, so they are planned by rules
+      // that can be read and tested, never by a model's guess.
+      if (findProvider(target.providerId).api === "noshx" || planTickets(prompt).calls.length > 0) {
+        const core = await answerWithCore(prompt, toolContext, onStep);
         patch((turn) => ({ ...turn, steps: turn.steps ?? core.steps, content: core.text }));
         return core.text;
       }
@@ -549,7 +572,7 @@ export function AgentScene({ data }: { data: XrplState }) {
           config: target,
           system: history[0].content,
           messages: history.slice(1),
-          context: { has, spendFreeCheck, refundFreeCheck },
+          context: toolContext,
           signal: controller.signal,
           reasoning,
           onStep: (step) => patch((turn) => ({ ...turn, steps: [...(turn.steps ?? []), step] })),
@@ -560,7 +583,7 @@ export function AgentScene({ data }: { data: XrplState }) {
         }
         // The model cannot call tools, so NOSHX Core reads the ledger for
         // it and the model phrases the answer from those readings.
-        const core = await answerWithCore(prompt, { has, spendFreeCheck, refundFreeCheck }, onStep);
+        const core = await answerWithCore(prompt, toolContext, onStep);
         if (core.facts) {
           history[0] = {
             ...history[0],
@@ -632,6 +655,24 @@ export function AgentScene({ data }: { data: XrplState }) {
   };
 
   const stop = () => abortRef.current?.abort();
+
+  const [repairing, setRepairing] = useState(false);
+  /** Self-repair, answered in the conversation so it can be sent on to a ticket. */
+  const selfRepair = async () => {
+    setRepairing(true);
+    try {
+      const report = await runSelfRepair({ refreshPlan, tier: () => tierRef.current, organizationId: org.selectedId });
+      const text = `${repairReportText(report)}${report.failing ? '\n\nSay "open a ticket with this report" to send it to support.' : ""}`;
+      setTurns((prev) => [...prev, { id: ++turnId, role: "user", content: "Run self-repair" }, { id: ++turnId, role: "assistant", content: text }]);
+      push({
+        title: report.failing ? "NEEDS ATTENTION" : report.repaired ? "REPAIRED" : "ALL CHECKS PASS",
+        body: report.failing ? `${report.failing} check${report.failing === 1 ? "" : "s"} still failing; the fix is in the conversation.` : `${report.checks.length} checks run.`,
+        tone: report.failing ? "hold" : "go",
+      });
+    } finally {
+      setRepairing(false);
+    }
+  };
 
   const diagnose = async () => {
     setDiagnosing(true);
@@ -1318,13 +1359,23 @@ export function AgentScene({ data }: { data: XrplState }) {
               corners
               className="shrink-0"
               right={
-                <button
-                  onClick={() => void diagnose()}
-                  disabled={diagnosing}
-                  className="stencil text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
-                >
-                  {diagnosing ? "RUNNING…" : "RUN"}
-                </button>
+                <span className="flex items-center gap-3">
+                  <button
+                    onClick={() => void selfRepair()}
+                    disabled={repairing}
+                    title="NOSHX checks and repairs the link, clock, sign-in, plan, watches, settings and version"
+                    className="stencil text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                  >
+                    {repairing ? "REPAIRING…" : "SELF-REPAIR"}
+                  </button>
+                  <button
+                    onClick={() => void diagnose()}
+                    disabled={diagnosing}
+                    className="stencil text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                  >
+                    {diagnosing ? "RUNNING…" : "RUN"}
+                  </button>
+                </span>
               }
             >
               {!diagnostics ? (

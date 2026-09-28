@@ -156,7 +156,7 @@ export function compose(tool: string, value: unknown): string {
       return `Latest validated ledger ${l.ledgerIndex.toLocaleString("en-US")}, closed ${l.closeTime}. Reference fee ${l.baseFeeXrp} XRP; the open ledger is charging ${l.openLedgerFeeXrp} XRP with ${l.queueSize} transactions queued.`;
     }
     default:
-      return "";
+      return findTool(tool)?.compose?.(value) ?? "";
   }
 }
 
@@ -253,7 +253,7 @@ export async function answerWithCore(
   context: ToolContext,
   onStep?: (step: NoshxStep) => void
 ): Promise<CoreResult> {
-  const p = plan(question);
+  const p = plan(question, { tickets: Boolean(findTool("list_tickets")) });
   const steps: NoshxStep[] = [];
   const record = (step: NoshxStep) => {
     steps.push(step);
@@ -308,6 +308,7 @@ export async function answerWithCore(
           : `${screen}: ${result.error} It is available after upgrading in Pricing.`
       );
     }
+    else if (findTool(call.tool)?.compose) readings.push(`${screen}: ${result.error}`);
     else readings.push(`${screen}: could not be read. ${result.error}`);
   }
 
@@ -324,6 +325,7 @@ export async function answerWithCore(
     }
   }
 
+  if (p.note) readings.unshift(p.note);
   const facts = readings.join("\n\n");
   let text = [facts, pages].filter(Boolean).join("\n\n");
   if (!text) {

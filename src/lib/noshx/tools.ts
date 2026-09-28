@@ -14,9 +14,12 @@ import { searchKnowledge } from "./knowledge";
 
 /**
  * What NOSHX can do: read the live XRP Ledger through the same readers
- * the screens use. Every tool is read-only — none signs, submits or
- * moves anything — and each is gated by the same plan feature as the
+ * the screens use. Every ledger tool is read-only — none signs, submits
+ * or moves anything — and each is gated by the same plan feature as the
  * screen it mirrors, so the agent is never a way around the paywall.
+ * The support tools (./ticketTools.ts, registered by the desktop app)
+ * read and write the person's own tickets and run self-repair; they
+ * write only when asked in words.
  *
  * The model chooses which tools to call; the numbers in its answer come
  * from these readers, not from the model.
@@ -36,6 +39,14 @@ export type ToolContext = {
   spendFreeCheck: () => boolean;
   /** Gives back a counted check whose read never reached the ledger. */
   refundFreeCheck?: () => void;
+  /** The operator's own message this turn: ticket writes run only when it asks for one. */
+  request?: string;
+  /** Re-reads the plan from the server (useBilling().refresh), for self-repair. */
+  refreshPlan?: () => Promise<void>;
+  /** The plan tier the app holds now, for self-repair. */
+  tier?: () => string;
+  /** The organization in use, whose watched accounts self-repair checks. */
+  organizationId?: string | null;
 };
 
 export type NoshxTool = {
@@ -47,6 +58,8 @@ export type NoshxTool = {
   /** The screen this mirrors, named for the operator. */
   screen: string;
   run: (input: Record<string, unknown>, context: ToolContext) => Promise<unknown>;
+  /** The result in sentences, for NOSHX Core; the ledger readers are composed in core/engine.ts. */
+  compose?: (value: unknown) => string;
 };
 
 const ADDRESS = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
@@ -219,6 +232,14 @@ export const NOSHX_TOOLS: NoshxTool[] = [
     run: (input) => readIssuance(address(input, "issuer")),
   },
 ];
+
+/**
+ * Adds tools that only the desktop app carries (the support tools in
+ * ./ticketTools.ts), so the website's NOSHX build never bundles them.
+ */
+export function registerTools(tools: NoshxTool[]) {
+  for (const tool of tools) if (!NOSHX_TOOLS.some((t) => t.name === tool.name)) NOSHX_TOOLS.push(tool);
+}
 
 export function findTool(name: string): NoshxTool | undefined {
   return NOSHX_TOOLS.find((tool) => tool.name === name);

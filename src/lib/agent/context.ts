@@ -197,9 +197,9 @@ export const SUGGESTED_PROMPTS: Record<AgentMode, string[]> = {
     "Why did the last gate check come back NO-GO?",
   ],
   support: [
+    "Something is not working. Run self-repair.",
+    "Show my tickets",
     "How do I export an audit trail for my accountant?",
-    "How do I change which wallet the console is watching?",
-    "What does the menu bar HUD show, and how do I open it?",
     "Where are my API secrets stored?",
   ],
 };

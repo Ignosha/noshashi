@@ -59,6 +59,44 @@ class XrplLink {
     return this.connected;
   }
 
+  /**
+   * Drop the current connection and open a fresh one on the next public
+   * server. Used by self-repair when a socket is stuck open but silent.
+   */
+  async reconnect(): Promise<boolean> {
+    window.clearTimeout(this.retryTimer);
+    const stale = this.socket;
+    this.socket = null;
+    this.connecting = null;
+    this.endpointIndex += 1;
+    this.attempt = 0;
+    this.setConnected(false);
+    if (stale) {
+      // Detach first: the old socket's close handler would otherwise run
+      // after the new socket opens and clear it.
+      stale.onopen = null;
+      stale.onclose = null;
+      stale.onerror = null;
+      stale.onmessage = null;
+      try {
+        stale.close();
+      } catch {
+        // Already closed.
+      }
+    }
+    for (const [, entry] of this.pending) {
+      window.clearTimeout(entry.timer);
+      entry.reject(new XrplError("Connection reset"));
+    }
+    this.pending.clear();
+    try {
+      await this.ensureSocket();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   onStream(handler: StreamHandler): () => void {
     this.streamHandlers.add(handler);
     void this.ensureSocket();
