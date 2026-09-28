@@ -343,6 +343,7 @@ export const TIERS: Tier[] = [
     ...priced("enterprise"),
     features: [
       "Everything in Institutional",
+      "Deposit screening: partial payments, counterfeit tokens, phishing dust and three-hop source of funds, before you credit",
       "Asset passports and issuer intelligence at institutional scope",
       "Portfolio monitoring, counterparty and liquidity intelligence",
       "Deterministic policy engine, adjudication and decision history",
@@ -361,8 +362,8 @@ export const TIERS: Tier[] = [
     features: [
       "Everything in Enterprise",
       "High-volume API capacity and contracted burst limits",
-      "XRPL event feeds, webhooks and machine-readable delivery",
-      "Custom schemas, retention and bulk export design",
+      "XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API",
+      "Custom export schemas, bulk export and event retention you set",
       "Architecture review before commitment",
       "Scope documented against the integration",
     ],

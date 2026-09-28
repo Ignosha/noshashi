@@ -186,8 +186,17 @@ export function referenceBlock(hits: Hit[], budget: number): string {
   const lines = ["NOSHASHI REFERENCE (retrieved from the product's own pages for this question; cite the source when you use it):"];
   let used = lines[0].length;
   for (const hit of hits) {
-    const entry = `\n[${hit.title}] (${hit.source})\n${hit.text}`;
-    if (used + entry.length > budget) break;
+    let entry = `\n[${hit.title}] (${hit.source})\n${hit.text}`;
+    if (used + entry.length > budget) {
+      // The best hit is never dropped for being long: it is cut to fit, at a
+      // sentence where one falls in range. Later hits that do not fit are left out.
+      if (lines.length > 1) break;
+      const room = budget - used - 1;
+      if (room < 120) break;
+      const cut = entry.slice(0, room);
+      const stop = cut.lastIndexOf(". ");
+      entry = (stop > room * 0.5 ? cut.slice(0, stop + 1) : cut.slice(0, room - 1)) + "…";
+    }
     lines.push(entry);
     used += entry.length;
   }

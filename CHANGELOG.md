@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Enterprise and Strategic: deposit screening and XRPL event feeds
+
+- **Deposit screening (Enterprise).** ADJUDICATION › LEDGER WATCH judges an
+  incoming payment before it is credited, read live: it credits what
+  arrived, never the Amount of a partial payment; holds a familiar ticker
+  whose issuer owes nothing as counterfeit; flags a drop of dust carrying a
+  link as a phishing lure; and traces who created the sender three hops
+  back against your deny list. Watched deposit addresses are screened by
+  the server every minute and sent to your webhooks as `deposit_screened`.
+- **XRPL event feeds (Strategic).** Up to 100 watched accounts read from
+  validated ledgers every minute; every event is sent to your webhooks as
+  `xrpl_event` and can be pulled as JSON, NDJSON or CSV, with a history
+  endpoint to backfill any ledger range.
+- **Custom schemas, bulk export and retention (Strategic).** Your own
+  field-to-column shapes for ledger events and the audit log, used by
+  console exports and the feed API alike; event history kept for 7 days to
+  10 years, as you set.
+
 ### Institutional: every listed feature now exists
 
 - **Regulator seats.** Owners, admins and compliance members give an

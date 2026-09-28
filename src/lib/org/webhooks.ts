@@ -20,6 +20,8 @@ export const WEBHOOK_EVENTS = [
   { id: "investigation_resolved", label: "Investigation closed" },
   { id: "receipt_created", label: "API verification receipt recorded" },
   { id: "custom_alert", label: "One of your alert rules fired (Institutional)" },
+  { id: "xrpl_event", label: "Something happened on a watched XRPL account (Strategic)" },
+  { id: "deposit_screened", label: "An incoming deposit was screened (Enterprise)" },
 ] as const;
 
 export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number]["id"];

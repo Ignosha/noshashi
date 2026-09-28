@@ -18,11 +18,27 @@ mode) → **WEBHOOKS**.
 | `investigation_resolved` | a shared investigation closed |
 | `receipt_created` | an API verification recorded against the organization |
 | `custom_alert` | one of the organization's alert rules fired on a scheduled stress run (Institutional); `data.state` holds the rule, the condition, the wallet and the measured values |
+| `xrpl_event` | the server watcher reading an event on one of the organization's watched XRPL accounts from a validated ledger (Strategic, or Enterprise for deposit addresses); `data` holds the address, type, tx_hash, ledger_index, ledger_time, counterparty and the event's facts |
+| `deposit_screened` | an incoming payment to a watched deposit address screened before crediting (Enterprise); as `xrpl_event`, plus `verdict` (clear, review, hold) and `screening` (the amount to credit, each finding and the sender's funding chain) |
 | `ping` | a test delivery requested from the app |
 
-Events come only from server records (the append-only audit log and API
-verifications). XRPL-side changes a workstation detects — issuer flags,
-credential expiry, liquidity — are not server records and are not sent.
+Events come only from server records: the append-only audit log, API
+verifications, and the ledger events the server watcher
+(`noshashi-xrpl-watch`) reads every minute for watched accounts. Changes
+a workstation detects on its own are not server records and are not sent.
+
+## Ledger events without webhooks
+
+The same events can be pulled with an organization-scoped `nsh_live_` key:
+
+- `GET /functions/v1/noshashi-xrpl-watch/events?after=<id>&limit=<≤1000>` —
+  JSON (`next_cursor`), or `format=ndjson|csv`; filters `types`, `address`,
+  `verdict`; `schema=<id>` applies one of the organization's export schemas.
+- `POST /functions/v1/noshashi-xrpl-watch/history` with
+  `{ address, from_ledger, to_ledger?, types?, screen?, config? }` — any
+  account's events over a ledger range, read live and not stored.
+- `POST /functions/v1/noshashi-xrpl-watch/screen` with
+  `{ hash, deposit_address, config? }` — screen one incoming payment.
 
 ## Request
 

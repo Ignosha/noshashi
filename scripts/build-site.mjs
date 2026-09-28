@@ -948,6 +948,7 @@ async function buildPricingEnhancement() {
           <p class="role">Contracted · architecture and commercial review</p>
           <ul class="spec">
             <li>Everything in Institutional</li>
+            <li>Deposit screening: partial payments, counterfeit tokens, phishing dust and three-hop source of funds, before you credit</li>
             <li>Asset passports and issuer intelligence at institutional scope</li>
             <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
             <li>Deterministic policy engine, adjudication and decision history</li>
@@ -969,8 +970,8 @@ async function buildPricingEnhancement() {
           <ul class="spec">
             <li>Everything in Enterprise</li>
             <li>High-volume API capacity and contracted burst limits</li>
-            <li>XRPL event feeds, webhooks and machine-readable delivery</li>
-            <li>Custom schemas, retention and bulk export design</li>
+            <li>XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API</li>
+            <li>Custom export schemas, bulk export and event retention you set</li>
             <li>Custom data integrations for risk, custody, trading and compliance</li>
             <li>Dedicated environment options where supported</li>
             <li>Embedded or white-label delivery when contracted</li>
@@ -1011,6 +1012,7 @@ async function buildPricingEnhancement() {
           <tr class="group"><th scope="rowgroup" colspan="6">Policy, adjudication &amp; evidence</th></tr>
           <tr><th scope="row">Policy engine &amp; adjudication</th><td class="limited">Session only</td><td class="yes">10,000 verdicts</td><td class="yes">Unlimited</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
           <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>
+          <tr><th scope="row">Deposit screening</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
           <tr><th scope="row">Evidence &amp; audit export</th><td class="yes">CSV</td><td class="yes">CSV</td><td class="yes">Signed export</td><td class="contracted">Immutable audit</td><td class="contracted">Data delivery</td></tr>
           <tr><th scope="row">Custom schemas</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="optional">Optional</td><td class="contracted">Included in scope</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">API &amp; delivery</th></tr>
