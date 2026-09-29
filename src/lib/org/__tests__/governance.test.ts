@@ -8,6 +8,7 @@ import {
   can,
   evidenceOf,
   evidenceReferences,
+  exceptionStanding,
   readGovernedResponse,
   verifiedActive,
   type MemberRole,
@@ -237,5 +238,22 @@ describe("further evidence on an exception — every reference must lead somewhe
     const { references, rejected } = evidenceReferences("see attached\nhttp://example.com/doc\n" + account);
     expect(references).toEqual([{ kind: "account", value: account }]);
     expect(rejected).toEqual(["see attached", "http://example.com/doc"]);
+  });
+});
+
+describe("exception expiry", () => {
+  const at = Date.parse("2026-09-29T03:00:00Z");
+  it("an approval covers its verdict only until it expires", () => {
+    expect(exceptionStanding({ status: "approved", expiresAt: "2026-10-29T03:00:00Z" }, at)).toBe("in-force");
+    expect(exceptionStanding({ status: "approved", expiresAt: "2026-09-29T02:59:59Z" }, at)).toBe("expired");
+    expect(exceptionStanding({ status: "approved", expiresAt: "2026-09-29T03:00:00Z" }, at)).toBe("expired");
+  });
+  it("an approval from before expiry was recorded says so rather than passing as in force", () => {
+    expect(exceptionStanding({ status: "approved", expiresAt: null }, at)).toBe("no-expiry");
+  });
+  it("undecided and rejected exceptions cover nothing", () => {
+    expect(exceptionStanding({ status: "pending", expiresAt: null }, at)).toBe("open");
+    expect(exceptionStanding({ status: "needs_evidence", expiresAt: null }, at)).toBe("open");
+    expect(exceptionStanding({ status: "rejected", expiresAt: null }, at)).toBe("rejected");
   });
 });

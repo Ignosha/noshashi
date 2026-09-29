@@ -1,7 +1,7 @@
 import { useAuth } from "@/lib/auth/useAuth";
 import { useInvestigations, type Investigation, type Mutation } from "@/lib/desk/investigations";
 import type { LedgerEntry } from "@/lib/desk/ledger";
-import { can, type PolicyException } from "@/lib/org/governance";
+import { can, exceptionStanding, type PolicyException } from "@/lib/org/governance";
 import { appendOrgCase, openOrgCase } from "@/lib/org/cases";
 import { nameOf, useOrg } from "@/lib/org/useOrg";
 
@@ -48,7 +48,8 @@ export function useCaseStore(): CaseStore {
       canWrite: can.editDraft(org.role),
       actor: accountId,
       who: (actor) => (data ? nameOf(data.directory, actor) : actor ?? "—"),
-      approvedExceptions: data?.exceptions.filter((x) => x.status === "approved") ?? [],
+      // Only approvals still in force can be cited; an expired one stays on record but covers nothing.
+      approvedExceptions: data?.exceptions.filter((x) => x.status === "approved" && exceptionStanding(x) !== "expired") ?? [],
       open: async (entry) => {
         if (!data) throw new Error("The organization is still loading.");
         try {

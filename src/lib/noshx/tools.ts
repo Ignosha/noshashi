@@ -8,7 +8,7 @@ import { readAmm } from "@/lib/desk/amm";
 import { readIssuance } from "@/lib/desk/issuance";
 import { readClaims } from "@/lib/desk/claims";
 import { readNft } from "@/lib/desk/nft";
-import { readSync } from "@/lib/net/sync";
+import { readSyncShared } from "@/lib/net/sync";
 import { fetchLedger } from "@/lib/xrpl/client";
 import { searchKnowledge } from "./knowledge";
 import { assessSecurity, readSecurityPosture } from "@/lib/security/hardening";
@@ -134,7 +134,7 @@ export const NOSHX_TOOLS: NoshxTool[] = [
     input_schema: schema({}),
     feature: null,
     screen: "Ledger Sync",
-    run: () => readSync(),
+    run: () => readSyncShared(30_000),
   },
   {
     name: "check_address",

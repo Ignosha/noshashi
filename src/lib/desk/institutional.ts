@@ -627,6 +627,90 @@ export function describeParams(p: PolicyParams): Array<{ field: string; label: s
   ];
 }
 
+export type RuleSheetRow = {
+  key: RuleKey;
+  id: string;
+  rule: string;
+  /** The configured value, or "off". */
+  value: string;
+  unit: string;
+  /** Where the observed figure comes from. */
+  reads: string;
+  /** The exact condition, in words, with the configured value in it. */
+  triggers: string;
+  /** What happens to the verdict when it triggers. */
+  effect: string;
+  on: boolean;
+};
+
+const EFFECT: Record<RuleOutcome, string> = {
+  review: "REVIEW → verdict HOLD: a person must sign off before anything moves",
+  fail: "FAIL → verdict NO-GO: the settlement is blocked under this policy",
+};
+
+/**
+ * Every setting of a policy as a rule sheet: what it is set to, in which
+ * unit, what it reads, the exact condition that triggers it, and what that
+ * does to the verdict. Built from the same params judge() applies, so the
+ * sheet cannot describe a rule differently from how it runs.
+ */
+export function ruleSheet(p: PolicyParams): RuleSheetRow[] {
+  const row = (key: RuleKey, on: boolean, value: string, unit: string, reads: string, triggers: string): RuleSheetRow => ({
+    key,
+    id: RULE_IDS[key],
+    rule: LABELS[key],
+    value: on ? value : "off",
+    unit,
+    reads,
+    triggers: on ? triggers : "Never: the rule is off. The fact is still measured and shown.",
+    effect: on ? EFFECT[p.outcomes[key]] : "None",
+    on,
+  });
+  const t = p.travelRule;
+  return [
+    row(
+      "hhi",
+      p.hhiLimit !== null,
+      fmt(p.hhiLimit ?? 0, 0),
+      "HHI points, 0–10,000",
+      "The subject's validated XRP payments (account_tx), counterparty by counterparty, including this settlement",
+      `Observed HHI is above ${fmt(p.hhiLimit ?? 0, 0)}`
+    ),
+    row(
+      "counterparty",
+      p.counterpartyShareLimitPct !== null,
+      `${fmt(p.counterpartyShareLimitPct ?? 0)}`,
+      "% of transferred XRP volume",
+      "The same payment window: the largest counterparty's share, or the destination's when one is given",
+      `One counterparty carries more than ${fmt(p.counterpartyShareLimitPct ?? 0)}% of volume`
+    ),
+    row(
+      "travelRule",
+      t !== null,
+      t ? `${fmt(t.thresholdFiat)} ${t.currency}${t.xrpReferenceRate ? ` at ${fmt(t.xrpReferenceRate, 6)} ${t.currency}/XRP` : " (no reference rate: INSUFFICIENT DATA)"}` : "",
+      t ? `${t.currency}, valued at the operator's reference rate (no price feed)` : "fiat",
+      "The settlement amount entered here, times the configured reference rate",
+      t ? `The settlement is worth ${fmt(t.thresholdFiat)} ${t.currency} or more. Triggering is a policy review, not a legal determination` : ""
+    ),
+    row(
+      "reserve",
+      p.reserveHeadroomMinXrp !== null,
+      fmt(p.reserveHeadroomMinXrp ?? 0, 6),
+      "XRP",
+      "Balance and owner count (account_info) and the live reserve (server_info)",
+      `Less than ${fmt(p.reserveHeadroomMinXrp ?? 0, 6)} XRP would remain spendable above the reserve after this settlement`
+    ),
+    row(
+      "freeze",
+      p.strictFreeze,
+      "enabled",
+      "on / off",
+      "Every issuer of a held token balance: its flags and trust lines (account_info, account_lines)",
+      "Any issuer of a held balance can still freeze it"
+    ),
+  ];
+}
+
 export function diffParams(from: PolicyParams, to: PolicyParams): ParamChange[] {
   const a = describeParams(from);
   const b = describeParams(to);

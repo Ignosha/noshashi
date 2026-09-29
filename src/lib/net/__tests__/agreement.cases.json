@@ -1,0 +1,25 @@
+{
+  "_source": "Real XRPL mainnet JSON-RPC replies, recorded 2026-09-29 through Supabase pg_net from three public nodes. Only the fields the agreement rule reads are kept; nothing is edited.",
+  "ledger_107305907": {
+    "https://xrplcluster.com/": { "result": { "status": "success", "validated": true, "ledger_index": 107305907, "ledger_hash": "3334A8AD946A8E07C08FE66B9E66BF0E12D5DEFA1689CD44E9DADBD01CAB2784" } },
+    "https://s2.ripple.com:51234/": { "result": { "status": "success", "validated": true, "ledger_index": 107305907, "ledger_hash": "3334A8AD946A8E07C08FE66B9E66BF0E12D5DEFA1689CD44E9DADBD01CAB2784" } },
+    "https://xrpl.ws/": { "result": { "status": "success", "validated": true, "ledger_index": 107305907, "ledger_hash": "3334A8AD946A8E07C08FE66B9E66BF0E12D5DEFA1689CD44E9DADBD01CAB2784" } }
+  },
+  "ledger_107305906": {
+    "https://xrplcluster.com/": { "result": { "status": "success", "validated": true, "ledger_index": 107305906, "ledger_hash": "11BBF460D2C273F7D0788271328CBF51CCFF1271C6D5B14AE7823334677C97D6" } }
+  },
+  "bitstamp_107305907": {
+    "_account": "rrpNnNLKrartuEqfJGpqyDwPj1AFPg9vn1, last changed in ledger 106960400",
+    "https://xrplcluster.com/": { "result": { "status": "success", "validated": true, "ledger_index": 107305907, "account_data": { "Account": "rrpNnNLKrartuEqfJGpqyDwPj1AFPg9vn1", "Balance": "200000021", "Flags": 131072, "OwnerCount": 37, "Sequence": 60300, "PreviousTxnID": "9EC02A92353CCAC1DA0A4BAAB90B19FCB1891C9AEAECD82DB0D4FD9F54C69A2F", "PreviousTxnLgrSeq": 106960400 } } },
+    "https://s2.ripple.com:51234/": { "result": { "status": "success", "validated": true, "ledger_index": 107305907, "account_data": { "Account": "rrpNnNLKrartuEqfJGpqyDwPj1AFPg9vn1", "Balance": "200000021", "Flags": 131072, "OwnerCount": 37, "Sequence": 60300, "PreviousTxnID": "9EC02A92353CCAC1DA0A4BAAB90B19FCB1891C9AEAECD82DB0D4FD9F54C69A2F", "PreviousTxnLgrSeq": 106960400 } } },
+    "https://xrpl.ws/": { "result": { "status": "success", "validated": true, "ledger_index": 107305907, "account_data": { "Account": "rrpNnNLKrartuEqfJGpqyDwPj1AFPg9vn1", "Balance": "200000021", "Flags": 131072, "OwnerCount": 37, "Sequence": 60300, "PreviousTxnID": "9EC02A92353CCAC1DA0A4BAAB90B19FCB1891C9AEAECD82DB0D4FD9F54C69A2F", "PreviousTxnLgrSeq": 106960400 } } }
+  },
+  "sender": {
+    "_account": "rnBBvCh2SKLuAaWv3RYqQMpBKEtGodDEXE, which sent Payment 00E4F52FD187EB854110ABFE3A7BF7EAF2BA894FB7B54536BE13F96B77511DE8 in ledger 107305907",
+    "at_107305906": { "result": { "status": "success", "validated": true, "ledger_index": 107305906, "account_data": { "Account": "rnBBvCh2SKLuAaWv3RYqQMpBKEtGodDEXE", "Balance": "1954092", "Flags": 0, "OwnerCount": 1, "Sequence": 106592551, "PreviousTxnID": "460F7F8033D62DD7BE1370033615388608825D93D76E07827757C241F957948C", "PreviousTxnLgrSeq": 107305902 } } },
+    "at_107305907": { "result": { "status": "success", "validated": true, "ledger_index": 107305907, "account_data": { "Account": "rnBBvCh2SKLuAaWv3RYqQMpBKEtGodDEXE", "Balance": "1954082", "Flags": 0, "OwnerCount": 1, "Sequence": 106592552, "PreviousTxnID": "00E4F52FD187EB854110ABFE3A7BF7EAF2BA894FB7B54536BE13F96B77511DE8", "PreviousTxnLgrSeq": 107305907 } } }
+  },
+  "malformed": {
+    "https://xrplcluster.com/": { "result": { "status": "error", "error": "actMalformed", "validated": true, "ledger_index": 107305907 } }
+  }
+}

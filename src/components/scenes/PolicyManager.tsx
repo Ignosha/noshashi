@@ -19,6 +19,7 @@ import { useOrg } from "@/lib/org/useOrg";
 import { OrgBar, OrgPolicyManager } from "./OrgPolicyManager";
 import {
   describeParams,
+  ruleSheet,
   diffParams,
   validateParams,
   type InstitutionalPolicy,
@@ -460,14 +461,28 @@ export function RuleRow({
   );
 }
 
+/** A policy's settings as a rule sheet: value and unit, what it reads, when it triggers, what that does. */
 export function ParamGroups({ params }: { params: PolicyParams }) {
-  const rows = describeParams(params);
+  const rows = ruleSheet(params);
   return (
-    <div className="mt-2 grid grid-cols-2 gap-x-4">
+    <div className="mt-2 space-y-1.5">
       {rows.map((r) => (
-        <div key={r.field} className="flex justify-between gap-2 border-b border-border/30 py-1">
-          <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{r.label.toUpperCase()}</span>
-          <span className="mono-font text-[11px] text-foreground">{r.value}</span>
+        <div key={r.key} className={cn("rounded border border-border/60 px-3 py-2", !r.on && "opacity-70")}>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+            <span className="stencil text-[10.5px] tracking-[0.1em] text-foreground">{r.rule.toUpperCase()}</span>
+            <span className="mono-font text-[11.5px] text-foreground">
+              {r.value}
+              {r.on && <span className="text-muted-foreground"> · {r.unit}</span>}
+            </span>
+          </div>
+          <dl className="mt-1 grid grid-cols-[88px_minmax(0,1fr)] gap-x-2 gap-y-0.5 text-[11.5px] leading-snug">
+            <dt className="text-muted-foreground">Triggers when</dt>
+            <dd className="text-foreground/90">{r.triggers}</dd>
+            <dt className="text-muted-foreground">Effect</dt>
+            <dd className={cn(r.on ? (params.outcomes[r.key] === "fail" ? "text-no-go" : "text-hold") : "text-muted-foreground")}>{r.effect}</dd>
+            <dt className="text-muted-foreground">Reads</dt>
+            <dd className="text-muted-foreground">{r.reads}</dd>
+          </dl>
         </div>
       ))}
     </div>

@@ -9,6 +9,7 @@ import {
   toChecks,
   validateParams,
   RULE_IDS,
+  ruleSheet,
   type Measurements,
   type PolicyFacts,
   type PolicyParams,
@@ -357,5 +358,36 @@ describe("receipt policy binding", () => {
     // …and the recorded entry is untouched.
     expect(JSON.stringify(entry)).toBe(stored);
     expect(entry.policyResults!.find((x) => x.key === "hhi")!.state).toBe("PASS");
+  });
+});
+
+describe("rule sheet", () => {
+  it("describes every rule judge() runs, under the same rule id, with value, unit, trigger and effect", () => {
+    const sheet = ruleSheet(params());
+    expect(sheet.map((r) => r.id).sort()).toEqual(Object.values(RULE_IDS).sort());
+    for (const r of sheet) {
+      expect(r.unit.length).toBeGreaterThan(0);
+      expect(r.reads.length).toBeGreaterThan(0);
+      if (r.on) {
+        expect(r.value).not.toBe("off");
+        expect(r.effect).toMatch(/^(REVIEW → verdict HOLD|FAIL → verdict NO-GO)/);
+      }
+    }
+  });
+
+  it("names the configured value inside the trigger, so the sheet cannot drift from the setting", () => {
+    const sheet = ruleSheet(params({ hhiLimit: 3200, reserveHeadroomMinXrp: 12.5 }));
+    expect(sheet.find((r) => r.key === "hhi")!.triggers).toBe("Observed HHI is above 3,200");
+    expect(sheet.find((r) => r.key === "reserve")!.triggers).toContain("12.5 XRP");
+  });
+
+  it("an off rule has no effect on the verdict and says so", () => {
+    const off = ruleSheet(params({ hhiLimit: null })).find((r) => r.key === "hhi")!;
+    expect(off).toMatchObject({ on: false, value: "off", effect: "None" });
+  });
+
+  it("the outcome the sheet names is the outcome judge() applies", () => {
+    const p = params({ outcomes: { ...params().outcomes, hhi: "fail" } });
+    expect(ruleSheet(p).find((r) => r.key === "hhi")!.effect).toMatch(/^FAIL → verdict NO-GO/);
   });
 });

@@ -33,8 +33,8 @@ Status words used throughout: **EXISTS** (implemented, in the app),
 
 **Compliance**
 - GO / HOLD / NO-GO from a deterministic rule set with five check states (PASS, FAIL, REVIEW, INSUFFICIENT_DATA, NOT_APPLICABLE) — EXISTS.
-- Institutional policies: versioned, canonical hash, draft → pending → active → archived, four-eyes enforced by a table constraint and a trigger (author ≠ activator) — EXISTS. *Gap:* no separate *approved* and *superseded* states; a replaced policy is archived.
-- Exceptions with requester ≠ decider (constraint), evidence requests, audit rows — EXISTS. *Gap:* no expiry on an approved exception.
+- Institutional policies: versioned, canonical hash, draft → pending → active → archived, four-eyes enforced by a table constraint and a trigger (author ≠ activator) — EXISTS. Shown since Phase 3 as Draft / In review / Approved & active / Superseded; approval and activation are one four-eyes step.
+- Exceptions with requester ≠ decider (constraint), evidence requests, audit rows — EXISTS. Expiry on every approval since Phase 3.
 - Travel Rule, HHI, counterparty share, reserve headroom, strict freeze as policy thresholds that feed the verdict — EXISTS (`policy.ts`, `desk/rules.ts`); each needs its "what it affects / when it triggers" line surfaced in the policy editor — PARTIAL.
 - Credentials and permissioned domains — EXISTS (real mainnet directory since 1.0.15).
 - **WRONG:** the verification gate, the tray, Mission Control and the Desk still select from `DOMAIN_REGISTRY`, six illustrative "reference domains" with invented institution names and member counts. They are rule profiles, not ledger domains, and must be presented as such (names, no fabricated members) or replaced with real domains.
@@ -51,7 +51,7 @@ Status words used throughout: **EXISTS** (implemented, in the app),
 - **GAP:** an institutional report (executive summary → decision → findings → evidence → verification instructions) as one exportable document.
 
 **Data validation**
-- Multi-node agreement exists as its own screen (Ledger Sync). **GAP:** it is not attached to verdicts; a verdict does not yet say "read at ledger N, k of 4 sources agreeing", and disagreement does not withhold a verdict.
+- Multi-node agreement exists as its own screen (Ledger Sync), and since Phase 3 is attached to every recorded verdict (SOURCE_AGREEMENT). *Remaining:* the live posture indicators (tray, Mission Control, status rail) evaluate the rules without it; they are indicators, not recorded verdicts, and carry no receipt.
 
 **AI**
 - Governance rules (never signs, never issues verdicts, figures only from readings with a ledger index) — EXISTS in prompts and NOSHX Core. **PARTIAL:** answers cite sources in text; there is no structured citation object the UI can link to evidence.
@@ -91,7 +91,7 @@ merge, and this file updated with what landed.
 | 0 | Readability, real compliance data (1.0.15) | Type floor, scaling, title bar, sign-in, Domain Grid / Credentials / Audit Trail on real data, registry sweep | PR #57 |
 | 1 | Audit + critical fixes | This plan; business plan off every customer path (command palette only, labelled internal); the six gate profiles relabelled as reference rule profiles with no invented institutions or member counts; the never-deployed `backend/` (FastAPI), `frontend/` (Next.js) and `menubar/` (Swift) removed, each Vercel project keeping only the `vercel.json` that stops it deploying; legacy `TODO.md`, `UPGRADE.md` (a meme-coin terminal plan), `AUDIT_REPORT.md`, `STRIPE_SETUP.md` (Stripe Connect for a deposits product), `docker-compose.yml`, `nginx.conf`, workspace files and a stray PNG removed | done (PR #58) |
 | 2 | Product hierarchy + decision card | Sidebar regrouped into Overview, Compliance, Liquidity, Evidence, then Issuers & Treasury, Intelligence, Public tools; Executive mode (8 core screens, default for new installs) and Analyst mode (every tool), switchable in the sidebar, everything still reachable by search; a Decision Card on Overview from the latest recorded verdict: decision, meaning, policy or reference profile, rules passed, ledger index, receipt re-verified, public nodes in step now, and "people decide"; verdicts now record the ledger index they were read at (beside the receipt, not in its digest); tagline no longer says "autonomous" | done (PR #58) |
-| 3 | Compliance + policy | Source agreement gates the verdict (disagreement → no GO); every policy setting shows value, unit, effect and trigger; exception expiry; policy states approved/superseded | |
+| 3 | Compliance + policy | SOURCE_AGREEMENT rule (`src/lib/net/agreement.ts`): every public node asked for the ledger hash and AccountRoot at one validated index; disagreement, a single answering node, or state that moved since it was read withholds GO (HOLD, never NO-GO), recorded in the receipt, tested on real mainnet replies; rule sheet (`ruleSheet` in `desk/institutional.ts`) shows value, unit, what it reads, trigger and effect for every setting; exception expiry (migration `20260929140000`, `noshashi-exception-decide` v3, approver picks 1–365 days, expired approvals cannot close cases); lifecycle labels Draft / In review / Approved & active / Superseded (the database's `archived` is only reachable from `active`) | done |
 | 4 | Liquidity | Quoted vs executable as the headline on every liquidity surface | |
 | 5 | Evidence | Replay (re-read at the receipt's ledger, re-run its policy, diff); one institutional report export with verification instructions | |
 | 6 | AI governance | Structured citations (source, ledger, rule, evidence) on NOSHX answers, linked into the app; deterministic-wins conflict display | |

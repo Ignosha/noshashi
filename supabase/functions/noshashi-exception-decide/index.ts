@@ -14,6 +14,10 @@ import { createClient } from "npm:@supabase/supabase-js@2";
  * service_role only; a trigger on the table refuses any approval by a
  * non-authorized member even from a direct service-role write.
  *
+ * Every approval carries an expiry (expiresInDays, 1–365, default 30),
+ * set in the same transaction as the decision and recorded in its audit
+ * event. An expired approval no longer covers the verdict it was made for.
+ *
  * `request_evidence` is the third decision: the reviewer asks the requester
  * for more before deciding (noshashi.request_exception_evidence, the same
  * role and four-eyes checks, a written note required). The requester answers
@@ -60,6 +64,7 @@ const OUTCOMES: Record<string, { status: number; title: string; message: string 
   AWAITING_EVIDENCE: { status: 409, title: "AWAITING EVIDENCE", message: "More evidence was requested. It can be decided once the requester adds it." },
   ALREADY_REQUESTED: { status: 409, title: "EVIDENCE ALREADY REQUESTED", message: "More evidence has already been requested. The requester must add it before anyone decides." },
   EVIDENCE_REQUIRED: { status: 422, title: "EVIDENCE REQUIRED", message: "An exception cannot be decided without its evidence and receipt." },
+  EXPIRY_INVALID: { status: 422, title: "EXPIRY REQUIRED", message: "An approval must expire between 1 and 365 days from now." },
   NOTE_REQUIRED: { status: 422, title: "NOTE REQUIRED", message: "Rejecting an exception, or asking for more evidence, needs a written note of at least 10 characters." },
 };
 
@@ -88,9 +93,13 @@ Deno.serve(async (request: Request) => {
     const exceptionId = String(body.exceptionId ?? "");
     const decision = String(body.decision ?? "");
     const note = typeof body.note === "string" ? body.note.slice(0, 4000) : null;
+    // Every approval expires. 30 days unless the approver chose 1–365.
+    const expiresInDays = body.expiresInDays === undefined ? 30 : Number(body.expiresInDays);
     if (!/^[0-9a-f-]{36}$/i.test(exceptionId) || !["approve", "reject", "request_evidence"].includes(decision)) {
       return json(request, { ok: false, code: "BAD_REQUEST", title: "DECISION FAILED", message: "Malformed request. Nothing was changed." }, 400);
     }
+
+    if (decision === "approve" && !(Number.isInteger(expiresInDays) && expiresInDays >= 1 && expiresInDays <= 365)) return fail("EXPIRY_INVALID");
 
     const service = createServiceClient(url, serviceKey).schema("noshashi");
     const { data: result, error } =
@@ -101,6 +110,7 @@ Deno.serve(async (request: Request) => {
             p_actor: userData.user.id,
             p_approve: decision === "approve",
             p_note: note,
+            p_expires_in_days: decision === "approve" ? expiresInDays : 30,
           });
     if (error) throw error;
     if (!result?.ok) {
