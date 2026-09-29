@@ -174,6 +174,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
       const entry = receiptToEntry(result, {
           domainCode: domain.code,
           offline: vault.engaged,
+          ledgerIndex: vault.engaged ? vault.active!.ledgerIndex : data.ledger?.ledgerIndex,
           hhi: measurements.concentration.state === "ok" ? measurements.concentration.hhi : undefined,
           measurements,
           policyResults: results ?? undefined,

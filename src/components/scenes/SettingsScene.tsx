@@ -582,7 +582,7 @@ export function SettingsScene({
                     {BRAND.name} v{BRAND.version}
                   </p>
                   <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                    Autonomous Compliance Layer · XRPL Mainnet.
+                    XRPL intelligence for institutional decisions · XRPL Mainnet.
                     <br />
                     Built for regulated capital settlement.
                   </p>

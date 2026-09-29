@@ -3,7 +3,7 @@ import type { PolicyRef } from "./desk/institutional";
 
 /**
  * NOSHASHI policy engine — the deterministic core of the
- * Autonomous Compliance Layer.
+ * compliance engine.
  *
  * Given a subject account, the credentials it holds on-ledger, and a
  * destination Permissioned Domain (XLS-80), it produces a verdict —

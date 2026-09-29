@@ -123,7 +123,7 @@ import { SettingsScene } from "@/components/scenes/SettingsScene";
 import { TrayScene } from "@/components/scenes/TrayScene";
 import { useXRPL } from "@/lib/xrpl/useXRPL";
 import { useSetting } from "@/lib/store";
-import { isTauri, isTrayView } from "@/lib/env";
+import { isMac, isTauri, isTrayView } from "@/lib/env";
 import { ToastProvider, useToast } from "@/lib/toast";
 import { AppearanceProvider, logicalWidth, useAppearance } from "@/lib/appearance";
 import { AuthProvider, useAuth } from "@/lib/auth/useAuth";
@@ -201,14 +201,22 @@ type SceneDef = {
  */
 const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "overview", label: "OVERVIEW", scenes: ["home", "control"] },
-  { id: "adjudication", label: "ADJUDICATION", scenes: ["verify", "ledgerwatch", "provenance", "credentials", "domains"] },
-  { id: "security", label: "SECURITY", scenes: ["security"] },
-  { id: "markets", label: "MARKETS & EXPOSURE", scenes: ["risk", "desk", "book", "amm"] },
-  { id: "treasury", label: "TREASURY & ISSUANCE", scenes: ["treasury", "issuance", "authority", "passport"] },
-  { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
+  // The three questions the product answers, in the order an institution
+  // asks them: can this move, can we exit, can we prove why.
+  { id: "compliance", label: "COMPLIANCE", scenes: ["verify", "ledgerwatch", "credentials", "domains", "provenance", "authority", "security"] },
+  { id: "liquidity", label: "LIQUIDITY", scenes: ["risk", "book", "amm", "desk"] },
+  { id: "evidence", label: "EVIDENCE", scenes: ["history", "workstation", "settlement"] },
+  { id: "issuers", label: "ISSUERS & TREASURY", scenes: ["treasury", "issuance", "passport"] },
   { id: "intelligence", label: "INTELLIGENCE", scenes: ["agent", "garden"] },
-  { id: "public", label: "PUBLIC", scenes: ["safeshop", "claims", "nft", "network", "learn"] },
+  { id: "public", label: "PUBLIC TOOLS", scenes: ["safeshop", "claims", "nft", "network", "learn"] },
 ];
+
+/**
+ * Executive mode: the scenes that answer the three questions without
+ * needing to know what a trust line or a signer list is. Everything else
+ * stays one switch (or one search) away; nothing is removed.
+ */
+const EXECUTIVE_SCENES = new Set<SceneId>(["home", "verify", "risk", "history", "workstation", "agent", "safeshop", "learn"]);
 
 const SCENES: SceneDef[] = [
   {
@@ -585,6 +593,10 @@ function ConsoleApp() {
   // On a short window (or a large scale) the pinned SYSTEM block would leave
   // the scene list a few rows tall; the whole rail scrolls as one instead.
   const [shortRail, setShortRail] = useState(false);
+  // Executive mode shows the scenes that answer the three questions; Analyst
+  // shows every tool. New installs start in Executive (progressive
+  // disclosure); the choice persists.
+  const [consoleMode, setConsoleMode] = useSetting<"executive" | "analyst">("console.mode", "executive");
   useEffect(() => {
     const check = () => setShortRail(window.innerHeight / textScale < 720);
     check();
@@ -947,6 +959,44 @@ function ConsoleApp() {
               </button>
             </div>
 
+            {/* Executive / Analyst. A segmented switch when the rail is open,
+                one button when it is collapsed. */}
+            <div className="shrink-0 px-2.5 pb-2">
+              {railOpen ? (
+                <div role="radiogroup" aria-label="Console mode" className="grid grid-cols-2 rounded-md border border-border p-0.5">
+                  {(["executive", "analyst"] as const).map((m) => (
+                    <button
+                      key={m}
+                      role="radio"
+                      aria-checked={consoleMode === m}
+                      onClick={() => setConsoleMode(m)}
+                      title={m === "executive" ? "The core: decisions, liquidity and evidence" : "Every tool, with the raw ledger detail"}
+                      className={cn(
+                        "stencil rounded px-2 py-1.5 text-[10.5px] tracking-[0.1em] transition-colors",
+                        consoleMode === m ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {m === "executive" ? "EXECUTIVE" : "ANALYST"}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setConsoleMode(consoleMode === "executive" ? "analyst" : "executive")}
+                  aria-label={`Console mode: ${consoleMode}. Switch to ${consoleMode === "executive" ? "analyst" : "executive"}`}
+                  title={`Mode: ${consoleMode}`}
+                  className="stencil grid h-8 w-full place-items-center rounded-md border border-border text-[10.5px] text-muted-foreground hover:text-foreground"
+                >
+                  {consoleMode === "executive" ? "EX" : "AN"}
+                </button>
+              )}
+              {railOpen && consoleMode === "executive" && (
+                <p className="mt-1.5 px-1 text-[10.5px] leading-snug text-faint">
+                  {SCENES.filter((sc) => sc.group === "primary" && !EXECUTIVE_SCENES.has(sc.id)).length} more tools in Analyst, or search with {isMac ? "⌘K" : "Ctrl K"}.
+                </p>
+              )}
+            </div>
+
             {/* The fade says the list continues. Without it, on a window too
                 short for every section, the next heading showed cut off
                 against the SYSTEM rule and read as an empty section. */}
@@ -962,7 +1012,9 @@ function ConsoleApp() {
               {NAV_SECTIONS.map((section) => {
                 const items = section.scenes
                   .map((id) => SCENES.find((sc) => sc.id === id))
-                  .filter((sc): sc is SceneDef => Boolean(sc));
+                  .filter((sc): sc is SceneDef => Boolean(sc))
+                  // The scene in view stays listed even when its mode hides it.
+                  .filter((sc) => consoleMode === "analyst" || EXECUTIVE_SCENES.has(sc.id) || sc.id === scene);
                 if (items.length === 0) return null;
                 return (
                   <div key={section.id}>

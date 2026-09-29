@@ -2,6 +2,7 @@ import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
+import { DecisionCard } from "@/components/nova/DecisionCard";
 import { NovaLogo } from "@/components/nova/NovaLogo";
 import { CountUp } from "@/components/nova/CountUp";
 import { StatusDot } from "@/components/nova/StatusDot";
@@ -279,8 +280,14 @@ export function HomeScene({
             </div>
           </motion.div>
 
+          {/* What was decided, why, and whether it can be proved: the
+              first thing an executive reads, before any telemetry. */}
+          <Reveal delay={0.1} className="mt-8">
+            <DecisionCard onNavigate={onNavigate} />
+          </Reveal>
+
           {/* Live proof strip */}
-          <Reveal delay={0.15} className="mt-8">
+          <Reveal delay={0.15} className="mt-6">
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               {[
                 {
