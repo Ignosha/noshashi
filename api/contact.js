@@ -29,7 +29,7 @@
  * site, and an enquiries table would be the first — with a retention
  * question attached to it — for no gain over delivering the message.
  *
- * Configuration is documented in .env.example and README.md.
+ * Configuration is documented in .env.example and docs/OPERATIONS.md.
  */
 
 import { clientKey, take } from "./_lib/rate-limit.js";
