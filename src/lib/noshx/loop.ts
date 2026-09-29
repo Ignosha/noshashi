@@ -1,3 +1,4 @@
+import type { Citation } from "./citations";
 import {
   AgentUnavailableError,
   ANTHROPIC_MAX_TOKENS,
@@ -34,7 +35,7 @@ import { NOSHX_TOOLS, runTool, type ToolContext } from "./tools";
 export const MAX_STEPS = 8;
 
 export type NoshxStep =
-  | { kind: "tool"; name: string; input: Record<string, unknown>; ok: boolean; summary: string }
+  | { kind: "tool"; name: string; input: Record<string, unknown>; ok: boolean; summary: string; citation?: Citation }
   | { kind: "note"; text: string };
 
 export type NoshxRun = {
@@ -123,6 +124,7 @@ async function runCalls(calls: ToolCall[], run: NoshxRun, steps: NoshxStep[]) {
         input: call.input,
         ok: result.ok,
         summary: result.ok ? `${result.content.length.toLocaleString()} characters read` : result.content,
+        ...(result.citation ? { citation: result.citation } : {}),
       };
       steps.push(step);
       run.onStep?.(step);

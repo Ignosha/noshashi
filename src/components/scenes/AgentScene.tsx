@@ -49,6 +49,7 @@ import {
 import { CONTACT } from "@/lib/brand";
 import { dataBoundary, recordFor, useAiUseLog, type AiUseRecord } from "@/lib/agent/governance";
 import { AgentGovernance } from "./AgentGovernance";
+import { AnswerSources } from "./AnswerSources";
 import { SupportTickets } from "./SupportTickets";
 import { useLedger } from "@/lib/desk/ledger";
 import { useGoverningPolicy, useOrg } from "@/lib/org/useOrg";
@@ -954,6 +955,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                             GENERATING…
                           </span>
                         )}
+                        {turn.role !== "user" && !turn.streaming && turn.steps && <AnswerSources steps={turn.steps} />}
                       </div>
                     </motion.div>
                   ))}

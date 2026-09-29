@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### NOSHX: every answer lists what it rests on
+
+- Each reading NOSHX takes carries a citation: the screen that shows it,
+  what was asked, the validated ledger it was read at (taken from the
+  reading itself, never from the model's text) and when. Answers end with
+  **SOURCES**, each with an *open* link to that screen, and state which side
+  wins: if the answer and a reading disagree, the reading and the
+  deterministic engine are authoritative, not the assistant.
+- Works for hosted and local models and for NOSHX Core.
+
 ### Evidence: replay and the institutional report
 
 - **Replay** (Ledger & Policy → Evidence, per verdict): re-reads the
