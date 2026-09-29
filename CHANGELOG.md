@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.0.18
+
+### Getting started, on Home
+
+- A first-run guide says what NOSHASHI is for (one ledger, three questions;
+  it reads only and never signs) and walks four steps: choose Executive or
+  Analyst, run a first analysis, check its evidence, set your institution's
+  policy.
+- Each step is ticked by what you actually did: a verdict recorded, a
+  receipt re-verified, replayed or exported as a report, a policy made
+  active. Nothing is ticked for having been shown.
+- On a plan without Ledger & Policy, the evidence and policy steps say
+  *Included in Pro* instead of opening a locked screen. The guide can be
+  hidden, and goes away once every step is done.
+- The Home introduction now states the product the way the website does.
+
+### Compliance API: examples that work
+
+- The Account screen's *Calling the API* example, and every example in the
+  API documentation, now use the endpoint that is live:
+  `https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify`.
+  They previously named `api.noshashi.app`, which is not configured, so a
+  first call copied from them could not connect.
+
+### Documentation for reviewers
+
+- New: architecture, data model (every table, who can read it, personal
+  data, retention), policy engine (every rule and the verdict order),
+  evidence (the exact receipt bytes, re-verify, replay, the report), AI
+  governance, incident response and disaster recovery.
+- The nightly database backup reports a malformed connection string
+  precisely instead of failing obscurely.
+
 ## 1.0.17
 
 ### Website: one ledger, three questions
