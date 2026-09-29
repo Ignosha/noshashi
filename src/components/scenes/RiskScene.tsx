@@ -321,25 +321,32 @@ function RiskBody({
                       magnitude={`${a.position.toLocaleString(undefined, {
                         maximumFractionDigits: 2,
                       })} ${a.currency}`}
-                      confidence={
-                        a.verdict === "trapped"
-                          ? "HIGH"
-                          : a.verdict === "constrained"
-                            ? "MEDIUM"
-                            : "HIGH"
-                      }
                       source={`DEX BOOK · ${shortAddress(a.issuer)}`}
                       kicker={EXIT_COPY[a.verdict].label}
                       className="rounded-none border-b border-border/30"
                     >
                       <div className="mt-2.5 flex flex-wrap gap-x-6 gap-y-1 font-mono text-[11px] tabular-nums text-faint">
-                        <span>
-                          BID DEPTH{" "}
-                          <span className="text-muted-foreground">
-                            {a.depthBid.toLocaleString(undefined, { maximumFractionDigits: 0 })}{" "}
-                            {a.currency}
+                        {a.quoted ? (
+                          <span title="Fillable counts only what each offer's owner holds now (taker_gets_funded); quoted counts every resting offer at face value. Within 10% of mid.">
+                            FILLABLE BIDS{" "}
+                            <span className={a.quoted.bidRatio !== undefined && a.quoted.bidRatio < 0.5 ? "text-no-go" : "text-foreground"}>
+                              {a.quoted.fillableBid.toLocaleString(undefined, { maximumFractionDigits: 0 })} {a.currency}
+                            </span>{" "}
+                            <span className="text-muted-foreground">
+                              OF {a.quoted.quotedBid.toLocaleString(undefined, { maximumFractionDigits: 0 })} QUOTED
+                              {a.quoted.bidRatio !== undefined && ` · ${(a.quoted.bidRatio * 100).toFixed(1)}% REAL`}
+                              {` · LEDGER ${a.quoted.ledgerIndex.toLocaleString()}`}
+                            </span>
                           </span>
-                        </span>
+                        ) : (
+                          <span>
+                            BID DEPTH{" "}
+                            <span className="text-muted-foreground">
+                              {a.depthBid.toLocaleString(undefined, { maximumFractionDigits: 0 })}{" "}
+                              {a.currency}
+                            </span>
+                          </span>
+                        )}
                         {a.depthRatio !== undefined && (
                           <span>
                             POSITION / BOOK{" "}

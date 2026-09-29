@@ -582,8 +582,29 @@ export async function fetchOrderBook(
     }),
   ]);
 
-  const bids = toLevels((bidRes.offers ?? []) as Array<Record<string, any>>, true);
-  const asks = toLevels((askRes.offers ?? []) as Array<Record<string, any>>, false);
+  return assembleOrderBook(
+    (bidRes.offers ?? []) as Array<Record<string, any>>,
+    (askRes.offers ?? []) as Array<Record<string, any>>,
+    Number(bidRes.ledger_index ?? askRes.ledger_index ?? 0),
+    currency,
+    issuer
+  );
+}
+
+/**
+ * Two `book_offers` replies (bids: XRP for the asset; asks: the asset for
+ * XRP) as one book. Exported so recorded mainnet replies are tested through
+ * exactly the path a live read takes.
+ */
+export function assembleOrderBook(
+  bidOffers: Array<Record<string, any>>,
+  askOffers: Array<Record<string, any>>,
+  ledgerIndex: number,
+  currency: string,
+  issuer: string
+): OrderBook {
+  const bids = toLevels(bidOffers, true);
+  const asks = toLevels(askOffers, false);
 
   const touchBid = bids[0]?.price;
   const touchAsk = asks[0]?.price;
@@ -616,7 +637,7 @@ export async function fetchOrderBook(
     spreadPct: spread !== undefined && mid ? spread / mid : undefined,
     depthBidBanded: bandedDepth(bids, mid, DEPTH_BAND, "bid"),
     depthAskBanded: bandedDepth(asks, mid, DEPTH_BAND, "ask"),
-    ledgerIndex: Number(bidRes.ledger_index ?? askRes.ledger_index ?? 0),
+    ledgerIndex,
     empty: bids.length === 0 && asks.length === 0,
   };
 }

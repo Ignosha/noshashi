@@ -407,7 +407,6 @@ function WorkstationBody({
                     headline={a.headline}
                     detail={a.detail}
                     magnitude={`${a.from} → ${a.to}`}
-                    confidence="HIGH"
                     source={`${a.field} · ${shortAddress(a.issuer)}`}
                     at={a.at}
                     acknowledged={a.acknowledged}
