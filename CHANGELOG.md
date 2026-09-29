@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### NOSHX: every answer lists what it rests on
+
+- Each reading NOSHX takes carries a citation: the screen that shows it,
+  what was asked, the validated ledger it was read at (taken from the
+  reading itself, never from the model's text) and when. Answers end with
+  **SOURCES**, each with an *open* link to that screen, and state which side
+  wins: if the answer and a reading disagree, the reading and the
+  deterministic engine are authoritative, not the assistant.
+- Works for hosted and local models and for NOSHX Core.
+
+### Evidence: replay and the institutional report
+
+- **Replay** (Ledger & Policy → Evidence, per verdict): re-reads the
+  subject's account, credentials and the reserve in force *at the
+  receipt's own ledger index*, re-runs the same rules, and shows rule by
+  rule what matches and what does not, with both digests. A replay is
+  evaluated as of the recorded time, so an unchanged record reproduces its
+  digest exactly. The stored verdict is never changed. Where a public
+  server no longer holds that ledger, replay says so and compares nothing.
+- **Export report**: one HTML document per decision (prints to PDF):
+  executive summary, subject, policy and its SHA-256, decision, key
+  findings, every rule, ledger and source agreement, re-verification,
+  replay, exceptions with their expiry, a reviewer block, and verification
+  instructions that print the exact canonical bytes so the digest can be
+  recomputed with `shasum -a 256` without NOSHASHI.
+- Tested on Bitstamp's real account state, credentials and FeeSettings
+  reserve (1 XRP base, 0.2 XRP per object) at ledger 107,305,907.
+
 ### Liquidity: what can fill, before what is quoted
 
 - Every exit row on the Risk screen now leads with **fillable bids against

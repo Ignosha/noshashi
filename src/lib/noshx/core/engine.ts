@@ -14,6 +14,7 @@ import type { LedgerInfo } from "@/lib/xrpl/types";
 import type { SecurityAssessment, SecurityPosture } from "@/lib/security/hardening";
 import type { RecoveryOption, TakeoverSignal, Trace } from "@/lib/security/incident";
 import { runToolRaw, findTool, type ToolContext } from "../tools";
+import { citationFor } from "../citations";
 import { searchKnowledge, tokens, type Hit } from "../knowledge";
 import type { NoshxStep } from "../loop";
 import { plan, type Plan } from "./plan";
@@ -293,7 +294,7 @@ export async function answerWithCore(
       if (result.ok === false && result.gated && call.tool === "certify_authority" && typeof call.input.issuer === "string" && !alreadyChecked) {
         const free = await runToolRaw("check_address", { address: call.input.issuer }, context);
         if (free.ok) {
-          record({ kind: "tool", name: "check_address", input: { address: call.input.issuer }, ok: true, summary: "read" });
+          record({ kind: "tool", name: "check_address", input: { address: call.input.issuer }, ok: true, summary: "read", citation: citationFor("check_address", findTool("check_address")?.screen ?? "check_address", { address: call.input.issuer }, free.value) });
           return { call: { ...call, tool: "check_address", input: { ...call.input, address: call.input.issuer } as Record<string, unknown> }, result: free, gatedFrom: call };
         }
       }
@@ -301,7 +302,7 @@ export async function answerWithCore(
       if (!result.ok && call.tool === "read_settlement" && !result.gated) {
         const nft = await runToolRaw("read_token_rights", { token_id: call.input.hash }, context);
         if (nft.ok) {
-          record({ kind: "tool", name: "read_token_rights", input: { token_id: call.input.hash }, ok: true, summary: "read" });
+          record({ kind: "tool", name: "read_token_rights", input: { token_id: call.input.hash }, ok: true, summary: "read", citation: citationFor("read_token_rights", findTool("read_token_rights")?.screen ?? "read_token_rights", { token_id: call.input.hash }, nft.value) });
           return { call: { ...call, tool: "read_token_rights" }, result: nft };
         }
       }
@@ -311,6 +312,7 @@ export async function answerWithCore(
         input: call.input,
         ok: result.ok,
         summary: result.ok ? "read" : result.error,
+        ...(result.ok ? { citation: citationFor(call.tool, findTool(call.tool)?.screen ?? call.tool, call.input, result.value) } : {}),
       });
       return { call, result };
     })

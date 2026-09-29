@@ -1,3 +1,4 @@
+import { citationFor, type Citation } from "./citations";
 import { checkCounterparty } from "@/lib/public/counterparty";
 import { readProvenance } from "@/lib/desk/provenance";
 import { certifyAuthority } from "@/lib/desk/authority";
@@ -639,9 +640,9 @@ export async function runTool(
   name: string,
   input: Record<string, unknown>,
   context: ToolContext
-): Promise<{ ok: boolean; content: string }> {
+): Promise<{ ok: boolean; content: string; citation?: Citation }> {
   const result = await runToolRaw(name, input, context);
-  if (result.ok) return { ok: true, content: compactResult(result.value) };
+  if (result.ok) return { ok: true, content: compactResult(result.value), citation: citationFor(name, findTool(name)?.screen ?? name, input, result.value) };
   return {
     ok: false,
     content: result.gated

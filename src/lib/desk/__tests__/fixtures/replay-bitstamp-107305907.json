@@ -1,0 +1,7 @@
+{
+  "_about": "XRPL mainnet replies at validated ledger 107305907, read from s2.ripple.com on 2026-09-29 for rrpNnNLKrartuEqfJGpqyDwPj1AFPg9vn1 (Bitstamp). Result objects only; nothing altered.",
+  "ledger_index": 107305907,
+  "fee_settings": {"Flags": 0, "index": "4BC50C9B0D8515D3EAAE1E74B29A95804346C491EE1A95BF25E4AAB854A6A651", "BaseFeeDrops": "10", "PreviousTxnID": "4EEDB01BB943CE32E97BB468AC179ABF933B272D6FF990E76B6721FB48E069FC", "LedgerEntryType": "FeeSettings", "ReserveBaseDrops": "1000000", "PreviousTxnLgrSeq": 92508417, "ReserveIncrementDrops": "200000"},
+  "account_objects_credential": [],
+  "account_data": {"Flags": 131072, "index": "61DF00F848528FFCE51CF06EB39FBB36593F7D2F752F9E52DDDF85ED02C30152", "Account": "rrpNnNLKrartuEqfJGpqyDwPj1AFPg9vn1", "Balance": "200000021", "Sequence": 60300, "OwnerCount": 37, "PreviousTxnID": "9EC02A92353CCAC1DA0A4BAAB90B19FCB1891C9AEAECD82DB0D4FD9F54C69A2F", "LedgerEntryType": "AccountRoot", "PreviousTxnLgrSeq": 106960400}
+}
