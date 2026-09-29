@@ -11,6 +11,7 @@ import { verifyEntry } from "@/lib/desk/evidence";
 import { institutionalReport, reportFilename } from "@/lib/desk/report";
 import { saveTextFile } from "@/lib/export";
 import { useOrg } from "@/lib/org/useOrg";
+import { markEvidenceChecked } from "@/lib/onboarding";
 import { useToast } from "@/lib/toast";
 
 /**
@@ -30,6 +31,7 @@ export function ReplayButton({ entry, onResult }: { entry: LedgerEntry; onResult
       // The policy's parameters, when this device holds the exact version (matched by its hash).
       const params = entry.policy ? store.versions.find((v) => v.hash === entry.policy!.hash)?.params : undefined;
       onResult(await replayVerdict(entry, data, params));
+      void markEvidenceChecked();
     } catch (e) {
       onResult({ state: "not-replayable", reason: `The ledger could not be read for replay: ${e instanceof Error ? e.message : String(e)}. Nothing was compared.` });
     } finally {
@@ -122,6 +124,7 @@ export function ExportReportButton({ entry, replay }: { entry: LedgerEntry; repl
         exceptions: org.data?.exceptions ?? [],
       });
       const where = await saveTextFile(reportFilename(entry), html, "text/html");
+      void markEvidenceChecked();
       push({ title: "REPORT EXPORTED", body: `${where} · open it in a browser and print to PDF`, tone: "go" });
     } catch (e) {
       push({ title: "REPORT NOT SAVED", body: e instanceof Error ? e.message : String(e), tone: "no-go" });
