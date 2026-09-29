@@ -230,7 +230,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
         right={
           <span className="flex items-center gap-2">
             <Kbd keys="mod+enter" />
-            <span className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">
+            <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               RUN
             </span>
           </span>
@@ -248,7 +248,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
         >
           <div className="flex flex-wrap items-center gap-2">
             <StatusDot status={vault.staleness.severity === "critical" ? "no-go" : "hold"} />
-            <span className="stencil text-[9px] tracking-[0.2em]">
+            <span className="stencil text-[10.5px] tracking-[0.14em]">
               ADJUDICATING AGAINST CAPTURED STATE · {vault.staleness.label.toUpperCase()}
             </span>
           </div>
@@ -279,7 +279,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                   spellCheck={false}
                 />
                 {!destinationValid && (
-                  <p className="mt-1 text-[9px] text-no-go">
+                  <p className="mt-1 text-[10.5px] text-no-go">
                     Not a valid XRPL classic address.
                   </p>
                 )}
@@ -298,7 +298,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                   className="mono-font selectable mt-1.5 text-[11px]"
                 />
                 {!amountValid && (
-                  <p className="mt-1 text-[9px] text-no-go">
+                  <p className="mt-1 text-[10.5px] text-no-go">
                     Enter a non-negative number.
                   </p>
                 )}
@@ -309,7 +309,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                   <button
                     key={preset}
                     onClick={() => setAmount(String(preset))}
-                    className="mono-font border border-border px-2 py-0.5 text-[9px] tabular-nums text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
+                    className="mono-font border border-border px-2 py-0.5 text-[10.5px] tabular-nums text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
                   >
                     {preset.toLocaleString()}
                   </button>
@@ -343,7 +343,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
             className="min-h-0 flex-1"
             bodyClassName="overflow-y-auto p-2"
             right={
-              <span className="mono-font text-[9px] text-muted-foreground">
+              <span className="mono-font text-[10.5px] text-muted-foreground">
                 XLS-80
               </span>
             }
@@ -370,7 +370,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
             bodyClassName="relative flex min-h-0 flex-col p-0"
             right={
               receipt && (
-                <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+                <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                   {receipt.latencyMs}ms
                 </span>
               )
@@ -392,7 +392,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1.6, repeat: Infinity, ease: "linear" }}
                   />
-                  <p className="mono-font text-[10px] tracking-[0.2em] text-muted-foreground caret">
+                  <p className="mono-font text-[11px] tracking-[0.14em] text-muted-foreground caret">
                     ADJUDICATING RULE SET
                   </p>
                 </motion.div>
@@ -418,7 +418,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                     >
                       {VERDICT_COPY[receipt.verdict].title}
                     </span>
-                    <p className="max-w-[280px] text-center text-[10px] leading-relaxed text-muted-foreground">
+                    <p className="max-w-[280px] text-center text-[11px] leading-relaxed text-muted-foreground">
                       {VERDICT_COPY[receipt.verdict].blurb}
                     </p>
                   </div>
@@ -442,7 +442,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                               value: `Why did the last gate check come back ${VERDICT_COPY[receipt.verdict].title}? Receipt ${receipt.digest.slice(0, 16)}.`,
                             })
                           }
-                          className="stencil mt-2 border border-border px-2 py-1 text-[8px] tracking-[0.2em] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                          className="stencil mt-2 border border-border px-2 py-1 text-[10px] tracking-[0.14em] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
                         >
                           ASK NOSHASHI WHY
                         </button>
@@ -472,16 +472,16 @@ export function VerificationScene({ data }: { data: XrplState }) {
                           )}
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="mono-font text-[9px] text-foreground/85">
+                          <p className="mono-font text-[10.5px] text-foreground/85">
                             {check.id}
                           </p>
-                          <p className="mt-0.5 text-[9px] leading-snug text-muted-foreground">
+                          <p className="mt-0.5 text-[10.5px] leading-snug text-muted-foreground">
                             {check.detail}
                           </p>
                         </div>
                         <span
                           className={cn(
-                            "stencil shrink-0 text-[8px] tracking-[0.18em]", CHECK_TONE_CLASS[CHECK_STATE_COPY[checkState(check)].tone][0]
+                            "stencil shrink-0 text-[10px] tracking-[0.14em]", CHECK_TONE_CLASS[CHECK_STATE_COPY[checkState(check)].tone][0]
                           )}
                         >
                           {CHECK_STATE_COPY[checkState(check)].label}
@@ -493,11 +493,11 @@ export function VerificationScene({ data }: { data: XrplState }) {
                   <div className="shrink-0 border-t border-border p-3">
                     <Eyebrow className="mb-1.5">CRYPTOGRAPHIC RECEIPT</Eyebrow>
                     {receipt.policy && <PolicyRefLine policy={receipt.policy} className="mb-1.5" />}
-                    <p className="mono-font selectable break-all text-[9px] leading-relaxed text-foreground/80">
+                    <p className="mono-font selectable break-all text-[10.5px] leading-relaxed text-foreground/80">
                       {receipt.digest}
                     </p>
                     <div className="mt-2 flex items-center justify-between">
-                      <span className="mono-font text-[9px] text-muted-foreground">
+                      <span className="mono-font text-[10.5px] text-muted-foreground">
                         SHA-256 · {new Date(receipt.evaluatedAt).toLocaleTimeString()}
                       </span>
                       <button
@@ -505,7 +505,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                           void navigator.clipboard.writeText(receipt.digest);
                           push({ title: "RECEIPT COPIED", tone: "info" });
                         }}
-                        className="stencil text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+                        className="stencil text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
                       >
                         COPY
                       </button>
@@ -537,7 +537,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
             <p className="display text-[11px] font-[600] leading-tight text-foreground">
               {domain.name}
             </p>
-            <p className="mt-0.5 text-[9px] text-muted-foreground">
+            <p className="mt-0.5 text-[10.5px] text-muted-foreground">
               {domain.institution}
             </p>
             <div className="mt-3">
@@ -576,7 +576,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                   <span
                     key={requirement}
                     className={cn(
-                      "mono-font border px-1.5 py-0.5 text-[8px] tracking-wide",
+                      "mono-font border px-1.5 py-0.5 text-[10px] tracking-wide",
                       held
                         ? "border-go/40 bg-go-dim text-go"
                         : "border-no-go/40 bg-no-go-dim text-no-go"
@@ -594,13 +594,13 @@ export function VerificationScene({ data }: { data: XrplState }) {
             className="min-h-0 flex-1"
             bodyClassName="overflow-y-auto p-2"
             right={
-              <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+              <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                 {log.length}
               </span>
             }
           >
             {log.length === 0 ? (
-              <p className="px-1 py-4 text-center text-[9px] leading-relaxed text-muted-foreground">
+              <p className="px-1 py-4 text-center text-[10.5px] leading-relaxed text-muted-foreground">
                 Evaluations recorded this session appear here.
               </p>
             ) : (
@@ -617,10 +617,10 @@ export function VerificationScene({ data }: { data: XrplState }) {
                     )}
                   >
                     <StatusDot status={entry.verdict} size={5} />
-                    <span className="mono-font min-w-0 flex-1 truncate text-[9px] text-foreground/80">
+                    <span className="mono-font min-w-0 flex-1 truncate text-[10.5px] text-foreground/80">
                       {truncateMiddle(entry.digest, 6, 4)}
                     </span>
-                    <span className="mono-font shrink-0 text-[8px] tabular-nums text-muted-foreground">
+                    <span className="mono-font shrink-0 text-[10px] tabular-nums text-muted-foreground">
                       {entry.amountXrp.toLocaleString()}
                       {entry.policy && ` · v${entry.policy.version}`}
                     </span>
@@ -664,10 +664,10 @@ function DomainOption({
         <NovaTerminal size={11} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="mono-font block truncate text-[10px] text-foreground">
+        <span className="mono-font block truncate text-[11px] text-foreground">
           {domain.name}
         </span>
-        <span className="block truncate text-[9px] text-muted-foreground">
+        <span className="block truncate text-[10.5px] text-muted-foreground">
           {domain.requirements.length} credential
           {domain.requirements.length === 1 ? "" : "s"} · {domain.institution}
         </span>
@@ -680,7 +680,7 @@ function DomainOption({
               ? "hold"
               : "no-go"
         }
-        className="shrink-0 text-[8px]"
+        className="shrink-0 text-[10px]"
       >
         {domain.code}
       </Badge>
@@ -704,13 +704,13 @@ function PolicyGateStatus({ policy }: { policy: GoverningPolicy }) {
   const { state, active } = policy;
   const scope = policy.source === "organization" ? `ORGANIZATION · ${(policy.organizationName ?? "").toUpperCase()}` : "WORKSTATION";
   if (state.status === "loading") {
-    return <p className="mono-font animate-pulse text-[9px] text-muted-foreground">LOADING POLICY…</p>;
+    return <p className="mono-font animate-pulse text-[10.5px] text-muted-foreground">LOADING POLICY…</p>;
   }
   if (state.status === "unavailable") {
     return (
       <div className="border border-no-go/50 p-2">
-        <p className="stencil text-[8px] tracking-[0.2em] text-no-go">POLICY UNAVAILABLE</p>
-        <p className="mt-1 text-[9px] leading-snug text-muted-foreground">
+        <p className="stencil text-[10px] tracking-[0.14em] text-no-go">POLICY UNAVAILABLE</p>
+        <p className="mt-1 text-[10.5px] leading-snug text-muted-foreground">
           A verified policy configuration could not be loaded. No verdict will be generated until it
           is available. {state.reason}
         </p>
@@ -719,16 +719,16 @@ function PolicyGateStatus({ policy }: { policy: GoverningPolicy }) {
   }
   return active ? (
     <div className="border border-border p-2">
-      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">APPLYING POLICY · {scope}</p>
-      <p className="mono-font mt-0.5 text-[9.5px] text-foreground">
+      <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">APPLYING POLICY · {scope}</p>
+      <p className="mono-font mt-0.5 text-[11px] text-foreground">
         {active.name} v{active.version} <span className="text-go">● ACTIVE</span>
       </p>
-      <p className="mono-font text-[8.5px] text-muted-foreground">SHA-256 {active.hash.slice(0, 8)}…{active.hash.slice(-4)}</p>
+      <p className="mono-font text-[10px] text-muted-foreground">SHA-256 {active.hash.slice(0, 8)}…{active.hash.slice(-4)}</p>
     </div>
   ) : (
     <div className="border border-border p-2">
-      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">NO ACTIVE INSTITUTIONAL POLICY · {scope}</p>
-      <p className="mt-0.5 text-[9px] leading-snug text-muted-foreground">
+      <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">NO ACTIVE INSTITUTIONAL POLICY · {scope}</p>
+      <p className="mt-0.5 text-[10.5px] leading-snug text-muted-foreground">
         The domain's rules still apply. No institutional thresholds will be evaluated until a policy
         is activated in Ledger &amp; Policy.
       </p>
@@ -771,8 +771,8 @@ function LedgerFacts({ m }: { m: Measurements }) {
       <Eyebrow className="mb-1">RAW LEDGER FACTS · NO POLICY APPLIED</Eyebrow>
       {rows.map(([k, v]) => (
         <div key={k} className="flex items-baseline justify-between gap-3 border-b border-border/30 py-1 last:border-0">
-          <span className="stencil shrink-0 text-[7.5px] tracking-[0.2em] text-muted-foreground">{k}</span>
-          <span className="mono-font selectable truncate text-right text-[9.5px] text-foreground">{v}</span>
+          <span className="stencil shrink-0 text-[10px] tracking-[0.14em] text-muted-foreground">{k}</span>
+          <span className="mono-font selectable truncate text-right text-[11px] text-foreground">{v}</span>
         </div>
       ))}
     </div>

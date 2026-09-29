@@ -9,7 +9,8 @@
     "npm:@supabase/realtime-js@2.116.0": "2.116.0",
     "npm:@supabase/storage-js@2.116.0": "2.116.0",
     "npm:@supabase/supabase-js@2": "2.116.0",
-    "npm:openai@^4.52.5": "4.104.0"
+    "npm:openai@^4.52.5": "4.104.0",
+    "npm:ripple-binary-codec@2": "2.11.0"
   },
   "jsr": {
     "@supabase/functions-js@2.116.0": {
@@ -30,6 +31,12 @@
     }
   },
   "npm": {
+    "@noble/hashes@2.4.0": {
+      "integrity": "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA=="
+    },
+    "@scure/base@2.4.0": {
+      "integrity": "sha512-thZ1TuJwFwBblOhgsjDKvvGirBxNp+wSvY/DR6tJBJOTDhdAAcHJ8Vbr2eFnqaxeca4+t0i9KBf+uHYGWwZORg=="
+    },
     "@supabase/auth-js@2.116.0": {
       "integrity": "sha512-Cmosty12gyKGK9N3bQb+lMmuAFev5nmUzaR1AsmZHqKOAGzqX1VQzmp49CNPwOx/pw0H9Qqk4rs9yhwTlKpfDg==",
       "dependencies": [
@@ -88,6 +95,14 @@
         "undici-types"
       ]
     },
+    "@xrplf/isomorphic@1.0.2": {
+      "integrity": "sha512-ncZUdMXr6VlSXtdoiDi0jTH+gBrgGxwVeEidhoegII3PmyErbQsyj6e+j7acmR4LW/lvBkPkzb9QzRfJH0n3rA==",
+      "dependencies": [
+        "@noble/hashes",
+        "eventemitter3",
+        "ws"
+      ]
+    },
     "abort-controller@3.0.0": {
       "integrity": "sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==",
       "dependencies": [
@@ -102,6 +117,9 @@
     },
     "asynckit@0.4.0": {
       "integrity": "sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q=="
+    },
+    "bignumber.js@10.0.2": {
+      "integrity": "sha512-E8Wp9O06QA6lneJ4aRUXKYf/1GIomqUEmUMwtIOMtDxf1U52ffJY+y7JBk/8wRafA8qOIqLnXQGqonYXZdBnFQ=="
     },
     "call-bind-apply-helpers@1.0.2": {
       "integrity": "sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==",
@@ -150,6 +168,9 @@
     },
     "event-target-shim@5.0.1": {
       "integrity": "sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ=="
+    },
+    "eventemitter3@5.0.1": {
+      "integrity": "sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA=="
     },
     "form-data-encoder@1.7.2": {
       "integrity": "sha512-qfqtYan3rxrnCk1VYaA4H+Ms9xdpPqvLZa6xmMgFvhO32x7/3J/ExcTd6qpxM0vH2GdMI+poehyBZvqfMTto8A=="
@@ -261,6 +282,21 @@
       ],
       "bin": true
     },
+    "ripple-address-codec@5.0.1": {
+      "integrity": "sha512-JQHLKuVJV8lv9Qobmn4aUM2Dpv9WRRLKnNWfM8tN02fAbUtG8mUPsu9q9UYX8P76G4qzytEc5ZKMp/3JggNYmw==",
+      "dependencies": [
+        "@scure/base",
+        "@xrplf/isomorphic"
+      ]
+    },
+    "ripple-binary-codec@2.11.0": {
+      "integrity": "sha512-qad61CYAqIi8H7DuPnuDpj40wrXY8wYrc1YbuDcA9G/NZG0Uu8unHNbTC6Itz8SlOSL0P/nF/8HTFW/1caVlTg==",
+      "dependencies": [
+        "@xrplf/isomorphic",
+        "bignumber.js",
+        "ripple-address-codec"
+      ]
+    },
     "tr46@0.0.3": {
       "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw=="
     },
@@ -282,6 +318,9 @@
         "tr46",
         "webidl-conversions"
       ]
+    },
+    "ws@8.21.3": {
+      "integrity": "sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw=="
     }
   }
 }

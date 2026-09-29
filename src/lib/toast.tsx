@@ -108,7 +108,7 @@ function Toaster({
             <div className="min-w-0 flex-1">
               <p
                 className={cn(
-                  "stencil text-[10px] tracking-[0.2em]",
+                  "stencil text-[11px] tracking-[0.14em]",
                   toneText[toast.tone]
                 )}
               >

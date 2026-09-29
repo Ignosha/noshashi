@@ -181,7 +181,7 @@ function AuthorityBody() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="ISSUER" className="shrink-0">
-            <Label htmlFor="authority-issuer" className="text-[10px] tracking-wide">
+            <Label htmlFor="authority-issuer" className="text-[11px] tracking-wide">
               ISSUING ACCOUNT
             </Label>
             <Input
@@ -200,9 +200,9 @@ function AuthorityBody() {
                 onCheckedChange={(next: boolean) => setWalkSupply(next)}
                 className="mt-0.5"
               />
-              <span className="text-[10.5px] leading-relaxed text-muted-foreground">
+              <span className="text-[11.5px] leading-relaxed text-muted-foreground">
                 Walk the holder lines
-                <span className="block text-[9.5px] text-faint">
+                <span className="block text-[11px] text-faint">
                   Slower. Without it the concentration check abstains rather
                   than passing — an unmeasured supply is not a dispersed one.
                 </span>
@@ -215,7 +215,7 @@ function AuthorityBody() {
             </Button>
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
 
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               This reports <span className="text-muted-foreground">what authority the
               issuer has kept</span> over an asset. It is not a score and not a
               legal finding — no number is composited, and whether an asset is
@@ -226,7 +226,7 @@ function AuthorityBody() {
 
           {certificate && (
             <Panel label="CERTIFICATE" className="shrink-0">
-              <p className="font-mono text-[10.5px] text-muted-foreground">
+              <p className="font-mono text-[11.5px] text-muted-foreground">
                 {shortAddress(certificate.issuer)}
               </p>
               <div className="mt-1 flex items-center gap-2">
@@ -238,23 +238,23 @@ function AuthorityBody() {
                 />
                 <InvestigateIssuerButton issuer={certificate.issuer} from="authority" />
               </div>
-              <p className="mt-3 stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+              <p className="mt-3 stencil text-[10px] tracking-[0.14em] text-muted-foreground">
                 DIGEST · SHA-256
               </p>
               {/* Shown whole and wrapped. A digest truncated to eight
                   characters cannot be compared against anything, which
                   makes it an ornament rather than evidence. */}
-              <code className="mt-1 block break-all font-mono text-[9.5px] leading-relaxed text-foreground">
+              <code className="mt-1 block break-all font-mono text-[11px] leading-relaxed text-foreground">
                 {certificate.digest}
               </code>
               <Button
                 variant="outline"
-                className="mt-2.5 h-7 w-full text-[10px]"
+                className="mt-2.5 h-7 w-full text-[11px]"
                 onClick={() => void copyDigest()}
               >
                 {copied ? "COPIED" : "COPY DIGEST"}
               </Button>
-              <p className="mt-2.5 text-[9.5px] leading-relaxed text-faint">
+              <p className="mt-2.5 text-[11px] leading-relaxed text-faint">
                 Covers the verdict, the issuer, the scoped currency, the ledger
                 index and every check id with its result. The ledger index is
                 inside it deliberately: the same issuer at a later ledger is a
@@ -268,7 +268,7 @@ function AuthorityBody() {
           label="FINDINGS"
           right={
             certificate ? (
-              <span className="mono-font text-[9px] tabular-nums text-faint">
+              <span className="mono-font text-[10.5px] tabular-nums text-faint">
                 {new Date(certificate.evaluatedAt).toLocaleString()}
               </span>
             ) : undefined
@@ -288,7 +288,7 @@ function AuthorityBody() {
               <div className="border-b border-border/50 px-4 py-3">
                 <p
                   className={cn(
-                    "mono-font text-[10px] tracking-[0.18em]",
+                    "mono-font text-[11px] tracking-[0.14em]",
                     // Was a ternary whose final branch was "text-go", so a
                     // certificate that established nothing rendered its
                     // NOT ESTABLISHED title in the pass colour.
@@ -297,10 +297,10 @@ function AuthorityBody() {
                 >
                   {verdict?.title ?? certificate.verdict.toUpperCase()}
                 </p>
-                <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
+                <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
                   {verdict?.blurb}
                 </p>
-                <p className="mt-1.5 font-mono text-[9px] tabular-nums text-faint">
+                <p className="mt-1.5 font-mono text-[10.5px] tabular-nums text-faint">
                   LEDGER {certificate.ledgerIndex.toLocaleString()}
                   {certificate.currencyLabel && ` · ${certificate.currencyLabel}`}
                 </p>
@@ -317,7 +317,7 @@ function AuthorityBody() {
                 />
               ))}
               <div className="px-4 py-3">
-                <p className="text-[9.5px] leading-relaxed text-faint">
+                <p className="text-[11px] leading-relaxed text-faint">
                   Ledger facts about retained authority. Not a determination that
                   any asset is or is not decentralised, a security, or compliant
                   with any statute — those findings rest with the relevant

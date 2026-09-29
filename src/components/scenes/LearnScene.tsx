@@ -116,11 +116,11 @@ export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => vo
                 Hands-on labs
               </span>
               {due > 0 && (
-                <span className="rounded-[3px] bg-brand px-1.5 font-mono text-[8px] tracking-[0.14em] text-primary-foreground">
+                <span className="rounded-[3px] bg-brand px-1.5 font-mono text-[10px] tracking-[0.1em] text-primary-foreground">
                   {due} DUE
                 </span>
               )}
-              <span className="ml-auto font-mono text-[9px] text-faint">
+              <span className="ml-auto font-mono text-[10.5px] text-faint">
                 {labsDone}/{LABS.length} DONE
               </span>
             </div>
@@ -150,7 +150,7 @@ export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => vo
                   >
                     {t.title}
                   </span>
-                  <span className="ml-auto font-mono text-[9px] text-faint">
+                  <span className="ml-auto font-mono text-[10.5px] text-faint">
                     {t.minutes} MIN
                   </span>
                 </div>
@@ -174,7 +174,7 @@ export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => vo
               <span className={cn("text-[12.5px] font-medium", misread ? "text-brand" : "text-foreground")}>
                 The ledger can be misread
               </span>
-              <span className="ml-auto font-mono text-[9px] text-faint">6 REAL CASES</span>
+              <span className="ml-auto font-mono text-[10.5px] text-faint">6 REAL CASES</span>
             </div>
             <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
               What a basic interface sees against what NOSHASHI verifies, on recorded mainnet replies.
@@ -203,7 +203,7 @@ export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => vo
           bodyClassName="flex min-h-0 flex-col p-0"
           right={
             !reduced && (
-              <span className="font-mono text-[9px] tabular-nums text-faint">
+              <span className="font-mono text-[10.5px] tabular-nums text-faint">
                 {beat + 1}/{active.beats.length}
               </span>
             )
@@ -217,7 +217,7 @@ export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => vo
               {active.beats.map((b, i) => (
                 <div key={i} className="border-b border-border/40 px-4 py-3.5">
                   <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-[9px] text-faint">
+                    <span className="font-mono text-[10.5px] text-faint">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <span className="text-[12.5px] font-medium text-foreground">
@@ -228,7 +228,7 @@ export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => vo
                     {b.body}
                   </p>
                   {b.caption && (
-                    <p className="mt-1.5 font-mono text-[9px] tracking-[0.14em] text-telemetry">
+                    <p className="mt-1.5 font-mono text-[10.5px] tracking-[0.1em] text-telemetry">
                       {b.caption}
                     </p>
                   )}
@@ -262,7 +262,7 @@ export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => vo
                     transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   >
                     {current.caption && (
-                      <p className="font-mono text-[9px] tracking-[0.18em] text-telemetry">
+                      <p className="font-mono text-[10.5px] tracking-[0.14em] text-telemetry">
                         {current.caption}
                       </p>
                     )}
@@ -309,7 +309,7 @@ export function LearnScene({ onNavigate }: { onNavigate?: (scene: SceneId) => vo
                       />
                     ))}
                   </div>
-                  <span className="w-9 shrink-0 text-right font-mono text-[9px] tabular-nums text-faint">
+                  <span className="w-9 shrink-0 text-right font-mono text-[10.5px] tabular-nums text-faint">
                     {Math.round(progress * 100)}%
                   </span>
                 </div>

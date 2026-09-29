@@ -86,7 +86,7 @@ export function AgentGovernance({
         <DataRow label="ROLE" value="ADVISORY ONLY" tone="go" />
         <DataRow label="ISSUES VERDICTS" value="NO · DETERMINISTIC ENGINE" />
         <DataRow label="WRITES TO LEDGER" value="NO" />
-        <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
           Model output is shown in the conversation and nowhere else. It is not read by the policy
           engine, the adjudication ledger or the evidence chain; a test fails the build if any of
           them imports the agent. The ledger holds the facts, the policy decides, a person acts.
@@ -112,7 +112,7 @@ export function AgentGovernance({
           value={!provider.requiresKey ? "NOT REQUIRED" : keyStored ? "IN OS KEYRING" : "NOT SET"}
           tone={!provider.requiresKey || keyStored ? "default" : "hold"}
         />
-        <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">{boundary.statement}</p>
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{boundary.statement}</p>
       </section>
 
       <section>
@@ -131,13 +131,13 @@ export function AgentGovernance({
         <Eyebrow className="mb-2">RULES GIVEN TO THE MODEL</Eyebrow>
         <ol className="space-y-1.5">
           {HARD_RULES.map((rule, i) => (
-            <li key={rule} className="flex gap-2 text-[10px] leading-snug text-foreground">
+            <li key={rule} className="flex gap-2 text-[11px] leading-snug text-foreground">
               <span className="mono-font text-muted-foreground">{i + 1}.</span>
               <span>{rule}</span>
             </li>
           ))}
         </ol>
-        <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
           These are instructions, not guarantees: a model can fail to follow them. Nothing that
           decides a verdict depends on it following them.
         </p>
@@ -145,7 +145,7 @@ export function AgentGovernance({
 
       <section className="xl:col-span-2">
         <Eyebrow className="mb-2">WHAT EVERY PROMPT CONTAINS</Eyebrow>
-        <p className="text-[10px] leading-relaxed text-muted-foreground">
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
           The rules above,{" "}
           {mode === "compliance"
             ? "the policy engine's rule order and the domain registry"
@@ -158,7 +158,7 @@ export function AgentGovernance({
             <span
               key={f}
               className={cn(
-                "mono-font border px-1.5 py-0.5 text-[9px]",
+                "mono-font border px-1.5 py-0.5 text-[10.5px]",
                 f.startsWith("WALLET") || f === "HELD_CREDENTIALS"
                   ? "border-hold/50 text-hold"
                   : "border-border text-muted-foreground"
@@ -168,22 +168,22 @@ export function AgentGovernance({
             </span>
           ))}
         </div>
-        <p className="mt-1.5 text-[9px] text-muted-foreground/80">
+        <p className="mt-1.5 text-[10.5px] text-muted-foreground/80">
           Highlighted fields identify the loaded wallet.
         </p>
         <button
           onClick={() => setShowPrompt((v) => !v)}
           aria-expanded={showPrompt}
-          className="stencil mt-3 text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2"
+          className="stencil mt-3 text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2"
         >
           {showPrompt ? "HIDE EXACT SYSTEM PROMPT" : "SHOW EXACT SYSTEM PROMPT"}
         </button>
         {showPrompt && (
           <>
-            <p className="mono-font mt-2 text-[9px] text-muted-foreground">
+            <p className="mono-font mt-2 text-[10.5px] text-muted-foreground">
               {prompt.length.toLocaleString()} characters · as it would be sent now
             </p>
-            <pre className="mono-font selectable mt-1 max-h-[280px] overflow-auto whitespace-pre-wrap border border-border bg-background p-2.5 text-[9px] leading-relaxed text-muted-foreground">
+            <pre className="mono-font selectable mt-1 max-h-[280px] overflow-auto whitespace-pre-wrap border border-border bg-background p-2.5 text-[10.5px] leading-relaxed text-muted-foreground">
               {prompt}
             </pre>
           </>
@@ -212,22 +212,22 @@ export function AgentGovernance({
             </Button>
           </div>
         </div>
-        <p className="mb-2 text-[10px] leading-relaxed text-muted-foreground">
+        <p className="mb-2 text-[11px] leading-relaxed text-muted-foreground">
           One row per call to a model, kept on this device. It stores SHA-256 digests and sizes of what
           was sent and returned, never the text. Support answers from the built-in knowledge base are
           not model calls and are not recorded.
         </p>
         {!log.loaded ? (
-          <p className="mono-font animate-pulse text-[10px] text-muted-foreground">LOADING…</p>
+          <p className="mono-font animate-pulse text-[11px] text-muted-foreground">LOADING…</p>
         ) : counts.total === 0 ? (
-          <p className="mono-font text-[10px] text-muted-foreground">No model calls recorded yet.</p>
+          <p className="mono-font text-[11px] text-muted-foreground">No model calls recorded yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-border">
                   {["TIME", "MODE", "MODEL", "WHERE", "SENT", "RETURNED", "OUTCOME", "PROMPT SHA-256"].map((h) => (
-                    <th key={h} className="stencil px-2 py-1.5 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">
+                    <th key={h} className="stencil px-2 py-1.5 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">
                       {h}
                     </th>
                   ))}
@@ -236,29 +236,29 @@ export function AgentGovernance({
               <tbody>
                 {log.records.slice(0, SHOWN).map((r) => (
                   <tr key={`${r.at}-${r.promptDigest}`} className="border-b border-border/30">
-                    <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">
+                    <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">
                       {new Date(r.at).toLocaleString()}
                     </td>
-                    <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{r.mode}</td>
-                    <td className="mono-font max-w-[140px] truncate px-2 py-1.5 text-[9px] text-foreground">{r.model}</td>
-                    <td className={cn("mono-font px-2 py-1.5 text-[9px]", r.onDevice ? "text-go" : "text-hold")}>
+                    <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{r.mode}</td>
+                    <td className="mono-font max-w-[140px] truncate px-2 py-1.5 text-[10.5px] text-foreground">{r.model}</td>
+                    <td className={cn("mono-font px-2 py-1.5 text-[10.5px]", r.onDevice ? "text-go" : "text-hold")}>
                       {r.onDevice ? "device" : r.host}
                     </td>
-                    <td className="mono-font px-2 py-1.5 text-[9px] tabular-nums text-muted-foreground">
+                    <td className="mono-font px-2 py-1.5 text-[10.5px] tabular-nums text-muted-foreground">
                       {r.promptChars.toLocaleString()}
                     </td>
-                    <td className="mono-font px-2 py-1.5 text-[9px] tabular-nums text-muted-foreground">
+                    <td className="mono-font px-2 py-1.5 text-[10.5px] tabular-nums text-muted-foreground">
                       {r.responseChars.toLocaleString()}
                     </td>
                     <td
                       className={cn(
-                        "mono-font px-2 py-1.5 text-[9px]",
+                        "mono-font px-2 py-1.5 text-[10.5px]",
                         r.outcome === "complete" ? "text-go" : r.outcome === "error" ? "text-no-go" : "text-hold"
                       )}
                     >
                       {r.outcome}
                     </td>
-                    <td className="mono-font selectable px-2 py-1.5 text-[9px] text-muted-foreground">
+                    <td className="mono-font selectable px-2 py-1.5 text-[10.5px] text-muted-foreground">
                       {r.promptDigest.slice(0, 16)}…
                     </td>
                   </tr>
@@ -266,7 +266,7 @@ export function AgentGovernance({
               </tbody>
             </table>
             {counts.total > SHOWN && (
-              <p className="stencil mt-2 text-[8px] tracking-[0.18em] text-muted-foreground">
+              <p className="stencil mt-2 text-[10px] tracking-[0.14em] text-muted-foreground">
                 SHOWING {SHOWN} MOST RECENT · EXPORT FOR ALL {counts.total.toLocaleString()}
               </p>
             )}

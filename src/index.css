@@ -33,7 +33,7 @@
   --secondary: 0 0% 94%;
   --secondary-foreground: 0 0% 0%;
   --muted: 0 0% 94%;
-  --muted-foreground: 0 0% 42%;
+  --muted-foreground: 0 0% 32%;
   --accent: 0 0% 90%;
   --accent-foreground: 0 0% 0%;
   --destructive: 0 84% 50%;
@@ -46,7 +46,7 @@
      supersedes it. */
   --radius: 0.5rem;
 
-  --faint: 210 11% 47%;
+  --faint: 210 11% 38%;
 
   /* Light mode matches the website's light theme */
   --brand: 138 63% 40%;              /* #247A3B - matcha green */
@@ -86,8 +86,8 @@
   --secondary: 125 18% 12%;
   --secondary-foreground: 135 20% 90%;
   --muted: 125 15% 16%;              /* #263B2A */
-  --muted-foreground: 130 10% 65%;   /* #A7B8A8 */
-  --faint: 130 10% 50%;              /* #718473 */
+  --muted-foreground: 130 12% 74%;   /* raised for legibility on the dark ground */
+  --faint: 130 10% 62%;              /* AA on --background at 11px */
   --accent: 125 18% 12%;
   --accent-foreground: 135 20% 90%;
   --destructive: 355 85% 50%;
@@ -298,8 +298,15 @@ body,
  */
 #root {
   zoom: var(--text-scale, 1);
-  height: calc(100% / var(--text-scale, 1));
-  width: calc(100% / var(--text-scale, 1));
+  /* Pixel sizes, not percentages: engines disagree on whether a
+     percentage inside a zoomed box is zoomed (WebKit) or not (Chromium
+     128+ / WebView2), which left the app in the top-left corner of the
+     window on Windows. A px length is zoomed by every engine, so the
+     window size divided by the scale always fills exactly one window.
+     --app-w/--app-h are kept in step with the window by appearance.tsx. */
+  width: calc(var(--app-w, 100vw) / var(--text-scale, 1));
+  height: calc(var(--app-h, 100vh) / var(--text-scale, 1));
+  overflow: hidden;
 }
 
 /* High contrast: push the ink and the rules apart until nothing is subtle. */
@@ -870,3 +877,44 @@ tbody tr:hover {
   mask-image: linear-gradient(180deg, #000 55%, transparent);
 }
 :root:not(.dark) .garden-field-host > .garden-field { opacity: 0.4; }
+
+/* ------------------------------------------------------------
+   TITLE BAR — sheds detail as it narrows instead of overlapping.
+   Container queries measure the bar itself, so they follow the
+   operator's interface scale as well as the window width.
+   ------------------------------------------------------------ */
+.titlebar {
+  container-type: inline-size;
+}
+.tb-search {
+  width: clamp(150px, 34cqw, 360px);
+}
+@container (max-width: 980px) {
+  .tb-optional {
+    display: none;
+  }
+}
+@container (max-width: 620px) {
+  .tb-search {
+    width: auto;
+    padding-inline: 0.5rem;
+  }
+  .tb-search-label {
+    display: none;
+  }
+}
+@container (max-width: 440px) {
+  .tb-title {
+    display: none;
+  }
+}
+
+/* The status rail drops its secondary items before anything wraps. */
+.statusrail {
+  container-type: inline-size;
+}
+@container (max-width: 860px) {
+  .sr-optional {
+    display: none;
+  }
+}

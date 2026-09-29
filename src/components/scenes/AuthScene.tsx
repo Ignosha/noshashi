@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useAuth, passwordProblems, passwordScore } from "@/lib/auth/useAuth";
-import { useToast } from "@/lib/toast";
 import { BRAND, CONTACT, copyrightLine } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { SPRING } from "@/lib/motion";
@@ -75,7 +74,6 @@ export function AuthScene({
     user,
     mfaRequired,
   } = useAuth();
-  const { push } = useToast();
 
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
@@ -96,9 +94,22 @@ export function AuthScene({
     if (mfaRequired) setMode("mfa");
   }, [mfaRequired]);
 
+  // Closes only once the whole sign-in has finished. The session exists as
+  // soon as the password is accepted, before the second-factor check has
+  // answered, so without the busy guard an account with 2FA was waved
+  // through at the first factor and never saw the code prompt.
   useEffect(() => {
-    if (user && !mfaRequired) onAuthenticated();
-  }, [user, mfaRequired, onAuthenticated]);
+    if (user && !mfaRequired && !busy) onAuthenticated();
+  }, [user, mfaRequired, busy, onAuthenticated]);
+
+  // Escape leaves, like every other overlay in the console.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !busy) onDismiss();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [busy, onDismiss]);
 
   const problems = useMemo(() => passwordProblems(password), [password]);
   const score = useMemo(() => passwordScore(password), [password]);
@@ -128,9 +139,7 @@ export function AuthScene({
         if (needsSecond) {
           setMode("mfa");
           setNotice("Password accepted. Enter your authenticator code.");
-          return;
         }
-        push({ title: "SIGNED IN", tone: "go" });
       });
       return;
     }
@@ -150,7 +159,6 @@ export function AuthScene({
     if (mode === "otp") {
       void run(async () => {
         await verifyOtp(email.trim(), code);
-        push({ title: "SIGNED IN", tone: "go" });
       });
       return;
     }
@@ -168,7 +176,6 @@ export function AuthScene({
         const factor = factors.find((entry) => entry.status === "verified");
         if (!factor) throw new Error("No verified authenticator is enrolled.");
         await challengeTotp(factor.id, code);
-        push({ title: "SECOND FACTOR ACCEPTED", tone: "go" });
       });
       return;
     }
@@ -177,16 +184,24 @@ export function AuthScene({
   const copy = MODE_COPY[mode];
 
   return (
-    <div className="scanlines relative flex h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-background p-6 text-foreground">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={copy.title}
+      className="scanlines relative flex h-full w-full overflow-y-auto overflow-x-hidden bg-background p-6 text-foreground"
+    >
       <PatternMark element="orbital" size={460} opacity={0.06} className="-right-32 -top-24" />
 
-      <div className="relative w-full max-w-[420px]">
+      {/* m-auto rather than items-center: a centred flex child taller than
+          its box overflows upwards, where it cannot be scrolled to, which
+          hid the form's top at large text sizes. */}
+      <div className="relative m-auto w-full max-w-[440px]">
         <div className="mb-6 flex flex-col items-center text-center">
           <NovaLogo size={44} tone="color" />
           <h1 className="display mt-4 text-[22px] font-[800] tracking-[0.1em] text-foreground">
             {BRAND.name}
           </h1>
-          <p className="stencil mt-1.5 text-[8px] tracking-[0.3em] text-muted-foreground">
+          <p className="stencil mt-1.5 text-[10px] tracking-[0.14em] text-muted-foreground">
             {BRAND.tagline.toUpperCase()}
           </p>
         </div>
@@ -205,12 +220,12 @@ export function AuthScene({
                   <h2 className="display text-[15px] font-[700] tracking-[0.1em] text-foreground">
                     {copy.title}
                   </h2>
-                  <p className="mt-1.5 text-[10.5px] leading-relaxed text-muted-foreground">
+                  <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted-foreground">
                     {copy.blurb}
                   </p>
                 </div>
                 {mode === "mfa" && (
-                  <Badge variant="go" className="shrink-0 text-[8px]">
+                  <Badge variant="go" className="shrink-0 text-[10px]">
                     2FA
                   </Badge>
                 )}
@@ -276,7 +291,7 @@ export function AuthScene({
                             />
                           ))}
                         </div>
-                        <p className="mt-1.5 text-[9.5px] text-muted-foreground">
+                        <p className="mt-1.5 text-[11px] text-muted-foreground">
                           <span className="text-foreground">{STRENGTH_LABEL[score]}</span>
                           {problems.length > 0 && ` · needs ${problems.join(", ").toLowerCase()}`}
                         </p>
@@ -300,7 +315,7 @@ export function AuthScene({
                       onChange={(event) =>
                         setCode(event.target.value.replace(/[^0-9]/g, ""))
                       }
-                      className="mono-font mt-1.5 text-center text-[18px] tracking-[0.5em]"
+                      className="mono-font mt-1.5 text-center text-[18px] tracking-[0.14em]"
                       placeholder="000000"
                     />
                   </div>
@@ -309,7 +324,7 @@ export function AuthScene({
                 {error && (
                   <p
                     role="alert"
-                    className="border border-no-go/40 bg-no-go-dim px-2.5 py-2 text-[10.5px] leading-relaxed text-no-go"
+                    className="border border-no-go/40 bg-no-go-dim px-2.5 py-2 text-[11.5px] leading-relaxed text-no-go"
                   >
                     {error}
                   </p>
@@ -317,7 +332,7 @@ export function AuthScene({
                 {notice && (
                   <p
                     role="status"
-                    className="border border-go/40 bg-go-dim px-2.5 py-2 text-[10.5px] leading-relaxed text-go"
+                    className="border border-go/40 bg-go-dim px-2.5 py-2 text-[11.5px] leading-relaxed text-go"
                   >
                     {notice}
                   </p>
@@ -351,21 +366,21 @@ export function AuthScene({
                           setNotice("Code sent. It is valid for a few minutes.");
                         })
                       }
-                      className="flex w-full items-center gap-2 text-[10.5px] text-muted-foreground transition-colors hover:text-foreground"
+                      className="flex w-full items-center gap-2 text-[11.5px] text-muted-foreground transition-colors hover:text-foreground"
                     >
                       <NovaBolt size={11} />
                       Email me a one-time code instead
                     </button>
                     <button
                       onClick={() => setMode("reset")}
-                      className="flex w-full items-center gap-2 text-[10.5px] text-muted-foreground transition-colors hover:text-foreground"
+                      className="flex w-full items-center gap-2 text-[11.5px] text-muted-foreground transition-colors hover:text-foreground"
                     >
                       <NovaVault size={11} />
                       Forgot password
                     </button>
                     <button
                       onClick={() => setMode("signup")}
-                      className="flex w-full items-center gap-2 text-[10.5px] text-muted-foreground transition-colors hover:text-foreground"
+                      className="flex w-full items-center gap-2 text-[11.5px] text-muted-foreground transition-colors hover:text-foreground"
                     >
                       <NovaShield size={11} />
                       Create an account
@@ -381,7 +396,7 @@ export function AuthScene({
                       setNotice(null);
                       setCode("");
                     }}
-                    className="flex w-full items-center gap-2 text-[10.5px] text-muted-foreground transition-colors hover:text-foreground"
+                    className="flex w-full items-center gap-2 text-[11.5px] text-muted-foreground transition-colors hover:text-foreground"
                   >
                     <NovaEye size={11} />
                     Back to sign in
@@ -395,13 +410,13 @@ export function AuthScene({
         <div className="mt-4 flex items-center justify-between">
           <button
             onClick={onDismiss}
-            className="stencil text-[8px] tracking-[0.22em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+            className="stencil text-[10px] tracking-[0.14em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
           >
             ← CONTINUE WITHOUT AN ACCOUNT
           </button>
           <a
             href={`mailto:${CONTACT.support}`}
-            className="stencil text-[8px] tracking-[0.22em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+            className="stencil text-[10px] tracking-[0.14em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
           >
             NEED HELP
           </a>

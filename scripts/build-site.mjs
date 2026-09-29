@@ -1102,6 +1102,49 @@ ${card("STRATEGIC", "Watched around the clock.", [
   }));
 }
 
+/* ── /auth/confirmed/ ─────────────────────────────────────────────── */
+/*
+ * Where the sign-up confirmation email lands. It used to redirect to the
+ * home page, so someone who confirmed their address was never told it had
+ * worked or that the next step happens in the desktop app. The page reads
+ * only the outcome Supabase puts in the URL, never keeps the session it
+ * carries, and strips the fragment at once so the tokens are not left in
+ * the address bar or the history.
+ */
+async function buildAuthConfirmed() {
+  const head = `<meta name="robots" content="noindex">
+<style>
+.conf{max-width:560px;margin:48px auto}
+.conf h1{margin-top:6px}
+.conf ol{margin:14px 0 0 18px;line-height:1.8}
+.conf .bad{border-left:3px solid var(--nogo);padding-left:12px}
+</style>`;
+  const body = `<section class="conf"><div class="panel" id="conf-ok"><p class="eyebrow">ACCOUNT</p><h1>Your email is confirmed.</h1><p>Your NOSHASHI account is ready. Signing in happens in the desktop app, not on this website.</p><ol><li>Open the NOSHASHI app.</li><li>Go to <strong>Account</strong> and press <strong>Sign in</strong>.</li><li>Use the email and password you just registered.</li></ol><p style="margin-top:16px"><a class="btn" href="/#download">Download NOSHASHI</a> <a class="btn ghost" href="/contact/">Need help?</a></p></div>
+<div class="panel bad" id="conf-bad" hidden><p class="eyebrow">ACCOUNT</p><h1>This link did not work.</h1><p id="conf-why">The link has expired or was already used.</p><p>Open the NOSHASHI app, go to <strong>Account</strong>, and sign in. If your address still needs confirming, create the account again or use <strong>Email me a one-time code instead</strong> to get a fresh link.</p><p style="margin-top:16px"><a class="btn ghost" href="/contact/">Contact support</a></p></div></section>`;
+  const script = `<script>
+(function(){
+  var raw=(location.hash||"").replace(/^#/,"")||(location.search||"").replace(/^\\?/,"");
+  var q=new URLSearchParams(raw);
+  // Drop the tokens from the address bar and history before anything else.
+  if(location.hash||location.search){try{history.replaceState(null,"",location.pathname);}catch(e){}}
+  var err=q.get("error_description")||q.get("error");
+  if(err){
+    document.getElementById("conf-ok").hidden=true;
+    document.getElementById("conf-bad").hidden=false;
+    document.getElementById("conf-why").textContent=err.replace(/\\+/g," ");
+  }
+})();
+</script>`;
+  await write("auth/confirmed/index.html", renderPage({
+    title: "Email confirmed · NOSHASHI",
+    description: "Your NOSHASHI account email is confirmed. Sign in from the desktop app.",
+    path: "/auth/confirmed/",
+    head,
+    body,
+    scripts: script,
+  }));
+}
+
 /* ── institutional product pages ─────────────────────────────────── */
 const PRODUCT_PAGES = [
   ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Operating evidence</p><h2>Make every decision reviewable.</h2><p>Enterprise brings the same validated-ledger reading used in the public certificate into a governed workflow: the observation, policy result and adjudication remain connected.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p><ul class="proof-list"><li>Evidence attached to each policy result</li><li>Decision history suitable for second-line review</li></ul></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth, while teams retain the context required to act on them.</p><ul class="proof-list"><li>Validated state before interpretation</li><li>Exportable records for internal controls</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p>Architecture and commercial scope are confirmed before any contracted capability is promised.</p><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Trust &amp; security</a></p></div></section>`],
@@ -1619,6 +1662,7 @@ async function main() {
   await buildCertificate();
   await buildProtection();
   await buildRelease1014();
+  await buildAuthConfirmed();
   await buildPricingEnhancement();
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildTrust();

@@ -99,7 +99,7 @@ export function NftScene() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="TOKEN" className="shrink-0">
-            <Label htmlFor="nftid" className="text-[10px] tracking-wide">
+            <Label htmlFor="nftid" className="text-[11px] tracking-wide">
               NFTOKEN ID
             </Label>
             <Input
@@ -116,7 +116,7 @@ export function NftScene() {
               {busy ? "READING RIGHTS…" : "READ TOKEN RIGHTS"}
             </Button>
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               The rights are encoded in the id itself, so they are decoded{" "}
               <span className="text-muted-foreground">here, offline</span> — no
               server is asked and none can answer wrongly. That matters when
@@ -127,10 +127,10 @@ export function NftScene() {
 
           {r && (
             <Panel label="ISSUER" bodyClassName="p-3.5">
-              <p className="mono-font text-[8px] tracking-[0.2em] text-faint">
+              <p className="mono-font text-[10px] tracking-[0.14em] text-faint">
                 DECODED FROM THE TOKEN ID
               </p>
-              <code className="mt-1.5 block break-all text-[10.5px] text-muted-foreground">
+              <code className="mt-1.5 block break-all text-[11.5px] text-muted-foreground">
                 {r.issuer}
               </code>
               <div className="mt-2 flex gap-1.5">
@@ -143,7 +143,7 @@ export function NftScene() {
                   label="INBOX"
                 />
               </div>
-              <p className="mono-font mt-2.5 text-[9px] tabular-nums text-faint">
+              <p className="mono-font mt-2.5 text-[10.5px] tabular-nums text-faint">
                 TAXON {r.taxon.toLocaleString()} · SEQUENCE {r.sequence.toLocaleString()}
               </p>
             </Panel>
@@ -161,23 +161,23 @@ export function NftScene() {
                   <div className="flex items-baseline gap-2">
                     <span
                       className={cn(
-                        "mono-font text-[8px] tracking-[0.14em]",
+                        "mono-font text-[10px] tracking-[0.1em]",
                         side === "SELL" ? "text-no-go" : "text-go"
                       )}
                     >
                       {side}
                     </span>
-                    <code className="text-[10px] text-muted-foreground">
+                    <code className="text-[11px] text-muted-foreground">
                       {shortAddress(offer.owner)}
                     </code>
-                    <span className="ml-auto font-mono text-[10.5px] tabular-nums text-foreground">
+                    <span className="ml-auto font-mono text-[11.5px] tabular-nums text-foreground">
                       {offer.amountXrp !== undefined
                         ? `${offer.amountXrp.toLocaleString(undefined, { maximumFractionDigits: 6 })} XRP`
                         : "issued token"}
                     </span>
                   </div>
                   {offer.destination && (
-                    <p className="mono-font mt-1 text-[8.5px] tracking-[0.1em] text-hold">
+                    <p className="mono-font mt-1 text-[10px] tracking-[0.1em] text-hold">
                       RESERVED FOR {shortAddress(offer.destination)}
                     </p>
                   )}
@@ -202,7 +202,7 @@ export function NftScene() {
           ) : (
             <>
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="break-all font-mono text-[9.5px] text-faint">
+                <p className="break-all font-mono text-[11px] text-faint">
                   {report.rights.tokenId}
                 </p>
               </div>

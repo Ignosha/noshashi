@@ -95,7 +95,7 @@ function ProvenanceBody() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       {claimed && (
-        <p className="mono-font shrink-0 text-[9px] leading-snug text-faint">
+        <p className="mono-font shrink-0 text-[10.5px] leading-snug text-faint">
           TRACED FROM {String(claimed.from ?? "").toUpperCase()}
           {claimed.as && ` · ${claimed.as.toUpperCase()}`}
         </p>
@@ -159,7 +159,7 @@ function ProvenanceBody() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="COUNTERPARTY" className="shrink-0">
-            <Label htmlFor="prov" className="text-[10px] tracking-wide">
+            <Label htmlFor="prov" className="text-[11px] tracking-wide">
               XRPL ADDRESS
             </Label>
             <Input
@@ -176,7 +176,7 @@ function ProvenanceBody() {
               {busy ? "TRACING ORIGIN…" : "TRACE PROVENANCE"}
             </Button>
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               An account's{" "}
               <span className="text-muted-foreground">sequence</span> is not a
               transaction count. Accounts created after DeletableAccounts have
@@ -188,15 +188,15 @@ function ProvenanceBody() {
           {report?.fundedBy && (
             <Panel label="FUNDING CHAIN" bodyClassName="p-0">
               <div className="border-b border-border/30 px-3.5 py-2.5">
-                <p className="mono-font text-[8px] tracking-[0.2em] text-faint">
+                <p className="mono-font text-[10px] tracking-[0.14em] text-faint">
                   FUNDED THIS ACCOUNT
                 </p>
-                <code className="mt-1 block break-all text-[10.5px] text-muted-foreground">
+                <code className="mt-1 block break-all text-[11.5px] text-muted-foreground">
                   {report.fundedBy}
                 </code>
                 <Button
                   variant="outline"
-                  className="mt-2 h-7 w-full text-[10px]"
+                  className="mt-2 h-7 w-full text-[11px]"
                   onClick={() => void run(report.fundedBy)}
                   disabled={busy}
                 >
@@ -204,7 +204,7 @@ function ProvenanceBody() {
                 </Button>
               </div>
               <div className="px-3.5 py-2.5">
-                <p className="mono-font text-[9px] leading-relaxed text-faint">
+                <p className="mono-font text-[10.5px] leading-relaxed text-faint">
                   Funding is the strongest on-ledger link an address has to
                   anyone — it is written once and cannot be edited afterwards.
                   Walking it back is how a shell resolves to something known.
@@ -229,10 +229,10 @@ function ProvenanceBody() {
           ) : (
             <>
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="break-all font-mono text-[10px] text-muted-foreground">
+                <p className="break-all font-mono text-[11px] text-muted-foreground">
                   {report.address}
                 </p>
-                <p className="mt-1 font-mono text-[9px] tabular-nums text-faint">
+                <p className="mt-1 font-mono text-[10.5px] tabular-nums text-faint">
                   {report.originLedger
                     ? `ORIGIN LEDGER ${report.originLedger.toLocaleString()}`
                     : "ORIGIN NOT FOUND"}

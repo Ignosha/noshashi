@@ -141,7 +141,7 @@ function AmmBody() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="POOL" className="shrink-0">
-            <Label htmlFor="amm" className="text-[10px] tracking-wide">
+            <Label htmlFor="amm" className="text-[11px] tracking-wide">
               AMM ACCOUNT
             </Label>
             <Input
@@ -158,7 +158,7 @@ function AmmBody() {
               {busy ? "READING POOL GOVERNANCE…" : "READ POOL GOVERNANCE"}
             </Button>
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               An AMM account is created by the protocol, not by a person — it
               is not an ordinary wallet. Vote weight is a share of{" "}
               <span className="text-muted-foreground">LP token supply</span>,
@@ -178,7 +178,7 @@ function AmmBody() {
                 return (
                   <div key={v.account} className="border-b border-border/30 px-3.5 py-2">
                     <div className="flex items-baseline gap-2">
-                      <code className="text-[10.5px] text-muted-foreground">
+                      <code className="text-[11.5px] text-muted-foreground">
                         {shortAddress(v.account)}
                       </code>
                       <TraceButton
@@ -187,7 +187,7 @@ function AmmBody() {
                         from="amm"
                         as="fee voter"
                       />
-                      <span className="ml-auto font-mono text-[10px] tabular-nums text-faint">
+                      <span className="ml-auto font-mono text-[11px] tabular-nums text-faint">
                         votes {v.votedFeePct.toFixed(3)}%
                       </span>
                       <span
@@ -205,14 +205,14 @@ function AmmBody() {
                         style={{ width: `${Math.min(100, v.weightOfCast * 100)}%` }}
                       />
                     </div>
-                    <p className="mono-font mt-1 text-[8.5px] tabular-nums text-faint">
+                    <p className="mono-font mt-1 text-[10px] tabular-nums text-faint">
                       {(v.weightOfSupply * 100).toFixed(3)}% OF LP SUPPLY
                     </p>
                   </div>
                 );
               })}
               <div className="px-3.5 py-2.5">
-                <p className="mono-font text-[9px] leading-snug text-faint">
+                <p className="mono-font text-[10.5px] leading-snug text-faint">
                   Bars show share of weight <span className="text-muted-foreground">cast</span>.
                   The line beneath each is share of total LP supply — the gap
                   between them is the liquidity that did not vote.
@@ -237,11 +237,11 @@ function AmmBody() {
           ) : (
             <>
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="font-mono text-[10px] text-muted-foreground">
+                <p className="font-mono text-[11px] text-muted-foreground">
                   {report.pair}
                   <span className="ml-2 text-faint">{shortAddress(report.account)}</span>
                 </p>
-                <p className="mt-1 font-mono text-[9px] tabular-nums text-faint">
+                <p className="mt-1 font-mono text-[10.5px] tabular-nums text-faint">
                   LEDGER {report.ledgerIndex.toLocaleString()} · CLOSED{" "}
                   {report.ledgerCloseTime.toISOString().replace("T", " ").slice(0, 16)} UTC
                 </p>

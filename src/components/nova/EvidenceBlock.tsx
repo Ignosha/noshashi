@@ -13,7 +13,7 @@ export function EvidenceBlock({
 }) {
   return (
     <div className="border-b border-border/40 py-2 last:border-0">
-      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">{label}</p>
+      <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{label}</p>
       <p
         className={cn(
           "data-font mt-1 text-[12px] tabular-nums",
@@ -25,7 +25,7 @@ export function EvidenceBlock({
       >
         {value}
       </p>
-      <p className="mono-font mt-0.5 text-[9px] leading-relaxed text-faint">{detail}</p>
+      <p className="mono-font mt-0.5 text-[10.5px] leading-relaxed text-faint">{detail}</p>
     </div>
   );
 }

@@ -70,9 +70,13 @@ export function TitleBar({
   return (
     <header
       data-tauri-drag-region
-      className="relative z-30 flex h-11 shrink-0 items-center justify-between border-b border-border bg-background/90 px-3 backdrop-blur"
+      // Three columns that cannot overlap: the search sits in the middle
+      // one instead of being absolutely centred over the others, and the
+      // bar sheds its least important readouts as it narrows (index.css,
+      // .titlebar container queries).
+      className="titlebar relative z-30 grid h-11 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-border bg-background/90 px-3 backdrop-blur"
     >
-      <div data-tauri-drag-region className="flex items-center gap-3">
+      <div data-tauri-drag-region className="flex min-w-0 items-center gap-3">
         <div className="flex items-center gap-2">
           <button
             onClick={() => void handleClose()}
@@ -128,13 +132,13 @@ export function TitleBar({
 
         <span data-tauri-drag-region className="h-3.5 w-px bg-border" />
 
-        <span data-tauri-drag-region className="stencil text-[9px] tracking-[0.26em] text-muted-foreground">
+        <span data-tauri-drag-region className="stencil tb-title min-w-0 truncate text-[10.5px] tracking-[0.14em] text-muted-foreground">
           {title}
         </span>
         {/* Unmissable in the demo build, absent in the full one, so a
             screenshot of the demo can never pass for the product. */}
         {isDemo && (
-          <span className="rounded border border-hold/60 bg-hold/10 px-1.5 py-0.5 font-mono text-[8.5px] tracking-[0.2em] text-hold">
+          <span className="rounded border border-hold/60 bg-hold/10 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.14em] text-hold">
             EARLY RELEASE · DEMO
           </span>
         )}
@@ -149,23 +153,24 @@ export function TitleBar({
       {onCommand && (
         <button
           onClick={onCommand}
-          className="group absolute left-1/2 flex h-6 w-[min(340px,32vw)] -translate-x-1/2 items-center gap-2 rounded-full border border-border bg-card px-3 text-left transition-colors hover:border-brand/40 hover:bg-popover"
+          className="tb-search group flex h-7 items-center gap-2 justify-self-center rounded-full border border-border bg-card px-3 text-left transition-colors hover:border-brand/40 hover:bg-popover"
           aria-label="Open command palette"
+          title="Search scenes, wallets, commands"
         >
-          <NovaSearch size={11} className="shrink-0 text-faint" />
-          <span className="min-w-0 flex-1 truncate text-[10px] tracking-[0.1em] text-faint">
+          <NovaSearch size={12} className="shrink-0 text-muted-foreground" />
+          <span className="tb-search-label min-w-0 flex-1 truncate text-[11.5px] text-muted-foreground">
             Search scenes, wallets, commands
           </span>
-          <kbd className="shrink-0 font-mono text-[9px] text-faint">⌘K</kbd>
+          <kbd className="tb-search-label shrink-0 font-mono text-[10.5px] text-faint">{isMac ? "⌘K" : "Ctrl K"}</kbd>
         </button>
       )}
 
-      <div data-tauri-drag-region className="flex items-center gap-3">
-        <span className="flex items-center gap-1.5">
+      <div data-tauri-drag-region className="flex min-w-0 items-center justify-end gap-3">
+        <span className="flex shrink-0 items-center gap-1.5">
           <StatusDot status={status} size={5} pulse={status === "go"} />
           <span
             className={cn(
-              "stencil text-[8px] tracking-[0.2em]",
+              "stencil text-[10px] tracking-[0.14em]",
               status === "go" && "text-go",
               status === "hold" && "text-hold",
               status === "no-go" && "text-no-go"
@@ -181,17 +186,17 @@ export function TitleBar({
         */}
         {freshness !== undefined && (
           <>
-            <span className="h-3.5 w-px bg-border" />
+            <span className="tb-optional h-3.5 w-px bg-border" />
             <span
-              className="mono-font text-[9px] tabular-nums text-faint"
+              className="tb-optional shrink-0 mono-font text-[10.5px] tabular-nums text-faint"
               title="Age of the newest validated ledger read"
             >
               {freshness < 60 ? `${Math.max(0, Math.round(freshness))}s AGO` : "STALE"}
             </span>
           </>
         )}
-        <span className="h-3.5 w-px bg-border" />
-        <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+        <span className="tb-optional h-3.5 w-px bg-border" />
+        <span className="tb-optional shrink-0 truncate mono-font text-[10.5px] tabular-nums text-muted-foreground">
           XRPL · MAINNET{isMac ? "" : " · WIN"}
         </span>
       </div>

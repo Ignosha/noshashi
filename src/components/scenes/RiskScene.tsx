@@ -64,11 +64,11 @@ function FindingRow({ finding }: { finding: Finding }) {
       <p className={cn("text-[11.5px] font-medium", tone[finding.severity])}>
         {finding.title}
       </p>
-      <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
+      <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
         {finding.detail}
       </p>
       {finding.action && (
-        <p className="mono-font mt-1.5 border-t border-border/40 pt-1.5 text-[9px] text-foreground/70">
+        <p className="mono-font mt-1.5 border-t border-border/40 pt-1.5 text-[10.5px] text-foreground/70">
           → {finding.action}
         </p>
       )}
@@ -179,7 +179,7 @@ function RiskBody({
           { label: "COUNTERPARTY HHI", value: concentration.hhi, tone: concentration.hhi > 2500 ? ("no-go" as const) : ("default" as const) },
         ].map((stat) => (
           <Panel key={stat.label} bodyClassName="p-3">
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               {stat.label}
             </p>
             <p
@@ -218,7 +218,7 @@ function RiskBody({
                   <TabsTrigger value="exit">
                     EXIT
                     {trappedCount > 0 && (
-                      <span className="ml-1.5 bg-no-go px-1 text-[9px] font-bold text-background">
+                      <span className="ml-1.5 bg-no-go px-1 text-[10.5px] font-bold text-background">
                         {trappedCount}
                       </span>
                     )}
@@ -249,7 +249,7 @@ function RiskBody({
                   <thead className="sticky top-0 z-10 bg-card">
                     <tr className="border-b border-border">
                       {["", "ISSUER", "CURRENCY", "BALANCE", "FREEZE POSTURE"].map((h, i) => (
-                        <th key={i} className="stencil px-3 py-2 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">{h}</th>
+                        <th key={i} className="stencil px-3 py-2 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -257,16 +257,16 @@ function RiskBody({
                     {exposures.map((e) => (
                       <tr key={e.issuer} className="border-b border-border/30 hover:bg-secondary/40">
                         <td className="px-3 py-2"><span className={cn("block h-1.5 w-1.5", dot[e.severity])} /></td>
-                        <td className="mono-font selectable px-3 py-2 text-[10px] text-foreground">
+                        <td className="mono-font selectable px-3 py-2 text-[11px] text-foreground">
                           {e.domain ?? shortAddress(e.issuer)}
                         </td>
-                        <td className="mono-font px-3 py-2 text-[10px] text-muted-foreground">
+                        <td className="mono-font px-3 py-2 text-[11px] text-muted-foreground">
                           {e.currencies.join(", ")}
                         </td>
-                        <td className="mono-font px-3 py-2 text-[10px] tabular-nums text-foreground">
+                        <td className="mono-font px-3 py-2 text-[11px] tabular-nums text-foreground">
                           {e.balance.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                         </td>
-                        <td className={cn("px-3 py-2 text-[10px] leading-snug", tone[e.severity])}>
+                        <td className={cn("px-3 py-2 text-[11px] leading-snug", tone[e.severity])}>
                           {e.headline}
                         </td>
                       </tr>
@@ -280,7 +280,7 @@ function RiskBody({
 
           {tab === "exit" && (
             <div className="flex flex-col">
-              <div className="border-b border-border/60 px-4 py-2.5 text-[10px] leading-relaxed text-faint">
+              <div className="border-b border-border/60 px-4 py-2.5 text-[11px] leading-relaxed text-faint">
                 Every position walked against the live XRPL DEX bid side and
                 its AMM pool, then joined to the issuer&rsquo;s freeze rights.
                 A balance is only an asset if the issuer cannot immobilise it{" "}
@@ -332,7 +332,7 @@ function RiskBody({
                       kicker={EXIT_COPY[a.verdict].label}
                       className="rounded-none border-b border-border/30"
                     >
-                      <div className="mt-2.5 flex flex-wrap gap-x-6 gap-y-1 font-mono text-[10px] tabular-nums text-faint">
+                      <div className="mt-2.5 flex flex-wrap gap-x-6 gap-y-1 font-mono text-[11px] tabular-nums text-faint">
                         <span>
                           BID DEPTH{" "}
                           <span className="text-muted-foreground">
@@ -409,23 +409,23 @@ function RiskBody({
                   <thead>
                     <tr className="border-b border-border">
                       {["DIR", "COUNTERPARTY", "AMOUNT", "FIAT", "DATA"].map((h, i) => (
-                        <th key={i} className="stencil pb-2 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">{h}</th>
+                        <th key={i} className="stencil pb-2 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {travel.inScope.slice(0, 40).map((hit) => (
                       <tr key={hit.hash} className="border-b border-border/30">
-                        <td className="mono-font py-2 text-[10px] text-muted-foreground">
+                        <td className="mono-font py-2 text-[11px] text-muted-foreground">
                           {hit.direction === "in" ? "↓" : "↑"}
                         </td>
-                        <td className="mono-font py-2 text-[10px] text-foreground/80">
+                        <td className="mono-font py-2 text-[11px] text-foreground/80">
                           {shortAddress(hit.counterparty)}
                         </td>
-                        <td className="mono-font py-2 text-[10px] tabular-nums text-foreground">
+                        <td className="mono-font py-2 text-[11px] tabular-nums text-foreground">
                           {hit.amountXrp.toLocaleString(undefined, { maximumFractionDigits: 2 })} XRP
                         </td>
-                        <td className="mono-font py-2 text-[10px] tabular-nums text-muted-foreground">
+                        <td className="mono-font py-2 text-[11px] tabular-nums text-muted-foreground">
                           {hit.amountFiat.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </td>
                         <td className="py-2">
@@ -445,7 +445,7 @@ function RiskBody({
                                   ? "go"
                                   : "insufficient-data"
                             }
-                            className="text-[8px]"
+                            className="text-[10px]"
                           >
                             {hit.counterpartyRecord === "missing"
                               ? "MISSING"
@@ -475,10 +475,10 @@ function RiskBody({
                   {concentration.counterparties.slice(0, 12).map((party) => (
                     <div key={party.address} className="inset-row p-2.5">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="mono-font selectable truncate text-[10px] text-foreground">
+                        <span className="mono-font selectable truncate text-[11px] text-foreground">
                           {shortAddress(party.address)}
                         </span>
-                        <span className="mono-font shrink-0 text-[10px] tabular-nums text-muted-foreground">
+                        <span className="mono-font shrink-0 text-[11px] tabular-nums text-muted-foreground">
                           {party.transfers} tx · {party.volumeXrp.toLocaleString(undefined, { maximumFractionDigits: 0 })} XRP
                         </span>
                       </div>
@@ -518,7 +518,7 @@ function RiskBody({
                     key={p.label}
                     onClick={() => setPreset(i)}
                     className={cn(
-                      "mono-font border px-2 py-1 text-[9px] transition-colors",
+                      "mono-font border px-2 py-1 text-[10.5px] transition-colors",
                       preset === i
                         ? "border-foreground bg-foreground text-background"
                         : "border-border text-muted-foreground hover:border-foreground/40"
@@ -537,7 +537,7 @@ function RiskBody({
                   inputMode="decimal"
                   className="mono-font mt-1.5 text-[11px]"
                 />
-                <p className="mt-1.5 text-[9px] leading-relaxed text-muted-foreground">
+                <p className="mt-1.5 text-[10.5px] leading-relaxed text-muted-foreground">
                   There is no price feed in this build — supply the rate your
                   compliance function already uses, so the threshold matches
                   your own books rather than a third party's.
@@ -593,7 +593,7 @@ function RiskBody({
               )}
               {(tab === "concentration" ? concentrationResults : issuerResults).length === 0 &&
                 tab !== "travel" && (
-                  <p className="text-[10px] leading-relaxed text-muted-foreground">
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">
                     Nothing to report on this view.
                   </p>
                 )}
@@ -608,7 +608,7 @@ function RiskBody({
             ].map((row) => (
               <div key={row.text} className="flex gap-2 border-b border-border/30 py-1.5 last:border-0">
                 <span className="mt-0.5 shrink-0 text-muted-foreground">{row.icon}</span>
-                <span className="text-[10px] leading-snug text-muted-foreground">{row.text}</span>
+                <span className="text-[11px] leading-snug text-muted-foreground">{row.text}</span>
               </div>
             ))}
           </Panel>

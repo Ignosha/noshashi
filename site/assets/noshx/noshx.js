@@ -789,8 +789,8 @@ async function vn(e) {
   const n = t.account_data ?? {}, s = Number(n.Sequence ?? 0);
   let a;
   try {
-    const k = await S("server_info", {}), $ = String(k.info?.complete_ledgers ?? ""), _ = Number($.split("-")[0]);
-    Number.isFinite(_) && (a = _);
+    const k = await S("server_info", {}), $ = String(k.info?.complete_ledgers ?? ""), x = Number($.split("-")[0]);
+    Number.isFinite(x) && (a = x);
   } catch {
   }
   let o;
@@ -812,8 +812,8 @@ async function vn(e) {
       k > 0 && (i = !0);
       break;
     }
-    const _ = $.transactions ?? [];
-    if (o || (o = _[0]), r.push(..._), c = $.marker, !c) break;
+    const x = $.transactions ?? [];
+    if (o || (o = x[0]), r.push(...x), c = $.marker, !c) break;
     k === Oe - 1 && (i = !0);
   }
   const d = o?.tx_json ?? o?.tx ?? {}, u = Number(o?.ledger_index ?? d.ledger_index ?? 0) || void 0, f = Number(d.date), p = Number.isFinite(f) ? new Date((f + $t) * 1e3) : void 0, h = d.TransactionType ? String(d.TransactionType) : void 0, l = h === "Payment" && d.Destination === e && d.Account !== e, y = l ? String(d.Account) : void 0, w = d.Amount ?? d.DeliverMax, m = l && typeof w == "string" ? Number(w) / 1e6 : void 0, g = u === void 0 ? void 0 : bn(s, u), b = u !== void 0 && a !== void 0 && a > yn && u <= a, v = p ? Math.floor((Date.now() - p.getTime()) / 864e5) : void 0;
@@ -915,7 +915,7 @@ function $n(e) {
   const n = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((s, a) => n[s.severity] - n[a.severity]);
 }
-const Tn = 946684800, _n = 0.5, xn = 0.25, ne = (e) => typeof e == "string" ? Number(e) / 1e6 : e && typeof e == "object" ? Number(e.value ?? 0) : 0;
+const Tn = 946684800, xn = 0.5, _n = 0.25, ne = (e) => typeof e == "string" ? Number(e) / 1e6 : e && typeof e == "object" ? Number(e.value ?? 0) : 0;
 function Pe(e, t, n) {
   const s = [];
   for (const r of e) {
@@ -995,7 +995,7 @@ function Nn(e) {
       continue;
     }
     const u = 1 - d.fundedRatio;
-    d.fundedRatio < _n ? t.push({
+    d.fundedRatio < xn ? t.push({
       id: `phantom-${c}`,
       severity: u > 0.9 ? "critical" : "warn",
       title: `${n(u)} of ${c.toLowerCase()} depth cannot fill`,
@@ -1008,7 +1008,7 @@ function Nn(e) {
       detail: `${s(d.fundableDepth)} of ${s(d.listedDepth)} advertised is backed by owners who still hold it.`
     });
   }
-  e.topMakerShare >= xn && e.topMaker && t.push({
+  e.topMakerShare >= _n && e.topMaker && t.push({
     id: "maker-concentration",
     severity: e.topMakerShare >= 0.5 ? "warn" : "info",
     title: `One account rests ${n(e.topMakerShare)} of the quoted depth`,
@@ -1306,7 +1306,7 @@ function zn(e) {
   const t = e.reduce((n, s) => n + s, 0);
   return t <= 0 ? 0 : e.reduce((n, s) => n + (s / t * 100) ** 2, 0);
 }
-async function _t(e, t) {
+async function xt(e, t) {
   const [n, s] = await Promise.all([
     S("account_info", { account: e, ledger_index: "validated" }),
     S("gateway_balances", { account: e, ledger_index: "validated" })
@@ -1750,7 +1750,7 @@ const We = [
   "wss://s1.ripple.com",
   "wss://s2.ripple.com",
   "wss://xrpl.ws"
-], ls = 2, us = 4, xt = 12e3;
+], ls = 2, us = 4, _t = 12e3;
 function hs(e) {
   return new Promise((t) => {
     const n = Date.now();
@@ -1777,7 +1777,7 @@ function hs(e) {
     }
     const r = window.setTimeout(
       () => o({ url: e, reachable: !1, error: "no response within 12s" }),
-      xt
+      _t
     );
     a.onerror = () => {
       window.clearTimeout(r), o({ url: e, reachable: !1, error: "connection refused or blocked" });
@@ -1825,7 +1825,7 @@ function fs(e) {
       a(void 0);
       return;
     }
-    const o = window.setTimeout(() => a(void 0), xt);
+    const o = window.setTimeout(() => a(void 0), _t);
     s.onerror = () => {
       window.clearTimeout(o), a(void 0);
     }, s.onopen = () => s.send(JSON.stringify({ id: 1, command: "fee" })), s.onmessage = (r) => {
@@ -1983,7 +1983,7 @@ async function $s(e, t = {}) {
     kt(e).catch((i) => (n.push(`posture: ${i instanceof Error ? i.message : String(i)}`), null)),
     // The supply walk is the expensive read, so it is opt-in. When it is
     // skipped the concentration checks abstain rather than assume.
-    t.walkSupply ? _t(e).catch((i) => (n.push(`issuance: ${i instanceof Error ? i.message : String(i)}`), null)) : Promise.resolve(null)
+    t.walkSupply ? xt(e).catch((i) => (n.push(`issuance: ${i instanceof Error ? i.message : String(i)}`), null)) : Promise.resolve(null)
   ]), r = a?.unreadable ? null : a;
   return a?.unreadable && n.push(`posture: ${a.unreadable}`), {
     issuer: e,
@@ -2085,15 +2085,15 @@ function Ts(e) {
   }
   return t;
 }
-function _s(e, t = {}) {
+function xs(e, t = {}) {
   return e.some((n) => n.severity === "block" && !n.passed) ? "no-go" : (t.unreadable?.length ?? 0) > 0 ? "insufficient-data" : e.some((n) => !n.passed) ? "hold" : "go";
 }
-async function xs(e, t = {}) {
+async function _s(e, t = {}) {
   const n = await $s(e, t);
   return As(n);
 }
 async function As(e) {
-  const t = Ts(e), n = _s(t, { unreadable: e.unreadable }), s = At(e.issuance)?.currency, a = e.readAt, o = await ks({
+  const t = Ts(e), n = xs(t, { unreadable: e.unreadable }), s = At(e.issuance)?.currency, a = e.readAt, o = await ks({
     kind: "authority",
     subject: e.issuer,
     // The ledger index is inside the digest because a certificate is a
@@ -2611,7 +2611,7 @@ const Ns = [
       "phishing_feed"
     ]
   }
-], Es = [{ name: "Overview", plan: "Free", summary: "what NOSHASHI is and what it reads." }, { name: "Mission Control", plan: "Free", summary: "live mainnet telemetry, wallet gate, policy rule set." }, { name: "Verification", plan: "Free", summary: "describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast." }, { name: "Credentials", plan: "Free", summary: "XLS-70 objects held by the wallet, and which domains they unlock." }, { name: "Domain Grid", plan: "Free", summary: "XLS-80 permissioned domains and their rule sets." }, { name: "Audit Trail", plan: "Free", summary: "wallet history, filterable, exportable to CSV." }, { name: "NOSHX", plan: "Free", summary: "this assistant, NOSHASHI's agent. It reads the live ledger with read-only tools (authority, order book, settlement, control surface, provenance, pools, issuance, address check, claims, NFT rights, ledger status), each gated like its screen, answers questions about NOSHASHI itself from the product's own pages (features, screens, plans, docs, trust, legal), and by default runs on NOSHX Core, NOSHASHI's own engine, which uses no language model: it plans from the question, runs the readers and writes the answer itself. A language model can be added (the trained NOSHX model through Ollama, or a hosted one), with optional failover back to Core and a deep reasoning switch. It has an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant." }, { name: "Portfolio & Radar", plan: "Desk", summary: "multi-wallet surveillance and the compliance radar." }, { name: "Exposure Analysis", plan: "Desk", summary: "issuer freeze rights, Travel Rule scope, counterparty concentration." }, { name: "Ledger & Policy", plan: "Desk", summary: "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export." }, { name: "Check an Address", plan: "Free", summary: "read what the ledger publishes about any account." }, { name: "Token Rights", plan: "Free", summary: "what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly." }, { name: "Inbox", plan: "Free", summary: "every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds." }, { name: "Ledger Sync", plan: "Free", summary: "four public XRPL nodes queried and compared, with disagreement between them treated as the reading." }, { name: "Learn", plan: "Free", summary: "short animated explainers." }, { name: "Settlement", plan: "Desk", summary: "what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question." }, { name: "Ledger Garden", plan: "Desk", summary: "walk the ledger's relationships one validated read at a time — an issuer's assets, an asset's holders (from the first 200 of the issuer's trust lines, in ledger order; Issuance walks them all), an account's holdings and recent transactions, a transaction's settlement evidence — then hand the whole path to this agent as a question." }, { name: "Provenance", plan: "Desk", summary: "how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts." }, { name: "Control Surface", plan: "Desk", summary: "how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable." }, { name: "Order Book", plan: "Desk", summary: "how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill." }, { name: "Pool Governance", plan: "Desk", summary: "who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot." }, { name: "Issuance", plan: "Institution", summary: "holder concentration and enforcement history for an issuer, from the issuer's side." }, { name: "Authority Certificate", plan: "Desk", summary: "what authority an issuer has kept over an asset it issued — whether it can freeze a holder, whether it gave that power up irrevocably (lsfNoFreeze cannot be cleared once set), whether the asset is frozen right now, whether holding it needs the issuer's permission, whether one signer reaches the quorum alone, what it charges on a transfer between holders, and how concentrated the supply is. Each answer is a fact at one named ledger index, and the set is digested with SHA-256 so the same reading can be checked again later. It is NOT a score — no number is composited from the checks — and NOT a legal finding: whether an asset is decentralised or is a security is a determination for an agency applying statutory criteria, which this software does not evaluate. If the supply walk is skipped, or trust-line coverage falls below 95%, the concentration check abstains rather than passing." }, { name: "Ledger Watch", plan: "Free", summary: "screens an incoming payment to a deposit address before it is credited, read live from the ledger — it credits what actually arrived (delivered_amount, never the Amount of a partial payment), holds a familiar ticker whose issuer owes nothing as counterfeit, flags dust carrying a link as a phishing lure, notes a missing destination tag, the issuer's freeze and clawback rights, the Travel Rule threshold, and traces who created the sender and who created them, three hops back, against the organization's deny list. Verdicts are clear, review or hold; what could not be read holds the deposit. Deposit addresses and monitored accounts are read by the server every minute; each event goes to the organization's webhooks (xrpl_event, deposit_screened) and to a JSON/NDJSON feed API with a history endpoint; export schemas shape bulk exports and the feed. Requires Enterprise (deposit screening); monitoring any account, event feeds, custom schemas and retention need Strategic." }, { name: "Security Center", plan: "Free", summary: "ACCOUNT CHECK (free) grades any address A to F from who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts and open doors (NFT offers, checks, payment channels), and writes an unsigned hardening plan the owner signs in their own wallet. SAFE SEND (free) checks a pasted destination against the operator's own address book for lookalikes and against the OFAC list. INCIDENT RESPONSE (Pro+; five hops and a case on Enterprise) follows stolen value through payments and AccountDelete sweeps past dust, says where it is, and rates every recovery path; validated transactions are never reversible. GUARDIAN (Strategic) sends security_alert webhooks when a watched account's keys change or it is deleted." }, { name: "Asset Passport", plan: "Enterprise", summary: "a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks." }, { name: "Growth", plan: "Free", summary: "platform-native drafts built from measured figures." }, { name: "Pricing", plan: "Free", summary: "plans, checkout and verification credits." }, { name: "Account", plan: "Free", summary: "subscription, two-factor authentication and API keys." }, { name: "Business Plan", plan: "Free", summary: "revenue streams, tiers and sequencing." }, { name: "Legal & Accessibility", plan: "Free", summary: "policies, accessibility statement and contact routes." }, { name: "Trust & Security", plan: "Free", summary: "the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim." }, { name: "Settings", plan: "Free", summary: "appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage." }], Nt = {
+], Es = [{ name: "Overview", plan: "Free", summary: "what NOSHASHI is and what it reads." }, { name: "Mission Control", plan: "Free", summary: "live mainnet telemetry, wallet gate, policy rule set." }, { name: "Verification", plan: "Free", summary: "describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast." }, { name: "Credentials", plan: "Free", summary: "XLS-70 credentials held by the wallet and the real mainnet domains they admit it to; a counterparty's credentials (who vouched, expiry); an issuer register (issued, not accepted, expiring, expired), each exportable to CSV." }, { name: "Domain Grid", plan: "Free", summary: "every XLS-80 permissioned domain on mainnet (from a sweep of the whole ledger), read live by domain ID or owner, and an admission check of any counterparty saved with its ledger index and SHA-256." }, { name: "Audit Trail", plan: "Free", summary: "any account's validated history with delivered amounts, destination tags, memos and partial payments; every counterparty screened against the OFAC SDN list and the scam registry; exported as CSV with a SHA-256 manifest." }, { name: "NOSHX", plan: "Free", summary: "this assistant, NOSHASHI's agent. It reads the live ledger with read-only tools (authority, order book, settlement, control surface, provenance, pools, issuance, address check, claims, NFT rights, ledger status), each gated like its screen, answers questions about NOSHASHI itself from the product's own pages (features, screens, plans, docs, trust, legal), and by default runs on NOSHX Core, NOSHASHI's own engine, which uses no language model: it plans from the question, runs the readers and writes the answer itself. A language model can be added (the trained NOSHX model through Ollama, or a hosted one), with optional failover back to Core and a deep reasoning switch. It has an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant." }, { name: "Portfolio & Radar", plan: "Desk", summary: "multi-wallet surveillance and the compliance radar." }, { name: "Exposure Analysis", plan: "Desk", summary: "issuer freeze rights, Travel Rule scope, counterparty concentration." }, { name: "Ledger & Policy", plan: "Desk", summary: "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export." }, { name: "Check an Address", plan: "Free", summary: "read what the ledger publishes about any account." }, { name: "Token Rights", plan: "Free", summary: "what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly." }, { name: "Inbox", plan: "Free", summary: "every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds." }, { name: "Ledger Sync", plan: "Free", summary: "four public XRPL nodes queried and compared, with disagreement between them treated as the reading." }, { name: "Learn", plan: "Free", summary: "short animated explainers." }, { name: "Settlement", plan: "Desk", summary: "what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question." }, { name: "Ledger Garden", plan: "Desk", summary: "walk the ledger's relationships one validated read at a time — an issuer's assets, an asset's holders (from the first 200 of the issuer's trust lines, in ledger order; Issuance walks them all), an account's holdings and recent transactions, a transaction's settlement evidence — then hand the whole path to this agent as a question." }, { name: "Provenance", plan: "Desk", summary: "how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts." }, { name: "Control Surface", plan: "Desk", summary: "how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable." }, { name: "Order Book", plan: "Desk", summary: "how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill." }, { name: "Pool Governance", plan: "Desk", summary: "who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot." }, { name: "Issuance", plan: "Institution", summary: "holder concentration and enforcement history for an issuer, from the issuer's side." }, { name: "Authority Certificate", plan: "Desk", summary: "what authority an issuer has kept over an asset it issued — whether it can freeze a holder, whether it gave that power up irrevocably (lsfNoFreeze cannot be cleared once set), whether the asset is frozen right now, whether holding it needs the issuer's permission, whether one signer reaches the quorum alone, what it charges on a transfer between holders, and how concentrated the supply is. Each answer is a fact at one named ledger index, and the set is digested with SHA-256 so the same reading can be checked again later. It is NOT a score — no number is composited from the checks — and NOT a legal finding: whether an asset is decentralised or is a security is a determination for an agency applying statutory criteria, which this software does not evaluate. If the supply walk is skipped, or trust-line coverage falls below 95%, the concentration check abstains rather than passing." }, { name: "Ledger Watch", plan: "Free", summary: "screens an incoming payment to a deposit address before it is credited, read live from the ledger — it credits what actually arrived (delivered_amount, never the Amount of a partial payment), holds a familiar ticker whose issuer owes nothing as counterfeit, flags dust carrying a link as a phishing lure, notes a missing destination tag, the issuer's freeze and clawback rights, the Travel Rule threshold, and traces who created the sender and who created them, three hops back, against the organization's deny list. Verdicts are clear, review or hold; what could not be read holds the deposit. Deposit addresses and monitored accounts are read by the server every minute; each event goes to the organization's webhooks (xrpl_event, deposit_screened) and to a JSON/NDJSON feed API with a history endpoint; export schemas shape bulk exports and the feed. Requires Enterprise (deposit screening); monitoring any account, event feeds, custom schemas and retention need Strategic." }, { name: "Security Center", plan: "Free", summary: "ACCOUNT CHECK (free) grades any address A to F from who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts and open doors (NFT offers, checks, payment channels), and writes an unsigned hardening plan the owner signs in their own wallet. SAFE SEND (free) checks a pasted destination against the operator's own address book for lookalikes and against the OFAC list. INCIDENT RESPONSE (Pro+; five hops and a case on Enterprise) follows stolen value through payments and AccountDelete sweeps past dust, says where it is, and rates every recovery path; validated transactions are never reversible. GUARDIAN (Strategic) sends security_alert webhooks when a watched account's keys change or it is deleted." }, { name: "Asset Passport", plan: "Enterprise", summary: "a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks." }, { name: "Pricing", plan: "Free", summary: "plans, checkout and verification credits." }, { name: "Account", plan: "Free", summary: "subscription, two-factor authentication and API keys." }, { name: "Business Plan", plan: "Free", summary: "revenue streams, tiers and sequencing." }, { name: "Legal & Accessibility", plan: "Free", summary: "policies, accessibility statement and contact routes." }, { name: "Trust & Security", plan: "Free", summary: "the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim." }, { name: "Settings", plan: "Free", summary: "appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage." }], Nt = {
   scenes: Es
 }, Fs = "https://www.noshashi.app";
 function Rs() {
@@ -2702,7 +2702,7 @@ function Ls(e) {
   It = e, V = null;
 }
 function Et() {
-  return V ?? (V = import("./pages-DewjQW6C.js").then(({ default: e }) => Os([...Rs(), ...It, ...e]))), V;
+  return V ?? (V = import("./pages-DRXV7OmH.js").then(({ default: e }) => Os([...Rs(), ...It, ...e]))), V;
 }
 function Xs() {
   if (V) return;
@@ -2821,9 +2821,9 @@ function Je(e, t, n, s) {
         break;
       case "SignerListSet":
         if ($) {
-          const _ = Number(m.SignerQuorum ?? 0), x = (m.SignerEntries ?? []).length;
+          const x = Number(m.SignerQuorum ?? 0), _ = (m.SignerEntries ?? []).length;
           u.push(
-            _ > 0 ? { kind: "signer_list_set", ledger: b, at: k, hash: v, detail: `Signer list set: quorum ${_} across ${x} signer${x === 1 ? "" : "s"}.` } : { kind: "signer_list_removed", ledger: b, at: k, hash: v, detail: "Signer list removed." }
+            x > 0 ? { kind: "signer_list_set", ledger: b, at: k, hash: v, detail: `Signer list set: quorum ${x} across ${_} signer${_ === 1 ? "" : "s"}.` } : { kind: "signer_list_removed", ledger: b, at: k, hash: v, detail: "Signer list removed." }
           );
         }
         break;
@@ -2836,8 +2836,8 @@ function Je(e, t, n, s) {
       case "Payment":
         if ($ && typeof m.Destination == "string" && f.add(m.Destination), m.Destination === e && typeof m.Account == "string") {
           p.push({ from: m.Account, hash: v, ledger: b });
-          const _ = typeof m.Amount == "string" ? Number(m.Amount) : NaN;
-          Number.isFinite(_) && _ < 1e4 && (h += 1);
+          const x = typeof m.Amount == "string" ? Number(m.Amount) : NaN;
+          Number.isFinite(x) && x < 1e4 && (h += 1);
         }
         break;
     }
@@ -3017,25 +3017,25 @@ async function sa(e, t) {
     do {
       const k = await n.accountTx(l, y, Math.min(400, a - m.read), v).catch(() => ({ transactions: [] })), $ = k.transactions ?? [];
       m.read += $.length;
-      for (const _ of $) {
-        const x = na(l, _);
-        if (!x) continue;
-        if (x.amount.currency === "XRP" && x.amount.value < o && x.kind === "payment") {
-          c.count += 1, c.xrp += x.amount.value;
+      for (const x of $) {
+        const _ = na(l, x);
+        if (!_) continue;
+        if (_.amount.currency === "XRP" && _.amount.value < o && _.kind === "payment") {
+          c.count += 1, c.xrp += _.amount.value;
           continue;
         }
-        i.push(x);
-        const z = x.amount.currency === "XRP" ? x.amount.value : 0, j = r.get(x.to);
+        i.push(_);
+        const z = _.amount.currency === "XRP" ? _.amount.value : 0, j = r.get(_.to);
         if (j) {
-          j.receivedXrp += z, x.destinationTag !== null && j.status !== "source" && (j.tagged = !0, j.status = "custodial");
+          j.receivedXrp += z, _.destinationTag !== null && j.status !== "source" && (j.tagged = !0, j.status = "custodial");
           continue;
         }
-        const B = x.destinationTag !== null;
-        if (r.set(x.to, { address: x.to, depth: w + 1, status: B ? "custodial" : "holding", receivedXrp: z, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: !1, tagged: B }), !B && w + 1 <= s) {
-          d.push({ address: x.to, from: x.ledger, depth: w + 1 });
+        const B = _.destinationTag !== null;
+        if (r.set(_.to, { address: _.to, depth: w + 1, status: B ? "custodial" : "holding", receivedXrp: z, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: !1, tagged: B }), !B && w + 1 <= s) {
+          d.push({ address: _.to, from: _.ledger, depth: w + 1 });
           continue;
         }
-        const W = r.get(x.to), le = await n.accountInfo(x.to).catch(() => {
+        const W = r.get(_.to), le = await n.accountInfo(_.to).catch(() => {
         });
         if (le === null) W.status = "deleted";
         else if (le?.account_data) {
@@ -3400,8 +3400,8 @@ function Rt(e, t = {}) {
     const b = String(g.index ?? "");
     switch (g.LedgerEntryType) {
       case "Escrow": {
-        const v = I(g.Amount) ?? 0, k = typeof g.FinishAfter == "number" ? g.FinishAfter : null, $ = typeof g.CancelAfter == "number" ? g.CancelAfter : null, _ = $ !== null && $ <= s, z = t[b] ?? (typeof g.Sequence == "number" ? g.Sequence : null) ?? "<sequence of the EscrowCreate>";
-        g.Destination === n && !_ ? g.Condition ? o.push({ id: `escrow-${b}`, kind: "escrow_conditional", title: `${D(g.Amount)} in escrow for you, locked by a condition`, detail: `Escrow from ${g.Account}. It needs the fulfillment (the secret matching its crypto-condition), which only whoever set it up has.`, xrp: 0, reserveXrp: 0, when: "info", tx: null }) : k === null || k <= s ? o.push({
+        const v = I(g.Amount) ?? 0, k = typeof g.FinishAfter == "number" ? g.FinishAfter : null, $ = typeof g.CancelAfter == "number" ? g.CancelAfter : null, x = $ !== null && $ <= s, z = t[b] ?? (typeof g.Sequence == "number" ? g.Sequence : null) ?? "<sequence of the EscrowCreate>";
+        g.Destination === n && !x ? g.Condition ? o.push({ id: `escrow-${b}`, kind: "escrow_conditional", title: `${D(g.Amount)} in escrow for you, locked by a condition`, detail: `Escrow from ${g.Account}. It needs the fulfillment (the secret matching its crypto-condition), which only whoever set it up has.`, xrp: 0, reserveXrp: 0, when: "info", tx: null }) : k === null || k <= s ? o.push({
           id: `escrow-${b}`,
           kind: "escrow_finish",
           title: `Finish an escrow: ${D(g.Amount)} is waiting for you`,
@@ -3410,7 +3410,7 @@ function Rt(e, t = {}) {
           reserveXrp: 0,
           when: "now",
           tx: { TransactionType: "EscrowFinish", Account: n, Owner: g.Account, OfferSequence: z }
-        }) : o.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `${D(g.Amount)} in escrow for you, maturing ${F(k)?.slice(0, 10)}`, detail: `Escrow from ${g.Account}. From ${F(k)} anyone can finish it; this scan will list the transaction then.`, xrp: v, reserveXrp: 0, when: "later", availableAt: F(k), tx: null }) : g.Account === n ? _ ? o.push({
+        }) : o.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `${D(g.Amount)} in escrow for you, maturing ${F(k)?.slice(0, 10)}`, detail: `Escrow from ${g.Account}. From ${F(k)} anyone can finish it; this scan will list the transaction then.`, xrp: v, reserveXrp: 0, when: "later", availableAt: F(k), tx: null }) : g.Account === n ? x ? o.push({
           id: `escrow-${b}`,
           kind: "escrow_cancel",
           title: `Cancel an expired escrow: ${D(g.Amount)} comes back`,
@@ -3419,7 +3419,7 @@ function Rt(e, t = {}) {
           reserveXrp: a,
           when: "now",
           tx: { TransactionType: "EscrowCancel", Account: n, Owner: n, OfferSequence: z }
-        }) : $ !== null && g.Destination !== n && o.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `${D(g.Amount)} escrowed to ${g.Destination}, returnable ${F($)?.slice(0, 10)} if unfinished`, detail: "If the recipient has not finished it by then, you can cancel it back.", xrp: 0, reserveXrp: 0, when: "later", availableAt: F($), tx: null }) : g.Destination === n && _ && o.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `An escrow for you from ${g.Account} expired unfinished`, detail: `${D(g.Amount)} can now only go back to its owner.`, xrp: 0, reserveXrp: 0, when: "info", tx: null });
+        }) : $ !== null && g.Destination !== n && o.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `${D(g.Amount)} escrowed to ${g.Destination}, returnable ${F($)?.slice(0, 10)} if unfinished`, detail: "If the recipient has not finished it by then, you can cancel it back.", xrp: 0, reserveXrp: 0, when: "later", availableAt: F($), tx: null }) : g.Destination === n && x && o.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `An escrow for you from ${g.Account} expired unfinished`, detail: `${D(g.Amount)} can now only go back to its owner.`, xrp: 0, reserveXrp: 0, when: "info", tx: null });
         break;
       }
       case "Check": {
@@ -3451,7 +3451,7 @@ function Rt(e, t = {}) {
       }
       case "PayChannel": {
         if (g.Account !== n) break;
-        const v = (I(g.Amount) ?? 0) - (I(g.Balance) ?? 0), k = [g.Expiration, g.CancelAfter].filter(($) => typeof $ == "number").sort(($, _) => $ - _)[0];
+        const v = (I(g.Amount) ?? 0) - (I(g.Balance) ?? 0), k = [g.Expiration, g.CancelAfter].filter(($) => typeof $ == "number").sort(($, x) => $ - x)[0];
         k !== void 0 && k <= s ? o.push({
           id: `channel-${b}`,
           kind: "channel_close",
@@ -3577,14 +3577,14 @@ async function ka(e, t = Ie) {
   }
   return n;
 }
-const Sa = 1, $a = 8388608, Ta = 8, _a = 10;
+const Sa = 1, $a = 8388608, Ta = 8, xa = 10;
 function K(e) {
   const t = I(e);
   if (t !== null) return `${t.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`;
   const n = e;
   return `${n?.value} ${O(String(n?.currency ?? ""))}`;
 }
-function xa(e, t = []) {
+function _a(e, t = []) {
   const n = e.address, s = e.closeTime, a = [], o = e.root;
   if (!o) return { address: n, exists: !1, ledgerIndex: e.ledgerIndex, exposures: [], atRiskXrp: 0, complete: !0 };
   const r = (u) => typeof u == "string" && t.includes(u);
@@ -3685,7 +3685,7 @@ function xa(e, t = []) {
     atRiskXrp: Number(o.Balance ?? 0) / 1e6,
     revoke: { TransactionType: "SetRegularKey", Account: n },
     caution: "Removing the regular key when the master key is disabled and no signer list exists locks the account forever."
-  }), typeof o.NFTokenMinter == "string" && a.push({ id: "nft-minter", risk: r(o.NFTokenMinter) ? "low" : "medium", kind: "nft_minter", title: `${o.NFTokenMinter} can mint NFTs in your name`, detail: "An authorised minter issues NFTs that name this account as issuer: fakes of your collection look genuine.", atRiskXrp: 0, revoke: { TransactionType: "AccountSet", Account: n, ClearFlag: _a } });
+  }), typeof o.NFTokenMinter == "string" && a.push({ id: "nft-minter", risk: r(o.NFTokenMinter) ? "low" : "medium", kind: "nft_minter", title: `${o.NFTokenMinter} can mint NFTs in your name`, detail: "An authorised minter issues NFTs that name this account as issuer: fakes of your collection look genuine.", atRiskXrp: 0, revoke: { TransactionType: "AccountSet", Account: n, ClearFlag: xa } });
   const i = e.objects.some((u) => u.LedgerEntryType === "RippleState" && ee(u, n).balance < 0);
   (Number(o.Flags ?? 0) & $a) !== 0 && !i && a.push({
     id: "default-ripple",
@@ -3988,15 +3988,15 @@ async function Ma(e, t = {}) {
       w.stop = "hub";
       continue;
     }
-    for (const _ of $.links) {
-      i.set(`${_.hash}:${_.from}:${_.to}`, _);
-      const x = _.from === l ? _.to : _.from;
-      if (!r.has(x)) {
+    for (const x of $.links) {
+      i.set(`${x.hash}:${x.from}:${x.to}`, x);
+      const _ = x.from === l ? x.to : x.from;
+      if (!r.has(_)) {
         if (r.size >= a) {
           d = !0;
           continue;
         }
-        r.set(x, { address: x, depth: y + 1, exists: !0, balanceXrp: null, stop: null, sanction: null, memos: [] }), y + 1 <= s && c.push({ address: x, depth: y + 1 });
+        r.set(_, { address: _, depth: y + 1, exists: !0, balanceXrp: null, stop: null, sanction: null, memos: [] }), y + 1 <= s && c.push({ address: _, depth: y + 1 });
       }
     }
   }
@@ -4390,7 +4390,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ issuer: A("Issuer's classic address") }),
     feature: "authority_certificate",
     screen: "Authority",
-    run: (e) => xs(N(e, "issuer"), { walkSupply: !1 })
+    run: (e) => _s(N(e, "issuer"), { walkSupply: !1 })
   },
   {
     name: "read_provenance",
@@ -4446,7 +4446,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ issuer: A("Issuer's classic address") }),
     feature: "portfolios",
     screen: "Issuance",
-    run: (e) => _t(N(e, "issuer"))
+    run: (e) => xt(N(e, "issuer"))
   },
   {
     name: "security_check",
@@ -4530,7 +4530,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ address: A("The account to audit, r…") }),
     feature: null,
     screen: "Security Center › Exposure audit",
-    run: async (e) => xa(await ae(N(e))),
+    run: async (e) => _a(await ae(N(e))),
     compose: (e) => {
       const t = e;
       return t.exists ? t.exposures.length ? [
@@ -5451,13 +5451,13 @@ const U = {
     a: `The contact form reaches the team directly. For specific routes: ${U.support} for product support, ${U.institutions} for institutional enquiries, ${U.security} for vulnerability reports and ${U.privacy} for data questions.`,
     links: [{ label: "Contact form", href: "/contact/" }]
   }
-], _i = new Set(
+], xi = new Set(
   "a an the is are was were be been do does did can could would should i you it this that of for to in on at by with my your our we us and or if how what when where why not no yes please tell me about".split(" ")
 );
 function ke(e) {
-  return String(e || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((t) => t.length > 1 && !_i.has(t));
+  return String(e || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((t) => t.length > 1 && !xi.has(t));
 }
-function xi(e) {
+function _i(e) {
   const t = ke(e);
   return t.length ? Ee.map((n) => {
     const s = new Set(n.keywords), a = new Set(ke(n.q)), o = new Set(ke(n.a));
@@ -5469,7 +5469,7 @@ function xi(e) {
 }
 const yt = 3;
 function Ai(e) {
-  const t = xi(e), n = t[0];
+  const t = _i(e), n = t[0];
   if (!n || n.score < yt)
     return {
       grounded: !1,
@@ -5527,34 +5527,34 @@ class Di extends Error {
     ), this.name = "SecretInMessageError";
   }
 }
-const qt = 10, Ut = "noshashi:web.checks", _e = () => {
+const qt = 10, Ut = "noshashi:web.checks", xe = () => {
   const e = /* @__PURE__ */ new Date();
   return `${e.getUTCFullYear()}-${String(e.getUTCMonth() + 1).padStart(2, "0")}`;
 };
 function Ci() {
   try {
     const e = JSON.parse(localStorage.getItem(Ut) ?? "null");
-    if (e && e.month === _e() && typeof e.count == "number" && Number.isFinite(e.count))
+    if (e && e.month === xe() && typeof e.count == "number" && Number.isFinite(e.count))
       return { month: e.month, count: Math.max(0, e.count) };
   } catch {
   }
-  return { month: _e(), count: 0 };
+  return { month: xe(), count: 0 };
 }
 let Mt = 0;
 function bt(e) {
   Mt = e;
   try {
-    localStorage.setItem(Ut, JSON.stringify({ month: _e(), count: e }));
+    localStorage.setItem(Ut, JSON.stringify({ month: xe(), count: e }));
   } catch {
   }
 }
-const xe = () => Math.max(Ci().count, Mt), Oi = {
+const _e = () => Math.max(Ci().count, Mt), Oi = {
   has: () => !1,
   spendFreeCheck: () => {
-    const e = xe();
+    const e = _e();
     return e >= qt ? !1 : (bt(e + 1), !0);
   },
-  refundFreeCheck: () => bt(Math.max(0, xe() - 1))
+  refundFreeCheck: () => bt(Math.max(0, _e() - 1))
 }, Ae = "Support › ";
 Ls(
   Ee.map((e) => ({
@@ -5635,7 +5635,7 @@ const Li = {
   certify_authority: "the issuer",
   ledger_status: "the latest ledger",
   ledger_sync: "the public servers"
-}, qi = () => Math.max(0, qt - xe()), Ui = () => Xs();
+}, qi = () => Math.max(0, qt - _e()), Ui = () => Xs();
 export {
   Hi as ask,
   qi as checksLeft,

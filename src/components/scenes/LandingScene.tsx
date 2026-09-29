@@ -153,7 +153,7 @@ export function LandingScene({
             aria-label={`${BRAND.name} — enter console`}
           >
             <NovaLogo size={18} tone="color" />
-            <span className="display text-[13px] font-[800] tracking-[0.14em] text-foreground">
+            <span className="display text-[13px] font-[800] tracking-[0.1em] text-foreground">
               {BRAND.name}
             </span>
           </button>
@@ -167,7 +167,7 @@ export function LandingScene({
               <button
                 key={link.label}
                 onClick={() => onNavigate(link.scene)}
-                className="stencil text-[8px] tracking-[0.22em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                className="stencil text-[10px] tracking-[0.14em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
               >
                 {link.label}
               </button>
@@ -191,11 +191,11 @@ export function LandingScene({
             >
               <div className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1">
                 <StatusDot status={connected ? "go" : "no-go"} size={5} pulse={connected} />
-                <span className="stencil text-[8px] tracking-[0.26em] text-muted-foreground">
+                <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
                   {connected ? "LIVE ON XRPL MAINNET" : "CONNECTING TO MAINNET"}
                 </span>
               </div>
-              <p className="mono-font -mt-3 text-[9px] text-faint" aria-live="off">
+              <p className="mono-font -mt-3 text-[10.5px] text-faint" aria-live="off">
                 {connected && ledger
                   ? `Each ring in the pond is a validated ledger closing · #${ledger.ledgerIndex.toLocaleString("en-US")} · ${ledger.txnCount} transactions`
                   : "The pond is still until a validated ledger arrives."}
@@ -213,13 +213,15 @@ export function LandingScene({
                   <h1 className="display text-[60px] font-[900] leading-[0.86] tracking-[0.02em] text-foreground">
                     NOSHASHI
                   </h1>
-                  <p className="stencil mt-3 text-[10px] tracking-[0.38em] text-muted-foreground">
+                  <p className="stencil mt-3 text-[11px] tracking-[0.14em] text-muted-foreground">
                     {BRAND.tagline.toUpperCase()}
                   </p>
                 </div>
               </div>
 
-              <div className="max-w-[720px]">
+              {/* The ripple field runs behind this column; a soft ground under
+                  the copy keeps it legible without hiding the field. */}
+              <div className="relative max-w-[720px] rounded-lg bg-background/80 p-4 -m-4 shadow-[0_0_40px_24px_hsl(var(--background)/0.8)]">
                 <Eyebrow>THE OBJECTIVE</Eyebrow>
                 <p className="mt-3 text-[19px] leading-[1.55] text-foreground/90">
                   Make regulated value move on the XRP Ledger without anyone
@@ -243,7 +245,7 @@ export function LandingScene({
                   className="group flex items-center gap-3 bg-primary px-7 py-3.5 text-primary-foreground"
                 >
                   <NovaLogo size={16} animated={false} />
-                  <span className="stencil text-[11px] font-semibold tracking-[0.2em]">
+                  <span className="stencil text-[11px] font-semibold tracking-[0.14em]">
                     GET STARTED
                   </span>
                   <motion.span
@@ -265,7 +267,7 @@ export function LandingScene({
                 </Button>
               </div>
 
-              <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground/60">
+              <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground/60">
                 FREE FOR INDIVIDUALS · NO ACCOUNT · NO WALLET CONNECTION REQUIRED
               </p>
             </motion.div>
@@ -282,13 +284,13 @@ export function LandingScene({
               ].map((stat) => (
                 <div key={stat.label} className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="stencil text-[8px] tracking-[0.22em] text-muted-foreground">
+                    <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
                       {stat.label}
                     </p>
                     <p className="data-font mt-1.5 text-[24px] font-[600] leading-none text-foreground">
                       {stat.value === null ? "—" : <CountUp value={stat.value} />}
                       {stat.suffix && stat.value !== null && (
-                        <span className="ml-1 text-[10px] font-normal text-muted-foreground">
+                        <span className="ml-1 text-[11px] font-normal text-muted-foreground">
                           {stat.suffix}
                         </span>
                       )}
@@ -321,10 +323,10 @@ export function LandingScene({
                     <div className="relative z-10 mb-4 grid h-11 w-11 place-items-center rounded-md border border-border bg-background text-foreground">
                       {step.icon}
                     </div>
-                    <p className="display text-[11px] font-[700] tracking-[0.24em] text-muted-foreground/50">
+                    <p className="display text-[11px] font-[700] tracking-[0.14em] text-muted-foreground/50">
                       {step.step}
                     </p>
-                    <p className="display mt-1 text-[15px] font-[700] tracking-[0.12em] text-foreground">
+                    <p className="display mt-1 text-[15px] font-[700] tracking-[0.1em] text-foreground">
                       {step.title}
                     </p>
                     <p className="mt-2.5 text-[11.5px] leading-relaxed text-muted-foreground">
@@ -354,7 +356,7 @@ export function LandingScene({
                         <div className="mb-3 grid h-9 w-9 place-items-center rounded-md border border-border text-foreground">
                           {audience.icon}
                         </div>
-                        <p className="stencil text-[8px] tracking-[0.26em] text-muted-foreground">
+                        <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
                           {audience.kicker}
                         </p>
                         <p className="display mt-2 text-[16px] font-[700] leading-tight text-foreground">
@@ -398,10 +400,10 @@ export function LandingScene({
                   <div className="flex h-full gap-3 border border-border p-3.5">
                     <span className="mt-0.5 h-1.5 w-1.5 shrink-0 bg-go" />
                     <div>
-                      <p className="stencil text-[9px] tracking-[0.2em] text-foreground">
+                      <p className="stencil text-[10.5px] tracking-[0.14em] text-foreground">
                         {item.label}
                       </p>
-                      <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
+                      <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
                         {item.detail}
                       </p>
                     </div>
@@ -427,7 +429,7 @@ export function LandingScene({
                     <p className="display text-[13px] font-[700] leading-tight text-foreground">
                       {concept.title}
                     </p>
-                    <p className="mt-2.5 text-[10.5px] leading-relaxed text-muted-foreground">
+                    <p className="mt-2.5 text-[11.5px] leading-relaxed text-muted-foreground">
                       {concept.detail}
                     </p>
                   </Panel>
@@ -438,7 +440,7 @@ export function LandingScene({
             <Reveal delay={0.1}>
               <button
                 onClick={() => onNavigate("home")}
-                className="stencil mt-4 text-[8px] tracking-[0.24em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                className="stencil mt-4 text-[10px] tracking-[0.14em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
               >
                 SEE ALL {CONCEPTS.length} CONCEPTS →
               </button>
@@ -464,7 +466,7 @@ export function LandingScene({
                     onClick={onGetStarted}
                     className="flex items-center gap-3 bg-primary px-7 py-3.5 text-primary-foreground"
                   >
-                    <span className="stencil text-[11px] font-semibold tracking-[0.2em]">
+                    <span className="stencil text-[11px] font-semibold tracking-[0.14em]">
                       GET STARTED
                     </span>
                     <span className="text-[13px]">→</span>
@@ -482,7 +484,7 @@ export function LandingScene({
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
                 <NovaLogo size={15} animated={false} tone="color" />
-                <span className="mono-font text-[9px] text-muted-foreground">
+                <span className="mono-font text-[10.5px] text-muted-foreground">
                   {copyrightLine()} · v{BRAND.version} · {BRAND.network}
                 </span>
               </div>
@@ -496,7 +498,7 @@ export function LandingScene({
                     key={link.label}
                     href={link.href}
                     className={cn(
-                      "stencil text-[8px] tracking-[0.2em] text-muted-foreground",
+                      "stencil text-[10px] tracking-[0.14em] text-muted-foreground",
                       "underline-offset-4 transition-colors hover:text-foreground hover:underline"
                     )}
                   >
@@ -505,7 +507,7 @@ export function LandingScene({
                 ))}
                 <button
                   onClick={() => onNavigate("legal")}
-                  className="stencil text-[8px] tracking-[0.2em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                  className="stencil text-[10px] tracking-[0.14em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
                 >
                   LEGAL & ACCESSIBILITY
                 </button>

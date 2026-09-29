@@ -53,7 +53,7 @@ function SettingRow({
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-[11px] font-medium text-foreground">{title}</p>
-        <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">
+        <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
           {description}
         </p>
       </div>
@@ -244,7 +244,7 @@ export function SettingsScene({
                       onClick={() => appearance.setTheme(mode)}
                       aria-pressed={appearance.theme === mode}
                       className={
-                        "stencil px-2 py-1 text-[8px] tracking-[0.16em] transition-colors " +
+                        "stencil px-2 py-1 text-[10px] tracking-[0.1em] transition-colors " +
                         (appearance.theme === mode
                           ? "bg-foreground text-background"
                           : "text-muted-foreground hover:text-foreground")
@@ -279,7 +279,7 @@ export function SettingsScene({
                       onClick={() => appearance.setTextScale(scale.value)}
                       aria-pressed={appearance.textScale === scale.value}
                       className={
-                        "mono-font px-1.5 py-1 text-[8px] tabular-nums transition-colors " +
+                        "mono-font px-1.5 py-1 text-[10px] tabular-nums transition-colors " +
                         (appearance.textScale === scale.value
                           ? "bg-foreground text-background"
                           : "text-muted-foreground hover:text-foreground")
@@ -303,7 +303,7 @@ export function SettingsScene({
                       onClick={() => appearance.setMotion(mode)}
                       aria-pressed={appearance.motion === mode}
                       className={
-                        "stencil px-2 py-1 text-[8px] tracking-[0.16em] transition-colors " +
+                        "stencil px-2 py-1 text-[10px] tracking-[0.1em] transition-colors " +
                         (appearance.motion === mode
                           ? "bg-foreground text-background"
                           : "text-muted-foreground hover:text-foreground")
@@ -340,7 +340,7 @@ export function SettingsScene({
                 </Button>
               </div>
               {!addressValid && draftAddress.length > 0 && (
-                <p className="mt-1.5 text-[9px] text-no-go">
+                <p className="mt-1.5 text-[10.5px] text-no-go">
                   Not a valid XRPL classic address (starts with r, 25–35 characters).
                 </p>
               )}
@@ -439,7 +439,7 @@ export function SettingsScene({
                 </Badge>
               }
             >
-              <p className="text-[10px] leading-relaxed text-muted-foreground">
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
                 API secrets are held in the {isMac ? "macOS Keychain" : "system keyring"} through
                 the Rust <span className="mono-font">keyring</span> crate. Nothing is written to
                 the preferences file, and the value is never returned to the webview.
@@ -464,13 +464,13 @@ export function SettingsScene({
               {secretStored && (
                 <button
                   onClick={() => void clearSecret()}
-                  className="stencil mt-2 text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-no-go"
+                  className="stencil mt-2 text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-no-go"
                 >
                   CLEAR STORED SECRET
                 </button>
               )}
               {!isTauri && (
-                <p className="mt-2 text-[9px] text-hold">
+                <p className="mt-2 text-[10.5px] text-hold">
                   Keychain access requires the desktop runtime.
                 </p>
               )}
@@ -505,7 +505,7 @@ export function SettingsScene({
 
           <motion.div variants={staggerChild}>
             <Panel label="BINARY INTEGRITY" corners>
-              <p className="text-[10px] leading-relaxed text-muted-foreground">
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Hashes the executable that is currently running. Compare the digest
                 against the one published for your release; a mismatch means the
                 binary changed between download and execution.
@@ -540,7 +540,7 @@ export function SettingsScene({
               {integrity && (
                 <div className="inset-row mt-3 p-2.5">
                   <Eyebrow>SHA-256 · RUNNING BINARY</Eyebrow>
-                  <p className="mono-font selectable mt-1.5 break-all text-[9px] leading-relaxed text-foreground">
+                  <p className="mono-font selectable mt-1.5 break-all text-[10.5px] leading-relaxed text-foreground">
                     {integrity.digest}
                   </p>
                   <div className="mt-2">
@@ -555,18 +555,18 @@ export function SettingsScene({
                       void navigator.clipboard.writeText(integrity.digest);
                       push({ title: "DIGEST COPIED", tone: "info" });
                     }}
-                    className="stencil mt-2 text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2"
+                    className="stencil mt-2 text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2"
                   >
                     COPY DIGEST
                   </button>
-                  <p className="mono-font mt-2 border-t border-border pt-2 text-[8px] leading-relaxed text-muted-foreground">
+                  <p className="mono-font mt-2 border-t border-border pt-2 text-[10px] leading-relaxed text-muted-foreground">
                     Verify yourself: shasum -a 256 &quot;{integrity.path.split("/").slice(-1)[0]}&quot;
                   </p>
                 </div>
               )}
 
               {!isTauri && (
-                <p className="mt-2 text-[9px] text-hold">
+                <p className="mt-2 text-[10.5px] text-hold">
                   Integrity verification requires the desktop runtime.
                 </p>
               )}
@@ -581,7 +581,7 @@ export function SettingsScene({
                   <p className="display text-[12px] font-[700] tracking-[0.1em] text-foreground">
                     {BRAND.name} v{BRAND.version}
                   </p>
-                  <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+                  <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
                     Autonomous Compliance Layer · XRPL Mainnet.
                     <br />
                     Built for regulated capital settlement.
@@ -597,7 +597,7 @@ export function SettingsScene({
                   { keys: "mod+1", label: "Jump to Mission Control" },
                 ].map((row) => (
                   <div key={row.keys} className="flex items-center justify-between">
-                    <span className="text-[10px] text-muted-foreground">{row.label}</span>
+                    <span className="text-[11px] text-muted-foreground">{row.label}</span>
                     <Kbd keys={row.keys} />
                   </div>
                 ))}
@@ -681,7 +681,7 @@ function AutomaticUpdates() {
         </Button>
       }
     >
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         Every update is signed, and the signature is checked against a key
         compiled into this build before anything is written to disk. An
         unsigned or altered download is refused, whatever served it. Nothing
@@ -710,7 +710,7 @@ function AutomaticUpdates() {
               {status.date ? ` · ${status.date.slice(0, 10)}` : ""}
             </p>
             {status.notes && (
-              <p className="mt-2 whitespace-pre-line text-[10px] leading-relaxed text-muted-foreground">
+              <p className="mt-2 whitespace-pre-line text-[11px] leading-relaxed text-muted-foreground">
                 {status.notes}
               </p>
             )}
@@ -731,7 +731,7 @@ function AutomaticUpdates() {
         )}
 
         {status?.state === "current" && (
-          <p className="mt-2 text-[10px] text-muted-foreground">
+          <p className="mt-2 text-[11px] text-muted-foreground">
             This is the current release.
           </p>
         )}
@@ -740,7 +740,7 @@ function AutomaticUpdates() {
           status?.state === "unconfigured" ||
           status?.state === "error") && (
           <p
-            className={`mt-2 text-[10px] leading-relaxed ${
+            className={`mt-2 text-[11px] leading-relaxed ${
               status.state === "error" ? "text-no-go" : "text-hold"
             }`}
           >
@@ -797,7 +797,7 @@ function NetworkCapabilities() {
 
       {report && (
         <>
-          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 font-mono text-[10px] tabular-nums text-faint">
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 font-mono text-[11px] tabular-nums text-faint">
             <span>
               AMENDMENTS ACTIVE{" "}
               <span className="text-muted-foreground">{report.totalEnabled}</span>
@@ -825,17 +825,17 @@ function NetworkCapabilities() {
                 <StatusDot status={cap.enabled ? "go" : "hold"} size={5} />
                 <span className="text-[11.5px] text-foreground">{cap.label}</span>
                 {cap.xls && (
-                  <span className="font-mono text-[9px] text-faint">{cap.xls}</span>
+                  <span className="font-mono text-[10.5px] text-faint">{cap.xls}</span>
                 )}
                 <span
                   className={
-                    "ml-auto font-mono text-[9px] tracking-[0.14em] " +
+                    "ml-auto font-mono text-[10.5px] tracking-[0.1em] " +
                     (cap.enabled ? "text-go" : "text-hold")
                   }
                 >
                   {cap.enabled ? "LIVE" : "NOT ACTIVATED"}
                 </span>
-                <p className="w-full text-[10.5px] leading-relaxed text-muted-foreground">
+                <p className="w-full text-[11.5px] leading-relaxed text-muted-foreground">
                   {cap.blurb}
                 </p>
               </div>

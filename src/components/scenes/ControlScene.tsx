@@ -150,7 +150,7 @@ function ControlBody() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="ACCOUNT" className="shrink-0">
-            <Label htmlFor="ctl" className="text-[10px] tracking-wide">
+            <Label htmlFor="ctl" className="text-[11px] tracking-wide">
               TREASURY OR OPERATING ACCOUNT
             </Label>
             <Input
@@ -167,7 +167,7 @@ function ControlBody() {
               {busy ? "READING CONTROL STATE…" : "READ CONTROL SURFACE"}
             </Button>
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               Quorum is compared against the{" "}
               <span className="text-muted-foreground">sum of signing weights</span>,
               not a count of signers — so five signers where one carries the
@@ -189,7 +189,7 @@ function ControlBody() {
                       key={sgn.account}
                       className="flex items-center gap-2 border-b border-border/30 px-3.5 py-2.5"
                     >
-                      <code className="text-[10.5px] text-muted-foreground">
+                      <code className="text-[11.5px] text-muted-foreground">
                         {shortAddress(sgn.account)}
                       </code>
                       <TraceButton
@@ -199,7 +199,7 @@ function ControlBody() {
                         as="signer"
                       />
                       {unilateral && (
-                        <span className="font-mono text-[8.5px] tracking-[0.14em] text-no-go">
+                        <span className="font-mono text-[10px] tracking-[0.1em] text-no-go">
                           CAN SIGN ALONE
                         </span>
                       )}
@@ -215,7 +215,7 @@ function ControlBody() {
                   );
                 })}
               <div className="px-3.5 py-2.5">
-                <p className="mono-font text-[9px] tabular-nums text-faint">
+                <p className="mono-font text-[10.5px] tabular-nums text-faint">
                   TOTAL WEIGHT {surface.signers.totalWeight} · QUORUM{" "}
                   {surface.signers.quorum}
                 </p>
@@ -239,10 +239,10 @@ function ControlBody() {
           ) : (
             <>
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="font-mono text-[10px] text-muted-foreground">
+                <p className="font-mono text-[11px] text-muted-foreground">
                   {shortAddress(surface.address)}
                 </p>
-                <p className="mt-1 font-mono text-[9px] tabular-nums text-faint">
+                <p className="mt-1 font-mono text-[10.5px] tabular-nums text-faint">
                   LEDGER {surface.ledgerIndex.toLocaleString()} ·{" "}
                   {surface.balanceXrp.toLocaleString(undefined, { maximumFractionDigits: 2 })} XRP
                   {surface.escrows.length > 0 && ` · ${surface.escrows.length} ESCROWS`}

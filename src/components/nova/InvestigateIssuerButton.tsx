@@ -29,7 +29,7 @@ export function InvestigateIssuerButton({ issuer, from, className }: { issuer: s
       <Button size="sm" variant="outline" disabled={busy} onClick={() => void run()}>
         {busy ? "INVESTIGATING…" : "INVESTIGATE ISSUER"}
       </Button>
-      {error && <span className="mt-1 block text-[10px] text-no-go">{error}</span>}
+      {error && <span className="mt-1 block text-[11px] text-no-go">{error}</span>}
     </span>
   );
 }

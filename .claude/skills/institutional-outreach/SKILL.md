@@ -1,6 +1,6 @@
 ---
 name: institutional-outreach
-description: Find, source and keep the list of institutions that would buy NOSHASHI (compliance officers, auditors, XRPL issuers, treasury holders, trading desks, payments corridors), and draft first emails to them. Use when asked to find prospects or leads, add institutions, find contact emails, build or update the outreach CSV, or write a pitch or cold email to an institution. Not for social posts or grant applications; the Growth scene's pitch composer covers those.
+description: Find, source and keep the list of institutions that would buy NOSHASHI (compliance officers, auditors, XRPL issuers, treasury holders, trading desks, payments corridors), and draft first emails to them. Use when asked to find prospects or leads, add institutions, find contact emails, build or update the outreach CSV, or write a pitch or cold email to an institution. Not for social posts or grant applications.
 ---
 
 # Institutional outreach

@@ -32,7 +32,7 @@ export function EmptyState({
         </span>
       )}
       <div className="max-w-[300px]">
-        <p className="stencil text-[10px] tracking-[0.24em] text-foreground">
+        <p className="stencil text-[11px] tracking-[0.14em] text-foreground">
           {title}
         </p>
         <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">

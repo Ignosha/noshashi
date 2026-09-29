@@ -64,12 +64,12 @@ export function TrayScene({ data }: { data: XrplState }) {
       >
         <div className="flex items-center gap-2">
           <NovaLogo size={16} tone="color" />
-          <span className="display text-[11px] font-[700] tracking-[0.14em] text-foreground">
+          <span className="display text-[11px] font-[700] tracking-[0.1em] text-foreground">
             NOSHASHI
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={connected ? "go" : "no-go"} className="text-[8px]">
+          <Badge variant={connected ? "go" : "no-go"} className="text-[10px]">
             <span
               className={cn(
                 "h-1.5 w-1.5 rounded-full",
@@ -88,7 +88,7 @@ export function TrayScene({ data }: { data: XrplState }) {
         animate={{ opacity: 1, y: 0 }}
         transition={SPRING}
       >
-        <p className="stencil text-[8px] tracking-[0.28em] text-muted-foreground">
+        <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
           {DOMAIN_REGISTRY[0].code} SETTLEMENT GATE
         </p>
         <p
@@ -99,7 +99,7 @@ export function TrayScene({ data }: { data: XrplState }) {
         >
           {VERDICT_COPY[gate.verdict].title}
         </p>
-        <p className="mt-2 text-[9px] leading-relaxed text-muted-foreground">
+        <p className="mt-2 text-[10.5px] leading-relaxed text-muted-foreground">
           {passed}/{gate.checks.length} rules passing
         </p>
       </motion.div>
@@ -110,10 +110,10 @@ export function TrayScene({ data }: { data: XrplState }) {
           <NovaShield size={13} className="text-foreground" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="mono-font truncate text-[10px] text-foreground">
+          <p className="mono-font truncate text-[11px] text-foreground">
             {account ? shortAddress(account.address) : "NO WALLET"}
           </p>
-          <p className="mt-0.5 truncate text-[9px] text-muted-foreground">
+          <p className="mt-0.5 truncate text-[10.5px] text-muted-foreground">
             {account?.domain ?? "No domain attestation"}
           </p>
         </div>
@@ -121,7 +121,7 @@ export function TrayScene({ data }: { data: XrplState }) {
           <p className="data-font text-[13px] font-[600] leading-none tabular-nums text-foreground">
             <CountUp value={account ? Number(account.balanceXrp) : 0} decimals={2} />
           </p>
-          <p className="stencil mt-0.5 text-[7px] tracking-[0.2em] text-muted-foreground">
+          <p className="stencil mt-0.5 text-[10px] tracking-[0.14em] text-muted-foreground">
             XRP
           </p>
         </div>
@@ -138,10 +138,10 @@ export function TrayScene({ data }: { data: XrplState }) {
             key={stat.label}
             className={cn("px-3 py-2", index < 2 && "border-r border-border")}
           >
-            <p className="stencil text-[7px] tracking-[0.2em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               {stat.label}
             </p>
-            <p className="mono-font mt-1 truncate text-[10px] tabular-nums text-foreground">
+            <p className="mono-font mt-1 truncate text-[11px] tabular-nums text-foreground">
               {stat.value}
             </p>
           </div>
@@ -151,7 +151,7 @@ export function TrayScene({ data }: { data: XrplState }) {
       {/* Cadence */}
       <div className="shrink-0 border-b border-border px-3 py-2.5">
         <div className="flex items-center justify-between">
-          <span className="stencil text-[7px] tracking-[0.22em] text-muted-foreground">
+          <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
             LEDGER CADENCE
           </span>
           <NovaSat size={11} className="text-muted-foreground" />
@@ -167,13 +167,13 @@ export function TrayScene({ data }: { data: XrplState }) {
       {/* Stream */}
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="flex items-center justify-between border-b border-border px-3 py-1.5">
-          <span className="stencil text-[7px] tracking-[0.22em] text-muted-foreground">
+          <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
             LIVE STREAM
           </span>
           <StatusDot status={linkStatus} size={5} pulse={connected} />
         </div>
         {events.length === 0 ? (
-          <p className="mono-font animate-pulse px-3 py-4 text-[9px] text-muted-foreground">
+          <p className="mono-font animate-pulse px-3 py-4 text-[10.5px] text-muted-foreground">
             AWAITING VALIDATED TRANSACTIONS…
           </p>
         ) : (
@@ -188,13 +188,13 @@ export function TrayScene({ data }: { data: XrplState }) {
                   event.result === "tesSUCCESS" ? "bg-go" : "bg-no-go"
                 )}
               />
-              <span className="mono-font w-[92px] shrink-0 truncate text-[9px] text-foreground/75">
+              <span className="mono-font w-[92px] shrink-0 truncate text-[10.5px] text-foreground/75">
                 {event.type}
               </span>
-              <span className="mono-font min-w-0 flex-1 truncate text-[9px] text-muted-foreground">
+              <span className="mono-font min-w-0 flex-1 truncate text-[10.5px] text-muted-foreground">
                 {shortAddress(event.account)}
               </span>
-              <span className="mono-font shrink-0 text-[8px] tabular-nums text-muted-foreground/60">
+              <span className="mono-font shrink-0 text-[10px] tabular-nums text-muted-foreground/60">
                 {timeAgo(event.at)}
               </span>
             </div>
@@ -209,12 +209,12 @@ export function TrayScene({ data }: { data: XrplState }) {
           OPEN MISSION CONTROL
         </Button>
         <div className="mt-2 flex items-center justify-between px-0.5">
-          <span className="mono-font text-[8px] text-muted-foreground">
+          <span className="mono-font text-[10px] text-muted-foreground">
             {server ? `NET ${server.networkId}` : "NET —"}
           </span>
           <span className="flex items-center gap-1.5">
             <Kbd keys="mod+shift+x" />
-            <span className="stencil text-[7px] tracking-[0.18em] text-muted-foreground">
+            <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               TOGGLE
             </span>
           </span>

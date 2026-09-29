@@ -93,7 +93,7 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
                   key={count}
                   onClick={() => setSeats(count)}
                   className={cn(
-                    "mono-font border px-2.5 py-1 text-[10px] tabular-nums transition-colors",
+                    "mono-font border px-2.5 py-1 text-[11px] tabular-nums transition-colors",
                     seats === count
                       ? "border-foreground bg-foreground text-background"
                       : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground"
@@ -103,14 +103,14 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
                 </button>
               ))}
             </div>
-            <span className="text-[10.5px] text-muted-foreground">
+            <span className="text-[11.5px] text-muted-foreground">
               Desk is billed per seat. Institution is a flat account price.
             </span>
             <span className="ml-auto">
               <Eyebrow>DESK TOTAL</Eyebrow>
               <p className="data-font text-[18px] font-[600] leading-none text-foreground">
                 <CountUp value={seats * 749} prefix="$" />
-                <span className="ml-1 text-[9px] font-normal text-muted-foreground">
+                <span className="ml-1 text-[10.5px] font-normal text-muted-foreground">
                   /MO
                 </span>
               </p>
@@ -144,7 +144,7 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
           className="min-w-0"
           bodyClassName="relative p-4"
           right={
-            <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+            <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
               {entitlement.verificationQuota.toLocaleString()} REMAINING
             </span>
           }
@@ -166,11 +166,11 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
                   <p className="data-font text-[20px] font-[600] leading-none text-foreground">
                     {(pack.verifications / 1000).toLocaleString()}K
                   </p>
-                  <Badge variant="outline" className="text-[8px]">
+                  <Badge variant="outline" className="text-[10px]">
                     {pack.unitLabel}
                   </Badge>
                 </div>
-                <p className="stencil mt-1.5 text-[8px] tracking-[0.2em] text-muted-foreground">
+                <p className="stencil mt-1.5 text-[10px] tracking-[0.14em] text-muted-foreground">
                   VERIFICATIONS
                 </p>
                 <p className="data-font mt-3 text-[17px] font-[600] text-foreground">
@@ -210,13 +210,13 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
                 ].map((line) => (
                   <li key={line} className="flex gap-2">
                     <span className="mt-[6px] h-1 w-1 shrink-0 bg-muted-foreground" />
-                    <span className="text-[10.5px] leading-relaxed text-muted-foreground">
+                    <span className="text-[11.5px] leading-relaxed text-muted-foreground">
                       {line}
                     </span>
                   </li>
                 ))}
               </ul>
-              <p className="mt-2.5 text-[10px] text-muted-foreground">
+              <p className="mt-2.5 text-[11px] text-muted-foreground">
                 Payment is handled entirely by Stripe; card details never reach this
                 application. Prices exclude tax, which Stripe calculates at checkout.
               </p>
@@ -248,7 +248,7 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
                 <span className="mt-0.5 shrink-0 text-muted-foreground">{item.icon}</span>
                 <div>
                   <p className="text-[11px] font-medium text-foreground">{item.title}</p>
-                  <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
+                  <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
                     {item.body}
                   </p>
                 </div>
@@ -292,14 +292,14 @@ function PlanCard({
             <p className="display text-[15px] font-[700] tracking-[0.1em] text-foreground">
               {plan.name}
             </p>
-            <p className="mt-1 text-[9.5px] text-muted-foreground">{plan.audience}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{plan.audience}</p>
           </div>
           {current ? (
-            <Badge variant="go" className="text-[8px]">
+            <Badge variant="go" className="text-[10px]">
               CURRENT
             </Badge>
           ) : plan.emphasis ? (
-            <Badge variant="hold" className="text-[8px]">
+            <Badge variant="hold" className="text-[10px]">
               MOST CAPABLE
             </Badge>
           ) : null}
@@ -309,7 +309,7 @@ function PlanCard({
           <p className="data-font text-[28px] font-[700] leading-none text-foreground">
             {plan.priceLabel}
           </p>
-          <p className="mono-font mt-1.5 text-[9px] text-muted-foreground">
+          <p className="mono-font mt-1.5 text-[10.5px] text-muted-foreground">
             {plan.cadence}
             {total !== null && seats > 1 && ` · $${total.toLocaleString()}/mo for ${seats}`}
           </p>
@@ -319,7 +319,7 @@ function PlanCard({
           {plan.features.map((feature) => (
             <li key={feature} className="flex gap-2">
               <span className="mt-[5px] h-1 w-1 shrink-0 bg-go" />
-              <span className="text-[10.5px] leading-snug text-muted-foreground">
+              <span className="text-[11.5px] leading-snug text-muted-foreground">
                 {feature}
               </span>
             </li>

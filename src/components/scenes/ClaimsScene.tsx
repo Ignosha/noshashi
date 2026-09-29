@@ -76,7 +76,7 @@ export function ClaimsScene() {
       />
 
       {claimed && (
-        <p className="mono-font shrink-0 text-[9px] leading-snug text-faint">
+        <p className="mono-font shrink-0 text-[10.5px] leading-snug text-faint">
           TRACED FROM {String(claimed.from ?? "").toUpperCase()}
           {claimed.as && ` · ${claimed.as.toUpperCase()}`}
         </p>
@@ -116,7 +116,7 @@ export function ClaimsScene() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="ACCOUNT" className="shrink-0">
-            <Label htmlFor="claims" className="text-[10px] tracking-wide">
+            <Label htmlFor="claims" className="text-[11px] tracking-wide">
               XRPL ADDRESS
             </Label>
             <Input
@@ -133,7 +133,7 @@ export function ClaimsScene() {
               {busy ? "READING CLAIMS…" : "READ CLAIMS"}
             </Button>
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               A currency code is{" "}
               <span className="text-muted-foreground">not a name anyone owns</span>.
               Any account can issue a token called USDT, and the ledger draws
@@ -153,7 +153,7 @@ export function ClaimsScene() {
                 return (
                   <div key={claim.index} className="border-b border-border/30 px-3.5 py-2.5">
                     <div className="flex items-baseline gap-2">
-                      <code className="text-[10.5px] text-muted-foreground">
+                      <code className="text-[11.5px] text-muted-foreground">
                         {shortAddress(claim.from)}
                       </code>
                       <TraceButton
@@ -164,7 +164,7 @@ export function ClaimsScene() {
                       />
                       <span
                         className={cn(
-                          "ml-auto font-mono text-[10.5px] tabular-nums",
+                          "ml-auto font-mono text-[11.5px] tabular-nums",
                           bad ? "text-no-go" : "text-muted-foreground"
                         )}
                       >
@@ -172,12 +172,12 @@ export function ClaimsScene() {
                       </span>
                     </div>
                     {bad && (
-                      <p className="mono-font mt-1.5 text-[8.5px] leading-snug tracking-[0.1em] text-no-go">
+                      <p className="mono-font mt-1.5 text-[10px] leading-snug tracking-[0.1em] text-no-go">
                         ISSUER HAS ISSUED NOTHING — NOT CASHABLE
                       </p>
                     )}
                     {claim.issuerDomain && (
-                      <p className="mono-font mt-1 text-[9px] text-faint">
+                      <p className="mono-font mt-1 text-[10.5px] text-faint">
                         issuer claims {claim.issuerDomain}
                       </p>
                     )}
@@ -203,10 +203,10 @@ export function ClaimsScene() {
           ) : (
             <>
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="break-all font-mono text-[10px] text-muted-foreground">
+                <p className="break-all font-mono text-[11px] text-muted-foreground">
                   {report.address}
                 </p>
-                <p className="mt-1 font-mono text-[9px] tabular-nums text-faint">
+                <p className="mt-1 font-mono text-[10.5px] tabular-nums text-faint">
                   LEDGER {report.ledgerIndex.toLocaleString()}
                 </p>
               </div>

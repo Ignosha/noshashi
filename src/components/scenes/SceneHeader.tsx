@@ -44,7 +44,7 @@ export function SceneHeader({
             </span>
           )}
           <div className="min-w-0">
-            <p className="stencil text-[9px] tracking-[0.32em] text-muted-foreground">
+            <p className="stencil text-[10.5px] tracking-[0.14em] text-muted-foreground">
               {kicker}
             </p>
             <h1 className="display mt-0.5 truncate text-[18px] font-[700] leading-none text-foreground">
@@ -59,7 +59,7 @@ export function SceneHeader({
               <StatusDot status={status} size={6} pulse={status === "go"} />
               <span
                 className={cn(
-                  "stencil text-[9px] tracking-[0.2em]",
+                  "stencil text-[10.5px] tracking-[0.14em]",
                   status === "go" && "text-go",
                   status === "hold" && "text-hold",
                   status === "no-go" && "text-no-go"

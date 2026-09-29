@@ -133,7 +133,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       <div className="relative flex w-[min(560px,86vw)] flex-col items-center">
         {/* 0.00s — system indicator */}
         <motion.p
-          className="font-display text-[9px] tracking-[0.34em] text-faint"
+          className="font-display text-[10.5px] tracking-[0.14em] text-faint"
           initial={{ opacity: 0 }}
           animate={{ opacity: t >= T.system ? 1 : 0 }}
           transition={{ duration: 0.24 }}
@@ -195,7 +195,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         </div>
 
         <motion.p
-          className="mt-7 font-display text-[11px] tracking-[0.26em] text-muted-foreground"
+          className="mt-7 font-display text-[11px] tracking-[0.14em] text-muted-foreground"
           initial={{ opacity: 0 }}
           animate={{ opacity: t >= T.telemetry ? 1 : 0 }}
           transition={{ duration: 0.3 }}
@@ -226,15 +226,15 @@ export function Preloader({ onDone }: { onDone: () => void }) {
                         : "bg-faint")
                   }
                 />
-                <span className="font-display text-[10px] tracking-[0.18em] text-foreground">
+                <span className="font-display text-[11px] tracking-[0.14em] text-foreground">
                   {m.label}
                 </span>
-                <span className="font-mono text-[9px] tracking-[0.1em] text-faint">
+                <span className="font-mono text-[10.5px] tracking-[0.1em] text-faint">
                   {m.detail}
                 </span>
                 <span
                   className={
-                    "ml-auto font-mono text-[9px] tracking-[0.16em] " +
+                    "ml-auto font-mono text-[10.5px] tracking-[0.1em] " +
                     (state === "online"
                       ? "text-go"
                       : state === "connecting"
@@ -262,7 +262,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
           />
         </div>
 
-        <p className="mt-4 font-mono text-[9px] tracking-[0.2em] text-faint">
+        <p className="mt-4 font-mono text-[10.5px] tracking-[0.14em] text-faint">
           ANALYZE · DISCOVER · NAVIGATE
         </p>
       </div>

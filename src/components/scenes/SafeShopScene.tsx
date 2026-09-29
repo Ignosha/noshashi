@@ -110,7 +110,7 @@ export function SafeShopScene({ onUpgrade }: { onUpgrade: () => void }) {
       <div className="grid min-h-0 flex-1 grid-cols-5 gap-3">
         <div className="col-span-2 flex min-h-0 flex-col gap-3">
           <Panel label="ADDRESS" className="shrink-0">
-            <Label htmlFor="cp" className="text-[10px] tracking-wide">
+            <Label htmlFor="cp" className="text-[11px] tracking-wide">
               XRPL ACCOUNT
             </Label>
             <Input
@@ -149,7 +149,7 @@ export function SafeShopScene({ onUpgrade }: { onUpgrade: () => void }) {
 
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
 
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               Everything reported is published on the XRP Ledger and readable by
               anyone. NOSHASHI does not hold a list of &ldquo;known bad
               actors&rdquo; and does not score reputation — inventing one would
@@ -165,7 +165,7 @@ export function SafeShopScene({ onUpgrade }: { onUpgrade: () => void }) {
                 "Whether an address is sanctioned. That requires a sanctions list, which is a legal product NOSHASHI does not publish.",
                 "Whether you will get your goods. This is a ledger reader, not an escrow.",
               ].map((t) => (
-                <li key={t} className="flex gap-2 text-[10.5px] leading-relaxed text-muted-foreground">
+                <li key={t} className="flex gap-2 text-[11.5px] leading-relaxed text-muted-foreground">
                   <span aria-hidden className="mt-[6px] h-[3px] w-[3px] shrink-0 bg-hold" />
                   {t}
                 </li>
@@ -196,7 +196,7 @@ export function SafeShopScene({ onUpgrade }: { onUpgrade: () => void }) {
                 <p className="mt-1 max-w-2xl text-[11px] leading-relaxed text-muted-foreground">
                   {VERDICT_COPY[report.verdict].blurb}
                 </p>
-                <div className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1 font-mono text-[10px] tabular-nums text-faint">
+                <div className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1 font-mono text-[11px] tabular-nums text-faint">
                   <span>{shortAddress(report.address)}</span>
                   {report.funded && (
                     <span>
@@ -240,7 +240,7 @@ export function SafeShopScene({ onUpgrade }: { onUpgrade: () => void }) {
 
               <div className="px-4 py-3">
                 <Eyebrow>NOT ADVICE</Eyebrow>
-                <p className="mt-1.5 max-w-2xl text-[10px] leading-relaxed text-faint">
+                <p className="mt-1.5 max-w-2xl text-[11px] leading-relaxed text-faint">
                   This is a reading of public ledger state at{" "}
                   {new Date(report.checkedAt).toLocaleString()}. It is not legal,
                   regulatory or financial advice, and it is not a representation

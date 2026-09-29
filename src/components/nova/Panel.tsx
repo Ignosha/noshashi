@@ -77,7 +77,7 @@ export function Panel({
               : "h-9 border-b border-border/70 px-3.5"
           )}
         >
-          <span className="stencil truncate text-[9px] tracking-[0.28em] text-muted-foreground">
+          <span className="stencil truncate text-[10.5px] tracking-[0.14em] text-muted-foreground">
             {label}
           </span>
           {right && <span className="flex shrink-0 items-center gap-2">{right}</span>}
@@ -112,7 +112,7 @@ export function DataRow({
         className
       )}
     >
-      <span className="stencil shrink-0 text-[8px] tracking-[0.22em] text-muted-foreground">
+      <span className="stencil shrink-0 text-[10px] tracking-[0.14em] text-muted-foreground">
         {label}
       </span>
       <span
@@ -161,7 +161,7 @@ export function StatCell({
 }) {
   return (
     <Panel bodyClassName="p-3.5" className={className}>
-      <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+      <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
         {label}
       </p>
       <p
@@ -177,7 +177,7 @@ export function StatCell({
       {caveat !== undefined && caveat !== null && (
         <p
           className={cn(
-            "mono-font mt-1.5 text-[9px] leading-snug",
+            "mono-font mt-1.5 text-[10.5px] leading-snug",
             tone === "no-go" ? "text-no-go/80" : "text-faint"
           )}
         >
@@ -199,7 +199,7 @@ export function Eyebrow({
   return (
     <p
       className={cn(
-        "stencil text-[8px] tracking-[0.26em] text-muted-foreground",
+        "stencil text-[10px] tracking-[0.14em] text-muted-foreground",
         className
       )}
     >

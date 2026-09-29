@@ -162,7 +162,7 @@ export function StressPanel({
               onClick={() => setScenarioId(option.id)}
               aria-pressed={option.id === scenarioId}
               className={cn(
-                "stencil border px-2.5 py-1 text-[9px] tracking-[0.18em] transition-colors",
+                "stencil border px-2.5 py-1 text-[10.5px] tracking-[0.14em] transition-colors",
                 option.id === scenarioId
                   ? "border-brand bg-brand/10 text-brand"
                   : "border-border/60 text-muted-foreground hover:text-foreground"
@@ -174,7 +174,7 @@ export function StressPanel({
           <div className="ml-auto flex items-center gap-2">
             <label
               htmlFor="stress-participation"
-              className="stencil text-[8.5px] tracking-[0.18em] text-faint"
+              className="stencil text-[10px] tracking-[0.14em] text-faint"
             >
               DAILY PARTICIPATION
             </label>
@@ -196,7 +196,7 @@ export function StressPanel({
           </div>
         </div>
 
-        <p className="mt-2.5 text-[10px] leading-relaxed text-faint">
+        <p className="mt-2.5 text-[11px] leading-relaxed text-faint">
           {scenario.blurb}
           {" "}
           <span className="text-muted-foreground">
@@ -220,7 +220,7 @@ export function StressPanel({
       <div className="border-b border-border/60 px-4 py-4">
         <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
           <div>
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               RECOVERABLE
             </p>
             <p
@@ -238,7 +238,7 @@ export function StressPanel({
             </p>
           </div>
           <div>
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               MARK TO MID
             </p>
             <p className="data-font mt-1 text-[20px] leading-none tabular-nums text-muted-foreground">
@@ -247,7 +247,7 @@ export function StressPanel({
             </p>
           </div>
           <div>
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               RECOVERY
             </p>
             <p className="data-font mt-1 text-[20px] leading-none tabular-nums text-foreground">
@@ -257,7 +257,7 @@ export function StressPanel({
             </p>
           </div>
           <div>
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               DAYS TO EXIT
             </p>
             <p className="data-font mt-1 text-[20px] leading-none tabular-nums text-foreground">
@@ -265,7 +265,7 @@ export function StressPanel({
             </p>
           </div>
           <div>
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               FREEZABLE
             </p>
             <p
@@ -286,7 +286,7 @@ export function StressPanel({
       {/* ── Waterfall ───────────────────────────────────────────────── */}
       {report.markXrp > 0 && (
         <div className="border-b border-border/60 px-4 py-4">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
             MARK TO RECOVERABLE
           </p>
 
@@ -334,11 +334,11 @@ export function StressPanel({
                     <span className="data-font ml-auto shrink-0 tabular-nums text-muted-foreground">
                       {xrp(row.xrp, 0)}
                     </span>
-                    <span className="data-font shrink-0 text-[10px] tabular-nums text-faint">
+                    <span className="data-font shrink-0 text-[11px] tabular-nums text-faint">
                       {((row.xrp / report.markXrp) * 100).toFixed(1)}%
                     </span>
                   </p>
-                  <p className="mt-0.5 text-[10px] leading-relaxed text-faint">
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-faint">
                     {WATERFALL_COPY[row.id]}
                   </p>
                 </div>
@@ -380,7 +380,7 @@ export function StressPanel({
               }
               className="rounded-none border-b border-border/30"
             >
-              <div className="mt-2.5 flex flex-wrap gap-x-6 gap-y-1 font-mono text-[10px] tabular-nums text-faint">
+              <div className="mt-2.5 flex flex-wrap gap-x-6 gap-y-1 font-mono text-[11px] tabular-nums text-faint">
                 <span>
                   ROUTED{" "}
                   <span className="text-muted-foreground">
@@ -464,7 +464,7 @@ export function StressSidebar({ report }: { report: PortfolioStress | null }) {
         ) : (
           <p className="text-[11px] text-faint">No positions to stress.</p>
         )}
-        <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+        <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
           These are inputs, not predictions. A committee that has agreed its
           own haircut should use theirs — the value of the number is that it
           can be argued with.
@@ -490,7 +490,7 @@ export function StressSidebar({ report }: { report: PortfolioStress | null }) {
           against the same offers. What is left is discounted for balances
           the issuer retains the right to immobilise.
         </p>
-        <p className="mt-2.5 text-[10px] leading-relaxed text-faint">
+        <p className="mt-2.5 text-[11px] leading-relaxed text-faint">
           Nothing here is a forecast of a price. It is what the ledger
           currently evidences a buyer for, under stated assumptions, at the
           ledger index the positions were read at.

@@ -169,7 +169,7 @@ export function GardenBody({ initial }: { initial?: { columns: GardenColumn[]; p
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <Panel label="START" className="shrink-0" bodyClassName="p-3">
-        <Label htmlFor="garden-subject" className="text-[10px] tracking-wide">
+        <Label htmlFor="garden-subject" className="text-[11px] tracking-wide">
           ISSUER, ACCOUNT OR TRANSACTION
         </Label>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -226,10 +226,10 @@ export function GardenBody({ initial }: { initial?: { columns: GardenColumn[]; p
 
               {columns.map((column, c) => (
                 <div key={`h${c}`} className="absolute" style={{ left: c * (colWidth + colGap), top: 0, width: colWidth }}>
-                  <p className="stencil truncate text-[9px] tracking-[0.2em] text-foreground">{column.title}</p>
+                  <p className="stencil truncate text-[10.5px] tracking-[0.14em] text-foreground">{column.title}</p>
                   <p
                     className={cn(
-                      "data-font truncate text-[8px] tracking-[0.12em]",
+                      "data-font truncate text-[10px] tracking-[0.1em]",
                       column.state.startsWith("NOT") ? "text-no-go" : "text-faint"
                     )}
                   >
@@ -240,7 +240,7 @@ export function GardenBody({ initial }: { initial?: { columns: GardenColumn[]; p
               {layout.groups.map((g) => (
                 <p
                   key={`g${g.column}:${g.text}`}
-                  className="stencil absolute text-[7.5px] tracking-[0.24em] text-muted-foreground"
+                  className="stencil absolute text-[10px] tracking-[0.14em] text-muted-foreground"
                   style={{ left: g.x, top: g.y - 8 }}
                 >
                   {g.text}
@@ -262,17 +262,17 @@ export function GardenBody({ initial }: { initial?: { columns: GardenColumn[]; p
                   style={{ left: p.x, top: p.y, width: p.w, height: p.h }}
                 >
                   <span className="flex items-baseline gap-2">
-                    <span className="data-font min-w-0 flex-1 truncate text-[10.5px] text-foreground">{p.node.label}</span>
-                    <span className="stencil shrink-0 text-[7px] tracking-[0.2em] text-faint">{KIND_LABEL[p.node.kind]}</span>
+                    <span className="data-font min-w-0 flex-1 truncate text-[11.5px] text-foreground">{p.node.label}</span>
+                    <span className="stencil shrink-0 text-[10px] tracking-[0.14em] text-faint">{KIND_LABEL[p.node.kind]}</span>
                   </span>
-                  <span className="truncate text-[9px] text-muted-foreground">{p.node.detail}</span>
+                  <span className="truncate text-[10.5px] text-muted-foreground">{p.node.detail}</span>
                 </button>
               ))}
 
               {growing !== null && (
                 <p
                   role="status"
-                  className="stencil absolute animate-pulse text-[9px] tracking-[0.2em] text-go"
+                  className="stencil absolute animate-pulse text-[10.5px] tracking-[0.14em] text-go"
                   style={{ left: growing * (colWidth + colGap), top: header }}
                 >
                   GROWING — READING THE LEDGER…
@@ -289,16 +289,16 @@ export function GardenBody({ initial }: { initial?: { columns: GardenColumn[]; p
               <p className="text-[11px] text-muted-foreground">Nothing selected yet.</p>
             ) : (
               <>
-                <p className="stencil text-[8px] tracking-[0.22em] text-faint">{KIND_LABEL[selected.kind]}</p>
+                <p className="stencil text-[10px] tracking-[0.14em] text-faint">{KIND_LABEL[selected.kind]}</p>
                 <p className="data-font selectable mt-1 break-all text-[11px] text-foreground">
                   {selected.ref.hash ?? selected.ref.address ?? `${selected.label}`}
                 </p>
                 {selected.kind === "asset" && (
-                  <p className="data-font selectable mt-0.5 break-all text-[9.5px] text-muted-foreground">
+                  <p className="data-font selectable mt-0.5 break-all text-[11px] text-muted-foreground">
                     issued by {selected.ref.issuer}
                   </p>
                 )}
-                <p className="mt-2 text-[10.5px] leading-relaxed text-foreground/85">{selected.detail}</p>
+                <p className="mt-2 text-[11.5px] leading-relaxed text-foreground/85">{selected.detail}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button
                     size="sm"
@@ -337,10 +337,10 @@ export function GardenBody({ initial }: { initial?: { columns: GardenColumn[]; p
             ) : (
               <ol className="space-y-1.5">
                 {pathNodes.map((node, i) => (
-                  <li key={`${i}:${node.id}`} className="text-[10.5px] leading-snug">
-                    <span className="stencil mr-1.5 text-[7.5px] tracking-[0.2em] text-faint">{KIND_LABEL[node.kind]}</span>
+                  <li key={`${i}:${node.id}`} className="text-[11.5px] leading-snug">
+                    <span className="stencil mr-1.5 text-[10px] tracking-[0.14em] text-faint">{KIND_LABEL[node.kind]}</span>
                     <span className="data-font text-foreground">{node.label}</span>
-                    <span className="block text-[9.5px] text-muted-foreground">{node.detail}</span>
+                    <span className="block text-[11px] text-muted-foreground">{node.detail}</span>
                   </li>
                 ))}
               </ol>
@@ -349,8 +349,8 @@ export function GardenBody({ initial }: { initial?: { columns: GardenColumn[]; p
               <div className="mt-3 space-y-1.5 border-t border-border/50 pt-2.5">
                 {columns.map((c, i) =>
                   c.note ? (
-                    <p key={`n${i}`} className="text-[9.5px] leading-relaxed text-faint">
-                      <span className="stencil mr-1 text-[7.5px] tracking-[0.2em] text-muted-foreground">{c.title}</span>
+                    <p key={`n${i}`} className="text-[11px] leading-relaxed text-faint">
+                      <span className="stencil mr-1 text-[10px] tracking-[0.14em] text-muted-foreground">{c.title}</span>
                       {c.note}
                     </p>
                   ) : null

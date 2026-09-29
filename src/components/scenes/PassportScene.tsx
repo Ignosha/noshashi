@@ -106,7 +106,7 @@ function PassportBody() {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setPassport(null); }}
           placeholder="Enter issuer address…"
-          className="mono-font h-7 flex-1 text-[10px]"
+          className="mono-font h-7 flex-1 text-[11px]"
         />
         <Button size="sm" className="gap-2" onClick={() => void run()} disabled={busy}>
           <NovaSearch size={13} />
@@ -126,7 +126,7 @@ function PassportBody() {
                   key={s.id}
                   onClick={() => setTab(s.id)}
                   className={cn(
-                    "border px-2 py-1 text-[10px] tracking-wide transition-colors",
+                    "border px-2 py-1 text-[11px] tracking-wide transition-colors",
                     tab === s.id
                       ? "border-brand text-brand"
                       : "border-border text-muted hover:text-foreground"
@@ -186,7 +186,7 @@ function Summary({ passport }: { passport: AssetPassport }) {
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Panel bodyClassName="p-3">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">VERDICT</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">VERDICT</p>
           <p className={cn("data-font mt-1.5 text-[22px] font-[600] leading-none",
             passport.authority.verdict === "no-go" ? "text-no-go"
               : passport.authority.verdict === "hold" ? "text-hold"
@@ -197,19 +197,19 @@ function Summary({ passport }: { passport: AssetPassport }) {
           </p>
         </Panel>
         <Panel bodyClassName="p-3">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">CURRENCY</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">CURRENCY</p>
           <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
             {passport.asset.currency}
           </p>
         </Panel>
         <Panel bodyClassName="p-3">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">LEDGER</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">LEDGER</p>
           <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
             #{passport.authority.ledgerIndex.toLocaleString()}
           </p>
         </Panel>
         <Panel bodyClassName="p-3">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">HOLDERS</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">HOLDERS</p>
           <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
             {passport.issuance.currencies[0]?.holders.toLocaleString() ?? "—"}
           </p>
@@ -272,25 +272,25 @@ function ConcentrationSection({ passport }: { passport: AssetPassport }) {
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Panel bodyClassName="p-3">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">OUTSTANDING</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">OUTSTANDING</p>
           <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
             {c.outstanding.toLocaleString()}
           </p>
         </Panel>
         <Panel bodyClassName="p-3">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">HOLDERS</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">HOLDERS</p>
           <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
             {c.holders.toLocaleString()}
           </p>
         </Panel>
         <Panel bodyClassName="p-3">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">HHI</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">HHI</p>
           <p className={cn("data-font mt-1.5 text-[22px] font-[600] leading-none", c.hhi >= 2500 ? "text-hold" : "text-foreground")}>
             {Math.round(c.hhi).toLocaleString()}
           </p>
         </Panel>
         <Panel bodyClassName="p-3">
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">COVERAGE</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">COVERAGE</p>
           <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
             {(c.coverage * 100).toFixed(1)}%
           </p>
@@ -323,7 +323,7 @@ function IssuerPostureSection({ passport }: { passport: AssetPassport }) {
           {passport.findings.map((f) => (
             <div key={f.id} className={cn("border-b border-border/40 py-2 last:border-0")}>
               <p className="text-[11px] font-medium text-foreground">{f.title}</p>
-              <p className="text-[10px] leading-relaxed text-muted-foreground">{f.detail}</p>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">{f.detail}</p>
             </div>
           ))}
         </Panel>
@@ -389,7 +389,7 @@ function ExportSection({ passport }: { passport: AssetPassport }) {
   return (
     <div className="flex flex-col gap-3">
       <Panel label="JSON" bodyClassName="p-3.5">
-        <pre className="mono-font max-h-[300px] overflow-auto rounded-md border border-border bg-background p-2.5 text-[9px] leading-relaxed text-muted-foreground">
+        <pre className="mono-font max-h-[300px] overflow-auto rounded-md border border-border bg-background p-2.5 text-[10.5px] leading-relaxed text-muted-foreground">
           {JSON.stringify(passport, null, 2)}
         </pre>
         <div className="mt-2 flex gap-2">
@@ -399,7 +399,7 @@ function ExportSection({ passport }: { passport: AssetPassport }) {
         </div>
       </Panel>
       <Panel label="CSV" bodyClassName="p-3.5">
-        <pre className="mono-font max-h-[300px] overflow-auto rounded-md border border-border bg-background p-2.5 text-[9px] leading-relaxed text-muted-foreground">
+        <pre className="mono-font max-h-[300px] overflow-auto rounded-md border border-border bg-background p-2.5 text-[10.5px] leading-relaxed text-muted-foreground">
           {passportToCsv(passport)}
         </pre>
         <div className="mt-2 flex gap-2">

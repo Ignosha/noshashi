@@ -32,7 +32,12 @@
       "permanent": true
     },
     {
-      "source": "/auth/:path*",
+      "source": "/auth",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/auth/:path((?!confirmed).*)",
       "destination": "/",
       "permanent": true
     },

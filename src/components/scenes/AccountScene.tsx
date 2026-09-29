@@ -133,7 +133,7 @@ export function AccountScene({
                       {subscription?.status?.toUpperCase() ?? "FREE"}
                     </Badge>
                   </div>
-                  <p className="mt-1.5 text-[10.5px] text-muted-foreground">
+                  <p className="mt-1.5 text-[11.5px] text-muted-foreground">
                     {plan.priceLabel} · {plan.cadence}
                   </p>
 
@@ -185,7 +185,7 @@ export function AccountScene({
                     {entitlement.features.map((feature) => (
                       <span
                         key={feature}
-                        className="mono-font rounded border border-border px-1.5 py-0.5 text-[8px] text-muted-foreground"
+                        className="mono-font rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground"
                       >
                         {feature.replace(/_/g, " ").toUpperCase()}
                       </span>
@@ -193,7 +193,7 @@ export function AccountScene({
                   </div>
 
                   <Eyebrow className="mb-2 mt-4">SUPPORT</Eyebrow>
-                  <p className="text-[10.5px] leading-relaxed text-muted-foreground">
+                  <p className="text-[11.5px] leading-relaxed text-muted-foreground">
                     {entitlement.features.includes("priority_support")
                       ? `Priority queue. Email ${CONTACT.support} and reference your account email.`
                       : `Community support. Email ${CONTACT.support}; paid plans get a priority queue.`}
@@ -307,7 +307,7 @@ function SecurityTab({
                 className="h-[160px] w-[160px]"
               />
             </div>
-            <p className="mono-font selectable mt-2 break-all text-center text-[9px] text-muted-foreground">
+            <p className="mono-font selectable mt-2 break-all text-center text-[10.5px] text-muted-foreground">
               {enrolment.secret}
             </p>
             <div className="mt-3">
@@ -318,7 +318,7 @@ function SecurityTab({
                 maxLength={6}
                 value={code}
                 onChange={(event) => setCode(event.target.value.replace(/[^0-9]/g, ""))}
-                className="mono-font mt-1.5 text-center text-[16px] tracking-[0.4em]"
+                className="mono-font mt-1.5 text-center text-[16px] tracking-[0.14em]"
                 placeholder="000000"
               />
             </div>
@@ -345,16 +345,16 @@ function SecurityTab({
                   className={factor.status === "verified" ? "text-go" : "text-hold"}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[10.5px] text-foreground">
+                  <p className="truncate text-[11.5px] text-foreground">
                     {factor.friendlyName}
                   </p>
-                  <p className="mono-font text-[9px] text-muted-foreground">
+                  <p className="mono-font text-[10.5px] text-muted-foreground">
                     {factor.status.toUpperCase()}
                   </p>
                 </div>
                 <button
                   onClick={() => void unenrollFactor(factor.id)}
-                  className="stencil text-[8px] tracking-[0.18em] text-muted-foreground transition-colors hover:text-no-go"
+                  className="stencil text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-no-go"
                 >
                   REMOVE
                 </button>
@@ -416,7 +416,7 @@ function SecurityTab({
         </Button>
 
         <Eyebrow className="mb-1.5 mt-5">REPORTING</Eyebrow>
-        <p className="text-[10px] leading-relaxed text-muted-foreground">
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
           Found a vulnerability? Email{" "}
           <a
             href={`mailto:${CONTACT.security}`}
@@ -518,7 +518,7 @@ function ApiTab({
         {revealed && (
           <div className="inset-row mt-3 border-l-2 border-l-hold bg-hold-dim/40 p-3">
             <Eyebrow className="text-hold">SHOWN ONCE — COPY IT NOW</Eyebrow>
-            <p className="mono-font selectable mt-1.5 break-all text-[10px] text-foreground">
+            <p className="mono-font selectable mt-1.5 break-all text-[11px] text-foreground">
               {revealed}
             </p>
             <div className="mt-2 flex gap-2">
@@ -527,13 +527,13 @@ function ApiTab({
                   void navigator.clipboard.writeText(revealed);
                   onNotify({ title: "KEY COPIED", tone: "info" });
                 }}
-                className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2"
+                className="stencil text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2"
               >
                 COPY
               </button>
               <button
                 onClick={() => setRevealed(null)}
-                className="stencil text-[8px] tracking-[0.2em] text-muted-foreground underline underline-offset-2"
+                className="stencil text-[10px] tracking-[0.14em] text-muted-foreground underline underline-offset-2"
               >
                 DISMISS
               </button>
@@ -543,7 +543,7 @@ function ApiTab({
 
         <div className="mt-4 space-y-1.5">
           {keys.length === 0 && (
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-[11px] text-muted-foreground">
               No keys issued yet. A key is shown once and stored only as a hash.
             </p>
           )}
@@ -557,14 +557,14 @@ function ApiTab({
             >
               <NovaVault size={13} className="shrink-0 text-muted-foreground" />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[10.5px] text-foreground">{key.name}</p>
-                <p className="mono-font text-[9px] text-muted-foreground">
+                <p className="truncate text-[11.5px] text-foreground">{key.name}</p>
+                <p className="mono-font text-[10.5px] text-muted-foreground">
                   {truncateMiddle(key.prefix, 12, 0)}… ·{" "}
                   {new Date(key.createdAt).toLocaleDateString()}
                 </p>
               </div>
               {key.revokedAt ? (
-                <Badge variant="no-go" className="text-[8px]">
+                <Badge variant="no-go" className="text-[10px]">
                   REVOKED
                 </Badge>
               ) : (
@@ -576,7 +576,7 @@ function ApiTab({
                       onNotify({ title: "KEY REVOKED", tone: "info" });
                     })()
                   }
-                  className="stencil text-[8px] tracking-[0.18em] text-muted-foreground transition-colors hover:text-no-go"
+                  className="stencil text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-no-go"
                 >
                   REVOKE
                 </button>
@@ -593,7 +593,7 @@ function ApiTab({
             before drawing any conclusion from this panel.
           </p>
         ) : usageState === "loading" ? (
-          <p className="mono-font animate-pulse text-[10px] tracking-[0.18em] text-faint">
+          <p className="mono-font animate-pulse text-[11px] tracking-[0.14em] text-faint">
             READING USAGE…
           </p>
         ) : (
@@ -607,7 +607,7 @@ function ApiTab({
         )}
 
         <Eyebrow className="mb-1.5 mt-4">CALLING THE API</Eyebrow>
-        <pre className="mono-font selectable overflow-x-auto rounded-md border border-border bg-background p-2.5 text-[9px] leading-relaxed text-muted-foreground">
+        <pre className="mono-font selectable overflow-x-auto rounded-md border border-border bg-background p-2.5 text-[10.5px] leading-relaxed text-muted-foreground">
 {`curl -X POST \\
   https://api.noshashi.app/v1/verify \\
   -H "Authorization: Bearer nsh_live_…" \\
@@ -618,7 +618,7 @@ function ApiTab({
     "amount_xrp": 1000
   }'`}
         </pre>
-        <p className="mt-2 flex items-start gap-1.5 text-[9.5px] leading-relaxed text-muted-foreground">
+        <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-relaxed text-muted-foreground">
           <NovaBolt size={11} className="mt-0.5 shrink-0 text-hold" />
           Each call draws one prepaid credit and writes a receipt to your audit trail.
         </p>

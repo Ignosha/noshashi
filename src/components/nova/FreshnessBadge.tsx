@@ -27,7 +27,7 @@ export function FreshnessBadge({
   return (
     <span
       className={cn(
-        "mono-font inline-flex items-center gap-1.5 text-[9px] tracking-[0.14em]",
+        "mono-font inline-flex items-center gap-1.5 text-[10.5px] tracking-[0.1em]",
         TONE[freshness],
         className
       )}
