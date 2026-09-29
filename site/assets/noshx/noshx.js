@@ -1,11 +1,11 @@
-var Wt = Object.defineProperty;
-var Gt = (e, t, n) => t in e ? Wt(e, t, { enumerable: !0, configurable: !0, writable: !0, value: n }) : e[t] = n;
-var N = (e, t, n) => Gt(e, typeof t != "symbol" ? t + "" : t, n);
+var Yt = Object.defineProperty;
+var Vt = (e, t, n) => t in e ? Yt(e, t, { enumerable: !0, configurable: !0, writable: !0, value: n }) : e[t] = n;
+var N = (e, t, n) => Vt(e, typeof t != "symbol" ? t + "" : t, n);
 function re(e) {
   const t = Number(e) / 1e6;
   return Number.isFinite(t) ? t.toFixed(6).replace(/\.?0+$/, "") : "0";
 }
-function St(e) {
+function _t(e) {
   return new Date((e + 946684800) * 1e3);
 }
 function U(e) {
@@ -13,12 +13,12 @@ function U(e) {
   const t = (e.match(/../g) ?? []).map((n) => String.fromCharCode(parseInt(n, 16))).join("").replace(/\0+$/, "").trim();
   return t && /^[\x20-\x7E]+$/.test(t) ? t : e;
 }
-const Kt = /* @__PURE__ */ new Set(["slowDown", "tooBusy"]), Yt = /* @__PURE__ */ new Set(["noNetwork", "noCurrent", "noClosed", "notReady", "disconnected"]), Vt = 4, Jt = 3, Re = 1e3, Qt = 8e3, Zt = "Public XRPL servers are limiting requests from this network right now. NOSHASHI slowed down and retried on more than one server. Wait a minute and try again; nothing was decided on a partial read.", en = {
+const Jt = /* @__PURE__ */ new Set(["slowDown", "tooBusy"]), Qt = /* @__PURE__ */ new Set(["noNetwork", "noCurrent", "noClosed", "notReady", "disconnected"]), Zt = 4, en = 3, Oe = 1e3, tn = 8e3, nn = "Public XRPL servers are limiting requests from this network right now. NOSHASHI slowed down and retried on more than one server. Wait a minute and try again; nothing was decided on a partial read.", sn = {
   now: () => Date.now(),
   sleep: (e) => new Promise((t) => setTimeout(t, e))
 };
-class tn {
-  constructor(t, n, s = en, a = () => Math.random() * 250) {
+class an {
+  constructor(t, n, s = sn, a = () => Math.random() * 250) {
     N(this, "rotate");
     N(this, "giveUp");
     N(this, "clock");
@@ -44,7 +44,7 @@ class tn {
         await this.clock.sleep(t);
         continue;
       }
-      if (this.inFlight < Vt) {
+      if (this.inFlight < Zt) {
         this.inFlight += 1;
         return;
       }
@@ -56,7 +56,7 @@ class tn {
   }
   throttled() {
     this.streak += 1;
-    const t = Math.min(Qt, Re * 2 ** (this.streak - 1)) + this.jitter();
+    const t = Math.min(tn, Oe * 2 ** (this.streak - 1)) + this.jitter();
     this.coolUntil = Math.max(this.coolUntil, this.clock.now() + t), this.streak % 2 === 0 && this.rotate();
   }
   /**
@@ -68,25 +68,25 @@ class tn {
       await this.acquire();
       let s;
       try {
-        const r = await t();
-        return this.streak = 0, r;
-      } catch (r) {
-        s = r;
+        const o = await t();
+        return this.streak = 0, o;
+      } catch (o) {
+        s = o;
       } finally {
         this.release();
       }
-      const a = s?.code ?? "", i = Kt.has(a);
-      if (!i && !Yt.has(a)) throw s;
-      if (i ? this.throttled() : await this.clock.sleep(Re + this.jitter()), n >= Jt)
-        throw i ? this.giveUp(Zt, a) : s;
+      const a = s?.code ?? "", i = Jt.has(a);
+      if (!i && !Qt.has(a)) throw s;
+      if (i ? this.throttled() : await this.clock.sleep(Oe + this.jitter()), n >= en)
+        throw i ? this.giveUp(nn, a) : s;
     }
   }
 }
-const De = [
+const Ce = [
   "wss://xrplcluster.com",
   "wss://s1.ripple.com",
   "wss://s2.ripple.com"
-], Ce = 12e3, nn = 2e4;
+], Pe = 12e3, on = 2e4;
 class F extends Error {
   constructor(n, s) {
     super(n);
@@ -94,7 +94,7 @@ class F extends Error {
     this.code = s, this.name = "XrplError";
   }
 }
-class sn {
+class rn {
   constructor() {
     N(this, "socket", null);
     N(this, "pending", /* @__PURE__ */ new Map());
@@ -109,7 +109,7 @@ class sn {
     N(this, "connected", !1);
     // Every read goes through the pacer: bounded concurrency, and a cool-down
     // plus retry (then the next server) when a public node says slowDown.
-    N(this, "pacer", new tn(
+    N(this, "pacer", new an(
       () => {
         this.reconnect();
       },
@@ -160,18 +160,18 @@ class sn {
   }
   ensureSocket() {
     return this.socket && this.socket.readyState === WebSocket.OPEN ? Promise.resolve(this.socket) : this.connecting ? this.connecting : (this.connecting = new Promise((t, n) => {
-      const s = De[this.endpointIndex % De.length];
+      const s = Ce[this.endpointIndex % Ce.length];
       let a;
       try {
         a = new WebSocket(s);
-      } catch (r) {
-        this.connecting = null, n(r instanceof Error ? r : new Error(String(r)));
+      } catch (o) {
+        this.connecting = null, n(o instanceof Error ? o : new Error(String(o)));
         return;
       }
       this.socket = a;
       const i = window.setTimeout(() => {
         a.close();
-      }, Ce);
+      }, Pe);
       a.onopen = () => {
         window.clearTimeout(i), this.attempt = 0, this.connecting = null, this.setConnected(!0), a.send(
           JSON.stringify({
@@ -180,12 +180,12 @@ class sn {
             streams: ["ledger", "transactions"]
           })
         ), t(a);
-      }, a.onmessage = (r) => this.handleMessage(r), a.onerror = () => {
+      }, a.onmessage = (o) => this.handleMessage(o), a.onerror = () => {
         window.clearTimeout(i);
       }, a.onclose = () => {
         window.clearTimeout(i), this.connecting = null, this.socket = null, this.setConnected(!1);
-        for (const [, r] of this.pending)
-          window.clearTimeout(r.timer), r.reject(new F("Connection closed", "disconnected"));
+        for (const [, o] of this.pending)
+          window.clearTimeout(o.timer), o.reject(new F("Connection closed", "disconnected"));
         this.pending.clear(), n(new F("Connection closed", "disconnected")), this.scheduleReconnect();
       };
     }), this.connecting);
@@ -193,7 +193,7 @@ class sn {
   scheduleReconnect() {
     if (this.streamHandlers.size === 0 && this.pending.size === 0) return;
     window.clearTimeout(this.retryTimer), this.endpointIndex += 1, this.attempt += 1;
-    const t = Math.min(nn, 1e3 * 2 ** Math.min(this.attempt - 1, 4));
+    const t = Math.min(on, 1e3 * 2 ** Math.min(this.attempt - 1, 4));
     this.retryTimer = window.setTimeout(() => {
       this.ensureSocket().catch(() => {
       });
@@ -230,30 +230,30 @@ class sn {
   }
   async send(t, n = {}) {
     const s = await this.ensureSocket(), a = this.nextId++, i = performance.now();
-    return new Promise((r, o) => {
+    return new Promise((o, r) => {
       const c = window.setTimeout(() => {
-        this.pending.delete(a), o(new F(`Timed out: ${t}`));
-      }, Ce);
+        this.pending.delete(a), r(new F(`Timed out: ${t}`));
+      }, Pe);
       this.pending.set(a, {
         resolve: (d) => {
-          this.latencyMs = Math.max(1, Math.round(performance.now() - i)), r(d);
+          this.latencyMs = Math.max(1, Math.round(performance.now() - i)), o(d);
         },
-        reject: o,
+        reject: r,
         timer: c
       });
       try {
         s.send(JSON.stringify({ id: a, command: t, ...n }));
       } catch (d) {
-        window.clearTimeout(c), this.pending.delete(a), o(d instanceof Error ? d : new Error(String(d)));
+        window.clearTimeout(c), this.pending.delete(a), r(d instanceof Error ? d : new Error(String(d)));
       }
     });
   }
 }
-const an = new sn();
+const cn = new rn();
 async function S(e, t = {}) {
-  return an.request(e, t);
+  return cn.request(e, t);
 }
-async function on() {
+async function dn() {
   const [e, t] = await Promise.all([
     S("ledger", { ledger_index: "validated", transactions: !1, expand: !1 }),
     S("fee").catch(() => ({}))
@@ -261,7 +261,7 @@ async function on() {
   return {
     ledgerIndex: Number(n.ledger_index ?? e.ledger_index ?? 0),
     ledgerHash: String(n.ledger_hash ?? ""),
-    closeTime: St(Number(n.close_time ?? 0)).toLocaleString(),
+    closeTime: _t(Number(n.close_time ?? 0)).toLocaleString(),
     validated: !!(e.validated ?? !1),
     baseFeeXrp: re(Number(t.drops?.base_fee ?? 10)),
     openLedgerFeeXrp: re(Number(t.drops?.open_ledger_fee ?? 10)),
@@ -280,48 +280,48 @@ function ce(e) {
     return;
   }
 }
-function rn(e) {
+function ln(e) {
   return { address: e, balanceXrp: "0.00", sequence: 0, ownerCount: 0, unfunded: !0 };
 }
-async function cn(e) {
+async function un(e, t = "validated") {
   try {
-    const n = (await S("account_info", {
+    const s = (await S("account_info", {
       account: e,
-      ledger_index: "validated"
+      ledger_index: t
     })).account_data ?? {};
     return {
       address: e,
-      balanceXrp: (Number(n.Balance ?? 0) / 1e6).toFixed(2),
-      sequence: Number(n.Sequence ?? 0),
-      ownerCount: Number(n.OwnerCount ?? 0),
-      domain: ce(String(n.Domain ?? ""))
+      balanceXrp: (Number(s.Balance ?? 0) / 1e6).toFixed(2),
+      sequence: Number(s.Sequence ?? 0),
+      ownerCount: Number(s.OwnerCount ?? 0),
+      domain: ce(String(s.Domain ?? ""))
     };
-  } catch (t) {
-    if (t instanceof F && t.code === "actNotFound") return rn(e);
-    throw t instanceof F && t.code === "actMalformed" ? new F(
+  } catch (n) {
+    if (n instanceof F && n.code === "actNotFound") return ln(e);
+    throw n instanceof F && n.code === "actMalformed" ? new F(
       "Address failed its base58 checksum — check for a mistyped character.",
       "actMalformed"
-    ) : t;
+    ) : n;
   }
 }
-async function dn(e) {
+async function hn(e, t = "validated") {
   return ((await S("account_objects", {
     account: e,
-    ledger_index: "validated",
+    ledger_index: t,
     type: "credential",
     limit: 100
-  })).account_objects ?? []).map((s) => ({
-    subject: String(s.Subject ?? ""),
-    issuer: String(s.Issuer ?? ""),
-    credentialType: ce(String(s.CredentialType ?? "")) ?? String(s.CredentialType ?? "UNKNOWN"),
+  })).account_objects ?? []).map((a) => ({
+    subject: String(a.Subject ?? ""),
+    issuer: String(a.Issuer ?? ""),
+    credentialType: ce(String(a.CredentialType ?? "")) ?? String(a.CredentialType ?? "UNKNOWN"),
     // XLS-70 marks acceptance with the lsfAccepted flag (0x00010000).
-    accepted: (Number(s.Flags ?? 0) & 65536) !== 0,
-    revoked: !!(s.Revoked ?? !1),
-    uri: s.URI ? ce(String(s.URI)) : void 0,
-    expiration: s.Expiration ? Number(s.Expiration) : void 0
+    accepted: (Number(a.Flags ?? 0) & 65536) !== 0,
+    revoked: !!(a.Revoked ?? !1),
+    uri: a.URI ? ce(String(a.URI)) : void 0,
+    expiration: a.Expiration ? Number(a.Expiration) : void 0
   }));
 }
-async function ln(e, t = 40) {
+async function fn(e, t = 40) {
   try {
     return ((await S("account_tx", {
       account: e,
@@ -331,16 +331,16 @@ async function ln(e, t = 40) {
       forward: !1,
       limit: t
     })).transactions ?? []).map((a) => {
-      const i = a.tx ?? a.tx_json ?? {}, r = a.meta ?? {}, o = r.delivered_amount ?? r.DeliveredAmount, c = typeof o == "string" ? Number(re(o)) : void 0, d = String(i.Account ?? ""), u = String(i.Destination ?? ""), f = d === e ? "out" : u === e ? "in" : "cross", p = St(Number(i.date ?? 0));
+      const i = a.tx ?? a.tx_json ?? {}, o = a.meta ?? {}, r = o.delivered_amount ?? o.DeliveredAmount, c = typeof r == "string" ? Number(re(r)) : void 0, d = String(i.Account ?? ""), u = String(i.Destination ?? ""), h = d === e ? "out" : u === e ? "in" : "cross", p = _t(Number(i.date ?? 0));
       return {
         hash: String(i.hash ?? a.hash ?? ""),
         transactionType: String(i.TransactionType ?? "UNKNOWN"),
-        result: String(r.TransactionResult ?? "—"),
+        result: String(o.TransactionResult ?? "—"),
         ledgerIndex: Number(a.ledger_index ?? i.ledger_index ?? 0),
         date: p.toLocaleString(),
         timestamp: p.getTime(),
-        direction: f,
-        counterparty: f === "out" ? u || "—" : d || "—",
+        direction: h,
+        counterparty: h === "out" ? u || "—" : d || "—",
         amountXrp: c,
         feeXrp: re(String(i.Fee ?? "0"))
       };
@@ -350,11 +350,11 @@ async function ln(e, t = 40) {
     throw n;
   }
 }
-function un(e) {
+function pn(e) {
   return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(e.trim());
 }
-const hn = 262144, fn = 4194304, pn = 2097152, gn = 1048576;
-async function mn(e) {
+const gn = 262144, mn = 4194304, yn = 2097152, wn = 1048576;
+async function bn(e) {
   try {
     return ((await S("account_lines", {
       account: e,
@@ -381,7 +381,7 @@ async function mn(e) {
     throw t;
   }
 }
-async function $t(e) {
+async function xt(e) {
   try {
     const n = (await S("account_info", {
       account: e,
@@ -390,10 +390,10 @@ async function $t(e) {
     return {
       address: e,
       domain: ce(String(n.Domain ?? "")),
-      noFreeze: (s & pn) !== 0,
-      globalFreeze: (s & fn) !== 0,
-      requireAuth: (s & hn) !== 0,
-      masterDisabled: (s & gn) !== 0,
+      noFreeze: (s & yn) !== 0,
+      globalFreeze: (s & mn) !== 0,
+      requireAuth: (s & gn) !== 0,
+      masterDisabled: (s & wn) !== 0,
       transferRateBps: i
     };
   } catch (t) {
@@ -408,15 +408,15 @@ async function $t(e) {
     };
   }
 }
-async function yn(e) {
+async function vn(e) {
   try {
     const t = await S("gateway_balances", {
       account: e,
       ledger_index: "validated"
     }), n = t.obligations ?? {}, s = {};
     for (const [a, i] of Object.entries(n)) {
-      const r = Number(i);
-      Number.isFinite(r) && (s[a] = r);
+      const o = Number(i);
+      Number.isFinite(o) && (s[a] = o);
     }
     return {
       issuer: e,
@@ -432,9 +432,9 @@ async function yn(e) {
     };
   }
 }
-const wn = "https://xiurbiwuwcfowqnpmwki.supabase.co", le = `${wn}/functions/v1`, Oe = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+const kn = "https://xiurbiwuwcfowqnpmwki.supabase.co", le = `${kn}/functions/v1`, Le = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 async function ne(e, t) {
-  const n = [...new Set(e.filter((s) => Oe.test(s)))].slice(0, 50);
+  const n = [...new Set(e.filter((s) => Le.test(s)))].slice(0, 50);
   if (n.length === 0) return { hits: {}, listAsOf: null, listed: 0 };
   try {
     const s = await fetch(`${le}/noshashi-xrpl-watch/sanctions?addresses=${n.join(",")}`, {
@@ -442,13 +442,13 @@ async function ne(e, t) {
     });
     if (!s.ok) return null;
     const a = await s.json(), i = {};
-    for (const r of a.hits ?? []) Oe.test(r.address) && (i[r.address] = r);
+    for (const o of a.hits ?? []) Le.test(o.address) && (i[o.address] = o);
     return { hits: i, listAsOf: a.list_as_of ?? null, listed: Number(a.listed ?? 0) };
   } catch {
     return null;
   }
 }
-function bn(e, t) {
+function Sn(e, t) {
   if (t === void 0) return null;
   if (t === null)
     return {
@@ -472,7 +472,7 @@ function bn(e, t) {
   };
 }
 function he(e, t) {
-  const n = bn(e.address, t);
+  const n = Sn(e.address, t);
   if (!n) return e;
   const s = [n, ...e.findings], a = t?.hits[e.address], i = a ? "avoid" : e.verdict;
   return {
@@ -502,8 +502,8 @@ const ee = {
     label: "NOT READABLE",
     blurb: "This address could not be read, so nothing about it is being asserted."
   }
-}, vn = 60;
-async function kn(e) {
+}, $n = 60;
+async function Tn(e) {
   const t = e.trim(), n = {
     address: t,
     verdict: "unknown",
@@ -520,7 +520,7 @@ async function kn(e) {
     ledgerIndex: 0,
     checkedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
-  if (!un(t))
+  if (!pn(t))
     return {
       ...n,
       findings: [
@@ -534,7 +534,7 @@ async function kn(e) {
       ],
       headline: "NOT A VALID ADDRESS"
     };
-  const [s, a] = await Promise.all([cn(t).catch(() => null), ne([t])]);
+  const [s, a] = await Promise.all([un(t).catch(() => null), ne([t])]);
   if (!s)
     return a?.hits[t] ? he(n, a) : n;
   if (s.unfunded)
@@ -555,27 +555,27 @@ async function kn(e) {
         }
       ]
     }, a);
-  const [i, r, o] = await Promise.all([
-    dn(t).catch(() => []),
-    mn(t).catch(() => []),
-    ln(t, vn).catch(() => [])
-  ]), c = await yn(t).catch(() => null), f = Object.keys(c?.obligations ?? {}).length > 0 ? await $t(t).catch(() => {
+  const [i, o, r] = await Promise.all([
+    hn(t).catch(() => []),
+    bn(t).catch(() => []),
+    fn(t, $n).catch(() => [])
+  ]), c = await vn(t).catch(() => null), h = Object.keys(c?.obligations ?? {}).length > 0 ? await xt(t).catch(() => {
   }) : void 0;
   return he(
-    Sn({
+    _n({
       address: t,
       account: s,
       credentials: i,
-      lines: r,
-      transactions: o,
+      lines: o,
+      transactions: r,
       obligations: c,
-      posture: f
+      posture: h
     }),
     a
   );
 }
-function Sn(e) {
-  const { address: t, account: n, credentials: s, lines: a, transactions: i, obligations: r, posture: o } = e, c = Object.keys(r?.obligations ?? {}), d = c.length > 0, u = [];
+function _n(e) {
+  const { address: t, account: n, credentials: s, lines: a, transactions: i, obligations: o, posture: r } = e, c = Object.keys(o?.obligations ?? {}), d = c.length > 0, u = [];
   if (n.domain ? u.push({
     id: "domain",
     severity: "info",
@@ -596,29 +596,29 @@ function Sn(e) {
       detail: y.length > 0 ? `Someone has attested to this account on-ledger: ${y.map((w) => w.credentialType).join(", ")}. The attestation is only worth as much as the issuer behind it.` : "Every credential attached to this account is either unaccepted or revoked."
     });
   }
-  d && o && (o.globalFreeze && u.push({
+  d && r && (r.globalFreeze && u.push({
     id: "global-freeze",
     severity: "critical",
     title: "This issuer has frozen everything it issued",
     detail: "lsfGlobalFreeze is set. Every balance of every currency this account issues is immobilised right now — holders cannot send or redeem.",
     action: "Do not buy this issuer's tokens while this flag stands."
-  }), o.noFreeze ? u.push({
+  }), r.noFreeze ? u.push({
     id: "no-freeze",
     severity: "ok",
     title: "This issuer has permanently given up the right to freeze",
     detail: "lsfNoFreeze is set and cannot be undone. It can never immobilise a holder's balance."
-  }) : o.globalFreeze || u.push({
+  }) : r.globalFreeze || u.push({
     id: "can-freeze",
     severity: "warn",
     title: "This issuer can freeze your balance at any time",
     detail: "lsfNoFreeze is not set, so the issuer retains the right to immobilise what it issued — yours included — in a single transaction, without warning.",
     action: "Hold only what you would accept losing access to."
-  }), o.transferRateBps > 0 && u.push({
+  }), r.transferRateBps > 0 && u.push({
     id: "transfer-fee",
     severity: "warn",
-    title: `Charges ${o.transferRateBps} basis points to transfer`,
-    detail: `Moving this issuer's token costs ${(o.transferRateBps / 100).toFixed(2)}%, taken by the issuer. It is not refundable and it applies every time the token changes hands.`
-  }), o.requireAuth && u.push({
+    title: `Charges ${r.transferRateBps} basis points to transfer`,
+    detail: `Moving this issuer's token costs ${(r.transferRateBps / 100).toFixed(2)}%, taken by the issuer. It is not refundable and it applies every time the token changes hands.`
+  }), r.requireAuth && u.push({
     id: "require-auth",
     severity: "info",
     title: "Requires authorisation before you can hold it",
@@ -627,13 +627,13 @@ function Sn(e) {
     id: "supply",
     severity: "info",
     title: `Issues ${c.length} currenc${c.length === 1 ? "y" : "ies"}`,
-    detail: `Outstanding: ${c.slice(0, 6).map((y) => `${y} ${Math.round(r?.obligations[y] ?? 0).toLocaleString()}`).join(" · ")}`
+    detail: `Outstanding: ${c.slice(0, 6).map((y) => `${y} ${Math.round(o?.obligations[y] ?? 0).toLocaleString()}`).join(" · ")}`
   }));
-  const f = a.filter((y) => y.frozenByIssuer || y.deepFrozenByIssuer);
-  f.length > 0 && u.push({
+  const h = a.filter((y) => y.frozenByIssuer || y.deepFrozenByIssuer);
+  h.length > 0 && u.push({
     id: "freezes-others",
     severity: "warn",
-    title: `Has frozen ${f.length} counterpart${f.length === 1 ? "y" : "ies"}`,
+    title: `Has frozen ${h.length} counterpart${h.length === 1 ? "y" : "ies"}`,
     detail: "This account has used freeze against people it deals with. That may be entirely legitimate — a sanctions response, for instance — but it demonstrates both the willingness and the ability to do it."
   });
   const p = new Set(
@@ -650,10 +650,10 @@ function Sn(e) {
     title: `${i.length} recent transactions across ${p.size} counterparties`,
     detail: p.size <= 2 ? "Almost all activity is with the same one or two addresses, which is unusual for a business." : "Activity is spread across a range of counterparties."
   });
-  const h = u.reduce((y, w) => {
+  const f = u.reduce((y, w) => {
     const m = { critical: 3, warn: 2, info: 1, ok: 0 };
     return m[w.severity] > m[y] ? w.severity : y;
-  }, "ok"), l = h === "critical" ? "avoid" : h === "warn" ? "caution" : "clear";
+  }, "ok"), l = f === "critical" ? "avoid" : f === "warn" ? "caution" : "clear";
   return {
     address: t,
     verdict: l,
@@ -669,26 +669,26 @@ function Sn(e) {
     activityCount: i.length,
     isIssuer: d,
     issuedCurrencies: c,
-    posture: o,
+    posture: r,
     credentials: s,
     sanctionsChecked: !1,
-    ledgerIndex: r?.ledgerIndex ?? 0,
+    ledgerIndex: o?.ledgerIndex ?? 0,
     checkedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const $n = 946684800;
-function Pe(e) {
-  return new Date((e + $n) * 1e3);
+const xn = 946684800;
+function Xe(e) {
+  return new Date((e + xn) * 1e3);
 }
-const Tn = 1048576;
-function _n(e, t) {
+const An = 1048576;
+function Nn(e, t) {
   const n = e.map((a) => a.weight).sort((a, i) => i - a);
   let s = 0;
   for (let a = 0; a < n.length; a += 1)
     if (s += n[a], s >= t) return a + 1;
   return 1 / 0;
 }
-async function Tt(e) {
+async function At(e) {
   const [t, n, s, a] = await Promise.all([
     S("account_info", { account: e, ledger_index: "validated" }),
     S("server_info").catch(() => ({})),
@@ -706,26 +706,26 @@ async function Tt(e) {
       ledger_index: "validated",
       limit: 200
     }).catch(() => ({}))
-  ]), i = t.account_data ?? {}, r = Number(i.Flags ?? 0), o = n.info?.validated_ledger ?? {}, c = (s.account_objects ?? [])[0], d = (c?.SignerEntries ?? []).map((m) => ({
+  ]), i = t.account_data ?? {}, o = Number(i.Flags ?? 0), r = n.info?.validated_ledger ?? {}, c = (s.account_objects ?? [])[0], d = (c?.SignerEntries ?? []).map((m) => ({
     account: String(m.SignerEntry?.Account ?? ""),
     weight: Number(m.SignerEntry?.SignerWeight ?? 0)
-  })).filter((m) => m.account), u = Number(c?.SignerQuorum ?? 0), f = d.reduce((m, g) => m + g.weight, 0), h = (a.account_objects ?? []).filter((m) => typeof m.Amount == "string").map((m) => ({
+  })).filter((m) => m.account), u = Number(c?.SignerQuorum ?? 0), h = d.reduce((m, g) => m + g.weight, 0), f = (a.account_objects ?? []).filter((m) => typeof m.Amount == "string").map((m) => ({
     amountXrp: Number(m.Amount) / 1e6,
-    finishAfter: m.FinishAfter !== void 0 ? Pe(Number(m.FinishAfter)).toISOString() : void 0,
-    cancelAfter: m.CancelAfter !== void 0 ? Pe(Number(m.CancelAfter)).toISOString() : void 0,
+    finishAfter: m.FinishAfter !== void 0 ? Xe(Number(m.FinishAfter)).toISOString() : void 0,
+    cancelAfter: m.CancelAfter !== void 0 ? Xe(Number(m.CancelAfter)).toISOString() : void 0,
     destination: m.Destination ? String(m.Destination) : void 0
-  })), l = Number(i.OwnerCount ?? 0), y = Number(o.reserve_base_xrp ?? 1), w = Number(o.reserve_inc_xrp ?? 0.2);
+  })), l = Number(i.OwnerCount ?? 0), y = Number(r.reserve_base_xrp ?? 1), w = Number(r.reserve_inc_xrp ?? 0.2);
   return {
     address: e,
-    masterKeyEnabled: (r & Tn) === 0,
+    masterKeyEnabled: (o & An) === 0,
     regularKey: i.RegularKey ? String(i.RegularKey) : void 0,
     signers: {
       present: d.length > 0,
       unreadable: s.__unreadable ? String(s.__unreadable) : void 0,
       quorum: u,
       signers: d,
-      totalWeight: f,
-      minimumSigners: d.length > 0 ? _n(d, u) : 0,
+      totalWeight: h,
+      minimumSigners: d.length > 0 ? Nn(d, u) : 0,
       unilateralSigners: d.filter((m) => u > 0 && m.weight >= u).map((m) => m.account)
     },
     ownerCount: l,
@@ -733,14 +733,14 @@ async function Tt(e) {
     reserveIncrementXrp: w,
     reserveLockedXrp: y + l * w,
     balanceXrp: Number(i.Balance ?? 0) / 1e6,
-    escrows: h,
-    escrowedXrp: h.reduce((m, g) => m + g.amountXrp, 0),
+    escrows: f,
+    escrowedXrp: f.reduce((m, g) => m + g.amountXrp, 0),
     truncated: !!(a.marker || s.marker),
     ledgerIndex: Number(t.ledger_index ?? 0),
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function xn(e) {
+function In(e) {
   const t = [];
   if (e.masterKeyEnabled && !e.signers.present && t.push({
     id: "single-key",
@@ -761,24 +761,24 @@ function xn(e) {
     detail: "The master key is disabled and no signer list is present. Unless a regular key is set, nothing can sign for this account and the balance is unreachable.",
     action: "Verify a regular key exists before relying on this account."
   }), e.signers.present) {
-    const { quorum: a, totalWeight: i, minimumSigners: r, signers: o, unilateralSigners: c } = e.signers;
-    r === 1 / 0 ? t.push({
+    const { quorum: a, totalWeight: i, minimumSigners: o, signers: r, unilateralSigners: c } = e.signers;
+    o === 1 / 0 ? t.push({
       id: "quorum-unreachable",
       severity: "critical",
       title: "Quorum can never be met",
       detail: `Quorum is ${a} but the signers' weights total only ${i}. No combination of the configured signers can authorise a transaction.`,
       action: "Lower the quorum or add weight before this account needs to move."
-    }) : r === 1 ? t.push({
+    }) : o === 1 ? t.push({
       id: "effective-single",
       severity: "critical",
-      title: `${o.length} signers, but one can act alone`,
+      title: `${r.length} signers, but one can act alone`,
       detail: `Quorum is ${a} and at least one signer carries that weight by themselves${c.length ? ` (${c.length} of them can)` : ""}. XRPL compares quorum against the sum of signing weights, not a count of signers, so this list provides no second approval in practice.`,
       action: "Rebalance the weights so no single signer reaches quorum unaided."
     }) : t.push({
       id: "quorum-ok",
       severity: "ok",
-      title: `Requires at least ${r} of ${o.length} signers`,
-      detail: `Quorum ${a} against a total weight of ${i}. Taking the heaviest signers first, ${r} must agree before anything moves.`
+      title: `Requires at least ${o} of ${r.length} signers`,
+      detail: `Quorum ${a} against a total weight of ${i}. Taking the heaviest signers first, ${o} must agree before anything moves.`
     });
   }
   const n = e.balanceXrp - e.reserveLockedXrp - e.escrowedXrp;
@@ -788,7 +788,7 @@ function xn(e) {
     title: `${e.reserveLockedXrp.toLocaleString(void 0, { maximumFractionDigits: 1 })} XRP locked by reserve`,
     detail: `${e.reserveBaseXrp} XRP base plus ${e.ownerCount.toLocaleString()} owned objects at ${e.reserveIncrementXrp} XRP each. This is not spendable while those objects exist — every trust line, offer and escrow adds to it.`
   }), e.escrows.length > 0) {
-    const a = e.escrows.filter((i) => i.finishAfter).sort((i, r) => i.finishAfter < r.finishAfter ? -1 : 1)[0];
+    const a = e.escrows.filter((i) => i.finishAfter).sort((i, o) => i.finishAfter < o.finishAfter ? -1 : 1)[0];
     t.push({
       id: "escrow",
       severity: "info",
@@ -817,18 +817,18 @@ function xn(e) {
   const s = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((a, i) => s[a.severity] - s[i.severity]);
 }
-const _t = 946684800, An = 32570, Le = 10;
-function Nn(e, t) {
+const Nt = 946684800, En = 32570, He = 10;
+function Fn(e, t) {
   const n = [];
   for (const s of e) {
     const a = s.tx_json ?? s.tx ?? s;
     if (a.Account !== t) continue;
-    const i = Number(s.ledger_index ?? a.ledger_index ?? 0), r = Number(a.date), o = Number.isFinite(r) ? new Date((r + _t) * 1e3) : void 0;
+    const i = Number(s.ledger_index ?? a.ledger_index ?? 0), o = Number(a.date), r = Number.isFinite(o) ? new Date((o + Nt) * 1e3) : void 0;
     if (a.TransactionType === "SetRegularKey") {
       const c = !!a.RegularKey;
       n.push({
         ledgerIndex: i,
-        at: o,
+        at: r,
         kind: c ? "regular-key-set" : "regular-key-removed",
         label: c ? "A regular key was assigned — a second key able to sign" : "The regular key was removed"
       });
@@ -836,28 +836,28 @@ function Nn(e, t) {
       const c = Number(a.SignerQuorum ?? 0) === 0;
       n.push({
         ledgerIndex: i,
-        at: o,
+        at: r,
         kind: c ? "signer-list-removed" : "signer-list-set",
         label: c ? "The signer list was deleted — multi-party approval ended" : "A signer list was configured or replaced"
       });
     } else a.TransactionType === "AccountSet" && (Number(a.SetFlag) === 4 ? n.push({
       ledgerIndex: i,
-      at: o,
+      at: r,
       kind: "master-key-disabled",
       label: "The master key was disabled"
     }) : Number(a.ClearFlag) === 4 && n.push({
       ledgerIndex: i,
-      at: o,
+      at: r,
       kind: "master-key-enabled",
       label: "The master key was re-enabled"
     }));
   }
   return n.sort((s, a) => s.ledgerIndex - a.ledgerIndex);
 }
-function In(e, t) {
+function Rn(e, t) {
   return e >= t ? e - t : Math.max(0, e - 1);
 }
-async function En(e) {
+async function Dn(e) {
   let t;
   try {
     t = await S("account_info", { account: e, ledger_index: "validated" });
@@ -874,9 +874,9 @@ async function En(e) {
   } catch {
   }
   let i;
-  const r = [];
-  let o = !1, c;
-  for (let k = 0; k < Le; k += 1) {
+  const o = [];
+  let r = !1, c;
+  for (let k = 0; k < He; k += 1) {
     let $;
     try {
       $ = await S("account_tx", {
@@ -889,14 +889,14 @@ async function En(e) {
         ...c ? { marker: c } : {}
       });
     } catch {
-      k > 0 && (o = !0);
+      k > 0 && (r = !0);
       break;
     }
     const _ = $.transactions ?? [];
-    if (i || (i = _[0]), r.push(..._), c = $.marker, !c) break;
-    k === Le - 1 && (o = !0);
+    if (i || (i = _[0]), o.push(..._), c = $.marker, !c) break;
+    k === He - 1 && (r = !0);
   }
-  const d = i?.tx_json ?? i?.tx ?? {}, u = Number(i?.ledger_index ?? d.ledger_index ?? 0) || void 0, f = Number(d.date), p = Number.isFinite(f) ? new Date((f + _t) * 1e3) : void 0, h = d.TransactionType ? String(d.TransactionType) : void 0, l = h === "Payment" && d.Destination === e && d.Account !== e, y = l ? String(d.Account) : void 0, w = d.Amount ?? d.DeliverMax, m = l && typeof w == "string" ? Number(w) / 1e6 : void 0, g = u === void 0 ? void 0 : In(s, u), b = u !== void 0 && a !== void 0 && a > An && u <= a, v = p ? Math.floor((Date.now() - p.getTime()) / 864e5) : void 0;
+  const d = i?.tx_json ?? i?.tx ?? {}, u = Number(i?.ledger_index ?? d.ledger_index ?? 0) || void 0, h = Number(d.date), p = Number.isFinite(h) ? new Date((h + Nt) * 1e3) : void 0, f = d.TransactionType ? String(d.TransactionType) : void 0, l = f === "Payment" && d.Destination === e && d.Account !== e, y = l ? String(d.Account) : void 0, w = d.Amount ?? d.DeliverMax, m = l && typeof w == "string" ? Number(w) / 1e6 : void 0, g = u === void 0 ? void 0 : Rn(s, u), b = u !== void 0 && a !== void 0 && a > En && u <= a, v = p ? Math.floor((Date.now() - p.getTime()) / 864e5) : void 0;
   return {
     address: e,
     balanceXrp: Number(n.Balance ?? 0) / 1e6,
@@ -906,19 +906,19 @@ async function En(e) {
     originDate: p,
     fundedBy: y,
     fundingAmountXrp: m,
-    originType: h,
+    originType: f,
     approxSentCount: g,
     historyIncomplete: b,
     nodeHistoryFrom: a,
     ageDays: v,
     lastActivityLedger: Number(n.PreviousTxnLgrSeq ?? 0) || void 0,
-    controlEvents: Nn(r, e),
-    controlHistoryPartial: o,
+    controlEvents: Fn(o, e),
+    controlHistoryPartial: r,
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const Fn = 30, Rn = 365;
-function Dn(e) {
+const On = 30, Cn = 365;
+function Pn(e) {
   const t = [];
   if (e.historyIncomplete ? t.push({
     id: "history-incomplete",
@@ -926,13 +926,13 @@ function Dn(e) {
     title: "This account may be older than it appears",
     detail: `The earliest transaction found sits at ledger ${e.originLedger?.toLocaleString()}, which is the edge of what this node retains (from ${e.nodeHistoryFrom?.toLocaleString()}). Anything before that is not missing from the ledger, only from this node — so the age below is a floor, not a measurement.`,
     action: "Query a full-history node before treating the age as established."
-  }) : e.originDate && e.ageDays !== void 0 && (e.ageDays < Fn ? t.push({
+  }) : e.originDate && e.ageDays !== void 0 && (e.ageDays < On ? t.push({
     id: "young-account",
     severity: "warn",
     title: `This account is ${e.ageDays} day${e.ageDays === 1 ? "" : "s"} old`,
     detail: `First seen ${e.originDate.toISOString().slice(0, 10)}. An account this new has no track record — nothing about its history can corroborate or contradict what its operator tells you.`,
     action: "Weight the counterparty's off-ledger identity accordingly."
-  }) : e.ageDays >= Rn ? t.push({
+  }) : e.ageDays >= Cn ? t.push({
     id: "established",
     severity: "ok",
     title: `Continuously on the ledger for ${(e.ageDays / 365).toFixed(1)} years`,
@@ -978,7 +978,7 @@ function Dn(e) {
       detail: `Most recently: ${s.label.toLowerCase()}${s.at ? ` on ${s.at.toISOString().slice(0, 10)}` : ""}, at ledger ${s.ledgerIndex.toLocaleString()}.` + (i ? ` This account is ${(e.ageDays / 365).toFixed(1)} years old and its control moved ${a} day${a === 1 ? "" : "s"} ago. A long-established account whose signing authority changes suddenly is the shape a compromised key takes — and equally the shape of an ordinary key rotation.` : " Changing keys is routine hygiene; what matters is whether the operator expected it."),
       action: i ? "Confirm with the operator, through a channel that does not depend on this account, that they made this change." : void 0
     }), e.controlEvents.filter(
-      (o) => o.kind === "signer-list-removed" || o.kind === "master-key-enabled"
+      (r) => r.kind === "signer-list-removed" || r.kind === "master-key-enabled"
     ).length > 0 && t.push({
       id: "control-weakened",
       severity: "warn",
@@ -995,37 +995,37 @@ function Dn(e) {
   const n = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((s, a) => n[s.severity] - n[a.severity]);
 }
-const Cn = 946684800, On = 0.5, Pn = 0.25, se = (e) => typeof e == "string" ? Number(e) / 1e6 : e && typeof e == "object" ? Number(e.value ?? 0) : 0;
-function Xe(e, t, n) {
+const Ln = 946684800, Xn = 0.5, Hn = 0.25, se = (e) => typeof e == "string" ? Number(e) / 1e6 : e && typeof e == "object" ? Number(e.value ?? 0) : 0;
+function qe(e, t, n) {
   const s = [];
-  for (const r of e) {
-    const o = se(r.TakerGets), c = se(r.TakerPays);
-    if (o <= 0 || c <= 0) continue;
-    const d = r.taker_gets_funded !== void 0 ? se(r.taker_gets_funded) : o, u = r.taker_pays_funded !== void 0 ? se(r.taker_pays_funded) : c, f = n ? o / c : c / o;
-    if (!Number.isFinite(f) || f <= 0) continue;
-    const p = n ? c : o, h = n ? u : d, l = Number.isFinite(h) ? Math.max(0, Math.min(h, p)) : 0, y = r.Expiration !== void 0 && Number(r.Expiration) < t;
+  for (const o of e) {
+    const r = se(o.TakerGets), c = se(o.TakerPays);
+    if (r <= 0 || c <= 0) continue;
+    const d = o.taker_gets_funded !== void 0 ? se(o.taker_gets_funded) : r, u = o.taker_pays_funded !== void 0 ? se(o.taker_pays_funded) : c, h = n ? r / c : c / r;
+    if (!Number.isFinite(h) || h <= 0) continue;
+    const p = n ? c : r, f = n ? u : d, l = Number.isFinite(f) ? Math.max(0, Math.min(f, p)) : 0, y = o.Expiration !== void 0 && Number(o.Expiration) < t;
     s.push({
-      account: String(r.Account ?? ""),
+      account: String(o.Account ?? ""),
       listed: p,
       fundable: y ? 0 : l,
-      price: f,
+      price: h,
       dead: y || l <= 0,
       expired: y
     });
   }
-  s.sort((r, o) => n ? o.price - r.price : r.price - o.price);
-  const a = s.reduce((r, o) => r + o.listed, 0), i = s.reduce((r, o) => r + o.fundable, 0);
+  s.sort((o, r) => n ? r.price - o.price : o.price - r.price);
+  const a = s.reduce((o, r) => o + r.listed, 0), i = s.reduce((o, r) => o + r.fundable, 0);
   return {
     offers: s,
     listedDepth: a,
     fundableDepth: i,
     fundedRatio: a > 0 ? i / a : 1,
-    deadOffers: s.filter((r) => r.dead).length,
-    bestPrice: s.find((r) => !r.dead)?.price
+    deadOffers: s.filter((o) => o.dead).length,
+    bestPrice: s.find((o) => !o.dead)?.price
   };
 }
-async function Ln(e, t, n = 100) {
-  const s = { currency: e, issuer: t }, [a, i, r] = await Promise.all([
+async function qn(e, t, n = 100) {
+  const s = { currency: e, issuer: t }, [a, i, o] = await Promise.all([
     // Bids: someone paying XRP to receive the issued asset.
     S("book_offers", {
       taker_gets: { currency: "XRP" },
@@ -1041,10 +1041,10 @@ async function Ln(e, t, n = 100) {
       limit: n
     }),
     S("ledger", { ledger_index: "validated" })
-  ]), o = Number(r.ledger?.close_time ?? 0), c = Xe(a.offers ?? [], o, !0), d = Xe(i.offers ?? [], o, !1), u = /* @__PURE__ */ new Map();
-  for (const h of [...c.offers, ...d.offers])
-    u.set(h.account, (u.get(h.account) ?? 0) + h.listed);
-  const f = c.listedDepth + d.listedDepth, p = [...u.entries()].sort((h, l) => l[1] - h[1]);
+  ]), r = Number(o.ledger?.close_time ?? 0), c = qe(a.offers ?? [], r, !0), d = qe(i.offers ?? [], r, !1), u = /* @__PURE__ */ new Map();
+  for (const f of [...c.offers, ...d.offers])
+    u.set(f.account, (u.get(f.account) ?? 0) + f.listed);
+  const h = c.listedDepth + d.listedDepth, p = [...u.entries()].sort((f, l) => l[1] - f[1]);
   return {
     pair: `${e}/XRP`,
     currency: e,
@@ -1052,14 +1052,14 @@ async function Ln(e, t, n = 100) {
     bids: c,
     asks: d,
     makers: u.size,
-    topMakerShare: f > 0 && p[0] ? p[0][1] / f : 0,
+    topMakerShare: h > 0 && p[0] ? p[0][1] / h : 0,
     topMaker: p[0]?.[0],
-    ledgerIndex: Number(r.ledger_index ?? r.ledger?.ledger_index ?? 0),
-    ledgerCloseTime: new Date((o + Cn) * 1e3),
+    ledgerIndex: Number(o.ledger_index ?? o.ledger?.ledger_index ?? 0),
+    ledgerCloseTime: new Date((r + Ln) * 1e3),
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function Xn(e) {
+function Un(e) {
   const t = [], n = (c) => `${(c * 100).toFixed(1)}%`, s = (c) => c.toLocaleString(void 0, { maximumFractionDigits: 2 });
   for (const [c, d] of [
     ["Asks", e.asks],
@@ -1075,7 +1075,7 @@ function Xn(e) {
       continue;
     }
     const u = 1 - d.fundedRatio;
-    d.fundedRatio < On ? t.push({
+    d.fundedRatio < Xn ? t.push({
       id: `phantom-${c}`,
       severity: u > 0.9 ? "critical" : "warn",
       title: `${n(u)} of ${c.toLowerCase()} depth cannot fill`,
@@ -1088,7 +1088,7 @@ function Xn(e) {
       detail: `${s(d.fundableDepth)} of ${s(d.listedDepth)} advertised is backed by owners who still hold it.`
     });
   }
-  e.topMakerShare >= Pn && e.topMaker && t.push({
+  e.topMakerShare >= Hn && e.topMaker && t.push({
     id: "maker-concentration",
     severity: e.topMakerShare >= 0.5 ? "warn" : "info",
     title: `One account rests ${n(e.topMakerShare)} of the quoted depth`,
@@ -1102,29 +1102,29 @@ function Xn(e) {
     title: `${a.length} offer${a.length === 1 ? "" : "s"} already past expiry`,
     detail: "These carry an expiration the current ledger has passed. They still occupy the book because nothing has tried to cross them, and they are excluded from the fundable figures above."
   });
-  const i = e.bids.bestPrice, r = e.asks.bestPrice;
-  if (i !== void 0 && r !== void 0)
-    if (i >= r)
+  const i = e.bids.bestPrice, o = e.asks.bestPrice;
+  if (i !== void 0 && o !== void 0)
+    if (i >= o)
       t.push({
         id: "crossed",
         severity: "warn",
         title: "The fundable touch is crossed",
-        detail: `Best fundable bid ${i.toFixed(6)} is at or above best fundable ask ${r.toFixed(6)}. On a live book this resolves in moments, so it usually means the read caught a moment mid-cross rather than a standing arbitrage.`
+        detail: `Best fundable bid ${i.toFixed(6)} is at or above best fundable ask ${o.toFixed(6)}. On a live book this resolves in moments, so it usually means the read caught a moment mid-cross rather than a standing arbitrage.`
       });
     else {
-      const c = r - i;
+      const c = o - i;
       t.push({
         id: "spread",
         severity: "info",
-        title: `Fundable spread ${(c / r * 100).toFixed(2)}%`,
-        detail: `Between ${i.toFixed(6)} and ${r.toFixed(6)}, measured on offers that can actually fill. A spread taken from the advertised touch would be narrower and would not be tradeable.`
+        title: `Fundable spread ${(c / o * 100).toFixed(2)}%`,
+        detail: `Between ${i.toFixed(6)} and ${o.toFixed(6)}, measured on offers that can actually fill. A spread taken from the advertised touch would be narrower and would not be tradeable.`
       });
     }
-  const o = { critical: 0, warn: 1, info: 2, ok: 3 };
-  return t.sort((c, d) => o[c.severity] - o[d.severity]);
+  const r = { critical: 0, warn: 1, info: 2, ok: 3 };
+  return t.sort((c, d) => r[c.severity] - r[d.severity]);
 }
-const Hn = 131072;
-function He(e) {
+const Mn = 131072;
+function Ue(e) {
   if (typeof e == "string") {
     const t = Number(e);
     return Number.isFinite(t) ? { kind: "xrp", drops: t, value: t / 1e6 } : void 0;
@@ -1149,10 +1149,10 @@ function ae(e) {
   }
   return `${e.value.toLocaleString(void 0, { maximumFractionDigits: 10 })} ${t}`;
 }
-function Un(e, t) {
+function zn(e, t) {
   return e.kind !== t.kind ? !1 : e.kind === "xrp" ? !0 : e.currency === t.currency && e.issuer === t.issuer;
 }
-async function qn(e) {
+async function jn(e) {
   let t;
   try {
     t = await S("tx", { transaction: e.trim() });
@@ -1161,12 +1161,12 @@ async function qn(e) {
       "No transaction with that hash is in this node's history. It may never have existed, or the node may not retain ledgers that far back."
     ) : n;
   }
-  return Mn(t, e);
+  return Bn(t, e);
 }
-function Mn(e, t = "") {
-  const n = e.tx_json ?? e, s = e.meta ?? e.metaData ?? {}, a = String(n.TransactionType ?? "unknown"), i = String(s.TransactionResult ?? "unknown"), r = Number(n.Flags ?? 0), o = a === "Payment" ? He(n.DeliverMax ?? n.Amount) : void 0, c = s.delivered_amount ?? s.DeliveredAmount, d = c === "unavailable", u = d ? void 0 : He(c);
-  let f;
-  return o && u && Un(o, u) && o.value > 0 && (f = u.value / o.value), {
+function Bn(e, t = "") {
+  const n = e.tx_json ?? e, s = e.meta ?? e.metaData ?? {}, a = String(n.TransactionType ?? "unknown"), i = String(s.TransactionResult ?? "unknown"), o = Number(n.Flags ?? 0), r = a === "Payment" ? Ue(n.DeliverMax ?? n.Amount) : void 0, c = s.delivered_amount ?? s.DeliveredAmount, d = c === "unavailable", u = d ? void 0 : Ue(c);
+  let h;
+  return r && u && zn(r, u) && r.value > 0 && (h = u.value / r.value), {
     hash: String(n.hash ?? e.hash ?? t),
     validated: e.validated === !0,
     transactionType: a,
@@ -1176,16 +1176,16 @@ function Mn(e, t = "") {
     destination: n.Destination ? String(n.Destination) : void 0,
     ledgerIndex: Number(e.ledger_index ?? n.ledger_index ?? 0) || void 0,
     feeDrops: Number(n.Fee ?? 0),
-    requested: o,
+    requested: r,
     delivered: u,
     deliveredUnavailable: d,
-    partialFlagSet: (r & Hn) !== 0,
-    deliveredFraction: f,
+    partialFlagSet: (o & Mn) !== 0,
+    deliveredFraction: h,
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const Ue = 0.999999;
-function zn(e) {
+const Me = 0.999999;
+function Wn(e) {
   const t = [];
   if (e.validated || t.push({
     id: "not-validated",
@@ -1217,8 +1217,8 @@ function zn(e) {
       action: "Reconstruct the movement from the affected balances in the metadata before crediting anything."
     }), t;
   if (e.partialFlagSet) {
-    const s = e.deliveredFraction, a = s !== void 0 && s < Ue ? 1 / Math.max(s, Number.MIN_VALUE) : void 0;
-    s !== void 0 && s < Ue ? t.push({
+    const s = e.deliveredFraction, a = s !== void 0 && s < Me ? 1 / Math.max(s, Number.MIN_VALUE) : void 0;
+    s !== void 0 && s < Me ? t.push({
       id: "partial-shortfall",
       severity: "critical",
       title: `Only ${(s * 100).toFixed(4)}% of the requested amount arrived`,
@@ -1246,15 +1246,15 @@ function zn(e) {
   const n = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((s, a) => n[s.severity] - n[a.severity]);
 }
-const qe = 1e5, fe = 1e3, xt = 946684800;
-function jn(e) {
+const ze = 1e5, fe = 1e3, It = 946684800;
+function Gn(e) {
   if (typeof e == "number" && Number.isFinite(e))
-    return new Date((e + xt) * 1e3);
+    return new Date((e + It) * 1e3);
   if (typeof e != "string" || e.length === 0) return null;
   const t = e.replace(/([+-]\d{2})(\d{2})$/, "$1:$2"), n = new Date(t);
   return Number.isNaN(n.getTime()) ? null : n;
 }
-function Me(e) {
+function je(e) {
   if (!e || typeof e != "object") return "XRP";
   const n = String(e.currency ?? "XRP");
   if (n === "XRP") return "XRP";
@@ -1264,7 +1264,7 @@ function Me(e) {
   }
   return n;
 }
-async function Bn(e) {
+async function Kn(e) {
   const t = "No AMM exists at that address. An AMM account is created by the protocol when a pool is opened — it is not an ordinary wallet, and a wallet address will not resolve here.";
   let n, s;
   try {
@@ -1279,43 +1279,43 @@ async function Bn(e) {
     throw p instanceof F && (p.code === "actNotFound" || p.code === "actMalformed") ? new Error(t) : p;
   }
   if (!n.amm) throw new Error(t);
-  const a = n.amm, i = Number(s.ledger?.close_time ?? 0), r = new Date((i + xt) * 1e3), o = a.vote_slots ?? [], c = o.reduce((p, h) => p + Number(h.vote_weight ?? 0), 0), d = o.map((p) => ({
+  const a = n.amm, i = Number(s.ledger?.close_time ?? 0), o = new Date((i + It) * 1e3), r = a.vote_slots ?? [], c = r.reduce((p, f) => p + Number(f.vote_weight ?? 0), 0), d = r.map((p) => ({
     account: String(p.account ?? ""),
     votedFeePct: Number(p.trading_fee ?? 0) / fe,
-    weightOfSupply: Number(p.vote_weight ?? 0) / qe,
+    weightOfSupply: Number(p.vote_weight ?? 0) / ze,
     weightOfCast: c > 0 ? Number(p.vote_weight ?? 0) / c : 0
-  })).sort((p, h) => h.weightOfSupply - p.weightOfSupply);
+  })).sort((p, f) => f.weightOfSupply - p.weightOfSupply);
   let u;
-  const f = a.auction_slot;
-  if (f?.account) {
-    const p = jn(f.expiration);
+  const h = a.auction_slot;
+  if (h?.account) {
+    const p = Gn(h.expiration);
     p && (u = {
-      holder: String(f.account),
-      discountedFeePct: Number(f.discounted_fee ?? 0) / fe,
+      holder: String(h.account),
+      discountedFeePct: Number(h.discounted_fee ?? 0) / fe,
       expiresAt: p,
-      expired: p.getTime() < r.getTime(),
-      pricePaid: Number(f.price?.value ?? 0),
-      authAccounts: (f.auth_accounts ?? []).map((h) => String(h.account ?? "")).filter(Boolean)
+      expired: p.getTime() < o.getTime(),
+      pricePaid: Number(h.price?.value ?? 0),
+      authAccounts: (h.auth_accounts ?? []).map((f) => String(f.account ?? "")).filter(Boolean)
     });
   }
   return {
     account: String(a.account ?? ""),
-    pair: `${Me(a.amount)} / ${Me(a.amount2)}`,
+    pair: `${je(a.amount)} / ${je(a.amount2)}`,
     tradingFeePct: Number(a.trading_fee ?? 0) / fe,
-    participation: c / qe,
+    participation: c / ze,
     votes: d,
     auction: u,
     lpTokenSupply: Number(a.lp_token?.value ?? 0),
     // Preserved as undefined for XRP: absent means inapplicable, not false.
     assetFrozen: typeof a.asset_frozen == "boolean" ? a.asset_frozen : void 0,
     asset2Frozen: typeof a.asset2_frozen == "boolean" ? a.asset2_frozen : void 0,
-    ledgerCloseTime: r,
+    ledgerCloseTime: o,
     ledgerIndex: Number(s.ledger_index ?? s.ledger?.ledger_index ?? 0),
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const Wn = 0.1, Gn = 0.5;
-function Kn(e) {
+const Yn = 0.1, Vn = 0.5;
+function Jn(e) {
   const t = [], n = (i) => `${(i * 100).toFixed(2)}%`, s = e.votes[0];
   if (e.votes.length === 0 ? t.push({
     id: "no-votes",
@@ -1323,7 +1323,7 @@ function Kn(e) {
     title: "Nobody is voting on this pool's fee",
     detail: `All eight vote slots are empty, so the trading fee sits at ${e.tradingFeePct.toFixed(3)}% by default. The first liquidity provider to cast a vote sets it, at whatever weight they hold.`,
     action: "If you hold LP tokens here, your vote is currently unopposed."
-  }) : s && s.weightOfCast >= Gn ? t.push({
+  }) : s && s.weightOfCast >= Vn ? t.push({
     id: "vote-capture",
     severity: s.weightOfCast >= 0.99 ? "critical" : "warn",
     title: `One account controls ${n(s.weightOfCast)} of the votes cast`,
@@ -1334,7 +1334,7 @@ function Kn(e) {
     severity: "ok",
     title: `Fee votes are spread across ${e.votes.length} providers`,
     detail: `The largest single voter carries ${n(s?.weightOfCast ?? 0)} of weight cast. No one account can move the fee alone.`
-  }), e.participation < Wn && e.votes.length > 0 && t.push({
+  }), e.participation < Yn && e.votes.length > 0 && t.push({
     id: "thin-participation",
     severity: "warn",
     title: `The fee is set by ${n(e.participation)} of the liquidity`,
@@ -1351,12 +1351,12 @@ function Kn(e) {
         action: `Claiming it would trade at ${i.discountedFeePct.toFixed(3)}% against everyone else's ${e.tradingFeePct.toFixed(3)}%.`
       });
     else {
-      const r = i.discountedFeePct > 0 ? e.tradingFeePct / i.discountedFeePct : 1 / 0;
+      const o = i.discountedFeePct > 0 ? e.tradingFeePct / i.discountedFeePct : 1 / 0;
       t.push({
         id: "auction-active",
         severity: "warn",
         title: `${i.holder} is trading this pool at a discount right now`,
-        detail: `The auction slot holder pays ${i.discountedFeePct.toFixed(3)}% while every other participant pays ${e.tradingFeePct.toFixed(3)}%${Number.isFinite(r) ? ` — ${r.toFixed(0)}x cheaper` : " — the holder trades free"}. The window closes ${i.expiresAt.toISOString().replace("T", " ").slice(0, 16)} UTC.${i.authAccounts.length > 0 ? ` ${i.authAccounts.length} further account${i.authAccounts.length === 1 ? " has" : "s have"} been nominated to share the discount.` : ""}`,
+        detail: `The auction slot holder pays ${i.discountedFeePct.toFixed(3)}% while every other participant pays ${e.tradingFeePct.toFixed(3)}%${Number.isFinite(o) ? ` — ${o.toFixed(0)}x cheaper` : " — the holder trades free"}. The window closes ${i.expiresAt.toISOString().replace("T", " ").slice(0, 16)} UTC.${i.authAccounts.length > 0 ? ` ${i.authAccounts.length} further account${i.authAccounts.length === 1 ? " has" : "s have"} been nominated to share the discount.` : ""}`,
         action: "Arbitrage against this pool is asymmetric until that window closes."
       });
     }
@@ -1367,11 +1367,11 @@ function Kn(e) {
       title: "No auction slot is held",
       detail: `Every participant pays the same ${e.tradingFeePct.toFixed(3)}% fee.`
     });
-  for (const [i, r] of [
+  for (const [i, o] of [
     ["First asset", e.assetFrozen],
     ["Second asset", e.asset2Frozen]
   ])
-    r === !0 && t.push({
+    o === !0 && t.push({
       id: `frozen-${i}`,
       severity: "critical",
       title: `${i} in this pair is frozen by its issuer`,
@@ -1379,42 +1379,42 @@ function Kn(e) {
       action: "Do not treat this pool's depth as available liquidity."
     });
   const a = { critical: 0, warn: 1, info: 2, ok: 3 };
-  return t.sort((i, r) => a[i.severity] - a[r.severity]);
+  return t.sort((i, o) => a[i.severity] - a[o.severity]);
 }
-const ze = 250, Yn = 400, Vn = 262144, Jn = 4194304, Qn = 2097152;
-function Zn(e) {
+const Be = 250, Qn = 400, Zn = 262144, es = 4194304, ts = 2097152;
+function ns(e) {
   const t = e.reduce((n, s) => n + s, 0);
   return t <= 0 ? 0 : e.reduce((n, s) => n + (s / t * 100) ** 2, 0);
 }
-async function At(e, t) {
+async function Et(e, t) {
   const [n, s] = await Promise.all([
     S("account_info", { account: e, ledger_index: "validated" }),
     S("gateway_balances", { account: e, ledger_index: "validated" })
-  ]), a = n.account_data ?? {}, i = Number(a.Flags ?? 0), r = {};
-  for (const [h, l] of Object.entries(
+  ]), a = n.account_data ?? {}, i = Number(a.Flags ?? 0), o = {};
+  for (const [f, l] of Object.entries(
     s.obligations ?? {}
   )) {
     const y = Number(l);
-    Number.isFinite(y) && (r[h] = y);
+    Number.isFinite(y) && (o[f] = y);
   }
-  const o = [];
-  let c, d = 0, u = !1, f;
-  for (; d < ze; ) {
-    let h;
+  const r = [];
+  let c, d = 0, u = !1, h;
+  for (; d < Be; ) {
+    let f;
     try {
-      h = await S("account_lines", {
+      f = await S("account_lines", {
         account: e,
         ledger_index: "validated",
-        limit: Yn,
+        limit: Qn,
         ...c ? { marker: c } : {}
       });
     } catch (l) {
       if (d === 0) throw l;
-      f = l instanceof Error ? l.message : "the walk was interrupted", u = !0;
+      h = l instanceof Error ? l.message : "the walk was interrupted", u = !0;
       break;
     }
-    for (const l of h.lines ?? [])
-      o.push({
+    for (const l of f.lines ?? [])
+      r.push({
         account: String(l.account ?? ""),
         currency: String(l.currency ?? ""),
         // From the issuer's side a holder's balance is reported negative.
@@ -1424,18 +1424,18 @@ async function At(e, t) {
         frozenByIssuer: l.freeze === !0,
         authorized: l.authorized === !0
       });
-    if (c = h.marker, d += 1, !c) break;
-    d >= ze && (u = !0);
+    if (c = f.marker, d += 1, !c) break;
+    d >= Be && (u = !0);
   }
-  const p = Object.keys(r).map((h) => {
-    const l = o.filter((b) => b.currency === h), y = l.filter((b) => b.held > 0).sort((b, v) => v.held - b.held), w = y.map((b) => b.held), m = w.reduce((b, v) => b + v, 0), g = r[h];
+  const p = Object.keys(o).map((f) => {
+    const l = r.filter((b) => b.currency === f), y = l.filter((b) => b.held > 0).sort((b, v) => v.held - b.held), w = y.map((b) => b.held), m = w.reduce((b, v) => b + v, 0), g = o[f];
     return {
-      currency: h,
+      currency: f,
       outstanding: g,
       observedHeld: m,
       holders: l.length,
       activeHolders: y.length,
-      hhi: Zn(w),
+      hhi: ns(w),
       topHolderPct: m > 0 ? (w[0] ?? 0) / m : 0,
       topFivePct: m > 0 ? w.slice(0, 5).reduce((b, v) => b + v, 0) / m : 0,
       frozenSeen: l.filter((b) => b.frozenByIssuer).length,
@@ -1443,7 +1443,7 @@ async function At(e, t) {
       coverage: g > 0 ? m / g : 0,
       top: y.slice(0, 10)
     };
-  }).sort((h, l) => l.outstanding - h.outstanding);
+  }).sort((f, l) => l.outstanding - f.outstanding);
   return {
     issuer: e,
     domain: a.Domain ? (() => {
@@ -1456,18 +1456,18 @@ async function At(e, t) {
       }
     })() : void 0,
     currencies: p,
-    linesWalked: o.length,
+    linesWalked: r.length,
     truncated: u,
-    walkError: f,
-    requiresAuth: (i & Vn) !== 0,
-    canFreeze: (i & Qn) === 0,
-    globalFreeze: (i & Jn) !== 0,
+    walkError: h,
+    requiresAuth: (i & Zn) !== 0,
+    canFreeze: (i & ts) === 0,
+    globalFreeze: (i & es) !== 0,
     ledgerIndex: Number(n.ledger_index ?? 0),
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-const es = 2500, je = 0.95;
-function ts(e) {
+const ss = 2500, We = 0.95;
+function as(e) {
   const t = [];
   e.walkError ? t.push({
     id: "walk-error",
@@ -1484,13 +1484,13 @@ function ts(e) {
   });
   for (const s of e.currencies) {
     if (s.outstanding <= 0) continue;
-    s.coverage < je && t.push({
+    s.coverage < We && t.push({
       id: `coverage-${s.currency}`,
       severity: "warn",
       title: `${s.currency}: holder lines account for only ${(s.coverage * 100).toFixed(1)}% of supply`,
       detail: `gateway_balances reports ${s.outstanding.toLocaleString(void 0, { maximumFractionDigits: 2 })} outstanding, but the holder lines read sum to ${s.observedHeld.toLocaleString(void 0, { maximumFractionDigits: 2 })}. Those come from different commands and should agree, so the gap is holders this walk did not see.`,
       action: "Trust the outstanding figure; treat the holder breakdown as incomplete."
-    }), s.coverage >= je ? s.hhi >= es ? t.push({
+    }), s.coverage >= We ? s.hhi >= ss ? t.push({
       id: `hhi-${s.currency}`,
       severity: s.hhi >= 5e3 ? "critical" : "warn",
       title: `${s.currency}: holdings are highly concentrated (HHI ${Math.round(s.hhi).toLocaleString()})`,
@@ -1546,7 +1546,7 @@ function ts(e) {
   const n = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((s, a) => n[s.severity] - n[a.severity]);
 }
-const ns = /* @__PURE__ */ new Set([
+const is = /* @__PURE__ */ new Set([
   "USDT",
   "USDC",
   "USD",
@@ -1559,16 +1559,16 @@ const ns = /* @__PURE__ */ new Set([
   "GBP",
   "TUSD",
   "BUSD"
-]), ss = 946684800;
-function as(e) {
+]), os = 946684800;
+function rs(e) {
   if (!/^([0-9A-F]{2})+$/i.test(e)) return e;
   const t = (e.match(/../g) ?? []).map((n) => String.fromCharCode(parseInt(n, 16))).join("").replace(/\0+$/, "").trim();
   return t && /^[\x20-\x7E]+$/.test(t) ? t : e;
 }
-function Be(e) {
+function Ge(e) {
   return e.kind === "xrp" ? `${e.value.toLocaleString(void 0, { maximumFractionDigits: 6 })} XRP` : `${e.value.toLocaleString(void 0, { maximumFractionDigits: 6 })} ${U(e.currency)}`;
 }
-async function is(e) {
+async function cs(e) {
   let t;
   try {
     t = await S("account_objects", {
@@ -1584,42 +1584,42 @@ async function is(e) {
   }
   const n = t.account_objects ?? [], s = n.filter((i) => i.Destination === e), a = /* @__PURE__ */ new Map();
   for (const i of s) {
-    const r = i.SendMax;
-    if (typeof r != "object" || !r?.issuer) continue;
-    const o = `${r.issuer}|${r.currency}`;
-    if (!a.has(o))
+    const o = i.SendMax;
+    if (typeof o != "object" || !o?.issuer) continue;
+    const r = `${o.issuer}|${o.currency}`;
+    if (!a.has(r))
       try {
         const [c, d] = await Promise.all([
-          S("gateway_balances", { account: r.issuer, ledger_index: "validated" }),
-          S("account_info", { account: r.issuer, ledger_index: "validated" })
-        ]), u = Number((c.obligations ?? {})[r.currency] ?? 0), f = d.account_data?.Domain;
-        a.set(o, {
+          S("gateway_balances", { account: o.issuer, ledger_index: "validated" }),
+          S("account_info", { account: o.issuer, ledger_index: "validated" })
+        ]), u = Number((c.obligations ?? {})[o.currency] ?? 0), h = d.account_data?.Domain;
+        a.set(r, {
           obligations: Number.isFinite(u) ? u : 0,
-          domain: f ? as(String(f)) : void 0
+          domain: h ? rs(String(h)) : void 0
         });
       } catch {
       }
   }
-  return os(e, n, a, Number(t.ledger_index ?? 0));
+  return ds(e, n, a, Number(t.ledger_index ?? 0));
 }
-function os(e, t, n, s) {
-  const a = t.filter((r) => r.Destination === e), i = a.map((r) => {
-    const o = r.SendMax, c = typeof o == "object" && o !== null, d = c ? {
+function ds(e, t, n, s) {
+  const a = t.filter((o) => o.Destination === e), i = a.map((o) => {
+    const r = o.SendMax, c = typeof r == "object" && r !== null, d = c ? {
       kind: "iou",
-      currency: String(o.currency ?? ""),
-      issuer: String(o.issuer ?? ""),
-      value: Number(o.value ?? 0)
-    } : { kind: "xrp", value: Number(o ?? 0) / 1e6 }, u = c ? `${o.issuer}|${o.currency}` : "", f = n.get(u), p = c ? U(String(o.currency ?? "")) : "XRP";
+      currency: String(r.currency ?? ""),
+      issuer: String(r.issuer ?? ""),
+      value: Number(r.value ?? 0)
+    } : { kind: "xrp", value: Number(r ?? 0) / 1e6 }, u = c ? `${r.issuer}|${r.currency}` : "", h = n.get(u), p = c ? U(String(r.currency ?? "")) : "XRP";
     return {
-      index: String(r.index ?? ""),
-      from: String(r.Account ?? ""),
+      index: String(o.index ?? ""),
+      from: String(o.Account ?? ""),
       amount: d,
-      destinationTag: r.DestinationTag !== void 0 ? Number(r.DestinationTag) : void 0,
-      expiration: r.Expiration !== void 0 ? new Date((Number(r.Expiration) + ss) * 1e3) : void 0,
-      issuerObligations: f?.obligations,
-      issuerOwesNothing: f !== void 0 && f.obligations === 0,
-      borrowedTicker: c && ns.has(p.toUpperCase()),
-      issuerDomain: f?.domain
+      destinationTag: o.DestinationTag !== void 0 ? Number(o.DestinationTag) : void 0,
+      expiration: o.Expiration !== void 0 ? new Date((Number(o.Expiration) + os) * 1e3) : void 0,
+      issuerObligations: h?.obligations,
+      issuerOwesNothing: h !== void 0 && h.obligations === 0,
+      borrowedTicker: c && is.has(p.toUpperCase()),
+      issuerDomain: h?.domain
     };
   });
   return {
@@ -1630,7 +1630,7 @@ function os(e, t, n, s) {
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function rs(e) {
+function ls(e) {
   const t = [];
   if (e.inbound.length === 0)
     return t.push({
@@ -1639,30 +1639,30 @@ function rs(e) {
       title: "Nothing is addressed to this account",
       detail: "No checks are pending against it. Note that a check can be cancelled by whoever created it at any time before it is cashed, so an empty result today does not mean none has ever arrived."
     }), t;
-  const n = e.inbound.filter((o) => o.borrowedTicker && o.issuerOwesNothing);
-  for (const o of n) {
-    const c = o.amount.kind === "iou" ? U(o.amount.currency) : "XRP";
+  const n = e.inbound.filter((r) => r.borrowedTicker && r.issuerOwesNothing);
+  for (const r of n) {
+    const c = r.amount.kind === "iou" ? U(r.amount.currency) : "XRP";
     t.push({
-      id: `impersonation-${o.index.slice(0, 12)}`,
+      id: `impersonation-${r.index.slice(0, 12)}`,
       severity: "critical",
-      title: `A claim for ${Be(o.amount)} that cannot be cashed for anything`,
-      detail: `${o.from} has addressed a check for ${Be(o.amount)} to this account. A currency code is not a name anyone owns — any account can issue a token called ${c}, and the ledger renders them identically. This one's issuer has NO obligations outstanding at all, meaning it has never issued a balance to anyone, so there is nothing this check could pay out.${o.issuerDomain ? ` The issuer publishes the domain ${o.issuerDomain}.` : ""}`,
+      title: `A claim for ${Ge(r.amount)} that cannot be cashed for anything`,
+      detail: `${r.from} has addressed a check for ${Ge(r.amount)} to this account. A currency code is not a name anyone owns — any account can issue a token called ${c}, and the ledger renders them identically. This one's issuer has NO obligations outstanding at all, meaning it has never issued a balance to anyone, so there is nothing this check could pay out.${r.issuerDomain ? ` The issuer publishes the domain ${r.issuerDomain}.` : ""}`,
       action: "Do not visit any domain associated with it and do not enter a wallet key anywhere it leads. The check itself is inert — it cannot move your funds, and ignoring it costs you nothing."
     });
   }
-  const s = e.inbound.filter((o) => o.borrowedTicker && !o.issuerOwesNothing);
-  for (const o of s) {
-    const c = o.amount.kind === "iou" ? U(o.amount.currency) : "XRP";
+  const s = e.inbound.filter((r) => r.borrowedTicker && !r.issuerOwesNothing);
+  for (const r of s) {
+    const c = r.amount.kind === "iou" ? U(r.amount.currency) : "XRP";
     t.push({
-      id: `ticker-${o.index.slice(0, 12)}`,
+      id: `ticker-${r.index.slice(0, 12)}`,
       severity: "warn",
       title: `A claim denominated in ${c} — verify the issuer, not the ticker`,
-      detail: `The issuer does have ${o.issuerObligations?.toLocaleString(void 0, { maximumFractionDigits: 2 })} outstanding, so this token is genuinely held by someone. That still does not make it the ${c} you are thinking of: the code is unowned and any issuer may use it. Only the issuing address identifies a token.`,
-      action: `Confirm ${o.amount.kind === "iou" ? o.amount.issuer : ""} is the issuer you expect before treating this as ${c}.`
+      detail: `The issuer does have ${r.issuerObligations?.toLocaleString(void 0, { maximumFractionDigits: 2 })} outstanding, so this token is genuinely held by someone. That still does not make it the ${c} you are thinking of: the code is unowned and any issuer may use it. Only the issuing address identifies a token.`,
+      action: `Confirm ${r.amount.kind === "iou" ? r.amount.issuer : ""} is the issuer you expect before treating this as ${c}.`
     });
   }
   const a = e.inbound.filter(
-    (o) => o.amount.kind === "iou" && o.issuerObligations === void 0
+    (r) => r.amount.kind === "iou" && r.issuerObligations === void 0
   );
   a.length > 0 && t.push({
     id: "unverified",
@@ -1671,7 +1671,7 @@ function rs(e) {
     detail: "The ledger did not answer for those issuing accounts, so whether they have issued anything is unknown — which is not the same as their being fine."
   });
   const i = e.inbound.filter(
-    (o) => !o.borrowedTicker && (o.issuerObligations !== void 0 || o.amount.kind === "xrp")
+    (r) => !r.borrowedTicker && (r.issuerObligations !== void 0 || r.amount.kind === "xrp")
   );
   i.length > 0 && t.push({
     id: "pending",
@@ -1684,38 +1684,38 @@ function rs(e) {
     title: "None of this costs the recipient anything",
     detail: "A Check object counts against the reserve of whoever created it, not of whoever receives it. Ignoring an unwanted claim is free, and there is nothing to clean up."
   });
-  const r = { critical: 0, warn: 1, info: 2, ok: 3 };
-  return t.sort((o, c) => r[o.severity] - r[c.severity]);
+  const o = { critical: 0, warn: 1, info: 2, ok: 3 };
+  return t.sort((r, c) => o[r.severity] - o[c.severity]);
 }
-const cs = 1, ds = 2, ls = 8, us = 16, hs = 5, We = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
-function fs(e) {
+const us = 1, hs = 2, fs = 8, ps = 16, gs = 5, Ke = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz";
+function ms(e) {
   let t = 0n;
   for (const s of e) t = t << 8n | BigInt(s);
   let n = "";
   for (; t > 0n; )
-    n = We[Number(t % 58n)] + n, t /= 58n;
+    n = Ke[Number(t % 58n)] + n, t /= 58n;
   for (const s of e) {
     if (s !== 0) break;
-    n = We[0] + n;
+    n = Ke[0] + n;
   }
   return n;
 }
-async function Ge(e) {
+async function Ye(e) {
   return new Uint8Array(await crypto.subtle.digest("SHA-256", e));
 }
-function ps(e) {
+function ys(e) {
   const t = new Uint8Array(e.length / 2);
   for (let n = 0; n < t.length; n += 1)
     t[n] = parseInt(e.slice(n * 2, n * 2 + 2), 16);
   return t;
 }
-async function gs(e) {
+async function ws(e) {
   const t = new Uint8Array(21);
-  t[0] = 0, t.set(ps(e), 1);
-  const n = (await Ge(await Ge(t))).slice(0, 4), s = new Uint8Array(25);
-  return s.set(t, 0), s.set(n, 21), fs(s);
+  t[0] = 0, t.set(ys(e), 1);
+  const n = (await Ye(await Ye(t))).slice(0, 4), s = new Uint8Array(25);
+  return s.set(t, 0), s.set(n, 21), ms(s);
 }
-async function ms(e) {
+async function bs(e) {
   const t = e.trim().toUpperCase();
   if (!/^[0-9A-F]{64}$/.test(t))
     throw new Error(
@@ -1724,18 +1724,18 @@ async function ms(e) {
   const n = parseInt(t.slice(0, 4), 16), s = parseInt(t.slice(4, 8), 16);
   return {
     tokenId: t,
-    issuer: await gs(t.slice(8, 48)),
-    burnable: (n & cs) !== 0,
-    mutable: (n & us) !== 0,
-    transferable: (n & ls) !== 0,
-    onlyXrp: (n & ds) !== 0,
+    issuer: await ws(t.slice(8, 48)),
+    burnable: (n & us) !== 0,
+    mutable: (n & ps) !== 0,
+    transferable: (n & fs) !== 0,
+    onlyXrp: (n & hs) !== 0,
     // TransferFee is in units of 0.001%, so 5000 is 5%.
     transferFeePct: s / 1e3,
     taxon: parseInt(t.slice(48, 56), 16),
     sequence: parseInt(t.slice(56, 64), 16)
   };
 }
-function ys(e) {
+function vs(e) {
   return Array.isArray(e) ? e.map((t) => ({
     index: String(t.nft_offer_index ?? ""),
     owner: String(t.owner ?? ""),
@@ -1744,15 +1744,15 @@ function ys(e) {
     destination: t.destination ? String(t.destination) : void 0
   })) : [];
 }
-async function ws(e) {
-  const t = await ms(e);
+async function ks(e) {
+  const t = await bs(e);
   let n = !1;
-  const s = async (r) => {
+  const s = async (o) => {
     try {
-      const o = await S(r, { nft_id: t.tokenId, ledger_index: "validated" });
-      return ys(o.offers);
-    } catch (o) {
-      return o?.code !== "objectNotFound" && (n = !0), [];
+      const r = await S(o, { nft_id: t.tokenId, ledger_index: "validated" });
+      return vs(r.offers);
+    } catch (r) {
+      return r?.code !== "objectNotFound" && (n = !0), [];
     }
   }, [a, i] = await Promise.all([
     s("nft_sell_offers"),
@@ -1766,7 +1766,7 @@ async function ws(e) {
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function bs(e) {
+function Ss(e) {
   const t = [], n = e.rights;
   if (n.burnable ? t.push({
     id: "burnable",
@@ -1793,7 +1793,7 @@ function bs(e) {
     action: "Do not value it against comparable tokens that can be resold."
   }), n.transferFeePct > 0 && t.push({
     id: "transfer-fee",
-    severity: n.transferFeePct >= hs ? "warn" : "info",
+    severity: n.transferFeePct >= gs ? "warn" : "info",
     title: `The issuer takes ${n.transferFeePct.toFixed(3)}% of every resale`,
     detail: `A transfer fee is deducted by the issuer each time this token changes hands, on top of anything a marketplace charges. At this rate a round trip costs ${(n.transferFeePct * 2).toFixed(3)}% before any price movement.`
   }), n.onlyXrp && t.push({
@@ -1825,48 +1825,48 @@ function bs(e) {
   const s = { critical: 0, warn: 1, info: 2, ok: 3 };
   return t.sort((a, i) => s[a.severity] - s[i.severity]);
 }
-const Ke = [
+const Ve = [
   "wss://xrplcluster.com",
   "wss://s1.ripple.com",
   "wss://s2.ripple.com",
   "wss://xrpl.ws"
-], vs = 2, ks = 4, Nt = 12e3;
-function Ss(e) {
+], $s = 2, Ts = 4, Ft = 12e3;
+function _s(e) {
   return new Promise((t) => {
     const n = Date.now();
     let s = !1, a;
-    const i = (o) => {
+    const i = (r) => {
       if (!s) {
         s = !0;
         try {
           a?.close();
         } catch {
         }
-        t(o);
+        t(r);
       }
     };
     try {
       a = new WebSocket(e);
-    } catch (o) {
+    } catch (r) {
       i({
         url: e,
         reachable: !1,
-        error: o instanceof Error ? o.message : "could not open socket"
+        error: r instanceof Error ? r.message : "could not open socket"
       });
       return;
     }
-    const r = window.setTimeout(
+    const o = window.setTimeout(
       () => i({ url: e, reachable: !1, error: "no response within 12s" }),
-      Nt
+      Ft
     );
     a.onerror = () => {
-      window.clearTimeout(r), i({ url: e, reachable: !1, error: "connection refused or blocked" });
+      window.clearTimeout(o), i({ url: e, reachable: !1, error: "connection refused or blocked" });
     }, a.onopen = () => {
       a.send(JSON.stringify({ id: 1, command: "server_info" }));
-    }, a.onmessage = (o) => {
-      window.clearTimeout(r);
+    }, a.onmessage = (r) => {
+      window.clearTimeout(o);
       try {
-        const c = JSON.parse(String(o.data))?.result?.info ?? {}, d = c.validated_ledger ?? {}, u = String(c.complete_ledgers ?? "").split("-")[0];
+        const c = JSON.parse(String(r.data))?.result?.info ?? {}, d = c.validated_ledger ?? {}, u = String(c.complete_ledgers ?? "").split("-")[0];
         i({
           url: e,
           reachable: !0,
@@ -1886,17 +1886,17 @@ function Ss(e) {
     };
   });
 }
-function $s(e) {
+function xs(e) {
   return new Promise((t) => {
     let n = !1, s;
-    const a = (r) => {
+    const a = (o) => {
       if (!n) {
         n = !0;
         try {
           s?.close();
         } catch {
         }
-        t(r);
+        t(o);
       }
     };
     try {
@@ -1905,21 +1905,21 @@ function $s(e) {
       a(void 0);
       return;
     }
-    const i = window.setTimeout(() => a(void 0), Nt);
+    const i = window.setTimeout(() => a(void 0), Ft);
     s.onerror = () => {
       window.clearTimeout(i), a(void 0);
-    }, s.onopen = () => s.send(JSON.stringify({ id: 1, command: "fee" })), s.onmessage = (r) => {
+    }, s.onopen = () => s.send(JSON.stringify({ id: 1, command: "fee" })), s.onmessage = (o) => {
       window.clearTimeout(i);
       try {
-        const o = JSON.parse(String(r.data))?.result ?? {}, c = o.levels ?? {}, d = Number(c.reference_level) || 256;
+        const r = JSON.parse(String(o.data))?.result ?? {}, c = r.levels ?? {}, d = Number(c.reference_level) || 256;
         a({
           source: e,
           pressure: (Number(c.open_ledger_level) || d) / d,
-          queueSize: Number(o.current_queue_size ?? 0),
-          maxQueueSize: Number(o.max_queue_size ?? 0),
-          expectedLedgerSize: Number(o.expected_ledger_size ?? 0),
-          minimumFeeDrops: Number(o.drops?.minimum_fee ?? 0),
-          openLedgerFeeDrops: Number(o.drops?.open_ledger_fee ?? 0)
+          queueSize: Number(r.current_queue_size ?? 0),
+          maxQueueSize: Number(r.max_queue_size ?? 0),
+          expectedLedgerSize: Number(r.expected_ledger_size ?? 0),
+          minimumFeeDrops: Number(r.drops?.minimum_fee ?? 0),
+          openLedgerFeeDrops: Number(r.drops?.open_ledger_fee ?? 0)
         });
       } catch {
         a(void 0);
@@ -1927,10 +1927,10 @@ function $s(e) {
     };
   });
 }
-async function Ts() {
+async function As() {
   const [e, t] = await Promise.all([
-    Promise.all(Ke.map(Ss)),
-    $s(Ke[0])
+    Promise.all(Ve.map(_s)),
+    xs(Ve[0])
   ]), n = e.filter((s) => s.reachable && typeof s.ledgerSeq == "number").map((s) => s.ledgerSeq);
   return {
     nodes: e,
@@ -1941,16 +1941,16 @@ async function Ts() {
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-let M = null;
-function _s(e = 6e4) {
+let z = null;
+function Ns(e = 6e4) {
   const t = Date.now();
-  if (M && t - M.at < e) return M.report;
-  const n = Ts();
-  return M = { at: t, report: n }, n.catch(() => {
-    M?.report === n && (M = null);
+  if (z && t - z.at < e) return z.report;
+  const n = As();
+  return z = { at: t, report: n }, n.catch(() => {
+    z?.report === n && (z = null);
   }), n;
 }
-function xs(e) {
+function Is(e) {
   const t = [], n = e.nodes.length;
   if (e.reachableCount === 0)
     return t.push({
@@ -1969,7 +1969,7 @@ function xs(e) {
     action: "A single unreachable endpoint is routine. All-but-one usually means this machine, not the ledger."
   }), typeof e.leaderSeq == "number") {
     const c = e.nodes.filter(
-      (d) => d.reachable && typeof d.ledgerSeq == "number" && e.leaderSeq - d.ledgerSeq >= ks
+      (d) => d.reachable && typeof d.ledgerSeq == "number" && e.leaderSeq - d.ledgerSeq >= Ts
     );
     c.length > 0 ? t.push({
       id: "node-lag",
@@ -1979,7 +1979,7 @@ function xs(e) {
         (d) => `${d.url} is ${e.leaderSeq - d.ledgerSeq} ledgers back`
       ).join(". ") + ". Ledgers close every three to four seconds, so this is beyond normal cadence.",
       action: "Readings taken from a trailing node describe a ledger that has already moved on."
-    }) : typeof e.spread == "number" && e.spread <= vs && t.push({
+    }) : typeof e.spread == "number" && e.spread <= $s && t.push({
       id: "in-sync",
       severity: "ok",
       title: `All ${e.reachableCount} reachable nodes agree`,
@@ -2017,42 +2017,97 @@ function xs(e) {
       detail: `The open ledger is charging the reference fee — ${c.openLedgerFeeDrops.toLocaleString()} drops — with ${c.queueSize.toLocaleString()} transactions queued of ${c.maxQueueSize.toLocaleString()} capacity (${(d * 100).toFixed(1)}% full). Expected ledger size is ${c.expectedLedgerSize.toLocaleString()} transactions.`
     });
   }
-  const r = e.nodes.filter((c) => c.reachable && c.version === void 0);
-  r.length > 0 && t.push({
+  const o = e.nodes.filter((c) => c.reachable && c.version === void 0);
+  o.length > 0 && t.push({
     id: "undisclosed",
     severity: "info",
-    title: `${r.length} node${r.length === 1 ? " does" : "s do"} not disclose their software version`,
-    detail: `${r.map((c) => c.url).join(", ")} answered normally but omit build version, server state and peer count. That is an operator's choice about what to publish — it is not a fault, and it is not something this tool can infer.`
+    title: `${o.length} node${o.length === 1 ? " does" : "s do"} not disclose their software version`,
+    detail: `${o.map((c) => c.url).join(", ")} answered normally but omit build version, server state and peer count. That is an operator's choice about what to publish — it is not a fault, and it is not something this tool can infer.`
   });
-  const o = { critical: 0, warn: 1, info: 2, ok: 3 };
-  return t.sort((c, d) => o[c.severity] - o[d.severity]);
+  const r = { critical: 0, warn: 1, info: 2, ok: 3 };
+  return t.sort((c, d) => r[c.severity] - r[d.severity]);
 }
-function As(e) {
+function Es(e) {
   return e.passed ? "PASS" : e.severity === "block" ? "FAIL" : "REVIEW";
 }
-function Ns(e) {
-  return e.state ?? As(e);
+function Fs(e) {
+  return e.state ?? Es(e);
 }
-const Is = /* @__PURE__ */ new Set(["INSUFFICIENT_DATA", "NOT_APPLICABLE"]);
-function Es(e) {
-  return e.state && Is.has(e.state) ? [e.id, e.passed, e.state] : [e.id, e.passed];
+const Rs = /* @__PURE__ */ new Set(["INSUFFICIENT_DATA", "NOT_APPLICABLE"]);
+function Ds(e) {
+  return e.state && Rs.has(e.state) ? [e.id, e.passed, e.state] : [e.id, e.passed];
 }
-async function Fs(e) {
+async function Os(e) {
   const t = new TextEncoder().encode(e), n = await crypto.subtle.digest("SHA-256", t);
   return Array.from(new Uint8Array(n)).map((s) => s.toString(16).padStart(2, "0")).join("").toUpperCase();
 }
-async function Rs(e) {
-  return Fs(
+async function Cs(e) {
+  return Os(
     JSON.stringify({
       kind: e.kind,
       subject: e.subject,
       scope: Object.keys(e.scope).sort().map((t) => [t, e.scope[t]]),
       evaluatedAt: e.evaluatedAt,
-      checks: e.checks.map(Es)
+      checks: e.checks.map(Ds)
     })
   );
 }
-const Ye = 0.95, Ds = /* @__PURE__ */ new Set([
+const Je = {
+  ledger_status: "control",
+  ledger_sync: "network",
+  check_address: "risk",
+  read_claims: "claims",
+  read_token_rights: "nft",
+  certify_authority: "authority",
+  read_provenance: "provenance",
+  read_book: "book",
+  read_settlement: "settlement",
+  read_control_surface: "authority",
+  read_pool: "amm",
+  read_issuance: "issuance",
+  security_check: "security",
+  investigate_hack: "security",
+  explain_transaction: "security",
+  find_stuck_funds: "security",
+  audit_exposure: "security",
+  asset_inventory: "security",
+  deposit_help: "security",
+  verify_domain: "security",
+  map_cluster: "security",
+  drainer_check: "security",
+  emergency_kit: "security",
+  who_is: "security",
+  scam_registry: "security",
+  check_link: "security",
+  screen_withdrawal: "security",
+  surveil_market: "security",
+  search_noshashi: "learn"
+}, Ps = ["ledgerIndex", "ledger_index", "leaderSeq", "validatedLedger"];
+function _e(e, t = 0) {
+  if (t > 5 || e === null || typeof e != "object") return;
+  const n = e;
+  for (const s of Ps) {
+    const a = n[s];
+    if (typeof a == "number" && Number.isInteger(a) && a > 32570) return a;
+    if (typeof a == "string" && /^\d{5,}$/.test(a) && Number(a) > 32570) return Number(a);
+  }
+  for (const s of Array.isArray(e) ? e.slice(0, 20) : Object.values(n)) {
+    const a = _e(s, t + 1);
+    if (a !== void 0) return a;
+  }
+}
+function pe(e, t, n, s, a = /* @__PURE__ */ new Date()) {
+  const i = Object.values(n ?? {}).filter((o) => typeof o == "string" || typeof o == "number").map(String).join(" · ");
+  return {
+    tool: e,
+    screen: t,
+    ...Je[e] ? { scene: Je[e] } : {},
+    ...i ? { subject: i } : {},
+    ..._e(s) !== void 0 ? { ledgerIndex: _e(s) } : {},
+    readAt: a.toISOString()
+  };
+}
+const Qe = 0.95, Ls = /* @__PURE__ */ new Set([
   "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
   // ACCOUNT_ZERO
   "rrrrrrrrrrrrrrrrrrrrBZbvji",
@@ -2062,32 +2117,32 @@ const Ye = 0.95, Ds = /* @__PURE__ */ new Set([
   "rrrrrrrrrrrrrrrrrrrn5RM1rHd"
   // rippled's NaN sentinel
 ]);
-function pe(e) {
-  return !!e && !Ds.has(e);
+function ge(e) {
+  return !!e && !Ls.has(e);
 }
-const Ve = 2500, Je = 2;
-async function Cs(e, t = {}) {
+const Ze = 2500, et = 2;
+async function Xs(e, t = {}) {
   const n = [], [s, a, i] = await Promise.all([
-    Tt(e).catch((o) => (n.push(`control: ${o instanceof Error ? o.message : String(o)}`), null)),
-    $t(e).catch((o) => (n.push(`posture: ${o instanceof Error ? o.message : String(o)}`), null)),
+    At(e).catch((r) => (n.push(`control: ${r instanceof Error ? r.message : String(r)}`), null)),
+    xt(e).catch((r) => (n.push(`posture: ${r instanceof Error ? r.message : String(r)}`), null)),
     // The supply walk is the expensive read, so it is opt-in. When it is
     // skipped the concentration checks abstain rather than assume.
-    t.walkSupply ? At(e).catch((o) => (n.push(`issuance: ${o instanceof Error ? o.message : String(o)}`), null)) : Promise.resolve(null)
-  ]), r = a?.unreadable ? null : a;
+    t.walkSupply ? Et(e).catch((r) => (n.push(`issuance: ${r instanceof Error ? r.message : String(r)}`), null)) : Promise.resolve(null)
+  ]), o = a?.unreadable ? null : a;
   return a?.unreadable && n.push(`posture: ${a.unreadable}`), {
     issuer: e,
     control: s,
-    posture: r,
+    posture: o,
     issuance: i,
     unreadable: n,
     ledgerIndex: s?.ledgerIndex ?? i?.ledgerIndex ?? 0,
     readAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function It(e) {
+function Rt(e) {
   return !e || e.currencies.length === 0 ? null : e.currencies.reduce((t, n) => n.outstanding > t.outstanding ? n : t);
 }
-function Os(e) {
+function Hs(e) {
   const t = [], { control: n, posture: s } = e;
   if (!s || s.unreadable || !n)
     return t.push({
@@ -2116,15 +2171,15 @@ function Os(e) {
     passed: !s.requireAuth,
     detail: s.requireAuth ? "lsfRequireAuth is set. The issuer authorises each holder individually, so who may hold this asset is the issuer's decision." : "lsfRequireAuth is clear. Any account may open a line without the issuer's permission."
   });
-  const a = !!n.signers.unreadable, i = !n.masterKeyEnabled && !!n.regularKey && !pe(n.regularKey), r = n.signers.present ? n.signers.minimumSigners <= 1 : pe(n.regularKey) || n.masterKeyEnabled;
+  const a = !!n.signers.unreadable, i = !n.masterKeyEnabled && !!n.regularKey && !ge(n.regularKey), o = n.signers.present ? n.signers.minimumSigners <= 1 : ge(n.regularKey) || n.masterKeyEnabled;
   t.push({
     id: "NO_UNILATERAL_SIGNER",
     label: "No single key controls the issuer",
     severity: "block",
     // A signer list that could not be read cannot be ruled out, and an
     // unverifiable absence must not read as an absence.
-    passed: !r && !a,
-    detail: a ? `The signer list could not be read (${n.signers.unreadable}), so it cannot be established whether a committee controls this account or one key does. This is an unknown, not a pass.` : n.signers.present ? n.signers.minimumSigners <= 1 ? `A signer list is present, but ${n.signers.unilateralSigners.length || 1} signer reaches the quorum of ${n.signers.quorum} alone. This is a single-key account wearing a committee's clothes.` : `${n.signers.minimumSigners} signers must agree to reach the quorum of ${n.signers.quorum}, derived from summed weights rather than a headcount.` : i ? `The master key is disabled and the regular key is set to ${n.regularKey}, an address whose private key does not exist. The account is blackholed: it can never sign another transaction, so no party can act on this issuance.` : pe(n.regularKey) ? `No signer list. The master key is ${n.masterKeyEnabled ? "enabled" : "disabled"} and a regular key is set, so ${n.regularKey} signs for this issuer on its own.` : n.masterKeyEnabled ? "No signer list and no usable regular key, and the master key is enabled. One key signs for this issuer." : "The master key is disabled, no regular key is set and no signer list is present, so the account cannot currently be signed for at all."
+    passed: !o && !a,
+    detail: a ? `The signer list could not be read (${n.signers.unreadable}), so it cannot be established whether a committee controls this account or one key does. This is an unknown, not a pass.` : n.signers.present ? n.signers.minimumSigners <= 1 ? `A signer list is present, but ${n.signers.unilateralSigners.length || 1} signer reaches the quorum of ${n.signers.quorum} alone. This is a single-key account wearing a committee's clothes.` : `${n.signers.minimumSigners} signers must agree to reach the quorum of ${n.signers.quorum}, derived from summed weights rather than a headcount.` : i ? `The master key is disabled and the regular key is set to ${n.regularKey}, an address whose private key does not exist. The account is blackholed: it can never sign another transaction, so no party can act on this issuance.` : ge(n.regularKey) ? `No signer list. The master key is ${n.masterKeyEnabled ? "enabled" : "disabled"} and a regular key is set, so ${n.regularKey} signs for this issuer on its own.` : n.masterKeyEnabled ? "No signer list and no usable regular key, and the master key is enabled. One key signs for this issuer." : "The master key is disabled, no regular key is set and no signer list is present, so the account cannot currently be signed for at all."
   }), s.transferRateBps > 0 && t.push({
     id: "NO_TRANSFER_FEE",
     label: "No issuer transfer fee",
@@ -2132,7 +2187,7 @@ function Os(e) {
     passed: !1,
     detail: `The issuer charges ${(s.transferRateBps / 100).toFixed(2)}% on every transfer between holders. The rate is set by the issuer and can be changed by them.`
   });
-  const o = It(e.issuance), c = e.unreadable.find((d) => d.startsWith("issuance:"));
+  const r = Rt(e.issuance), c = e.unreadable.find((d) => d.startsWith("issuance:"));
   if (!e.issuance)
     t.push({
       id: "SUPPLY_CONCENTRATION",
@@ -2142,7 +2197,7 @@ function Os(e) {
       state: "INSUFFICIENT_DATA",
       detail: c ? `The holder walk was requested and could not be completed (${c.replace(/^issuance:\s*/, "")}), so no concentration finding is made. This is a failed read, not an abstention and not a pass.` : "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass."
     });
-  else if (!o)
+  else if (!r)
     t.push({
       id: "SUPPLY_CONCENTRATION",
       label: "Supply concentration",
@@ -2153,36 +2208,36 @@ function Os(e) {
       state: "NOT_APPLICABLE",
       detail: "The issuer reports no outstanding obligations, so there is no supply to measure."
     });
-  else if (o.coverage < Ye)
+  else if (r.coverage < Qe)
     t.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${U(o.currency)} supply concentration`,
+      label: `${U(r.currency)} supply concentration`,
       severity: "warn",
       passed: !1,
       state: "INSUFFICIENT_DATA",
-      detail: `The holder lines read account for ${(o.coverage * 100).toFixed(1)}% of the outstanding ${U(o.currency)}. Below ${Ye * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`
+      detail: `The holder lines read account for ${(r.coverage * 100).toFixed(1)}% of the outstanding ${U(r.currency)}. Below ${Qe * 100}% coverage no concentration figure is reported, high or low, because shares over that fraction describe the holders seen rather than the issuance.`
     });
   else {
-    const d = o.hhi >= Ve, u = e.issuance.source === "indexer" ? ` Holder balances are from ${e.issuance.sourceName}, not read from the ledger directly; their total was reconciled against the ledger's own obligations to within ${Math.abs(o.coverage - 1) * 100 < 0.01 ? "0.01" : (Math.abs(o.coverage - 1) * 100).toFixed(2)}%, which establishes that none are missing or invented but not that each is attributed correctly.` : " Holder balances were read from validated ledger state.";
+    const d = r.hhi >= Ze, u = e.issuance.source === "indexer" ? ` Holder balances are from ${e.issuance.sourceName}, not read from the ledger directly; their total was reconciled against the ledger's own obligations to within ${Math.abs(r.coverage - 1) * 100 < 0.01 ? "0.01" : (Math.abs(r.coverage - 1) * 100).toFixed(2)}%, which establishes that none are missing or invented but not that each is attributed correctly.` : " Holder balances were read from validated ledger state.";
     t.push({
       id: "SUPPLY_CONCENTRATION",
-      label: `${U(o.currency)} supply not concentrated`,
+      label: `${U(r.currency)} supply not concentrated`,
       severity: "warn",
       passed: !d,
-      detail: (d ? `HHI ${Math.round(o.hhi)} over ${o.holders} holders at ${(o.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${o.topHolderPct.toFixed(1)}% and the top five carry ${o.topFivePct.toFixed(1)}%.` : `HHI ${Math.round(o.hhi)} over ${o.holders} holders at ${(o.coverage * 100).toFixed(1)}% coverage, below the ${Ve} threshold.`) + u
+      detail: (d ? `HHI ${Math.round(r.hhi)} over ${r.holders} holders at ${(r.coverage * 100).toFixed(1)}% coverage. The largest holder carries ${r.topHolderPct.toFixed(1)}% and the top five carry ${r.topFivePct.toFixed(1)}%.` : `HHI ${Math.round(r.hhi)} over ${r.holders} holders at ${(r.coverage * 100).toFixed(1)}% coverage, below the ${Ze} threshold.`) + u
     });
   }
   return t;
 }
-function Ps(e, t = {}) {
+function qs(e, t = {}) {
   return e.some((n) => n.severity === "block" && !n.passed) ? "no-go" : (t.unreadable?.length ?? 0) > 0 ? "insufficient-data" : e.some((n) => !n.passed) ? "hold" : "go";
 }
-async function Ls(e, t = {}) {
-  const n = await Cs(e, t);
-  return Xs(n);
+async function Us(e, t = {}) {
+  const n = await Xs(e, t);
+  return Ms(n);
 }
-async function Xs(e) {
-  const t = Os(e), n = Ps(t, { unreadable: e.unreadable }), s = It(e.issuance)?.currency, a = e.readAt, i = await Rs({
+async function Ms(e) {
+  const t = Hs(e), n = qs(t, { unreadable: e.unreadable }), s = Rt(e.issuance)?.currency, a = e.readAt, i = await Cs({
     kind: "authority",
     subject: e.issuer,
     // The ledger index is inside the digest because a certificate is a
@@ -2203,7 +2258,7 @@ async function Xs(e) {
       ledgerIndex: e.ledgerIndex,
       verdict: n,
       source: e.issuance?.source ?? "none",
-      rules: Je
+      rules: et
     },
     checks: t,
     evaluatedAt: a
@@ -2218,10 +2273,10 @@ async function Xs(e) {
     ledgerIndex: e.ledgerIndex,
     evaluatedAt: a,
     source: e.issuance?.source ?? "none",
-    rulesVersion: Je
+    rulesVersion: et
   };
 }
-const Hs = [
+const zs = [
   {
     id: "ticket",
     question: "How do I contact support or open a ticket?",
@@ -2435,7 +2490,7 @@ const Hs = [
     answer: "No, and we will not pretend otherwise. A GO means the rules you configured passed — it is not legal advice, not a regulatory determination, and it does not discharge an obligation you owe a regulator. The receipt proves a check ran against a stated rule set at a stated time. Anything with legal consequence needs your compliance officer and qualified counsel.",
     keywords: ["legal", "advice", "rely", "compliance", "regulator", "lawyer", "liability", "guarantee"]
   }
-], Us = [
+], js = [
   {
     id: "operator",
     name: "FREE",
@@ -2700,23 +2755,23 @@ const Hs = [
       "phishing_feed"
     ]
   }
-], qs = [{ name: "Overview", plan: "Free", summary: "what NOSHASHI is and what it reads." }, { name: "Mission Control", plan: "Free", summary: "live mainnet telemetry, wallet gate, policy rule set." }, { name: "Verification", plan: "Free", summary: "describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast." }, { name: "Credentials", plan: "Free", summary: "XLS-70 credentials held by the wallet and the real mainnet domains they admit it to; a counterparty's credentials (who vouched, expiry); an issuer register (issued, not accepted, expiring, expired), each exportable to CSV." }, { name: "Domain Grid", plan: "Free", summary: "every XLS-80 permissioned domain on mainnet (from a sweep of the whole ledger), read live by domain ID or owner, and an admission check of any counterparty saved with its ledger index and SHA-256." }, { name: "Audit Trail", plan: "Free", summary: "any account's validated history with delivered amounts, destination tags, memos and partial payments; every counterparty screened against the OFAC SDN list and the scam registry; exported as CSV with a SHA-256 manifest." }, { name: "NOSHX", plan: "Free", summary: "this assistant, NOSHASHI's agent. It reads the live ledger with read-only tools (authority, order book, settlement, control surface, provenance, pools, issuance, address check, claims, NFT rights, ledger status), each gated like its screen, answers questions about NOSHASHI itself from the product's own pages (features, screens, plans, docs, trust, legal), and by default runs on NOSHX Core, NOSHASHI's own engine, which uses no language model: it plans from the question, runs the readers and writes the answer itself. A language model can be added (the trained NOSHX model through Ollama, or a hosted one), with optional failover back to Core and a deep reasoning switch. It has an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant." }, { name: "Portfolio & Radar", plan: "Desk", summary: "multi-wallet surveillance and the compliance radar." }, { name: "Exposure Analysis", plan: "Desk", summary: "issuer freeze rights, Travel Rule scope, counterparty concentration." }, { name: "Ledger & Policy", plan: "Desk", summary: "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export." }, { name: "Check an Address", plan: "Free", summary: "read what the ledger publishes about any account." }, { name: "Token Rights", plan: "Free", summary: "what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly." }, { name: "Inbox", plan: "Free", summary: "every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds." }, { name: "Ledger Sync", plan: "Free", summary: "four public XRPL nodes queried and compared, with disagreement between them treated as the reading." }, { name: "Learn", plan: "Free", summary: "short animated explainers." }, { name: "Settlement", plan: "Desk", summary: "what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question." }, { name: "Ledger Garden", plan: "Desk", summary: "walk the ledger's relationships one validated read at a time — an issuer's assets, an asset's holders (from the first 200 of the issuer's trust lines, in ledger order; Issuance walks them all), an account's holdings and recent transactions, a transaction's settlement evidence — then hand the whole path to this agent as a question." }, { name: "Provenance", plan: "Desk", summary: "how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts." }, { name: "Control Surface", plan: "Desk", summary: "how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable." }, { name: "Order Book", plan: "Desk", summary: "how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill." }, { name: "Pool Governance", plan: "Desk", summary: "who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot." }, { name: "Issuance", plan: "Institution", summary: "holder concentration and enforcement history for an issuer, from the issuer's side." }, { name: "Authority Certificate", plan: "Desk", summary: "what authority an issuer has kept over an asset it issued — whether it can freeze a holder, whether it gave that power up irrevocably (lsfNoFreeze cannot be cleared once set), whether the asset is frozen right now, whether holding it needs the issuer's permission, whether one signer reaches the quorum alone, what it charges on a transfer between holders, and how concentrated the supply is. Each answer is a fact at one named ledger index, and the set is digested with SHA-256 so the same reading can be checked again later. It is NOT a score — no number is composited from the checks — and NOT a legal finding: whether an asset is decentralised or is a security is a determination for an agency applying statutory criteria, which this software does not evaluate. If the supply walk is skipped, or trust-line coverage falls below 95%, the concentration check abstains rather than passing." }, { name: "Ledger Watch", plan: "Free", summary: "screens an incoming payment to a deposit address before it is credited, read live from the ledger — it credits what actually arrived (delivered_amount, never the Amount of a partial payment), holds a familiar ticker whose issuer owes nothing as counterfeit, flags dust carrying a link as a phishing lure, notes a missing destination tag, the issuer's freeze and clawback rights, the Travel Rule threshold, and traces who created the sender and who created them, three hops back, against the organization's deny list. Verdicts are clear, review or hold; what could not be read holds the deposit. Deposit addresses and monitored accounts are read by the server every minute; each event goes to the organization's webhooks (xrpl_event, deposit_screened) and to a JSON/NDJSON feed API with a history endpoint; export schemas shape bulk exports and the feed. Requires Enterprise (deposit screening); monitoring any account, event feeds, custom schemas and retention need Strategic." }, { name: "Security Center", plan: "Free", summary: "ACCOUNT CHECK (free) grades any address A to F from who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts and open doors (NFT offers, checks, payment channels), and writes an unsigned hardening plan the owner signs in their own wallet. SAFE SEND (free) checks a pasted destination against the operator's own address book for lookalikes and against the OFAC list. INCIDENT RESPONSE (Pro+; five hops and a case on Enterprise) follows stolen value through payments and AccountDelete sweeps past dust, says where it is, and rates every recovery path; validated transactions are never reversible. GUARDIAN (Strategic) sends security_alert webhooks when a watched account's keys change or it is deleted." }, { name: "Asset Passport", plan: "Enterprise", summary: "a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks." }, { name: "Pricing", plan: "Free", summary: "plans, checkout and verification credits." }, { name: "Account", plan: "Free", summary: "subscription, two-factor authentication and API keys." }, { name: "Legal & Accessibility", plan: "Free", summary: "policies, accessibility statement and contact routes." }, { name: "Trust & Security", plan: "Free", summary: "the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim." }, { name: "Settings", plan: "Free", summary: "appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage." }], Et = {
-  scenes: qs
-}, Ms = "https://www.noshashi.app";
-function zs() {
-  const e = Hs.map((n) => ({
+], Bs = [{ name: "Overview", plan: "Free", summary: "what NOSHASHI is and what it reads." }, { name: "Mission Control", plan: "Free", summary: "live mainnet telemetry, wallet gate, policy rule set." }, { name: "Verification", plan: "Free", summary: "describe a settlement, run it against a domain, get an explainable verdict and a SHA-256 receipt. Nothing is broadcast." }, { name: "Credentials", plan: "Free", summary: "XLS-70 credentials held by the wallet and the real mainnet domains they admit it to; a counterparty's credentials (who vouched, expiry); an issuer register (issued, not accepted, expiring, expired), each exportable to CSV." }, { name: "Domain Grid", plan: "Free", summary: "every XLS-80 permissioned domain on mainnet (from a sweep of the whole ledger), read live by domain ID or owner, and an admission check of any counterparty saved with its ledger index and SHA-256." }, { name: "Audit Trail", plan: "Free", summary: "any account's validated history with delivered amounts, destination tags, memos and partial payments; every counterparty screened against the OFAC SDN list and the scam registry; exported as CSV with a SHA-256 manifest." }, { name: "NOSHX", plan: "Free", summary: "this assistant, NOSHASHI's agent. It reads the live ledger with read-only tools (authority, order book, settlement, control surface, provenance, pools, issuance, address check, claims, NFT rights, ledger status), each gated like its screen, answers questions about NOSHASHI itself from the product's own pages (features, screens, plans, docs, trust, legal), and by default runs on NOSHX Core, NOSHASHI's own engine, which uses no language model: it plans from the question, runs the readers and writes the answer itself. A language model can be added (the trained NOSHX model through Ollama, or a hosted one), with optional failover back to Core and a deep reasoning switch. It has an Observer that reads the wallets you name from validated mainnet on an interval and records what changed (freezes, balances, credentials, issuer powers) by fixed rules, and a one-click issuer investigation that reads an issuer's authority certificate and obligations and hands the findings to this assistant." }, { name: "Portfolio & Radar", plan: "Desk", summary: "multi-wallet surveillance and the compliance radar." }, { name: "Exposure Analysis", plan: "Desk", summary: "issuer freeze rights, Travel Rule scope, counterparty concentration." }, { name: "Ledger & Policy", plan: "Desk", summary: "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export." }, { name: "Check an Address", plan: "Free", summary: "read what the ledger publishes about any account." }, { name: "Token Rights", plan: "Free", summary: "what the issuer of an NFT can still do to it after someone owns it — destroy it (lsfBurnable), rewrite what its URI points at (lsfMutable), block resale entirely, or take a cut of every transfer. All of it is encoded in the NFTokenID itself and decoded offline, so no server is asked and none can answer wrongly." }, { name: "Inbox", plan: "Free", summary: "every check a stranger has addressed to an account, and whether the token each one offers has ever been issued by anyone. A currency code is not a name anyone owns — any account can issue a token called USDT — so an unsolicited claim for a large round sum from an issuer with no obligations is impersonation, not money. Receiving one costs nothing and cannot move funds." }, { name: "Ledger Sync", plan: "Free", summary: "four public XRPL nodes queried and compared, with disagreement between them treated as the reading." }, { name: "Learn", plan: "Free", summary: "short animated explainers." }, { name: "Settlement", plan: "Desk", summary: "what a transaction actually DELIVERED against what it requested. A partial payment can return tesSUCCESS having delivered a fraction of the stated amount; this is the screen for that question." }, { name: "Ledger Garden", plan: "Desk", summary: "walk the ledger's relationships one validated read at a time — an issuer's assets, an asset's holders (from the first 200 of the issuer's trust lines, in ledger order; Issuance walks them all), an account's holdings and recent transactions, a transaction's settlement evidence — then hand the whole path to this agent as a question." }, { name: "Provenance", plan: "Desk", summary: "how long an account has existed and who sent it its first XRP. Note the sequence number is not a transaction count on modern accounts." }, { name: "Control Surface", plan: "Desk", summary: "how few signers can actually move a treasury, whether the master key bypasses the quorum, and how much balance is locked rather than spendable." }, { name: "Order Book", plan: "Desk", summary: "how much of an order book's quoted depth is backed by an owner who still holds the asset. An offer rests whether or not its owner kept the funds, and nothing removes it until someone tries to cross it — on some mainnet books over 90% of the visible depth cannot fill." }, { name: "Pool Governance", plan: "Desk", summary: "who votes an AMM's trading fee, on what share of the liquidity, and who holds the discounted auction slot." }, { name: "Issuance", plan: "Institution", summary: "holder concentration and enforcement history for an issuer, from the issuer's side." }, { name: "Authority Certificate", plan: "Desk", summary: "what authority an issuer has kept over an asset it issued — whether it can freeze a holder, whether it gave that power up irrevocably (lsfNoFreeze cannot be cleared once set), whether the asset is frozen right now, whether holding it needs the issuer's permission, whether one signer reaches the quorum alone, what it charges on a transfer between holders, and how concentrated the supply is. Each answer is a fact at one named ledger index, and the set is digested with SHA-256 so the same reading can be checked again later. It is NOT a score — no number is composited from the checks — and NOT a legal finding: whether an asset is decentralised or is a security is a determination for an agency applying statutory criteria, which this software does not evaluate. If the supply walk is skipped, or trust-line coverage falls below 95%, the concentration check abstains rather than passing." }, { name: "Ledger Watch", plan: "Free", summary: "screens an incoming payment to a deposit address before it is credited, read live from the ledger — it credits what actually arrived (delivered_amount, never the Amount of a partial payment), holds a familiar ticker whose issuer owes nothing as counterfeit, flags dust carrying a link as a phishing lure, notes a missing destination tag, the issuer's freeze and clawback rights, the Travel Rule threshold, and traces who created the sender and who created them, three hops back, against the organization's deny list. Verdicts are clear, review or hold; what could not be read holds the deposit. Deposit addresses and monitored accounts are read by the server every minute; each event goes to the organization's webhooks (xrpl_event, deposit_screened) and to a JSON/NDJSON feed API with a history endpoint; export schemas shape bulk exports and the feed. Requires Enterprise (deposit screening); monitoring any account, event feeds, custom schemas and retention need Strategic." }, { name: "Security Center", plan: "Free", summary: "ACCOUNT CHECK (free) grades any address A to F from who can sign (master key, regular key, signer list and its real quorum), recent key and settings changes, address-poisoning attempts and open doors (NFT offers, checks, payment channels), and writes an unsigned hardening plan the owner signs in their own wallet. SAFE SEND (free) checks a pasted destination against the operator's own address book for lookalikes and against the OFAC list. INCIDENT RESPONSE (Pro+; five hops and a case on Enterprise) follows stolen value through payments and AccountDelete sweeps past dust, says where it is, and rates every recovery path; validated transactions are never reversible. GUARDIAN (Strategic) sends security_alert webhooks when a watched account's keys change or it is deleted." }, { name: "Asset Passport", plan: "Enterprise", summary: "a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks." }, { name: "Pricing", plan: "Free", summary: "plans, checkout and verification credits." }, { name: "Account", plan: "Free", summary: "subscription, two-factor authentication and API keys." }, { name: "Legal & Accessibility", plan: "Free", summary: "policies, accessibility statement and contact routes." }, { name: "Trust & Security", plan: "Free", summary: "the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim." }, { name: "Settings", plan: "Free", summary: "appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage." }], Dt = {
+  scenes: Bs
+}, Ws = "https://www.noshashi.app";
+function Gs() {
+  const e = zs.map((n) => ({
     title: `Help › ${n.question}`,
     source: "NOSHX › Support",
     text: `${n.question}
 ${n.answer}`
   }));
-  for (const n of Us)
+  for (const n of js)
     e.push({
       title: `Pricing › ${n.name}`,
-      source: `${Ms}/pricing/`,
+      source: `${Ws}/pricing/`,
       text: `${n.name} plan, for ${n.audience}. Price (cost): ${n.priceLabel} ${n.cadence}. Includes: ${n.features.join("; ")}.`
     });
-  const t = Et.scenes;
+  const t = Dt.scenes;
   for (let n = 0; n < t.length; n += 6)
     e.push({
       title: "App screens",
@@ -2726,9 +2781,9 @@ ${n.answer}`
     });
   return e;
 }
-const js = new Set(
+const Ks = new Set(
   "a an and are as at be but by can do does for from has have how i if in is it its me my of on or our so that the their them then there these this to was we what when where which who why will with you your".split(" ")
-), Bs = {
+), Ys = {
   sent: "send",
   sending: "send",
   sends: "send",
@@ -2748,127 +2803,127 @@ const js = new Set(
   prices: "price"
 };
 function X(e) {
-  return (e.toLowerCase().match(/[a-z0-9][a-z0-9_-]*/g) ?? []).filter((t) => !js.has(t) && t.length > 1).map((t) => Bs[t] ?? (t.length > 4 ? t.replace(/(ies|es|s|ing|ed)$/, (n) => n === "ies" ? "y" : "") : t));
+  return (e.toLowerCase().match(/[a-z0-9][a-z0-9_-]*/g) ?? []).filter((t) => !Ks.has(t) && t.length > 1).map((t) => Ys[t] ?? (t.length > 4 ? t.replace(/(ies|es|s|ing|ed)$/, (n) => n === "ies" ? "y" : "") : t));
 }
-function Ws(e) {
+function Vs(e) {
   const t = [], n = [];
-  for (const r of e) {
-    const o = X(r.title), c = X(r.text), d = /* @__PURE__ */ new Map();
-    for (const u of o) d.set(u, (d.get(u) ?? 0) + 2);
+  for (const o of e) {
+    const r = X(o.title), c = X(o.text), d = /* @__PURE__ */ new Map();
+    for (const u of r) d.set(u, (d.get(u) ?? 0) + 2);
     for (const u of c) d.set(u, (d.get(u) ?? 0) + 1);
-    t.push(d), n.push(` ${o.join(" ")} ${c.join(" ")} `);
+    t.push(d), n.push(` ${r.join(" ")} ${c.join(" ")} `);
   }
-  const s = t.map((r) => [...r.values()].reduce((o, c) => o + c, 0)), a = /* @__PURE__ */ new Map();
-  for (const r of t) for (const o of r.keys()) a.set(o, (a.get(o) ?? 0) + 1);
-  const i = s.reduce((r, o) => r + o, 0) / Math.max(1, s.length);
+  const s = t.map((o) => [...o.values()].reduce((r, c) => r + c, 0)), a = /* @__PURE__ */ new Map();
+  for (const o of t) for (const r of o.keys()) a.set(r, (a.get(r) ?? 0) + 1);
+  const i = s.reduce((o, r) => o + r, 0) / Math.max(1, s.length);
   return { passages: e, docs: t, sequences: n, lengths: s, df: a, avg: i };
 }
-function Gs(e, t, n = 5) {
-  const s = X(t), a = [...new Set(s)], i = s.slice(1).map((p, h) => ` ${s[h]} ${p} `);
+function Js(e, t, n = 5) {
+  const s = X(t), a = [...new Set(s)], i = s.slice(1).map((p, f) => ` ${s[f]} ${p} `);
   if (a.length === 0) return [];
-  const r = e.passages.length, o = 1.4, c = 0.55, d = (p) => {
-    const h = e.df.get(p) ?? 0;
-    return Math.log(1 + (r - h + 0.5) / (h + 0.5));
+  const o = e.passages.length, r = 1.4, c = 0.55, d = (p) => {
+    const f = e.df.get(p) ?? 0;
+    return Math.log(1 + (o - f + 0.5) / (f + 0.5));
   }, u = [];
-  e.docs.forEach((p, h) => {
+  e.docs.forEach((p, f) => {
     let l = 0;
     for (const y of a) {
       const w = p.get(y);
-      w && (l += d(y) * w * (o + 1) / (w + o * (1 - c + c * e.lengths[h] / e.avg)));
+      w && (l += d(y) * w * (r + 1) / (w + r * (1 - c + c * e.lengths[f] / e.avg)));
     }
     for (const y of i)
-      if (e.sequences[h].includes(y)) {
+      if (e.sequences[f].includes(y)) {
         const [w, m] = y.trim().split(" ");
         l += 0.6 * (d(w) + d(m));
       }
-    l > 0 && u.push({ ...e.passages[h], score: l * (e.passages[h].weight ?? 1) });
-  }), u.sort((p, h) => h.score - p.score);
-  const f = /* @__PURE__ */ new Set();
-  return u.filter((p) => !f.has(p.title) && f.add(p.title)).slice(0, n);
+    l > 0 && u.push({ ...e.passages[f], score: l * (e.passages[f].weight ?? 1) });
+  }), u.sort((p, f) => f.score - p.score);
+  const h = /* @__PURE__ */ new Set();
+  return u.filter((p) => !h.has(p.title) && h.add(p.title)).slice(0, n);
 }
-let J = null, Ft = [];
-function Ks(e) {
-  Ft = e, J = null;
+let Q = null, Ot = [];
+function Qs(e) {
+  Ot = e, Q = null;
 }
-function Rt() {
-  return J ?? (J = import("./pages-DjqKpQbi.js").then(({ default: e }) => Ws([...zs(), ...Ft, ...e]))), J;
+function Ct() {
+  return Q ?? (Q = import("./pages-DjqKpQbi.js").then(({ default: e }) => Vs([...Gs(), ...Ot, ...e]))), Q;
 }
-function Ys() {
-  if (J) return;
+function Zs() {
+  if (Q) return;
   const e = () => {
-    Rt();
+    Ct();
   };
   typeof requestIdleCallback == "function" ? requestIdleCallback(e, { timeout: 1500 }) : setTimeout(e, 0);
 }
-async function Dt(e, t = 5) {
-  return Gs(await Rt(), e, t);
+async function Pt(e, t = 5) {
+  return Js(await Ct(), e, t);
 }
-function O(e) {
+function C(e) {
   if (!/^[0-9A-F]{40}$/i.test(e)) return e;
   const t = (e.match(/../g) ?? []).map((n) => String.fromCharCode(parseInt(n, 16))).join("").replace(/\0+$/, "").trim();
   return t && /^[\x20-\x7E]+$/.test(t) ? t : e;
 }
-function Vs(e) {
+function ea(e) {
   const t = e.tx_json ?? e.tx ?? e, n = { ...t, hash: t.hash ?? e.hash, date: t.date ?? e.date }, s = Number(e.ledger_index ?? t.ledger_index ?? t.inLedger), a = e.meta ?? e.metaData ?? t.meta ?? {};
   return { tx: n, meta: a, ledgerIndex: Number.isFinite(s) ? s : 0 };
 }
-const Js = /(https?:\/\/|www\.)\S+|\b[a-z0-9-]{2,}\.(?:[a-z]{2,24})\b/i, Qs = (e) => Js.test(e), Zs = 21600;
-function Ie(e, t, n = 4) {
+const ta = /(https?:\/\/|www\.)\S+|\b[a-z0-9-]{2,}\.(?:[a-z]{2,24})\b/i, na = (e) => ta.test(e), sa = 21600;
+function Fe(e, t, n = 4) {
   for (const s of t)
     if (!(s === e || s.length < n * 2 + 1) && s.slice(0, n + 1) === e.slice(0, n + 1) && s.slice(-n) === e.slice(-n))
       return s;
   return null;
 }
-function ea(e, t) {
+function aa(e, t) {
   if (!t) return { account: e, fundedBy: null, activatedLedger: null };
-  const { tx: n, meta: s, ledgerIndex: a } = Vs(t);
+  const { tx: n, meta: s, ledgerIndex: a } = ea(t);
   return (s.AffectedNodes ?? []).some(
-    (r) => r.CreatedNode?.LedgerEntryType === "AccountRoot" && r.CreatedNode?.NewFields?.Account === e
+    (o) => o.CreatedNode?.LedgerEntryType === "AccountRoot" && o.CreatedNode?.NewFields?.Account === e
   ) ? { account: e, fundedBy: String(n.Account ?? "") || null, activatedLedger: a > 0 ? a : null } : { account: e, fundedBy: null, activatedLedger: null };
 }
-function ta(e) {
+function ia(e) {
   const t = e.trim().replace(/^[a-z][a-z0-9+.-]*:\/\//i, "").split(/[/?#]/)[0].replace(/\.$/, "").toLowerCase();
   return t.length > 253 || !/^([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(t) || t === "localhost" || t.endsWith(".localhost") || t.endsWith(".local") || t.endsWith(".internal") ? null : t;
 }
-const na = (e) => `confirmed in ${e.reports} report${e.reports === 1 ? "" : "s"} to the shared scam registry (${e.categories.join(", ")}) since ${e.firstConfirmed.slice(0, 10)}. Reports carry transaction evidence and are reviewed before they count.`;
-function sa(e) {
+const oa = (e) => `confirmed in ${e.reports} report${e.reports === 1 ? "" : "s"} to the shared scam registry (${e.categories.join(", ")}) since ${e.firstConfirmed.slice(0, 10)}. Reports carry transaction evidence and are reviewed before they count.`;
+function ra(e) {
   const t = [], n = e.destinationInfo?.account_data ?? null, s = Number(n?.Flags ?? 0), a = e.destination;
   n ? ((s & 131072) !== 0 && e.destinationTag === null && t.push({ id: "will_fail_tag", severity: "critical", title: "The payment will fail: the destination requires a tag", detail: `${a} refuses payments without a destination tag (tecDST_TAG_NEEDED). Ask the customer for the tag their exchange gave them.` }), (s & 16777216) !== 0 && t.push({ id: "deposit_auth", severity: "warn", title: "The destination only accepts preauthorised senders", detail: "Unless it has preauthorised the sending account, the payment will fail (tecNO_PERMISSION)." })) : e.amountXrp !== null && e.amountXrp < e.reserveBaseXrp ? t.push({ id: "will_fail_reserve", severity: "critical", title: "The payment will fail: the destination does not exist", detail: `${a} is not a funded account, and ${e.amountXrp} XRP is below the ${e.reserveBaseXrp} XRP needed to create it (tecNO_DST_INSUF_XRP).` }) : t.push({ id: "new_destination_account", severity: "warn", title: "The payment would create a brand-new account", detail: `${a} does not exist yet. Withdrawals to never-used addresses are common in account takeovers; confirm with the customer.` });
-  const i = e.ownAddresses ?? [], r = e.previousDestinations ?? [], o = Ie(a, [...r, ...i]);
-  o ? t.push({
+  const i = e.ownAddresses ?? [], o = e.previousDestinations ?? [], r = Fe(a, [...o, ...i]);
+  r ? t.push({
     id: "address_poisoning",
     severity: "critical",
-    title: `Lookalike destination: it imitates ${o.slice(0, 6)}…${o.slice(-4)}`,
-    detail: `${a} starts and ends like ${o}, ${i.includes(o) ? "one of your own addresses" : "an address this customer has withdrawn to before"}, but is a different account. This is how address poisoning steals withdrawals. Hold it and confirm with the customer.`
-  }) : r.length && !r.includes(a) && t.push({ id: "first_withdrawal_here", severity: "info", title: "First withdrawal to this destination", detail: "The customer has not withdrawn here before." });
+    title: `Lookalike destination: it imitates ${r.slice(0, 6)}…${r.slice(-4)}`,
+    detail: `${a} starts and ends like ${r}, ${i.includes(r) ? "one of your own addresses" : "an address this customer has withdrawn to before"}, but is a different account. This is how address poisoning steals withdrawals. Hold it and confirm with the customer.`
+  }) : o.length && !o.includes(a) && t.push({ id: "first_withdrawal_here", severity: "info", title: "First withdrawal to this destination", detail: "The customer has not withdrawn here before." });
   const c = e.chain[0];
-  if (n && c?.activatedLedger !== null && c?.activatedLedger !== void 0 && e.currentLedger - c.activatedLedger < Zs) {
+  if (n && c?.activatedLedger !== null && c?.activatedLedger !== void 0 && e.currentLedger - c.activatedLedger < sa) {
     const p = Math.max(1, Math.round((e.currentLedger - c.activatedLedger) * 4 / 3600));
     t.push({ id: "fresh_destination", severity: "warn", title: `The destination is about ${p} hour${p === 1 ? "" : "s"} old`, detail: `${a} was created in ledger ${c.activatedLedger.toLocaleString("en-US")}, funded by ${c.fundedBy ?? "an unknown account"}. Freshly created destinations receive most stolen withdrawals.` });
   }
   const d = e.sanctions ?? {};
-  e.chain.forEach((p, h) => {
+  e.chain.forEach((p, f) => {
     const l = d[p.account];
-    l && t.push({ id: `sanctioned_hop_${h}`, severity: "critical", title: h === 0 ? `The destination is on the ${l.list} list: ${l.entityName}` : `The destination was funded ${h} hop${h === 1 ? "" : "s"} back by a listed address: ${l.entityName}`, detail: `${p.account}. Do not send; escalate to your sanctions officer. Source: ${l.sourceUrl}.` });
+    l && t.push({ id: `sanctioned_hop_${f}`, severity: "critical", title: f === 0 ? `The destination is on the ${l.list} list: ${l.entityName}` : `The destination was funded ${f} hop${f === 1 ? "" : "s"} back by a listed address: ${l.entityName}`, detail: `${p.account}. Do not send; escalate to your sanctions officer. Source: ${l.sourceUrl}.` });
   });
   const u = e.threats ?? {};
-  return e.chain.forEach((p, h) => {
+  return e.chain.forEach((p, f) => {
     const l = u[p.account];
-    l && t.push({ id: `reported_hop_${h}`, severity: h === 0 ? "critical" : "warn", title: h === 0 ? `The destination is in the scam registry (${l.categories.join(", ")})` : `The destination was funded ${h} hop${h === 1 ? "" : "s"} back by a reported account`, detail: `${p.account}: ${na(l)}` });
+    l && t.push({ id: `reported_hop_${f}`, severity: f === 0 ? "critical" : "warn", title: f === 0 ? `The destination is in the scam registry (${l.categories.join(", ")})` : `The destination was funded ${f} hop${f === 1 ? "" : "s"} back by a reported account`, detail: `${p.account}: ${oa(l)}` });
   }), i.includes(a) && t.push({ id: "own_address", severity: "info", title: "The destination is one of your own addresses", detail: "An internal transfer." }), { verdict: t.some((p) => p.severity === "critical") ? "hold" : t.some((p) => p.severity === "warn") ? "review" : "clear", findings: t };
 }
-const aa = 946684800, V = {
+const ca = 946684800, J = {
   disableMaster: 1048576,
   depositAuth: 16777216,
   disallowIncomingNFTokenOffer: 67108864,
   disallowIncomingCheck: 134217728,
   disallowIncomingPayChan: 268435456
-}, H = {
+}, q = {
   disableMaster: 4,
   disallowIncomingNFTokenOffer: 12,
   disallowIncomingCheck: 13,
   disallowIncomingPayChan: 14
-}, Qe = {
+}, tt = {
   1: "require a destination tag",
   2: "require authorisation",
   3: "disallow XRP",
@@ -2884,24 +2939,24 @@ const aa = 946684800, V = {
   14: "refuse incoming payment channels",
   15: "refuse incoming trust lines",
   16: "allow trust-line clawback"
-}, ia = (e) => typeof e == "number" ? new Date((e + aa) * 1e3).toISOString() : null;
-function oa(e) {
+}, da = (e) => typeof e == "number" ? new Date((e + ca) * 1e3).toISOString() : null;
+function la(e) {
   return /^([0-9A-Fa-f]{2})+$/.test(e) ? new TextDecoder().decode(new Uint8Array((e.match(/../g) ?? []).map((t) => parseInt(t, 16)))) : e;
 }
-function ra(e, t) {
+function ua(e, t) {
   const n = e.map((a) => a.weight).sort((a, i) => i - a);
   let s = 0;
   for (let a = 0; a < n.length; a++)
     if (s += n[a], s >= t) return a + 1;
   return 1 / 0;
 }
-function Ze(e, t, n, s) {
-  const a = t?.account_data ?? null, r = (t?.signer_lists ?? a?.signer_lists ?? [])[0], o = (r?.SignerEntries ?? []).map((w) => ({ account: String(w.SignerEntry?.Account ?? ""), weight: Number(w.SignerEntry?.SignerWeight ?? 0) })).filter((w) => w.account), c = Number(r?.SignerQuorum ?? 0), d = Number(a?.Flags ?? 0), u = [], f = /* @__PURE__ */ new Set(), p = [];
-  let h = 0;
+function nt(e, t, n, s) {
+  const a = t?.account_data ?? null, o = (t?.signer_lists ?? a?.signer_lists ?? [])[0], r = (o?.SignerEntries ?? []).map((w) => ({ account: String(w.SignerEntry?.Account ?? ""), weight: Number(w.SignerEntry?.SignerWeight ?? 0) })).filter((w) => w.account), c = Number(o?.SignerQuorum ?? 0), d = Number(a?.Flags ?? 0), u = [], h = /* @__PURE__ */ new Set(), p = [];
+  let f = 0;
   for (const w of n) {
     const m = w.tx_json ?? w.tx ?? w;
     if ((w.meta ?? {}).TransactionResult !== "tesSUCCESS") continue;
-    const b = Number(w.ledger_index ?? m.ledger_index ?? 0), v = String(m.hash ?? w.hash ?? ""), k = ia(m.date ?? w.date), $ = m.Account === e;
+    const b = Number(w.ledger_index ?? m.ledger_index ?? 0), v = String(m.hash ?? w.hash ?? ""), k = da(m.date ?? w.date), $ = m.Account === e;
     switch (m.TransactionType) {
       case "SetRegularKey":
         $ && u.push(
@@ -2917,24 +2972,24 @@ function Ze(e, t, n, s) {
         }
         break;
       case "AccountSet":
-        $ && (m.SetFlag === H.disableMaster ? u.push({ kind: "master_disabled", ledger: b, at: k, hash: v, detail: "Master key disabled." }) : m.ClearFlag === H.disableMaster ? u.push({ kind: "master_enabled", ledger: b, at: k, hash: v, detail: "Master key re-enabled." }) : typeof m.SetFlag == "number" ? u.push({ kind: "flag_set", ledger: b, at: k, hash: v, detail: `Set: ${Qe[m.SetFlag] ?? `flag ${m.SetFlag}`}.` }) : typeof m.ClearFlag == "number" && u.push({ kind: "flag_cleared", ledger: b, at: k, hash: v, detail: `Cleared: ${Qe[m.ClearFlag] ?? `flag ${m.ClearFlag}`}.` }));
+        $ && (m.SetFlag === q.disableMaster ? u.push({ kind: "master_disabled", ledger: b, at: k, hash: v, detail: "Master key disabled." }) : m.ClearFlag === q.disableMaster ? u.push({ kind: "master_enabled", ledger: b, at: k, hash: v, detail: "Master key re-enabled." }) : typeof m.SetFlag == "number" ? u.push({ kind: "flag_set", ledger: b, at: k, hash: v, detail: `Set: ${tt[m.SetFlag] ?? `flag ${m.SetFlag}`}.` }) : typeof m.ClearFlag == "number" && u.push({ kind: "flag_cleared", ledger: b, at: k, hash: v, detail: `Cleared: ${tt[m.ClearFlag] ?? `flag ${m.ClearFlag}`}.` }));
         break;
       case "AccountDelete":
         $ && u.push({ kind: "account_deleted", ledger: b, at: k, hash: v, detail: `Account deleted; its XRP went to ${m.Destination}.` });
         break;
       case "Payment":
-        if ($ && typeof m.Destination == "string" && f.add(m.Destination), m.Destination === e && typeof m.Account == "string") {
+        if ($ && typeof m.Destination == "string" && h.add(m.Destination), m.Destination === e && typeof m.Account == "string") {
           p.push({ from: m.Account, hash: v, ledger: b });
           const _ = typeof m.Amount == "string" ? Number(m.Amount) : NaN;
-          Number.isFinite(_) && _ < 1e4 && (h += 1);
+          Number.isFinite(_) && _ < 1e4 && (f += 1);
         }
         break;
     }
   }
   const l = [], y = /* @__PURE__ */ new Set();
   for (const w of p) {
-    if (f.has(w.from) || y.has(w.from)) continue;
-    const m = Ie(w.from, f);
+    if (h.has(w.from) || y.has(w.from)) continue;
+    const m = Fe(w.from, h);
     m && (y.add(w.from), l.push({ sender: w.from, imitates: m, hash: w.hash, ledger: w.ledger }));
   }
   return {
@@ -2942,29 +2997,29 @@ function Ze(e, t, n, s) {
     exists: !!a,
     balanceXrp: a ? Number(a.Balance ?? 0) / 1e6 : 0,
     flags: d,
-    masterEnabled: (d & V.disableMaster) === 0,
+    masterEnabled: (d & J.disableMaster) === 0,
     regularKey: a?.RegularKey ? String(a.RegularKey) : null,
-    signerList: o.length ? { quorum: c, signers: o, minimumSigners: ra(o, c) } : null,
-    domain: typeof a?.Domain == "string" && a.Domain ? oa(a.Domain) : null,
+    signerList: r.length ? { quorum: c, signers: r, minimumSigners: ua(r, c) } : null,
+    domain: typeof a?.Domain == "string" && a.Domain ? la(a.Domain) : null,
     ledgerIndex: Number(t?.ledger_index ?? 0),
     events: u,
     poisoning: l,
-    dustReceived: h,
+    dustReceived: f,
     historyRead: n.length,
     historyComplete: s
   };
 }
-async function et(e, t = 200) {
+async function st(e, t = 200) {
   const n = await S("account_info", { account: e, ledger_index: "validated", signer_lists: !0 }).catch((i) => {
     if (/actNotFound|not found/i.test(i instanceof Error ? i.message : String(i))) return null;
     throw i;
   });
-  if (!n) return Ze(e, null, [], !0);
+  if (!n) return nt(e, null, [], !0);
   const s = await S("account_tx", { account: e, ledger_index_min: -1, ledger_index_max: -1, forward: !1, limit: t }).catch(() => ({ transactions: [] })), a = s.transactions ?? [];
-  return Ze(e, n, a, !s.marker);
+  return nt(e, n, a, !s.marker);
 }
-const tt = { critical: 0, warn: 1, info: 2, ok: 3 }, ca = 864e5;
-function da(e, t = Date.now()) {
+const at = { critical: 0, warn: 1, info: 2, ok: 3 }, ha = 864e5;
+function fa(e, t = Date.now()) {
   const n = [], s = [], a = (l) => (e.flags & l) !== 0;
   if (!e.exists)
     return {
@@ -2999,12 +3054,12 @@ function da(e, t = Date.now()) {
     detail: `Quorum ${i.quorum} is configured, but the master key still signs alone, so one stolen seed skips every approval.`,
     action: "Disable the master key once the signers have been confirmed to sign."
   }), i.minimumSigners === 1 / 0 ? n.push({ id: "quorum-unreachable", severity: "critical", title: "The signers can never reach quorum", detail: `Quorum ${i.quorum} is more than the signers' combined weight. Unless another key exists, nothing can be moved.` }) : i.minimumSigners === 1 ? n.push({ id: "one-signer-enough", severity: "critical", title: "One signer can act alone", detail: `A single signer carries quorum ${i.quorum} by weight, so the list gives no second approval.`, action: "Rebalance weights so no single signer reaches quorum." }) : n.push({ id: "multisig", severity: "ok", title: `At least ${i.minimumSigners} of ${i.signers.length} signers must agree`, detail: `Quorum ${i.quorum}. A thief needs ${i.minimumSigners} separate secrets, usually on separate people's devices.` })), !e.masterEnabled && !e.regularKey && !i && n.push({ id: "blackholed", severity: "info", title: "Nothing can sign for this account", detail: "Master key disabled, no regular key, no signer list: the account is blackholed. Nothing can be stolen from it, and nothing can be moved out of it again." });
-  const r = e.events.filter((l) => l.at && t - Date.parse(l.at) < 30 * ca && l.kind !== "flag_set" && l.kind !== "flag_cleared");
-  r.length && n.push({
+  const o = e.events.filter((l) => l.at && t - Date.parse(l.at) < 30 * ha && l.kind !== "flag_set" && l.kind !== "flag_cleared");
+  o.length && n.push({
     id: "recent-key-change",
     severity: "warn",
-    title: `Signing keys changed ${r.length === 1 ? "once" : `${r.length} times`} in the last 30 days`,
-    detail: `${r.map((l) => `${l.at.slice(0, 10)}: ${l.detail}`).join(" ")} Taking over an account usually starts with a new regular key or signer list, so every change should be one you made.`,
+    title: `Signing keys changed ${o.length === 1 ? "once" : `${o.length} times`} in the last 30 days`,
+    detail: `${o.map((l) => `${l.at.slice(0, 10)}: ${l.detail}`).join(" ")} Taking over an account usually starts with a new regular key or signer list, so every change should be one you made.`,
     action: "If you did not make these changes, treat the account as compromised: open Incident Response now."
   }), e.poisoning.length && n.push({
     id: "poisoning",
@@ -3014,9 +3069,9 @@ function da(e, t = Date.now()) {
     action: "Never copy a destination from transaction history. Keep an address book, and check a pasted address against it before signing."
   }), e.dustReceived >= 3 && n.push({ id: "dust", severity: "info", title: `${e.dustReceived} dust payments received`, detail: "Payments under 0.01 XRP are how links to fake wallets and airdrops reach an account's history. Do not open links that arrive on the ledger." });
   const c = [
-    [V.disallowIncomingNFTokenOffer, H.disallowIncomingNFTokenOffer, "NFT offers", "Unsolicited NFT offers are a common phishing carrier: their names and images point at fake claim sites."],
-    [V.disallowIncomingCheck, H.disallowIncomingCheck, "checks", "A check someone else created shows up as something to cash; scammers use them as lures."],
-    [V.disallowIncomingPayChan, H.disallowIncomingPayChan, "payment channels", "Unsolicited payment channels clutter the account and are rarely legitimate for a personal wallet."]
+    [J.disallowIncomingNFTokenOffer, q.disallowIncomingNFTokenOffer, "NFT offers", "Unsolicited NFT offers are a common phishing carrier: their names and images point at fake claim sites."],
+    [J.disallowIncomingCheck, q.disallowIncomingCheck, "checks", "A check someone else created shows up as something to cash; scammers use them as lures."],
+    [J.disallowIncomingPayChan, q.disallowIncomingPayChan, "payment channels", "Unsolicited payment channels clutter the account and are rarely legitimate for a personal wallet."]
   ].filter(([l]) => !a(l));
   if (c.length) {
     n.push({
@@ -3029,7 +3084,7 @@ function da(e, t = Date.now()) {
       s.push({ id: `refuse-${l}`, title: `Refuse incoming ${y}`, why: w, tx: { TransactionType: "AccountSet", Account: e.address, SetFlag: l } });
   } else
     n.push({ id: "doors-closed", severity: "ok", title: "Unsolicited NFT offers, checks and payment channels are refused", detail: "The account has closed the channels phishing usually arrives through." });
-  a(V.depositAuth) && n.push({ id: "deposit-auth", severity: "ok", title: "Only preauthorised senders can pay this account", detail: "Deposit authorisation is on: nothing arrives unless the account approved the sender, which also blocks dust and poisoning." }), e.masterEnabled && !i && (s.unshift({
+  a(J.depositAuth) && n.push({ id: "deposit-auth", severity: "ok", title: "Only preauthorised senders can pay this account", detail: "Deposit authorisation is on: nothing arrives unless the account approved the sender, which also blocks dust and poisoning." }), e.masterEnabled && !i && (s.unshift({
     id: "regular-key",
     title: "Sign day to day with a regular key",
     why: "A regular key on a hardware wallet does the signing; the master seed goes offline (paper or steel, never a photo or cloud). If the regular key is ever exposed, the master key replaces it in one transaction.",
@@ -3049,13 +3104,13 @@ function da(e, t = Date.now()) {
     id: "disable-master",
     title: "Disable the master key",
     why: "So the signer list actually binds: until then one stolen master seed skips the quorum.",
-    tx: { TransactionType: "AccountSet", Account: e.address, SetFlag: H.disableMaster },
+    tx: { TransactionType: "AccountSet", Account: e.address, SetFlag: q.disableMaster },
     caution: "Sign it only after a multisigned test transaction has succeeded. If the signers cannot reach quorum, disabling the master key locks the account permanently."
-  }), n.sort((l, y) => tt[l.severity] - tt[y.severity]);
-  const d = n.filter((l) => l.severity === "critical").length, u = n.filter((l) => l.severity === "warn").length, f = Math.max(0, Math.min(100, 100 - d * 30 - u * 12 - c.length * 3 - (i && i.minimumSigners >= 2 && !e.masterEnabled ? -5 : 0))), p = f >= 90 ? "A" : f >= 75 ? "B" : f >= 60 ? "C" : f >= 40 ? "D" : "F", h = d > 0 ? "Serious weaknesses: fix the critical findings before holding meaningful value here." : u > 0 ? "Workable, with changes worth making." : "Well protected by what the ledger can show.";
-  return { score: f, grade: p, summary: h, findings: n, plan: s };
+  }), n.sort((l, y) => at[l.severity] - at[y.severity]);
+  const d = n.filter((l) => l.severity === "critical").length, u = n.filter((l) => l.severity === "warn").length, h = Math.max(0, Math.min(100, 100 - d * 30 - u * 12 - c.length * 3 - (i && i.minimumSigners >= 2 && !e.masterEnabled ? -5 : 0))), p = h >= 90 ? "A" : h >= 75 ? "B" : h >= 60 ? "C" : h >= 40 ? "D" : "F", f = d > 0 ? "Serious weaknesses: fix the critical findings before holding meaningful value here." : u > 0 ? "Workable, with changes worth making." : "Well protected by what the ledger can show.";
+  return { score: h, grade: p, summary: f, findings: n, plan: s };
 }
-const la = 946684800, nt = 131072, ua = {
+const pa = 946684800, it = 131072, ga = {
   accountTx: (e, t, n, s) => S("account_tx", { account: e, ledger_index_min: t, ledger_index_max: -1, forward: !0, limit: n, ...s ? { marker: s } : {} }),
   accountInfo: (e) => S("account_info", { account: e, ledger_index: "validated" }).catch((t) => {
     if (/actNotFound|not found/i.test(t instanceof Error ? t.message : String(t))) return null;
@@ -3065,88 +3120,88 @@ const la = 946684800, nt = 131072, ua = {
 }, de = {
   standard: { depth: 2, perAccount: 400 },
   deep: { depth: 5, perAccount: 1e3 }
-}, ha = (e) => typeof e == "number" ? new Date((e + la) * 1e3).toISOString() : null;
-function st(e) {
+}, ma = (e) => typeof e == "number" ? new Date((e + pa) * 1e3).toISOString() : null;
+function ot(e) {
   if (typeof e == "string" && /^\d+$/.test(e)) return { currency: "XRP", issuer: null, value: Number(e) / 1e6 };
   if (e && typeof e == "object") {
     const t = e, n = Number(t.value);
-    if (typeof t.currency == "string" && Number.isFinite(n)) return { currency: O(t.currency), issuer: t.issuer ?? null, value: n };
+    if (typeof t.currency == "string" && Number.isFinite(n)) return { currency: C(t.currency), issuer: t.issuer ?? null, value: n };
   }
   return null;
 }
-function fa(e, t) {
+function ya(e, t) {
   const n = t.tx_json ?? t.tx ?? t, s = t.meta ?? {};
   if (t.validated === !1 || s.TransactionResult !== "tesSUCCESS" || n.Account !== e) return null;
   const a = {
     from: e,
     ledger: Number(t.ledger_index ?? n.ledger_index ?? 0),
-    at: ha(n.date ?? t.date),
+    at: ma(n.date ?? t.date),
     hash: String(n.hash ?? t.hash ?? ""),
     destinationTag: typeof n.DestinationTag == "number" ? n.DestinationTag : null
-  }, i = st(s.delivered_amount ?? s.DeliveredAmount);
+  }, i = ot(s.delivered_amount ?? s.DeliveredAmount);
   if (n.TransactionType === "Payment" && typeof n.Destination == "string" && n.Destination !== e && i)
     return { ...a, to: n.Destination, kind: "payment", amount: i };
   if (n.TransactionType === "AccountDelete" && typeof n.Destination == "string" && i)
     return { ...a, to: n.Destination, kind: "account_delete", amount: i };
   if (n.TransactionType === "EscrowCreate" && typeof n.Destination == "string") {
-    const r = st(n.Amount);
-    if (r) return { ...a, to: n.Destination, kind: "escrow", amount: r };
+    const o = ot(n.Amount);
+    if (o) return { ...a, to: n.Destination, kind: "escrow", amount: o };
   }
   return null;
 }
-async function pa(e, t) {
-  const n = t.reader ?? ua, s = t.depth ?? de.standard.depth, a = t.perAccount ?? de.standard.perAccount, i = t.minXrp ?? 1, r = /* @__PURE__ */ new Map(), o = [], c = { count: 0, xrp: 0 }, d = [{ address: e, from: t.sinceLedger, depth: 0 }];
-  for (r.set(e, { address: e, depth: 0, status: "source", receivedXrp: 0, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: !1 }); d.length; ) {
-    const { address: l, from: y, depth: w } = d.shift(), m = r.get(l), g = await n.accountInfo(l).catch(() => {
+async function wa(e, t) {
+  const n = t.reader ?? ga, s = t.depth ?? de.standard.depth, a = t.perAccount ?? de.standard.perAccount, i = t.minXrp ?? 1, o = /* @__PURE__ */ new Map(), r = [], c = { count: 0, xrp: 0 }, d = [{ address: e, from: t.sinceLedger, depth: 0 }];
+  for (o.set(e, { address: e, depth: 0, status: "source", receivedXrp: 0, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: !1 }); d.length; ) {
+    const { address: l, from: y, depth: w } = d.shift(), m = o.get(l), g = await n.accountInfo(l).catch(() => {
     });
     g === void 0 && (m.status = m.status === "source" ? "source" : "unread");
     const b = g?.account_data;
-    if (b ? (m.balanceXrp = Number(b.Balance ?? 0) / 1e6, typeof b.Domain == "string" && b.Domain && (m.domain = new TextDecoder().decode(new Uint8Array((b.Domain.match(/../g) ?? []).map((k) => parseInt(k, 16))))), m.status !== "source" && (m.status = m.tagged || (Number(b.Flags ?? 0) & nt) !== 0 ? "custodial" : "holding")) : g === null && m.status !== "source" && (m.status = "deleted"), m.tagged && m.status !== "source" && (m.status = "custodial"), m.status === "custodial") continue;
+    if (b ? (m.balanceXrp = Number(b.Balance ?? 0) / 1e6, typeof b.Domain == "string" && b.Domain && (m.domain = new TextDecoder().decode(new Uint8Array((b.Domain.match(/../g) ?? []).map((k) => parseInt(k, 16))))), m.status !== "source" && (m.status = m.tagged || (Number(b.Flags ?? 0) & it) !== 0 ? "custodial" : "holding")) : g === null && m.status !== "source" && (m.status = "deleted"), m.tagged && m.status !== "source" && (m.status = "custodial"), m.status === "custodial") continue;
     let v;
     do {
       const k = await n.accountTx(l, y, Math.min(400, a - m.read), v).catch(() => ({ transactions: [] })), $ = k.transactions ?? [];
       m.read += $.length;
       for (const _ of $) {
-        const x = fa(l, _);
+        const x = ya(l, _);
         if (!x) continue;
         if (x.amount.currency === "XRP" && x.amount.value < i && x.kind === "payment") {
           c.count += 1, c.xrp += x.amount.value;
           continue;
         }
-        o.push(x);
-        const j = x.amount.currency === "XRP" ? x.amount.value : 0, B = r.get(x.to);
-        if (B) {
-          B.receivedXrp += j, x.destinationTag !== null && B.status !== "source" && (B.tagged = !0, B.status = "custodial");
+        r.push(x);
+        const B = x.amount.currency === "XRP" ? x.amount.value : 0, W = o.get(x.to);
+        if (W) {
+          W.receivedXrp += B, x.destinationTag !== null && W.status !== "source" && (W.tagged = !0, W.status = "custodial");
           continue;
         }
-        const W = x.destinationTag !== null;
-        if (r.set(x.to, { address: x.to, depth: w + 1, status: W ? "custodial" : "holding", receivedXrp: j, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: !1, tagged: W }), !W && w + 1 <= s) {
+        const G = x.destinationTag !== null;
+        if (o.set(x.to, { address: x.to, depth: w + 1, status: G ? "custodial" : "holding", receivedXrp: B, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: !1, tagged: G }), !G && w + 1 <= s) {
           d.push({ address: x.to, from: x.ledger, depth: w + 1 });
           continue;
         }
-        const G = r.get(x.to), ue = await n.accountInfo(x.to).catch(() => {
+        const K = o.get(x.to), ue = await n.accountInfo(x.to).catch(() => {
         });
-        if (ue === null) G.status = "deleted";
+        if (ue === null) K.status = "deleted";
         else if (ue?.account_data) {
-          const K = ue.account_data;
-          G.balanceXrp = Number(K.Balance ?? 0) / 1e6, typeof K.Domain == "string" && K.Domain && (G.domain = new TextDecoder().decode(new Uint8Array((K.Domain.match(/../g) ?? []).map((Bt) => parseInt(Bt, 16))))), G.status = W || (Number(K.Flags ?? 0) & nt) !== 0 ? "custodial" : "not_followed";
-        } else W || (G.status = "not_followed");
+          const Y = ue.account_data;
+          K.balanceXrp = Number(Y.Balance ?? 0) / 1e6, typeof Y.Domain == "string" && Y.Domain && (K.domain = new TextDecoder().decode(new Uint8Array((Y.Domain.match(/../g) ?? []).map((Kt) => parseInt(Kt, 16))))), K.status = G || (Number(Y.Flags ?? 0) & it) !== 0 ? "custodial" : "not_followed";
+        } else G || (K.status = "not_followed");
       }
       v = k.marker, m.read >= a && v && (m.truncated = !0);
     } while (v && m.read < a);
   }
-  const u = [...r.values()], f = await n.sanctions(u.map((l) => l.address)).catch(() => null);
-  for (const l of u) l.sanction = f?.[l.address] ?? null;
+  const u = [...o.values()], h = await n.sanctions(u.map((l) => l.address)).catch(() => null);
+  for (const l of u) l.sanction = h?.[l.address] ?? null;
   const p = /* @__PURE__ */ new Map();
   for (const l of u) {
     const y = l.address.slice(-4).toLowerCase();
     p.set(y, [...p.get(y) ?? [], l.address]);
   }
-  const h = [...p].filter(([, l]) => l.length >= 2).map(([l, y]) => ({ ending: l, accounts: y }));
-  return { root: e, sinceLedger: t.sinceLedger, depthLimit: s, minXrp: i, nodes: u, flows: o, dust: c, vanity: h, sanctionsChecked: f !== null };
+  const f = [...p].filter(([, l]) => l.length >= 2).map(([l, y]) => ({ ending: l, accounts: y }));
+  return { root: e, sinceLedger: t.sinceLedger, depthLimit: s, minXrp: i, nodes: u, flows: r, dust: c, vanity: f, sanctionsChecked: h !== null };
 }
-const ge = (e) => `${e.value.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${e.currency}${e.issuer ? ` (issuer ${e.issuer})` : ""}`;
-function ga(e, t) {
+const me = (e) => `${e.value.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${e.currency}${e.issuer ? ` (issuer ${e.issuer})` : ""}`;
+function ba(e, t) {
   const n = [
     {
       id: "finality",
@@ -3156,37 +3211,37 @@ function ga(e, t) {
     }
   ], s = e.nodes.filter((d) => d.status === "custodial");
   for (const d of s) {
-    const u = e.flows.filter((f) => f.to === d.address);
+    const u = e.flows.filter((h) => h.to === d.address);
     n.push({
       id: `freeze-${d.address}`,
       title: `Ask the service behind ${d.address}${d.domain ? ` (${d.domain})` : ""} to freeze the deposit`,
-      detail: `This account requires destination tags, the mark of an exchange or custodial service that credits deposits to customer accounts. The service can identify and freeze the customer who received ${u.map((f) => ge(f.amount)).join(" and ") || "the funds"} if you reach it before the funds are withdrawn, usually with a police or court reference. Send it the evidence below.`,
+      detail: `This account requires destination tags, the mark of an exchange or custodial service that credits deposits to customer accounts. The service can identify and freeze the customer who received ${u.map((h) => me(h.amount)).join(" and ") || "the funds"} if you reach it before the funds are withdrawn, usually with a police or court reference. Send it the evidence below.`,
       outlook: "possible",
-      evidence: u.map((f) => `${f.at ?? `ledger ${f.ledger}`}: ${ge(f.amount)} to ${f.to}${f.destinationTag !== null ? ` tag ${f.destinationTag}` : ""}, transaction ${f.hash}`)
+      evidence: u.map((h) => `${h.at ?? `ledger ${h.ledger}`}: ${me(h.amount)} to ${h.to}${h.destinationTag !== null ? ` tag ${h.destinationTag}` : ""}, transaction ${h.hash}`)
     });
   }
   const a = e.flows.filter((d) => d.amount.issuer), i = [...new Set(a.map((d) => d.amount.issuer))];
   for (const d of i) {
-    const u = a.filter((f) => f.amount.issuer === d);
+    const u = a.filter((h) => h.amount.issuer === d);
     n.push({
       id: `issuer-${d}`,
       title: `Ask the issuer ${d} to freeze, or claw back, its ${u[0].amount.currency}`,
       detail: "Issued tokens are the issuer's obligations. Unless it has given up the right (No Freeze), the issuer can freeze the trust lines now holding its token, and if it enabled clawback it can take the balance back and reissue it. Check the issuer's posture on the Authority screen, then contact it through its published domain with the evidence below.",
       outlook: "possible",
-      evidence: u.map((f) => `${f.at ?? `ledger ${f.ledger}`}: ${ge(f.amount)} from ${f.from} to ${f.to}, transaction ${f.hash}`)
+      evidence: u.map((h) => `${h.at ?? `ledger ${h.ledger}`}: ${me(h.amount)} from ${h.from} to ${h.to}, transaction ${h.hash}`)
     });
   }
-  const r = e.nodes.filter((d) => d.status === "holding" && d.depth > 0 && (d.balanceXrp ?? 0) > 0);
-  r.length && n.push({
+  const o = e.nodes.filter((d) => d.status === "holding" && d.depth > 0 && (d.balanceXrp ?? 0) > 0);
+  o.length && n.push({
     id: "still-held",
-    title: `${r.length} account${r.length === 1 ? " still holds" : "s still hold"} XRP from the trail`,
-    detail: `${r.map((d) => `${d.address}: ${d.balanceXrp.toLocaleString("en-US")} XRP`).join("; ")}. Nothing on the ledger can move it without that account's key, but law enforcement can act on an identified owner, and Ledger Watch can alert you the moment it moves (and where to).`,
+    title: `${o.length} account${o.length === 1 ? " still holds" : "s still hold"} XRP from the trail`,
+    detail: `${o.map((d) => `${d.address}: ${d.balanceXrp.toLocaleString("en-US")} XRP`).join("; ")}. Nothing on the ledger can move it without that account's key, but law enforcement can act on an identified owner, and Ledger Watch can alert you the moment it moves (and where to).`,
     outlook: "unlikely"
   });
-  const o = e.nodes.filter((d) => d.status === "deleted" && d.depth > 0);
-  o.length && n.push({
+  const r = e.nodes.filter((d) => d.status === "deleted" && d.depth > 0);
+  r.length && n.push({
     id: "deleted",
-    title: `${o.length} account${o.length === 1 ? " in the trail was" : "s in the trail were"} deleted after use`,
+    title: `${r.length} account${r.length === 1 ? " in the trail was" : "s in the trail were"} deleted after use`,
     detail: "Throwaway accounts that sweep their balance onward with AccountDelete: the value is not in them any more. It is followed to where it went.",
     outlook: "not_possible"
   });
@@ -3212,17 +3267,17 @@ function ga(e, t) {
     outlook: "possible"
   }), n;
 }
-async function ma(e) {
+async function va(e) {
   const t = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(e));
   return Array.from(new Uint8Array(t)).map((n) => n.toString(16).padStart(2, "0")).join("").toUpperCase();
 }
-function ya(e, t, n) {
-  const s = [], a = n.filter((d) => d.from === e).sort((d, u) => d.ledger - u.ledger), i = a[0], r = t.filter((d) => d.kind === "regular_key_set" || d.kind === "signer_list_set" || d.kind === "master_disabled"), o = i ? r.filter((d) => d.ledger <= i.ledger && i.ledger - d.ledger < 1e5) : [];
-  o.length ? s.push({
+function ka(e, t, n) {
+  const s = [], a = n.filter((d) => d.from === e).sort((d, u) => d.ledger - u.ledger), i = a[0], o = t.filter((d) => d.kind === "regular_key_set" || d.kind === "signer_list_set" || d.kind === "master_disabled"), r = i ? o.filter((d) => d.ledger <= i.ledger && i.ledger - d.ledger < 1e5) : [];
+  r.length ? s.push({
     id: "key-then-drain",
     severity: "critical",
     title: "Signing keys changed, then value left",
-    detail: `${o.map((d) => `${d.at?.slice(0, 16).replace("T", " ") ?? `ledger ${d.ledger}`}: ${d.detail}`).join(" ")} Value started leaving at ${i.at?.slice(0, 16).replace("T", " ") ?? `ledger ${i.ledger}`}. An attacker who adds their own key can keep signing after the owner notices.`
+    detail: `${r.map((d) => `${d.at?.slice(0, 16).replace("T", " ") ?? `ledger ${d.ledger}`}: ${d.detail}`).join(" ")} Value started leaving at ${i.at?.slice(0, 16).replace("T", " ") ?? `ledger ${i.ledger}`}. An attacker who adds their own key can keep signing after the owner notices.`
   }) : i && s.push({
     id: "seed-used",
     severity: "warn",
@@ -3241,8 +3296,8 @@ function ya(e, t, n) {
   }
   return a.some((d) => d.kind === "account_delete") && s.push({ id: "deleted", severity: "info", title: "The account was deleted", detail: "Its remaining XRP was swept to the destination of its AccountDelete. The address can be funded again, but its history stays on the ledger." }), s;
 }
-const wa = 131072, ba = 1, va = 131072, ka = 1e3;
-async function Sa(e) {
+const Sa = 131072, $a = 1, Ta = 131072, _a = 1e3;
+async function xa(e) {
   const t = e.trim();
   if (!t) throw new Error("Paste a transaction: its JSON, or the hex blob a site asks you to sign.");
   if (t.startsWith("{")) {
@@ -3272,14 +3327,14 @@ function P(e) {
   if (typeof e == "string" && /^\d+$/.test(e)) return `${(Number(e) / 1e6).toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`;
   if (e && typeof e == "object") {
     const t = e;
-    return "mpt_issuance_id" in t ? `${t.value} of MPT ${String(t.mpt_issuance_id).slice(0, 12)}…` : `${t.value} ${O(String(t.currency ?? ""))}${t.issuer ? ` (issuer ${t.issuer})` : ""}`;
+    return "mpt_issuance_id" in t ? `${t.value} of MPT ${String(t.mpt_issuance_id).slice(0, 12)}…` : `${t.value} ${C(String(t.currency ?? ""))}${t.issuer ? ` (issuer ${t.issuer})` : ""}`;
   }
   return String(e);
 }
-function at(e) {
+function rt(e) {
   return e == null ? !0 : typeof e == "string" ? Number(e) === 0 : typeof e == "object" ? Number(e.value) === 0 : !1;
 }
-function $a(e) {
+function Aa(e) {
   const t = [];
   for (const n of e.Memos ?? []) {
     const s = n.Memo ?? n;
@@ -3287,14 +3342,14 @@ function $a(e) {
       const i = s[a];
       if (!(typeof i != "string" || !/^([0-9A-Fa-f]{2})+$/.test(i)))
         try {
-          t.push(new TextDecoder("utf-8", { fatal: !1 }).decode(new Uint8Array((i.match(/../g) ?? []).map((r) => parseInt(r, 16)))));
+          t.push(new TextDecoder("utf-8", { fatal: !1 }).decode(new Uint8Array((i.match(/../g) ?? []).map((o) => parseInt(o, 16)))));
         } catch {
         }
     }
   }
   return t;
 }
-const it = {
+const ct = {
   1: "require a destination tag on incoming payments",
   2: "require authorisation for its trust lines",
   3: "ask senders not to send XRP",
@@ -3311,46 +3366,46 @@ const it = {
   15: "refuse incoming trust lines",
   16: "allow clawback of its tokens"
 };
-function Ta(e, t, n = {}) {
-  const s = [], a = [], i = String(e.TransactionType), r = typeof e.Account == "string" ? e.Account : "", o = Number(e.Flags ?? 0), c = typeof e.TxnSignature == "string" || Array.isArray(e.Signers), d = (l, y) => {
+function Na(e, t, n = {}) {
+  const s = [], a = [], i = String(e.TransactionType), o = typeof e.Account == "string" ? e.Account : "", r = Number(e.Flags ?? 0), c = typeof e.TxnSignature == "string" || Array.isArray(e.Signers), d = (l, y) => {
     if (typeof l != "string" || !l) return;
     const w = n.sanctioned?.[l];
     w && a.push({ id: "sanctioned", severity: "danger", text: `The ${y} ${l} is on the OFAC SDN list (${w.entityName}). Dealing with it is prohibited for US persons and many others.` });
     const m = n.known ?? [];
     if (m.length && !m.includes(l)) {
-      const g = Ie(l, m);
+      const g = Fe(l, m);
       g && a.push({ id: "lookalike", severity: "danger", text: `The ${y} ${l} starts and ends like ${g} from your address book but is a different account: address poisoning.` });
     }
   };
-  switch (n.me && r && r !== n.me && a.push({ id: "other-account", severity: "warn", text: `This transaction is for account ${r}, not ${n.me}. Signing it with your key only works if you are a signer or its regular key.` }), i) {
+  switch (n.me && o && o !== n.me && a.push({ id: "other-account", severity: "warn", text: `This transaction is for account ${o}, not ${n.me}. Signing it with your key only works if you are a signer or its regular key.` }), i) {
     case "Payment": {
-      const l = (o & wa) !== 0;
-      s.push(`Sends ${P(e.Amount ?? e.DeliverMax)} from ${r} to ${e.Destination}${typeof e.DestinationTag == "number" ? ` with destination tag ${e.DestinationTag}` : ""}.`), e.SendMax && s.push(`It may spend up to ${P(e.SendMax)} to deliver that.`), l && a.push({ id: "partial-payment", severity: "warn", text: "Partial payment flag set: the recipient may receive far less than the Amount shown. Legitimate for some conversions; used to fake large deposits." }), e.Destination === r && s.push("Sender and destination are the same account: a currency conversion through the DEX."), d(e.Destination, "destination");
+      const l = (r & Sa) !== 0;
+      s.push(`Sends ${P(e.Amount ?? e.DeliverMax)} from ${o} to ${e.Destination}${typeof e.DestinationTag == "number" ? ` with destination tag ${e.DestinationTag}` : ""}.`), e.SendMax && s.push(`It may spend up to ${P(e.SendMax)} to deliver that.`), l && a.push({ id: "partial-payment", severity: "warn", text: "Partial payment flag set: the recipient may receive far less than the Amount shown. Legitimate for some conversions; used to fake large deposits." }), e.Destination === o && s.push("Sender and destination are the same account: a currency conversion through the DEX."), d(e.Destination, "destination");
       break;
     }
     case "SetRegularKey":
-      e.RegularKey ? (s.push(`Gives the key of ${e.RegularKey} full power to sign for ${r}.`), a.push({ id: "regular-key", severity: "danger", text: `After this, whoever holds ${e.RegularKey} can move everything in the account, and keeps that power even if you change nothing else. A site asking you to sign this is taking over the account unless ${e.RegularKey} is a key you control.` }), d(e.RegularKey, "new key")) : (s.push("Removes the account's regular key."), a.push({ id: "regular-key-removed", severity: "warn", text: "If the master key is disabled and there is no signer list, removing the regular key leaves nothing that can sign: the account is locked forever." }));
+      e.RegularKey ? (s.push(`Gives the key of ${e.RegularKey} full power to sign for ${o}.`), a.push({ id: "regular-key", severity: "danger", text: `After this, whoever holds ${e.RegularKey} can move everything in the account, and keeps that power even if you change nothing else. A site asking you to sign this is taking over the account unless ${e.RegularKey} is a key you control.` }), d(e.RegularKey, "new key")) : (s.push("Removes the account's regular key."), a.push({ id: "regular-key-removed", severity: "warn", text: "If the master key is disabled and there is no signer list, removing the regular key leaves nothing that can sign: the account is locked forever." }));
       break;
     case "SignerListSet": {
       const l = (e.SignerEntries ?? []).map((y) => y.SignerEntry ?? y);
       if (Number(e.SignerQuorum ?? 0) === 0)
         s.push("Deletes the account's signer list."), a.push({ id: "signers-removed", severity: "warn", text: "Removes the multi-signature requirement. If the master key is disabled and there is no regular key, nothing can sign afterwards." });
       else {
-        s.push(`Lets ${l.length} signer${l.length === 1 ? "" : "s"} sign for ${r} together (quorum ${e.SignerQuorum}): ${l.map((y) => `${y.Account} (weight ${y.SignerWeight})`).join(", ")}.`), a.push({ id: "signer-list", severity: "danger", text: "These accounts will be able to move everything in this account. Sign only if every one of them is yours or someone you have chosen." });
+        s.push(`Lets ${l.length} signer${l.length === 1 ? "" : "s"} sign for ${o} together (quorum ${e.SignerQuorum}): ${l.map((y) => `${y.Account} (weight ${y.SignerWeight})`).join(", ")}.`), a.push({ id: "signer-list", severity: "danger", text: "These accounts will be able to move everything in this account. Sign only if every one of them is yours or someone you have chosen." });
         for (const y of l) d(y.Account, "signer");
       }
       break;
     }
     case "AccountSet": {
-      typeof e.SetFlag == "number" && s.push(`Turns on: ${it[e.SetFlag] ?? `flag ${e.SetFlag}`}.`), typeof e.ClearFlag == "number" && s.push(`Turns off: ${it[e.ClearFlag] ?? `flag ${e.ClearFlag}`}.`), e.SetFlag === H.disableMaster && a.push({ id: "disable-master", severity: "warn", text: "Disables the master key. Sound when a regular key or signer list you control is already set and tested; if not, the account can never sign again." }), e.ClearFlag === H.disableMaster && a.push({ id: "enable-master", severity: "warn", text: "Re-enables the master key: whoever has the original seed can sign alone again." }), e.SetFlag === 6 && a.push({ id: "no-freeze", severity: "info", text: "No Freeze is permanent: it cannot be turned off again." }), e.SetFlag === 7 && a.push({ id: "global-freeze", severity: "warn", text: "Global freeze stops every holder of this account's tokens from moving them." }), typeof e.Domain == "string" && s.push(`Sets the account's domain to ${e.Domain ? _a(e.Domain) : "(none)"}.`), typeof e.TransferRate == "number" && s.push(`Sets a transfer fee of ${((e.TransferRate / 1e9 - 1) * 100).toFixed(3)}% on its tokens.`), s.length || s.push("Changes no flags: an AccountSet like this only bumps the sequence.");
+      typeof e.SetFlag == "number" && s.push(`Turns on: ${ct[e.SetFlag] ?? `flag ${e.SetFlag}`}.`), typeof e.ClearFlag == "number" && s.push(`Turns off: ${ct[e.ClearFlag] ?? `flag ${e.ClearFlag}`}.`), e.SetFlag === q.disableMaster && a.push({ id: "disable-master", severity: "warn", text: "Disables the master key. Sound when a regular key or signer list you control is already set and tested; if not, the account can never sign again." }), e.ClearFlag === q.disableMaster && a.push({ id: "enable-master", severity: "warn", text: "Re-enables the master key: whoever has the original seed can sign alone again." }), e.SetFlag === 6 && a.push({ id: "no-freeze", severity: "info", text: "No Freeze is permanent: it cannot be turned off again." }), e.SetFlag === 7 && a.push({ id: "global-freeze", severity: "warn", text: "Global freeze stops every holder of this account's tokens from moving them." }), typeof e.Domain == "string" && s.push(`Sets the account's domain to ${e.Domain ? Ia(e.Domain) : "(none)"}.`), typeof e.TransferRate == "number" && s.push(`Sets a transfer fee of ${((e.TransferRate / 1e9 - 1) * 100).toFixed(3)}% on its tokens.`), s.length || s.push("Changes no flags: an AccountSet like this only bumps the sequence.");
       break;
     }
     case "AccountDelete":
-      s.push(`DELETES account ${r} and sends all of its remaining XRP to ${e.Destination}${typeof e.DestinationTag == "number" ? ` (tag ${e.DestinationTag})` : ""}.`), a.push({ id: "account-delete", severity: "danger", text: `The account ceases to exist and every drop it holds goes to ${e.Destination}. Thieves ask victims to sign this to empty an account in one step. Sign only to close an account you are finished with, to a destination you own.` }), d(e.Destination, "destination");
+      s.push(`DELETES account ${o} and sends all of its remaining XRP to ${e.Destination}${typeof e.DestinationTag == "number" ? ` (tag ${e.DestinationTag})` : ""}.`), a.push({ id: "account-delete", severity: "danger", text: `The account ceases to exist and every drop it holds goes to ${e.Destination}. Thieves ask victims to sign this to empty an account in one step. Sign only to close an account you are finished with, to a destination you own.` }), d(e.Destination, "destination");
       break;
     case "NFTokenCreateOffer": {
-      const l = (o & ba) !== 0;
-      s.push(`${l ? "Offers to SELL" : "Offers to BUY"} NFT ${String(e.NFTokenID).slice(0, 16)}… for ${at(e.Amount) ? "NOTHING" : P(e.Amount)}${e.Destination ? `, only to ${e.Destination}` : ", to anyone"}.`), l && at(e.Amount) && a.push({ id: "nft-free", severity: "danger", text: "A sell offer for zero gives the NFT away. The classic NFT phishing prompt asks for exactly this, disguised as a 'claim' or 'verify'." }), l && e.Destination && d(e.Destination, "buyer"), l && e.Destination && !(n.known ?? []).includes(e.Destination) && a.push({ id: "nft-stranger", severity: "warn", text: `Only ${e.Destination} can accept this sell offer. Make sure that account is who you think it is.` });
+      const l = (r & $a) !== 0;
+      s.push(`${l ? "Offers to SELL" : "Offers to BUY"} NFT ${String(e.NFTokenID).slice(0, 16)}… for ${rt(e.Amount) ? "NOTHING" : P(e.Amount)}${e.Destination ? `, only to ${e.Destination}` : ", to anyone"}.`), l && rt(e.Amount) && a.push({ id: "nft-free", severity: "danger", text: "A sell offer for zero gives the NFT away. The classic NFT phishing prompt asks for exactly this, disguised as a 'claim' or 'verify'." }), l && e.Destination && d(e.Destination, "buyer"), l && e.Destination && !(n.known ?? []).includes(e.Destination) && a.push({ id: "nft-stranger", severity: "warn", text: `Only ${e.Destination} can accept this sell offer. Make sure that account is who you think it is.` });
       break;
     }
     case "NFTokenAcceptOffer":
@@ -3358,7 +3413,7 @@ function Ta(e, t, n = {}) {
       break;
     case "TrustSet": {
       const l = e.LimitAmount;
-      s.push(`Sets a trust line to hold up to ${l?.value} ${O(String(l?.currency ?? ""))} issued by ${l?.issuer}.`), a.push({ id: "trustline", severity: "info", text: "A trust line only lets you hold a token. Airdropped tokens with a link in their name are a common lure; the token is only worth what its issuer stands behind." });
+      s.push(`Sets a trust line to hold up to ${l?.value} ${C(String(l?.currency ?? ""))} issued by ${l?.issuer}.`), a.push({ id: "trustline", severity: "info", text: "A trust line only lets you hold a token. Airdropped tokens with a link in their name are a common lure; the token is only worth what its issuer stands behind." });
       break;
     }
     case "OfferCreate":
@@ -3387,7 +3442,7 @@ function Ta(e, t, n = {}) {
       s.push(`Opens a payment channel funding ${e.Destination} with up to ${P(e.Amount)}.`), d(e.Destination, "destination");
       break;
     case "PaymentChannelClaim":
-      s.push(`Claims from payment channel ${String(e.Channel).slice(0, 16)}…${(o & va) !== 0 ? " and asks to close it" : ""}.`);
+      s.push(`Claims from payment channel ${String(e.Channel).slice(0, 16)}…${(r & Ta) !== 0 ? " and asks to close it" : ""}.`);
       break;
     case "DepositPreauth":
       s.push(e.Authorize ? `Lets ${e.Authorize} pay this account while deposit authorisation is on.` : `Withdraws ${e.Unauthorize}'s permission to pay this account.`);
@@ -3396,57 +3451,57 @@ function Ta(e, t, n = {}) {
       s.push(`Reserves ${e.TicketCount} ticket${e.TicketCount === 1 ? "" : "s"}: sequence numbers transactions can use later, in any order.`), a.push({ id: "tickets", severity: "info", text: "Tickets let pre-signed transactions be submitted later, out of order. Know who will hold transactions signed against them." });
       break;
     default:
-      s.push(`A ${i} transaction from ${r}.`), a.push({ id: "unfamiliar", severity: "info", text: `${i} is not one of the transactions this explainer describes in detail. Read the fields below before signing.` });
+      s.push(`A ${i} transaction from ${o}.`), a.push({ id: "unfamiliar", severity: "info", text: `${i} is not one of the transactions this explainer describes in detail. Read the fields below before signing.` });
   }
   const u = Number(e.Fee ?? 0);
-  Number.isFinite(u) && u > ka && a.push({ id: "high-fee", severity: u >= 1e6 ? "danger" : "warn", text: `The fee is ${(u / 1e6).toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP, destroyed whether or not the transaction does anything. A normal fee is 0.00001 XRP.` });
-  const p = $a(e).find(Qs);
+  Number.isFinite(u) && u > _a && a.push({ id: "high-fee", severity: u >= 1e6 ? "danger" : "warn", text: `The fee is ${(u / 1e6).toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP, destroyed whether or not the transaction does anything. A normal fee is 0.00001 XRP.` });
+  const p = Aa(e).find(na);
   p && a.push({ id: "memo-link", severity: "warn", text: `A memo carries a link or domain ("${p.slice(0, 80)}"). Never visit links that arrive on the ledger.` }), c && a.push({ id: "already-signed", severity: "warn", text: "This blob is already signed: anyone who has it can submit it, whether or not you approve." }), typeof e.LastLedgerSequence != "number" && a.push({ id: "no-expiry", severity: "info", text: "No LastLedgerSequence: once signed, it stays valid until its sequence is used." });
-  const h = a.some((l) => l.severity === "danger") ? "DO NOT SIGN" : a.some((l) => l.severity === "warn") ? "CAREFUL" : "SAFE-LOOKING";
-  return { tx: e, format: t, summary: s, flags: a, verdict: h, signed: c };
+  const f = a.some((l) => l.severity === "danger") ? "DO NOT SIGN" : a.some((l) => l.severity === "warn") ? "CAREFUL" : "SAFE-LOOKING";
+  return { tx: e, format: t, summary: s, flags: a, verdict: f, signed: c };
 }
-function _a(e) {
+function Ia(e) {
   return /^([0-9A-Fa-f]{2})+$/.test(e) ? new TextDecoder().decode(new Uint8Array((e.match(/../g) ?? []).map((t) => parseInt(t, 16)))) : e;
 }
-function xa(e) {
+function Ea(e) {
   const t = /* @__PURE__ */ new Set();
   for (const n of ["Destination", "RegularKey", "Owner", "Authorize"]) typeof e[n] == "string" && t.add(e[n]);
   for (const n of e.SignerEntries ?? []) typeof (n.SignerEntry ?? n).Account == "string" && t.add((n.SignerEntry ?? n).Account);
   return [...t];
 }
-const Aa = 946684800, Ee = { request: (e, t) => S(e, t) }, Na = (e) => /actNotFound|not found/i.test(e instanceof Error ? e.message : String(e));
-async function ot(e, t, n, s, a) {
+const Fa = 946684800, Re = { request: (e, t) => S(e, t) }, Ra = (e) => /actNotFound|not found/i.test(e instanceof Error ? e.message : String(e));
+async function dt(e, t, n, s, a) {
   const i = [];
-  let r;
-  for (let o = 0; o < a; o++) {
-    const c = await e.request(t, { ...n, ...r ? { marker: r } : {} });
-    if (i.push(...c[s] ?? []), r = c.marker, !r) return { rows: i, complete: !0 };
+  let o;
+  for (let r = 0; r < a; r++) {
+    const c = await e.request(t, { ...n, ...o ? { marker: o } : {} });
+    if (i.push(...c[s] ?? []), o = c.marker, !o) return { rows: i, complete: !0 };
   }
   return { rows: i, complete: !1 };
 }
-async function ie(e, t = Ee, n = 10) {
-  const s = await t.request("ledger", { ledger_index: "validated" }), a = Number(s.ledger?.ledger_index ?? s.ledger_index), i = Number(s.ledger?.close_time ?? 0), o = (await t.request("server_info", {}).catch(() => ({}))).info?.validated_ledger ?? {}, c = Number(o.reserve_base_xrp ?? 1), d = Number(o.reserve_inc_xrp ?? 0.2), u = await t.request("account_info", { account: e, ledger_index: a }).catch((h) => {
-    if (Na(h)) return null;
-    throw h;
+async function ie(e, t = Re, n = 10) {
+  const s = await t.request("ledger", { ledger_index: "validated" }), a = Number(s.ledger?.ledger_index ?? s.ledger_index), i = Number(s.ledger?.close_time ?? 0), r = (await t.request("server_info", {}).catch(() => ({}))).info?.validated_ledger ?? {}, c = Number(r.reserve_base_xrp ?? 1), d = Number(r.reserve_inc_xrp ?? 0.2), u = await t.request("account_info", { account: e, ledger_index: a }).catch((f) => {
+    if (Ra(f)) return null;
+    throw f;
   });
   if (!u) return { address: e, root: null, objects: [], nfts: [], ledgerIndex: a, closeTime: i, reserveBaseXrp: c, reserveIncXrp: d, complete: !0 };
-  const [f, p] = await Promise.all([
-    ot(t, "account_objects", { account: e, ledger_index: a, limit: 400 }, "account_objects", n),
-    ot(t, "account_nfts", { account: e, ledger_index: a, limit: 400 }, "account_nfts", n).catch(() => ({ rows: [], complete: !1 }))
+  const [h, p] = await Promise.all([
+    dt(t, "account_objects", { account: e, ledger_index: a, limit: 400 }, "account_objects", n),
+    dt(t, "account_nfts", { account: e, ledger_index: a, limit: 400 }, "account_nfts", n).catch(() => ({ rows: [], complete: !1 }))
   ]);
   return {
     address: e,
     root: u.account_data,
-    objects: f.rows,
+    objects: h.rows,
     nfts: p.rows,
     ledgerIndex: a,
     closeTime: i,
     reserveBaseXrp: c,
     reserveIncXrp: d,
-    complete: f.complete && p.complete
+    complete: h.complete && p.complete
   };
 }
-const R = (e) => typeof e == "number" && e > 0 ? new Date((e + Aa) * 1e3).toISOString() : null, E = (e) => typeof e == "string" && /^\d+$/.test(e) ? Number(e) / 1e6 : null;
+const R = (e) => typeof e == "number" && e > 0 ? new Date((e + Fa) * 1e3).toISOString() : null, E = (e) => typeof e == "string" && /^\d+$/.test(e) ? Number(e) / 1e6 : null;
 function te(e, t) {
   const n = e.LowLimit?.issuer === t, s = Number(e.Balance?.value ?? 0);
   return {
@@ -3460,21 +3515,21 @@ function te(e, t) {
     index: String(e.index ?? "")
   };
 }
-const rt = 131072, Ia = 131072, Ea = 8388608, Fa = 1, Te = (e) => `${e.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`;
+const lt = 131072, Da = 131072, Oa = 8388608, Ca = 1, xe = (e) => `${e.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`;
 function D(e) {
   const t = E(e);
-  if (t !== null) return Te(t);
+  if (t !== null) return xe(t);
   const n = e;
-  return `${n?.value} ${O(String(n?.currency ?? ""))}`;
+  return `${n?.value} ${C(String(n?.currency ?? ""))}`;
 }
-function Ct(e, t = {}) {
-  const n = e.address, s = e.closeTime, a = e.reserveIncXrp, i = [], r = e.root, o = R(s);
-  if (!r)
+function Lt(e, t = {}) {
+  const n = e.address, s = e.closeTime, a = e.reserveIncXrp, i = [], o = e.root, r = R(s);
+  if (!o)
     return {
       address: n,
       exists: !1,
       ledgerIndex: e.ledgerIndex,
-      at: o,
+      at: r,
       balanceXrp: 0,
       lockedXrp: 0,
       spendableXrp: 0,
@@ -3489,7 +3544,7 @@ function Ct(e, t = {}) {
     const b = String(g.index ?? "");
     switch (g.LedgerEntryType) {
       case "Escrow": {
-        const v = E(g.Amount) ?? 0, k = typeof g.FinishAfter == "number" ? g.FinishAfter : null, $ = typeof g.CancelAfter == "number" ? g.CancelAfter : null, _ = $ !== null && $ <= s, j = t[b] ?? (typeof g.Sequence == "number" ? g.Sequence : null) ?? "<sequence of the EscrowCreate>";
+        const v = E(g.Amount) ?? 0, k = typeof g.FinishAfter == "number" ? g.FinishAfter : null, $ = typeof g.CancelAfter == "number" ? g.CancelAfter : null, _ = $ !== null && $ <= s, B = t[b] ?? (typeof g.Sequence == "number" ? g.Sequence : null) ?? "<sequence of the EscrowCreate>";
         g.Destination === n && !_ ? g.Condition ? i.push({ id: `escrow-${b}`, kind: "escrow_conditional", title: `${D(g.Amount)} in escrow for you, locked by a condition`, detail: `Escrow from ${g.Account}. It needs the fulfillment (the secret matching its crypto-condition), which only whoever set it up has.`, xrp: 0, reserveXrp: 0, when: "info", tx: null }) : k === null || k <= s ? i.push({
           id: `escrow-${b}`,
           kind: "escrow_finish",
@@ -3498,7 +3553,7 @@ function Ct(e, t = {}) {
           xrp: v,
           reserveXrp: 0,
           when: "now",
-          tx: { TransactionType: "EscrowFinish", Account: n, Owner: g.Account, OfferSequence: j }
+          tx: { TransactionType: "EscrowFinish", Account: n, Owner: g.Account, OfferSequence: B }
         }) : i.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `${D(g.Amount)} in escrow for you, maturing ${R(k)?.slice(0, 10)}`, detail: `Escrow from ${g.Account}. From ${R(k)} anyone can finish it; this scan will list the transaction then.`, xrp: v, reserveXrp: 0, when: "later", availableAt: R(k), tx: null }) : g.Account === n ? _ ? i.push({
           id: `escrow-${b}`,
           kind: "escrow_cancel",
@@ -3507,7 +3562,7 @@ function Ct(e, t = {}) {
           xrp: v,
           reserveXrp: a,
           when: "now",
-          tx: { TransactionType: "EscrowCancel", Account: n, Owner: n, OfferSequence: j }
+          tx: { TransactionType: "EscrowCancel", Account: n, Owner: n, OfferSequence: B }
         }) : $ !== null && g.Destination !== n && i.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `${D(g.Amount)} escrowed to ${g.Destination}, returnable ${R($)?.slice(0, 10)} if unfinished`, detail: "If the recipient has not finished it by then, you can cancel it back.", xrp: 0, reserveXrp: 0, when: "later", availableAt: R($), tx: null }) : g.Destination === n && _ && i.push({ id: `escrow-${b}`, kind: "escrow_waiting", title: `An escrow for you from ${g.Account} expired unfinished`, detail: `${D(g.Amount)} can now only go back to its owner.`, xrp: 0, reserveXrp: 0, when: "info", tx: null });
         break;
       }
@@ -3544,22 +3599,22 @@ function Ct(e, t = {}) {
         k !== void 0 && k <= s ? i.push({
           id: `channel-${b}`,
           kind: "channel_close",
-          title: `Close an expired payment channel: ${Te(v)} comes back`,
+          title: `Close an expired payment channel: ${xe(v)} comes back`,
           detail: `Channel to ${g.Destination}, expired ${R(k)?.slice(0, 10)}. Closing returns what was never claimed and its ${a} XRP reserve.`,
           xrp: v,
           reserveXrp: a,
           when: "now",
-          tx: { TransactionType: "PaymentChannelClaim", Account: n, Channel: b, Flags: rt }
+          tx: { TransactionType: "PaymentChannelClaim", Account: n, Channel: b, Flags: lt }
         }) : i.push({
           id: `channel-${b}`,
           kind: "channel_request_close",
-          title: `Payment channel to ${g.Destination} holds ${Te(v)} unclaimed`,
+          title: `Payment channel to ${g.Destination} holds ${xe(v)} unclaimed`,
           detail: `Asking to close starts a ${Number(g.SettleDelay ?? 0).toLocaleString("en-US")}-second settle delay so ${g.Destination} can redeem claims you already signed; after that the rest (and the ${a} XRP reserve) comes back with a second close.${k ? ` It expires on its own ${R(k)?.slice(0, 10)}.` : ""}`,
           xrp: 0,
           reserveXrp: 0,
           when: "optional",
           availableAt: k ? R(k) : null,
-          tx: { TransactionType: "PaymentChannelClaim", Account: n, Channel: b, Flags: rt },
+          tx: { TransactionType: "PaymentChannelClaim", Account: n, Channel: b, Flags: lt },
           caution: "Only if the channel is finished with: the recipient loses the ability to redeem further claims."
         });
         break;
@@ -3581,7 +3636,7 @@ function Ct(e, t = {}) {
       }
       case "NFTokenOffer": {
         if (g.Owner !== n) break;
-        const v = typeof g.Expiration == "number" && g.Expiration <= s, k = (Number(g.Flags ?? 0) & Fa) !== 0;
+        const v = typeof g.Expiration == "number" && g.Expiration <= s, k = (Number(g.Flags ?? 0) & Ca) !== 0;
         i.push({
           id: `nftoffer-${b}`,
           kind: "nft_offer_cancel",
@@ -3597,11 +3652,11 @@ function Ct(e, t = {}) {
       case "RippleState": {
         const v = te(g, n);
         if (!v.reserved || v.balance !== 0) break;
-        const k = (Number(r.Flags ?? 0) & Ea) !== 0;
+        const k = (Number(o.Flags ?? 0) & Oa) !== 0;
         i.push({
           id: `line-${b}`,
           kind: "trustline_remove",
-          title: `Remove an empty trust line: ${O(v.currency)} from ${v.counterparty}`,
+          title: `Remove an empty trust line: ${C(v.currency)} from ${v.counterparty}`,
           detail: `Zero balance, and it holds ${a} XRP of reserve. Setting the limit to zero deletes it once every setting on your side is back to default.`,
           xrp: 0,
           reserveXrp: a,
@@ -3610,7 +3665,7 @@ function Ct(e, t = {}) {
             TransactionType: "TrustSet",
             Account: n,
             LimitAmount: { currency: v.currency, issuer: v.counterparty, value: "0" },
-            ...k ? {} : { Flags: Ia }
+            ...k ? {} : { Flags: Da }
           },
           caution: "If the line has a freeze or authorisation on your side, it stays until those are cleared too."
         });
@@ -3627,95 +3682,95 @@ function Ct(e, t = {}) {
       }
     }
   }
-  const c = Number(r.Balance ?? 0) / 1e6, d = e.reserveBaseXrp + a * Number(r.OwnerCount ?? 0), u = { now: 0, optional: 1, later: 2, info: 3 };
+  const c = Number(o.Balance ?? 0) / 1e6, d = e.reserveBaseXrp + a * Number(o.OwnerCount ?? 0), u = { now: 0, optional: 1, later: 2, info: 3 };
   i.sort((g, b) => u[g.when] - u[b.when] || b.xrp + b.reserveXrp - (g.xrp + g.reserveXrp));
-  const f = (g, b) => Math.round(g.reduce((v, k) => v + b(k), 0) * 1e6) / 1e6, p = i.filter((g) => g.when === "now"), h = [], l = (g) => e.objects.filter((b) => b.LedgerEntryType === g).length;
-  l("Escrow") && h.push(`${l("Escrow")} escrow${l("Escrow") === 1 ? "" : "s"}`), l("PayChannel") && h.push(`${l("PayChannel")} payment channel${l("PayChannel") === 1 ? "" : "s"}`), l("Check") && h.push(`${l("Check")} check${l("Check") === 1 ? "" : "s"}`);
+  const h = (g, b) => Math.round(g.reduce((v, k) => v + b(k), 0) * 1e6) / 1e6, p = i.filter((g) => g.when === "now"), f = [], l = (g) => e.objects.filter((b) => b.LedgerEntryType === g).length;
+  l("Escrow") && f.push(`${l("Escrow")} escrow${l("Escrow") === 1 ? "" : "s"}`), l("PayChannel") && f.push(`${l("PayChannel")} payment channel${l("PayChannel") === 1 ? "" : "s"}`), l("Check") && f.push(`${l("Check")} check${l("Check") === 1 ? "" : "s"}`);
   const y = e.objects.filter((g) => g.LedgerEntryType === "RippleState" && te(g, n).balance !== 0).length;
-  y && h.push(`${y} trust line${y === 1 ? "" : "s"} with a balance`), (e.nfts.length || l("NFTokenPage")) && h.push(`${e.nfts.length || "some"} NFTs`), (l("AMM") || r.AMMID) && h.push("an AMM"), Number(r.Sequence ?? 0) + 256 > e.ledgerIndex && h.push("its sequence is too recent (wait 256 ledgers, about 15 minutes)");
+  y && f.push(`${y} trust line${y === 1 ? "" : "s"} with a balance`), (e.nfts.length || l("NFTokenPage")) && f.push(`${e.nfts.length || "some"} NFTs`), (l("AMM") || o.AMMID) && f.push("an AMM"), Number(o.Sequence ?? 0) + 256 > e.ledgerIndex && f.push("its sequence is too recent (wait 256 ledgers, about 15 minutes)");
   const w = a, m = Math.max(0, Math.round((c - w) * 1e6) / 1e6);
   return {
     address: n,
     exists: !0,
     ledgerIndex: e.ledgerIndex,
-    at: o,
+    at: r,
     balanceXrp: c,
     lockedXrp: Math.round(d * 1e6) / 1e6,
     spendableXrp: Math.max(0, Math.round((c - d) * 1e6) / 1e6),
     items: i,
-    recoverableNowXrp: f(p, (g) => g.xrp + g.reserveXrp),
-    optionalReserveXrp: f(i.filter((g) => g.when === "optional"), (g) => g.reserveXrp),
-    laterXrp: f(i.filter((g) => g.when === "later"), (g) => g.xrp),
+    recoverableNowXrp: h(p, (g) => g.xrp + g.reserveXrp),
+    optionalReserveXrp: h(i.filter((g) => g.when === "optional"), (g) => g.reserveXrp),
+    laterXrp: h(i.filter((g) => g.when === "later"), (g) => g.xrp),
     deletion: {
-      possible: h.length === 0,
+      possible: f.length === 0,
       returnsXrp: m,
-      blockers: h,
-      tx: h.length === 0 ? { TransactionType: "AccountDelete", Account: n, Destination: "<an account you own>", Fee: String(Math.round(w * 1e6)) } : null
+      blockers: f,
+      tx: f.length === 0 ? { TransactionType: "AccountDelete", Account: n, Destination: "<an account you own>", Fee: String(Math.round(w * 1e6)) } : null
     },
     complete: e.complete
   };
 }
-async function Ra(e, t = Ee) {
+async function Pa(e, t = Re) {
   const n = {};
   for (const s of e.objects) {
     if (s.LedgerEntryType !== "Escrow" || typeof s.PreviousTxnID != "string") continue;
     const a = await t.request("tx", { transaction: s.PreviousTxnID, binary: !1 }).catch(() => null), i = a?.tx_json ?? a;
     if (i?.TransactionType !== "EscrowCreate") continue;
-    const r = Number(i.TicketSequence ?? i.Sequence ?? 0);
-    r > 0 && (n[String(s.index)] = r);
+    const o = Number(i.TicketSequence ?? i.Sequence ?? 0);
+    o > 0 && (n[String(s.index)] = o);
   }
   return n;
 }
-const Da = 1, Ca = 8388608, Oa = 8, Pa = 10;
-function Y(e) {
+const La = 1, Xa = 8388608, Ha = 8, qa = 10;
+function V(e) {
   const t = E(e);
   if (t !== null) return `${t.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`;
   const n = e;
-  return `${n?.value} ${O(String(n?.currency ?? ""))}`;
+  return `${n?.value} ${C(String(n?.currency ?? ""))}`;
 }
-function La(e, t = []) {
+function Ua(e, t = []) {
   const n = e.address, s = e.closeTime, a = [], i = e.root;
   if (!i) return { address: n, exists: !1, ledgerIndex: e.ledgerIndex, exposures: [], atRiskXrp: 0, complete: !0 };
-  const r = (u) => typeof u == "string" && t.includes(u);
+  const o = (u) => typeof u == "string" && t.includes(u);
   for (const u of e.objects) {
-    const f = String(u.index ?? ""), p = typeof u.Expiration == "number" && u.Expiration <= s;
+    const h = String(u.index ?? ""), p = typeof u.Expiration == "number" && u.Expiration <= s;
     switch (u.LedgerEntryType) {
       case "Check":
         u.Account === n && !p && a.push({
-          id: `check-${f}`,
-          risk: r(u.Destination) ? "low" : "high",
+          id: `check-${h}`,
+          risk: o(u.Destination) ? "low" : "high",
           kind: "check",
-          title: `${u.Destination} can pull up to ${Y(u.SendMax)} from you`,
+          title: `${u.Destination} can pull up to ${V(u.SendMax)} from you`,
           detail: `A check you wrote${u.Expiration ? `, valid until ${R(u.Expiration)?.slice(0, 10)}` : " with no expiry"}. It is cashable for as long as it exists.`,
           atRiskXrp: E(u.SendMax) ?? 0,
-          revoke: { TransactionType: "CheckCancel", Account: n, CheckID: f }
+          revoke: { TransactionType: "CheckCancel", Account: n, CheckID: h }
         });
         break;
       case "NFTokenOffer": {
-        if (u.Owner !== n || p || (Number(u.Flags ?? 0) & Da) === 0) break;
-        const h = (E(u.Amount) ?? Number(u.Amount?.value ?? 1)) === 0;
+        if (u.Owner !== n || p || (Number(u.Flags ?? 0) & La) === 0) break;
+        const f = (E(u.Amount) ?? Number(u.Amount?.value ?? 1)) === 0;
         a.push({
-          id: `nft-${f}`,
-          risk: h ? "high" : r(u.Destination) ? "low" : "medium",
+          id: `nft-${h}`,
+          risk: f ? "high" : o(u.Destination) ? "low" : "medium",
           kind: "nft_sell_offer",
-          title: `${u.Destination ? u.Destination : "Anyone"} can take NFT ${String(u.NFTokenID).slice(0, 12)}… for ${h ? "NOTHING" : Y(u.Amount)}`,
-          detail: h ? "A zero-price sell offer gives the NFT away to whoever accepts it. Phishing sites ask for exactly this signature, disguised as a claim or a verification. If you did not mean to give it away, cancel it now." : "An open sell offer: it fills the moment someone accepts it at that price.",
+          title: `${u.Destination ? u.Destination : "Anyone"} can take NFT ${String(u.NFTokenID).slice(0, 12)}… for ${f ? "NOTHING" : V(u.Amount)}`,
+          detail: f ? "A zero-price sell offer gives the NFT away to whoever accepts it. Phishing sites ask for exactly this signature, disguised as a claim or a verification. If you did not mean to give it away, cancel it now." : "An open sell offer: it fills the moment someone accepts it at that price.",
           atRiskXrp: 0,
-          revoke: { TransactionType: "NFTokenCancelOffer", Account: n, NFTokenOffers: [f] }
+          revoke: { TransactionType: "NFTokenCancelOffer", Account: n, NFTokenOffers: [h] }
         });
         break;
       }
       case "PayChannel": {
         if (u.Account !== n) break;
-        const h = (E(u.Amount) ?? 0) - (E(u.Balance) ?? 0);
+        const f = (E(u.Amount) ?? 0) - (E(u.Balance) ?? 0);
         a.push({
-          id: `channel-${f}`,
-          risk: r(u.Destination) ? "low" : "medium",
+          id: `channel-${h}`,
+          risk: o(u.Destination) ? "low" : "medium",
           kind: "payment_channel",
-          title: `${u.Destination} can redeem claims on ${h.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`,
+          title: `${u.Destination} can redeem claims on ${f.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`,
           detail: "A payment channel you fund. Every claim you have signed for it can be redeemed until it closes. Signing claims on a site you do not trust hands that XRP over.",
-          atRiskXrp: h,
-          revoke: { TransactionType: "PaymentChannelClaim", Account: n, Channel: f, Flags: 131072 },
+          atRiskXrp: f,
+          revoke: { TransactionType: "PaymentChannelClaim", Account: n, Channel: h, Flags: 131072 },
           caution: "Closing starts the settle delay; the recipient can still redeem claims you already signed until it ends."
         });
         break;
@@ -3723,10 +3778,10 @@ function La(e, t = []) {
       case "Offer":
         if (u.Account !== n || p) break;
         a.push({
-          id: `offer-${f}`,
+          id: `offer-${h}`,
           risk: "low",
           kind: "dex_offer",
-          title: `Open order: pay ${Y(u.TakerGets)} for ${Y(u.TakerPays)}`,
+          title: `Open order: pay ${V(u.TakerGets)} for ${V(u.TakerPays)}`,
           detail: "Anyone can fill it at that price, now or months from now. Old orders left open are filled when the market moves through them.",
           atRiskXrp: E(u.TakerGets) ?? 0,
           revoke: { TransactionType: "OfferCancel", Account: n, OfferSequence: u.Sequence }
@@ -3734,26 +3789,26 @@ function La(e, t = []) {
         break;
       case "DepositPreauth":
         if (u.Account !== n || typeof u.Authorize != "string") break;
-        a.push({ id: `preauth-${f}`, risk: "low", kind: "deposit_preauth", title: `${u.Authorize} is preauthorised to pay you`, detail: "With deposit authorisation on, this sender's payments are accepted. Remove it if you no longer deal with them.", atRiskXrp: 0, revoke: { TransactionType: "DepositPreauth", Account: n, Unauthorize: u.Authorize } });
+        a.push({ id: `preauth-${h}`, risk: "low", kind: "deposit_preauth", title: `${u.Authorize} is preauthorised to pay you`, detail: "With deposit authorisation on, this sender's payments are accepted. Remove it if you no longer deal with them.", atRiskXrp: 0, revoke: { TransactionType: "DepositPreauth", Account: n, Unauthorize: u.Authorize } });
         break;
       case "Escrow":
         if (u.Account !== n || u.Destination === n) break;
         a.push({
-          id: `escrow-${f}`,
+          id: `escrow-${h}`,
           risk: "low",
           kind: "escrow",
-          title: `${Y(u.Amount)} escrowed to ${u.Destination}`,
+          title: `${V(u.Amount)} escrowed to ${u.Destination}`,
           detail: typeof u.CancelAfter == "number" ? `Returnable to you if not finished by ${R(u.CancelAfter)?.slice(0, 10)}.` : "It has no cancel time: once it matures it can only go to the destination.",
           atRiskXrp: E(u.Amount) ?? 0,
           revoke: null
         });
         break;
       case "SignerList": {
-        const h = (u.SignerEntries ?? []).map((l) => l.SignerEntry ?? l);
-        for (const l of h)
+        const f = (u.SignerEntries ?? []).map((l) => l.SignerEntry ?? l);
+        for (const l of f)
           a.push({
             id: `signer-${l.Account}`,
-            risk: r(l.Account) ? "low" : "medium",
+            risk: o(l.Account) ? "low" : "medium",
             kind: "signer",
             title: `${l.Account} is a signer (weight ${l.SignerWeight} of quorum ${u.SignerQuorum})`,
             detail: "Signers together can move everything. Each should be a key you or a trusted colleague control.",
@@ -3767,43 +3822,43 @@ function La(e, t = []) {
   }
   typeof i.RegularKey == "string" && a.push({
     id: "regular-key",
-    risk: r(i.RegularKey) ? "low" : "medium",
+    risk: o(i.RegularKey) ? "low" : "medium",
     kind: "regular_key",
     title: `${i.RegularKey} can sign for this account on its own`,
     detail: "The regular key has full power. If you do not recognise it, someone else can empty the account: open Incident Response.",
     atRiskXrp: Number(i.Balance ?? 0) / 1e6,
     revoke: { TransactionType: "SetRegularKey", Account: n },
     caution: "Removing the regular key when the master key is disabled and no signer list exists locks the account forever."
-  }), typeof i.NFTokenMinter == "string" && a.push({ id: "nft-minter", risk: r(i.NFTokenMinter) ? "low" : "medium", kind: "nft_minter", title: `${i.NFTokenMinter} can mint NFTs in your name`, detail: "An authorised minter issues NFTs that name this account as issuer: fakes of your collection look genuine.", atRiskXrp: 0, revoke: { TransactionType: "AccountSet", Account: n, ClearFlag: Pa } });
-  const o = e.objects.some((u) => u.LedgerEntryType === "RippleState" && te(u, n).balance < 0);
-  (Number(i.Flags ?? 0) & Ca) !== 0 && !o && a.push({
+  }), typeof i.NFTokenMinter == "string" && a.push({ id: "nft-minter", risk: o(i.NFTokenMinter) ? "low" : "medium", kind: "nft_minter", title: `${i.NFTokenMinter} can mint NFTs in your name`, detail: "An authorised minter issues NFTs that name this account as issuer: fakes of your collection look genuine.", atRiskXrp: 0, revoke: { TransactionType: "AccountSet", Account: n, ClearFlag: qa } });
+  const r = e.objects.some((u) => u.LedgerEntryType === "RippleState" && te(u, n).balance < 0);
+  (Number(i.Flags ?? 0) & Xa) !== 0 && !r && a.push({
     id: "default-ripple",
     risk: "low",
     kind: "default_ripple",
     title: "Default Ripple is on, but this account issues nothing",
     detail: "Balances in the same currency from different issuers can ripple through your trust lines, swapping one issuer's IOU for another's without you acting. Only issuers need it.",
     atRiskXrp: 0,
-    revoke: { TransactionType: "AccountSet", Account: n, ClearFlag: Oa },
+    revoke: { TransactionType: "AccountSet", Account: n, ClearFlag: Ha },
     caution: "Clearing it affects new trust lines; set No Ripple on existing lines to close them too."
   });
   const c = { high: 0, medium: 1, low: 2 };
-  a.sort((u, f) => c[u.risk] - c[f.risk] || f.atRiskXrp - u.atRiskXrp);
-  const d = Math.round(a.filter((u) => u.kind !== "regular_key" && u.kind !== "escrow").reduce((u, f) => u + f.atRiskXrp, 0) * 1e6) / 1e6;
+  a.sort((u, h) => c[u.risk] - c[h.risk] || h.atRiskXrp - u.atRiskXrp);
+  const d = Math.round(a.filter((u) => u.kind !== "regular_key" && u.kind !== "escrow").reduce((u, h) => u + h.atRiskXrp, 0) * 1e6) / 1e6;
   return { address: n, exists: !0, ledgerIndex: e.ledgerIndex, exposures: a, atRiskXrp: d, complete: e.complete };
 }
-const Xa = (e) => /^03[0-9A-F]{38}$/i.test(e);
-function Ha(e) {
+const Ma = (e) => /^03[0-9A-F]{38}$/i.test(e);
+function za(e) {
   const t = e.address, n = [];
   if (!e.root) return { address: t, exists: !1, ledgerIndex: e.ledgerIndex, xrpBalance: 0, items: n, valuedXrp: 0, priced: !1, complete: !0 };
   for (const s of e.objects)
     if (s.LedgerEntryType === "RippleState") {
       const a = te(s, t);
       if (a.balance <= 0) continue;
-      const i = Xa(a.currency);
+      const i = Ma(a.currency);
       n.push({
         id: `line-${s.index}`,
         kind: i ? "lp_token" : "token",
-        label: i ? `AMM pool share (${a.counterparty.slice(0, 8)}…)` : O(a.currency),
+        label: i ? `AMM pool share (${a.counterparty.slice(0, 8)}…)` : C(a.currency),
         amount: a.balance,
         currency: a.currency,
         issuer: a.counterparty,
@@ -3816,7 +3871,7 @@ function Ha(e) {
       n.push({
         id: `offer-${s.index}`,
         kind: "open_order",
-        label: `Open order selling ${i !== null ? `${i} XRP` : `${a?.value} ${O(String(a?.currency))}`}`,
+        label: `Open order selling ${i !== null ? `${i} XRP` : `${a?.value} ${C(String(a?.currency))}`}`,
         amount: i ?? Number(a?.value ?? 0),
         currency: i !== null ? "XRP" : String(a?.currency),
         issuer: i !== null ? null : String(a?.issuer),
@@ -3838,50 +3893,50 @@ function Ha(e) {
     });
   return { address: t, exists: !0, ledgerIndex: e.ledgerIndex, xrpBalance: Number(e.root.Balance ?? 0) / 1e6, items: n, valuedXrp: 0, priced: !1, complete: e.complete };
 }
-async function Ua(e, t = Ee, n = 60) {
+async function ja(e, t = Re, n = 60) {
   const s = [];
   let a = 0;
-  for (const r of e.items) {
-    if (r.valueXrp !== null || a >= n) {
-      s.push(r);
+  for (const o of e.items) {
+    if (o.valueXrp !== null || a >= n) {
+      s.push(o);
       continue;
     }
     a += 1;
     try {
-      if (r.kind === "lp_token" && r.issuer) {
-        const o = (await t.request("amm_info", { amm_account: r.issuer, ledger_index: "validated" })).amm, c = Number(o?.lp_token?.value ?? 0), d = E(o?.amount) ?? E(o?.amount2);
-        if (o && c > 0 && d !== null) {
-          s.push({ ...r, valueXrp: me(r.amount / c * d * 2), priceSource: "pool_share", note: `${(r.amount / c * 100).toPrecision(3)}% of the pool.` });
+      if (o.kind === "lp_token" && o.issuer) {
+        const r = (await t.request("amm_info", { amm_account: o.issuer, ledger_index: "validated" })).amm, c = Number(r?.lp_token?.value ?? 0), d = E(r?.amount) ?? E(r?.amount2);
+        if (r && c > 0 && d !== null) {
+          s.push({ ...o, valueXrp: ye(o.amount / c * d * 2), priceSource: "pool_share", note: `${(o.amount / c * 100).toPrecision(3)}% of the pool.` });
           continue;
         }
-        s.push({ ...r, note: o ? "The pool has no XRP side; priced in its two tokens only." : "The pool no longer exists." });
+        s.push({ ...o, note: r ? "The pool has no XRP side; priced in its two tokens only." : "The pool no longer exists." });
         continue;
       }
-      if (r.kind === "token" && r.issuer) {
-        const o = { currency: r.currency, issuer: r.issuer }, [c, d] = await Promise.all([
-          t.request("book_offers", { taker_gets: { currency: "XRP" }, taker_pays: o, limit: 5, ledger_index: "validated" }).catch(() => ({ offers: [] })),
-          t.request("amm_info", { asset: { currency: "XRP" }, asset2: o, ledger_index: "validated" }).catch(() => null)
-        ]), u = (c.offers ?? [])[0], f = u ? (E(u.taker_gets_funded ?? u.TakerGets) ?? 0) / Number((u.taker_pays_funded ?? u.TakerPays)?.value ?? 1 / 0) : 0, p = d?.amm, h = p ? (E(p.amount) ?? 0) / Number(p.amount2?.value ?? 1 / 0) : 0, l = Math.max(Number.isFinite(f) ? f : 0, Number.isFinite(h) ? h : 0);
+      if (o.kind === "token" && o.issuer) {
+        const r = { currency: o.currency, issuer: o.issuer }, [c, d] = await Promise.all([
+          t.request("book_offers", { taker_gets: { currency: "XRP" }, taker_pays: r, limit: 5, ledger_index: "validated" }).catch(() => ({ offers: [] })),
+          t.request("amm_info", { asset: { currency: "XRP" }, asset2: r, ledger_index: "validated" }).catch(() => null)
+        ]), u = (c.offers ?? [])[0], h = u ? (E(u.taker_gets_funded ?? u.TakerGets) ?? 0) / Number((u.taker_pays_funded ?? u.TakerPays)?.value ?? 1 / 0) : 0, p = d?.amm, f = p ? (E(p.amount) ?? 0) / Number(p.amount2?.value ?? 1 / 0) : 0, l = Math.max(Number.isFinite(h) ? h : 0, Number.isFinite(f) ? f : 0);
         s.push(
-          l > 0 ? { ...r, valueXrp: me(r.amount * l), priceSource: l === f ? "order_book" : "amm", note: [r.note, `${l.toPrecision(4)} XRP each at the ${l === f ? "best bid" : "AMM spot price"}.`].filter(Boolean).join(" ") } : { ...r, valueXrp: 0, priceSource: null, note: [r.note, "Nobody is bidding XRP for it on the DEX or an AMM pool."].filter(Boolean).join(" ") }
+          l > 0 ? { ...o, valueXrp: ye(o.amount * l), priceSource: l === h ? "order_book" : "amm", note: [o.note, `${l.toPrecision(4)} XRP each at the ${l === h ? "best bid" : "AMM spot price"}.`].filter(Boolean).join(" ") } : { ...o, valueXrp: 0, priceSource: null, note: [o.note, "Nobody is bidding XRP for it on the DEX or an AMM pool."].filter(Boolean).join(" ") }
         );
         continue;
       }
-      if (r.kind === "nft") {
-        const o = await t.request("nft_buy_offers", { nft_id: r.currency, ledger_index: "validated", limit: 50 }).catch(() => ({ offers: [] })), c = Math.max(0, ...(o.offers ?? []).map((d) => E(d.amount) ?? 0));
-        s.push(c > 0 ? { ...r, valueXrp: c, priceSource: "order_book", note: `Highest standing buy offer: ${c} XRP.` } : { ...r, valueXrp: 0, note: "No XRP buy offers stand for it." });
+      if (o.kind === "nft") {
+        const r = await t.request("nft_buy_offers", { nft_id: o.currency, ledger_index: "validated", limit: 50 }).catch(() => ({ offers: [] })), c = Math.max(0, ...(r.offers ?? []).map((d) => E(d.amount) ?? 0));
+        s.push(c > 0 ? { ...o, valueXrp: c, priceSource: "order_book", note: `Highest standing buy offer: ${c} XRP.` } : { ...o, valueXrp: 0, note: "No XRP buy offers stand for it." });
         continue;
       }
-      s.push(r);
+      s.push(o);
     } catch {
-      s.push({ ...r, note: [r.note, "Could not be priced just now."].filter(Boolean).join(" ") });
+      s.push({ ...o, note: [o.note, "Could not be priced just now."].filter(Boolean).join(" ") });
     }
   }
-  s.sort((r, o) => (o.valueXrp ?? -1) - (r.valueXrp ?? -1));
-  const i = me(s.reduce((r, o) => r + (o.kind === "open_order" ? 0 : o.valueXrp ?? 0), 0));
+  s.sort((o, r) => (r.valueXrp ?? -1) - (o.valueXrp ?? -1));
+  const i = ye(s.reduce((o, r) => o + (r.kind === "open_order" ? 0 : r.valueXrp ?? 0), 0));
   return { ...e, items: s, valuedXrp: i, priced: !0 };
 }
-const me = (e) => Math.round(e * 1e6) / 1e6, qa = {
+const ye = (e) => Math.round(e * 1e6) / 1e6, Ba = {
   tecDST_TAG_NEEDED: "The destination requires a destination tag and none was given, so the ledger refused the payment.",
   tecNO_DST: "The destination account does not exist, and the payment was too small to create it.",
   tecNO_DST_INSUF_XRP: "The destination account does not exist, and the payment was below the base reserve needed to create it.",
@@ -3895,84 +3950,84 @@ const me = (e) => Math.round(e * 1e6) / 1e6, qa = {
   tecFROZEN: "The token is frozen, so it could not move.",
   tecINSUF_RESERVE_LINE: "The account could not afford the reserve the trust line needed.",
   tecEXPIRED: "The transaction expired before it could apply."
-}, Ma = 131072;
-function ct(e) {
+}, Wa = 131072;
+function ut(e) {
   if (e == null) return null;
   if (typeof e == "string" && /^\d+$/.test(e)) return `${(Number(e) / 1e6).toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`;
   const t = e;
-  return `${t.value} ${O(String(t.currency ?? ""))}${t.issuer ? ` (issuer ${t.issuer})` : ""}`;
+  return `${t.value} ${C(String(t.currency ?? ""))}${t.issuer ? ` (issuer ${t.issuer})` : ""}`;
 }
-const za = (e) => typeof e == "number" ? new Date((e + 946684800) * 1e3).toISOString() : null;
-function ja(e) {
+const Ga = (e) => typeof e == "number" ? new Date((e + 946684800) * 1e3).toISOString() : null;
+function Ka(e) {
   return typeof e != "string" || !/^([0-9A-Fa-f]{2})+$/.test(e) ? null : new TextDecoder().decode(new Uint8Array((e.match(/../g) ?? []).map((t) => parseInt(t, 16))));
 }
-function Ot(e, t) {
+function Xt(e, t) {
   const n = t.map((s) => s.tx_json ?? s.tx ?? s).filter((s) => s.TransactionType === "Payment" && s.Destination === e && s.Account !== e);
   return n.length < 5 ? null : n.filter((s) => typeof s.DestinationTag == "number").length / n.length;
 }
-async function Ba(e, t, n = {}) {
-  const s = t.tx, a = s?.tx_json ?? s, i = s?.meta ?? {}, r = t.destination?.account_data ?? null, o = {
+async function Ya(e, t, n = {}) {
+  const s = t.tx, a = s?.tx_json ?? s, i = s?.meta ?? {}, o = t.destination?.account_data ?? null, r = {
     result: i.TransactionResult ?? null,
     ledger: typeof s?.ledger_index == "number" ? s.ledger_index : null,
-    at: za(a?.date ?? s?.date) ?? (typeof s?.close_time_iso == "string" ? s.close_time_iso : null),
+    at: Ga(a?.date ?? s?.date) ?? (typeof s?.close_time_iso == "string" ? s.close_time_iso : null),
     from: a?.Account ?? null,
     to: a?.Destination ?? null,
     destinationTag: typeof a?.DestinationTag == "number" ? a.DestinationTag : null,
-    requested: ct(a?.DeliverMax ?? a?.Amount),
-    delivered: ct(i.delivered_amount ?? i.DeliveredAmount),
+    requested: ut(a?.DeliverMax ?? a?.Amount),
+    delivered: ut(i.delivered_amount ?? i.DeliveredAmount),
     feeXrp: a?.Fee ? Number(a.Fee) / 1e6 : null,
-    destinationDomain: ja(r?.Domain),
-    destinationRequiresTag: r ? (Number(r.Flags ?? 0) & Ma) !== 0 : null,
-    destinationExists: t.destination === null ? !1 : r ? !0 : null
+    destinationDomain: Ka(o?.Domain),
+    destinationRequiresTag: o ? (Number(o.Flags ?? 0) & Wa) !== 0 : null,
+    destinationExists: t.destination === null ? !1 : o ? !0 : null
   };
   if (!s || !a)
-    return { hash: e, outcome: "not_found", headline: "No validated transaction has this hash", explanation: "The public ledger does not know it. Check the hash (it is 64 characters, from your wallet's history). If your wallet shows it as pending, it was never validated and nothing left your account.", steps: ["Copy the hash again from your wallet's transaction details.", "If it never validated, your balance was not changed: check it."], facts: o };
+    return { hash: e, outcome: "not_found", headline: "No validated transaction has this hash", explanation: "The public ledger does not know it. Check the hash (it is 64 characters, from your wallet's history). If your wallet shows it as pending, it was never validated and nothing left your account.", steps: ["Copy the hash again from your wallet's transaction details.", "If it never validated, your balance was not changed: check it."], facts: r };
   if (a.TransactionType !== "Payment")
-    return { hash: e, outcome: "not_payment", headline: `This is a ${a.TransactionType}, not a payment`, explanation: "This helper explains deposits. Open the transaction in Settlement Forensics for any other type.", steps: [], facts: o };
+    return { hash: e, outcome: "not_payment", headline: `This is a ${a.TransactionType}, not a payment`, explanation: "This helper explains deposits. Open the transaction in Settlement Forensics for any other type.", steps: [], facts: r };
   const c = String(i.TransactionResult ?? "");
   if (c !== "tesSUCCESS") {
-    const h = qa[c] ?? `The payment failed with ${c}.`;
+    const f = Ba[c] ?? `The payment failed with ${c}.`;
     return {
       hash: e,
       outcome: "failed_nothing_lost",
       headline: "The payment failed. Your funds never left your account.",
-      explanation: `${h} A failed transaction still pays its fee (${o.feeXrp ?? 1e-5} XRP, destroyed), but nothing else moved: the amount is still in ${o.from}.`,
+      explanation: `${f} A failed transaction still pays its fee (${r.feeXrp ?? 1e-5} XRP, destroyed), but nothing else moved: the amount is still in ${r.from}.`,
       steps: c === "tecDST_TAG_NEEDED" ? ["Get the destination tag from the exchange's deposit page.", "Send again with that tag."] : ["Fix the cause above, then send again.", "Check your balance: the amount is still there."],
-      facts: o
+      facts: r
     };
   }
   const d = i.delivered_amount ?? i.DeliveredAmount, u = a.DeliverMax ?? a.Amount;
   if (typeof d == "object" && typeof u == "object" && Number(d.value) < Number(u.value))
-    return { hash: e, outcome: "partial_delivery", headline: `Only ${o.delivered} arrived, not ${o.requested}`, explanation: "This was a partial payment: the Amount field is a ceiling, not what arrived. A recipient must credit delivered_amount, which is what reached them.", steps: ["Compare with what the recipient credited.", "If they credited the Amount field, they were misled by the partial-payment flag."], facts: o };
+    return { hash: e, outcome: "partial_delivery", headline: `Only ${r.delivered} arrived, not ${r.requested}`, explanation: "This was a partial payment: the Amount field is a ceiling, not what arrived. A recipient must credit delivered_amount, which is what reached them.", steps: ["Compare with what the recipient credited.", "If they credited the Amount field, they were misled by the partial-payment flag."], facts: r };
   if (typeof d == "string" && typeof u == "string" && Number(d) < Number(u))
-    return { hash: e, outcome: "partial_delivery", headline: `Only ${o.delivered} arrived, not ${o.requested}`, explanation: "This was a partial payment: the Amount field is a ceiling, not what arrived.", steps: [], facts: o };
-  const f = o.destinationRequiresTag === !0 || (t.taggedShare ?? 0) >= 0.5, p = t.expectedTag !== void 0 && t.expectedTag !== null && o.destinationTag !== t.expectedTag;
-  if (f && (o.destinationTag === null || p)) {
-    const h = o.destinationTag === null ? "delivered_no_tag_custodial" : "delivered_tag_custodial", l = await Wa(e, o, { expectedTag: t.expectedTag ?? null, generatedAt: n.generatedAt, customerRef: n.customerRef });
+    return { hash: e, outcome: "partial_delivery", headline: `Only ${r.delivered} arrived, not ${r.requested}`, explanation: "This was a partial payment: the Amount field is a ceiling, not what arrived.", steps: [], facts: r };
+  const h = r.destinationRequiresTag === !0 || (t.taggedShare ?? 0) >= 0.5, p = t.expectedTag !== void 0 && t.expectedTag !== null && r.destinationTag !== t.expectedTag;
+  if (h && (r.destinationTag === null || p)) {
+    const f = r.destinationTag === null ? "delivered_no_tag_custodial" : "delivered_tag_custodial", l = await Va(e, r, { expectedTag: t.expectedTag ?? null, generatedAt: n.generatedAt, customerRef: n.customerRef });
     return {
       hash: e,
-      outcome: h,
-      headline: o.destinationTag === null ? `${o.delivered} reached the service, without a destination tag` : `${o.delivered} reached the service with tag ${o.destinationTag}, not your tag ${t.expectedTag}`,
-      explanation: `The payment succeeded: the funds are in ${o.to}${o.destinationDomain ? ` (which claims ${o.destinationDomain})` : ""}, a pooled account where the service credits each customer by tag. Without the right tag it cannot tell the deposit is yours, so it sits unassigned. Only the service can credit it, and services routinely do when given the facts below. Nobody else can move it, so ignore anyone offering to "recover" it for a fee.`,
+      outcome: f,
+      headline: r.destinationTag === null ? `${r.delivered} reached the service, without a destination tag` : `${r.delivered} reached the service with tag ${r.destinationTag}, not your tag ${t.expectedTag}`,
+      explanation: `The payment succeeded: the funds are in ${r.to}${r.destinationDomain ? ` (which claims ${r.destinationDomain})` : ""}, a pooled account where the service credits each customer by tag. Without the right tag it cannot tell the deposit is yours, so it sits unassigned. Only the service can credit it, and services routinely do when given the facts below. Nobody else can move it, so ignore anyone offering to "recover" it for a fee.`,
       steps: [
         "Open a support ticket with the service from your logged-in account (never through a link someone sent you).",
         "Paste the letter below; attach it as a file if they allow.",
         "Expect them to ask you to prove you own the sending address, usually by a small payment or signing a message from it."
       ],
-      facts: o,
+      facts: r,
       letter: l
     };
   }
-  return !f && o.destinationExists !== !1 ? {
+  return !h && r.destinationExists !== !1 ? {
     hash: e,
     outcome: "delivered_private",
-    headline: `${o.delivered} was delivered to ${o.to}`,
+    headline: `${r.delivered} was delivered to ${r.to}`,
     explanation: "The payment succeeded to an account that does not require destination tags: most likely a personal wallet. Only whoever holds its key can send it back. If you meant to send elsewhere (a mistyped or poisoned address), the only route is asking the owner; if the account belongs to someone who tricked you, see Incident Response.",
     steps: ["Compare the destination with the address you meant, character by character.", "If you know the owner, ask them to return it.", "If it was a scam, open Incident Response to trace it and prepare a report."],
-    facts: o
-  } : { hash: e, outcome: "delivered", headline: `${o.delivered} was delivered to ${o.to}${o.destinationTag !== null ? ` with tag ${o.destinationTag}` : ""}`, explanation: "The payment succeeded with a destination tag. If the service has not credited it, give it the hash: it can look up the deposit directly.", steps: ["Send the service the transaction hash and the tag.", "Deposits are usually credited after a few ledgers; delays mean a manual review."], facts: o };
+    facts: r
+  } : { hash: e, outcome: "delivered", headline: `${r.delivered} was delivered to ${r.to}${r.destinationTag !== null ? ` with tag ${r.destinationTag}` : ""}`, explanation: "The payment succeeded with a destination tag. If the service has not credited it, give it the hash: it can look up the deposit directly.", steps: ["Send the service the transaction hash and the tag.", "Deposits are usually credited after a few ledgers; delays mean a manual review."], facts: r };
 }
-async function Wa(e, t, n) {
+async function Va(e, t, n) {
   const a = [
     `Subject: Unassigned XRP Ledger deposit, transaction ${e}`,
     "",
@@ -3997,116 +4052,116 @@ async function Wa(e, t, n) {
     `Prepared ${n.generatedAt ?? (/* @__PURE__ */ new Date()).toISOString()} with NOSHASHI.`
   ].join(`
 `);
-  return { text: a, sha256: await ma(a) };
+  return { text: a, sha256: await va(a) };
 }
-async function Ga(e, t) {
+async function Ja(e, t) {
   const n = e.trim().toUpperCase();
   if (!/^[0-9A-F]{64}$/.test(n)) throw new Error("A transaction hash is 64 hexadecimal characters.");
-  const s = await S("tx", { transaction: n, binary: !1 }).catch((o) => {
-    if (/txnNotFound|not found/i.test(o instanceof Error ? o.message : String(o))) return null;
-    throw o;
-  }), a = (s?.tx_json ?? s)?.Destination, i = typeof a == "string" ? await S("account_info", { account: a, ledger_index: "validated" }).catch((o) => /actNotFound|not found/i.test(o instanceof Error ? o.message : String(o)) ? null : void 0) : void 0, r = typeof a == "string" && i ? await S("account_tx", { account: a, ledger_index_min: -1, ledger_index_max: -1, forward: !1, limit: 100 }).catch(() => null) : null;
-  return Ba(n, {
+  const s = await S("tx", { transaction: n, binary: !1 }).catch((r) => {
+    if (/txnNotFound|not found/i.test(r instanceof Error ? r.message : String(r))) return null;
+    throw r;
+  }), a = (s?.tx_json ?? s)?.Destination, i = typeof a == "string" ? await S("account_info", { account: a, ledger_index: "validated" }).catch((r) => /actNotFound|not found/i.test(r instanceof Error ? r.message : String(r)) ? null : void 0) : void 0, o = typeof a == "string" && i ? await S("account_tx", { account: a, ledger_index_min: -1, ledger_index_max: -1, forward: !1, limit: 100 }).catch(() => null) : null;
+  return Ya(n, {
     tx: s && s.validated !== !1 ? s : null,
     destination: i === void 0 ? {} : i,
     expectedTag: t,
-    taggedShare: r && typeof a == "string" ? Ot(a, r.transactions ?? []) : null
+    taggedShare: o && typeof a == "string" ? Xt(a, o.transactions ?? []) : null
   });
 }
-async function _e(e) {
+async function Ae(e) {
   const t = "address" in e ? `address=${encodeURIComponent(e.address)}` : `domain=${encodeURIComponent(e.domain)}`, n = await fetch(`${le}/noshashi-xrpl-watch/domain-verify?${t}`, { signal: AbortSignal.timeout(2e4) }), s = await n.json().catch(() => ({}));
   if (!n.ok || !s.check) throw new Error(s.message ?? `The domain check failed (HTTP ${n.status}).`);
   return { check: s.check, accounts: s.accounts };
 }
-const Ka = {
+const Qa = {
   accountTx: (e, t, n) => S("account_tx", { account: e, ledger_index_min: -1, ledger_index_max: -1, forward: t, limit: n }),
   accountInfo: (e) => S("account_info", { account: e, ledger_index: "validated" }).catch((t) => {
     if (/actNotFound|not found/i.test(t instanceof Error ? t.message : String(t))) return null;
     throw t;
   }),
   sanctions: async (e) => (await ne(e))?.hits ?? null
-}, Q = {
+}, Z = {
   standard: { depth: 2, maxAccounts: 40, perAccount: 200 },
   deep: { depth: 4, maxAccounts: 200, perAccount: 400 }
-}, Ya = 131072, Va = 60;
-function dt(e, t) {
+}, Za = 131072, ei = 60;
+function ht(e, t) {
   return (e.AffectedNodes ?? []).some((n) => n.CreatedNode?.LedgerEntryType === "AccountRoot" && n.CreatedNode?.NewFields?.Account === t);
 }
-function ye(e) {
+function we(e) {
   const t = e.delivered_amount ?? e.DeliveredAmount;
   return typeof t == "string" && /^\d+$/.test(t) ? Number(t) / 1e6 : 0;
 }
-function Ja(e) {
+function ti(e) {
   const t = [];
   for (const n of e.Memos ?? []) {
     const s = (n.Memo ?? n).MemoData;
     if (typeof s != "string" || !/^([0-9A-Fa-f]{2})+$/.test(s)) continue;
-    const i = new TextDecoder("utf-8", { fatal: !1 }).decode(new Uint8Array((s.match(/../g) ?? []).map((r) => parseInt(r, 16)))).replace(/\s+/g, " ").trim().toLowerCase();
+    const i = new TextDecoder("utf-8", { fatal: !1 }).decode(new Uint8Array((s.match(/../g) ?? []).map((o) => parseInt(o, 16)))).replace(/\s+/g, " ").trim().toLowerCase();
     i.length >= 8 && /[a-z]/.test(i) && t.push(i.slice(0, 200));
   }
   return t;
 }
-function Qa(e, t) {
+function ni(e, t) {
   const n = [], s = /* @__PURE__ */ new Set();
   let a = 0;
   for (const i of t) {
-    const r = i.tx_json ?? i.tx ?? i, o = i.meta ?? {};
-    if (o.TransactionResult !== "tesSUCCESS") continue;
-    const c = String(r.hash ?? i.hash ?? ""), d = Number(i.ledger_index ?? r.ledger_index ?? 0);
-    if (r.Account === e) for (const u of Ja(r)) s.add(u);
-    r.TransactionType === "Payment" && typeof r.Destination == "string" && (r.Destination === e && r.Account !== e && dt(o, e) ? n.push({ from: r.Account, to: e, kind: "funded", hash: c, ledger: d, xrp: ye(o) }) : r.Account === e && dt(o, r.Destination) && (a += 1, n.push({ from: e, to: r.Destination, kind: "funded", hash: c, ledger: d, xrp: ye(o) }))), r.TransactionType === "AccountDelete" && typeof r.Destination == "string" && (r.Account === e || r.Destination === e) && n.push({ from: r.Account, to: r.Destination, kind: "swept", hash: c, ledger: d, xrp: ye(o) });
+    const o = i.tx_json ?? i.tx ?? i, r = i.meta ?? {};
+    if (r.TransactionResult !== "tesSUCCESS") continue;
+    const c = String(o.hash ?? i.hash ?? ""), d = Number(i.ledger_index ?? o.ledger_index ?? 0);
+    if (o.Account === e) for (const u of ti(o)) s.add(u);
+    o.TransactionType === "Payment" && typeof o.Destination == "string" && (o.Destination === e && o.Account !== e && ht(r, e) ? n.push({ from: o.Account, to: e, kind: "funded", hash: c, ledger: d, xrp: we(r) }) : o.Account === e && ht(r, o.Destination) && (a += 1, n.push({ from: e, to: o.Destination, kind: "funded", hash: c, ledger: d, xrp: we(r) }))), o.TransactionType === "AccountDelete" && typeof o.Destination == "string" && (o.Account === e || o.Destination === e) && n.push({ from: o.Account, to: o.Destination, kind: "swept", hash: c, ledger: d, xrp: we(r) });
   }
   return { links: n, memos: [...s], funded: a };
 }
-async function Za(e, t = {}) {
-  const n = t.reader ?? Ka, s = t.depth ?? Q.standard.depth, a = t.maxAccounts ?? Q.standard.maxAccounts, i = t.perAccount ?? Q.standard.perAccount, r = /* @__PURE__ */ new Map(), o = /* @__PURE__ */ new Map(), c = [{ address: e, depth: 0 }];
-  r.set(e, { address: e, depth: 0, exists: !0, balanceXrp: null, stop: null, sanction: null, memos: [] });
+async function si(e, t = {}) {
+  const n = t.reader ?? Qa, s = t.depth ?? Z.standard.depth, a = t.maxAccounts ?? Z.standard.maxAccounts, i = t.perAccount ?? Z.standard.perAccount, o = /* @__PURE__ */ new Map(), r = /* @__PURE__ */ new Map(), c = [{ address: e, depth: 0 }];
+  o.set(e, { address: e, depth: 0, exists: !0, balanceXrp: null, stop: null, sanction: null, memos: [] });
   let d = !1;
   for (; c.length; ) {
-    const { address: l, depth: y } = c.shift(), w = r.get(l), m = await n.accountInfo(l).catch(() => {
+    const { address: l, depth: y } = c.shift(), w = o.get(l), m = await n.accountInfo(l).catch(() => {
     }), g = m?.account_data;
-    if (w.exists = m !== null, g && (w.balanceXrp = Number(g.Balance ?? 0) / 1e6, l !== e && (Number(g.Flags ?? 0) & Ya) !== 0)) {
+    if (w.exists = m !== null, g && (w.balanceXrp = Number(g.Balance ?? 0) / 1e6, l !== e && (Number(g.Flags ?? 0) & Za) !== 0)) {
       w.stop = "service";
       continue;
     }
     const [b, v] = await Promise.all([
       n.accountTx(l, !0, 20).catch(() => ({ transactions: [] })),
       n.accountTx(l, !1, i).catch(() => ({ transactions: [] }))
-    ]), k = [...b.transactions ?? [], ...v.transactions ?? []], $ = Qa(l, k);
-    if (w.memos = $.memos, $.funded > Va && l !== e) {
+    ]), k = [...b.transactions ?? [], ...v.transactions ?? []], $ = ni(l, k);
+    if (w.memos = $.memos, $.funded > ei && l !== e) {
       w.stop = "hub";
       continue;
     }
     for (const _ of $.links) {
-      o.set(`${_.hash}:${_.from}:${_.to}`, _);
+      r.set(`${_.hash}:${_.from}:${_.to}`, _);
       const x = _.from === l ? _.to : _.from;
-      if (!r.has(x)) {
-        if (r.size >= a) {
+      if (!o.has(x)) {
+        if (o.size >= a) {
           d = !0;
           continue;
         }
-        r.set(x, { address: x, depth: y + 1, exists: !0, balanceXrp: null, stop: null, sanction: null, memos: [] }), y + 1 <= s && c.push({ address: x, depth: y + 1 });
+        o.set(x, { address: x, depth: y + 1, exists: !0, balanceXrp: null, stop: null, sanction: null, memos: [] }), y + 1 <= s && c.push({ address: x, depth: y + 1 });
       }
     }
   }
-  const u = [...r.values()], f = await n.sanctions(u.map((l) => l.address)).catch(() => null);
-  for (const l of u) l.sanction = f?.[l.address] ?? null;
+  const u = [...o.values()], h = await n.sanctions(u.map((l) => l.address)).catch(() => null);
+  for (const l of u) l.sanction = h?.[l.address] ?? null;
   const p = /* @__PURE__ */ new Map();
   for (const l of u) p.set(l.address.slice(-4).toLowerCase(), [...p.get(l.address.slice(-4).toLowerCase()) ?? [], l.address]);
-  const h = /* @__PURE__ */ new Map();
-  for (const l of u) for (const y of l.memos) h.set(y, (h.get(y) ?? /* @__PURE__ */ new Set()).add(l.address));
+  const f = /* @__PURE__ */ new Map();
+  for (const l of u) for (const y of l.memos) f.set(y, (f.get(y) ?? /* @__PURE__ */ new Set()).add(l.address));
   return {
     seed: e,
     nodes: u,
-    links: [...o.values()].sort((l, y) => l.ledger - y.ledger),
+    links: [...r.values()].sort((l, y) => l.ledger - y.ledger),
     vanity: [...p].filter(([, l]) => l.length >= 2).map(([l, y]) => ({ ending: l, accounts: y })),
-    sharedMemos: [...h].filter(([, l]) => l.size >= 2).map(([l, y]) => ({ text: l, accounts: [...y] })),
+    sharedMemos: [...f].filter(([, l]) => l.size >= 2).map(([l, y]) => ({ text: l, accounts: [...y] })),
     capped: d,
-    sanctionsChecked: f !== null
+    sanctionsChecked: h !== null
   };
 }
-const we = 3e3, ei = 1e4;
-function ti(e) {
+const be = 3e3, ai = 1e4;
+function ii(e) {
   return e.map((t) => {
     const n = t.tx_json ?? t.tx ?? t;
     return { tx: n, meta: t.meta ?? {}, ledger: Number(t.ledger_index ?? n.ledger_index ?? 0), hash: String(n.hash ?? t.hash ?? "") };
@@ -4116,76 +4171,76 @@ const oe = (e) => {
   const t = e.meta.delivered_amount ?? e.meta.DeliveredAmount;
   return typeof t == "string" && /^\d+$/.test(t) ? Number(t) : 0;
 };
-function ni(e, t, n = 100) {
-  const s = ti(t), a = [], i = s.filter((o) => o.tx.Account === e);
-  for (const o of i.filter((c) => c.tx.TransactionType === "SetRegularKey" || c.tx.TransactionType === "SignerListSet" || c.tx.TransactionType === "AccountSet" && c.tx.SetFlag === 4)) {
-    const c = i.filter((d) => d.ledger >= o.ledger && d.ledger - o.ledger <= we && d.hash !== o.hash && (d.tx.TransactionType === "AccountDelete" || d.tx.TransactionType === "Payment" && d.tx.Destination !== e && oe(d) >= n * 1e6));
+function oi(e, t, n = 100) {
+  const s = ii(t), a = [], i = s.filter((r) => r.tx.Account === e);
+  for (const r of i.filter((c) => c.tx.TransactionType === "SetRegularKey" || c.tx.TransactionType === "SignerListSet" || c.tx.TransactionType === "AccountSet" && c.tx.SetFlag === 4)) {
+    const c = i.filter((d) => d.ledger >= r.ledger && d.ledger - r.ledger <= be && d.hash !== r.hash && (d.tx.TransactionType === "AccountDelete" || d.tx.TransactionType === "Payment" && d.tx.Destination !== e && oe(d) >= n * 1e6));
     if (c.length) {
-      const d = c.reduce((u, f) => u + oe(f), 0) / 1e6;
+      const d = c.reduce((u, h) => u + oe(h), 0) / 1e6;
       a.push({
         id: "key_then_drain",
         severity: "critical",
-        title: `Keys changed, then ${d.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP left within ${c[c.length - 1].ledger - o.ledger} ledgers`,
-        detail: `${o.tx.TransactionType} in ledger ${o.ledger}, then ${c.length} outflow${c.length === 1 ? "" : "s"}. A thief adds a key of their own first so they can keep signing.`,
-        evidence: [o.hash, ...c.map((u) => u.hash)],
-        fromLedger: o.ledger,
+        title: `Keys changed, then ${d.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP left within ${c[c.length - 1].ledger - r.ledger} ledgers`,
+        detail: `${r.tx.TransactionType} in ledger ${r.ledger}, then ${c.length} outflow${c.length === 1 ? "" : "s"}. A thief adds a key of their own first so they can keep signing.`,
+        evidence: [r.hash, ...c.map((u) => u.hash)],
+        fromLedger: r.ledger,
         toLedger: c[c.length - 1].ledger
       });
       break;
     }
   }
-  const r = i.find((o) => o.tx.TransactionType === "AccountDelete");
-  if (r) {
-    const o = i.filter((d) => d.tx.TransactionType === "Payment" && d.ledger <= r.ledger && oe(d) > 0 && oe(d) < ei), c = new Set(o.map((d) => d.tx.Destination));
-    o.length >= 20 && c.size >= 10 && a.push({
+  const o = i.find((r) => r.tx.TransactionType === "AccountDelete");
+  if (o) {
+    const r = i.filter((d) => d.tx.TransactionType === "Payment" && d.ledger <= o.ledger && oe(d) > 0 && oe(d) < ai), c = new Set(r.map((d) => d.tx.Destination));
+    r.length >= 20 && c.size >= 10 && a.push({
       id: "spray_then_sweep",
       severity: "critical",
-      title: `${o.length} dust payments to ${c.size} accounts, then the account deleted itself into ${r.tx.Destination}`,
+      title: `${r.length} dust payments to ${c.size} accounts, then the account deleted itself into ${o.tx.Destination}`,
       detail: "The pattern of a phishing relay: spray links or lookalike addresses into many histories, then pass the balance on and disappear.",
-      evidence: [o[0].hash, o[o.length - 1].hash, r.hash],
-      fromLedger: o[0].ledger,
-      toLedger: r.ledger
+      evidence: [r[0].hash, r[r.length - 1].hash, o.hash],
+      fromLedger: r[0].ledger,
+      toLedger: o.ledger
     });
   }
-  for (const o of i.filter((c) => c.tx.TransactionType === "NFTokenCreateOffer" && (Number(c.tx.Flags ?? 0) & 1) !== 0 && String(c.tx.Amount ?? "") === "0")) {
-    const c = s.find((d) => d.tx.TransactionType === "NFTokenAcceptOffer" && d.tx.Account !== e && d.ledger >= o.ledger && d.ledger - o.ledger <= we);
-    c && a.push({ id: "nft_giveaway", severity: "critical", title: `An NFT was offered for nothing, and ${c.tx.Account} took it`, detail: `NFT ${String(o.tx.NFTokenID).slice(0, 16)}…: the zero-price offer in ledger ${o.ledger} was accepted in ledger ${c.ledger}.`, evidence: [o.hash, c.hash], fromLedger: o.ledger, toLedger: c.ledger });
+  for (const r of i.filter((c) => c.tx.TransactionType === "NFTokenCreateOffer" && (Number(c.tx.Flags ?? 0) & 1) !== 0 && String(c.tx.Amount ?? "") === "0")) {
+    const c = s.find((d) => d.tx.TransactionType === "NFTokenAcceptOffer" && d.tx.Account !== e && d.ledger >= r.ledger && d.ledger - r.ledger <= be);
+    c && a.push({ id: "nft_giveaway", severity: "critical", title: `An NFT was offered for nothing, and ${c.tx.Account} took it`, detail: `NFT ${String(r.tx.NFTokenID).slice(0, 16)}…: the zero-price offer in ledger ${r.ledger} was accepted in ledger ${c.ledger}.`, evidence: [r.hash, c.hash], fromLedger: r.ledger, toLedger: c.ledger });
   }
-  for (const o of i.filter((c) => c.tx.TransactionType === "CheckCreate")) {
-    const c = s.find((d) => d.tx.TransactionType === "CheckCash" && d.tx.Account === o.tx.Destination && d.ledger >= o.ledger && d.ledger - o.ledger <= we);
-    c && a.push({ id: "check_then_cash", severity: "warn", title: `A check to ${o.tx.Destination} was cashed ${c.ledger - o.ledger} ledgers after it was written`, detail: "Checks let the payee pull value later; a phishing site can ask for one signature and cash it at once.", evidence: [o.hash, c.hash], fromLedger: o.ledger, toLedger: c.ledger });
+  for (const r of i.filter((c) => c.tx.TransactionType === "CheckCreate")) {
+    const c = s.find((d) => d.tx.TransactionType === "CheckCash" && d.tx.Account === r.tx.Destination && d.ledger >= r.ledger && d.ledger - r.ledger <= be);
+    c && a.push({ id: "check_then_cash", severity: "warn", title: `A check to ${r.tx.Destination} was cashed ${c.ledger - r.ledger} ledgers after it was written`, detail: "Checks let the payee pull value later; a phishing site can ask for one signature and cash it at once.", evidence: [r.hash, c.hash], fromLedger: r.ledger, toLedger: c.ledger });
   }
   return a;
 }
-async function si(e, t = 2) {
+async function ri(e, t = 2) {
   const n = [];
   let s;
   for (let a = 0; a < t; a++) {
     const i = await S("account_tx", { account: e, ledger_index_min: -1, ledger_index_max: -1, forward: !1, limit: 200, ...s ? { marker: s } : {} });
     if (n.push(...i.transactions ?? []), s = i.marker, !s) break;
   }
-  return { patterns: ni(e, n), transactions: n.length };
+  return { patterns: oi(e, n), transactions: n.length };
 }
-const ai = 1;
-function ii(e, t) {
+const ci = 1;
+function di(e, t) {
   const n = e.address;
   if (!e.root) throw new Error("There is no account at this address to protect.");
   if (t.cold === n) throw new Error("The cold account must be a different account.");
-  const s = String(t.feeDrops ?? 5e3), a = [], i = e.objects.filter((l) => l.LedgerEntryType === "NFTokenOffer" && l.Owner === n && (Number(l.Flags ?? 0) & ai) !== 0);
+  const s = String(t.feeDrops ?? 5e3), a = [], i = e.objects.filter((l) => l.LedgerEntryType === "NFTokenOffer" && l.Owner === n && (Number(l.Flags ?? 0) & ci) !== 0);
   for (let l = 0; l < i.length; l += 200) {
     const y = i.slice(l, l + 200);
     a.push({ id: `nft-offers-${l}`, title: `Cancel ${y.length} NFT sell offer${y.length === 1 ? "" : "s"}`, why: "Anyone holding one of these can take the NFT at its price, including a thief's own zero-price offer.", tx: { TransactionType: "NFTokenCancelOffer", Account: n, NFTokenOffers: y.map((w) => String(w.index)) } });
   }
   for (const l of e.objects.filter((y) => y.LedgerEntryType === "Check" && y.Account === n))
     a.push({ id: `check-${l.index}`, title: `Cancel the check to ${l.Destination}`, why: "Its payee can pull from the account until it is cancelled.", tx: { TransactionType: "CheckCancel", Account: n, CheckID: String(l.index) } });
-  const r = Ct(e), o = r.deletion.blockers.filter((l) => !/sequence is too recent/.test(l)), c = Math.max(0, Number(e.root.OwnerCount ?? 0) - e.objects.length - e.nfts.length);
-  (!e.complete || c > 0) && o.push(`${c || "some"} object${c === 1 ? "" : "s"} the read did not reach (NFT pages, for example)`);
-  const d = o.length === 0;
+  const o = Lt(e), r = o.deletion.blockers.filter((l) => !/sequence is too recent/.test(l)), c = Math.max(0, Number(e.root.OwnerCount ?? 0) - e.objects.length - e.nfts.length);
+  (!e.complete || c > 0) && r.push(`${c || "some"} object${c === 1 ? "" : "s"} the read did not reach (NFT pages, for example)`);
+  const d = r.length === 0;
   if (d)
     a.push({
       id: "sweep-delete",
       title: `Delete the account into ${t.cold}`,
-      why: `AccountDelete sends every drop the account holds (${r.balanceXrp.toLocaleString("en-US")} XRP today, less its fee) to the cold account in one transaction, however the balance changes before it is submitted.`,
+      why: `AccountDelete sends every drop the account holds (${o.balanceXrp.toLocaleString("en-US")} XRP today, less its fee) to the cold account in one transaction, however the balance changes before it is submitted.`,
       tx: { TransactionType: "AccountDelete", Account: n, Destination: t.cold, Fee: String(Math.max(Number(s), Math.round(e.reserveIncXrp * 1e6))) },
       caution: "The account must be at least 256 ledgers past its last sequence when this is submitted. It is gone afterwards; anything sent to it later needs the reserve anew."
     });
@@ -4194,15 +4249,15 @@ function ii(e, t) {
     for (const w of l)
       a.push({
         id: `token-${w.currency}-${w.counterparty}`,
-        title: `Send the ${w.balance.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${O(w.currency)} to ${t.cold}`,
+        title: `Send the ${w.balance.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${C(w.currency)} to ${t.cold}`,
         why: "Tokens are taken as easily as XRP.",
         tx: { TransactionType: "Payment", Account: n, Destination: t.cold, Amount: { currency: w.currency, issuer: w.counterparty, value: String(w.balance) } },
-        caution: `The cold account needs a trust line to ${w.counterparty} for ${O(w.currency)}, set before the emergency.`
+        caution: `The cold account needs a trust line to ${w.counterparty} for ${C(w.currency)}, set before the emergency.`
       });
     a.push({
       id: "sweep-xrp",
       title: `Send the spendable XRP to ${t.cold}`,
-      why: `AccountDelete is blocked by ${o.join(", ")}, so the XRP above the reserve is paid out instead.`,
+      why: `AccountDelete is blocked by ${r.join(", ")}, so the XRP above the reserve is paid out instead.`,
       tx: { TransactionType: "Payment", Account: n, Destination: t.cold, Amount: "0" },
       caution: "The amount is fixed when signed, leaving the fees of the kit (and the reserve of its unused tickets) behind. If the balance has fallen by the time it is submitted, it fails: rebuild it with the amount shown then."
     });
@@ -4211,134 +4266,134 @@ function ii(e, t) {
   }
   d || (t.newRegularKey ? (a.push({ id: "rotate", title: "Hand signing to a new key", why: "A thief holding the old regular key loses it.", tx: { TransactionType: "SetRegularKey", Account: n, RegularKey: t.newRegularKey } }), a.push({ id: "disable-master", title: "Disable the master key", why: "If the master seed is what leaked, this is the only way to stop it signing.", tx: { TransactionType: "AccountSet", Account: n, SetFlag: 4 }, caution: "Only after the new regular key has signed a test transaction, or the account locks for good." })) : a.push({ id: "rotate", title: "Hand signing to a new key", why: "Choose a key from a hardware wallet that never held this seed.", tx: { TransactionType: "SetRegularKey", Account: n, RegularKey: "<a new key's address>" } }));
   const u = a.map((l, y) => ({ ...l, order: y + 1 }));
-  let f = null;
-  t.useTickets && (f = { TransactionType: "TicketCreate", Account: n, TicketCount: u.length, Fee: s }, u.forEach((l, y) => {
+  let h = null;
+  t.useTickets && (h = { TransactionType: "TicketCreate", Account: n, TicketCount: u.length, Fee: s }, u.forEach((l, y) => {
     l.tx = { ...l.tx, Sequence: 0, TicketSequence: `<ticket ${y + 1} from the TicketCreate>` };
   }));
   for (const l of u) l.tx.Fee || (l.tx.Fee = s);
   const p = u.find((l) => l.id === "sweep-xrp");
   if (p) {
-    const l = u.reduce((m, g) => m + Number(g.tx.Fee), 0) + (f ? Number(s) : 0), y = f ? u.length - p.order + 1 : 0, w = Math.max(0, Math.floor(r.spendableXrp * 1e6 - l - y * Math.round(e.reserveIncXrp * 1e6)));
+    const l = u.reduce((m, g) => m + Number(g.tx.Fee), 0) + (h ? Number(s) : 0), y = h ? u.length - p.order + 1 : 0, w = Math.max(0, Math.floor(o.spendableXrp * 1e6 - l - y * Math.round(e.reserveIncXrp * 1e6)));
     p.tx.Amount = String(w), p.title = `Send the spendable ${(w / 1e6).toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP to ${t.cold}`;
   }
-  const h = [
+  const f = [
     "Submit the steps in order, as fast as you can: a thief with the key is racing you.",
     t.useTickets ? "Sign the TicketCreate now, read the ticket numbers it creates, fill them in and sign every step now. Keep the signed kit offline; it stays valid whatever happens to the account's sequence." : "Signing needs the account's current key: prepare the kit now, sign it the moment it is needed.",
     `Each ticket and each open object holds ${e.reserveIncXrp} XRP of reserve while it exists.`
   ];
-  return { address: n, cold: t.cold, steps: u, tickets: f, sweepsEverything: d, notes: h };
+  return { address: n, cold: t.cold, steps: u, tickets: h, sweepsEverything: d, notes: f };
 }
-const Pt = (e) => typeof e == "string" && /^([0-9A-Fa-f]{2})+$/.test(e) ? new TextDecoder().decode(new Uint8Array((e.match(/../g) ?? []).map((t) => parseInt(t, 16)))) : null;
-function lt(e, t, n, s, a = 0) {
+const Ht = (e) => typeof e == "string" && /^([0-9A-Fa-f]{2})+$/.test(e) ? new TextDecoder().decode(new Uint8Array((e.match(/../g) ?? []).map((t) => parseInt(t, 16)))) : null;
+function ft(e, t, n, s, a = 0) {
   const i = t?.account_data ?? null;
   if (!i) return { address: e, kind: "not_found", name: null, confidence: "none", evidence: ["No account exists at this address."], advice: "Nothing is held here now. If value passed through, follow where it went in Incident Response." };
-  const r = [], o = (Number(i.Flags ?? 0) & 131072) !== 0, c = Ot(e, n);
-  o && r.push("It requires a destination tag on every incoming payment."), c !== null && r.push(`${Math.round(c * 100)}% of the incoming payments read carried a destination tag.`), a > 0 && r.push("It has issued tokens other accounts hold.");
-  const d = Pt(i.Domain);
-  d && r.push(`Its Domain field names ${d}.`), s && r.push(s.detail);
-  const u = o || (c ?? 0) >= 0.5, f = u ? "custodial_service" : a > 0 ? "issuer" : "personal_or_unknown";
+  const o = [], r = (Number(i.Flags ?? 0) & 131072) !== 0, c = Xt(e, n);
+  r && o.push("It requires a destination tag on every incoming payment."), c !== null && o.push(`${Math.round(c * 100)}% of the incoming payments read carried a destination tag.`), a > 0 && o.push("It has issued tokens other accounts hold.");
+  const d = Ht(i.Domain);
+  d && o.push(`Its Domain field names ${d}.`), s && o.push(s.detail);
+  const u = r || (c ?? 0) >= 0.5, h = u ? "custodial_service" : a > 0 ? "issuer" : "personal_or_unknown";
   return s?.status === "verified" ? {
     address: e,
-    kind: f,
+    kind: h,
     name: s.domain,
     confidence: "verified",
-    evidence: r,
-    advice: f === "custodial_service" ? `Contact ${s.domain} through the support pages on its own website, with the transaction hashes and destination tags, and ask it to freeze the deposit. A police report number makes it act faster.` : `${s.domain} vouches for this account.`
+    evidence: o,
+    advice: h === "custodial_service" ? `Contact ${s.domain} through the support pages on its own website, with the transaction hashes and destination tags, and ask it to freeze the deposit. A police report number makes it act faster.` : `${s.domain} vouches for this account.`
   } : d ? {
     address: e,
-    kind: f,
+    kind: h,
     name: d,
     confidence: "claimed",
-    evidence: r,
+    evidence: o,
     advice: `The account claims ${d}, but the site does not confirm it. Contact ${d} through its own website, never through a link found on the ledger, and say the claim is unverified.`
-  } : u ? { address: e, kind: f, name: null, confidence: "behaviour", evidence: r, advice: "A service pooling customers' funds, which does not name itself. Law enforcement can ask the major exchanges to identify it; include the tags and hashes." } : { address: e, kind: f, name: null, confidence: "none", evidence: r.length ? r : ["Nothing on the ledger identifies who controls it."], advice: "Nothing identifies the owner. Only the key holder can move what it holds." };
+  } : u ? { address: e, kind: h, name: null, confidence: "behaviour", evidence: o, advice: "A service pooling customers' funds, which does not name itself. Law enforcement can ask the major exchanges to identify it; include the tags and hashes." } : { address: e, kind: h, name: null, confidence: "none", evidence: o.length ? o : ["Nothing on the ledger identifies who controls it."], advice: "Nothing identifies the owner. Only the key holder can move what it holds." };
 }
-async function oi(e) {
-  const t = await S("account_info", { account: e, ledger_index: "validated" }).catch((r) => {
-    if (/actNotFound|not found/i.test(r instanceof Error ? r.message : String(r))) return null;
-    throw r;
+async function li(e) {
+  const t = await S("account_info", { account: e, ledger_index: "validated" }).catch((o) => {
+    if (/actNotFound|not found/i.test(o instanceof Error ? o.message : String(o))) return null;
+    throw o;
   });
-  if (!t) return lt(e, null, [], null);
+  if (!t) return ft(e, null, [], null);
   const [n, s, a] = await Promise.all([
     S("account_tx", { account: e, ledger_index_min: -1, ledger_index_max: -1, forward: !1, limit: 100 }).catch(() => ({ transactions: [] })),
-    Pt(t.account_data?.Domain) ? _e({ address: e }).then((r) => r.check).catch(() => null) : Promise.resolve(null),
+    Ht(t.account_data?.Domain) ? Ae({ address: e }).then((o) => o.check).catch(() => null) : Promise.resolve(null),
     S("gateway_balances", { account: e, ledger_index: "validated" }).catch(() => null)
-  ]), i = Object.values(a?.obligations ?? {}).reduce((r, o) => r + (Number(o) || 0), 0);
-  return lt(e, t, n.transactions ?? [], s, i);
+  ]), i = Object.values(a?.obligations ?? {}).reduce((o, r) => o + (Number(r) || 0), 0);
+  return ft(e, t, n.transactions ?? [], s, i);
 }
-function ri(e) {
+function ui(e) {
   const t = e.tx_json ?? e.tx ?? e, n = e.meta ?? {};
   if (n.TransactionResult !== "tesSUCCESS") return [];
   const s = [];
   for (const a of n.AffectedNodes ?? []) {
     const i = a.ModifiedNode ?? a.DeletedNode;
     if (!i || i.LedgerEntryType !== "Offer") continue;
-    const r = i.PreviousFields;
-    if (!r || !("TakerGets" in r || "TakerPays" in r)) continue;
-    const o = String(i.FinalFields?.Account ?? "");
-    o && o !== t.Account && s.push({ hash: String(t.hash ?? ""), ledger: Number(e.ledger_index ?? t.ledger_index ?? 0), taker: String(t.Account), maker: o });
+    const o = i.PreviousFields;
+    if (!o || !("TakerGets" in o || "TakerPays" in o)) continue;
+    const r = String(i.FinalFields?.Account ?? "");
+    r && r !== t.Account && s.push({ hash: String(t.hash ?? ""), ledger: Number(e.ledger_index ?? t.ledger_index ?? 0), taker: String(t.Account), maker: r });
   }
   return s;
 }
-function ut(e, t, n = {}) {
-  const s = /* @__PURE__ */ new Map(), a = (h) => (s.has(h) || s.set(h, { account: h, placed: 0, replaced: 0, cancelled: 0, filledAsMaker: 0, tookAsTaker: 0 }), s.get(h)), i = [];
-  let r = 1 / 0, o = 0;
-  for (const h of t) {
-    const l = h.tx_json ?? h.tx ?? h, y = Number(h.ledger_index ?? l.ledger_index ?? 0);
-    if (r = Math.min(r, y), o = Math.max(o, y), (h.meta ?? {}).TransactionResult !== "tesSUCCESS") continue;
+function pt(e, t, n = {}) {
+  const s = /* @__PURE__ */ new Map(), a = (f) => (s.has(f) || s.set(f, { account: f, placed: 0, replaced: 0, cancelled: 0, filledAsMaker: 0, tookAsTaker: 0 }), s.get(f)), i = [];
+  let o = 1 / 0, r = 0;
+  for (const f of t) {
+    const l = f.tx_json ?? f.tx ?? f, y = Number(f.ledger_index ?? l.ledger_index ?? 0);
+    if (o = Math.min(o, y), r = Math.max(r, y), (f.meta ?? {}).TransactionResult !== "tesSUCCESS") continue;
     const w = String(l.Account ?? "");
     if (l.TransactionType === "OfferCreate") {
       const m = a(w);
       m.placed += 1, typeof l.OfferSequence == "number" && (m.replaced += 1);
     } else l.TransactionType === "OfferCancel" && (a(w).cancelled += 1);
-    for (const m of ri(h))
+    for (const m of ui(f))
       i.push(m), a(m.maker).filledAsMaker += 1, a(m.taker).tookAsTaker += 1;
   }
-  const c = [...s.values()].sort((h, l) => l.placed + l.cancelled - (h.placed + h.cancelled)), d = [], u = c.reduce((h, l) => h + l.placed + l.cancelled, 0);
-  for (const h of c) {
-    const l = h.replaced + h.cancelled;
-    h.placed >= 20 && l / h.placed >= 0.8 && h.filledAsMaker === 0 && d.push({
-      id: `quote-churn-${h.account}`,
+  const c = [...s.values()].sort((f, l) => l.placed + l.cancelled - (f.placed + f.cancelled)), d = [], u = c.reduce((f, l) => f + l.placed + l.cancelled, 0);
+  for (const f of c) {
+    const l = f.replaced + f.cancelled;
+    f.placed >= 20 && l / f.placed >= 0.8 && f.filledAsMaker === 0 && d.push({
+      id: `quote-churn-${f.account}`,
       severity: "warn",
-      title: `${h.account} placed ${h.placed} orders, replaced or cancelled ${l}, and none filled`,
-      detail: `Over ledgers ${r.toLocaleString("en-US")}–${o.toLocaleString("en-US")}. Depth that is constantly re-quoted and never trades makes the book look deeper than it is: check what can actually be filled before relying on the quoted price.`,
-      accounts: [h.account]
+      title: `${f.account} placed ${f.placed} orders, replaced or cancelled ${l}, and none filled`,
+      detail: `Over ledgers ${o.toLocaleString("en-US")}–${r.toLocaleString("en-US")}. Depth that is constantly re-quoted and never trades makes the book look deeper than it is: check what can actually be filled before relying on the quoted price.`,
+      accounts: [f.account]
     });
   }
-  const f = c[0];
-  f && u >= 20 && (f.placed + f.cancelled) / u >= 0.5 && d.push({
+  const h = c[0];
+  h && u >= 20 && (h.placed + h.cancelled) / u >= 0.5 && d.push({
     id: "concentration",
     severity: "info",
-    title: `One account supplied ${Math.round((f.placed + f.cancelled) / u * 100)}% of the order activity`,
-    detail: `${f.account}: ${f.placed + f.cancelled} of ${u} order placements and cancellations in the transactions read.`,
-    accounts: [f.account]
+    title: `One account supplied ${Math.round((h.placed + h.cancelled) / u * 100)}% of the order activity`,
+    detail: `${h.account}: ${h.placed + h.cancelled} of ${u} order placements and cancellations in the transactions read.`,
+    accounts: [h.account]
   });
-  const p = i.filter((h) => n[h.maker] && n[h.maker] === n[h.taker]);
+  const p = i.filter((f) => n[f.maker] && n[f.maker] === n[f.taker]);
   if (p.length) {
-    const h = [...new Set(p.map((l) => `${l.taker} ↔ ${l.maker}`))];
-    d.push({ id: "self-cluster-trades", severity: "warn", title: `${p.length} trade${p.length === 1 ? "" : "s"} between accounts funded by the same account`, detail: `${h.slice(0, 5).join("; ")}. Trading between accounts of one owner moves the price and volume without changing who holds what.`, accounts: [...new Set(p.flatMap((l) => [l.maker, l.taker]))] });
+    const f = [...new Set(p.map((l) => `${l.taker} ↔ ${l.maker}`))];
+    d.push({ id: "self-cluster-trades", severity: "warn", title: `${p.length} trade${p.length === 1 ? "" : "s"} between accounts funded by the same account`, detail: `${f.slice(0, 5).join("; ")}. Trading between accounts of one owner moves the price and volume without changing who holds what.`, accounts: [...new Set(p.flatMap((l) => [l.maker, l.taker]))] });
   }
-  return d.length || d.push({ id: "nothing", severity: "info", title: "No manipulation indicators in the transactions read", detail: `${t.length} transactions, ${i.length} trade${i.length === 1 ? "" : "s"}.`, accounts: [] }), { issuer: e, transactions: t.length, ledgers: { from: r === 1 / 0 ? 0 : r, to: o }, traders: c, fills: i, findings: d };
+  return d.length || d.push({ id: "nothing", severity: "info", title: "No manipulation indicators in the transactions read", detail: `${t.length} transactions, ${i.length} trade${i.length === 1 ? "" : "s"}.`, accounts: [] }), { issuer: e, transactions: t.length, ledgers: { from: o === 1 / 0 ? 0 : o, to: r }, traders: c, fills: i, findings: d };
 }
-async function ci(e, t = 3) {
+async function hi(e, t = 3) {
   const n = [];
   let s;
-  for (let o = 0; o < t; o++) {
+  for (let r = 0; r < t; r++) {
     const c = await S("account_tx", { account: e, ledger_index_min: -1, ledger_index_max: -1, forward: !1, limit: 200, ...s ? { marker: s } : {} });
     if (n.push(...c.transactions ?? []), s = c.marker, !s) break;
   }
-  const a = ut(e, n), i = [.../* @__PURE__ */ new Set([...a.traders.slice(0, 10).map((o) => o.account), ...a.fills.flatMap((o) => [o.maker, o.taker])])].slice(0, 30), r = {};
-  for (const o of i) {
-    const d = ((await S("account_tx", { account: o, ledger_index_min: -1, ledger_index_max: -1, forward: !0, limit: 1 }).catch(() => null))?.transactions ?? [])[0], u = d?.tx_json ?? d?.tx;
-    u?.TransactionType === "Payment" && u.Destination === o && (r[o] = String(u.Account));
+  const a = pt(e, n), i = [.../* @__PURE__ */ new Set([...a.traders.slice(0, 10).map((r) => r.account), ...a.fills.flatMap((r) => [r.maker, r.taker])])].slice(0, 30), o = {};
+  for (const r of i) {
+    const d = ((await S("account_tx", { account: r, ledger_index_min: -1, ledger_index_max: -1, forward: !0, limit: 1 }).catch(() => null))?.transactions ?? [])[0], u = d?.tx_json ?? d?.tx;
+    u?.TransactionType === "Payment" && u.Destination === r && (o[r] = String(u.Account));
   }
-  return ut(e, n, r);
+  return pt(e, n, o);
 }
-const di = 3;
-async function li(e) {
+const fi = 3;
+async function pi(e) {
   return ((await S("account_tx", { account: e, ledger_index_min: -1, ledger_index_max: -1, forward: !0, limit: 1 })).transactions ?? [])[0] ?? null;
 }
-async function ui(e, t = di) {
+async function gi(e, t = fi) {
   const n = [];
   let s = e;
   const a = /* @__PURE__ */ new Set();
@@ -4346,7 +4401,7 @@ async function ui(e, t = di) {
     a.add(s);
     let i;
     try {
-      i = ea(s, await li(s));
+      i = aa(s, await pi(s));
     } catch {
       i = { account: s, fundedBy: null, activatedLedger: null };
     }
@@ -4354,64 +4409,64 @@ async function ui(e, t = di) {
   }
   return n;
 }
-const ht = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
-async function Lt(e) {
-  const t = [...new Set(e.filter((n) => ht.test(n)))].slice(0, 50);
+const gt = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+async function qt(e) {
+  const t = [...new Set(e.filter((n) => gt.test(n)))].slice(0, 50);
   if (!t.length) return {};
   try {
     const n = await fetch(`${le}/noshashi-xrpl-watch/threats?addresses=${t.join(",")}`, { signal: AbortSignal.timeout(8e3) });
     if (!n.ok) return null;
     const s = await n.json(), a = {};
     for (const i of s.hits ?? [])
-      ht.test(i.address) && (a[i.address] = { address: i.address, reports: i.reports, categories: i.categories, firstConfirmed: i.first_confirmed, evidenceTx: i.evidence_tx ?? [] });
+      gt.test(i.address) && (a[i.address] = { address: i.address, reports: i.reports, categories: i.categories, firstConfirmed: i.first_confirmed, evidenceTx: i.evidence_tx ?? [] });
     return a;
   } catch {
     return null;
   }
 }
-async function hi(e) {
-  const t = ta(e);
+async function mi(e) {
+  const t = ia(e);
   if (!t) throw new Error("That is not a public domain name or link.");
   const n = await fetch(`${le}/noshashi-xrpl-watch/phishing?domain=${encodeURIComponent(t)}`, { signal: AbortSignal.timeout(1e4) }), s = await n.json().catch(() => ({}));
   if (!n.ok) throw new Error(s.message ?? `The phishing check failed (HTTP ${n.status}).`);
   return s;
 }
-async function fi(e) {
+async function yi(e) {
   const [t, n, s] = await Promise.all([
     S("ledger", { ledger_index: "validated" }),
-    S("account_info", { account: e.destination, ledger_index: "validated" }).catch((h) => h instanceof F && h.code === "actNotFound" ? null : Promise.reject(h)),
+    S("account_info", { account: e.destination, ledger_index: "validated" }).catch((f) => f instanceof F && f.code === "actNotFound" ? null : Promise.reject(f)),
     S("server_info", {})
   ]), a = Number(t.ledger_index ?? t.ledger?.ledger_index), i = Number(s.info?.validated_ledger?.reserve_base_xrp);
   if (!Number.isFinite(i) || i <= 0) throw new Error("The base reserve could not be read.");
-  const r = n ? await ui(e.destination) : [{ account: e.destination, fundedBy: null, activatedLedger: null }], o = r.map((h) => h.account), [c, d] = await Promise.all([ne(o), Lt(o)]), u = [...c === null ? ["the OFAC SDN list"] : [], ...d === null ? ["the scam registry"] : []], f = sa({
+  const o = n ? await gi(e.destination) : [{ account: e.destination, fundedBy: null, activatedLedger: null }], r = o.map((f) => f.account), [c, d] = await Promise.all([ne(r), qt(r)]), u = [...c === null ? ["the OFAC SDN list"] : [], ...d === null ? ["the scam registry"] : []], h = ra({
     destination: e.destination,
     destinationTag: e.destinationTag,
     amountXrp: e.amountXrp,
     destinationInfo: n,
-    chain: r,
+    chain: o,
     currentLedger: a,
     reserveBaseXrp: i,
     sanctions: c?.hits ?? {},
     threats: d ?? {},
     previousDestinations: e.previousDestinations,
     ownAddresses: e.ownAddresses
-  }), p = u.length && f.verdict === "clear" ? "review" : f.verdict;
-  return { ...f, verdict: p, chain: r, ledger: a, unchecked: u };
+  }), p = u.length && h.verdict === "clear" ? "review" : h.verdict;
+  return { ...h, verdict: p, chain: o, ledger: a, unchecked: u };
 }
-const Xt = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/, pi = /^[0-9A-Fa-f]{64}$/;
-class z extends Error {
+const Ut = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/, wi = /^[0-9A-Fa-f]{64}$/;
+class j extends Error {
 }
 function I(e, t = "address") {
   const n = String(e[t] ?? "").trim();
-  if (!Xt.test(n)) throw new z(`${t} must be a classic XRPL address starting with r.`);
+  if (!Ut.test(n)) throw new j(`${t} must be a classic XRPL address starting with r.`);
   return n;
 }
-function be(e, t) {
+function ve(e, t) {
   const n = String(e[t] ?? "").trim();
-  if (!pi.test(n)) throw new z(`${t} must be 64 hexadecimal characters.`);
+  if (!wi.test(n)) throw new j(`${t} must be 64 hexadecimal characters.`);
   return n;
 }
-const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required: t, additionalProperties: !1 }), A = (e) => ({ type: "string", description: e }), gi = [
+const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required: t, additionalProperties: !1 }), A = (e) => ({ type: "string", description: e }), bi = [
   {
     name: "search_noshashi",
     description: "Search NOSHASHI's own pages and help: every app screen and button, features, plans and prices, the Learn course and word list, docs (API, webhooks, receipts, policies, security, enterprise), trust, legal and privacy. Use it for any question about the product, what a customer should use, or how NOSHASHI handles compliance. Returns passages with their page address.",
@@ -4420,8 +4475,8 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     screen: "NOSHASHI pages",
     run: async (e) => {
       const t = String(e.query ?? "").trim();
-      if (!t) throw new z("query is empty.");
-      const n = await Dt(t, 6);
+      if (!t) throw new j("query is empty.");
+      const n = await Pt(t, 6);
       return n.length === 0 ? "Nothing in NOSHASHI's pages matches that. Say so rather than guess." : n.map((s) => ({ title: s.title, source: s.source, text: s.text }));
     }
   },
@@ -4431,7 +4486,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({}),
     feature: null,
     screen: "Mission Control",
-    run: () => on()
+    run: () => dn()
   },
   {
     name: "ledger_sync",
@@ -4439,7 +4494,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({}),
     feature: null,
     screen: "Ledger Sync",
-    run: () => _s(3e4)
+    run: () => Ns(3e4)
   },
   {
     name: "check_address",
@@ -4450,8 +4505,8 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     run: async (e, t) => {
       const n = I(e), s = !t.has("portfolios");
       if (s && !t.spendFreeCheck())
-        throw new z("This month's 10 free address checks are used up. Pro includes unlimited checks.");
-      const a = await kn(n);
+        throw new j("This month's 10 free address checks are used up. Pro includes unlimited checks.");
+      const a = await Tn(n);
       if (a.verdict === "unknown" && !a.exists && a.findings.length === 0)
         throw s && t.refundFreeCheck?.(), new Error("The ledger could not be reached, so nothing about this address is known yet. Try again in a moment.");
       return a;
@@ -4463,7 +4518,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ address: A("Classic address whose inbox to read") }),
     feature: null,
     screen: "Inbox",
-    run: (e) => is(I(e))
+    run: (e) => cs(I(e))
   },
   {
     name: "read_token_rights",
@@ -4471,7 +4526,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ token_id: A("The 64-character NFTokenID") }),
     feature: null,
     screen: "Token Rights",
-    run: (e) => ws(be(e, "token_id"))
+    run: (e) => ks(ve(e, "token_id"))
   },
   {
     name: "certify_authority",
@@ -4479,7 +4534,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ issuer: A("Issuer's classic address") }),
     feature: "authority_certificate",
     screen: "Authority",
-    run: (e) => Ls(I(e, "issuer"), { walkSupply: !1 })
+    run: (e) => Us(I(e, "issuer"), { walkSupply: !1 })
   },
   {
     name: "read_provenance",
@@ -4487,7 +4542,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ address: A("Counterparty address") }),
     feature: "portfolios",
     screen: "Provenance",
-    run: (e) => En(I(e))
+    run: (e) => Dn(I(e))
   },
   {
     name: "read_book",
@@ -4501,8 +4556,8 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     run: (e) => {
       const t = String(e.currency ?? "").trim();
       if (!/^([A-Za-z0-9]{3}|[0-9A-Fa-f]{40})$/.test(t))
-        throw new z("currency must be a 3-character code or 40 hexadecimal characters.");
-      return Ln(t, I(e, "issuer"));
+        throw new j("currency must be a 3-character code or 40 hexadecimal characters.");
+      return qn(t, I(e, "issuer"));
     }
   },
   {
@@ -4511,7 +4566,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ hash: A("Transaction hash, 64 hexadecimal characters") }),
     feature: "portfolios",
     screen: "Settlement",
-    run: (e) => qn(be(e, "hash"))
+    run: (e) => jn(ve(e, "hash"))
   },
   {
     name: "read_control_surface",
@@ -4519,7 +4574,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ address: A("Treasury or issuer address") }),
     feature: "portfolios",
     screen: "Control Surface",
-    run: (e) => Tt(I(e))
+    run: (e) => At(I(e))
   },
   {
     name: "read_pool",
@@ -4527,7 +4582,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ amm_account: A("The AMM pool's own account address") }),
     feature: "portfolios",
     screen: "Pool Governance",
-    run: (e) => Bn({ ammAccount: I(e, "amm_account") })
+    run: (e) => Kn({ ammAccount: I(e, "amm_account") })
   },
   {
     name: "read_issuance",
@@ -4535,7 +4590,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ issuer: A("Issuer's classic address") }),
     feature: "portfolios",
     screen: "Issuance",
-    run: (e) => At(I(e, "issuer"))
+    run: (e) => Et(I(e, "issuer"))
   },
   {
     name: "security_check",
@@ -4544,8 +4599,8 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     feature: null,
     screen: "Security Center",
     run: async (e) => {
-      const t = await et(I(e));
-      return { posture: { ...t, events: t.events.slice(0, 10) }, assessment: da(t) };
+      const t = await st(I(e));
+      return { posture: { ...t, events: t.events.slice(0, 10) }, assessment: fa(t) };
     }
   },
   {
@@ -4561,11 +4616,11 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     feature: "incident_response",
     screen: "Security Center › Incident Response",
     run: async (e, t) => {
-      const n = I(e), s = await et(n, 400), a = Number(e.from_ledger), i = [...s.events].reverse().find((d) => d.kind === "regular_key_set" || d.kind === "signer_list_set"), r = Number.isInteger(a) && a > 0 ? a : i?.ledger ?? Math.max(1, s.ledgerIndex - 21600 * 30), o = t.has("forensic_trace") ? de.deep : de.standard, c = await pa(n, { sinceLedger: r, depth: o.depth, perAccount: o.perAccount });
+      const n = I(e), s = await st(n, 400), a = Number(e.from_ledger), i = [...s.events].reverse().find((d) => d.kind === "regular_key_set" || d.kind === "signer_list_set"), o = Number.isInteger(a) && a > 0 ? a : i?.ledger ?? Math.max(1, s.ledgerIndex - 21600 * 30), r = t.has("forensic_trace") ? de.deep : de.standard, c = await wa(n, { sinceLedger: o, depth: r.depth, perAccount: r.perAccount });
       return {
-        signals: ya(n, s.events, c.flows),
+        signals: ka(n, s.events, c.flows),
         trace: { ...c, flows: c.flows.slice(0, 40) },
-        options: ga(c, { stillHoldsXrp: s.exists ? s.balanceXrp : 0, keyEvents: s.events })
+        options: ba(c, { stillHoldsXrp: s.exists ? s.balanceXrp : 0, keyEvents: s.events })
       };
     }
   },
@@ -4576,8 +4631,8 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     feature: null,
     screen: "Security Center › Pre-sign check",
     run: async (e) => {
-      const { tx: t, format: n } = await Sa(String(e.transaction ?? "")), s = await ne(xa(t));
-      return Ta(t, n, { sanctioned: s?.hits });
+      const { tx: t, format: n } = await xa(String(e.transaction ?? "")), s = await ne(Ea(t));
+      return Na(t, n, { sanctioned: s?.hits });
     },
     compose: (e) => {
       const t = e;
@@ -4597,7 +4652,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     screen: "Security Center › Recover funds",
     run: async (e) => {
       const t = await ie(I(e));
-      return Ct(t, await Ra(t));
+      return Lt(t, await Pa(t));
     },
     compose: (e) => {
       const t = e;
@@ -4619,7 +4674,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     input_schema: T({ address: A("The account to audit, r…") }),
     feature: null,
     screen: "Security Center › Exposure audit",
-    run: async (e) => La(await ie(I(e))),
+    run: async (e) => Ua(await ie(I(e))),
     compose: (e) => {
       const t = e;
       return t.exists ? t.exposures.length ? [
@@ -4637,8 +4692,8 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     feature: null,
     screen: "Security Center › Recover funds",
     run: async (e, t) => {
-      const n = Ha(await ie(I(e)));
-      return t.has("asset_recovery") ? Ua(n) : n;
+      const n = za(await ie(I(e)));
+      return t.has("asset_recovery") ? ja(n) : n;
     },
     compose: (e) => {
       const t = e;
@@ -4661,7 +4716,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     screen: "Security Center › Deposit help",
     run: (e) => {
       const t = Number(e.expected_tag);
-      return Ga(be(e, "hash"), Number.isInteger(t) ? t : null);
+      return Ja(ve(e, "hash"), Number.isInteger(t) ? t : null);
     },
     compose: (e) => {
       const t = e;
@@ -4684,10 +4739,10 @@ ${t.letter.text}` : ""
     screen: "Security Center › Domain check",
     run: (e) => {
       const t = String(e.address ?? "").trim();
-      if (Xt.test(t)) return _e({ address: t });
+      if (Ut.test(t)) return Ae({ address: t });
       const n = String(e.domain ?? "").trim();
-      if (!n) throw new z("Give an address or a domain.");
-      return _e({ domain: n });
+      if (!n) throw new j("Give an address or a domain.");
+      return Ae({ domain: n });
     },
     compose: (e) => {
       const t = e;
@@ -4704,7 +4759,7 @@ ${t.letter.text}` : ""
     input_schema: T({ address: A("A known scam account, r…") }),
     feature: "asset_recovery",
     screen: "Security Center › Scam clusters",
-    run: (e, t) => Za(I(e), t.has("forensic_trace") ? Q.deep : Q.standard),
+    run: (e, t) => si(I(e), t.has("forensic_trace") ? Z.deep : Z.standard),
     compose: (e) => {
       const t = e;
       return [
@@ -4724,7 +4779,7 @@ ${t.letter.text}` : ""
     input_schema: T({ address: A("The account, r…") }),
     feature: null,
     screen: "Security Center › Emergency kit",
-    run: (e) => si(I(e)),
+    run: (e) => ri(I(e)),
     compose: (e) => {
       const t = e;
       return t.patterns.length ? [
@@ -4740,7 +4795,7 @@ ${t.letter.text}` : ""
     input_schema: T({ address: A("The compromised account, r…"), cold: A("A cold account the owner controls, r…") }),
     feature: null,
     screen: "Security Center › Emergency kit",
-    run: async (e) => ii(await ie(I(e)), { cold: I(e, "cold") }),
+    run: async (e) => di(await ie(I(e)), { cold: I(e, "cold") }),
     compose: (e) => {
       const t = e;
       return [
@@ -4758,7 +4813,7 @@ ${t.letter.text}` : ""
     input_schema: T({ address: A("The address, r…") }),
     feature: null,
     screen: "Security Center › Who is this?",
-    run: (e) => oi(I(e)),
+    run: (e) => li(I(e)),
     compose: (e) => {
       const t = e;
       return [`${t.address}: ${t.name ?? "unnamed"} (${t.kind.replace(/_/g, " ")}, ${t.confidence}).`, ...t.evidence.map((n) => `· ${n}`), t.advice].join(`
@@ -4772,7 +4827,7 @@ ${t.letter.text}` : ""
     feature: null,
     screen: "Security Center › Scam registry",
     run: async (e) => {
-      const t = I(e), n = await Lt([t]);
+      const t = I(e), n = await qt([t]);
       if (n === null) throw new Error("The scam registry could not be reached.");
       return { address: t, hit: n[t] ?? null };
     },
@@ -4787,7 +4842,7 @@ ${t.letter.text}` : ""
     input_schema: T({ domain: A("A domain or link, e.g. example.com") }),
     feature: null,
     screen: "Security Center › Scam registry",
-    run: (e) => hi(String(e.domain ?? "")),
+    run: (e) => mi(String(e.domain ?? "")),
     compose: (e) => {
       const t = e, n = t.sightings[0];
       return [
@@ -4806,7 +4861,7 @@ ${t.letter.text}` : ""
     screen: "Security Center › Withdrawals",
     run: (e) => {
       const t = Number(e.destination_tag), n = Number(e.amount_xrp);
-      return fi({ destination: I(e, "destination"), destinationTag: Number.isInteger(t) ? t : null, amountXrp: Number.isFinite(n) && n > 0 ? n : null, previousDestinations: [], ownAddresses: [] });
+      return yi({ destination: I(e, "destination"), destinationTag: Number.isInteger(t) ? t : null, amountXrp: Number.isFinite(n) && n > 0 ? n : null, previousDestinations: [], ownAddresses: [] });
     },
     compose: (e) => {
       const t = e;
@@ -4824,7 +4879,7 @@ ${t.letter.text}` : ""
     input_schema: T({ issuer: A("The token issuer, r…") }),
     feature: "market_surveillance",
     screen: "Security Center › Surveillance",
-    run: (e) => ci(I(e, "issuer")),
+    run: (e) => hi(I(e, "issuer")),
     compose: (e) => {
       const t = e;
       return [
@@ -4835,11 +4890,11 @@ ${t.letter.text}` : ""
     }
   }
 ];
-function Z(e) {
-  return gi.find((t) => t.name === e);
+function H(e) {
+  return bi.find((t) => t.name === e);
 }
-async function ve(e, t, n) {
-  const s = Z(e);
+async function ke(e, t, n) {
+  const s = H(e);
   if (!s) return { ok: !1, error: `No tool named ${e}.` };
   if (s.feature && !n.has(s.feature))
     return { ok: !1, gated: !0, error: `${s.screen} needs a Pro plan or higher.` };
@@ -4849,7 +4904,7 @@ async function ve(e, t, n) {
     return { ok: !1, error: a instanceof Error ? a.message : "The read failed." };
   }
 }
-const Ht = /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/g, Ut = /\b[0-9A-Fa-f]{64}\b/g, mi = /\b[0-9A-F]{40}\b/g, yi = /\b[A-Z][A-Z0-9]{2}\b/g, wi = /* @__PURE__ */ new Set([
+const Mt = /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/g, zt = /\b[0-9A-Fa-f]{64}\b/g, vi = /\b[0-9A-F]{40}\b/g, ki = /\b[A-Z][A-Z0-9]{2}\b/g, Si = /* @__PURE__ */ new Set([
   "XRP",
   "AMM",
   "NFT",
@@ -4903,15 +4958,15 @@ const Ht = /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/g, Ut = /\b[0-9A-Fa-f]{64}\b/g, mi 
   "OFAC",
   "MICA"
 ]);
-function bi(e) {
-  const t = (i) => [...new Set(i)], n = t(e.match(Ut) ?? []).map((i) => i.toUpperCase()), s = (e.match(mi) ?? []).filter((i) => !n.some((r) => r.includes(i))), a = (e.match(yi) ?? []).filter((i) => !wi.has(i));
+function $i(e) {
+  const t = (i) => [...new Set(i)], n = t(e.match(zt) ?? []).map((i) => i.toUpperCase()), s = (e.match(vi) ?? []).filter((i) => !n.some((o) => o.includes(i))), a = (e.match(ki) ?? []).filter((i) => !Si.has(i));
   return {
-    addresses: t(e.match(Ht) ?? []),
+    addresses: t(e.match(Mt) ?? []),
     hashes: n,
     currencies: t([...a, ...s])
   };
 }
-const vi = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "amm_account", surveil_market: "issuer", screen_withdrawal: "destination" }, ki = [
+const Ti = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "amm_account", surveil_market: "issuer", screen_withdrawal: "destination" }, _i = [
   {
     tool: "certify_authority",
     label: "issuer powers",
@@ -5074,42 +5129,42 @@ const vi = { certify_authority: "issuer", read_issuance: "issuer", read_pool: "a
     needs: "none",
     words: /ledger (index|status|height|number)|latest ledger|current ledger|network (status|fee|busy)|\bfees? (now|right now|today)|reference fee|is the (network|ledger) (up|live|working)/i
   }
-], Si = /noshashi|noshx|\bplans?\b|pricing|price|cost|which screen|how (do|can|should) i|what (is|are|does)|explain|difference between|what does .* mean|travel rule|\bkyc\b|\baml\b|mica|webhook|\bapi\b|examiner|auditor/i, $i = /\bNSH-?\s?(\d{1,9})\b/gi, ke = /self[- ]?repair|\brepair\b|diagnos|troubleshoot|health ?check|not working|isn'?t working|doesn'?t work|stopped working|\bbroken\b|won'?t (load|connect|open|start|sign)|can'?t (connect|sign in|log in|load)|keeps? (disconnect|signing me out|failing)|\bfix (it|the app|this|noshashi|my app|yourself|everything)\b|something('?s| is) wrong|check (the app|everything|my setup)/i, Ti = /\b(my|our|open|active|all|pending|unresolved|resolved|recent|customer|support) tickets?\b|\btickets? (queue|inbox|waiting|list)\b|\blist (the |my |all )?tickets\b|\bany tickets\b|\bshow (me )?(the |my )?tickets\b/i, _i = /\b(open|file|create|raise|start|submit|log) (a |an |new |the )?(support )?(ticket|case with support|support request)\b|\b(contact|tell|email|message) support\b|\breport (a |this |the )?bug\b/i, ft = /\b(with|attach|include|send) (this|the|a|my)? ?(self-?repair |repair |diagnostic )?(report|diagnostics|results)\b/i;
-function pt(e, t) {
+], xi = /noshashi|noshx|\bplans?\b|pricing|price|cost|which screen|how (do|can|should) i|what (is|are|does)|explain|difference between|what does .* mean|travel rule|\bkyc\b|\baml\b|mica|webhook|\bapi\b|examiner|auditor/i, Ai = /\bNSH-?\s?(\d{1,9})\b/gi, Se = /self[- ]?repair|\brepair\b|diagnos|troubleshoot|health ?check|not working|isn'?t working|doesn'?t work|stopped working|\bbroken\b|won'?t (load|connect|open|start|sign)|can'?t (connect|sign in|log in|load)|keeps? (disconnect|signing me out|failing)|\bfix (it|the app|this|noshashi|my app|yourself|everything)\b|something('?s| is) wrong|check (the app|everything|my setup)/i, Ni = /\b(my|our|open|active|all|pending|unresolved|resolved|recent|customer|support) tickets?\b|\btickets? (queue|inbox|waiting|list)\b|\blist (the |my |all )?tickets\b|\bany tickets\b|\bshow (me )?(the |my )?tickets\b/i, Ii = /\b(open|file|create|raise|start|submit|log) (a |an |new |the )?(support )?(ticket|case with support|support request)\b|\b(contact|tell|email|message) support\b|\breport (a |this |the )?bug\b/i, mt = /\b(with|attach|include|send) (this|the|a|my)? ?(self-?repair |repair |diagnostic )?(report|diagnostics|results)\b/i;
+function yt(e, t) {
   const n = e.slice(t);
   return (/^\s*(?::|—|-|,)?\s*(?:saying|say|with|that|and say|telling (?:them|him|her))?\s*[:,]?\s*([\s\S]*)$/i.exec(n)?.[1] ?? "").trim().replace(/^["'“]|["'”]$/g, "").trim();
 }
-function xi(e) {
+function Ei(e) {
   const t = [];
   let n = e;
-  const s = [...e.matchAll($i)].map((r) => ({ ref: `NSH-${r[1]}`, index: r.index ?? 0, end: (r.index ?? 0) + r[0].length })), a = /\b(reply|respond|write|add|post|answer back|tell (?:them|the customer))(?: to| on| in)?\s+NSH-?\s?(\d{1,9})\b/i.exec(e);
+  const s = [...e.matchAll(Ai)].map((o) => ({ ref: `NSH-${o[1]}`, index: o.index ?? 0, end: (o.index ?? 0) + o[0].length })), a = /\b(reply|respond|write|add|post|answer back|tell (?:them|the customer))(?: to| on| in)?\s+NSH-?\s?(\d{1,9})\b/i.exec(e);
   if (a) {
-    const r = pt(e, (a.index ?? 0) + a[0].length);
-    return r.length >= 10 ? (t.push({ tool: "reply_ticket", input: { ticket: `NSH-${a[2]}`, message: r }, why: "reply to the ticket" }), n = e.slice(0, a.index)) : t.push({ tool: "read_ticket", input: { ticket: `NSH-${a[2]}` }, why: "the ticket to reply to (no message given)" }), { calls: t, rest: n };
+    const o = yt(e, (a.index ?? 0) + a[0].length);
+    return o.length >= 10 ? (t.push({ tool: "reply_ticket", input: { ticket: `NSH-${a[2]}`, message: o }, why: "reply to the ticket" }), n = e.slice(0, a.index)) : t.push({ tool: "read_ticket", input: { ticket: `NSH-${a[2]}` }, why: "the ticket to reply to (no message given)" }), { calls: t, rest: n };
   }
-  const i = _i.exec(e);
+  const i = Ii.exec(e);
   if (i) {
-    if (ft.test(e) || ke.test(e))
+    if (mt.test(e) || Se.test(e))
       return t.push({ tool: "self_repair", input: { open_ticket: !0 }, why: "repair, then open a ticket with the report" }), { calls: t, rest: "" };
-    const r = pt(e, (i.index ?? 0) + i[0].length).replace(/^(about|for|regarding|because|that)\s+/i, "");
-    if (r.length >= 10) {
-      const o = (r.split(/[.!?](?:\s|$)|\n/)[0] ?? r).trim().slice(0, 100);
-      return t.push({ tool: "open_ticket", input: { subject: o.length >= 4 ? o : r.slice(0, 100), body: r }, why: "open a support ticket" }), { calls: t, rest: e.slice(0, i.index) };
+    const o = yt(e, (i.index ?? 0) + i[0].length).replace(/^(about|for|regarding|because|that)\s+/i, "");
+    if (o.length >= 10) {
+      const r = (o.split(/[.!?](?:\s|$)|\n/)[0] ?? o).trim().slice(0, 100);
+      return t.push({ tool: "open_ticket", input: { subject: r.length >= 4 ? r : o.slice(0, 100), body: o }, why: "open a support ticket" }), { calls: t, rest: e.slice(0, i.index) };
     }
     return { calls: t, rest: "", note: "To open a ticket, say what happened after it, for example: open a ticket: the Ledger Watch tab shows no events since this morning." };
   }
-  for (const { ref: r } of s) {
-    const o = e;
-    /\b(re-?open|not (solved|fixed|resolved))\b/i.test(o) ? t.push({ tool: "set_ticket_status", input: { ticket: r, status: "open" }, why: "reopen the ticket" }) : /\b(close|resolve|mark (it |this )?(as )?(resolved|solved|done|closed)|it'?s (solved|fixed))\b/i.test(o) ? t.push({ tool: "set_ticket_status", input: { ticket: r, status: "resolved" }, why: "resolve the ticket" }) : /\bmark (it |this )?(as )?answered\b/i.test(o) ? t.push({ tool: "set_ticket_status", input: { ticket: r, status: "answered" }, why: "mark the ticket answered" }) : /\b(answer|draft|suggest)\b/i.test(o) ? t.push({ tool: "answer_ticket", input: { ticket: r, send: /\b(send|post|and reply|submit) (it|that|this|the (draft|answer|reply))?\b|\band send\b/i.test(o) }, why: "answer the ticket from NOSHASHI's pages" }) : ke.test(o) || ft.test(o) ? t.push({ tool: "self_repair", input: { post_to_ticket: r }, why: "repair and post the report to the ticket" }) : t.push({ tool: "read_ticket", input: { ticket: r }, why: "read the ticket" });
+  for (const { ref: o } of s) {
+    const r = e;
+    /\b(re-?open|not (solved|fixed|resolved))\b/i.test(r) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "open" }, why: "reopen the ticket" }) : /\b(close|resolve|mark (it |this )?(as )?(resolved|solved|done|closed)|it'?s (solved|fixed))\b/i.test(r) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "resolved" }, why: "resolve the ticket" }) : /\bmark (it |this )?(as )?answered\b/i.test(r) ? t.push({ tool: "set_ticket_status", input: { ticket: o, status: "answered" }, why: "mark the ticket answered" }) : /\b(answer|draft|suggest)\b/i.test(r) ? t.push({ tool: "answer_ticket", input: { ticket: o, send: /\b(send|post|and reply|submit) (it|that|this|the (draft|answer|reply))?\b|\band send\b/i.test(r) }, why: "answer the ticket from NOSHASHI's pages" }) : Se.test(r) || mt.test(r) ? t.push({ tool: "self_repair", input: { post_to_ticket: o }, why: "repair and post the report to the ticket" }) : t.push({ tool: "read_ticket", input: { ticket: o }, why: "read the ticket" });
   }
-  if (s.length) return { calls: t, rest: s.reduceRight((r, o) => r.slice(0, o.index) + r.slice(o.end), e) };
-  if (Ti.test(e)) {
-    const r = /\bresolved\b|\bclosed\b/i.test(e) && !/unresolved/i.test(e) ? "resolved" : /\ball\b/i.test(e) ? "any" : "active";
-    return t.push({ tool: "list_tickets", input: { status: r }, why: "the support tickets" }), { calls: t, rest: "" };
+  if (s.length) return { calls: t, rest: s.reduceRight((o, r) => o.slice(0, r.index) + o.slice(r.end), e) };
+  if (Ni.test(e)) {
+    const o = /\bresolved\b|\bclosed\b/i.test(e) && !/unresolved/i.test(e) ? "resolved" : /\ball\b/i.test(e) ? "any" : "active";
+    return t.push({ tool: "list_tickets", input: { status: o }, why: "the support tickets" }), { calls: t, rest: "" };
   }
-  return ke.test(e) && t.push({ tool: "self_repair", input: {}, why: "check and repair the app" }), { calls: t, rest: n };
+  return Se.test(e) && t.push({ tool: "self_repair", input: {}, why: "check and repair the app" }), { calls: t, rest: n };
 }
-function Ai(e) {
+function Fi(e) {
   const t = e.indexOf("{"), n = e.lastIndexOf("}");
   if (t >= 0 && n > t) {
     const a = e.slice(t, n + 1);
@@ -5118,80 +5173,80 @@ function Ai(e) {
   const s = /\b12[0-9A-Fa-f]{98,}\b/.exec(e);
   return s ? s[0] : null;
 }
-const gt = /\b((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24})\b/gi;
-function qt(e, t = {}) {
-  const n = t.tickets ? xi(e) : { calls: [], rest: e };
+const wt = /\b((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24})\b/gi;
+function jt(e, t = {}) {
+  const n = t.tickets ? Ei(e) : { calls: [], rest: e };
   e = n.rest;
   const s = [...n.calls], a = (c) => {
     s.some((d) => d.tool === c.tool && JSON.stringify(d.input) === JSON.stringify(c.input)) || s.push(c);
-  }, i = Ai(e);
+  }, i = Fi(e);
   i && (a({ tool: "explain_transaction", input: { transaction: i }, why: "what the transaction does if signed" }), e = e.replace(i, " "));
-  const r = bi(e);
-  for (const c of ki)
+  const o = $i(e);
+  for (const c of _i)
     if (c.words.test(e)) {
       if (c.tool === "emergency_kit") {
-        r.addresses.length >= 2 && a({ tool: c.tool, input: { address: r.addresses[0], cold: r.addresses[1] }, why: c.label });
+        o.addresses.length >= 2 && a({ tool: c.tool, input: { address: o.addresses[0], cold: o.addresses[1] }, why: c.label });
         continue;
       }
       if (c.needs === "domain") {
-        const d = [...e.matchAll(gt)].map((u) => u[1].toLowerCase()).filter((u) => !/(^|\.)noshashi\.(com|app)$/.test(u));
+        const d = [...e.matchAll(wt)].map((u) => u[1].toLowerCase()).filter((u) => !/(^|\.)noshashi\.(com|app)$/.test(u));
         d[0] && a({ tool: c.tool, input: { domain: d[0] }, why: c.label });
         continue;
       }
-      if (c.tool === "verify_domain" && r.addresses.length === 0) {
-        const d = [...e.replace(/xrp-ledger\.toml/gi, " ").matchAll(gt)].map((u) => u[1].toLowerCase()).filter((u) => !/(^|\.)noshashi\.com$/.test(u));
+      if (c.tool === "verify_domain" && o.addresses.length === 0) {
+        const d = [...e.replace(/xrp-ledger\.toml/gi, " ").matchAll(wt)].map((u) => u[1].toLowerCase()).filter((u) => !/(^|\.)noshashi\.com$/.test(u));
         d[0] && a({ tool: c.tool, input: { domain: d[0] }, why: c.label });
         continue;
       }
       if (c.needs === "address")
-        for (const d of r.addresses) a({ tool: c.tool, input: { [vi[c.tool] ?? "address"]: d }, why: c.label });
+        for (const d of o.addresses) a({ tool: c.tool, input: { [Ti[c.tool] ?? "address"]: d }, why: c.label });
       else if (c.needs === "hash")
-        for (const d of r.hashes)
+        for (const d of o.hashes)
           a({ tool: c.tool, input: c.tool === "read_token_rights" ? { token_id: d } : { hash: d }, why: c.label });
       else if (c.needs === "book") {
-        const d = r.addresses[0];
-        for (const u of r.currencies) d && a({ tool: c.tool, input: { currency: u, issuer: d }, why: c.label });
+        const d = o.addresses[0];
+        for (const u of o.currencies) d && a({ tool: c.tool, input: { currency: u, issuer: d }, why: c.label });
       } else
         a({ tool: c.tool, input: {}, why: c.label });
     }
   if (s.length === 0 && e.trim()) {
-    for (const c of r.hashes) a({ tool: "read_settlement", input: { hash: c }, why: "a hash on its own" });
-    for (const c of r.addresses) a({ tool: "check_address", input: { address: c }, why: "an address on its own" });
+    for (const c of o.hashes) a({ tool: "read_settlement", input: { hash: c }, why: "a hash on its own" });
+    for (const c of o.addresses) a({ tool: "check_address", input: { address: c }, why: "an address on its own" });
   }
-  const o = s.length === 0 && e.trim().length > 0 || n.calls.length === 0 && Si.test(e.replace(Ht, " ").replace(Ut, " "));
-  return { calls: s.slice(0, 6), knowledge: o, entities: r, note: n.note };
+  const r = s.length === 0 && e.trim().length > 0 || n.calls.length === 0 && xi.test(e.replace(Mt, " ").replace(zt, " "));
+  return { calls: s.slice(0, 6), knowledge: r, entities: o, note: n.note };
 }
-const Ni = Et.scenes, Ii = X("noshashi noshx plan plans need use screen screens help feature which tool tools we our us want get way much many cost price pay"), Ei = /\bwhich\b|\bwhat (screen|tool|plan|should)|how (do|can|does|should) (i|we|noshashi)|\bhelp\b|\bneed\b|\buse\b|where (do|can)|feature/i;
-function Fi(e, t = 3) {
+const Ri = Dt.scenes, Di = X("noshashi noshx plan plans need use screen screens help feature which tool tools we our us want get way much many cost price pay"), Oi = /\bwhich\b|\bwhat (screen|tool|plan|should)|how (do|can|does|should) (i|we|noshashi)|\bhelp\b|\bneed\b|\buse\b|where (do|can)|feature/i;
+function Ci(e, t = 3) {
   const n = new Set(X(e));
-  for (const s of Ii) n.delete(s);
-  return Ni.map((s) => {
-    const a = X(`${s.name} ${s.name} ${s.summary}`), i = a.filter((r) => n.has(r)).length;
+  for (const s of Di) n.delete(s);
+  return Ri.map((s) => {
+    const a = X(`${s.name} ${s.name} ${s.summary}`), i = a.filter((o) => n.has(o)).length;
     return { scene: s, score: i / Math.sqrt(a.length + 4) };
   }).filter((s) => s.score > 0.12).sort((s, a) => a.score - s.score).slice(0, t).map((s) => s.scene);
 }
-const mt = { critical: 0, warn: 1, info: 2, ok: 3 }, Ri = { critical: "✕", warn: "!", info: "·", ok: "✓" };
-function C(e, t = 6) {
-  const n = [...e].sort((s, a) => mt[s.severity] - mt[a.severity]).slice(0, t);
-  return n.length === 0 ? "Nothing notable was recorded." : n.map((s) => `${Ri[s.severity]} ${s.title}. ${s.detail}${s.action ? ` What to do: ${s.action}` : ""}`).join(`
+const bt = { critical: 0, warn: 1, info: 2, ok: 3 }, Pi = { critical: "✕", warn: "!", info: "·", ok: "✓" };
+function O(e, t = 6) {
+  const n = [...e].sort((s, a) => bt[s.severity] - bt[a.severity]).slice(0, t);
+  return n.length === 0 ? "Nothing notable was recorded." : n.map((s) => `${Pi[s.severity]} ${s.title}. ${s.detail}${s.action ? ` What to do: ${s.action}` : ""}`).join(`
 `);
 }
-const L = (e) => e ? ` (validated ledger ${e.toLocaleString("en-US")})` : "", yt = (e) => e.length > 12 ? `${e.slice(0, 6)}…${e.slice(-4)}` : e;
-function wt(e, t) {
+const L = (e) => e ? ` (validated ledger ${e.toLocaleString("en-US")})` : "", vt = (e) => e.length > 12 ? `${e.slice(0, 6)}…${e.slice(-4)}` : e;
+function kt(e, t) {
   switch (e) {
     case "check_address": {
       const n = t, s = ee[n.verdict];
       return [
         `Address check for ${n.address}${L(n.ledgerIndex)}: ${s.label}.${n.headline === s.label ? "" : ` ${n.headline}`}`,
         n.exists ? `Balance ${n.balanceXrp.toLocaleString("en-US")} XRP${n.domain ? `, claims the domain ${n.domain} (claimed, not verified)` : ""}${n.isIssuer ? `, issues ${n.issuedCurrencies.join(", ") || "tokens"}` : ""}.` : "",
-        C(n.findings),
+        O(n.findings),
         "This reports what the ledger publishes. Nothing recorded against an address is not the same as safe."
       ].filter(Boolean).join(`
 `);
     }
     case "certify_authority": {
       const n = t, s = n.checks.map((a) => {
-        const i = Ns(a);
+        const i = Fs(a);
         return `${i === "PASS" ? "✓" : i === "FAIL" ? "✕" : "!"} ${a.label} (${a.severity === "block" ? "blocking" : "warning"}): ${i}. ${a.detail}`;
       }).join(`
 `);
@@ -5205,49 +5260,49 @@ function wt(e, t) {
     case "read_control_surface": {
       const n = t;
       return [
-        `Who controls ${n.address}${L(n.ledgerIndex)}: master key ${n.masterKeyEnabled ? "enabled" : "disabled"}${n.regularKey ? `, regular key ${yt(n.regularKey)}` : ""}${n.signers.present ? `, signer list quorum ${n.signers.quorum} with the fewest signers that reach it being ${n.signers.minimumSigners}` : ", no signer list"}. Balance ${n.balanceXrp.toLocaleString("en-US")} XRP, ${n.reserveLockedXrp.toLocaleString("en-US")} XRP locked in reserve${n.escrowedXrp ? `, ${n.escrowedXrp.toLocaleString("en-US")} XRP in escrow` : ""}.`,
-        C(xn(n))
+        `Who controls ${n.address}${L(n.ledgerIndex)}: master key ${n.masterKeyEnabled ? "enabled" : "disabled"}${n.regularKey ? `, regular key ${vt(n.regularKey)}` : ""}${n.signers.present ? `, signer list quorum ${n.signers.quorum} with the fewest signers that reach it being ${n.signers.minimumSigners}` : ", no signer list"}. Balance ${n.balanceXrp.toLocaleString("en-US")} XRP, ${n.reserveLockedXrp.toLocaleString("en-US")} XRP locked in reserve${n.escrowedXrp ? `, ${n.escrowedXrp.toLocaleString("en-US")} XRP in escrow` : ""}.`,
+        O(In(n))
       ].join(`
 `);
     }
     case "read_provenance": {
       const n = t;
-      return [`Provenance of ${n.address}${n.ageDays !== void 0 ? `, about ${Math.round(n.ageDays).toLocaleString("en-US")} days old` : ""}${n.fundedBy ? `, first funded by ${n.fundedBy}` : ""}:`, C(Dn(n))].join(`
+      return [`Provenance of ${n.address}${n.ageDays !== void 0 ? `, about ${Math.round(n.ageDays).toLocaleString("en-US")} days old` : ""}${n.fundedBy ? `, first funded by ${n.fundedBy}` : ""}:`, O(Pn(n))].join(`
 `);
     }
     case "read_book": {
       const n = t;
-      return [`Order book${L(n.ledgerIndex)}:`, C(Xn(n))].join(`
+      return [`Order book${L(n.ledgerIndex)}:`, O(Un(n))].join(`
 `);
     }
     case "read_settlement": {
       const n = t;
       return [
-        `Transaction ${yt(n.hash)}${L(n.ledgerIndex)}: ${n.transactionType}, result ${n.result}${n.validated ? "" : " (not yet validated, so nothing here is final)"}.`,
-        C(zn(n))
+        `Transaction ${vt(n.hash)}${L(n.ledgerIndex)}: ${n.transactionType}, result ${n.result}${n.validated ? "" : " (not yet validated, so nothing here is final)"}.`,
+        O(Wn(n))
       ].join(`
 `);
     }
     case "read_pool": {
       const n = t;
-      return [`AMM pool${L(n.ledgerIndex)}:`, C(Kn(n))].join(`
+      return [`AMM pool${L(n.ledgerIndex)}:`, O(Jn(n))].join(`
 `);
     }
     case "read_issuance": {
       const n = t;
-      return [`Issuance${L(n.ledgerIndex)}:`, C(ts(n))].join(`
+      return [`Issuance${L(n.ledgerIndex)}:`, O(as(n))].join(`
 `);
     }
     case "read_claims": {
       const n = t;
-      return [`Tokens sent to the account${L(n.ledgerIndex)}:`, C(rs(n))].join(`
+      return [`Tokens sent to the account${L(n.ledgerIndex)}:`, O(ls(n))].join(`
 `);
     }
     case "read_token_rights":
-      return ["NFT rights:", C(bs(t))].join(`
+      return ["NFT rights:", O(Ss(t))].join(`
 `);
     case "ledger_sync":
-      return ["What the public servers report:", C(xs(t))].join(`
+      return ["What the public servers report:", O(Is(t))].join(`
 `);
     case "ledger_status": {
       const n = t;
@@ -5260,7 +5315,7 @@ function wt(e, t) {
 Hardening plan (unsigned; review and sign each in your own wallet, NOSHASHI never signs):
 ${s.plan.map((i) => `→ ${i.title}: ${JSON.stringify(i.tx)}${i.caution ? ` Before signing: ${i.caution}` : ""}`).join(`
 `)}` : "";
-      return [`Security check for ${n.address}${L(n.ledgerIndex)}: grade ${s.grade}, ${s.score}/100. ${s.summary}`, C(s.findings), a].filter(Boolean).join(`
+      return [`Security check for ${n.address}${L(n.ledgerIndex)}: grade ${s.grade}, ${s.score}/100. ${s.summary}`, O(s.findings), a].filter(Boolean).join(`
 `);
     }
     case "investigate_hack": {
@@ -5280,14 +5335,14 @@ ${n.options.map((a) => `[${a.outlook.replace("_", " ").toUpperCase()}] ${a.title
 `);
     }
     default:
-      return Z(e)?.compose?.(t) ?? "";
+      return H(e)?.compose?.(t) ?? "";
   }
 }
-function Di(e) {
+function Li(e) {
   return e.replace(/^Q: .*$/m, "").replace(/^A: /m, "").replace(/([.!?])\s+/g, `$1
 `).split(/\n+/).map((t) => t.trim()).filter((t) => t.length > 25 && !/^[|·—-]/.test(t));
 }
-function Ci(e, t) {
+function Xi(e, t) {
   if (t.length === 0) return "";
   const n = new Set(X(e)), s = t[0], a = /^(Help ›|Support ›|Learn NOSHASHI › Knowledge check|Pricing ›)/, i = t.slice(0, 2).find((p) => a.test(p.title) && p.score >= s.score * 0.85);
   if (i) {
@@ -5300,83 +5355,84 @@ Source: ${i.title} · ${i.source}`;
   }
   if (s.title.startsWith("Learn NOSHASHI › Word list")) {
     const p = s.text.split(`
-`).find((h) => X(h.split(":")[0]).some((l) => n.has(l)));
+`).find((f) => X(f.split(":")[0]).some((l) => n.has(l)));
     if (p) return `${p}
 
 Source: NOSHASHI word list · ${s.source}`;
   }
-  const r = t.slice(0, 3).flatMap(
-    (p, h) => Di(p.text).map((l, y) => {
+  const o = t.slice(0, 3).flatMap(
+    (p, f) => Li(p.text).map((l, y) => {
       const w = X(l), m = w.filter((g) => n.has(g)).length;
-      return { hit: p, sentence: l, position: y, score: m / Math.sqrt(w.length + 1) + (h === 0 ? 0.3 : 0) - y * 0.01 };
+      return { hit: p, sentence: l, position: y, score: m / Math.sqrt(w.length + 1) + (f === 0 ? 0.3 : 0) - y * 0.01 };
     })
-  ), o = /* @__PURE__ */ new Set(), c = r.filter((p) => p.score > 0).sort((p, h) => h.score - p.score).filter((p) => {
-    const h = p.sentence.toLowerCase().replace(/\s+/g, " ");
-    return !o.has(h) && o.add(h);
+  ), r = /* @__PURE__ */ new Set(), c = o.filter((p) => p.score > 0).sort((p, f) => f.score - p.score).filter((p) => {
+    const f = p.sentence.toLowerCase().replace(/\s+/g, " ");
+    return !r.has(f) && r.add(f);
   }).slice(0, 4);
   if (c.length === 0) return `${s.text.slice(0, 600)}
 
 Source: ${s.title} · ${s.source}`;
   const d = /* @__PURE__ */ new Map();
   for (const p of c) d.set(p.hit, [...d.get(p.hit) ?? [], p]);
-  const u = [], f = [];
-  for (const [p, h] of d)
-    u.push(h.sort((l, y) => l.position - y.position).map((l) => l.sentence).join(" ")), f.push(`${p.title} · ${p.source}`);
+  const u = [], h = [];
+  for (const [p, f] of d)
+    u.push(f.sort((l, y) => l.position - y.position).map((l) => l.sentence).join(" ")), h.push(`${p.title} · ${p.source}`);
   return `${u.join(`
 
 `)}
 
-Source${f.length > 1 ? "s" : ""}: ${f.join("; ")}`;
+Source${h.length > 1 ? "s" : ""}: ${h.join("; ")}`;
 }
-async function Oi(e, t, n) {
-  const s = qt(e, { tickets: !!Z("list_tickets") }), a = [], i = (f) => {
-    a.push(f), n?.(f);
-  }, r = await Promise.all(
-    s.calls.map(async (f) => {
-      const p = await ve(f.tool, f.input, t), h = s.calls.some((l) => l.tool === "check_address" && l.input.address === f.input.issuer);
-      if (p.ok === !1 && p.gated && f.tool === "certify_authority" && typeof f.input.issuer == "string" && !h) {
-        const l = await ve("check_address", { address: f.input.issuer }, t);
+async function Hi(e, t, n) {
+  const s = jt(e, { tickets: !!H("list_tickets") }), a = [], i = (h) => {
+    a.push(h), n?.(h);
+  }, o = await Promise.all(
+    s.calls.map(async (h) => {
+      const p = await ke(h.tool, h.input, t), f = s.calls.some((l) => l.tool === "check_address" && l.input.address === h.input.issuer);
+      if (p.ok === !1 && p.gated && h.tool === "certify_authority" && typeof h.input.issuer == "string" && !f) {
+        const l = await ke("check_address", { address: h.input.issuer }, t);
         if (l.ok)
-          return i({ kind: "tool", name: "check_address", input: { address: f.input.issuer }, ok: !0, summary: "read" }), { call: { ...f, tool: "check_address", input: { ...f.input, address: f.input.issuer } }, result: l, gatedFrom: f };
+          return i({ kind: "tool", name: "check_address", input: { address: h.input.issuer }, ok: !0, summary: "read", citation: pe("check_address", H("check_address")?.screen ?? "check_address", { address: h.input.issuer }, l.value) }), { call: { ...h, tool: "check_address", input: { ...h.input, address: h.input.issuer } }, result: l, gatedFrom: h };
       }
-      if (!p.ok && f.tool === "read_settlement" && !p.gated) {
-        const l = await ve("read_token_rights", { token_id: f.input.hash }, t);
+      if (!p.ok && h.tool === "read_settlement" && !p.gated) {
+        const l = await ke("read_token_rights", { token_id: h.input.hash }, t);
         if (l.ok)
-          return i({ kind: "tool", name: "read_token_rights", input: { token_id: f.input.hash }, ok: !0, summary: "read" }), { call: { ...f, tool: "read_token_rights" }, result: l };
+          return i({ kind: "tool", name: "read_token_rights", input: { token_id: h.input.hash }, ok: !0, summary: "read", citation: pe("read_token_rights", H("read_token_rights")?.screen ?? "read_token_rights", { token_id: h.input.hash }, l.value) }), { call: { ...h, tool: "read_token_rights" }, result: l };
       }
       return i({
         kind: "tool",
-        name: f.tool,
-        input: f.input,
+        name: h.tool,
+        input: h.input,
         ok: p.ok,
-        summary: p.ok ? "read" : p.error
-      }), { call: f, result: p };
+        summary: p.ok ? "read" : p.error,
+        ...p.ok ? { citation: pe(h.tool, H(h.tool)?.screen ?? h.tool, h.input, p.value) } : {}
+      }), { call: h, result: p };
     })
-  ), o = [];
-  for (const f of r) {
-    const { call: p, result: h } = f, l = Z(p.tool)?.screen ?? p.tool;
-    h.ok && "gatedFrom" in f ? o.push(
-      `${wt(p.tool, h.value)}
+  ), r = [];
+  for (const h of o) {
+    const { call: p, result: f } = h, l = H(p.tool)?.screen ?? p.tool;
+    f.ok && "gatedFrom" in h ? r.push(
+      `${kt(p.tool, f.value)}
 
 That is the free address check. The six issuer checks with a GO/HOLD/NO-GO certificate need Pro in the app, and are free on the website without an account: https://www.noshashi.app/certificate/`
-    ) : h.ok ? o.push(wt(p.tool, h.value)) : h.gated ? o.push(
-      p.tool === "certify_authority" ? `${l}: ${h.error} The same six issuer checks are free on the website, without an account: https://www.noshashi.app/certificate/ (paste ${String(p.input.issuer ?? "the issuer address")}).` : `${l}: ${h.error} It is available after upgrading in Pricing.`
-    ) : Z(p.tool)?.compose ? o.push(`${l}: ${h.error}`) : o.push(`${l}: could not be read. ${h.error}`);
+    ) : f.ok ? r.push(kt(p.tool, f.value)) : f.gated ? r.push(
+      p.tool === "certify_authority" ? `${l}: ${f.error} The same six issuer checks are free on the website, without an account: https://www.noshashi.app/certificate/ (paste ${String(p.input.issuer ?? "the issuer address")}).` : `${l}: ${f.error} It is available after upgrading in Pricing.`
+    ) : H(p.tool)?.compose ? r.push(`${l}: ${f.error}`) : r.push(`${l}: could not be read. ${f.error}`);
   }
   let c = "";
   if (s.knowledge) {
-    const f = await Dt(e, 5).catch(() => []);
-    if (i({ kind: "tool", name: "search_noshashi", input: { query: e.slice(0, 60) }, ok: f.length > 0, summary: f.length ? `${f.length} passages` : "nothing matched" }), c = Ci(e, f), Ei.test(e)) {
-      const p = Fi(e);
+    const h = await Pt(e, 5).catch(() => []);
+    if (i({ kind: "tool", name: "search_noshashi", input: { query: e.slice(0, 60) }, ok: h.length > 0, summary: h.length ? `${h.length} passages` : "nothing matched" }), c = Xi(e, h), Oi.test(e)) {
+      const p = Ci(e);
       p.length > 0 && (c += `${c ? `
 
 ` : ""}Where in NOSHASHI:
-${p.map((h) => `→ ${h.name} (${h.plan}): ${h.summary}`).join(`
+${p.map((f) => `→ ${f.name} (${f.plan}): ${f.summary}`).join(`
 `)}`);
     }
   }
-  s.note && o.unshift(s.note);
-  const d = o.join(`
+  s.note && r.unshift(s.note);
+  const d = r.join(`
 
 `);
   let u = [d, c].filter(Boolean).join(`
@@ -5384,13 +5440,13 @@ ${p.map((h) => `→ ${h.name} (${h.plan}): ${h.summary}`).join(`
 `);
   return u || (u = "I could not find that in NOSHASHI's pages, and the question names nothing I can read from the ledger. Name an address (r…), an issuer and currency, or a 64-character transaction hash, or ask about a NOSHASHI screen, plan or feature."), { text: u, steps: a, plan: s, facts: d };
 }
-const q = {
+const M = {
   support: "support@noshashi.app",
   institutions: "institutions@noshashi.app",
   security: "security@noshashi.app",
   privacy: "privacy@noshashi.app",
   form: "/contact/"
-}, Fe = [
+}, De = [
   {
     id: "what",
     keywords: ["what", "noshashi", "do", "product", "about", "purpose", "explain", "is"],
@@ -5537,36 +5593,36 @@ const q = {
     id: "contact",
     keywords: ["contact", "email", "human", "sales", "talk", "reach", "help", "support", "someone"],
     q: "How do I reach a person?",
-    a: `The contact form reaches the team directly. For specific routes: ${q.support} for product support, ${q.institutions} for institutional enquiries, ${q.security} for vulnerability reports and ${q.privacy} for data questions.`,
+    a: `The contact form reaches the team directly. For specific routes: ${M.support} for product support, ${M.institutions} for institutional enquiries, ${M.security} for vulnerability reports and ${M.privacy} for data questions.`,
     links: [{ label: "Contact form", href: "/contact/" }]
   }
-], Pi = new Set(
+], qi = new Set(
   "a an the is are was were be been do does did can could would should i you it this that of for to in on at by with my your our we us and or if how what when where why not no yes please tell me about".split(" ")
 );
-function Se(e) {
-  return String(e || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((t) => t.length > 1 && !Pi.has(t));
+function $e(e) {
+  return String(e || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((t) => t.length > 1 && !qi.has(t));
 }
-function Li(e) {
-  const t = Se(e);
-  return t.length ? Fe.map((n) => {
-    const s = new Set(n.keywords), a = new Set(Se(n.q)), i = new Set(Se(n.a));
-    let r = 0;
-    for (const o of t)
-      s.has(o) ? r += 3 : a.has(o) ? r += 2 : i.has(o) ? r += 0.5 : [...s].some((c) => c.startsWith(o) || o.startsWith(c)) && (r += 1.5);
-    return { entry: n, score: r };
+function Ui(e) {
+  const t = $e(e);
+  return t.length ? De.map((n) => {
+    const s = new Set(n.keywords), a = new Set($e(n.q)), i = new Set($e(n.a));
+    let o = 0;
+    for (const r of t)
+      s.has(r) ? o += 3 : a.has(r) ? o += 2 : i.has(r) ? o += 0.5 : [...s].some((c) => c.startsWith(r) || r.startsWith(c)) && (o += 1.5);
+    return { entry: n, score: o };
   }).filter((n) => n.score > 0).sort((n, s) => s.score - n.score) : [];
 }
-const bt = 3;
-function Xi(e) {
-  const t = Li(e), n = t[0];
-  if (!n || n.score < bt)
+const St = 3;
+function Mi(e) {
+  const t = Ui(e), n = t[0];
+  if (!n || n.score < St)
     return {
       grounded: !1,
       text: "I can answer questions about pricing, downloads and verification, what the paid tiers add, privacy and security posture, billing, and the XRPL data the product reads. I don't have a confident answer to that one — rather than guess, send it to the team and you'll get a real answer.",
-      links: [{ label: "Contact the team", href: q.form }],
+      links: [{ label: "Contact the team", href: M.form }],
       matched: t.slice(0, 3).map((a) => a.entry.id)
     };
-  const s = t.slice(1, 3).filter((a) => a.score > bt * 0.8).map((a) => a.entry.q);
+  const s = t.slice(1, 3).filter((a) => a.score > St * 0.8).map((a) => a.entry.q);
   return {
     grounded: !0,
     text: n.entry.a,
@@ -5575,79 +5631,79 @@ function Xi(e) {
     matched: [n.entry.id]
   };
 }
-const vt = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz", Hi = /\bs[1-9A-HJ-NP-Za-km-z]{24,34}\b/g;
-function Ui(e) {
+const $t = "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz", zi = /\bs[1-9A-HJ-NP-Za-km-z]{24,34}\b/g;
+function ji(e) {
   const t = [0];
   for (const i of e) {
-    const r = vt.indexOf(i);
-    if (r < 0) return null;
-    let o = r;
+    const o = $t.indexOf(i);
+    if (o < 0) return null;
+    let r = o;
     for (let c = t.length - 1; c >= 0; c -= 1)
-      o += t[c] * 58, t[c] = o & 255, o >>= 8;
-    for (; o > 0; )
-      t.unshift(o & 255), o >>= 8;
+      r += t[c] * 58, t[c] = r & 255, r >>= 8;
+    for (; r > 0; )
+      t.unshift(r & 255), r >>= 8;
   }
   let n = 0;
-  for (; n < e.length && e[n] === vt[0]; ) n += 1;
+  for (; n < e.length && e[n] === $t[0]; ) n += 1;
   let s = 0;
   for (; s < t.length && t[s] === 0; ) s += 1;
   const a = new Uint8Array(n + t.length - s);
   return a.set(t.slice(s), n), a;
 }
-async function qi(e) {
+async function Bi(e) {
   const t = e.slice(0, e.length - 4), n = await crypto.subtle.digest("SHA-256", t), s = new Uint8Array(await crypto.subtle.digest("SHA-256", n));
-  return e.slice(e.length - 4).every((i, r) => i === s[r]);
+  return e.slice(e.length - 4).every((i, o) => i === s[o]);
 }
-async function Mi(e) {
-  const t = Ui(e);
+async function Wi(e) {
+  const t = ji(e);
   if (!t) return !1;
   const n = t.length === 21 && t[0] === 33, s = t.length === 23 && t[0] === 1 && t[1] === 225 && t[2] === 75;
-  return !n && !s ? !1 : qi(t);
+  return !n && !s ? !1 : Bi(t);
 }
-async function zi(e) {
-  for (const t of e.matchAll(Hi))
-    if (await Mi(t[0])) return !0;
+async function Gi(e) {
+  for (const t of e.matchAll(zi))
+    if (await Wi(t[0])) return !0;
   return !1;
 }
-class ji extends Error {
+class Ki extends Error {
   constructor() {
     super(
       "That message contains an XRPL secret seed, so it was not sent. NOSHASHI never needs a seed. Treat this one as exposed: move the funds to a new account and stop using it."
     ), this.name = "SecretInMessageError";
   }
 }
-const Mt = 10, zt = "noshashi:web.checks", xe = () => {
+const Bt = 10, Wt = "noshashi:web.checks", Ne = () => {
   const e = /* @__PURE__ */ new Date();
   return `${e.getUTCFullYear()}-${String(e.getUTCMonth() + 1).padStart(2, "0")}`;
 };
-function Bi() {
+function Yi() {
   try {
-    const e = JSON.parse(localStorage.getItem(zt) ?? "null");
-    if (e && e.month === xe() && typeof e.count == "number" && Number.isFinite(e.count))
+    const e = JSON.parse(localStorage.getItem(Wt) ?? "null");
+    if (e && e.month === Ne() && typeof e.count == "number" && Number.isFinite(e.count))
       return { month: e.month, count: Math.max(0, e.count) };
   } catch {
   }
-  return { month: xe(), count: 0 };
+  return { month: Ne(), count: 0 };
 }
-let jt = 0;
-function kt(e) {
-  jt = e;
+let Gt = 0;
+function Tt(e) {
+  Gt = e;
   try {
-    localStorage.setItem(zt, JSON.stringify({ month: xe(), count: e }));
+    localStorage.setItem(Wt, JSON.stringify({ month: Ne(), count: e }));
   } catch {
   }
 }
-const Ae = () => Math.max(Bi().count, jt), Wi = {
+const Ie = () => Math.max(Yi().count, Gt), Vi = {
   has: () => !1,
   spendFreeCheck: () => {
-    const e = Ae();
-    return e >= Mt ? !1 : (kt(e + 1), !0);
+    const e = Ie();
+    return e >= Bt ? !1 : (Tt(e + 1), !0);
   },
-  refundFreeCheck: () => kt(Math.max(0, Ae() - 1))
-}, Ne = "Support › ";
-Ks(
-  Fe.map((e) => ({
-    title: `${Ne}${e.q}`,
+  refundFreeCheck: () => Tt(Math.max(0, Ie() - 1))
+}, Ee = "Support › ";
+Qs(
+  De.map((e) => ({
+    title: `${Ee}${e.q}`,
     source: "noshashi.app support",
     text: `${e.q}
 ${e.a}`,
@@ -5655,63 +5711,63 @@ ${e.a}`,
     weight: 1.25
   }))
 );
-const $e = { label: "Contact the team", href: q.form };
-function Gi(e) {
+const Te = { label: "Contact the team", href: M.form };
+function Ji(e) {
   const t = /\n\nSources?: ([^\n]+)/.exec(e);
   if (!t) return { body: e, links: [] };
   const n = [];
   let s;
   for (const a of t[1].split("; ")) {
-    const i = a.lastIndexOf(" · "), r = i >= 0 ? a.slice(0, i) : a, o = i >= 0 ? a.slice(i + 3) : "";
-    r.startsWith(Ne) && (s = r.slice(Ne.length));
-    const c = /^https:\/\/www\.noshashi\.app(\/[^\s]*)?$/.exec(o);
+    const i = a.lastIndexOf(" · "), o = i >= 0 ? a.slice(0, i) : a, r = i >= 0 ? a.slice(i + 3) : "";
+    o.startsWith(Ee) && (s = o.slice(Ee.length));
+    const c = /^https:\/\/www\.noshashi\.app(\/[^\s]*)?$/.exec(r);
     if (!c) continue;
     const d = c[1] ?? "/";
-    if (n.some((f) => f.href.split("#")[0] === d.split("#")[0])) continue;
-    const u = (r.split(" › ").pop() ?? r).replace(/^NOSHASHI — /, "").trim();
+    if (n.some((h) => h.href.split("#")[0] === d.split("#")[0])) continue;
+    const u = (o.split(" › ").pop() ?? o).replace(/^NOSHASHI — /, "").trim();
     n.push({ label: u.length > 38 ? `${u.slice(0, 36)}…` : u, href: d });
   }
   return { body: e.replace(t[0], ""), links: n.slice(0, 3), support: s };
 }
-async function Vi(e, t) {
+async function eo(e, t) {
   const n = String(e ?? "").trim().slice(0, 600);
   if (!n)
     return { text: "Ask a question about NOSHASHI, or paste an XRPL address, token id or transaction hash.", steps: [], links: [], related: [], source: "none" };
-  if (await zi(n))
-    return { text: new ji().message, steps: [], links: [], related: [], source: "refused" };
-  const s = qt(n).calls.length > 0, a = [];
+  if (await Gi(n))
+    return { text: new Ki().message, steps: [], links: [], related: [], source: "refused" };
+  const s = jt(n).calls.length > 0, a = [];
   let i = !1;
   try {
-    const r = await Oi(n, Wi, (h) => {
-      if (h.kind !== "tool") return;
-      if (h.name === "search_noshashi") {
-        i = h.ok;
+    const o = await Hi(n, Vi, (f) => {
+      if (f.kind !== "tool") return;
+      if (f.name === "search_noshashi") {
+        i = f.ok;
         return;
       }
-      const l = { reader: Ki[h.name] ?? h.name, ok: h.ok, summary: h.summary };
+      const l = { reader: Qi[f.name] ?? f.name, ok: f.ok, summary: f.summary };
       a.push(l), t?.(l);
     });
-    if (!r.facts && !i)
-      return { text: Xi(n).text, steps: a, links: [$e], related: [], source: "none" };
-    const { body: o, links: c, support: d } = Gi(r.text), u = d ? Fe.find((h) => h.q === d) : void 0, f = o.includes("https://www.noshashi.app/certificate/") ? [{ label: "Free issuer certificate", href: "/certificate/" }] : [], p = [...u?.links ?? [], ...f, ...c];
+    if (!o.facts && !i)
+      return { text: Mi(n).text, steps: a, links: [Te], related: [], source: "none" };
+    const { body: r, links: c, support: d } = Ji(o.text), u = d ? De.find((f) => f.q === d) : void 0, h = r.includes("https://www.noshashi.app/certificate/") ? [{ label: "Free issuer certificate", href: "/certificate/" }] : [], p = [...u?.links ?? [], ...h, ...c];
     return {
-      text: o,
+      text: r,
       steps: a,
-      links: p.some((h) => h.href === q.form) ? p.slice(0, 4) : [...p.slice(0, 3), $e],
+      links: p.some((f) => f.href === M.form) ? p.slice(0, 4) : [...p.slice(0, 3), Te],
       related: [],
-      source: r.facts ? "ledger" : u ? "support" : "pages"
+      source: o.facts ? "ledger" : u ? "support" : "pages"
     };
-  } catch (r) {
+  } catch (o) {
     return {
-      text: `NOSHX could not finish that: ${r instanceof Error ? r.message : "an unexpected error"}. Try again, or contact the team.`,
+      text: `NOSHX could not finish that: ${o instanceof Error ? o.message : "an unexpected error"}. Try again, or contact the team.`,
       steps: a,
-      links: [$e],
+      links: [Te],
       related: [],
       source: s ? "ledger" : "none"
     };
   }
 }
-const Ki = {
+const Qi = {
   check_address: "the address",
   read_claims: "the inbox",
   read_token_rights: "the token",
@@ -5724,10 +5780,10 @@ const Ki = {
   certify_authority: "the issuer",
   ledger_status: "the latest ledger",
   ledger_sync: "the public servers"
-}, Ji = () => Math.max(0, Mt - Ae()), Qi = () => Ys();
+}, to = () => Math.max(0, Bt - Ie()), no = () => Zs();
 export {
-  Vi as ask,
-  Ji as checksLeft,
-  Qi as prewarm,
-  Gi as splitSources
+  eo as ask,
+  to as checksLeft,
+  no as prewarm,
+  Ji as splitSources
 };
