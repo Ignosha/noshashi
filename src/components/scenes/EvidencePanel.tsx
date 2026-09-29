@@ -21,6 +21,7 @@ import { OpenInvestigationButton } from "./CasesPanel";
 import { RequestExceptionButton } from "./OrgPolicyManager";
 import { ExportReportButton, ReplayButton, ReplayResultView } from "./ReplayPanel";
 import type { ReplayResult } from "@/lib/desk/replay";
+import { markEvidenceChecked } from "@/lib/onboarding";
 
 const LIST = 60;
 
@@ -93,6 +94,7 @@ export function EvidencePanel({
     setChecking(true);
     try {
       setCheck(await verifyEntry(selected));
+      void markEvidenceChecked();
     } finally {
       setChecking(false);
     }

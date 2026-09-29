@@ -3,6 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
 import { DecisionCard } from "@/components/nova/DecisionCard";
+import { FirstRunGuide } from "@/components/scenes/FirstRunGuide";
 import { NovaLogo } from "@/components/nova/NovaLogo";
 import { CountUp } from "@/components/nova/CountUp";
 import { StatusDot } from "@/components/nova/StatusDot";
@@ -201,9 +202,15 @@ function Reveal({
 export function HomeScene({
   data,
   onNavigate,
+  mode,
+  modeChosen,
+  onChooseMode,
 }: {
   data: XrplState;
   onNavigate: (scene: string) => void;
+  mode: "executive" | "analyst";
+  modeChosen: boolean;
+  onChooseMode: (mode: "executive" | "analyst") => void;
 }) {
   const { ledger, connected, events, successRate } = data;
   const [filter, setFilter] = useState<"all" | Maturity>("all");
@@ -255,13 +262,13 @@ export function HomeScene({
             </div>
 
             <p className="max-w-[680px] text-[15px] leading-relaxed text-foreground/85">
-              Compliance on the XRP Ledger is a cost centre — a thing institutions
-              survive rather than use. NOSHASHI turns it into infrastructure:
-              every settlement is adjudicated <em className="not-italic text-foreground">before</em> it is
+              Whether an XRPL asset or transaction can move under your policy,
+              whether enough real liquidity exists to execute, and why. Every
+              settlement is analysed <em className="not-italic text-foreground">before</em> it is
               signed, answered <span className="text-go">GO</span> /{" "}
               <span className="text-hold">HOLD</span> /{" "}
-              <span className="text-no-go">NO-GO</span>, and handed back with a
-              receipt an auditor can verify.
+              <span className="text-no-go">NO-GO</span> from validated ledger state,
+              and recorded with a receipt an auditor can verify.
             </p>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -279,6 +286,11 @@ export function HomeScene({
               </Button>
             </div>
           </motion.div>
+
+          {/* First run: purpose, then view → analysis → evidence → policy. */}
+          <Reveal delay={0.05} className="mt-8">
+            <FirstRunGuide mode={mode} modeChosen={modeChosen} onChooseMode={onChooseMode} onNavigate={onNavigate} />
+          </Reveal>
 
           {/* What was decided, why, and whether it can be proved: the
               first thing an executive reads, before any telemetry. */}

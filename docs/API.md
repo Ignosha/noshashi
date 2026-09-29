@@ -46,13 +46,13 @@ is one that double-charges and double-logs.
 ## 2. Base URL and versioning
 
 ```
-https://api.noshashi.app/v1
+https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify
 ```
 
-Currently served directly from Supabase Edge Functions at
-`https://<project>.supabase.co/functions/v1/noshashi-verify`. The
-`api.noshashi.app` origin is a CNAME in front of it; both work, and the
-vanity origin is the one to publish.
+Served directly by the Supabase Edge Function. Settlement adjudication is
+the bare path; read verbs are sub-paths of it. A vanity origin
+(`api.noshashi.app`) is planned but **not configured**: do not integrate
+against it until this section says otherwise.
 
 Versioning is in the path. `/v1` is frozen once the first customer
 integrates: new fields may be **added** to a response, and new optional
@@ -141,13 +141,14 @@ Domain?**
 ### Request
 
 ```http
-POST /v1/compliance/rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH HTTP/1.1
-Host: api.noshashi.app
+POST /functions/v1/noshashi-verify HTTP/1.1
+Host: xiurbiwuwcfowqnpmwki.supabase.co
 Authorization: Bearer nsh_live_…
 Content-Type: application/json
 Idempotency-Key: settlement-8814-attempt-1
 
 {
+  "subject": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH",
   "domain": "DEX-US",
   "amount_xrp": 25000
 }
@@ -525,7 +526,7 @@ the winner's receipt as a replay. No double charge, one audit row.
 ### 11.2 First call
 
 ```bash
-curl -sS -X POST https://api.noshashi.app/v1/compliance \
+curl -sS -X POST https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify \
   -H "Authorization: Bearer $NOSHASHI_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: $(uuidgen)" \
@@ -541,7 +542,7 @@ trailing newline, or the `nsh_live_` prefix dropped. Confirm the endpoint
 is reachable and your JSON is right with the unauthenticated descriptor:
 
 ```bash
-curl -sS https://api.noshashi.app/v1/compliance
+curl -sS https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify
 ```
 
 ### 11.3 Node
@@ -560,7 +561,7 @@ export async function verify(subject, domain, amountXrp, idempotencyKey) {
       await new Promise((r) => setTimeout(r, backoff[attempt] * Math.random()));
     }
 
-    const response = await fetch("https://api.noshashi.app/v1/compliance", {
+    const response = await fetch("https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${KEY}`,
@@ -602,7 +603,7 @@ export async function verify(subject, domain, amountXrp, idempotencyKey) {
 import os, uuid, time, random, requests
 
 KEY = os.environ["NOSHASHI_KEY"]
-URL = "https://api.noshashi.app/v1/compliance"
+URL = "https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify"
 
 def verify(subject: str, domain: str, amount_xrp: float, idem: str | None = None):
     idem = idem or str(uuid.uuid4())

@@ -96,6 +96,7 @@ const AccountScene = lazy(() =>
   import("@/components/scenes/AccountScene").then((m) => ({ default: m.AccountScene }))
 );
 import { HomeScene } from "@/components/scenes/HomeScene";
+import { MODE_CHOSEN_KEY } from "@/lib/onboarding";
 import { SecurityScene } from "@/components/scenes/SecurityScene";
 import { MissionControlScene } from "@/components/scenes/MissionControlScene";
 import { VerificationScene } from "@/components/scenes/VerificationScene";
@@ -597,6 +598,16 @@ function ConsoleApp() {
   // shows every tool. New installs start in Executive (progressive
   // disclosure); the choice persists.
   const [consoleMode, setConsoleMode] = useSetting<"executive" | "analyst">("console.mode", "executive");
+  // Whether the operator has picked a view, rather than inheriting the default
+  // (the first step of the getting-started guide on Home).
+  const [modeChosen, setModeChosen] = useSetting(MODE_CHOSEN_KEY, false);
+  const chooseMode = useCallback(
+    (m: "executive" | "analyst") => {
+      setConsoleMode(m);
+      setModeChosen(true);
+    },
+    [setConsoleMode, setModeChosen]
+  );
   useEffect(() => {
     const check = () => setShortRail(window.innerHeight / textScale < 720);
     check();
@@ -969,7 +980,7 @@ function ConsoleApp() {
                       key={m}
                       role="radio"
                       aria-checked={consoleMode === m}
-                      onClick={() => setConsoleMode(m)}
+                      onClick={() => chooseMode(m)}
                       title={m === "executive" ? "The core: decisions, liquidity and evidence" : "Every tool, with the raw ledger detail"}
                       className={cn(
                         "stencil rounded px-2 py-1.5 text-[10.5px] tracking-[0.1em] transition-colors",
@@ -982,7 +993,7 @@ function ConsoleApp() {
                 </div>
               ) : (
                 <button
-                  onClick={() => setConsoleMode(consoleMode === "executive" ? "analyst" : "executive")}
+                  onClick={() => chooseMode(consoleMode === "executive" ? "analyst" : "executive")}
                   aria-label={`Console mode: ${consoleMode}. Switch to ${consoleMode === "executive" ? "analyst" : "executive"}`}
                   title={`Mode: ${consoleMode}`}
                   className="stencil grid h-8 w-full place-items-center rounded-md border border-border text-[10.5px] text-muted-foreground hover:text-foreground"
@@ -1144,7 +1155,7 @@ function ConsoleApp() {
                   <ErrorBoundary scope={active.title} onReset={resync}>
                     <Suspense fallback={<SceneLoading />}>
                     {scene === "home" ? (
-                      <HomeScene data={data} onNavigate={goTo} />
+                      <HomeScene data={data} onNavigate={goTo} mode={consoleMode} modeChosen={modeChosen} onChooseMode={chooseMode} />
                     ) : scene === "control" ? (
                       <MissionControlScene
                         data={data}

@@ -609,7 +609,7 @@ function ApiTab({
         <Eyebrow className="mb-1.5 mt-4">CALLING THE API</Eyebrow>
         <pre className="mono-font selectable overflow-x-auto rounded-md border border-border bg-background p-2.5 text-[10.5px] leading-relaxed text-muted-foreground">
 {`curl -X POST \\
-  https://api.noshashi.app/v1/verify \\
+  https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify \\
   -H "Authorization: Bearer nsh_live_…" \\
   -H "Content-Type: application/json" \\
   -d '{

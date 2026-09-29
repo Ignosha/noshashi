@@ -27,7 +27,7 @@ Last reviewed 2026-09-29 against the code and the published legal pages
 
 | Item | Status | Detail |
 |---|---|---|
-| Security documentation | IMPLEMENTED | `SECURITY.md`, `docs/SECURITY_THREAT_MODEL.md`. |
+| Security documentation | IMPLEMENTED | `SECURITY.md`, `docs/SECURITY_THREAT_MODEL.md`, `docs/ARCHITECTURE.md`, `docs/DATA_MODEL.md`, `docs/AI_GOVERNANCE.md`. |
 | Certifications (SOC 2, ISO 27001) | PLANNED | None held. |
 | Penetration test | PLANNED | None performed. |
 | Encryption in transit | IMPLEMENTED | TLS to Supabase, XRPL servers, Stripe and the website. |
@@ -64,8 +64,8 @@ Last reviewed 2026-09-29 against the code and the published legal pages
 
 | Item | Status | Detail |
 |---|---|---|
-| Incident response | PARTIAL | Responsibilities and contact in `SECURITY.md`; a written incident-response runbook (`docs/INCIDENT_RESPONSE.md`) is PLANNED. |
-| Business continuity / disaster recovery | PARTIAL | Managed Postgres backups by Supabase; the desktop app keeps working read-only against XRPL without the server. A written DR plan with RTO/RPO is PLANNED. |
+| Incident response | IMPLEMENTED | Written runbook: roles, severity levels, containment per scenario (including key and credential rotation), evidence preservation, customer and breach notification, post-incident review (`docs/INCIDENT_RESPONSE.md`). Contact in `SECURITY.md`. |
+| Business continuity / disaster recovery | PARTIAL | Written plan with target RTO/RPO and restore steps (`docs/DISASTER_RECOVERY.md`); the desktop app keeps working against XRPL without the server. Gap: the database is on Supabase's Free plan (no managed backups) and the nightly encrypted backup is not yet succeeding; no restore has been tested. |
 | Support | IMPLEMENTED | In-app support tickets with staff inbox; email contact. No contractual response time. |
 | Status page | IMPLEMENTED | <https://www.noshashi.app/status/>. |
 | Versioning and change log | IMPLEMENTED | Semantic versions; `CHANGELOG.md`; release notes on the website; signed auto-update. |
