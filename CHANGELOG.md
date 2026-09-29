@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Liquidity: what can fill, before what is quoted
+
+- Every exit row on the Risk screen now leads with **fillable bids against
+  quoted bids** within 10% of mid, the share that is real, and the ledger it
+  was read at. Quoted counts every resting offer at face value; fillable
+  counts only what each offer's owner holds now (`taker_gets_funded`). Exit
+  simulation has always filled against fillable depth; now the headline
+  says so.
+- Tested on a real XRP/USD.Bitstamp book at ledger 107,312,802, where one
+  ask quotes 1,450,000.7 USD and its owner can deliver 3,370.63.
+- Invented "confidence" labels (HIGH / MEDIUM) removed from exit and watch
+  signals: they had no defined measure behind them.
+
 ## 1.0.16
 
 ### Fixed: "too much load" errors from the public XRPL servers

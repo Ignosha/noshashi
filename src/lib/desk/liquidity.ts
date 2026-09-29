@@ -128,6 +128,8 @@ export type ExitAssessment = {
   action?: string;
 
   /* Market facts */
+  /** Quoted against fillable depth on the book this was assessed against. */
+  quoted?: QuotedVsFillable;
   depthBid: number;
   /** Position as a multiple of the entire resting bid side. */
   depthRatio?: number;
@@ -309,3 +311,48 @@ export const EXIT_COPY: Record<ExitVerdict, { label: string; blurb: string }> = 
     blurb: "No exit at a price the ledger can evidence.",
   },
 };
+
+export type QuotedVsFillable = {
+  /** What the book advertises within the band, both sides. */
+  quotedBid: number;
+  quotedAsk: number;
+  /** What owners can actually deliver within the band. */
+  fillableBid: number;
+  fillableAsk: number;
+  /** fillable / quoted; undefined where nothing is quoted. */
+  bidRatio?: number;
+  askRatio?: number;
+  /** The band used: offers within this fraction of mid. Undefined when no mid could be set, so the whole book is counted. */
+  band?: number;
+  ledgerIndex: number;
+};
+
+const BAND = 0.1;
+
+/**
+ * The headline every liquidity surface leads with: what the book QUOTES
+ * against what can actually FILL, within 10% of mid (the whole book when
+ * no mid can be set). Quoted counts every resting offer at face value;
+ * fillable counts only what each owner holds right now
+ * (`taker_gets_funded`). The difference is depth that disappears the moment
+ * anyone tries to use it.
+ */
+export function quotedVsFillable(book: OrderBook): QuotedVsFillable {
+  const within = (price: number) => book.mid === undefined || Math.abs(price - book.mid) <= book.mid * BAND;
+  const sum = (levels: BookLevel[], key: "quantity" | "listedQuantity") =>
+    levels.filter((l) => within(l.price)).reduce((total, l) => total + l[key], 0);
+  const quotedBid = sum(book.bids, "listedQuantity");
+  const quotedAsk = sum(book.asks, "listedQuantity");
+  const fillableBid = sum(book.bids, "quantity");
+  const fillableAsk = sum(book.asks, "quantity");
+  return {
+    quotedBid,
+    quotedAsk,
+    fillableBid,
+    fillableAsk,
+    bidRatio: quotedBid > 0 ? fillableBid / quotedBid : undefined,
+    askRatio: quotedAsk > 0 ? fillableAsk / quotedAsk : undefined,
+    band: book.mid === undefined ? undefined : BAND,
+    ledgerIndex: book.ledgerIndex,
+  };
+}

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchAmmPool, fetchOrderBook } from "@/lib/xrpl/client";
 import type { AmmPool, OrderBook } from "@/lib/xrpl/types";
-import { assessExit, type ExitAssessment } from "./liquidity";
+import { assessExit, quotedVsFillable, type ExitAssessment } from "./liquidity";
 import type { IssuerExposure } from "./risk";
 
 /**
@@ -80,7 +80,7 @@ export function useExitLiquidity(exposures: IssuerExposure[]): LiquidityState {
         ]);
         nextBooks.set(key(exposure.issuer, currency), book);
         nextPools.set(key(exposure.issuer, currency), pool);
-        out.push(assessExit(exposure, book, pool, currency));
+        out.push({ ...assessExit(exposure, book, pool, currency), quoted: quotedVsFillable(book) });
       } catch {
         failures += 1;
         // A market we could not read is not a market we can vouch for, so
