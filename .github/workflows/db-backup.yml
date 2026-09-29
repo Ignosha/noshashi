@@ -80,6 +80,20 @@ jobs:
           if [ -z "${DB_URL}" ]; then echo "::error::SUPABASE_DB_URL is not set"; exit 1; fi
           if [ -z "${PASSPHRASE}" ]; then echo "::error::BACKUP_PASSPHRASE is not set"; exit 1; fi
 
+          # A value pasted with surrounding quotes or whitespace is not a URI, so
+          # pg_dump takes it as a local database name and tries a Unix socket
+          # ("connection to server on socket /var/run/postgresql…"). Strip those,
+          # then refuse anything that is still not a postgres URI, without ever
+          # printing the value.
+          DB_URL="$(printf '%s' "${DB_URL}" | tr -d '\r\n' | sed -e 's/^[[:space:]"'"'"']*//' -e 's/[[:space:]"'"'"']*$//')"
+          case "${DB_URL}" in
+            postgresql://*|postgres://*) ;;
+            *) echo "::error::SUPABASE_DB_URL must be the Session pooler connection string, starting with postgresql:// (see the comment at the top of this file)"; exit 1 ;;
+          esac
+          case "${DB_URL}" in
+            *'[YOUR-PASSWORD]'*) echo "::error::SUPABASE_DB_URL still contains the [YOUR-PASSWORD] placeholder"; exit 1 ;;
+          esac
+
           stamp="$(date -u +%Y%m%dT%H%M%SZ)"
           echo "STAMP=${stamp}" >> "${GITHUB_ENV}"
 

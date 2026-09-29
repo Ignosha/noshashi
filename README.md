@@ -98,11 +98,20 @@ See [`SECURITY.md`](SECURITY.md) and
 [`docs/SECURITY_THREAT_MODEL.md`](docs/SECURITY_THREAT_MODEL.md). No
 certifications are held; known gaps are listed, not hidden.
 
+## How it works, in depth
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): components, data flow, scheduled jobs.
+- [`docs/POLICY_ENGINE.md`](docs/POLICY_ENGINE.md): every rule, the verdict order, policies and four-eyes.
+- [`docs/EVIDENCE.md`](docs/EVIDENCE.md): receipts, re-verification, replay, the report.
+- [`docs/AI_GOVERNANCE.md`](docs/AI_GOVERNANCE.md): what the assistant may do and where data goes.
+- [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md): what is stored, where, who can read it, retention.
+
 ## Enterprise and procurement
 
 - [`docs/PROCUREMENT.md`](docs/PROCUREMENT.md): every control marked
   IMPLEMENTED, PARTIAL or PLANNED.
 - [`docs/API.md`](docs/API.md): the Compliance API.
+- [`docs/INCIDENT_RESPONSE.md`](docs/INCIDENT_RESPONSE.md), [`docs/DISASTER_RECOVERY.md`](docs/DISASTER_RECOVERY.md).
 - [`docs/ONE_PAGER.md`](docs/ONE_PAGER.md), [`docs/SALES_DEMO.md`](docs/SALES_DEMO.md).
 
 ## Release

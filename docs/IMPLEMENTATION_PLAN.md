@@ -100,7 +100,7 @@ merge, and this file updated with what landed.
 | 9 | Tauri + release engineering | macOS signing and notarisation wired in `release.yml`, exported only when the owner's secrets exist (no-op otherwise); `docs/RELEASE_SIGNING.md` (secrets, verification commands, Windows options, release checklist). *Remaining:* Windows Authenticode needs a chosen certificate provider; `docs/DEPLOYMENT.md` | partial |
 | 10 | Website + onboarding | Hero rewritten ("XRPL intelligence for institutional decisions.", 8 languages); "One ledger. Three questions." section with the ledger-to-approval workflow under the hero. *Remaining:* first-run onboarding (purpose → mode → first analysis → evidence) | partial |
 | 11 | Performance + accessibility | Bundle and startup measurements, animation budgets, reduced motion everywhere, focus and labels | |
-| 12 | QA + documentation sync | README rewritten, operator handbook preserved in `docs/OPERATIONS.md`; sales docs (`SALES_DEMO.md`, `ONE_PAGER.md` + PDF). *Remaining:* ARCHITECTURE, DATA_MODEL, POLICY_ENGINE, EVIDENCE, AI_GOVERNANCE, PRIVACY, DR, INCIDENT_RESPONSE; single source of truth for version and features | partial |
+| 12 | QA + documentation sync | README rewritten, operator handbook preserved in `docs/OPERATIONS.md`; sales docs (`SALES_DEMO.md`, `ONE_PAGER.md` + PDF). `docs/ARCHITECTURE.md`, `DATA_MODEL.md` (every table, access, personal data, retention), `POLICY_ENGINE.md`, `EVIDENCE.md`, `AI_GOVERNANCE.md`, `INCIDENT_RESPONSE.md`, `DISASTER_RECOVERY.md`. Found and reported: the nightly database backup has never succeeded (secret format); the workflow now diagnoses it. *Remaining:* single source of truth for version and features | partial |
 
 ### Things this plan will not do
 
