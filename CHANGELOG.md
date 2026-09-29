@@ -1,5 +1,54 @@
 # Changelog
 
+## 1.0.15
+
+### Built for banks and compliance officers: readable, real, filed
+
+- **Domain Grid, on real data.** Every permissioned domain (XLS-80) on
+  mainnet, found by a server-side sweep of the whole validated ledger
+  (about 9,600 pages of 2,048 objects, pinned to one ledger; progress is
+  shown while it runs). Read any domain live by its ID or its owner, and
+  check whether a counterparty would be admitted: the owner always is,
+  anyone else must hold an accepted, unexpired credential the domain
+  accepts. The admission record is saved with its ledger index and a
+  SHA-256 digest. The sample domains, invented member counts and
+  illustrative institutions are gone from this screen.
+- **Credential Registry.** Which real domains the wallet's credentials
+  admit it to; a counterparty's credentials, who issued them and when they
+  lapse (flagged 30 days ahead); and an issuer register for institutions
+  that issue credentials: issued, not accepted, expiring and expired, with
+  CSV export. The "zero-knowledge selective disclosure" panel described
+  something XRPL credentials do not do and is replaced with how they work.
+- **Audit Trail.** Any account, not only the loaded wallet, 400 records at
+  a time back through its whole history. Delivered amounts (partial
+  payments flagged, compared exactly, not as floating point), tokens,
+  destination tags and memos. Every counterparty is screened against the
+  OFAC SDN list and the scam registry; a list that cannot be read is shown
+  as not checked, never as clear. A reporting threshold flags large
+  transfers. EXPORT EVIDENCE writes the CSV plus a manifest with its
+  SHA-256 and ledger range.
+- **New public API** (no account): `noshashi-ledger-registry` answers
+  `/status`, `/domains`, `/credentials?issuer=|subject=` and `/issuers`.
+- **Readability.** No text below 10px anywhere in the app (about 1,300
+  labels were 7–9.5px), tighter letter-spacing on labels, and stronger
+  contrast for secondary text in both themes.
+- **Accessibility text size** now scales the app to fill the window on
+  every platform. At 125% and 140% it previously shrank into the corner
+  and was clipped on Windows, and the accessibility panel ran off the top
+  of the screen; the panel now scrolls inside the window.
+- **Top bar.** The search no longer slides over the connection status
+  when the window is narrow; the bar drops its secondary readouts first
+  and the search becomes an icon. The status bar at the bottom does the
+  same instead of wrapping.
+- **Sign-in.** An account with two-factor authentication was let through
+  after the password and never asked for its code; it now always gets the
+  code step. The form scrolls instead of losing its top at large text
+  sizes, Escape closes it, and a successful sign-in says so once. The
+  email confirmation link now lands on a page that says the address is
+  confirmed and to sign in from the app, and strips the session tokens
+  from the address bar, instead of silently opening the home page.
+- **Growth is removed** from the app, the docs and the Learn course.
+
 ## 1.0.14
 
 ### Customer Asset Protection and institutional security tools

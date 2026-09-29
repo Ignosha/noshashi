@@ -34,7 +34,7 @@ export function policyReason(results: RuleResult[]): string {
 
 export function PolicyRefLine({ policy, className }: { policy: PolicyRef; className?: string }) {
   return (
-    <div className={cn("mono-font text-[9px] leading-relaxed text-muted-foreground", className)}>
+    <div className={cn("mono-font text-[10.5px] leading-relaxed text-muted-foreground", className)}>
       <span className="text-foreground">{policy.name} v{policy.version}</span>
       <span> · id {policy.id} · engine {policy.engine}</span>
       <br />
@@ -55,7 +55,7 @@ export function PolicyResults({ results }: { results: RuleResult[] }) {
     <div>
       <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 border-b border-border pb-1">
         {["RULE", "FACT · OBSERVED", "POLICY · CONFIGURED", "RESULT"].map((h) => (
-          <span key={h} className="stencil text-[7.5px] tracking-[0.2em] text-muted-foreground">
+          <span key={h} className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
             {h}
           </span>
         ))}
@@ -63,26 +63,26 @@ export function PolicyResults({ results }: { results: RuleResult[] }) {
       {results.map((r) => (
         <div key={r.id} className="border-b border-border/30 py-1.5 last:border-0">
           <div className="grid grid-cols-[1fr_auto_auto_auto] items-baseline gap-x-3">
-            <span className="text-[10px] text-foreground">{r.label}</span>
-            <span className="mono-font text-right text-[9.5px] tabular-nums text-foreground">
+            <span className="text-[11px] text-foreground">{r.label}</span>
+            <span className="mono-font text-right text-[11px] tabular-nums text-foreground">
               {r.observed ?? "—"}
               {r.delta && <span className="ml-1 text-muted-foreground">({r.delta})</span>}
             </span>
-            <span className="mono-font text-right text-[9.5px] tabular-nums text-muted-foreground">{r.configured}</span>
-            <span className={cn("stencil text-right text-[8px] tracking-[0.16em]", RULE_STATE_TONE[r.state])}>
+            <span className="mono-font text-right text-[11px] tabular-nums text-muted-foreground">{r.configured}</span>
+            <span className={cn("stencil text-right text-[10px] tracking-[0.1em]", RULE_STATE_TONE[r.state])}>
               {RULE_STATE_LABEL[r.state]}
             </span>
           </div>
-          <p className="mt-0.5 text-[9px] leading-snug text-muted-foreground">{r.reason}</p>
+          <p className="mt-0.5 text-[10.5px] leading-snug text-muted-foreground">{r.reason}</p>
           <button
             onClick={() => setOpen(open === r.id ? null : r.id)}
             aria-expanded={open === r.id}
-            className="stencil mt-0.5 text-[7.5px] tracking-[0.2em] text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            className="stencil mt-0.5 text-[10px] tracking-[0.14em] text-muted-foreground underline underline-offset-2 hover:text-foreground"
           >
             {open === r.id ? "HIDE CALCULATION" : "WHY? · VIEW CALCULATION"}
           </button>
           {open === r.id && (
-            <p className="mono-font selectable mt-1 border-l border-border pl-2 text-[9px] leading-relaxed text-muted-foreground">
+            <p className="mono-font selectable mt-1 border-l border-border pl-2 text-[10.5px] leading-relaxed text-muted-foreground">
               {r.calculation}
             </p>
           )}
@@ -107,7 +107,7 @@ export function PolicyVerdictBlock({
     return (
       <div className="border border-border p-2.5">
         <Eyebrow>NO ACTIVE INSTITUTIONAL POLICY</Eyebrow>
-        <p className="mt-1 text-[9.5px] leading-relaxed text-muted-foreground">
+        <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
           This verdict applied the domain's rules only. No institutional thresholds were evaluated,
           so it carries no institutional policy result. Activate a policy in Ledger &amp; Policy → POLICY.
         </p>
@@ -118,7 +118,7 @@ export function PolicyVerdictBlock({
     <div>
       <Eyebrow className="mb-1">INSTITUTIONAL POLICY</Eyebrow>
       <PolicyRefLine policy={policy} />
-      <p className="mb-2 mt-1.5 text-[10px] leading-relaxed text-foreground">{policyReason(results)}</p>
+      <p className="mb-2 mt-1.5 text-[11px] leading-relaxed text-foreground">{policyReason(results)}</p>
       {verdict && (
         <div className="mb-3 border border-border/60 p-2">
           <DecisionGarden verdict={verdict.label} verdictTone={verdict.tone} policy={policy} results={results} />
@@ -165,7 +165,7 @@ export function DecisionGarden({
   });
   const step = Math.min(0.02, 0.45 / Math.max(1, lines.length));
   return (
-    <pre className="mono-font selectable overflow-x-auto whitespace-pre text-[9.5px] leading-[1.55] text-muted-foreground" aria-label="Decision tree">
+    <pre className="mono-font selectable overflow-x-auto whitespace-pre text-[11px] leading-[1.55] text-muted-foreground" aria-label="Decision tree">
       {lines.map((l, i) => (
         <motion.span
           key={i}

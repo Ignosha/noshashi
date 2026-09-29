@@ -1,8 +1,8 @@
 import { PatternField } from "@/components/nova/brand/BrandPattern";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SceneHeader } from "./SceneHeader";
-import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
+import { Panel, DataRow } from "@/components/nova/Panel";
 import { EmptyState } from "@/components/nova/EmptyState";
 import { NovaCredit, NovaEye, NovaShield, NovaVault } from "@/components/nova/NovaIcon";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { shortAddress } from "@/lib/xrpl/client";
 import { rippleTimeToDate, truncateMiddle } from "@/lib/format";
-import { DOMAIN_REGISTRY, heldCredentialTypes } from "@/lib/policy";
+import { AccountDomains, CounterpartyCredentials, IssuerRegister } from "./CredentialTools";
 import { useToast } from "@/lib/toast";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import type { CredentialRecord } from "@/lib/xrpl/types";
@@ -59,18 +59,6 @@ export function CredentialsScene({ data }: { data: XrplState }) {
   const [view, setView] = useState<"grid" | "table">("grid");
   const [selected, setSelected] = useState<CredentialRecord | null>(null);
   const [disclosureOpen, setDisclosureOpen] = useState(false);
-
-  const held = useMemo(() => heldCredentialTypes(credentials), [credentials]);
-
-  /** Which domains this wallet could enter with what it holds today. */
-  const unlocked = useMemo(
-    () =>
-      DOMAIN_REGISTRY.map((domain) => ({
-        domain,
-        met: domain.requirements.filter((requirement) => held.has(requirement)).length,
-      })),
-    [held]
-  );
 
   const accepted = credentials.filter(
     (credential) => credentialState(credential) === "accepted"
@@ -121,7 +109,7 @@ export function CredentialsScene({ data }: { data: XrplState }) {
             className="min-h-0 flex-1"
             bodyClassName="min-h-0 overflow-y-auto p-3"
             right={
-              <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+              <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                 {credentials.length} OBJECT{credentials.length === 1 ? "" : "S"}
               </span>
             }
@@ -172,7 +160,7 @@ export function CredentialsScene({ data }: { data: XrplState }) {
                     {["TYPE", "ISSUER", "SUBJECT", "STATE"].map((heading) => (
                       <th
                         key={heading}
-                        className="stencil pb-2 text-[8px] font-medium tracking-[0.2em] text-muted-foreground"
+                        className="stencil pb-2 text-[10px] font-medium tracking-[0.14em] text-muted-foreground"
                       >
                         {heading}
                       </th>
@@ -188,13 +176,13 @@ export function CredentialsScene({ data }: { data: XrplState }) {
                         onClick={() => setSelected(credential)}
                         className="cursor-pointer border-b border-border/30 transition-colors hover:bg-secondary/40"
                       >
-                        <td className="mono-font py-2 text-[10px] text-foreground">
+                        <td className="mono-font py-2 text-[11px] text-foreground">
                           {credential.credentialType}
                         </td>
-                        <td className="mono-font py-2 text-[10px] text-muted-foreground">
+                        <td className="mono-font py-2 text-[11px] text-muted-foreground">
                           {shortAddress(credential.issuer)}
                         </td>
-                        <td className="mono-font py-2 text-[10px] text-muted-foreground">
+                        <td className="mono-font py-2 text-[11px] text-muted-foreground">
                           {shortAddress(credential.subject)}
                         </td>
                         <td className="py-2">
@@ -209,11 +197,11 @@ export function CredentialsScene({ data }: { data: XrplState }) {
           </Panel>
 
           <Panel
-            label="SELECTIVE DISCLOSURE"
+            label="HOW CREDENTIALS WORK"
             className="shrink-0"
             right={
-              <span className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">
-                ZERO-KNOWLEDGE
+              <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
+                ON-LEDGER
               </span>
             }
           >
@@ -222,8 +210,9 @@ export function CredentialsScene({ data }: { data: XrplState }) {
                 <NovaEye size={15} className="text-muted-foreground" />
               </div>
               <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-muted-foreground">
-                Prove a single predicate — “accredited”, “over 18”, “not sanctioned” —
-                without disclosing the credential payload behind it.
+                An issuer attests a fact about an account; the account accepts it; a
+                domain admits its holders. The ledger records who vouched and until
+                when, never the documents behind it.
               </p>
               <Button
                 size="sm"
@@ -231,58 +220,18 @@ export function CredentialsScene({ data }: { data: XrplState }) {
                 className="shrink-0"
                 onClick={() => setDisclosureOpen(true)}
               >
-                BUILD PROOF
+                HOW IT WORKS
               </Button>
             </div>
           </Panel>
         </div>
 
-        {/* Right — coverage against the domain registry */}
-        <div className="col-span-2 flex min-h-0 flex-col gap-3">
-          <Panel
-            label="DOMAIN UNLOCKS"
-            className="min-h-0 flex-1"
-            bodyClassName="overflow-y-auto p-3"
-          >
-            <Eyebrow className="mb-2">
-              WHAT THESE CREDENTIALS OPEN
-            </Eyebrow>
-            <div className="space-y-2">
-              {unlocked.map(({ domain, met }) => {
-                const complete = met === domain.requirements.length;
-                return (
-                  <div
-                    key={domain.id}
-                    className="inset-row p-2.5"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="mono-font truncate text-[10px] text-foreground">
-                        {domain.name}
-                      </span>
-                      <Badge variant={complete ? "go" : met > 0 ? "hold" : "no-go"}>
-                        {met}/{domain.requirements.length}
-                      </Badge>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {domain.requirements.map((requirement) => (
-                        <span
-                          key={requirement}
-                          className={cn(
-                            "mono-font border px-1.5 py-0.5 text-[8px]",
-                            held.has(requirement)
-                              ? "border-go/40 text-go"
-                              : "border-border text-muted-foreground"
-                          )}
-                        >
-                          {requirement}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </Panel>
+        {/* Right — live compliance reads: what this wallet enters, what a
+            counterparty holds, and the state of an issuer's book. */}
+        <div className="col-span-2 flex min-h-0 flex-col gap-3 overflow-y-auto [&>*]:shrink-0">
+          <AccountDomains account={account?.address ?? null} />
+          <CounterpartyCredentials />
+          <IssuerRegister defaultIssuer={account?.address} />
 
           <Panel label="REGISTRY FACTS" className="shrink-0">
             <DataRow label="SUBJECT" value={account ? shortAddress(account.address) : "—"} />
@@ -310,9 +259,9 @@ export function CredentialsScene({ data }: { data: XrplState }) {
       <Dialog open={disclosureOpen} onOpenChange={setDisclosureOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>SELECTIVE DISCLOSURE</DialogTitle>
+            <DialogTitle>HOW CREDENTIALS WORK</DialogTitle>
             <DialogDescription>
-              How a credential becomes a proof without becoming a disclosure.
+              What the XRP Ledger records, and what it leaves with the issuer.
             </DialogDescription>
           </DialogHeader>
           <ol className="mt-4 space-y-3">
@@ -329,13 +278,13 @@ export function CredentialsScene({ data }: { data: XrplState }) {
               },
               {
                 step: "03",
-                title: "You prove one predicate",
-                body: "The wallet generates a zero-knowledge proof for a single statement. The verifier learns the answer and nothing else.",
+                title: "Domains admit its holders",
+                body: "A permissioned domain lists the credentials it accepts (issuer and type). Anyone holding one, accepted and unexpired, is admitted; the Domain Grid checks this for any account.",
               },
               {
                 step: "04",
-                title: "The receipt is auditable",
-                body: "Each verification writes a hashed receipt, so a regulator can confirm the check happened without seeing the payload.",
+                title: "The documents stay with the issuer",
+                body: "The ledger holds who vouched, the type and the expiry, never the KYC file behind it. Each admission check here is saved with its ledger index and a SHA-256 digest, so the check itself can be audited.",
               },
             ].map((item) => (
               <li key={item.step} className="flex gap-3">
@@ -344,7 +293,7 @@ export function CredentialsScene({ data }: { data: XrplState }) {
                 </span>
                 <div>
                   <p className="text-[11px] font-medium text-foreground">{item.title}</p>
-                  <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
                     {item.body}
                   </p>
                 </div>
@@ -390,17 +339,17 @@ function CredentialCard({
       <p className="mono-font mt-3 truncate text-[11px] text-foreground">
         {credential.credentialType}
       </p>
-      <p className="mono-font mt-1 truncate text-[9px] text-muted-foreground">
+      <p className="mono-font mt-1 truncate text-[10.5px] text-muted-foreground">
         ISS {shortAddress(credential.issuer)}
       </p>
 
       <div className="mt-3 flex items-center justify-between border-t border-border pt-2">
-        <span className="stencil text-[8px] tracking-[0.18em] text-muted-foreground">
+        <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
           {credential.uri ? "URI ATTACHED" : "NO URI"}
         </span>
         <span
           className={cn(
-            "stencil text-[8px] tracking-[0.18em]",
+            "stencil text-[10px] tracking-[0.14em]",
             state === "accepted" ? "text-go" : "text-muted-foreground"
           )}
         >

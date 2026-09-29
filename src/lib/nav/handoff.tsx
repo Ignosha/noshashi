@@ -167,7 +167,7 @@ export function TraceButton({
       title={`Look up ${value} in ${String(to).toUpperCase()}`}
       className={
         "mono-font shrink-0 rounded-[3px] border border-border/60 px-1.5 py-0.5 " +
-        "text-[8px] tracking-[0.14em] text-muted-foreground transition-colors " +
+        "text-[10px] tracking-[0.1em] text-muted-foreground transition-colors " +
         "hover:border-brand/60 hover:text-brand focus-visible:outline-none " +
         "focus-visible:ring-1 focus-visible:ring-brand/60 " +
         (className ?? "")

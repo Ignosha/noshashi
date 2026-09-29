@@ -132,7 +132,7 @@ function BookBody() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="BOOK" className="shrink-0">
-            <Label htmlFor="bookiss" className="text-[10px] tracking-wide">
+            <Label htmlFor="bookiss" className="text-[11px] tracking-wide">
               ISSUER ADDRESS
             </Label>
             <Input
@@ -144,7 +144,7 @@ function BookBody() {
               spellCheck={false}
               className="mt-2 font-mono text-[12px]"
             />
-            <Label htmlFor="bookcur" className="mt-3 block text-[10px] tracking-wide">
+            <Label htmlFor="bookcur" className="mt-3 block text-[11px] tracking-wide">
               CURRENCY CODE
             </Label>
             <Input
@@ -161,7 +161,7 @@ function BookBody() {
               {busy ? "READING BOOK…" : "READ THIS BOOK"}
             </Button>
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               An offer rests whether or not its owner still holds the asset,
               and nothing removes it until someone tries to cross it. The
               ledger reports the difference in{" "}
@@ -194,7 +194,7 @@ function BookBody() {
                         className="border-b border-border/30 px-3.5 py-2"
                       >
                         <div className="flex items-baseline gap-2">
-                          <code className="text-[10px] text-muted-foreground">
+                          <code className="text-[11px] text-muted-foreground">
                             {shortAddress(offer.account)}
                           </code>
                           <TraceButton
@@ -203,7 +203,7 @@ function BookBody() {
                             from="book"
                             as="market maker"
                           />
-                          <span className="ml-auto font-mono text-[10px] tabular-nums text-faint">
+                          <span className="ml-auto font-mono text-[11px] tabular-nums text-faint">
                             @{offer.price.toFixed(6)}
                           </span>
                         </div>
@@ -221,14 +221,14 @@ function BookBody() {
                                 })}
                           </span>
                           {short && (
-                            <span className="font-mono text-[10px] tabular-nums text-faint line-through">
+                            <span className="font-mono text-[11px] tabular-nums text-faint line-through">
                               {offer.listed.toLocaleString(undefined, {
                                 maximumFractionDigits: 2,
                               })}
                             </span>
                           )}
                           {offer.expired && (
-                            <span className="mono-font text-[8px] tracking-[0.14em] text-hold">
+                            <span className="mono-font text-[10px] tracking-[0.1em] text-hold">
                               EXPIRED
                             </span>
                           )}
@@ -237,7 +237,7 @@ function BookBody() {
                     );
                   })}
                   {side.offers.length > 12 && (
-                    <p className="mono-font px-3.5 py-2 text-[9px] text-faint">
+                    <p className="mono-font px-3.5 py-2 text-[10.5px] text-faint">
                       + {side.offers.length - 12} more, included in the totals above
                     </p>
                   )}
@@ -262,11 +262,11 @@ function BookBody() {
           ) : (
             <>
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="font-mono text-[10px] text-muted-foreground">
+                <p className="font-mono text-[11px] text-muted-foreground">
                   {report.pair}
                   <span className="ml-2 text-faint">{shortAddress(report.issuer)}</span>
                 </p>
-                <p className="mt-1 font-mono text-[9px] tabular-nums text-faint">
+                <p className="mt-1 font-mono text-[10.5px] tabular-nums text-faint">
                   LEDGER {report.ledgerIndex.toLocaleString()} · CLOSED{" "}
                   {report.ledgerCloseTime.toISOString().replace("T", " ").slice(0, 16)} UTC
                 </p>

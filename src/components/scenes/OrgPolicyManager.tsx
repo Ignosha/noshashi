@@ -76,10 +76,10 @@ const ROLES: MemberRole[] = ["owner", "admin", "compliance", "risk", "analyst", 
 function Refusal({ failure }: { failure: ServerFailure }) {
   return (
     <div role="alert" className="border border-no-go/60 p-2.5">
-      <p className="stencil text-[8.5px] tracking-[0.2em] text-no-go">{failure.title}</p>
-      <p className="mt-1 text-[10.5px] leading-snug text-foreground">{failure.message}</p>
+      <p className="stencil text-[10px] tracking-[0.14em] text-no-go">{failure.title}</p>
+      <p className="mt-1 text-[11.5px] leading-snug text-foreground">{failure.message}</p>
       {failure.errors?.map((e) => (
-        <p key={e.field} className="mono-font mt-0.5 text-[9.5px] text-no-go">{e.field} · {e.message}</p>
+        <p key={e.field} className="mono-font mt-0.5 text-[11px] text-no-go">{e.field} · {e.message}</p>
       ))}
     </div>
   );
@@ -98,14 +98,14 @@ export function OrgBar() {
 
   if (org.state.status === "signed-out") {
     return (
-      <p className="mx-4 mt-4 border-l-2 border-border pl-2 text-[10px] leading-relaxed text-muted-foreground">
+      <p className="mx-4 mt-4 border-l-2 border-border pl-2 text-[11px] leading-relaxed text-muted-foreground">
         WORKSTATION POLICY · Sign in to govern verdicts with an organization policy, where a second
         authorized person must activate every change.
       </p>
     );
   }
   if (org.state.status === "loading") {
-    return <p className="mono-font mx-4 mt-4 animate-pulse text-[9px] text-muted-foreground">LOADING ORGANIZATIONS…</p>;
+    return <p className="mono-font mx-4 mt-4 animate-pulse text-[10.5px] text-muted-foreground">LOADING ORGANIZATIONS…</p>;
   }
   if (org.state.status === "error") {
     return (
@@ -136,12 +136,12 @@ export function OrgBar() {
   return (
     <div className="mx-4 mt-4 border border-border p-2.5">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">GOVERNED BY</span>
+        <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">GOVERNED BY</span>
         <select
           aria-label="Governing policy"
           value={org.selectedId ?? "workstation"}
           onChange={(e) => void org.select(e.target.value === "workstation" ? null : e.target.value)}
-          className="mono-font h-7 rounded border border-border bg-background px-1.5 text-[10px] text-foreground"
+          className="mono-font h-7 rounded border border-border bg-background px-1.5 text-[11px] text-foreground"
         >
           {org.memberships.map((m) => (
             <option key={m.organizationId} value={m.organizationId}>
@@ -151,20 +151,20 @@ export function OrgBar() {
           <option value="workstation">This workstation only (no four-eyes)</option>
         </select>
         {!creating && (
-          <button onClick={() => setCreating(true)} className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2">
+          <button onClick={() => setCreating(true)} className="stencil text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2">
             CREATE ORGANIZATION
           </button>
         )}
       </div>
       {org.data?.membership.role === "regulator" && (
-        <p role="status" className="mt-1.5 border-l-2 border-telemetry pl-2 text-[9.5px] leading-snug text-foreground">
+        <p role="status" className="mt-1.5 border-l-2 border-telemetry pl-2 text-[11px] leading-snug text-foreground">
           READ-ONLY EXAMINER SEAT · You can read this organization's policies, exceptions, investigations and audit trail and change
           nothing. The seat ends {org.data.membership.expiresAt ? new Date(org.data.membership.expiresAt).toLocaleString() : "soon"};
           your visits are recorded in the audit trail.
         </p>
       )}
       {org.selectedId === null && (
-        <p className="mt-1.5 text-[9.5px] leading-snug text-muted-foreground">
+        <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
           Workstation policy: one operator, kept on this device, no second approval. Its verdicts are not
           organization decisions.
         </p>
@@ -209,7 +209,7 @@ export function OrgPolicyManager({ entries }: { entries: LedgerEntry[] }) {
           The organization's policy could not be loaded. No institutional verdict will be generated
           until it is available. NOSHASHI does not fall back to the workstation policy.
         </p>
-        {org.dataError && <p className="mono-font mt-2 text-[10px] text-no-go">{org.dataError}</p>}
+        {org.dataError && <p className="mono-font mt-2 text-[11px] text-no-go">{org.dataError}</p>}
         <Button size="sm" variant="outline" className="mt-2" onClick={() => void org.refresh()}>RETRY</Button>
       </div>
     );
@@ -324,7 +324,7 @@ function OrgPolicyBody({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[11px] text-muted-foreground">
           <span className="text-foreground">{data.membership.name}</span> · your role{" "}
-          <span className="stencil text-[9px] tracking-[0.18em] text-foreground">{role.toUpperCase()}</span> · four-eyes activation ·
+          <span className="stencil text-[10.5px] tracking-[0.14em] text-foreground">{role.toUpperCase()}</span> · four-eyes activation ·
           read {utc(data.loadedAt)}
         </p>
         <Button size="sm" variant="ghost" disabled={busy} onClick={() => void refresh()}>REFRESH</Button>
@@ -339,7 +339,7 @@ function OrgPolicyBody({
           <div className="flex items-center justify-between">
             <Eyebrow>ACTIVE POLICY</Eyebrow>
             {active && (
-              <span className="stencil flex items-center gap-1.5 text-[8px] tracking-[0.2em] text-go">
+              <span className="stencil flex items-center gap-1.5 text-[10px] tracking-[0.14em] text-go">
                 <StatusDot status="go" size={6} pulse /> ACTIVE
               </span>
             )}
@@ -349,7 +349,7 @@ function OrgPolicyBody({
               <p className="display mt-1.5 text-[15px] font-[600] text-foreground">
                 {active.name} <span className="mono-font text-[12px] text-muted-foreground">v{active.version}</span>
               </p>
-              <p className="mono-font mt-1 text-[9px] leading-relaxed text-muted-foreground">
+              <p className="mono-font mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
                 AUTHOR {nameOf(dir, active.createdBy)} · CREATED {utc(active.createdAt)}
                 <br />
                 ACTIVATED BY {nameOf(dir, active.activatedBy)} · EFFECTIVE {utc(active.effectiveAt)}
@@ -359,7 +359,7 @@ function OrgPolicyBody({
               <ParamGroups params={active.params} />
             </>
           ) : (
-            <p className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground">
+            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
               No organization policy is active. Gate verdicts apply the domain's rules only and carry no
               institutional policy result.
             </p>
@@ -372,10 +372,10 @@ function OrgPolicyBody({
             <>
               <div className="flex items-center justify-between">
                 <Eyebrow>PENDING ACTIVATION</Eyebrow>
-                <span className="stencil text-[8px] tracking-[0.2em] text-hold">● v{pending.version} · DOES NOT AFFECT VERDICTS</span>
+                <span className="stencil text-[10px] tracking-[0.14em] text-hold">● v{pending.version} · DOES NOT AFFECT VERDICTS</span>
               </div>
               <p className="display mt-1.5 text-[14px] font-[600] text-foreground">{pending.name} <span className="mono-font text-[12px] text-muted-foreground">v{pending.version}</span></p>
-              <p className="mono-font mt-1 text-[9px] leading-relaxed text-muted-foreground">
+              <p className="mono-font mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
                 AUTHOR {nameOf(dir, pending.createdBy)} · CREATED {utc(pending.createdAt)}
                 <br />
                 SUBMITTED BY {nameOf(dir, pending.submittedBy)} · {utc(pending.submittedAt)}
@@ -392,12 +392,12 @@ function OrgPolicyBody({
                 </Button>
               </div>
               {!can.activate(role) && (
-                <p className="mt-2 text-[9.5px] leading-snug text-muted-foreground">
+                <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
                   Activation needs an owner, admin or compliance member who did not author this version.
                 </p>
               )}
               {can.activate(role) && iAmAuthor && (
-                <p className="mt-2 text-[9.5px] leading-snug text-hold">
+                <p className="mt-2 text-[11px] leading-snug text-hold">
                   You authored this version. A second authorized person must activate it; the server refuses an author's activation.
                 </p>
               )}
@@ -406,9 +406,9 @@ function OrgPolicyBody({
             <>
               <div className="flex items-center justify-between">
                 <Eyebrow>DRAFT</Eyebrow>
-                <span className="stencil text-[8px] tracking-[0.2em] text-hold">● DRAFT v{draft.version} · DOES NOT AFFECT VERDICTS</span>
+                <span className="stencil text-[10px] tracking-[0.14em] text-hold">● DRAFT v{draft.version} · DOES NOT AFFECT VERDICTS</span>
               </div>
-              <p className="mono-font mt-1 text-[9px] text-muted-foreground">AUTHOR {nameOf(dir, draft.createdBy)} · CREATED {utc(draft.createdAt)}</p>
+              <p className="mono-font mt-1 text-[10.5px] text-muted-foreground">AUTHOR {nameOf(dir, draft.createdBy)} · CREATED {utc(draft.createdAt)}</p>
               {!editable ? (
                 <ParamGroups params={draft.params} />
               ) : (
@@ -445,7 +445,7 @@ function OrgPolicyBody({
                     <Button size="sm" variant="ghost" disabled={busy} onClick={() => void act(() => discardDraft(draft), { title: "DRAFT DISCARDED", body: `v${draft.version}` })}>
                       DISCARD DRAFT
                     </Button>
-                    {errors.length > 0 && <span className="stencil text-[8px] tracking-[0.18em] text-no-go">INVALID POLICY VALUE · FIX TO SUBMIT</span>}
+                    {errors.length > 0 && <span className="stencil text-[10px] tracking-[0.14em] text-no-go">INVALID POLICY VALUE · FIX TO SUBMIT</span>}
                   </div>
                 </fieldset>
               )}
@@ -453,21 +453,21 @@ function OrgPolicyBody({
           ) : (
             <div>
               <Eyebrow>DRAFT</Eyebrow>
-              <p className="mt-1.5 text-[10px] text-muted-foreground">No open draft or pending version.</p>
+              <p className="mt-1.5 text-[11px] text-muted-foreground">No open draft or pending version.</p>
               {can.editDraft(role) ? (
                 <>
                   <Button size="sm" className="mt-2" disabled={busy} onClick={() => void newDraft()}>
                     {active ? `NEW DRAFT FROM v${active.version}` : "NEW DRAFT"}
                   </Button>
                   {!active && (
-                    <p className="mt-1.5 text-[9.5px] leading-snug text-hold">
+                    <p className="mt-1.5 text-[11px] leading-snug text-hold">
                       Pre-filled with the product's shipped defaults. These are placeholders, not recommendations,
                       legal requirements or XRPL policy.
                     </p>
                   )}
                 </>
               ) : (
-                <p className="mt-1.5 text-[9.5px] text-muted-foreground">Your role can view policies but not author them.</p>
+                <p className="mt-1.5 text-[11px] text-muted-foreground">Your role can view policies but not author them.</p>
               )}
             </div>
           )}
@@ -484,9 +484,9 @@ function OrgPolicyBody({
           <div>
             <Eyebrow className="mb-2">SIMULATION · v{(draft ?? pending)!.version} vs {active ? `ACTIVE v${active.version}` : "NO POLICY"}</Eyebrow>
             {!sim ? (
-              <p className="text-[10px] text-no-go">Fix the invalid values to simulate.</p>
+              <p className="text-[11px] text-no-go">Fix the invalid values to simulate.</p>
             ) : sim.summary.evaluated === 0 ? (
-              <p className="text-[10px] leading-relaxed text-muted-foreground">
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
                 No verdicts recorded on this workstation carry the facts these rules need yet. Run a gate check in Verification.
               </p>
             ) : (
@@ -504,7 +504,7 @@ function OrgPolicyBody({
             <thead>
               <tr className="border-b border-border">
                 {["VERSION", "STATUS", "AUTHOR", "ACTIVATED BY", "EFFECTIVE", "ARCHIVED", "SHA-256", ""].map((h) => (
-                  <th key={h} className="stencil px-2 py-1.5 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">{h}</th>
+                  <th key={h} className="stencil px-2 py-1.5 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -515,22 +515,22 @@ function OrgPolicyBody({
                 return (
                   <FragmentRow key={k} open={viewing === k}>
                     <tr className="border-b border-border/30">
-                      <td className="mono-font px-2 py-1.5 text-[10px] text-foreground">{v.name} v{v.version}</td>
-                      <td className={cn("stencil px-2 py-1.5 text-[8.5px] tracking-[0.16em]", tone)}>● {v.status.toUpperCase()}</td>
-                      <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{nameOf(dir, v.createdBy)}</td>
-                      <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{v.activatedBy ? nameOf(dir, v.activatedBy) : "—"}</td>
-                      <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{utc(v.effectiveAt)}</td>
-                      <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{utc(v.archivedAt)}</td>
-                      <td className="mono-font selectable px-2 py-1.5 text-[9px] text-muted-foreground">{v.hash.slice(0, 12)}…</td>
+                      <td className="mono-font px-2 py-1.5 text-[11px] text-foreground">{v.name} v{v.version}</td>
+                      <td className={cn("stencil px-2 py-1.5 text-[10px] tracking-[0.1em]", tone)}>● {v.status.toUpperCase()}</td>
+                      <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{nameOf(dir, v.createdBy)}</td>
+                      <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{v.activatedBy ? nameOf(dir, v.activatedBy) : "—"}</td>
+                      <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{utc(v.effectiveAt)}</td>
+                      <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{utc(v.archivedAt)}</td>
+                      <td className="mono-font selectable px-2 py-1.5 text-[10.5px] text-muted-foreground">{v.hash.slice(0, 12)}…</td>
                       <td className="px-2 py-1.5">
-                        <button onClick={() => setViewing(viewing === k ? null : k)} className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2">
+                        <button onClick={() => setViewing(viewing === k ? null : k)} className="stencil text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2">
                           {viewing === k ? "HIDE" : "VIEW"}
                         </button>
                       </td>
                     </tr>
                     <tr>
                       <td colSpan={8} className="px-2 pb-3">
-                        <p className="mono-font selectable break-all text-[9px] text-muted-foreground">SHA-256 {v.hash}</p>
+                        <p className="mono-font selectable break-all text-[10.5px] text-muted-foreground">SHA-256 {v.hash}</p>
                         <ParamGroups params={v.params} />
                       </td>
                     </tr>
@@ -560,20 +560,20 @@ function OrgPolicyBody({
           <div className="max-h-[260px] overflow-y-auto">
             <Eyebrow className="mb-1.5">CHANGES</Eyebrow>
             {pending && (active ? diffParams(active.params, pending.params) : describeParams(pending.params).map((r) => ({ field: r.field, label: r.label, from: "—", to: r.value }))).map((c) => (
-              <p key={c.field} className="mono-font text-[10px] text-foreground">
+              <p key={c.field} className="mono-font text-[11px] text-foreground">
                 {c.label}: <span className="text-muted-foreground">{c.from}</span> → {c.to}
               </p>
             ))}
             {pending && active && diffParams(active.params, pending.params).length === 0 && (
-              <p className="text-[10px] text-muted-foreground">No parameter changes from the active version.</p>
+              <p className="text-[11px] text-muted-foreground">No parameter changes from the active version.</p>
             )}
             {sim && sim.summary.evaluated > 0 && (
-              <p className="mt-2 text-[10px] text-muted-foreground">
+              <p className="mt-2 text-[11px] text-muted-foreground">
                 Simulated on {sim.summary.evaluated} recorded verdicts: {sim.summary.changed} would have been decided differently.
               </p>
             )}
           </div>
-          {busy && <p className="mono-font animate-pulse text-[9.5px] text-muted-foreground">SERVER VALIDATION…</p>}
+          {busy && <p className="mono-font animate-pulse text-[11px] text-muted-foreground">SERVER VALIDATION…</p>}
           {activationFailure && <Refusal failure={activationFailure} />}
           <DialogFooter>
             <Button variant="outline" size="sm" disabled={busy} onClick={() => setConfirming(false)}>CANCEL</Button>
@@ -657,17 +657,17 @@ function ExceptionsPanel({
           POLICY EXCEPTIONS · {data.exceptions.filter((x) => x.status === "pending").length} PENDING
           {data.exceptions.some((x) => x.status === "needs_evidence") && ` · ${data.exceptions.filter((x) => x.status === "needs_evidence").length} AWAITING EVIDENCE`}
         </Eyebrow>
-        <select aria-label="Exception filter" value={filter} onChange={(e) => setFilter(e.target.value as "pending" | "all")} className="mono-font h-6 rounded border border-border bg-background px-1 text-[9px] text-foreground">
+        <select aria-label="Exception filter" value={filter} onChange={(e) => setFilter(e.target.value as "pending" | "all")} className="mono-font h-6 rounded border border-border bg-background px-1 text-[10.5px] text-foreground">
           <option value="pending">Open</option>
           <option value="all">All</option>
         </select>
       </div>
-      <p className="mb-2 max-w-[720px] text-[9.5px] leading-snug text-muted-foreground">
+      <p className="mb-2 max-w-[720px] text-[11px] leading-snug text-muted-foreground">
         An exception is a person's decision recorded beside a verdict. The verdict and its receipt never change.
         Requested from a verdict in Verification or Evidence; decided by an owner, admin or compliance member who did not request it.
       </p>
       {rows.length === 0 ? (
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-[11px] text-muted-foreground">
           {filter === "pending" && data.exceptions.length > 0 ? `No open exceptions. ` : "No exceptions requested."}
           {filter === "pending" && data.exceptions.length > 0 && (
             <button onClick={() => setFilter("all")} className="underline underline-offset-2">Show all {data.exceptions.length}</button>
@@ -678,35 +678,35 @@ function ExceptionsPanel({
           {rows.map((x) => (
             <div key={x.id} className="border border-border p-2.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="mono-font text-[10px] text-foreground">
+                <p className="mono-font text-[11px] text-foreground">
                   {x.verdict.toUpperCase()} · {shortAddress(x.subject)} · {x.evidence.amountXrp.toLocaleString("en-US")} XRP
                   {x.policyId ? ` · ${x.policyId} v${x.policyVersion}` : " · no institutional policy"}
                 </p>
-                <span className={cn("stencil text-[8px] tracking-[0.2em]", x.status === "approved" ? "text-go" : x.status === "rejected" ? "text-no-go" : "text-hold")}>
+                <span className={cn("stencil text-[10px] tracking-[0.14em]", x.status === "approved" ? "text-go" : x.status === "rejected" ? "text-no-go" : "text-hold")}>
                   ● {x.status === "needs_evidence" ? "AWAITING EVIDENCE" : x.status.toUpperCase()}
                 </span>
               </div>
-              <p className="mono-font mt-1 text-[9px] leading-relaxed text-muted-foreground">
+              <p className="mono-font mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
                 REQUESTED BY {nameOf(dir, x.requestedBy)} · {utc(x.requestedAt)}
                 {x.decidedBy && <> · {x.status === "approved" ? "APPROVED" : "REJECTED"} BY {nameOf(dir, x.decidedBy)} · {utc(x.decidedAt)}</>}
                 <br />
                 RECEIPT <span className="selectable">{x.receiptDigest}</span>
                 {x.policyHash && <><br />POLICY SHA-256 <span className="selectable">{x.policyHash}</span></>}
               </p>
-              <p className="mt-1 whitespace-pre-wrap text-[10.5px] text-foreground">{x.reason}</p>
+              <p className="mt-1 whitespace-pre-wrap text-[11.5px] text-foreground">{x.reason}</p>
               {x.evidence.failedRules.length > 0 && (
-                <p className="mono-font mt-0.5 text-[9px] text-muted-foreground">FAILED RULES · {x.evidence.failedRules.join(", ")}</p>
+                <p className="mono-font mt-0.5 text-[10.5px] text-muted-foreground">FAILED RULES · {x.evidence.failedRules.join(", ")}</p>
               )}
               {x.notes.length > 0 && (
                 <ol className="mt-1.5 space-y-1 border-l border-border pl-2">
                   {x.notes.map((n) => (
-                    <li key={n.id} className="text-[10px] leading-snug">
-                      <span className="stencil mr-1 text-[7.5px] tracking-[0.2em] text-muted-foreground">
+                    <li key={n.id} className="text-[11px] leading-snug">
+                      <span className="stencil mr-1 text-[10px] tracking-[0.14em] text-muted-foreground">
                         {n.kind === "evidence_requested" ? "EVIDENCE REQUESTED" : "EVIDENCE ADDED"} · {nameOf(dir, n.author)} · {utc(n.createdAt)}
                       </span>
                       <span className="block whitespace-pre-wrap text-foreground/90">{n.note}</span>
                       {n.evidence?.references.map((ref, i) => (
-                        <span key={i} className="mono-font selectable block break-all text-[9px] text-muted-foreground">
+                        <span key={i} className="mono-font selectable block break-all text-[10.5px] text-muted-foreground">
                           {ref.kind.toUpperCase()} · {ref.kind === "url" ? <a href={ref.value} target="_blank" rel="noreferrer" className="underline underline-offset-2">{ref.value}</a> : ref.value}
                         </span>
                       ))}
@@ -714,14 +714,14 @@ function ExceptionsPanel({
                   ))}
                 </ol>
               )}
-              {x.decisionNote && <p className="mt-0.5 text-[10px] text-muted-foreground">Decision note: {x.decisionNote}</p>}
+              {x.decisionNote && <p className="mt-0.5 text-[11px] text-muted-foreground">Decision note: {x.decisionNote}</p>}
               {x.status === "needs_evidence" && x.requestedBy === accountId && (
                 open === x.id ? (
                   <div className="mt-2">
-                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="What the new evidence shows (at least 10 characters)" className="w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
-                    <textarea value={refs} onChange={(e) => setRefs(e.target.value)} rows={3} placeholder={"One reference per line:\nhttps://… · a transaction hash · an r… account · sha256:<document digest>"} className="mono-font mt-1 w-full rounded border border-border bg-background p-2 text-[10px] text-foreground" />
+                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="What the new evidence shows (at least 10 characters)" className="w-full rounded border border-border bg-background p-2 text-[11.5px] text-foreground" />
+                    <textarea value={refs} onChange={(e) => setRefs(e.target.value)} rows={3} placeholder={"One reference per line:\nhttps://… · a transaction hash · an r… account · sha256:<document digest>"} className="mono-font mt-1 w-full rounded border border-border bg-background p-2 text-[11px] text-foreground" />
                     {parsed.rejected.length > 0 && (
-                      <p className="text-[9.5px] text-no-go">Not a link, transaction, account or sha256 digest: {parsed.rejected.join(" · ")}</p>
+                      <p className="text-[11px] text-no-go">Not a link, transaction, account or sha256 digest: {parsed.rejected.join(" · ")}</p>
                     )}
                     <div className="mt-1.5 flex gap-1.5">
                       <Button size="sm" disabled={busy || parsed.references.length === 0 || parsed.rejected.length > 0} onClick={() => void supplement(x)}>ADD EVIDENCE</Button>
@@ -733,15 +733,15 @@ function ExceptionsPanel({
                 )
               )}
               {x.status === "needs_evidence" && x.requestedBy !== accountId && (
-                <p className="mt-1.5 text-[9.5px] text-hold">Waiting on {nameOf(dir, x.requestedBy)} to add evidence. It can be decided once they do.</p>
+                <p className="mt-1.5 text-[11px] text-hold">Waiting on {nameOf(dir, x.requestedBy)} to add evidence. It can be decided once they do.</p>
               )}
               {x.status === "pending" && can.approveException(role) && (
                 open === x.id ? (
                   <div className="mt-2">
                     {x.requestedBy === accountId && (
-                      <p className="mb-1 text-[9.5px] text-hold">You requested this exception. A second authorized person must decide it; the server refuses your decision.</p>
+                      <p className="mb-1 text-[11px] text-hold">You requested this exception. A second authorized person must decide it; the server refuses your decision.</p>
                     )}
-                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Decision note (required to reject or to ask for more evidence, at least 10 characters)" className="w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
+                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Decision note (required to reject or to ask for more evidence, at least 10 characters)" className="w-full rounded border border-border bg-background p-2 text-[11.5px] text-foreground" />
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       <Button size="sm" disabled={busy} onClick={() => void decide(x, "approve")}>APPROVE</Button>
                       <Button size="sm" variant="outline" disabled={busy} onClick={() => void decide(x, "reject")}>REJECT</Button>
@@ -790,13 +790,13 @@ function MembersPanel({ data, refresh, push }: { data: OrgData; refresh: () => P
       <Eyebrow className="mb-2">MEMBERS · {data.directory.filter((m) => m.role !== "regulator").length}</Eyebrow>
       <div className="space-y-0.5">
         {data.directory.filter((m) => m.role !== "regulator").map((m) => (
-          <p key={m.accountId} className="mono-font text-[9.5px] text-muted-foreground">
+          <p key={m.accountId} className="mono-font text-[11px] text-muted-foreground">
             <span className="text-foreground">{m.displayName || m.email}</span>
-            {m.displayName ? ` · ${m.email}` : ""} · <span className="stencil text-[8px] tracking-[0.18em]">{m.role.toUpperCase()}</span>
+            {m.displayName ? ` · ${m.email}` : ""} · <span className="stencil text-[10px] tracking-[0.14em]">{m.role.toUpperCase()}</span>
           </p>
         ))}
       </div>
-      <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
+      <p className="mt-1.5 text-[10.5px] leading-snug text-muted-foreground">
         Owner, admin and compliance may activate policies and decide exceptions. Analysts and risk may draft,
         simulate, submit and request. Viewers read only. Enforced by the server.
       </p>
@@ -806,7 +806,7 @@ function MembersPanel({ data, refresh, push }: { data: OrgData; refresh: () => P
             <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="person@institution.com" className="h-7 w-60 text-[11px]" />
           </Field>
           <Field label="ROLE">
-            <select aria-label="Member role" value={role} onChange={(e) => setRole(e.target.value as MemberRole)} className="mono-font h-7 rounded border border-border bg-background px-1 text-[10px] text-foreground">
+            <select aria-label="Member role" value={role} onChange={(e) => setRole(e.target.value as MemberRole)} className="mono-font h-7 rounded border border-border bg-background px-1 text-[11px] text-foreground">
               {ROLES.map((r) => <option key={r} value={r}>{r.toUpperCase()}</option>)}
             </select>
           </Field>
@@ -858,17 +858,17 @@ function SeatsPanel({ data, refresh, push }: { data: OrgData; refresh: () => Pro
   return (
     <div className="mt-4">
       <Eyebrow className="mb-2">REGULATOR SEATS · {seats.length}</Eyebrow>
-      <p className="text-[9px] leading-snug text-muted-foreground">
+      <p className="text-[10.5px] leading-snug text-muted-foreground">
         An examiner reads this organization's policies, exceptions, investigations and audit trail, and can change nothing.
         The seat ends on its date without anyone acting; every visit is written to the audit trail.
       </p>
       <div className="mt-1.5 space-y-0.5">
         {seats.map((m) => (
-          <p key={m.accountId} className="mono-font flex items-center gap-2 text-[9.5px] text-muted-foreground">
+          <p key={m.accountId} className="mono-font flex items-center gap-2 text-[11px] text-muted-foreground">
             <span className="text-foreground">{m.displayName || m.email}</span>
             <span>· ENDS {m.expiresAt ? new Date(m.expiresAt).toLocaleDateString() : "—"}</span>
             {manage && (
-              <button type="button" className="text-[8.5px] tracking-[0.14em] hover:text-no-go" onClick={() => void revoke(m.accountId, m.displayName || m.email)}>
+              <button type="button" className="text-[10px] tracking-[0.1em] hover:text-no-go" onClick={() => void revoke(m.accountId, m.displayName || m.email)}>
                 REVOKE
               </button>
             )}
@@ -881,7 +881,7 @@ function SeatsPanel({ data, refresh, push }: { data: OrgData; refresh: () => Pro
             <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="examiner@regulator.gov" className="h-7 w-60 text-[11px]" />
           </Field>
           <Field label="FOR">
-            <select aria-label="Seat length" value={days} onChange={(e) => setDays(Number(e.target.value))} className="mono-font h-7 rounded border border-border bg-background px-1 text-[10px] text-foreground">
+            <select aria-label="Seat length" value={days} onChange={(e) => setDays(Number(e.target.value))} className="mono-font h-7 rounded border border-border bg-background px-1 text-[11px] text-foreground">
               {SEAT_TERMS.map((d) => <option key={d} value={d}>{d} DAYS</option>)}
             </select>
           </Field>
@@ -919,7 +919,7 @@ function BrandPanel({ data, refresh, push }: { data: OrgData; refresh: () => Pro
   return (
     <div className="mt-4">
       <Eyebrow className="mb-2">WHITE-LABEL</Eyebrow>
-      <p className="text-[9px] leading-snug text-muted-foreground">
+      <p className="text-[10.5px] leading-snug text-muted-foreground">
         Your organization's name and colour on the console header and on the reports your members export. Leave both empty for NOSHASHI's own.
       </p>
       <div className="mt-2 flex flex-wrap items-end gap-2">
@@ -966,7 +966,7 @@ function AuditPanel({ data }: { data: OrgData }) {
     return (
       <section>
         <Eyebrow className="mb-2">GOVERNANCE AUDIT TRAIL</Eyebrow>
-        <p className="text-[10px] text-muted-foreground">The audit trail is readable by owner, admin, compliance and risk members.</p>
+        <p className="text-[11px] text-muted-foreground">The audit trail is readable by owner, admin, compliance and risk members.</p>
       </section>
     );
   }
@@ -974,11 +974,11 @@ function AuditPanel({ data }: { data: OrgData }) {
     <section>
       <Eyebrow className="mb-2">GOVERNANCE AUDIT TRAIL · SERVER RECORD · {data.audit.length}</Eyebrow>
       {data.audit.length === 0 ? (
-        <p className="text-[10px] text-muted-foreground">No governance events recorded.</p>
+        <p className="text-[11px] text-muted-foreground">No governance events recorded.</p>
       ) : (
         <div className="space-y-1">
           {data.audit.map((e) => (
-            <p key={e.id} className="mono-font border-b border-border/30 pb-1 text-[9.5px] text-foreground">
+            <p key={e.id} className="mono-font border-b border-border/30 pb-1 text-[11px] text-foreground">
               {utc(e.at)} · {nameOf(data.directory, e.actor)} · {AUDIT_WORDS[e.action] ?? e.action.toUpperCase()} {e.entityId ?? ""}
               {typeof e.newState?.hash === "string" && <span className="text-muted-foreground"> · SHA-256 {(e.newState.hash as string).slice(0, 12)}…</span>}
             </p>
@@ -1005,7 +1005,7 @@ export function RequestExceptionButton({ entry, caseId, className }: { entry: Le
 
   if (existing) {
     return (
-      <span className={cn("stencil border border-border px-2 py-1 text-[8px] tracking-[0.2em]", existing.status === "approved" ? "text-go" : "text-hold", className)}>
+      <span className={cn("stencil border border-border px-2 py-1 text-[10px] tracking-[0.14em]", existing.status === "approved" ? "text-go" : "text-hold", className)}>
         EXCEPTION {existing.status.toUpperCase()}
       </span>
     );
@@ -1030,7 +1030,7 @@ export function RequestExceptionButton({ entry, caseId, className }: { entry: Le
     <>
       <button
         onClick={() => { setOpen(true); setFailure(null); }}
-        className={cn("stencil border border-border px-2 py-1 text-[8px] tracking-[0.2em] text-muted-foreground hover:border-foreground/40 hover:text-foreground", className)}
+        className={cn("stencil border border-border px-2 py-1 text-[10px] tracking-[0.14em] text-muted-foreground hover:border-foreground/40 hover:text-foreground", className)}
       >
         REQUEST EXCEPTION
       </button>
@@ -1044,13 +1044,13 @@ export function RequestExceptionButton({ entry, caseId, className }: { entry: Le
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1">
-            <p className="mono-font text-[9.5px] text-muted-foreground">SUBJECT <span className="selectable text-foreground">{entry.subject}</span></p>
-            <p className="mono-font text-[9.5px] text-muted-foreground">RECEIPT <span className="selectable text-foreground">{entry.digest}</span></p>
-            <p className="mono-font text-[9.5px] text-muted-foreground">
+            <p className="mono-font text-[11px] text-muted-foreground">SUBJECT <span className="selectable text-foreground">{entry.subject}</span></p>
+            <p className="mono-font text-[11px] text-muted-foreground">RECEIPT <span className="selectable text-foreground">{entry.digest}</span></p>
+            <p className="mono-font text-[11px] text-muted-foreground">
               POLICY {entry.policy ? `${entry.policy.name} v${entry.policy.version} · ${entry.policy.hash.slice(0, 12)}…` : "none active when decided"}
             </p>
-            {entry.failedRules.length > 0 && <p className="mono-font text-[9.5px] text-muted-foreground">FAILED RULES {entry.failedRules.join(", ")}</p>}
-            <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder="Why this verdict should be excepted (at least 10 characters)" className="mt-1.5 w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
+            {entry.failedRules.length > 0 && <p className="mono-font text-[11px] text-muted-foreground">FAILED RULES {entry.failedRules.join(", ")}</p>}
+            <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder="Why this verdict should be excepted (at least 10 characters)" className="mt-1.5 w-full rounded border border-border bg-background p-2 text-[11.5px] text-foreground" />
           </div>
           {failure && <Refusal failure={failure} />}
           <DialogFooter>

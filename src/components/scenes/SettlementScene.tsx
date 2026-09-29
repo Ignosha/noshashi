@@ -103,18 +103,18 @@ export function SettlementBody() {
       {report?.transactionType === "Payment" && (
         <div className="grid shrink-0 grid-cols-1 gap-3 md:grid-cols-2">
           <Panel bodyClassName="p-3.5">
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               REQUESTED
             </p>
             <p className="data-font mt-1.5 break-all text-[20px] font-[600] leading-tight tabular-nums text-muted-foreground">
               {report.requested ? formatAmount(report.requested) : "—"}
             </p>
-            <p className="mono-font mt-1.5 text-[9px] leading-snug text-faint">
+            <p className="mono-font mt-1.5 text-[10.5px] leading-snug text-faint">
               what the sender asked to deliver
             </p>
           </Panel>
           <Panel bodyClassName="p-3.5">
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               DELIVERED
             </p>
             <p
@@ -131,7 +131,7 @@ export function SettlementBody() {
             </p>
             <p
               className={cn(
-                "mono-font mt-1.5 text-[9px] leading-snug",
+                "mono-font mt-1.5 text-[10.5px] leading-snug",
                 short ? "text-no-go" : "text-faint"
               )}
             >
@@ -146,7 +146,7 @@ export function SettlementBody() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
           <Panel label="TRANSACTION" className="shrink-0">
-            <Label htmlFor="tx" className="text-[10px] tracking-wide">
+            <Label htmlFor="tx" className="text-[11px] tracking-wide">
               TRANSACTION HASH
             </Label>
             <Input
@@ -163,7 +163,7 @@ export function SettlementBody() {
               {busy ? "READING SETTLEMENT…" : "READ SETTLEMENT"}
             </Button>
             {error && <p className="mt-3 text-[11px] text-no-go">{error}</p>}
-            <p className="mt-3 border-t border-border/50 pt-2.5 text-[10px] leading-relaxed text-faint">
+            <p className="mt-3 border-t border-border/50 pt-2.5 text-[11px] leading-relaxed text-faint">
               A payment can return{" "}
               <span className="text-muted-foreground">tesSUCCESS</span> having
               delivered a fraction of what it asked for. The success code and
@@ -221,12 +221,12 @@ export function SettlementBody() {
                   key={label}
                   className="flex items-baseline gap-3 border-b border-border/30 px-3.5 py-1.5 last:border-0"
                 >
-                  <span className="stencil text-[8px] tracking-[0.2em] text-faint">
+                  <span className="stencil text-[10px] tracking-[0.14em] text-faint">
                     {label}
                   </span>
                   <span
                     className={cn(
-                      "ml-auto font-mono text-[10.5px] tabular-nums",
+                      "ml-auto font-mono text-[11.5px] tabular-nums",
                       (label === "VALIDATED" && !report.validated) ||
                         (label === "PARTIAL FLAG" && report.partialFlagSet)
                         ? "text-no-go"
@@ -256,7 +256,7 @@ export function SettlementBody() {
           ) : (
             <>
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="break-all font-mono text-[9.5px] text-faint">{report.hash}</p>
+                <p className="break-all font-mono text-[11px] text-faint">{report.hash}</p>
               </div>
               {findings.map((f) => (
                 <Signal

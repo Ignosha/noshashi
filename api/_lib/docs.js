@@ -122,7 +122,7 @@ export const PERMISSION_LABELS = {
 };
 
 /** Scenes that are settings, commerce or help rather than readings of the ledger. */
-const NOT_ANALYSIS = new Set(["Overview", "Agent", "Learn", "Growth", "Pricing", "Account", "Business Plan", "Legal & Accessibility", "Trust & Security", "Settings"]);
+const NOT_ANALYSIS = new Set(["Overview", "Agent", "Learn", "Pricing", "Account", "Business Plan", "Legal & Accessibility", "Trust & Security", "Settings"]);
 const PLANS = ["Free", "Desk", "Institution", "Enterprise"];
 
 /* ── the fourteen sections ───────────────────────────────────────── */

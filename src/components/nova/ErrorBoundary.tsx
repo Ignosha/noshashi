@@ -53,23 +53,23 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="flex items-center gap-3">
             <NovaLogo size={22} animated={false} className="text-no-go" />
             <div>
-              <p className="stencil text-[10px] tracking-[0.24em] text-no-go">
+              <p className="stencil text-[11px] tracking-[0.14em] text-no-go">
                 {this.props.scope.toUpperCase()} FAILED TO RENDER
               </p>
-              <p className="mt-1 text-[10px] text-muted-foreground">
+              <p className="mt-1 text-[11px] text-muted-foreground">
                 The rest of the console is still running.
               </p>
             </div>
           </div>
 
-          <p className="mono-font selectable mt-4 max-h-[120px] overflow-y-auto break-words border border-border bg-background p-2.5 text-[9.5px] leading-relaxed text-foreground/80">
+          <p className="mono-font selectable mt-4 max-h-[120px] overflow-y-auto break-words border border-border bg-background p-2.5 text-[11px] leading-relaxed text-foreground/80">
             {error.message || "Unknown error"}
           </p>
 
           <div className="mt-4 flex items-center justify-between gap-3">
             <button
               onClick={this.reset}
-              className="border border-input px-3 py-1.5 text-[10px] tracking-wider text-foreground transition-colors hover:bg-accent"
+              className="border border-input px-3 py-1.5 text-[11px] tracking-wider text-foreground transition-colors hover:bg-accent"
             >
               RETRY
             </button>
@@ -77,7 +77,7 @@ export class ErrorBoundary extends Component<Props, State> {
               href={`mailto:${CONTACT.support}?subject=${encodeURIComponent(
                 `Render failure: ${this.props.scope}`
               )}&body=${encodeURIComponent(error.message)}`}
-              className="stencil text-[8px] tracking-[0.2em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+              className="stencil text-[10px] tracking-[0.14em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
             >
               REPORT TO SUPPORT
             </a>

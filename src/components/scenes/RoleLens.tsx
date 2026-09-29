@@ -60,7 +60,7 @@ export function RoleLens({
               aria-selected={l === current}
               onClick={() => choose(l)}
               className={cn(
-                "stencil rounded border px-2 py-0.5 text-[7.5px] tracking-[0.2em]",
+                "stencil rounded border px-2 py-0.5 text-[10px] tracking-[0.14em]",
                 l === current ? "border-foreground/50 text-foreground" : "border-border text-muted-foreground hover:text-foreground"
               )}
             >
@@ -69,7 +69,7 @@ export function RoleLens({
           ))}
         </div>
       </div>
-      <p className="mt-1 text-[9.5px] text-muted-foreground">
+      <p className="mt-1 text-[11px] text-muted-foreground">
         {def.purpose}
         {role && LENS_FOR_ROLE[role] === current ? ` Default for your role (${role}).` : ""}
       </p>
@@ -84,15 +84,15 @@ export function RoleLens({
               className="group border border-border p-2 text-left hover:border-foreground/40 disabled:cursor-default"
             >
               <div className="flex items-baseline justify-between gap-2">
-                <span className="stencil text-[7.5px] tracking-[0.2em] text-muted-foreground">{item.label}</span>
+                <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{item.label}</span>
                 {figure !== undefined && (
                   <span className={cn("data-font text-[11px]", figure === null ? "text-muted-foreground" : "text-foreground")}>
                     {figure ?? "unavailable"}
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 text-[9px] leading-snug text-muted-foreground">{item.answers}</p>
-              <p className="stencil mt-0.5 text-[7px] tracking-[0.2em] text-muted-foreground/70 group-hover:text-foreground">
+              <p className="mt-0.5 text-[10.5px] leading-snug text-muted-foreground">{item.answers}</p>
+              <p className="stencil mt-0.5 text-[10px] tracking-[0.14em] text-muted-foreground/70 group-hover:text-foreground">
                 OPEN {item.where ? `${item.where} ` : ""}→
               </p>
             </button>

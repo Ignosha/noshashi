@@ -100,7 +100,7 @@ export function SimulationPanel({
   };
 
   if (!loaded) {
-    return <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING LEDGER…</p>;
+    return <p className="mono-font animate-pulse p-4 text-[11px] text-muted-foreground">LOADING LEDGER…</p>;
   }
   if (entries.length === 0) {
     return (
@@ -116,7 +116,7 @@ export function SimulationPanel({
     <div className="grid min-h-full grid-cols-1 xl:grid-cols-[minmax(320px,420px)_1fr]">
       {/* ── Policy changes ───────────────────────────────────── */}
       <div className="border-b border-border p-4 xl:border-b-0 xl:border-r">
-        <p className="text-[10px] leading-relaxed text-muted-foreground">
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
           Re-decides the verdicts on this ledger under a changed policy, from what each entry
           recorded, using the engine's own verdict rule. Nothing is written and no receipt changes.
         </p>
@@ -126,8 +126,8 @@ export function SimulationPanel({
           {rules.map((r) => (
             <div key={r.id} className="flex items-center gap-2 border-b border-border/30 py-1">
               <div className="min-w-0 flex-1">
-                <p className="mono-font truncate text-[9.5px] text-foreground">{r.id}</p>
-                <p className="mono-font text-[8.5px] text-muted-foreground">
+                <p className="mono-font truncate text-[11px] text-foreground">{r.id}</p>
+                <p className="mono-font text-[10px] text-muted-foreground">
                   failed {r.failed.toLocaleString()} of {r.seen.toLocaleString()} ·{" "}
                   {[...r.severities].map((sev) => (sev === "block" ? "blocking" : "advisory")).join(" / ")}
                 </p>
@@ -136,7 +136,7 @@ export function SimulationPanel({
                 aria-label={`Severity for ${r.id}`}
                 value={scenario.severity[r.id] ?? ""}
                 onChange={(e) => setSeverity(r.id, e.target.value as Severity | "")}
-                className="mono-font h-6 rounded border border-border bg-background px-1 text-[9px] text-foreground"
+                className="mono-font h-6 rounded border border-border bg-background px-1 text-[10.5px] text-foreground"
               >
                 <option value="">AS RECORDED</option>
                 <option value="block">BLOCKING</option>
@@ -152,22 +152,22 @@ export function SimulationPanel({
             <Eyebrow className="mb-2 mt-5">TRANSFER CEILING (XRP)</Eyebrow>
             {domains.map((d) => (
               <div key={d.id} className="flex items-center gap-2 py-1">
-                <span className="mono-font w-20 shrink-0 text-[9.5px] text-foreground">{d.code}</span>
+                <span className="mono-font w-20 shrink-0 text-[11px] text-foreground">{d.code}</span>
                 <Input
                   inputMode="numeric"
                   aria-label={`Transfer ceiling for ${d.code}`}
                   placeholder={`as recorded · ${d.transferCeilingXrp > 0 ? d.transferCeilingXrp.toLocaleString() : "closed"}`}
                   value={scenario.ceilings[d.id] ?? ""}
                   onChange={(e) => setCeiling(d.id, e.target.value)}
-                  className="mono-font h-6 text-[9.5px]"
+                  className="mono-font h-6 text-[11px]"
                 />
               </div>
             ))}
-            <p className="mt-1 text-[9px] text-muted-foreground/80">0 closes the domain to settlement.</p>
+            <p className="mt-1 text-[10.5px] text-muted-foreground/80">0 closes the domain to settlement.</p>
           </>
         )}
 
-        <p className="mt-5 text-[9px] leading-relaxed text-muted-foreground/80">
+        <p className="mt-5 text-[10.5px] leading-relaxed text-muted-foreground/80">
           To see what a change to institutional thresholds (HHI, counterparty share, Travel Rule,
           reserve headroom, strict freeze) would do, edit a draft in the POLICY tab: its impact on
           these recorded verdicts is simulated there.
@@ -193,7 +193,7 @@ export function SimulationPanel({
             { k: "NOT RE-DECIDABLE", v: summary.skipped },
           ].map((t) => (
             <div key={t.k}>
-              <p className="stencil text-[8px] tracking-[0.22em] text-muted-foreground">{t.k}</p>
+              <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{t.k}</p>
               <p className={cn("data-font mt-1 text-[20px] font-[600] leading-none text-foreground", t.tone)}>
                 {t.v.toLocaleString()}
               </p>
@@ -201,7 +201,7 @@ export function SimulationPanel({
           ))}
         </div>
         {summary.skipped > 0 && (
-          <p className="mt-2 text-[9.5px] leading-relaxed text-muted-foreground">
+          <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
             {summary.skipped.toLocaleString()} entries were recorded before the full check list was stored
             with each verdict, so they cannot be re-decided and are left out.
           </p>
@@ -212,14 +212,14 @@ export function SimulationPanel({
           <tbody>
             {VERDICTS.map((v) => (
               <tr key={v} className="border-b border-border/30">
-                <td className={cn("stencil py-1.5 text-[9px] tracking-[0.18em]", TONE[v])}>{LABEL[v]}</td>
-                <td className="mono-font py-1.5 text-right text-[10px] tabular-nums text-muted-foreground">
+                <td className={cn("stencil py-1.5 text-[10.5px] tracking-[0.14em]", TONE[v])}>{LABEL[v]}</td>
+                <td className="mono-font py-1.5 text-right text-[11px] tabular-nums text-muted-foreground">
                   {summary.before[v].toLocaleString()}
                 </td>
-                <td className="mono-font px-2 py-1.5 text-center text-[10px] text-muted-foreground">→</td>
+                <td className="mono-font px-2 py-1.5 text-center text-[11px] text-muted-foreground">→</td>
                 <td
                   className={cn(
-                    "mono-font py-1.5 text-[10px] tabular-nums",
+                    "mono-font py-1.5 text-[11px] tabular-nums",
                     summary.after[v] !== summary.before[v] ? "text-foreground" : "text-muted-foreground"
                   )}
                 >
@@ -235,7 +235,7 @@ export function SimulationPanel({
             {Object.entries(summary.transitions).map(([k, n]) => {
               const [from, to] = k.split(">") as [Status, Status];
               return (
-                <span key={k} className="mono-font border border-border px-1.5 py-0.5 text-[9px]">
+                <span key={k} className="mono-font border border-border px-1.5 py-0.5 text-[10.5px]">
                   <span className={TONE[from]}>{LABEL[from]}</span>
                   <span className="text-muted-foreground"> → </span>
                   <span className={TONE[to]}>{LABEL[to]}</span>
@@ -253,18 +253,18 @@ export function SimulationPanel({
           </Button>
         </div>
         {!touched ? (
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-[11px] text-muted-foreground">
             Change a rule's severity or a ceiling to see which recorded verdicts would move.
           </p>
         ) : changed.length === 0 ? (
-          <p className="text-[10px] text-muted-foreground">No recorded verdict changes under this policy.</p>
+          <p className="text-[11px] text-muted-foreground">No recorded verdict changes under this policy.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-border">
                   {["", "SUBJECT", "DOMAIN", "AMOUNT", "RECORDED", "SIMULATED", "BECAUSE OF", "RECORDED ON"].map((h, i) => (
-                    <th key={i} className="stencil px-2 py-1.5 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">
+                    <th key={i} className="stencil px-2 py-1.5 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">
                       {h}
                     </th>
                   ))}
@@ -275,17 +275,17 @@ export function SimulationPanel({
                   r.state !== "evaluated" ? null : (
                     <tr key={r.entry.id} className="border-b border-border/30">
                       <td className="px-2 py-1.5"><StatusDot status={r.after} size={6} /></td>
-                      <td className="mono-font selectable px-2 py-1.5 text-[9.5px] text-foreground">
+                      <td className="mono-font selectable px-2 py-1.5 text-[11px] text-foreground">
                         {r.entry.label ?? shortAddress(r.entry.subject)}
                       </td>
-                      <td className="mono-font px-2 py-1.5 text-[9.5px] text-muted-foreground">{r.entry.domainCode}</td>
-                      <td className="mono-font px-2 py-1.5 text-[9.5px] tabular-nums text-muted-foreground">
+                      <td className="mono-font px-2 py-1.5 text-[11px] text-muted-foreground">{r.entry.domainCode}</td>
+                      <td className="mono-font px-2 py-1.5 text-[11px] tabular-nums text-muted-foreground">
                         {r.entry.amountXrp.toLocaleString()}
                       </td>
-                      <td className={cn("mono-font px-2 py-1.5 text-[9.5px]", TONE[r.before])}>{LABEL[r.before]}</td>
-                      <td className={cn("mono-font px-2 py-1.5 text-[9.5px]", TONE[r.after])}>{LABEL[r.after]}</td>
-                      <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{r.drivers.join(", ")}</td>
-                      <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground/80">
+                      <td className={cn("mono-font px-2 py-1.5 text-[11px]", TONE[r.before])}>{LABEL[r.before]}</td>
+                      <td className={cn("mono-font px-2 py-1.5 text-[11px]", TONE[r.after])}>{LABEL[r.after]}</td>
+                      <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{r.drivers.join(", ")}</td>
+                      <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground/80">
                         {new Date(r.entry.at).toLocaleString()}
                       </td>
                     </tr>
@@ -294,7 +294,7 @@ export function SimulationPanel({
               </tbody>
             </table>
             {changed.length > SHOWN && (
-              <p className="stencil mt-2 text-[8px] tracking-[0.18em] text-muted-foreground">
+              <p className="stencil mt-2 text-[10px] tracking-[0.14em] text-muted-foreground">
                 SHOWING {SHOWN} OF {changed.length.toLocaleString()} · EXPORT FOR ALL
               </p>
             )}

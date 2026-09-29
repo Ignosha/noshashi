@@ -636,7 +636,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
           <li>Open <a href="/downloads/">Downloads</a> and choose your system: <code>.dmg</code> for Mac (Apple Silicon or Intel), <code>.msi</code> or <code>-setup.exe</code> for Windows, <code>.deb</code>, <code>.rpm</code> or <code>.AppImage</code> for Linux.</li>
           <li>Install and open it. The landing screen shows the ledger live. Continue into the console.</li>
           <li>Glance at <strong>Mission Control</strong> first: it confirms the app is connected and shows the latest validated ledger.</li>
-          <li>Use the sidebar on the left. Screens are grouped into Overview, Adjudication, Markets &amp; Exposure, Treasury &amp; Issuance, Record, Intelligence, Public and Growth.</li>
+          <li>Use the sidebar on the left. Screens are grouped into Overview, Adjudication, Markets &amp; Exposure, Treasury &amp; Issuance, Record, Intelligence and Public, with System at the bottom.</li>
           <li>Try <strong>Check an Address</strong>: paste any address starting with <code>r</code> and press <span class="btnlabel">CHECK THIS ADDRESS</span>. The free plan includes 10 checks a month.</li>
           <li>Visit <strong>Settings</strong>: appearance (light or dark), notifications, the global keyboard shortcut for the menu-bar HUD, and <strong>Updates</strong>, where new versions install in place.</li>
           <li>To unlock paid screens, open <strong>Pricing</strong> in the app, choose a plan and sign in. <strong>Account</strong> holds your subscription, two-factor authentication and API keys.</li>
@@ -693,11 +693,11 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
           <dt>HOW</dt><dd><ol><li>Paste the counterparty's address.</li><li>Press <span class="btnlabel">TRACE PROVENANCE</span>.</li></ol></dd>
           <dt>WATCH FOR</dt><dd>A days-old account funded by an unknown source deserves more questions than a years-old one funded by a known exchange.</dd></dl></div>
         <div class="feature"><h4>Credentials</h4><dl>
-          <dt>FOR</dt><dd>The XLS-70 credential registry: which credentials an account holds and who issued them, with selective disclosure.</dd>
-          <dt>HOW</dt><dd>Switch between the grid and table views; open a credential to see its issuer and status.</dd></dl></div>
+          <dt>FOR</dt><dd>The XLS-70 credential registry: what your wallet holds and which real mainnet domains it admits you to; what a counterparty holds (who vouched, and when it lapses); and, for an institution that issues credentials, everything it has issued that is not accepted, expiring or expired.</dd>
+          <dt>HOW</dt><dd>Paste a counterparty's or an issuer's address and press <span class="btnlabel">READ</span>. Every list exports to CSV with the ledger it was read at.</dd></dl></div>
         <div class="feature"><h4>Domain Grid</h4><dl>
-          <dt>FOR</dt><dd>XLS-80 permissioned domains and their policy state, plus which amendments are enabled on mainnet.</dd>
-          <dt>HOW</dt><dd>Pick a domain to see its membership rules and whether an account qualifies.</dd></dl></div>
+          <dt>FOR</dt><dd>Every XLS-80 permissioned domain on mainnet, found by a sweep of the whole ledger, and whether a counterparty would be admitted to one.</dd>
+          <dt>HOW</dt><dd><ol><li>Pick a domain, or paste a domain ID or owner address and press <span class="btnlabel">READ LIVE</span>.</li><li>Paste the counterparty's address and press <span class="btnlabel">CHECK</span>.</li><li>Save the admission record: it carries the ledger index and a SHA-256 digest.</li></ol></dd></dl></div>
 
         <h3>Markets &amp; Exposure · "could I get out of it?"</h3>
         <div class="feature"><h4>Exposure Analysis <small>RISK</small></h4><dl>
@@ -736,8 +736,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 
         <h3>Record</h3>
         <div class="feature"><h4>Audit Trail <small>HISTORY</small></h4><dl>
-          <dt>FOR</dt><dd>A wallet's transaction history with compliance details attached, ready to export.</dd>
-          <dt>HOW</dt><dd>Use the filter box to search by hash, account or transaction type.</dd></dl></div>
+          <dt>FOR</dt><dd>Any account's validated history as a compliance file: what was actually delivered (partial payments shown for what they are), destination tags, memos, and every counterparty screened against the OFAC SDN list and the scam registry.</dd>
+          <dt>HOW</dt><dd><ol><li>Paste the account and press <span class="btnlabel">READ HISTORY</span>; <span class="btnlabel">LOAD OLDER</span> reads further back.</li><li>Set the XRP threshold at which transfers are flagged, and use the <span class="btnlabel">FLAGGED</span> tab.</li><li><span class="btnlabel">EXPORT EVIDENCE</span> writes the CSV and a manifest carrying its SHA-256 and ledger range.</li></ol></dd></dl></div>
         <div class="feature"><h4>Settlement</h4><dl>
           <dt>FOR</dt><dd>What a transaction actually delivered, not what it requested (lesson 9).</dd>
           <dt>HOW</dt><dd><ol><li>Paste the transaction hash (64 hex characters).</li><li>Press <span class="btnlabel">READ SETTLEMENT</span>.</li></ol></dd>
@@ -771,9 +771,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <div class="feature"><h4>Learn</h4><dl>
           <dt>FOR</dt><dd>Short animated explainers inside the app: the gate, freeze rights, book depth and the address check.</dd></dl></div>
 
-        <h3>Growth, account and extras</h3>
-        <div class="feature"><h4>Growth</h4><dl>
-          <dt>FOR</dt><dd>Drafts for posts and pitches built only from figures the app measured, each with its date. There is no publish button: you post them yourself.</dd></dl></div>
+        <h3>Account and extras</h3>
         <div class="feature"><h4>Pricing and Account</h4><dl>
           <dt>FOR</dt><dd>Plans, checkout and verification credits; your subscription, two-factor authentication and API keys.</dd></dl></div>
         <div class="feature"><h4>Menu-bar HUD <small>macOS</small></h4><dl>
@@ -1151,7 +1149,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["A check shows INSUFFICIENT_DATA. How should you treat it?", ["As a pass","As a fail","As an abstention: the ledger did not give enough to decide","As a bug"], 2, "It is never a pass. NOSHASHI would rather say it cannot tell than guess."],
     ["An issuer fails 'no single key controls the issuer'. Which verdict follows?", ["GO","HOLD","NO-GO","NOT_APPLICABLE"], 2, "That check is blocking, so a failure gives NO-GO."],
     ["Which screen tells you who can really move a treasury?", ["Order Book","Control Surface","Inbox","Ledger Sync"], 1, "Control Surface derives minimum signers from weights and flags a master-key bypass."],
-    ["You need to check a payment really arrived. Which screen and button?", ["Settlement · READ SETTLEMENT","Passport · GENERATE PASSPORT","Authority · CERTIFY AUTHORITY","Growth"], 0, "Settlement compares requested with delivered."],
+    ["You need to check a payment really arrived. Which screen and button?", ["Settlement · READ SETTLEMENT","Passport · GENERATE PASSPORT","Authority · CERTIFY AUTHORITY","Ledger Watch"], 0, "Settlement compares requested with delivered."],
     ["Why does every reading carry a ledger index and a SHA-256 digest?", ["Decoration","So anyone can re-check the same moment and prove the record was not changed","To make files bigger","It is required by the Travel Rule"], 1, "The index fixes the moment; the digest proves the contents are unchanged."],
     ["What does four-eyes approval mean for a policy change?", ["It needs four approvers","A second person must approve before it goes live","It is reviewed by four validators","It lasts four days"], 1, "One person drafts and submits; a different person approves."],
     ["ROUND 4 · VOCABULARY", "vocab"],
@@ -1169,7 +1167,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     ["In NOSHASHI, what is an exception?", ["A crash report","A check that was skipped","An approved, recorded override of a NO-GO for a stated reason","A payment that bounced"], 2, "It never erases the NO-GO. The override, its reason and its reviewer are kept alongside it.", 1],
     ["ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES"],
     ["A listed company holds XRP in its treasury. Its auditor asks whether the year-end value is defensible. How does NOSHASHI help?", ["It sets the price itself","It measures how much could really be sold in the market at a stated ledger index, so the auditor can re-check the figure","It guarantees the auditor signs off","It moves the XRP into cold storage"], 1, "Auditors need evidence of the principal market. Funded depth stamped with a ledger index is evidence anyone can reproduce."],
-    ["A compliance officer is asked to approve holding a new stablecoin. Which reading answers 'could the issuer freeze or claw back what we hold?'", ["Growth","Ledger Sync","Authority: CERTIFY AUTHORITY reads the issuer's flags and returns GO, HOLD or NO-GO","The HUD"], 2, "Freeze, clawback, Require Auth, key control, transfer fee and concentration are properties of the asset. Screening the people involved cannot see them."],
+    ["A compliance officer is asked to approve holding a new stablecoin. Which reading answers 'could the issuer freeze or claw back what we hold?'", ["Learn","Ledger Sync","Authority: CERTIFY AUTHORITY reads the issuer's flags and returns GO, HOLD or NO-GO","The HUD"], 2, "Freeze, clawback, Require Auth, key control, transfer fee and concentration are properties of the asset. Screening the people involved cannot see them."],
     ["An examiner asks a bank to show why a transfer was allowed eight months ago. What does NOSHASHI give it?", ["A screenshot","The receipt: ledger index, rules version, checks and digest, so the decision can be reproduced exactly","A phone number for support","Nothing; the ledger has changed since"], 1, "The ledger index fixes the moment. The digest proves the record was not edited afterwards."],
     ["Why does four-eyes approval matter to an enterprise?", ["It makes changes faster","No single employee can quietly change the rules that decide what the firm may do","It is needed to install the app","It lowers the price"], 1, "Segregation of duties is a basic control auditors and regulators expect. Drafts can be simulated before anyone approves them."],
     ["A trading desk is about to take a large position in an XRPL token. What risk does NOSHASHI check that a price chart hides?", ["Whether the logo is official","Whether the listed depth includes unfunded offers, so the way out is far thinner than it looks","The token's age in days","The colour of the chart"], 1, "In the 8 September sample, listed depth was a median 4.4 times funded depth within the band."],

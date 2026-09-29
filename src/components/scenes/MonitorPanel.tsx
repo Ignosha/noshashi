@@ -63,7 +63,7 @@ export function MonitorPanel({ wallets }: { wallets: PortfolioWallet[] }) {
           Scheduled monitoring re-runs the redemption stress test for every wallet in this book on a timer (every 1 to 24 hours),
           keeps each reading, and tests your organization's own alert rules against them: recovery ratio, freezable share, days to
           exit, trapped value and frozen positions, combined with ALL or ANY, sent to the console, the desktop, or your webhooks as a
-          signed <span className="font-mono text-[10.5px]">custom_alert</span> event. Every run is written to the organization's
+          signed <span className="font-mono text-[11.5px]">custom_alert</span> event. Every run is written to the organization's
           audit log.
         </p>
         <p className="mt-2">It is part of the Institutional plan. The stress test itself is on the Risk screen.</p>
@@ -87,10 +87,10 @@ export function MonitorPanel({ wallets }: { wallets: PortfolioWallet[] }) {
           >
             {m.config.enabled ? "SCHEDULE ON" : "SCHEDULE OFF"}
           </Button>
-          <label className="font-mono text-[9px] tracking-[0.14em] text-muted-foreground">
+          <label className="font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground">
             EVERY{" "}
             <select
-              className="ml-1 rounded-[3px] border border-border bg-background px-1.5 py-1 text-[10px] text-foreground"
+              className="ml-1 rounded-[3px] border border-border bg-background px-1.5 py-1 text-[11px] text-foreground"
               value={m.config.everyHours}
               onChange={(e) => setSchedule({ ...m.config, everyHours: Number(e.target.value) })}
             >
@@ -99,10 +99,10 @@ export function MonitorPanel({ wallets }: { wallets: PortfolioWallet[] }) {
               ))}
             </select>
           </label>
-          <label className="font-mono text-[9px] tracking-[0.14em] text-muted-foreground">
+          <label className="font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground">
             SCENARIO{" "}
             <select
-              className="ml-1 rounded-[3px] border border-border bg-background px-1.5 py-1 text-[10px] text-foreground"
+              className="ml-1 rounded-[3px] border border-border bg-background px-1.5 py-1 text-[11px] text-foreground"
               value={m.config.scenario}
               onChange={(e) => setSchedule({ ...m.config, scenario: e.target.value as ScenarioId })}
             >
@@ -120,15 +120,15 @@ export function MonitorPanel({ wallets }: { wallets: PortfolioWallet[] }) {
             {m.running ? "RUNNING…" : "RUN NOW"}
           </Button>
         </div>
-        <p className="mt-2 font-mono text-[9px] tracking-[0.12em] text-faint">
+        <p className="mt-2 font-mono text-[10.5px] tracking-[0.1em] text-faint">
           LAST RUN {when(m.lastRunAt).toUpperCase()}
           {next !== null && ` · NEXT ${next === 0 ? "WITHIN A MINUTE" : new Date(next).toLocaleString().toUpperCase()}`}
           {organizationId ? ` · RECORDED IN ${membership?.name.toUpperCase()}'S AUDIT LOG` : ""}
         </p>
-        <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
+        <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
           Runs while NOSHASHI is open (including in the menu bar), with the same readers and stress model as the Risk screen.
         </p>
-        {m.lastError && <p className="mt-1 text-[10.5px] text-hold">{m.lastError}</p>}
+        {m.lastError && <p className="mt-1 text-[11.5px] text-hold">{m.lastError}</p>}
       </section>
 
       {/* Readings */}
@@ -141,7 +141,7 @@ export function MonitorPanel({ wallets }: { wallets: PortfolioWallet[] }) {
             <thead>
               <tr className="border-b border-border">
                 {["WALLET", "RECOVERY", "FREEZABLE", "DAYS OUT", "TRAPPED", "TREND", "READ"].map((h) => (
-                  <th key={h} className="stencil px-2 py-1.5 text-[8px] tracking-[0.18em] text-muted-foreground">{h}</th>
+                  <th key={h} className="stencil px-2 py-1.5 text-[10px] tracking-[0.14em] text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -150,21 +150,21 @@ export function MonitorPanel({ wallets }: { wallets: PortfolioWallet[] }) {
                 const last = readings[readings.length - 1];
                 return (
                   <tr key={wallet.address} className="border-b border-border/30">
-                    <td className="px-2 py-1.5 text-[10.5px] text-foreground">
-                      {wallet.label ?? <span className="font-mono text-[10px]">{shortAddress(wallet.address)}</span>}
+                    <td className="px-2 py-1.5 text-[11.5px] text-foreground">
+                      {wallet.label ?? <span className="font-mono text-[11px]">{shortAddress(wallet.address)}</span>}
                     </td>
                     {last?.error ? (
-                      <td colSpan={5} className="px-2 py-1.5 text-[10px] text-hold">{last.error}</td>
+                      <td colSpan={5} className="px-2 py-1.5 text-[11px] text-hold">{last.error}</td>
                     ) : (
                       <>
-                        <td className="px-2 py-1.5 font-mono text-[10px] tabular-nums">{last ? ratio(last.recoveryRatio) : "—"}</td>
-                        <td className="px-2 py-1.5 font-mono text-[10px] tabular-nums">{last ? ratio(last.freezableShare) : "—"}</td>
-                        <td className="px-2 py-1.5 font-mono text-[10px] tabular-nums">{last && Number.isFinite(last.daysToExit) ? last.daysToExit.toFixed(1) : "—"}</td>
-                        <td className="px-2 py-1.5 font-mono text-[10px] tabular-nums">{last ? formatMetric("trapped_xrp", last.trappedXrp) : "—"}</td>
+                        <td className="px-2 py-1.5 font-mono text-[11px] tabular-nums">{last ? ratio(last.recoveryRatio) : "—"}</td>
+                        <td className="px-2 py-1.5 font-mono text-[11px] tabular-nums">{last ? ratio(last.freezableShare) : "—"}</td>
+                        <td className="px-2 py-1.5 font-mono text-[11px] tabular-nums">{last && Number.isFinite(last.daysToExit) ? last.daysToExit.toFixed(1) : "—"}</td>
+                        <td className="px-2 py-1.5 font-mono text-[11px] tabular-nums">{last ? formatMetric("trapped_xrp", last.trappedXrp) : "—"}</td>
                         <td className="px-2 py-1.5"><Trend readings={readings} /></td>
                       </>
                     )}
-                    <td className="px-2 py-1.5 font-mono text-[9px] text-faint">{last ? new Date(last.at).toLocaleTimeString() : "—"}</td>
+                    <td className="px-2 py-1.5 font-mono text-[10.5px] text-faint">{last ? new Date(last.at).toLocaleTimeString() : "—"}</td>
                   </tr>
                 );
               })}
@@ -192,7 +192,7 @@ export function MonitorPanel({ wallets }: { wallets: PortfolioWallet[] }) {
           ) : (
             <ul className="flex flex-col gap-1.5">
               {m.firings.slice(0, 12).map((f) => (
-                <li key={`${f.ruleId}-${f.address}-${f.at}`} className="border-l-2 border-l-hold pl-2.5 text-[10.5px]">
+                <li key={`${f.ruleId}-${f.address}-${f.at}`} className="border-l-2 border-l-hold pl-2.5 text-[11.5px]">
                   <span className="font-medium text-foreground">{f.ruleName}</span>{" "}
                   <span className="text-muted-foreground">· {f.label ?? shortAddress(f.address)} · {new Date(f.at).toLocaleString()}</span>
                   <div className="text-muted-foreground">
@@ -212,7 +212,7 @@ export function MonitorPanel({ wallets }: { wallets: PortfolioWallet[] }) {
 /** The last ten recovery ratios as bars, oldest first. */
 function Trend({ readings }: { readings: StressSnapshot[] }) {
   const points = readings.slice(-10).map((r) => r.recoveryRatio).filter((v) => Number.isFinite(v));
-  if (points.length < 2) return <span className="font-mono text-[9px] text-faint">—</span>;
+  if (points.length < 2) return <span className="font-mono text-[10.5px] text-faint">—</span>;
   return (
     <span className="flex h-3 items-end gap-px" aria-label={`Recovery ratio over the last ${points.length} runs`}>
       {points.map((v, i) => (
@@ -262,8 +262,8 @@ function RulesEditor({ rules, wallets, webhookAvailable }: { rules: AlertRule[];
         <div key={r.id} className={cn("inset-row flex items-start gap-2 px-3 py-2", !r.enabled && "opacity-60")}>
           <div className="min-w-0 flex-1">
             <p className="text-[11.5px] font-medium text-foreground">{r.name}</p>
-            <p className="text-[10.5px] text-muted-foreground">{describeRule(r)}</p>
-            <p className="mt-0.5 font-mono text-[9px] tracking-[0.12em] text-faint">
+            <p className="text-[11.5px] text-muted-foreground">{describeRule(r)}</p>
+            <p className="mt-0.5 font-mono text-[10.5px] tracking-[0.1em] text-faint">
               {r.scope === "all" ? "EVERY WALLET" : `${r.scope.length} WALLET${r.scope.length === 1 ? "" : "S"}`} · {r.destinations.join(" + ").toUpperCase()} · AGAIN AFTER {r.cooldownHours} H
             </p>
           </div>
@@ -286,7 +286,7 @@ function RulesEditor({ rules, wallets, webhookAvailable }: { rules: AlertRule[];
               onRemove={draft.conditions.length > 1 ? () => setDraft({ ...draft, conditions: draft.conditions.filter((_, j) => j !== i) }) : undefined}
             />
           ))}
-          <div className="flex flex-wrap items-center gap-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground">
             {draft.conditions.length < 6 && (
               <Button size="sm" variant="outline" onClick={() => setDraft({ ...draft, conditions: [...draft.conditions, { metric: "freezable_share", op: ">", threshold: 0.25 }] })}>
                 + CONDITION
@@ -295,7 +295,7 @@ function RulesEditor({ rules, wallets, webhookAvailable }: { rules: AlertRule[];
             {draft.conditions.length > 1 && (
               <label>
                 FIRE WHEN{" "}
-                <select className="rounded-[3px] border border-border bg-background px-1.5 py-1 text-[10px] text-foreground" value={draft.match} onChange={(e) => setDraft({ ...draft, match: e.target.value as "all" | "any" })}>
+                <select className="rounded-[3px] border border-border bg-background px-1.5 py-1 text-[11px] text-foreground" value={draft.match} onChange={(e) => setDraft({ ...draft, match: e.target.value as "all" | "any" })}>
                   <option value="all">ALL HOLD</option>
                   <option value="any">ANY HOLDS</option>
                 </select>
@@ -303,11 +303,11 @@ function RulesEditor({ rules, wallets, webhookAvailable }: { rules: AlertRule[];
             )}
             <label>
               AGAIN AFTER{" "}
-              <input type="number" min={0} max={720} className="w-14 rounded-[3px] border border-border bg-background px-1.5 py-1 text-[10px] text-foreground" value={draft.cooldownHours} onChange={(e) => setDraft({ ...draft, cooldownHours: Math.max(0, Math.min(720, Number(e.target.value) || 0)) })} /> H
+              <input type="number" min={0} max={720} className="w-14 rounded-[3px] border border-border bg-background px-1.5 py-1 text-[11px] text-foreground" value={draft.cooldownHours} onChange={(e) => setDraft({ ...draft, cooldownHours: Math.max(0, Math.min(720, Number(e.target.value) || 0)) })} /> H
             </label>
           </div>
-          <div className="flex flex-wrap items-center gap-3 text-[10.5px] text-muted-foreground">
-            <span className="font-mono text-[9px] tracking-[0.14em]">SEND TO</span>
+          <div className="flex flex-wrap items-center gap-3 text-[11.5px] text-muted-foreground">
+            <span className="font-mono text-[10.5px] tracking-[0.1em]">SEND TO</span>
             {(["console", "desktop", "webhook"] as Destination[]).map((d) => (
               <label key={d} className={cn("flex items-center gap-1", d === "webhook" && !webhookAvailable && "opacity-50")}>
                 <input
@@ -321,10 +321,10 @@ function RulesEditor({ rules, wallets, webhookAvailable }: { rules: AlertRule[];
             ))}
           </div>
           {!webhookAvailable && (
-            <p className="text-[10px] text-faint">Webhook delivery needs an organization in which your role records to the audit log.</p>
+            <p className="text-[11px] text-faint">Webhook delivery needs an organization in which your role records to the audit log.</p>
           )}
-          <div className="flex flex-wrap items-center gap-2 text-[10.5px] text-muted-foreground">
-            <span className="font-mono text-[9px] tracking-[0.14em]">WALLETS</span>
+          <div className="flex flex-wrap items-center gap-2 text-[11.5px] text-muted-foreground">
+            <span className="font-mono text-[10.5px] tracking-[0.1em]">WALLETS</span>
             <label className="flex items-center gap-1">
               <input type="radio" checked={draft.scope === "all"} onChange={() => setDraft({ ...draft, scope: "all" })} /> Every wallet
             </label>
@@ -343,7 +343,7 @@ function RulesEditor({ rules, wallets, webhookAvailable }: { rules: AlertRule[];
               </label>
             ))}
           </div>
-          <p className="text-[10.5px] text-foreground">{describeRule(draft)}</p>
+          <p className="text-[11.5px] text-foreground">{describeRule(draft)}</p>
           <div className="flex gap-2">
             <Button size="sm" onClick={save} disabled={!draft.name.trim() || draft.destinations.length === 0}>SAVE RULE</Button>
             <Button size="sm" variant="ghost" onClick={() => setDraft(null)}>CANCEL</Button>
@@ -364,7 +364,7 @@ function ConditionRow({ condition, onChange, onRemove }: { condition: Condition;
   return (
     <div className="flex flex-wrap items-center gap-2">
       <select
-        className="rounded-[3px] border border-border bg-background px-1.5 py-1 text-[10.5px] text-foreground"
+        className="rounded-[3px] border border-border bg-background px-1.5 py-1 text-[11.5px] text-foreground"
         value={condition.metric}
         onChange={(e) => {
           const metric = e.target.value as Metric;
@@ -378,7 +378,7 @@ function ConditionRow({ condition, onChange, onRemove }: { condition: Condition;
         ))}
       </select>
       <select
-        className="rounded-[3px] border border-border bg-background px-1.5 py-1 text-[10.5px] text-foreground"
+        className="rounded-[3px] border border-border bg-background px-1.5 py-1 text-[11.5px] text-foreground"
         value={condition.op}
         onChange={(e) => onChange({ ...condition, op: e.target.value as Op })}
       >
@@ -389,16 +389,16 @@ function ConditionRow({ condition, onChange, onRemove }: { condition: Condition;
       <input
         type="number"
         step="any"
-        className="w-24 rounded-[3px] border border-border bg-background px-1.5 py-1 text-[10.5px] text-foreground"
+        className="w-24 rounded-[3px] border border-border bg-background px-1.5 py-1 text-[11.5px] text-foreground"
         value={Number(unit.fromValue(condition.threshold).toFixed(4))}
         onChange={(e) => {
           const n = Number(e.target.value);
           if (Number.isFinite(n)) onChange({ ...condition, threshold: unit.toValue(n) });
         }}
       />
-      <span className="font-mono text-[9px] text-faint">{unit.suffix}</span>
+      <span className="font-mono text-[10.5px] text-faint">{unit.suffix}</span>
       {onRemove && (
-        <button type="button" onClick={onRemove} className="font-mono text-[9px] text-muted-foreground hover:text-no-go">REMOVE</button>
+        <button type="button" onClick={onRemove} className="font-mono text-[10.5px] text-muted-foreground hover:text-no-go">REMOVE</button>
       )}
     </div>
   );

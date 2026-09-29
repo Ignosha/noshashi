@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-09-29T03:00:00Z",
+    "kind": "release",
+    "title": "1.0.15: real domain and credential registry, audit evidence, readable at any size",
+    "body": "Every permissioned domain and credential on mainnet, read by a sweep of the ledger; admission checks with SHA-256 records; audit trails screened against OFAC and the scam registry with a signed manifest. Text is larger, scaling fills the window, and 2FA sign-in is fixed.",
+    "link": "/docs/release-notes/"
+  },
+  {
     "date": "2026-09-28T18:00:00Z",
     "kind": "release",
     "title": "1.0.14: safer to hold XRP, easier to trust who holds it",

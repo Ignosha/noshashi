@@ -62,6 +62,16 @@ function systemPrefersDark(): boolean {
   return !window.matchMedia("(prefers-color-scheme: light)").matches;
 }
 
+/**
+ * The window's width in the app's own px, after the operator's scale:
+ * the width the layout actually has to fit into.
+ */
+export function logicalWidth(scale?: number): number {
+  if (typeof window === "undefined") return Infinity;
+  const s = scale ?? (Number(document.documentElement.style.getPropertyValue("--text-scale")) || 1);
+  return window.innerWidth / s;
+}
+
 export function AppearanceProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeSetting] = useSetting<ThemeMode>("appearance.theme", "dark");
   const [highContrast, setHighContrastSetting] = useSetting(
@@ -101,6 +111,18 @@ export function AppearanceProvider({ children }: { children: React.ReactNode }) 
     // Lets form controls and scrollbars pick the right native styling.
     root.style.colorScheme = resolvedTheme;
   }, [resolvedTheme, highContrast, textScale, motion, readableText, underlineLinks, largeTargets]);
+
+  // The window's size in px, for the root's zoom sizing in index.css.
+  useEffect(() => {
+    const root = document.documentElement;
+    const sync = () => {
+      root.style.setProperty("--app-w", `${window.innerWidth}px`);
+      root.style.setProperty("--app-h", `${window.innerHeight}px`);
+    };
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, []);
 
   // Follow the OS when the operator has chosen to.
   useEffect(() => {

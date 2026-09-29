@@ -86,9 +86,6 @@ const LedgerWatchScene = lazy(() =>
 const PassportScene = lazy(() =>
   import("@/components/scenes/PassportScene").then((m) => ({ default: m.PassportScene }))
 );
-const GrowthScene = lazy(() =>
-  import("@/components/scenes/GrowthScene").then((m) => ({ default: m.GrowthScene }))
-);
 const LearnScene = lazy(() =>
   import("@/components/scenes/LearnScene").then((m) => ({ default: m.LearnScene }))
 );
@@ -128,7 +125,7 @@ import { useXRPL } from "@/lib/xrpl/useXRPL";
 import { useSetting } from "@/lib/store";
 import { isTauri, isTrayView } from "@/lib/env";
 import { ToastProvider, useToast } from "@/lib/toast";
-import { AppearanceProvider } from "@/lib/appearance";
+import { AppearanceProvider, logicalWidth, useAppearance } from "@/lib/appearance";
 import { AuthProvider, useAuth } from "@/lib/auth/useAuth";
 import { BillingProvider, useBilling } from "@/lib/billing/useEntitlements";
 import { SkipLink, Announcer } from "@/components/nova/A11y";
@@ -159,7 +156,6 @@ export type SceneId =
   | "workstation"
   | "safeshop"
   | "learn"
-  | "growth"
   | "issuance"
   | "authority"
   | "passport"
@@ -212,7 +208,6 @@ const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
   { id: "record", label: "RECORD", scenes: ["history", "settlement", "workstation"] },
   { id: "intelligence", label: "INTELLIGENCE", scenes: ["agent", "garden"] },
   { id: "public", label: "PUBLIC", scenes: ["safeshop", "claims", "nft", "network", "learn"] },
-  { id: "growth", label: "GROWTH", scenes: ["growth"] },
 ];
 
 const SCENES: SceneDef[] = [
@@ -464,15 +459,6 @@ const SCENES: SceneDef[] = [
     requires: "portfolios",
   },
   {
-    id: "growth",
-    label: "GROWTH",
-    title: "GROWTH",
-    hint: "Platform-native drafts built from measured figures — you post them",
-    icon: <NovaBolt size={15} />,
-    digit: "",
-    group: "primary",
-  },
-  {
     id: "plans",
     label: "PRICING",
     title: "PRICING",
@@ -587,16 +573,30 @@ function ConsoleApp() {
   // The board's sidebar is open by default; collapsing is an escape hatch
   // for narrow windows, not the resting state.
   const [railOpen, setRailOpen] = useState(
-    () => typeof window === "undefined" || window.innerWidth >= 1180
+    () => logicalWidth() >= 1180
   );
   // Below ~1180 the labelled sidebar costs more than it gives: the content
   // columns start truncating their own labels. Collapse to icons and let
   // the operator reopen it deliberately if they want it back.
+  const { textScale } = useAppearance();
+  // On a short window (or a large scale) the pinned SYSTEM block would leave
+  // the scene list a few rows tall; the whole rail scrolls as one instead.
+  const [shortRail, setShortRail] = useState(false);
+  useEffect(() => {
+    const check = () => setShortRail(window.innerHeight / textScale < 720);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [textScale]);
+  // A larger interface scale leaves less room, exactly like a narrower window.
+  useEffect(() => {
+    setRailOpen(logicalWidth(textScale) >= 1180);
+  }, [textScale]);
   useEffect(() => {
     let manual = false;
     const onResize = () => {
       if (manual) return;
-      setRailOpen(window.innerWidth >= 1180);
+      setRailOpen(logicalWidth() >= 1180);
     };
     window.addEventListener("resize", onResize);
     return () => {
@@ -926,6 +926,7 @@ function ConsoleApp() {
           <aside
             className={cn(
               "flex h-full shrink-0 flex-col border-r border-border bg-card/40",
+              shortRail && "overflow-y-auto overscroll-contain",
               railOpen ? "w-[212px]" : "w-[60px]"
             )}
           >
@@ -947,7 +948,12 @@ function ConsoleApp() {
                 short for every section, the next heading showed cut off
                 against the SYSTEM rule and read as an empty section. */}
             <nav
-              className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-2.5 pb-6 [mask-image:linear-gradient(to_bottom,#000_calc(100%-28px),transparent)]"
+              className={cn(
+                "flex flex-col gap-3.5 px-2.5",
+                shortRail
+                  ? "shrink-0 pb-3"
+                  : "min-h-0 flex-1 overflow-y-auto pb-6 [mask-image:linear-gradient(to_bottom,#000_calc(100%-28px),transparent)]"
+              )}
               aria-label="Primary"
             >
               {NAV_SECTIONS.map((section) => {
@@ -958,7 +964,7 @@ function ConsoleApp() {
                 return (
                   <div key={section.id}>
                     {railOpen && (
-                      <p className="px-2 pb-1 font-mono text-[8.5px] tracking-[0.2em] text-faint">
+                      <p className="px-2 pb-1 font-mono text-[10px] tracking-[0.14em] text-faint">
                         {section.label}
                       </p>
                     )}
@@ -981,7 +987,7 @@ function ConsoleApp() {
             {/* System — always visible, never scrolled away with the nav. */}
             <div className="shrink-0 border-t border-border bg-card/40 px-2.5 py-2.5">
               {railOpen && (
-                <p className="px-2 pb-1.5 font-mono text-[8.5px] tracking-[0.22em] text-faint">
+                <p className="px-2 pb-1.5 font-mono text-[10px] tracking-[0.14em] text-faint">
                   SYSTEM
                 </p>
               )}
@@ -1136,8 +1142,6 @@ function ConsoleApp() {
                       <SecurityScene onUpgrade={openPlans} onSignIn={openAuth} />
                     ) : scene === "passport" ? (
                       <PassportScene onUpgrade={openPlans} onSignIn={openAuth} />
-                    ) : scene === "growth" ? (
-                      <GrowthScene data={data} />
                     ) : scene === "learn" ? (
                       <LearnScene onNavigate={goTo} />
                     ) : scene === "plans" ? (
@@ -1216,7 +1220,7 @@ function ConsoleApp() {
 function SceneLoading() {
   return (
     <div className="flex h-full items-center justify-center">
-      <span className="mono-font animate-pulse text-[10px] tracking-[0.24em] text-muted-foreground">
+      <span className="mono-font animate-pulse text-[11px] tracking-[0.14em] text-muted-foreground">
         LOADING
       </span>
     </div>
@@ -1254,7 +1258,7 @@ function NavButton({
         </span>
       )}
       {expanded && item.digit && (
-        <span className="font-mono text-[9px] text-faint opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="font-mono text-[10.5px] text-faint opacity-0 transition-opacity group-hover:opacity-100">
           {item.digit}
         </span>
       )}
@@ -1335,7 +1339,7 @@ function RailAction({
 function BrandName() {
   const { brand } = useWorkstationOrg();
   if (!brand.name) {
-    return <span className="display truncate text-[13px] font-[600] tracking-[0.26em] text-foreground">NOSHASHI</span>;
+    return <span className="display truncate text-[13px] font-[600] tracking-[0.14em] text-foreground">NOSHASHI</span>;
   }
   return (
     <span className="flex min-w-0 flex-col leading-tight">
@@ -1346,7 +1350,7 @@ function BrandName() {
       >
         {brand.name}
       </span>
-      <span className="font-mono text-[7.5px] tracking-[0.22em] text-faint">ON NOSHASHI</span>
+      <span className="font-mono text-[10px] tracking-[0.14em] text-faint">ON NOSHASHI</span>
     </span>
   );
 }

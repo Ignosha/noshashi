@@ -796,13 +796,13 @@ export function AgentScene({ data }: { data: XrplState }) {
             busy ? (
               <button
                 onClick={stop}
-                className="stencil text-[8px] tracking-[0.2em] text-no-go transition-opacity hover:opacity-70"
+                className="stencil text-[10px] tracking-[0.14em] text-no-go transition-opacity hover:opacity-70"
               >
                 ■ STOP
               </button>
             ) : (
               config.model && (
-                <span className="mono-font truncate text-[9px] text-muted-foreground">
+                <span className="mono-font truncate text-[10.5px] text-muted-foreground">
                   {provider.name} · {config.model}
                 </span>
               )
@@ -835,7 +835,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                       href={provider.docsUrl}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="stencil text-[8px] tracking-[0.2em] text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+                      className="stencil text-[10px] tracking-[0.14em] text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
                     >
                       {provider.local ? "INSTALL" : "OPEN"} {provider.name.toUpperCase()}{provider.local ? "" : " DOCS"}
                     </a>
@@ -867,7 +867,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                       key={suggestion}
                       onClick={() => void send(suggestion)}
                       disabled={!ready && mode !== "support"}
-                      className="border border-border px-3 py-2 text-left text-[10px] leading-snug text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground disabled:opacity-40"
+                      className="border border-border px-3 py-2 text-left text-[11px] leading-snug text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground disabled:opacity-40"
                     >
                       {suggestion}
                     </button>
@@ -887,7 +887,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                     >
                       <span
                         className={cn(
-                          "mt-0.5 grid h-6 w-6 shrink-0 place-items-center border text-[8px]",
+                          "mt-0.5 grid h-6 w-6 shrink-0 place-items-center border text-[10px]",
                           turn.role === "user"
                             ? "border-border text-muted-foreground"
                             : turn.error
@@ -903,19 +903,19 @@ export function AgentScene({ data }: { data: XrplState }) {
                       </span>
                       <div className={cn("min-w-0 flex-1", turn.simulation && "border border-hold/40 p-2")}>
                         {turn.simulation && (
-                          <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-hold">
+                          <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-hold">
                             SIMULATION · COMPUTED BY THE POLICY ENGINE · NOT MODEL OUTPUT
                           </p>
                         )}
                         {turn.via && (
-                          <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-hold">
+                          <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-hold">
                             ANSWERED BY {turn.via.toUpperCase()} · FAILOVER
                           </p>
                         )}
                         {turn.steps && turn.steps.length > 0 && (
                           <ul className="mb-1.5 space-y-0.5 border-l border-border pl-2">
                             {turn.steps.map((step, index) => (
-                              <li key={index} className="mono-font text-[9px] leading-snug text-muted-foreground">
+                              <li key={index} className="mono-font text-[10.5px] leading-snug text-muted-foreground">
                                 {step.kind === "tool" ? (
                                   <>
                                     <span className={step.ok ? "text-go" : "text-no-go"}>{step.ok ? "READ" : "FAILED"}</span>{" "}
@@ -931,14 +931,14 @@ export function AgentScene({ data }: { data: XrplState }) {
                           </ul>
                         )}
                         {turn.streaming && turn.content.length === 0 && turn.steps && (
-                          <span className="mono-font block text-[8px] tracking-[0.2em] text-muted-foreground">
+                          <span className="mono-font block text-[10px] tracking-[0.14em] text-muted-foreground">
                             NOSHX IS READING THE LEDGER…
                           </span>
                         )}
                         <p
                           className={cn(
                             "selectable whitespace-pre-wrap break-words leading-relaxed",
-                            turn.simulation ? "mono-font text-[10px]" : "text-[11.5px]",
+                            turn.simulation ? "mono-font text-[11px]" : "text-[11.5px]",
                             turn.role === "user"
                               ? "text-foreground/85"
                               : turn.error
@@ -950,7 +950,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                           {turn.content}
                         </p>
                         {turn.streaming && turn.content.length > 0 && (
-                          <span className="mono-font mt-1 block text-[8px] tracking-[0.2em] text-muted-foreground">
+                          <span className="mono-font mt-1 block text-[10px] tracking-[0.14em] text-muted-foreground">
                             GENERATING…
                           </span>
                         )}
@@ -999,7 +999,7 @@ export function AgentScene({ data }: { data: XrplState }) {
               </Button>
             </div>
             {mode === "support" && turns.some((t) => t.role === "user") && (
-              <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
+              <div className="mt-1.5 flex items-center gap-2 text-[10.5px] text-muted-foreground">
                 <span>Not answered?</span>
                 <button
                   onClick={() => {
@@ -1007,19 +1007,19 @@ export function AgentScene({ data }: { data: XrplState }) {
                     setTicketDraft(lastQuestion);
                     setView("tickets");
                   }}
-                  className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2"
+                  className="stencil text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2"
                 >
                   OPEN A TICKET WITH SUPPORT
                 </button>
               </div>
             )}
             <div className="mt-1.5 flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-[9px] text-muted-foreground">
+              <span className="flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
                 <Kbd keys="enter" /> send
                 <span className="mx-1 opacity-40">·</span>
                 <Kbd keys="shift+enter" /> newline
               </span>
-              <span className="stencil text-[8px] tracking-[0.2em] text-muted-foreground/70">
+              <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground/70">
                 {boundary.onDevice ? "ON-DEVICE · NOTHING TRANSMITTED" : "REMOTE RUNTIME · TLS"}
               </span>
             </div>
@@ -1051,7 +1051,7 @@ export function AgentScene({ data }: { data: XrplState }) {
               {provider.api === "noshx" ? null : endpointDraft === null ? (
                 <button
                   onClick={() => setEndpointDraft(config.baseUrl)}
-                  className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+                  className="stencil mb-1 text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
                 >
                   EDIT ENDPOINT
                 </button>
@@ -1061,7 +1061,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                     value={endpointDraft}
                     onChange={(event) => setEndpointDraft(event.target.value)}
                     aria-label="Runtime endpoint"
-                    className="mono-font h-7 text-[10px]"
+                    className="mono-font h-7 text-[11px]"
                   />
                   <Button
                     size="sm"
@@ -1094,7 +1094,7 @@ export function AgentScene({ data }: { data: XrplState }) {
             <button
               onClick={() => setShowRuntimePicker((open) => !open)}
               aria-expanded={showRuntimePicker}
-              className="stencil mt-3 w-full border border-border py-1.5 text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
+              className="stencil mt-3 w-full border border-border py-1.5 text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
             >
               {showRuntimePicker ? "HIDE RUNTIMES" : "CHANGE RUNTIME"}
             </button>
@@ -1127,20 +1127,20 @@ export function AgentScene({ data }: { data: XrplState }) {
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="mono-font block truncate text-[9.5px] text-foreground">
+                      <span className="mono-font block truncate text-[11px] text-foreground">
                         {entry.name}
                         {entry.free && entry.local && (
                           <span className="ml-1.5 text-telemetry">FREE · LOCAL</span>
                         )}
                       </span>
-                      <span className="block text-[8.5px] leading-snug text-muted-foreground">
+                      <span className="block text-[10px] leading-snug text-muted-foreground">
                         {entry.blurb}
                       </span>
                     </span>
                   </button>
                 ))}
                 {!boundary.onDevice && (
-                  <p className="border border-hold/40 bg-hold-dim p-2 text-[8.5px] leading-relaxed text-hold">
+                  <p className="border border-hold/40 bg-hold-dim p-2 text-[10px] leading-relaxed text-hold">
                     A remote endpoint sends your prompt off this machine.
                     {isEndpointSafe(config.baseUrl).ok
                       ? " TLS is enforced."
@@ -1155,7 +1155,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                 <Eyebrow className="mb-1.5">
                   {provider.name.toUpperCase()} API KEY
                 </Eyebrow>
-                <p className="mb-2 text-[9px] leading-relaxed text-muted-foreground">
+                <p className="mb-2 text-[10.5px] leading-relaxed text-muted-foreground">
                   Sealed in the OS keyring, scoped to this provider, and only ever
                   sent to {provider.id === "custom" ? "your custom endpoint" : new URL(provider.defaultBaseUrl).host}.
                   The app adds it to each request itself; this window never reads it back.
@@ -1166,7 +1166,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                     value={keyDraft}
                     onChange={(event) => setKeyDraft(event.target.value)}
                     placeholder={keyStored ? "•••••••• sealed" : provider.setupHint}
-                    className="mono-font h-7 text-[10px]"
+                    className="mono-font h-7 text-[11px]"
                   />
                   <Button
                     size="sm"
@@ -1201,7 +1201,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                         push({ title: "KEY CLEARED", tone: "info" });
                       })()
                     }
-                    className="stencil mt-1.5 text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-no-go"
+                    className="stencil mt-1.5 text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-no-go"
                   >
                     CLEAR STORED KEY
                   </button>
@@ -1219,7 +1219,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                       onChange={(event) => setModelFilter(event.target.value)}
                       placeholder="FILTER"
                       aria-label="Filter available models"
-                      className="mono-font h-6 w-24 text-[8px]"
+                      className="mono-font h-6 w-24 text-[10px]"
                     />
                   )}
                 </div>
@@ -1236,16 +1236,16 @@ export function AgentScene({ data }: { data: XrplState }) {
                       )}
                     >
                       <NovaTerminal size={11} className="shrink-0 text-muted-foreground" />
-                      <span className="mono-font min-w-0 flex-1 truncate text-[9px] text-foreground">
+                      <span className="mono-font min-w-0 flex-1 truncate text-[10.5px] text-foreground">
                         {entry.name}
                       </span>
-                      <span className="mono-font shrink-0 text-[8px] tabular-nums text-muted-foreground">
+                      <span className="mono-font shrink-0 text-[10px] tabular-nums text-muted-foreground">
                         {entry.sizeBytes > 0 ? formatBytes(entry.sizeBytes, 1) : entry.detail}
                       </span>
                     </button>
                   ))}
                   {visibleModels.length === 0 && (
-                    <p className="border border-border/60 px-2 py-2 text-[9px] text-muted-foreground">
+                    <p className="border border-border/60 px-2 py-2 text-[10.5px] text-muted-foreground">
                     No models match this filter.
                     </p>
                   )}
@@ -1271,7 +1271,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                 {testingRuntime ? "TESTING…" : "TEST MODEL"}
               </Button>
             </div>
-            <label className="mt-2.5 flex cursor-pointer items-start gap-2 text-[9px] leading-snug text-muted-foreground">
+            <label className="mt-2.5 flex cursor-pointer items-start gap-2 text-[10.5px] leading-snug text-muted-foreground">
               <input
                 type="checkbox"
                 checked={failover}
@@ -1279,12 +1279,12 @@ export function AgentScene({ data }: { data: XrplState }) {
                 className="mt-0.5 accent-current"
               />
               <span>
-                <span className="stencil block text-[8px] tracking-[0.2em] text-foreground">FAILOVER</span>
+                <span className="stencil block text-[10px] tracking-[0.14em] text-foreground">FAILOVER</span>
                 If this runtime fails, answer with the last one that worked
                 {failoverTarget() ? ` (${findProvider(failoverTarget()!.providerId).name} · ${failoverTarget()!.model})` : ""} and say so.
               </span>
             </label>
-            <label className="mt-2 flex cursor-pointer items-start gap-2 text-[9px] leading-snug text-muted-foreground">
+            <label className="mt-2 flex cursor-pointer items-start gap-2 text-[10.5px] leading-snug text-muted-foreground">
               <input
                 type="checkbox"
                 checked={reasoning === "deep"}
@@ -1292,7 +1292,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                 className="mt-0.5 accent-current"
               />
               <span>
-                <span className="stencil block text-[8px] tracking-[0.2em] text-foreground">DEEP REASONING</span>
+                <span className="stencil block text-[10px] tracking-[0.14em] text-foreground">DEEP REASONING</span>
                 Let the model think before it answers. Better on hard questions; on a laptop model it adds seconds to each answer.
               </span>
             </label>
@@ -1308,13 +1308,13 @@ export function AgentScene({ data }: { data: XrplState }) {
                     return (
                       <div key={entry.model} className="border border-border px-2 py-1.5">
                         <div className="flex items-center gap-2">
-                          <span className="mono-font min-w-0 flex-1 truncate text-[9.5px] text-foreground">{entry.model}</span>
-                          <span className="stencil shrink-0 text-[7.5px] tracking-[0.16em] text-telemetry">{entry.fits.toUpperCase()}</span>
+                          <span className="mono-font min-w-0 flex-1 truncate text-[11px] text-foreground">{entry.model}</span>
+                          <span className="stencil shrink-0 text-[10px] tracking-[0.1em] text-telemetry">{entry.fits.toUpperCase()}</span>
                         </div>
-                        <p className="mt-0.5 text-[8.5px] leading-snug text-muted-foreground">{entry.blurb}</p>
+                        <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">{entry.blurb}</p>
                         <div className="mt-1">
                           {busyHere ? (
-                            <p className="mono-font text-[8.5px] text-hold">
+                            <p className="mono-font text-[10px] text-hold">
                               {installing!.status.toUpperCase()}
                               {installing!.percent !== null ? ` · ${installing!.percent}%` : ""}
                             </p>
@@ -1322,7 +1322,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                             <button
                               disabled={active}
                               onClick={() => setConfig({ ...config, model: entry.model })}
-                              className="stencil text-[8px] tracking-[0.2em] text-go disabled:opacity-60"
+                              className="stencil text-[10px] tracking-[0.14em] text-go disabled:opacity-60"
                             >
                               {active ? "IN USE" : "USE THIS MODEL"}
                             </button>
@@ -1331,12 +1331,12 @@ export function AgentScene({ data }: { data: XrplState }) {
                               disabled={Boolean(installing) || !reachable}
                               onClick={() => void install(entry.model)}
                               title={reachable ? undefined : "Start Ollama first"}
-                              className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2 disabled:opacity-40"
+                              className="stencil text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2 disabled:opacity-40"
                             >
                               INSTALL
                             </button>
                           ) : (
-                            <p className="text-[8.5px] leading-snug text-muted-foreground">
+                            <p className="text-[10px] leading-snug text-muted-foreground">
                               Not on this machine yet. Train it with the free NOSHX kit, then run{" "}
                               <span className="mono-font text-foreground">ollama create noshx -f Modelfile</span>.{" "}
                               <a href="https://www.noshashi.app/docs/ai/#training-noshx" target="_blank" rel="noreferrer noopener" className="underline underline-offset-2">
@@ -1364,14 +1364,14 @@ export function AgentScene({ data }: { data: XrplState }) {
                     onClick={() => void selfRepair()}
                     disabled={repairing}
                     title="NOSHX checks and repairs the link, clock, sign-in, plan, watches, settings and version"
-                    className="stencil text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                    className="stencil text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
                   >
                     {repairing ? "REPAIRING…" : "SELF-REPAIR"}
                   </button>
                   <button
                     onClick={() => void diagnose()}
                     disabled={diagnosing}
-                    className="stencil text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                    className="stencil text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
                   >
                     {diagnosing ? "RUNNING…" : "RUN"}
                   </button>
@@ -1379,7 +1379,7 @@ export function AgentScene({ data }: { data: XrplState }) {
               }
             >
               {!diagnostics ? (
-                <p className="text-[10px] leading-relaxed text-muted-foreground">
+                <p className="text-[11px] leading-relaxed text-muted-foreground">
                   Checks the link, the watched wallet, reserve headroom, the
                   credential registry and the AI runtime — then repairs what it
                   can. Works offline and needs no account.
@@ -1398,12 +1398,12 @@ export function AgentScene({ data }: { data: XrplState }) {
                             check.state === "running" && "bg-muted-foreground"
                           )}
                         />
-                        <span className="min-w-0 flex-1 truncate text-[10px] text-foreground">
+                        <span className="min-w-0 flex-1 truncate text-[11px] text-foreground">
                           {check.label}
                         </span>
                         <span
                           className={cn(
-                            "stencil shrink-0 text-[7px] tracking-[0.18em]",
+                            "stencil shrink-0 text-[10px] tracking-[0.14em]",
                             check.state === "pass" && "text-go",
                             check.state === "warn" && "text-hold",
                             check.state === "fail" && "text-no-go"
@@ -1412,7 +1412,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                           {check.state.toUpperCase()}
                         </span>
                       </div>
-                      <p className="mt-1 text-[9px] leading-relaxed text-muted-foreground">
+                      <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
                         {check.detail}
                       </p>
                       {check.fix && (
@@ -1424,7 +1424,7 @@ export function AgentScene({ data }: { data: XrplState }) {
                               void diagnose();
                             })()
                           }
-                          className="stencil mt-1.5 border border-border px-2 py-0.5 text-[7px] tracking-[0.18em] text-foreground transition-colors hover:border-foreground/50"
+                          className="stencil mt-1.5 border border-border px-2 py-0.5 text-[10px] tracking-[0.14em] text-foreground transition-colors hover:border-foreground/50"
                         >
                           {check.fix.label.toUpperCase()}
                         </button>
@@ -1450,7 +1450,7 @@ export function AgentScene({ data }: { data: XrplState }) {
             ].map((rule) => (
               <div key={rule.text} className="flex gap-2 border-b border-border/30 py-1.5 last:border-0">
                 <span className="mt-0.5 shrink-0 text-muted-foreground">{rule.icon}</span>
-                <span className="text-[10px] leading-snug text-muted-foreground">
+                <span className="text-[11px] leading-snug text-muted-foreground">
                   {rule.text}
                 </span>
               </div>
@@ -1458,7 +1458,7 @@ export function AgentScene({ data }: { data: XrplState }) {
           </Panel>
 
           <Panel label="HUMAN ESCALATION" className="flex-auto">
-            <p className="text-[10px] leading-relaxed text-muted-foreground">
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
               The agent hands off anything that needs a person. Support replies
               within {CONTACT.responseTarget}.
             </p>
@@ -1472,16 +1472,16 @@ export function AgentScene({ data }: { data: XrplState }) {
                   href={`mailto:${route.email}`}
                   className="inset-row flex items-center justify-between gap-3 px-2.5 py-2"
                 >
-                  <span className="stencil shrink-0 text-[8px] tracking-[0.2em] text-muted-foreground">
+                  <span className="stencil shrink-0 text-[10px] tracking-[0.14em] text-muted-foreground">
                     {route.label}
                   </span>
-                  <span className="mono-font min-w-0 break-all text-right text-[9px] text-foreground">
+                  <span className="mono-font min-w-0 break-all text-right text-[10.5px] text-foreground">
                     {route.email}
                   </span>
                 </a>
               ))}
             </div>
-            <p className="mono-font mt-2 text-[8px] text-muted-foreground/70">
+            <p className="mono-font mt-2 text-[10px] text-muted-foreground/70">
               {CONTACT.hours}
             </p>
           </Panel>

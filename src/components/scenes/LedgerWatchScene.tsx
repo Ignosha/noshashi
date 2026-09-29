@@ -106,7 +106,7 @@ function LedgerWatchBody() {
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "stencil border px-2 py-1 text-[9px] tracking-[0.2em]",
+              "stencil border px-2 py-1 text-[10.5px] tracking-[0.14em]",
               tab === t.id ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground"
             )}
           >
@@ -118,7 +118,7 @@ function LedgerWatchBody() {
         {tab === "screen" ? (
           <ScreenTab organizationId={membership?.organizationId ?? null} />
         ) : !membership ? (
-          <p className="max-w-[640px] text-[10px] text-muted-foreground">
+          <p className="max-w-[640px] text-[11px] text-muted-foreground">
             Watched accounts, the event feed and export schemas belong to an organization. Create or join one in the WORKSTATION, then
             come back. Screening a single deposit works without one.
           </p>
@@ -178,12 +178,12 @@ function ScreenTab({ organizationId }: { organizationId: string | null }) {
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
       <section className="space-y-2">
         <Eyebrow>INCOMING PAYMENT</Eyebrow>
-        <p className="max-w-[560px] text-[9.5px] leading-snug text-muted-foreground">
+        <p className="max-w-[560px] text-[11px] leading-snug text-muted-foreground">
           Read live from the ledger: the transaction, what it actually delivered, the issuer of any token, and who created the sender,
           who created them, and who created them. Nothing is estimated; what cannot be read is said to be unknown and holds the deposit.
         </p>
-        <Input value={hash} onChange={(e) => setHash(e.target.value)} placeholder="Transaction hash" className="mono-font h-7 text-[10px]" />
-        <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Deposit address (r…)" className="mono-font h-7 text-[10px]" list="deposit-watches" />
+        <Input value={hash} onChange={(e) => setHash(e.target.value)} placeholder="Transaction hash" className="mono-font h-7 text-[11px]" />
+        <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Deposit address (r…)" className="mono-font h-7 text-[11px]" list="deposit-watches" />
         <datalist id="deposit-watches">
           {watches.map((w) => (
             <option key={w.id} value={w.address}>{w.label ?? w.address}</option>
@@ -191,9 +191,9 @@ function ScreenTab({ organizationId }: { organizationId: string | null }) {
         </datalist>
         <DepositConfigEditor value={config} onChange={setConfig} />
         <Button size="sm" onClick={() => void run()} disabled={busy}>{busy ? "READING THE LEDGER…" : "SCREEN"}</Button>
-        {error && <p className="text-[9.5px] text-no-go">{error}</p>}
+        {error && <p className="text-[11px] text-no-go">{error}</p>}
       </section>
-      <section>{result ? <ScreeningView result={result} /> : <p className="text-[10px] text-muted-foreground">The verdict appears here.</p>}</section>
+      <section>{result ? <ScreeningView result={result} /> : <p className="text-[11px] text-muted-foreground">The verdict appears here.</p>}</section>
     </div>
   );
 }
@@ -210,25 +210,25 @@ function ScreeningView({ result }: { result: OnDemandScreening }) {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className={cn("stencil text-[18px] tracking-[0.2em]", VERDICT_TONE[screening.verdict])}>{screening.verdict.toUpperCase()}</p>
+        <p className={cn("stencil text-[18px] tracking-[0.14em]", VERDICT_TONE[screening.verdict])}>{screening.verdict.toUpperCase()}</p>
         <Button size="sm" variant="outline" onClick={exportIt}>EXPORT JSON</Button>
       </div>
-      <p className="text-[10px] text-foreground">
+      <p className="text-[11px] text-foreground">
         Credit: <span className="mono-font">{screening.credit ? formatAmount(screening.credit) : "nothing"}</span>
         {data.amount && data.delivered && data.amount.value !== data.delivered.value && (
           <span className="text-muted-foreground"> · asked {formatAmount(data.amount)}</span>
         )}
       </p>
-      <p className="mono-font text-[9px] text-muted-foreground">
+      <p className="mono-font text-[10.5px] text-muted-foreground">
         {event.txType} · {event.result} · ledger {event.ledgerIndex.toLocaleString("en-US")} · tag {data.destinationTag ?? "none"} · read at ledger{" "}
         {result.ledger.toLocaleString("en-US")}
       </p>
       <div className="space-y-1">
-        {screening.findings.length === 0 && <p className="text-[10px] text-go">No findings.</p>}
+        {screening.findings.length === 0 && <p className="text-[11px] text-go">No findings.</p>}
         {screening.findings.map((f) => (
           <div key={f.id} className="border border-border p-1.5">
-            <p className={cn("stencil text-[8.5px] tracking-[0.18em]", SEVERITY_TONE[f.severity])}>{f.severity.toUpperCase()} · {f.title}</p>
-            <p className="selectable mt-0.5 break-words text-[9.5px] leading-snug text-muted-foreground">{f.detail}</p>
+            <p className={cn("stencil text-[10px] tracking-[0.14em]", SEVERITY_TONE[f.severity])}>{f.severity.toUpperCase()} · {f.title}</p>
+            <p className="selectable mt-0.5 break-words text-[11px] leading-snug text-muted-foreground">{f.detail}</p>
           </div>
         ))}
       </div>
@@ -236,7 +236,7 @@ function ScreeningView({ result }: { result: OnDemandScreening }) {
         <div>
           <Eyebrow className="mb-1">SOURCE OF FUNDS</Eyebrow>
           {chain.map((h, i) => (
-            <p key={h.account} className="mono-font selectable text-[9px] text-muted-foreground">
+            <p key={h.account} className="mono-font selectable text-[10.5px] text-muted-foreground">
               {i === 0 ? "sender" : `${i} back`} · {h.account} · {h.activatedLedger ? `created in ledger ${h.activatedLedger.toLocaleString("en-US")}` : "creation not read"}
               {h.fundedBy ? ` · funded by ${h.fundedBy}` : ""}
             </p>
@@ -273,25 +273,25 @@ function DepositConfigEditor({ value, onChange, disabled }: { value: DepositConf
   };
   return (
     <div className="space-y-1.5 border border-dashed border-border p-2">
-      <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">RULES FOR THIS DEPOSIT ADDRESS</p>
-      <label className="block text-[9px] text-muted-foreground">
+      <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">RULES FOR THIS DEPOSIT ADDRESS</p>
+      <label className="block text-[10.5px] text-muted-foreground">
         Accepted issuers, one per line: <span className="mono-font">USD rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B</span>
-        <textarea disabled={disabled} value={issuers} onChange={(e) => setIssuers(e.target.value)} onBlur={() => commit()} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[9.5px] text-foreground" />
+        <textarea disabled={disabled} value={issuers} onChange={(e) => setIssuers(e.target.value)} onBlur={() => commit()} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[11px] text-foreground" />
       </label>
-      <label className="block text-[9px] text-muted-foreground">
+      <label className="block text-[10.5px] text-muted-foreground">
         Deny list: addresses you will not take funds from, directly or up to three hops back
-        <textarea disabled={disabled} value={deny} onChange={(e) => setDeny(e.target.value)} onBlur={() => commit()} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[9.5px] text-foreground" />
+        <textarea disabled={disabled} value={deny} onChange={(e) => setDeny(e.target.value)} onBlur={() => commit()} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[11px] text-foreground" />
       </label>
-      <label className="block text-[9px] text-muted-foreground">
+      <label className="block text-[10.5px] text-muted-foreground">
         Trusted counterparties: addresses you pay or are paid by. A sender that starts and ends like one of these (or like any address
         you watch) is flagged as address poisoning.
-        <textarea disabled={disabled} value={trusted} onChange={(e) => setTrusted(e.target.value)} onBlur={() => commit()} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[9.5px] text-foreground" />
+        <textarea disabled={disabled} value={trusted} onChange={(e) => setTrusted(e.target.value)} onBlur={() => commit()} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[11px] text-foreground" />
       </label>
-      <p className="text-[9px] text-muted-foreground">
+      <p className="text-[10.5px] text-muted-foreground">
         Every sender and its funders three hops back are also checked against the US Treasury's OFAC SDN list, refreshed daily from
         treasury.gov. A listed address holds the deposit.
       </p>
-      <div className="flex flex-wrap items-center gap-3 text-[9.5px] text-foreground">
+      <div className="flex flex-wrap items-center gap-3 text-[11px] text-foreground">
         <label className="flex items-center gap-1">
           <input type="checkbox" disabled={disabled} checked={value.requireTag} onChange={(e) => commit(issuers, deny, { requireTag: e.target.checked })} />
           Require a destination tag
@@ -305,7 +305,7 @@ function DepositConfigEditor({ value, onChange, disabled }: { value: DepositConf
             value={value.travelRuleXrp || ""}
             placeholder="off"
             onChange={(e) => commit(issuers, deny, { travelRuleXrp: Number(e.target.value) })}
-            className="mono-font h-6 w-24 text-[9.5px]"
+            className="mono-font h-6 w-24 text-[11px]"
           />
           XRP
         </label>
@@ -357,29 +357,29 @@ function WatchesTab({ organizationId, role }: { organizationId: string; role: Me
   return (
     <section className="space-y-2">
       <Eyebrow>WATCHED ACCOUNTS · READ EVERY MINUTE</Eyebrow>
-      <p className="max-w-[720px] text-[9.5px] leading-snug text-muted-foreground">
+      <p className="max-w-[720px] text-[11px] leading-snug text-muted-foreground">
         The server reads each account's new validated transactions once a minute, from the ledger the watch was added onward. Deposit
         addresses have every incoming payment screened; monitored accounts ({feeds ? "Strategic" : "Strategic plan"}) record payments,
         trust-line freezes, settings and issuer flag changes. Each event reaches your webhooks signed, and the feed API.
       </p>
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
-      {watches === null && !error && <p className="mono-font animate-pulse text-[9px] text-muted-foreground">LOADING…</p>}
-      {watches?.length === 0 && <p className="text-[10px] text-muted-foreground">No accounts watched yet.</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
+      {watches === null && !error && <p className="mono-font animate-pulse text-[10.5px] text-muted-foreground">LOADING…</p>}
+      {watches?.length === 0 && <p className="text-[11px] text-muted-foreground">No accounts watched yet.</p>}
       {watches?.map((w) => (
         <div key={w.id} className="border border-border p-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[10px] text-foreground">
-              <span className="stencil mr-1.5 text-[8px] tracking-[0.2em] text-muted-foreground">{w.purpose.toUpperCase()}</span>
+            <p className="text-[11px] text-foreground">
+              <span className="stencil mr-1.5 text-[10px] tracking-[0.14em] text-muted-foreground">{w.purpose.toUpperCase()}</span>
               {w.label ?? shortAddress(w.address)} <span className="mono-font selectable text-muted-foreground">{w.address}</span>
             </p>
-            <span className={cn("stencil text-[8px] tracking-[0.2em]", w.lastError ? "text-no-go" : w.active ? "text-go" : "text-muted-foreground")}>
+            <span className={cn("stencil text-[10px] tracking-[0.14em]", w.lastError ? "text-no-go" : w.active ? "text-go" : "text-muted-foreground")}>
               ● {w.lastError ? "READ FAILED" : w.active ? "WATCHING" : "PAUSED"}
             </span>
           </div>
-          <p className="mono-font text-[9px] text-muted-foreground">
+          <p className="mono-font text-[10.5px] text-muted-foreground">
             read to ledger {w.lastLedger?.toLocaleString("en-US") ?? "— (first read pending)"} · last read {utc(w.lastPolledAt)} · {w.eventTypes.length} event types
           </p>
-          {w.lastError && <p className="text-[9px] text-no-go">{w.lastError}</p>}
+          {w.lastError && <p className="text-[10.5px] text-no-go">{w.lastError}</p>}
           {canEdit && (
             <div className="mt-1 flex flex-wrap gap-1.5">
               <Button size="sm" variant="ghost" disabled={busy} onClick={() => void run(() => updateWatch(w.id, { active: !w.active }))}>{w.active ? "PAUSE" : "RESUME"}</Button>
@@ -392,11 +392,11 @@ function WatchesTab({ organizationId, role }: { organizationId: string; role: Me
       ))}
       {canEdit ? (
         <div className="border border-dashed border-border p-2">
-          <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground">WATCH AN ACCOUNT</p>
+          <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-muted-foreground">WATCH AN ACCOUNT</p>
           <div className="flex flex-wrap items-center gap-1.5">
-            <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="r… address" className="mono-font h-7 w-80 text-[10px]" />
-            <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label (optional)" maxLength={80} className="h-7 w-48 text-[10px]" />
-            <select value={purpose} onChange={(e) => setPurpose(e.target.value as "deposit" | "monitor")} className="h-7 border border-border bg-transparent px-1 text-[10px] text-foreground">
+            <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="r… address" className="mono-font h-7 w-80 text-[11px]" />
+            <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label (optional)" maxLength={80} className="h-7 w-48 text-[11px]" />
+            <select value={purpose} onChange={(e) => setPurpose(e.target.value as "deposit" | "monitor")} className="h-7 border border-border bg-transparent px-1 text-[11px] text-foreground">
               <option value="deposit">Deposit address (screen incoming)</option>
               <option value="monitor" disabled={!feeds}>Monitor all activity{feeds ? "" : " — Strategic"}</option>
             </select>
@@ -404,7 +404,7 @@ function WatchesTab({ organizationId, role }: { organizationId: string; role: Me
           </div>
         </div>
       ) : (
-        <p className="text-[9px] text-muted-foreground">Owners, admins, compliance and risk manage watched accounts.</p>
+        <p className="text-[10.5px] text-muted-foreground">Owners, admins, compliance and risk manage watched accounts.</p>
       )}
     </section>
   );
@@ -416,10 +416,10 @@ function WatchSettings({ watch, busy, onSave }: { watch: Watch; busy: boolean; o
   const [label, setLabel] = useState(watch.label ?? "");
   return (
     <div className="mt-2 space-y-2 border-t border-border pt-2">
-      <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label" maxLength={80} className="h-7 w-64 text-[10px]" />
+      <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label" maxLength={80} className="h-7 w-64 text-[11px]" />
       <div className="flex flex-wrap gap-x-3 gap-y-1">
         {EVENT_TYPES.map((t) => (
-          <label key={t} className="mono-font flex items-center gap-1 text-[9px] text-foreground">
+          <label key={t} className="mono-font flex items-center gap-1 text-[10.5px] text-foreground">
             <input type="checkbox" checked={types.includes(t)} onChange={(e) => setTypes((cur) => (e.target.checked ? [...cur, t] : cur.filter((x) => x !== t)))} />
             {t}
           </label>
@@ -484,29 +484,29 @@ function EventsTab({ organizationId, role, accountId }: { organizationId: string
     <section className="space-y-2">
       <div className="flex flex-wrap items-center gap-2">
         <Eyebrow>EVENTS · NEWEST FIRST</Eyebrow>
-        <select value={verdict} onChange={(e) => setVerdict(e.target.value as typeof verdict)} className="h-6 border border-border bg-transparent px-1 text-[9.5px] text-foreground">
+        <select value={verdict} onChange={(e) => setVerdict(e.target.value as typeof verdict)} className="h-6 border border-border bg-transparent px-1 text-[11px] text-foreground">
           <option value="">Any verdict</option>
           <option value="hold">Hold</option>
           <option value="review">Review</option>
           <option value="clear">Clear</option>
         </select>
-        <select value={type} onChange={(e) => setType(e.target.value as typeof type)} className="mono-font h-6 border border-border bg-transparent px-1 text-[9.5px] text-foreground">
+        <select value={type} onChange={(e) => setType(e.target.value as typeof type)} className="mono-font h-6 border border-border bg-transparent px-1 text-[11px] text-foreground">
           <option value="">Any event</option>
           {EVENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
         <Button size="sm" variant="ghost" onClick={() => void load()}>REFRESH</Button>
       </div>
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
-      {events === null && !error && <p className="mono-font animate-pulse text-[9px] text-muted-foreground">LOADING…</p>}
-      {events?.length === 0 && <p className="text-[10px] text-muted-foreground">No events recorded yet. A new watch reports what happens from the ledger it was added at.</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
+      {events === null && !error && <p className="mono-font animate-pulse text-[10.5px] text-muted-foreground">LOADING…</p>}
+      {events?.length === 0 && <p className="text-[11px] text-muted-foreground">No events recorded yet. A new watch reports what happens from the ledger it was added at.</p>}
       <div className="space-y-1">
         {events?.map((e) => {
           const delivered = (e.data as { delivered?: Amount | null }).delivered;
           return (
             <div key={e.id} className="border border-border p-1.5">
               <button className="w-full text-left" onClick={() => setOpen(open === e.id ? null : e.id)}>
-                <p className="mono-font text-[9.5px] text-foreground">
-                  {e.verdict && <span className={cn("stencil mr-1.5 tracking-[0.2em]", VERDICT_TONE[e.verdict])}>{e.verdict.toUpperCase()}</span>}
+                <p className="mono-font text-[11px] text-foreground">
+                  {e.verdict && <span className={cn("stencil mr-1.5 tracking-[0.14em]", VERDICT_TONE[e.verdict])}>{e.verdict.toUpperCase()}</span>}
                   {e.type} · {shortAddress(e.address)}
                   {e.counterparty ? ` ⇄ ${shortAddress(e.counterparty)}` : ""}
                   {delivered ? ` · ${formatAmount(delivered)}` : ""} · {utc(e.ledgerTime)}
@@ -514,19 +514,19 @@ function EventsTab({ organizationId, role, accountId }: { organizationId: string
               </button>
               {open === e.id && (
                 <div className="mt-1 space-y-1">
-                  <p className="mono-font selectable break-all text-[9px] text-muted-foreground">
+                  <p className="mono-font selectable break-all text-[10.5px] text-muted-foreground">
                     {e.txHash} · ledger {e.ledgerIndex.toLocaleString("en-US")} · {e.txType} · {e.txResult}
                   </p>
                   {e.screening?.findings.map((f) => (
-                    <p key={f.id} className="text-[9.5px] leading-snug text-muted-foreground">
-                      <span className={cn("stencil mr-1 text-[8px] tracking-[0.18em]", SEVERITY_TONE[f.severity])}>{f.severity.toUpperCase()}</span>
+                    <p key={f.id} className="text-[11px] leading-snug text-muted-foreground">
+                      <span className={cn("stencil mr-1 text-[10px] tracking-[0.14em]", SEVERITY_TONE[f.severity])}>{f.severity.toUpperCase()}</span>
                       {f.title}. {f.detail}
                     </p>
                   ))}
-                  {!e.screening && <pre className="mono-font selectable whitespace-pre-wrap break-all text-[8.5px] text-muted-foreground">{JSON.stringify(e.data, null, 1)}</pre>}
+                  {!e.screening && <pre className="mono-font selectable whitespace-pre-wrap break-all text-[10px] text-muted-foreground">{JSON.stringify(e.data, null, 1)}</pre>}
                   {e.verdict === "hold" && accountId && CASE_ROLES.includes(role) && (
                     cased[e.id] ? (
-                      <p className="mono-font text-[9px] text-go">Case {cased[e.id]} opened. It is in CASES for every member.</p>
+                      <p className="mono-font text-[10.5px] text-go">Case {cased[e.id]} opened. It is in CASES for every member.</p>
                     ) : (
                       <Button
                         size="sm"
@@ -603,7 +603,7 @@ function ExportTab({ organizationId, role }: { organizationId: string; role: Mem
 
   if (!has("custom_schemas")) {
     return (
-      <p className="max-w-[640px] text-[10px] text-muted-foreground">
+      <p className="max-w-[640px] text-[11px] text-muted-foreground">
         Custom export schemas, bulk export and event retention are part of the Strategic plan. Screened deposits can still be pulled as
         they are from the feed API with an organization key.
       </p>
@@ -614,22 +614,22 @@ function ExportTab({ organizationId, role }: { organizationId: string; role: Mem
     <section className="space-y-3">
       <div>
         <Eyebrow className="mb-1">YOUR SCHEMAS</Eyebrow>
-        {error && <p className="text-[9.5px] text-no-go">{error}</p>}
-        {note && <p className="text-[9.5px] text-go">{note}</p>}
-        {schemas?.length === 0 && <p className="text-[10px] text-muted-foreground">No schemas yet.</p>}
+        {error && <p className="text-[11px] text-no-go">{error}</p>}
+        {note && <p className="text-[11px] text-go">{note}</p>}
+        {schemas?.length === 0 && <p className="text-[11px] text-muted-foreground">No schemas yet.</p>}
         {schemas?.map((s) => (
           <div key={s.id} className="mb-1 border border-border p-2">
-            <p className="text-[10px] text-foreground">
+            <p className="text-[11px] text-foreground">
               {s.name} <span className="mono-font text-muted-foreground">· {s.dataset} · {s.format} · {s.fields.length} fields · id {s.id}</span>
             </p>
-            <p className="mono-font text-[9px] text-muted-foreground">{s.fields.map((f) => `${f.path}→${f.as}`).join("  ")}</p>
+            <p className="mono-font text-[10.5px] text-muted-foreground">{s.fields.map((f) => `${f.path}→${f.as}`).join("  ")}</p>
             <div className="mt-1 flex flex-wrap gap-1.5">
               <Button size="sm" variant="outline" disabled={busy} onClick={() => void exportWith(s)}>EXPORT ALL</Button>
               {canEdit && <Button size="sm" variant="ghost" disabled={busy} onClick={() => setDraft({ id: s.id, name: s.name, dataset: s.dataset, format: s.format, fields: s.fields })}>EDIT</Button>}
               {canEdit && <Button size="sm" variant="ghost" disabled={busy} onClick={() => void run(() => deleteSchema(s.id))}>DELETE</Button>}
             </div>
             {s.dataset === "events" && (
-              <p className="mono-font selectable mt-1 break-all text-[8.5px] text-muted-foreground">
+              <p className="mono-font selectable mt-1 break-all text-[10px] text-muted-foreground">
                 curl -H "Authorization: Bearer $NOSHASHI_KEY" "{FEED_ENDPOINT}/events?schema={s.id}&amp;after=0&amp;limit=1000"
               </p>
             )}
@@ -639,14 +639,14 @@ function ExportTab({ organizationId, role }: { organizationId: string; role: Mem
 
       {canEdit && (
         <div className="border border-dashed border-border p-2">
-          <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground">{draft.id ? "EDIT SCHEMA" : "NEW SCHEMA"}</p>
+          <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-muted-foreground">{draft.id ? "EDIT SCHEMA" : "NEW SCHEMA"}</p>
           <div className="flex flex-wrap items-center gap-1.5">
-            <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Name" maxLength={80} className="h-7 w-56 text-[10px]" />
-            <select value={draft.dataset} onChange={(e) => setDraft({ ...draft, dataset: e.target.value as "events" | "audit", fields: [] })} className="h-7 border border-border bg-transparent px-1 text-[10px] text-foreground">
+            <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Name" maxLength={80} className="h-7 w-56 text-[11px]" />
+            <select value={draft.dataset} onChange={(e) => setDraft({ ...draft, dataset: e.target.value as "events" | "audit", fields: [] })} className="h-7 border border-border bg-transparent px-1 text-[11px] text-foreground">
               <option value="events">Ledger events and screenings</option>
               <option value="audit">Audit log (adjudications, exports, settings)</option>
             </select>
-            <select value={draft.format} onChange={(e) => setDraft({ ...draft, format: e.target.value as ExportFormat })} className="h-7 border border-border bg-transparent px-1 text-[10px] text-foreground">
+            <select value={draft.format} onChange={(e) => setDraft({ ...draft, format: e.target.value as ExportFormat })} className="h-7 border border-border bg-transparent px-1 text-[11px] text-foreground">
               <option value="csv">CSV</option>
               <option value="ndjson">NDJSON</option>
               <option value="json">JSON</option>
@@ -679,15 +679,15 @@ function FieldEditor({ fields, paths, onChange }: { fields: SchemaField[]; paths
   return (
     <div className="mt-1.5 space-y-1">
       {fields.map((f, i) => (
-        <p key={`${f.path}-${i}`} className="mono-font flex items-center gap-2 text-[9.5px] text-foreground">
+        <p key={`${f.path}-${i}`} className="mono-font flex items-center gap-2 text-[11px] text-foreground">
           {f.path} → {f.as}
           <button className="text-muted-foreground hover:text-no-go" onClick={() => onChange(fields.filter((_, j) => j !== i))} aria-label={`Remove ${f.as}`}>×</button>
         </p>
       ))}
       <div className="flex flex-wrap items-center gap-1.5">
-        <Input value={path} onChange={(e) => setPath(e.target.value)} list="schema-paths" className="mono-font h-7 w-64 text-[10px]" />
+        <Input value={path} onChange={(e) => setPath(e.target.value)} list="schema-paths" className="mono-font h-7 w-64 text-[11px]" />
         <datalist id="schema-paths">{paths.map((p) => <option key={p} value={p} />)}</datalist>
-        <Input value={as} onChange={(e) => setAs(e.target.value)} placeholder={`column (${column})`} maxLength={63} className="h-7 w-40 text-[10px]" />
+        <Input value={as} onChange={(e) => setAs(e.target.value)} placeholder={`column (${column})`} maxLength={63} className="h-7 w-40 text-[11px]" />
         <Button size="sm" variant="ghost" onClick={() => { onChange([...fields, { path: path.trim(), as: column }]); setAs(""); }}>ADD FIELD</Button>
       </div>
     </div>
@@ -701,9 +701,9 @@ function RetentionEditor({ days, disabled, onSave }: { days: number | null; disa
   const valid = Number.isInteger(n) && n >= 7 && n <= 3650;
   const years = useMemo(() => (valid && n >= 365 ? ` (${(n / 365).toFixed(1)} years)` : ""), [n, valid]);
   return (
-    <div className="flex flex-wrap items-center gap-1.5 text-[9.5px] text-muted-foreground">
+    <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
       Keep ledger events for
-      <Input value={value} onChange={(e) => setValue(e.target.value)} type="number" min={7} max={3650} disabled={disabled} className="mono-font h-7 w-24 text-[10px]" />
+      <Input value={value} onChange={(e) => setValue(e.target.value)} type="number" min={7} max={3650} disabled={disabled} className="mono-font h-7 w-24 text-[11px]" />
       days{years}. Older events are removed daily. The audit log is never removed.
       <Button size="sm" variant="outline" disabled={disabled || !valid || n === days} onClick={() => onSave(n)}>SET</Button>
     </div>
@@ -768,7 +768,7 @@ function EmbedTab({ organizationId, role }: { organizationId: string; role: Memb
 
   if (!has("embedded_delivery")) {
     return (
-      <p className="max-w-[640px] text-[10px] text-muted-foreground">
+      <p className="max-w-[640px] text-[11px] text-muted-foreground">
         The website widget is part of the Enterprise and Strategic plans: address verification against poisoning, sanctions checks and
         deposit status for your customers, on your own site, with no key in the browser.
       </p>
@@ -777,18 +777,18 @@ function EmbedTab({ organizationId, role }: { organizationId: string; role: Memb
 
   return (
     <section className="max-w-[760px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         Put NOSHASHI's checks on your own website with one script tag. The widget answers only on the sites you list, holds no key, and
         renders in its own shadow root so it cannot touch your page.
         {sanctions && ` Sanctions: ${sanctions.listed.toLocaleString("en-US")} XRP address${sanctions.listed === 1 ? "" : "es"} on the OFAC SDN list${sanctions.asOf ? `, read from treasury.gov ${utc(sanctions.asOf)}` : ""}.`}
       </p>
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
 
       {embeds?.map((e) => (
         <div key={e.id} className="space-y-1 border border-border p-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[10.5px] text-foreground">
-              {e.label} <span className={cn("stencil ml-1 text-[8px] tracking-[0.2em]", e.active ? "text-go" : "text-muted-foreground")}>{e.active ? "LIVE" : "OFF"}</span>
+            <p className="text-[11.5px] text-foreground">
+              {e.label} <span className={cn("stencil ml-1 text-[10px] tracking-[0.14em]", e.active ? "text-go" : "text-muted-foreground")}>{e.active ? "LIVE" : "OFF"}</span>
             </p>
             {canEdit && (
               <span className="flex gap-1">
@@ -797,22 +797,22 @@ function EmbedTab({ organizationId, role }: { organizationId: string; role: Memb
               </span>
             )}
           </div>
-          <p className="text-[9.5px] text-muted-foreground">
+          <p className="text-[11px] text-muted-foreground">
             {e.widgets.map((w) => WIDGETS.find((x) => x.id === w)?.label).join(" · ")} · allowed on {e.allowedOrigins.length ? e.allowedOrigins.join(", ") : "no site yet (add one to switch it on)"}
           </p>
-          <pre className="mono-font selectable whitespace-pre-wrap break-all border border-dashed border-border p-1.5 text-[9px] text-foreground">{embedSnippet(e.id)}</pre>
+          <pre className="mono-font selectable whitespace-pre-wrap break-all border border-dashed border-border p-1.5 text-[10.5px] text-foreground">{embedSnippet(e.id)}</pre>
           <Button size="sm" variant="outline" onClick={() => void navigator.clipboard?.writeText(embedSnippet(e.id))}>COPY SNIPPET</Button>
         </div>
       ))}
-      {embeds?.length === 0 && <p className="text-[10px] text-muted-foreground">No widget yet.</p>}
+      {embeds?.length === 0 && <p className="text-[11px] text-muted-foreground">No widget yet.</p>}
 
       {canEdit && (
         <div className="space-y-2 border border-border p-2">
           <Eyebrow>{draft.id ? "EDIT WIDGET" : "NEW WIDGET"}</Eyebrow>
-          <Input value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} placeholder="Name customers see, e.g. Acme Exchange" className="h-7 text-[10px]" />
+          <Input value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} placeholder="Name customers see, e.g. Acme Exchange" className="h-7 text-[11px]" />
           <div className="space-y-1">
             {WIDGETS.map((w) => (
-              <label key={w.id} className="flex items-start gap-1.5 text-[9.5px] text-foreground">
+              <label key={w.id} className="flex items-start gap-1.5 text-[11px] text-foreground">
                 <input
                   type="checkbox"
                   checked={draft.widgets.includes(w.id)}
@@ -825,19 +825,19 @@ function EmbedTab({ organizationId, role }: { organizationId: string; role: Memb
             ))}
           </div>
           {(draft.widgets.includes("verify") || draft.widgets.includes("deposit")) && (
-            <select value={draft.depositAddress} onChange={(e) => setDraft({ ...draft, depositAddress: e.target.value })} className="mono-font h-7 w-full border border-border bg-transparent px-1 text-[9.5px] text-foreground">
+            <select value={draft.depositAddress} onChange={(e) => setDraft({ ...draft, depositAddress: e.target.value })} className="mono-font h-7 w-full border border-border bg-transparent px-1 text-[11px] text-foreground">
               <option value="">{deposits.length ? "Choose your deposit address" : "Watch a deposit address first (WATCHED ACCOUNTS)"}</option>
               {deposits.map((w) => <option key={w.id} value={w.address}>{w.label ? `${w.label} · ` : ""}{w.address}</option>)}
             </select>
           )}
-          <label className="block text-[9px] text-muted-foreground">
+          <label className="block text-[10.5px] text-muted-foreground">
             Sites it may appear on, one origin per line: <span className="mono-font">https://www.example.com</span>
-            <textarea value={draft.origins} onChange={(e) => setDraft({ ...draft, origins: e.target.value })} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[9.5px] text-foreground" />
+            <textarea value={draft.origins} onChange={(e) => setDraft({ ...draft, origins: e.target.value })} rows={2} className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[11px] text-foreground" />
           </label>
-          <div className="flex flex-wrap items-center gap-3 text-[9.5px] text-foreground">
+          <div className="flex flex-wrap items-center gap-3 text-[11px] text-foreground">
             <label className="flex items-center gap-1">
               Theme
-              <select value={draft.theme} onChange={(e) => setDraft({ ...draft, theme: e.target.value as Embed["theme"] })} className="h-6 border border-border bg-transparent px-1 text-[9.5px]">
+              <select value={draft.theme} onChange={(e) => setDraft({ ...draft, theme: e.target.value as Embed["theme"] })} className="h-6 border border-border bg-transparent px-1 text-[11px]">
                 <option value="auto">Follows the visitor</option>
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>

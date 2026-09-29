@@ -66,7 +66,7 @@ export function WebhooksPanel({ organizationId }: { organizationId: string }) {
   return (
     <section>
       <Eyebrow className="mb-2">WEBHOOKS · SIGNED EVENTS TO YOUR SYSTEMS</Eyebrow>
-      <p className="mb-2 max-w-[720px] text-[9.5px] leading-snug text-muted-foreground">
+      <p className="mb-2 max-w-[720px] text-[11px] leading-snug text-muted-foreground">
         Sent by the server when it records the event, as an HTTPS POST signed with HMAC-SHA256
         (header <span className="mono-font">X-Noshashi-Signature: t=…,v1=…</span> over "t.body"). Failed deliveries are retried three
         times. Only owners and admins can see or change webhooks.
@@ -74,15 +74,15 @@ export function WebhooksPanel({ organizationId }: { organizationId: string }) {
 
       {secret && (
         <div className="mb-2 border border-hold/60 p-2">
-          <p className="stencil text-[8px] tracking-[0.2em] text-hold">SIGNING SECRET · SHOWN ONCE</p>
-          <p className="mono-font selectable mt-1 break-all text-[10px] text-foreground">{secret}</p>
-          <p className="mt-1 text-[9px] text-muted-foreground">Store it in your receiving system now. NOSHASHI cannot show it again.</p>
+          <p className="stencil text-[10px] tracking-[0.14em] text-hold">SIGNING SECRET · SHOWN ONCE</p>
+          <p className="mono-font selectable mt-1 break-all text-[11px] text-foreground">{secret}</p>
+          <p className="mt-1 text-[10.5px] text-muted-foreground">Store it in your receiving system now. NOSHASHI cannot show it again.</p>
           <Button size="sm" variant="ghost" className="mt-1" onClick={() => setSecret(null)}>I HAVE STORED IT</Button>
         </div>
       )}
 
-      {hooks === null && !error && <p className="mono-font animate-pulse text-[9px] text-muted-foreground">LOADING…</p>}
-      {hooks && hooks.length === 0 && <p className="text-[10px] text-muted-foreground">No webhooks.</p>}
+      {hooks === null && !error && <p className="mono-font animate-pulse text-[10.5px] text-muted-foreground">LOADING…</p>}
+      {hooks && hooks.length === 0 && <p className="text-[11px] text-muted-foreground">No webhooks.</p>}
       {hooks && hooks.length > 0 && (
         <div className="space-y-1.5">
           {hooks.map((h) => {
@@ -90,13 +90,13 @@ export function WebhooksPanel({ organizationId }: { organizationId: string }) {
             return (
               <div key={h.id} className="border border-border p-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="mono-font selectable break-all text-[10px] text-foreground">{h.url}</p>
-                  <span className={cn("stencil text-[8px] tracking-[0.2em]", h.active ? "text-go" : "text-muted-foreground")}>
+                  <p className="mono-font selectable break-all text-[11px] text-foreground">{h.url}</p>
+                  <span className={cn("stencil text-[10px] tracking-[0.14em]", h.active ? "text-go" : "text-muted-foreground")}>
                     ● {h.active ? "ACTIVE" : "DISABLED"}
                   </span>
                 </div>
-                {h.description && <p className="text-[9.5px] text-muted-foreground">{h.description}</p>}
-                <p className="mono-font text-[9px] text-muted-foreground">{h.events.join(" · ")}</p>
+                {h.description && <p className="text-[11px] text-muted-foreground">{h.description}</p>}
+                <p className="mono-font text-[10.5px] text-muted-foreground">{h.events.join(" · ")}</p>
                 <div className="mt-1 flex gap-1.5">
                   <Button size="sm" variant="outline" disabled={busy || !h.active} onClick={() => void run(() => sendTestWebhook(h.id))}>SEND TEST</Button>
                   <Button size="sm" variant="ghost" disabled={busy} onClick={() => void run(() => setWebhookActive(h.id, !h.active))}>
@@ -106,7 +106,7 @@ export function WebhooksPanel({ organizationId }: { organizationId: string }) {
                 {recent.length > 0 && (
                   <div className="mt-1.5 space-y-0.5">
                     {recent.map((d) => (
-                      <p key={d.id} className="mono-font text-[8.5px] text-muted-foreground">
+                      <p key={d.id} className="mono-font text-[10px] text-muted-foreground">
                         {utc(d.createdAt)} · {d.event} ·{" "}
                         <span className={d.status === "delivered" ? "text-go" : d.status === "failed" ? "text-no-go" : "text-hold"}>
                           {d.status.toUpperCase()}
@@ -124,15 +124,15 @@ export function WebhooksPanel({ organizationId }: { organizationId: string }) {
       )}
 
       <div className="mt-2 border border-dashed border-border p-2">
-        <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground">ADD WEBHOOK</p>
+        <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-muted-foreground">ADD WEBHOOK</p>
         <div className="flex flex-wrap gap-1.5">
-          <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://your-system.example.com/noshashi" className="mono-font h-7 w-80 text-[10px]" />
-          <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description (optional)" className="h-7 w-56 text-[10px]" maxLength={200} />
+          <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://your-system.example.com/noshashi" className="mono-font h-7 w-80 text-[11px]" />
+          <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description (optional)" className="h-7 w-56 text-[11px]" maxLength={200} />
         </div>
-        {urlProblem && <p className="mt-1 text-[9px] text-no-go">{urlProblem}</p>}
+        {urlProblem && <p className="mt-1 text-[10.5px] text-no-go">{urlProblem}</p>}
         <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
           {WEBHOOK_EVENTS.map((ev) => (
-            <label key={ev.id} className="flex items-center gap-1 text-[9.5px] text-foreground">
+            <label key={ev.id} className="flex items-center gap-1 text-[11px] text-foreground">
               <input
                 type="checkbox"
                 checked={events.includes(ev.id)}
@@ -158,7 +158,7 @@ export function WebhooksPanel({ organizationId }: { organizationId: string }) {
           CREATE WEBHOOK
         </Button>
       </div>
-      {error && <p role="alert" className="mt-1.5 text-[9.5px] text-no-go">{error}</p>}
+      {error && <p role="alert" className="mt-1.5 text-[11px] text-no-go">{error}</p>}
     </section>
   );
 }

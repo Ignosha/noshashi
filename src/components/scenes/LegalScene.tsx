@@ -86,7 +86,7 @@ export function LegalScene() {
                   >
                     {policyIcon[entry.id]}
                   </span>
-                  <span className="mono-font min-w-0 flex-1 truncate text-[9.5px] text-foreground">
+                  <span className="mono-font min-w-0 flex-1 truncate text-[11px] text-foreground">
                     {entry.title}
                   </span>
                 </button>
@@ -115,16 +115,16 @@ export function LegalScene() {
                   href={`mailto:${route.email}`}
                   className="flex items-center justify-between gap-2 border border-border px-2 py-1.5 transition-colors hover:border-foreground/40"
                 >
-                  <span className="stencil shrink-0 text-[8px] tracking-[0.18em] text-muted-foreground">
+                  <span className="stencil shrink-0 text-[10px] tracking-[0.14em] text-muted-foreground">
                     {route.label}
                   </span>
-                  <span className="mono-font min-w-0 truncate text-[9px] text-foreground">
+                  <span className="mono-font min-w-0 truncate text-[10.5px] text-foreground">
                     {route.email}
                   </span>
                 </a>
               ))}
             </div>
-            <p className="mono-font mt-3 border-t border-border pt-2 text-[8px] leading-relaxed text-muted-foreground/70">
+            <p className="mono-font mt-3 border-t border-border pt-2 text-[10px] leading-relaxed text-muted-foreground/70">
               {CONTACT.hours}
               <br />
               TARGET REPLY: {CONTACT.responseTarget.toUpperCase()}
@@ -139,7 +139,7 @@ export function LegalScene() {
           className="col-span-3 min-h-0 min-w-0"
           bodyClassName="min-h-0 overflow-y-auto p-0"
           right={
-            <span className="mono-font text-[9px] text-muted-foreground">
+            <span className="mono-font text-[10.5px] text-muted-foreground">
               UPDATED {policy.updated.toUpperCase()}
             </span>
           }
@@ -153,7 +153,7 @@ export function LegalScene() {
               transition={SPRING}
               className="mx-auto max-w-[760px] px-6 py-6"
             >
-              <Badge variant="hold" className="text-[8px]">
+              <Badge variant="hold" className="text-[10px]">
                 TEMPLATE · NOT REVIEWED BY COUNSEL
               </Badge>
 
@@ -171,7 +171,7 @@ export function LegalScene() {
                       <span className="display shrink-0 text-[11px] font-[700] text-muted-foreground/40">
                         {String(index + 1).padStart(2, "0")}
                       </span>
-                      <h3 className="stencil text-[10px] tracking-[0.22em] text-foreground">
+                      <h3 className="stencil text-[11px] tracking-[0.14em] text-foreground">
                         {section.heading}
                       </h3>
                     </div>
@@ -225,7 +225,7 @@ export function LegalScene() {
 
               <footer className="mt-8 flex items-center gap-2.5 border-t border-border pt-4">
                 <NovaLogo size={15} animated={false} tone="color" />
-                <span className="mono-font text-[9px] text-muted-foreground">
+                <span className="mono-font text-[10.5px] text-muted-foreground">
                   {copyrightLine()} · All rights reserved.
                 </span>
               </footer>

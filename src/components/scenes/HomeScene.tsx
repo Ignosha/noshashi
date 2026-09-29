@@ -54,14 +54,14 @@ function RelayWorld({
     <div className="relative overflow-hidden rounded-md border border-border/70 bg-background/35">
       <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
         <div>
-          <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
             GLOBAL RELAY PULSE
           </p>
-          <p className="mono-font mt-1 text-[9px] text-muted-foreground">
+          <p className="mono-font mt-1 text-[10.5px] text-muted-foreground">
             {connected ? "LIVE CONNECTION FABRIC" : "RECONNECTING TO RELAY FABRIC"}
           </p>
         </div>
-        <span className="flex items-center gap-1.5 mono-font text-[9px] text-muted-foreground">
+        <span className="flex items-center gap-1.5 mono-font text-[10.5px] text-muted-foreground">
           <StatusDot status={connected ? "go" : "hold"} size={5} pulse={connected} />
           {eventCount} EVENTS
         </span>
@@ -135,18 +135,18 @@ function RelayWorld({
         </g>
       </svg>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 px-3 py-2">
-        <span className="mono-font text-[8px] tracking-[0.12em] text-muted-foreground">
+        <span className="mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
           LEDGER {ledgerIndex ? ledgerIndex.toLocaleString() : "—"}
         </span>
-        <span className="mono-font text-[8px] tracking-[0.12em] text-muted-foreground">
+        <span className="mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
           RELAY NODES {relayNodes.length} · REGIONS {RELAY_REGIONS.length}
         </span>
       </div>
-      <p className="px-3 pb-3 pt-2 text-[9px] leading-relaxed text-muted-foreground">
+      <p className="px-3 pb-3 pt-2 text-[10.5px] leading-relaxed text-muted-foreground">
         Packet lanes represent live ledger-event cadence through the observed relay topology. This
         is not transaction geolocation: XRPL publishes ledger events and node responses, not physical origin.
       </p>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border/40 px-3 pb-3 pt-2 mono-font text-[8px] tracking-[0.1em] text-muted-foreground">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border/40 px-3 pb-3 pt-2 mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
         <span><i className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[hsl(var(--telemetry))]" />RELAY NODE</span>
         <span><i className="mr-1.5 inline-block h-px w-4 align-middle bg-[hsl(var(--telemetry))]" />EVENT LANE</span>
         <span><i className="mr-1.5 inline-block h-px w-4 align-middle border-t border-dashed border-brand" />SECONDARY ROUTE</span>
@@ -230,7 +230,7 @@ export function HomeScene({
           >
             <div className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1">
               <StatusDot status={connected ? "go" : "no-go"} size={5} pulse={connected} />
-              <span className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+              <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
                 {connected ? "CONNECTED · XRPL MAINNET" : "RECONNECTING TO MAINNET"}
               </span>
             </div>
@@ -247,7 +247,7 @@ export function HomeScene({
                 <h1 className="display text-[46px] font-[900] leading-[0.9] tracking-[0.02em] text-foreground">
                   NOSHASHI
                 </h1>
-                <p className="stencil mt-2 text-[10px] tracking-[0.34em] text-muted-foreground">
+                <p className="stencil mt-2 text-[11px] tracking-[0.14em] text-muted-foreground">
                   {BRAND.tagline}
                 </p>
               </div>
@@ -308,7 +308,7 @@ export function HomeScene({
                 <Panel key={stat.label} bodyClassName="p-3">
                   <div className="flex items-start justify-between">
                     <div className="min-w-0">
-                      <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+                      <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
                         {stat.label}
                       </p>
                       <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
@@ -334,7 +334,7 @@ export function HomeScene({
             <Panel
               label="LIVE NETWORK PICTURE"
               right={
-                <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+                <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                   {data.history.length}/48 CLOSES
                 </span>
               }
@@ -352,7 +352,7 @@ export function HomeScene({
                   <p className="data-font text-[34px] font-[600] leading-none text-foreground">
                     {events.length}
                   </p>
-                  <p className="stencil mt-2 text-[8px] tracking-[0.22em] text-muted-foreground">
+                  <p className="stencil mt-2 text-[10px] tracking-[0.14em] text-muted-foreground">
                     OBSERVED IN LIVE WINDOW
                   </p>
                 </div>
@@ -455,16 +455,16 @@ export function HomeScene({
                     </p>
                     <Badge
                       variant={maturityTone[capability.maturity]}
-                      className="shrink-0 text-[8px]"
+                      className="shrink-0 text-[10px]"
                     >
                       {maturityLabel[capability.maturity]}
                     </Badge>
                   </div>
-                  <p className="mt-2 text-[10.5px] leading-relaxed text-muted-foreground">
+                  <p className="mt-2 text-[11.5px] leading-relaxed text-muted-foreground">
                     {capability.blurb}
                   </p>
                   {capability.scene && (
-                    <p className="stencil mt-3 border-t border-border pt-2 text-[8px] tracking-[0.2em] text-muted-foreground/70">
+                    <p className="stencil mt-3 border-t border-border pt-2 text-[10px] tracking-[0.14em] text-muted-foreground/70">
                       → {capability.scene}
                     </p>
                   )}
@@ -483,7 +483,7 @@ export function HomeScene({
                 WHAT NOBODY HAS BUILT HERE
               </h2>
             </div>
-            <span className="mono-font text-[9px] text-muted-foreground">
+            <span className="mono-font text-[10.5px] text-muted-foreground">
               {CONCEPTS.length} CONCEPTS
             </span>
           </div>
@@ -497,12 +497,12 @@ export function HomeScene({
                     <p className="display text-[13px] font-[700] leading-tight text-foreground">
                       {concept.title}
                     </p>
-                    <span className="mono-font shrink-0 rounded border border-border px-1.5 py-0.5 text-[8px] text-muted-foreground">
+                    <span className="mono-font shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
                       {concept.weight}
                     </span>
                   </div>
-                  <p className="mt-2.5 border-l border-no-go/40 pl-2.5 text-[10.5px] leading-relaxed text-muted-foreground">
-                    <span className="stencil mr-1.5 text-[8px] tracking-[0.2em] text-no-go">
+                  <p className="mt-2.5 border-l border-no-go/40 pl-2.5 text-[11.5px] leading-relaxed text-muted-foreground">
+                    <span className="stencil mr-1.5 text-[10px] tracking-[0.14em] text-no-go">
                       GAP
                     </span>
                     {concept.gap}
@@ -535,7 +535,7 @@ export function HomeScene({
                   href="https://noshashi.app/downloads/xrpl-edge-pack/"
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-[10px] font-semibold tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/85"
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/85"
                 >
                   OPEN EDGE PACK
                 </a>
@@ -543,7 +543,7 @@ export function HomeScene({
                   href="https://noshashi.app/docs/NOSHASHI_XRPL_Edge_Lab_Brief.pdf"
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-[10px] font-semibold tracking-[0.08em] text-foreground transition-colors hover:border-brand/50"
+                  className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-foreground transition-colors hover:border-brand/50"
                 >
                   READ PDF BRIEF
                 </a>
@@ -567,7 +567,7 @@ export function HomeScene({
                     href={link.href}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="flex items-center gap-2 text-[10.5px] text-muted-foreground transition-colors hover:text-foreground"
+                    className="flex items-center gap-2 text-[11.5px] text-muted-foreground transition-colors hover:text-foreground"
                   >
                     <NovaCredit size={11} className="shrink-0" />
                     <span className="min-w-0 truncate underline-offset-2 hover:underline">
@@ -588,7 +588,7 @@ export function HomeScene({
                   <a
                     key={route.email}
                     href={`mailto:${route.email}`}
-                    className="flex items-center justify-between gap-2 text-[10.5px] transition-colors hover:text-foreground"
+                    className="flex items-center justify-between gap-2 text-[11.5px] transition-colors hover:text-foreground"
                   >
                     <span className="text-muted-foreground">{route.label}</span>
                     <span className="mono-font min-w-0 truncate text-foreground/80 underline-offset-2 hover:underline">
@@ -597,14 +597,14 @@ export function HomeScene({
                   </a>
                 ))}
               </div>
-              <p className="mono-font mt-3 border-t border-border pt-2 text-[8px] text-muted-foreground/70">
+              <p className="mono-font mt-3 border-t border-border pt-2 text-[10px] text-muted-foreground/70">
                 {CONTACT.hours} · REPLY WITHIN {CONTACT.responseTarget.toUpperCase()}
               </p>
             </Panel>
 
             <Panel label="POSITION" bodyClassName="relative p-3.5">
               <PatternMark element="orbit" size={130} className="-bottom-8 -right-8" opacity={0.08} />
-              <p className="relative text-[10.5px] leading-relaxed text-muted-foreground">
+              <p className="relative text-[11.5px] leading-relaxed text-muted-foreground">
                 Mainnet only. No testnet path exists in this build — every reading
                 on every screen is the real ledger, because compliance software
                 that demos on a testnet has proven nothing.
@@ -614,7 +614,7 @@ export function HomeScene({
                   (tag) => (
                     <span
                       key={tag}
-                      className="mono-font rounded border border-border px-1.5 py-0.5 text-[8px] text-muted-foreground"
+                      className="mono-font rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground"
                     >
                       {tag}
                     </span>
@@ -630,7 +630,7 @@ export function HomeScene({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <NovaLogo size={16} animated={false} tone="color" />
-              <span className="mono-font text-[9px] text-muted-foreground">
+              <span className="mono-font text-[10.5px] text-muted-foreground">
                 {copyrightLine()} · v{BRAND.version} · {BRAND.network}
               </span>
             </div>
@@ -644,7 +644,7 @@ export function HomeScene({
                   key={link.scene}
                   onClick={() => onNavigate(link.scene)}
                   className={cn(
-                    "stencil text-[8px] tracking-[0.2em] text-muted-foreground",
+                    "stencil text-[10px] tracking-[0.14em] text-muted-foreground",
                     "underline-offset-4 transition-colors hover:text-foreground hover:underline"
                   )}
                 >

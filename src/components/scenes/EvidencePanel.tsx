@@ -70,7 +70,7 @@ export function EvidencePanel({
   useEffect(() => setCheck(null), [selected?.id]);
 
   if (!loaded) {
-    return <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING LEDGER…</p>;
+    return <p className="mono-font animate-pulse p-4 text-[11px] text-muted-foreground">LOADING LEDGER…</p>;
   }
   if (entries.length === 0) {
     return (
@@ -104,7 +104,7 @@ export function EvidencePanel({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Filter by address, label or digest…"
-            className="mono-font h-7 text-[10px]"
+            className="mono-font h-7 text-[11px]"
           />
         </div>
         <ul>
@@ -118,10 +118,10 @@ export function EvidencePanel({
                 )}
               >
                 <StatusDot status={e.verdict} size={6} />
-                <span className="mono-font flex-1 truncate text-[10px] text-foreground">
+                <span className="mono-font flex-1 truncate text-[11px] text-foreground">
                   {e.label ?? shortAddress(e.subject)}
                 </span>
-                <span className="mono-font text-[9px] text-muted-foreground/80">
+                <span className="mono-font text-[10.5px] text-muted-foreground/80">
                   {new Date(e.at).toLocaleDateString()}
                 </span>
               </button>
@@ -129,7 +129,7 @@ export function EvidencePanel({
           ))}
         </ul>
         {entries.length > list.length && !query && (
-          <p className="stencil px-3 py-2 text-[8px] tracking-[0.18em] text-muted-foreground">
+          <p className="stencil px-3 py-2 text-[10px] tracking-[0.14em] text-muted-foreground">
             MOST RECENT {LIST} OF {entries.length.toLocaleString()} · FILTER TO FIND OLDER
           </p>
         )}
@@ -145,7 +145,7 @@ export function EvidencePanel({
             <OpenInvestigationButton entry={selected} onOpened={onOpenCase} />
             {selected.verdict !== "go" && <RequestExceptionButton entry={selected} />}
             {consistent === false && (
-              <span className="stencil text-[8px] tracking-[0.18em] text-no-go">
+              <span className="stencil text-[10px] tracking-[0.14em] text-no-go">
                 STORED VERDICT DOES NOT FOLLOW FROM ITS RULES
               </span>
             )}
@@ -158,17 +158,17 @@ export function EvidencePanel({
             {chain.map((step, i) => (
               <li key={`${step.kind}-${i}`} className="relative pb-3 pl-4 last:pb-0">
                 <span className="absolute -left-[3px] top-1.5 h-[5px] w-[5px] bg-border" />
-                <p className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">{step.title}</p>
+                <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{step.title}</p>
                 <p
                   className={cn(
-                    "mono-font selectable mt-0.5 break-all text-[10px]",
+                    "mono-font selectable mt-0.5 break-all text-[11px]",
                     TONE[step.tone ?? "default"]
                   )}
                 >
                   {step.value}
                 </p>
                 {step.detail && (
-                  <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">{step.detail}</p>
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{step.detail}</p>
                 )}
               </li>
             ))}
@@ -183,7 +183,7 @@ export function EvidencePanel({
                 tone: selected.verdict === "go" ? "text-go" : selected.verdict === "no-go" ? "text-no-go" : "text-hold",
               }}
             />
-            <p className="mt-1.5 text-[9px] text-muted-foreground/80">
+            <p className="mt-1.5 text-[10.5px] text-muted-foreground/80">
               As recorded when the verdict was issued. The current policy is not applied to it.
             </p>
           </div>
@@ -200,8 +200,8 @@ export function EvidencePanel({
               ] as const
             ).map(([k, v]) => (
               <div key={k} className="contents">
-                <dt className="stencil pt-0.5 text-[8px] tracking-[0.2em] text-muted-foreground">{k}</dt>
-                <dd className="text-[10px] leading-relaxed text-foreground">{v}</dd>
+                <dt className="stencil pt-0.5 text-[10px] tracking-[0.14em] text-muted-foreground">{k}</dt>
+                <dd className="text-[11px] leading-relaxed text-foreground">{v}</dd>
               </div>
             ))}
           </dl>
@@ -216,7 +216,7 @@ function VerifyResult({ check }: { check: ReceiptCheck }) {
     return (
       <div className="mt-3 border border-go/40 bg-go-dim p-3">
         <Eyebrow className="text-go">VERIFIED · RECEIPT RE-DERIVED FROM THE STORED BODY</Eyebrow>
-        <p className="mono-font selectable mt-1.5 break-all text-[10px] text-foreground">{check.digest}</p>
+        <p className="mono-font selectable mt-1.5 break-all text-[11px] text-foreground">{check.digest}</p>
       </div>
     );
   }
@@ -224,10 +224,10 @@ function VerifyResult({ check }: { check: ReceiptCheck }) {
     return (
       <div className="mt-3 border border-no-go/50 p-3">
         <Eyebrow className="text-no-go">MISMATCH · THIS RECORD WAS CHANGED AFTER IT WAS ISSUED</Eyebrow>
-        <p className="mono-font selectable mt-1.5 break-all text-[10px] text-muted-foreground">
+        <p className="mono-font selectable mt-1.5 break-all text-[11px] text-muted-foreground">
           ISSUED {check.stored}
         </p>
-        <p className="mono-font selectable mt-1 break-all text-[10px] text-no-go">
+        <p className="mono-font selectable mt-1 break-all text-[11px] text-no-go">
           NOW&nbsp;&nbsp;&nbsp;{check.recomputed}
         </p>
       </div>
@@ -236,7 +236,7 @@ function VerifyResult({ check }: { check: ReceiptCheck }) {
   return (
     <div className="mt-3 border border-hold/40 p-3">
       <Eyebrow className="text-hold">UNVERIFIABLE</Eyebrow>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground">{check.reason}</p>
+      <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{check.reason}</p>
     </div>
   );
 }

@@ -136,18 +136,18 @@ export function NetworkScene() {
                     node.reachable ? "bg-go" : "bg-no-go"
                   )}
                 />
-                <code className="text-[10.5px] text-muted-foreground">
+                <code className="text-[11.5px] text-muted-foreground">
                   {node.url.replace("wss://", "")}
                 </code>
                 {node.reachable && (
-                  <span className="ml-auto font-mono text-[10px] tabular-nums text-faint">
+                  <span className="ml-auto font-mono text-[11px] tabular-nums text-faint">
                     {node.roundTripMs?.toLocaleString()}ms
                   </span>
                 )}
               </div>
               {node.reachable ? (
                 <>
-                  <p className="mono-font mt-1.5 text-[9px] tabular-nums text-faint">
+                  <p className="mono-font mt-1.5 text-[10.5px] tabular-nums text-faint">
                     LEDGER {node.ledgerSeq?.toLocaleString() ?? "—"}
                     {typeof node.ledgerAge === "number" && ` · ${node.ledgerAge}s OLD`}
                     {typeof report?.leaderSeq === "number" &&
@@ -155,7 +155,7 @@ export function NetworkScene() {
                       report.leaderSeq - node.ledgerSeq > 0 &&
                       ` · ${report.leaderSeq - node.ledgerSeq} BEHIND`}
                   </p>
-                  <p className="mono-font mt-0.5 text-[9px] text-faint">
+                  <p className="mono-font mt-0.5 text-[10.5px] text-faint">
                     {node.version ? (
                       <>
                         rippled {node.version}
@@ -168,14 +168,14 @@ export function NetworkScene() {
                   </p>
                 </>
               ) : (
-                <p className="mono-font mt-1.5 text-[9px] text-no-go">
+                <p className="mono-font mt-1.5 text-[10.5px] text-no-go">
                   {node.error ?? "no response"}
                 </p>
               )}
             </div>
           ))}
           <div className="px-3.5 py-2.5">
-            <p className="mono-font text-[9px] leading-relaxed text-faint">
+            <p className="mono-font text-[10.5px] leading-relaxed text-faint">
               Times span DNS, TLS and the WebSocket upgrade as measured from
               this machine. They describe reachability from here, not the
               node's own speed.
@@ -187,7 +187,7 @@ export function NetworkScene() {
               caption that kept saying "live" while nothing polled would be
               the same lie this scene exists to refuse.
             */}
-            <p className="mono-font mt-2 text-[9px] leading-relaxed text-faint">
+            <p className="mono-font mt-2 text-[10.5px] leading-relaxed text-faint">
               {paused
                 ? `${FRESHNESS_LABEL[freshness]} · AUTO-REFRESH PAUSED · WINDOW HIDDEN OR OFFLINE`
                 : `${FRESHNESS_LABEL[freshness]} · AUTO-REFRESH EVERY 30s${
@@ -213,7 +213,7 @@ export function NetworkScene() {
           <PatternField variant="orbital" />
           {!report ? (
             <div className="flex h-full items-center justify-center p-8">
-              <p className="mono-font text-[10px] tracking-[0.2em] text-faint">
+              <p className="mono-font text-[11px] tracking-[0.14em] text-faint">
                 <NovaSat size={14} className="mr-2 inline" />
                 QUERYING PUBLIC NODES…
               </p>
@@ -221,7 +221,7 @@ export function NetworkScene() {
           ) : (
             <>
               <div className="border-b border-border/50 px-4 py-3">
-                <p className="mono-font text-[9px] tabular-nums text-faint">
+                <p className="mono-font text-[10.5px] tabular-nums text-faint">
                   READ {report.readAt.replace("T", " ").slice(0, 19)} UTC ·{" "}
                   {report.nodes.length} ENDPOINTS QUERIED
                 </p>

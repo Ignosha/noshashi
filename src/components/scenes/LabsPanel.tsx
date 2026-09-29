@@ -132,7 +132,7 @@ function LabList({ progress, onOpen, onReview }: { progress: LabProgress; onOpen
           { label: "DUE NOW", value: String(due) },
         ].map((s) => (
           <div key={s.label} className="inset-row px-3 py-2" title={s.hint}>
-            <p className="font-mono text-[9px] tracking-[0.16em] text-faint">{s.label}</p>
+            <p className="font-mono text-[10.5px] tracking-[0.1em] text-faint">{s.label}</p>
             <p className="mt-0.5 font-mono text-[15px] tabular-nums text-foreground">{s.value}</p>
           </div>
         ))}
@@ -143,7 +143,7 @@ function LabList({ progress, onOpen, onReview }: { progress: LabProgress; onOpen
           {due > 0 ? `REVIEW ${due} QUESTION${due === 1 ? "" : "S"}` : "NOTHING TO REVIEW"}
         </Button>
         {due === 0 && upcoming !== null && (
-          <span className="font-mono text-[9px] tracking-[0.14em] text-faint">NEXT REVIEW {dueLabel(upcoming, now).toUpperCase()}</span>
+          <span className="font-mono text-[10.5px] tracking-[0.1em] text-faint">NEXT REVIEW {dueLabel(upcoming, now).toUpperCase()}</span>
         )}
         {kept.cards === 0 && (
           <span className="text-[11px] text-muted-foreground">Finish a step and its question joins your deck.</span>
@@ -158,8 +158,8 @@ function LabList({ progress, onOpen, onReview }: { progress: LabProgress; onOpen
             <button key={l.id} onClick={() => onOpen(l.id)} className="inset-row w-full px-3.5 py-3 text-left transition-colors hover:border-brand/50">
               <div className="flex items-baseline gap-2">
                 <span className={cn("text-[12.5px] font-medium", st.complete ? "text-go" : "text-foreground")}>{l.title}</span>
-                {locked && <span className="rounded-[3px] border border-hold/50 px-1.5 font-mono text-[8px] tracking-[0.14em] text-hold">NEEDS PRO</span>}
-                <span className="ml-auto shrink-0 font-mono text-[9px] text-faint">
+                {locked && <span className="rounded-[3px] border border-hold/50 px-1.5 font-mono text-[10px] tracking-[0.1em] text-hold">NEEDS PRO</span>}
+                <span className="ml-auto shrink-0 font-mono text-[10.5px] text-faint">
                   {st.complete ? "DONE" : st.done > 0 ? `${st.done}/${st.total} STEPS` : `${l.minutes} MIN`}
                 </span>
               </div>
@@ -207,16 +207,16 @@ function LabRun({
   const header = (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <button onClick={onBack} className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground hover:text-brand">
+        <button onClick={onBack} className="font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground hover:text-brand">
           ← ALL LABS
         </button>
-        <span className="ml-auto font-mono text-[9px] text-faint">
+        <span className="ml-auto font-mono text-[10.5px] text-faint">
           {status.done}/{status.total} STEPS
         </span>
       </div>
       <p className="text-[11.5px] leading-relaxed text-muted-foreground">{lab.outcome}</p>
       {(lab.note || locked) && (
-        <p className="font-mono text-[9px] tracking-[0.12em] text-hold">
+        <p className="font-mono text-[10.5px] tracking-[0.1em] text-hold">
           {locked ? "CONTROL SURFACE NEEDS A PRO PLAN. YOU CAN STILL ANSWER FROM THE RECORDED FACTS BELOW." : lab.note?.toUpperCase()}
         </p>
       )}
@@ -247,7 +247,7 @@ function LabRun({
       <div className="flex flex-col gap-4">
         {header}
         <div className="inset-row px-4 py-4">
-          <p className="font-mono text-[9px] tracking-[0.18em] text-go">LAB COMPLETE</p>
+          <p className="font-mono text-[10.5px] tracking-[0.14em] text-go">LAB COMPLETE</p>
           <p className="mt-1.5 text-[13px] font-medium text-foreground">{lab.title}</p>
           <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted-foreground">
             {lab.steps.length} question{lab.steps.length === 1 ? "" : "s"} joined your review deck. The first review comes
@@ -309,11 +309,11 @@ function GoThere({ step, onNavigate }: { step: LabStep; onNavigate?: (scene: Sce
     <div className="flex flex-col gap-2">
       {step.subject && (
         <div className="flex min-w-0 items-center gap-2">
-          <span className="shrink-0 font-mono text-[9px] tracking-[0.14em] text-faint">{(step.subjectLabel ?? "VALUE").toUpperCase()}</span>
-          <code className="min-w-0 flex-1 truncate font-mono text-[10.5px] text-telemetry" title={step.subject}>
+          <span className="shrink-0 font-mono text-[10.5px] tracking-[0.1em] text-faint">{(step.subjectLabel ?? "VALUE").toUpperCase()}</span>
+          <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-telemetry" title={step.subject}>
             {step.subject}
           </code>
-          <button onClick={() => void copy()} className="shrink-0 font-mono text-[9px] tracking-[0.14em] text-muted-foreground hover:text-brand">
+          <button onClick={() => void copy()} className="shrink-0 font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground hover:text-brand">
             {copied ? "COPIED" : "COPY"}
           </button>
         </div>
@@ -353,19 +353,19 @@ function StepCard({
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <p className="font-mono text-[9px] tracking-[0.18em] text-telemetry">{position} · {screenName(step.scene)}</p>
+        <p className="font-mono text-[10.5px] tracking-[0.14em] text-telemetry">{position} · {screenName(step.scene)}</p>
         <p className="mt-1.5 text-[13.5px] font-medium text-foreground">{step.task}</p>
       </div>
 
       <GoThere step={step} onNavigate={onNavigate} />
 
       <div>
-        <p className="font-mono text-[9px] tracking-[0.16em] text-faint">LOOK FOR</p>
+        <p className="font-mono text-[10.5px] tracking-[0.1em] text-faint">LOOK FOR</p>
         <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">{step.lookFor}</p>
       </div>
 
       <div className="border-t border-border/60 pt-3">
-        <p className="font-mono text-[9px] tracking-[0.16em] text-faint">CHECKPOINT{done ? " · ANSWERED BEFORE" : ""}</p>
+        <p className="font-mono text-[10.5px] tracking-[0.1em] text-faint">CHECKPOINT{done ? " · ANSWERED BEFORE" : ""}</p>
         <p className="mt-1 text-[12.5px] font-medium text-foreground">{step.check.question}</p>
         <Options options={q.options} answer={q.answer} picked={picked} onPick={(i) => {
           if (picked !== null && picked === q.answer) return;
@@ -475,7 +475,7 @@ function Review({
     const upcoming = nextDue(progress, KNOWN);
     return (
       <div className="flex flex-col gap-3">
-        <p className="font-mono text-[9px] tracking-[0.18em] text-go">REVIEW DONE</p>
+        <p className="font-mono text-[10.5px] tracking-[0.14em] text-go">REVIEW DONE</p>
         <p className="text-[13px] font-medium text-foreground">
           {queue.length === 0 ? "Nothing is due." : `${score} of ${queue.length} right.`}
         </p>
@@ -497,14 +497,14 @@ function Review({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <button onClick={onDone} className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground hover:text-brand">
+        <button onClick={onDone} className="font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground hover:text-brand">
           ← ALL LABS
         </button>
-        <span className="ml-auto font-mono text-[9px] tabular-nums text-faint">
+        <span className="ml-auto font-mono text-[10.5px] tabular-nums text-faint">
           {at + 1}/{queue.length}
         </span>
       </div>
-      <p className="font-mono text-[9px] tracking-[0.18em] text-telemetry">
+      <p className="font-mono text-[10.5px] tracking-[0.14em] text-telemetry">
         FROM {entry.lab.title.toUpperCase()} · {screenName(entry.step.scene)}
       </p>
       <p className="text-[13px] font-medium text-foreground">{entry.step.check.question}</p>

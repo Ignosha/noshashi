@@ -38,7 +38,7 @@ export function Gated({
   if (loading) {
     return (
       <div className={cn("flex h-full items-center justify-center", className)}>
-        <span className="mono-font animate-pulse text-[10px] tracking-[0.2em] text-muted-foreground">
+        <span className="mono-font animate-pulse text-[11px] tracking-[0.14em] text-muted-foreground">
           CHECKING ENTITLEMENT…
         </span>
       </div>
@@ -67,7 +67,7 @@ export function Gated({
           <NovaVault size={20} />
         </div>
 
-        <Badge variant="hold" className="mt-4 text-[8px]">
+        <Badge variant="hold" className="mt-4 text-[10px]">
           {requiredPlan.name} PLAN
         </Badge>
 
@@ -98,7 +98,7 @@ export function Gated({
           )}
         </div>
 
-        <p className="mono-font mt-4 text-[9px] text-faint">
+        <p className="mono-font mt-4 text-[10.5px] text-faint">
           {requiredPlan.priceLabel} · {requiredPlan.cadence}
         </p>
 
@@ -110,7 +110,7 @@ export function Gated({
         */}
         {requiredPlan.features.length > 0 && (
           <div className="mt-5 border-t border-border/60 pt-4 text-left">
-            <p className="stencil text-[8px] tracking-[0.28em] text-faint">
+            <p className="stencil text-[10px] tracking-[0.14em] text-faint">
               {requiredPlan.name} ALSO INCLUDES
             </p>
             <ul className="mt-2.5 grid gap-1.5">

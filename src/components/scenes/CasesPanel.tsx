@@ -67,9 +67,9 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
 
   if (!inv.loaded) {
     return inv.error ? (
-      <p className="p-4 text-[10px] text-no-go">Shared cases could not be loaded: {inv.error}</p>
+      <p className="p-4 text-[11px] text-no-go">Shared cases could not be loaded: {inv.error}</p>
     ) : (
-      <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING CASES…</p>
+      <p className="mono-font animate-pulse p-4 text-[11px] text-muted-foreground">LOADING CASES…</p>
     );
   }
   if (inv.cases.length === 0) {
@@ -85,7 +85,7 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
   return (
     <div className="grid min-h-full grid-cols-1 lg:grid-cols-[minmax(240px,320px)_1fr]">
       <div className="border-b border-border lg:border-b-0 lg:border-r">
-        <p className="stencil border-b border-border px-3 py-1.5 text-[7.5px] tracking-[0.2em] text-muted-foreground">
+        <p className="stencil border-b border-border px-3 py-1.5 text-[10px] tracking-[0.14em] text-muted-foreground">
           {inv.scope === "organization"
             ? `SHARED · ${(inv.organizationName ?? "").toUpperCase()} · SERVER-VERIFIED CHAIN${inv.canWrite ? "" : " · READ ONLY"}`
             : "THIS WORKSTATION ONLY"}
@@ -96,7 +96,7 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
               key={f}
               onClick={() => setFilter(f)}
               className={cn(
-                "stencil rounded border px-2 py-1 text-[8px] tracking-[0.18em]",
+                "stencil rounded border px-2 py-1 text-[10px] tracking-[0.14em]",
                 filter === f ? "border-foreground/50 text-foreground" : "border-border text-muted-foreground"
               )}
             >
@@ -105,7 +105,7 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
           ))}
         </div>
         {rows.length === 0 && (
-          <p className="px-3 py-3 text-[10px] leading-relaxed text-muted-foreground">
+          <p className="px-3 py-3 text-[11px] leading-relaxed text-muted-foreground">
             No {filter} cases.{" "}
             <button onClick={() => setFilter("all")} className="underline underline-offset-2 hover:text-foreground">
               Show all {inv.cases.length}
@@ -119,8 +119,8 @@ export function CasesPanel({ entries, initialCaseId }: { entries: LedgerEntry[];
                 onClick={() => setSelectedId(c.id)}
                 className={cn("w-full border-b border-border/30 px-3 py-2 text-left hover:bg-foreground/[0.03]", selected?.id === c.id && "bg-foreground/[0.06]")}
               >
-                <p className="truncate text-[10px] text-foreground">{c.title}</p>
-                <p className="mono-font mt-0.5 text-[8.5px] text-muted-foreground">
+                <p className="truncate text-[11px] text-foreground">{c.title}</p>
+                <p className="mono-font mt-0.5 text-[10px] text-muted-foreground">
                   <span className={STATUS_TONE[s.status]}>{s.status.toUpperCase()}</span> · {s.priority.toUpperCase()} · {s.linked.length} verdict{s.linked.length === 1 ? "" : "s"} · {utc(s.updatedAt)}
                 </p>
               </button>
@@ -183,20 +183,20 @@ function CaseDetail({
       <div>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="display text-[14px] font-[600] text-foreground">{c.title}</p>
-          <span className={cn("stencil text-[8px] tracking-[0.2em]", broken ? "text-no-go" : "text-go")}>
+          <span className={cn("stencil text-[10px] tracking-[0.14em]", broken ? "text-no-go" : "text-go")}>
             {integrity === null ? "CHECKING CHAIN…" : integrity.ok ? `● CASE LOG INTACT · ${c.events.length} EVENTS` : `INTEGRITY FAILURE · ${integrity.reason}`}
           </span>
         </div>
-        <p className="mono-font mt-1 text-[9.5px] text-muted-foreground">
+        <p className="mono-font mt-1 text-[11px] text-muted-foreground">
           SUBJECT <span className="selectable text-foreground">{c.subject}</span> · OPENED {utc(s.openedAt)} BY {store.who(s.openedBy)}
           {s.assignee && ` · ASSIGNED ${s.assignee}`}
         </p>
-        <p className="mono-font mt-0.5 text-[9.5px]">
+        <p className="mono-font mt-0.5 text-[11px]">
           <span className={STATUS_TONE[s.status]}>{s.status.toUpperCase()}</span>
           <span className="text-muted-foreground"> · PRIORITY {s.priority.toUpperCase()}</span>
           {s.outcome && <span className="text-foreground"> · {OUTCOME_LABEL[s.outcome].toUpperCase()}</span>}
         </p>
-        <p className="mt-2 max-w-[640px] text-[9.5px] leading-relaxed text-muted-foreground">
+        <p className="mt-2 max-w-[640px] text-[11px] leading-relaxed text-muted-foreground">
           The verdicts below are the engine's and do not change. This case records what people did about them;
           a resolution here — including an approved exception — sits beside the official verdict, never over it.
         </p>
@@ -208,24 +208,24 @@ function CaseDetail({
           const r = receipts[l.entryId];
           return (
             <div key={l.entryId} className="border-b border-border/30 py-1.5">
-              <p className="mono-font text-[9.5px]">
+              <p className="mono-font text-[11px]">
                 <span className={VERDICT_TONE[l.verdict]}>{l.verdict.toUpperCase()}</span>
                 <span className="text-foreground"> · {l.amountXrp.toLocaleString()} XRP · {l.domainCode}</span>
                 <span className="text-muted-foreground"> · {utc(l.at)}</span>
                 {l.policy && <span className="text-muted-foreground"> · {l.policy.name} v{l.policy.version}</span>}
               </p>
-              <p className="mono-font selectable text-[8.5px] text-muted-foreground">RECEIPT {l.digest}</p>
+              <p className="mono-font selectable text-[10px] text-muted-foreground">RECEIPT {l.digest}</p>
               {l.exceptions.length > 0 && (
-                <p className="mono-font text-[8.5px] text-hold">FAILED RULES {l.exceptions.join(", ")}</p>
+                <p className="mono-font text-[10px] text-hold">FAILED RULES {l.exceptions.join(", ")}</p>
               )}
               <button
                 onClick={() => void checkReceipt(l.entryId)}
-                className="stencil mt-0.5 text-[7.5px] tracking-[0.2em] text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                className="stencil mt-0.5 text-[10px] tracking-[0.14em] text-muted-foreground underline underline-offset-2 hover:text-foreground"
               >
                 VERIFY RECEIPT
               </button>
               {r && (
-                <span className={cn("mono-font ml-2 text-[8.5px]", r === "not-held" ? "text-muted-foreground" : r.state === "verified" ? "text-go" : r.state === "mismatch" ? "text-no-go" : "text-hold")}>
+                <span className={cn("mono-font ml-2 text-[10px]", r === "not-held" ? "text-muted-foreground" : r.state === "verified" ? "text-go" : r.state === "mismatch" ? "text-no-go" : "text-hold")}>
                   {r === "not-held"
                     ? "Verdict no longer on this ledger; the case keeps its recorded digest."
                     : r.state === "verified"
@@ -244,7 +244,7 @@ function CaseDetail({
               value={linkId}
               onChange={(e) => setLinkId(e.target.value)}
               aria-label="Verdict to link"
-              className="mono-font h-7 rounded border border-border bg-background px-1 text-[9.5px] text-foreground"
+              className="mono-font h-7 rounded border border-border bg-background px-1 text-[11px] text-foreground"
             >
               <option value="">Link another verdict on {shortAddress(c.subject)}…</option>
               {linkable.map((e) => (
@@ -275,7 +275,7 @@ function CaseDetail({
               rows={3}
               maxLength={4000}
               placeholder="What was checked, with whom, and what it showed."
-              className="w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground"
+              className="w-full rounded border border-border bg-background p-2 text-[11.5px] text-foreground"
             />
             <Button size="sm" className="mt-1.5" disabled={!note.trim()} onClick={() => run("NOTE", async () => { await store.mutate(c.id, { kind: "note", text: note }); setNote(""); })}>
               ADD NOTE
@@ -298,7 +298,7 @@ function CaseDetail({
               ))}
             </div>
             <div className="flex gap-1.5">
-              <Input value={assignee} onChange={(e) => setAssignee(e.target.value)} placeholder="Assign to (name or email)" className="h-7 text-[10px]" />
+              <Input value={assignee} onChange={(e) => setAssignee(e.target.value)} placeholder="Assign to (name or email)" className="h-7 text-[11px]" />
               <Button size="sm" variant="outline" disabled={!assignee.trim()} onClick={() => run("ASSIGN", async () => { await store.mutate(c.id, { kind: "assign", to: assignee }); setAssignee(""); })}>
                 ASSIGN
               </Button>
@@ -307,15 +307,15 @@ function CaseDetail({
               <Button size="sm" variant="outline" onClick={() => setClosing(true)}>CLOSE CASE…</Button>
             ) : (
               <div className="border border-border p-2">
-                <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground">RESOLUTION · A PERSON'S DECISION</p>
-                <select value={outcome} onChange={(e) => setOutcome(e.target.value as CaseOutcome)} aria-label="Outcome" className="mono-font h-7 w-full rounded border border-border bg-background px-1 text-[9.5px] text-foreground">
+                <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-muted-foreground">RESOLUTION · A PERSON'S DECISION</p>
+                <select value={outcome} onChange={(e) => setOutcome(e.target.value as CaseOutcome)} aria-label="Outcome" className="mono-font h-7 w-full rounded border border-border bg-background px-1 text-[11px] text-foreground">
                   {(Object.keys(OUTCOME_LABEL) as CaseOutcome[]).map((o) => (
                     <option key={o} value={o}>{OUTCOME_LABEL[o]}</option>
                   ))}
                 </select>
-                <textarea value={rationale} onChange={(e) => setRationale(e.target.value)} rows={3} placeholder="Rationale (required, at least 10 characters)" className="mt-1.5 w-full rounded border border-border bg-background p-2 text-[10.5px] text-foreground" />
+                <textarea value={rationale} onChange={(e) => setRationale(e.target.value)} rows={3} placeholder="Rationale (required, at least 10 characters)" className="mt-1.5 w-full rounded border border-border bg-background p-2 text-[11.5px] text-foreground" />
                 {outcome === "exception-approved" && store.scope === "workstation" && (
-                  <p className="mt-1 text-[9px] leading-snug text-hold">
+                  <p className="mt-1 text-[10.5px] leading-snug text-hold">
                     This closes the case as a local record against your name. It is not an organization approval: an
                     organization exception is requested from the verdict and decided by a second authorized person
                     (Ledger &amp; Policy → POLICY). The verdict and its receipt stay as the engine issued them.
@@ -323,13 +323,13 @@ function CaseDetail({
                 )}
                 {outcome === "exception-approved" && store.scope === "organization" && (
                   approvable.length === 0 ? (
-                    <p className="mt-1 text-[9px] leading-snug text-no-go">
+                    <p className="mt-1 text-[10.5px] leading-snug text-no-go">
                       No approved policy exception exists for a verdict in this case. Request one from the verdict; an
                       owner, admin or compliance member other than the requester must approve it before the case can
                       close this way.
                     </p>
                   ) : (
-                    <select value={exceptionId} onChange={(e) => setExceptionId(e.target.value)} aria-label="Approved exception" className="mono-font mt-1.5 h-7 w-full rounded border border-border bg-background px-1 text-[9.5px] text-foreground">
+                    <select value={exceptionId} onChange={(e) => setExceptionId(e.target.value)} aria-label="Approved exception" className="mono-font mt-1.5 h-7 w-full rounded border border-border bg-background px-1 text-[11px] text-foreground">
                       <option value="">Choose the approved exception…</option>
                       {approvable.map((x) => (
                         <option key={x.id} value={x.id}>
@@ -358,10 +358,10 @@ function CaseDetail({
       {closed && !broken && store.canWrite && (
         <section>
           <Eyebrow className="mb-1">RESOLVED {utc(s.closedAt)}</Eyebrow>
-          <p className="text-[10.5px] text-foreground">{s.outcome && OUTCOME_LABEL[s.outcome]}</p>
-          <p className="mt-0.5 whitespace-pre-wrap text-[10px] text-muted-foreground">{s.rationale}</p>
+          <p className="text-[11.5px] text-foreground">{s.outcome && OUTCOME_LABEL[s.outcome]}</p>
+          <p className="mt-0.5 whitespace-pre-wrap text-[11px] text-muted-foreground">{s.rationale}</p>
           <div className="mt-2 flex gap-1.5">
-            <Input value={reopenReason} onChange={(e) => setReopenReason(e.target.value)} placeholder="Reason to reopen (at least 10 characters)" className="h-7 text-[10px]" />
+            <Input value={reopenReason} onChange={(e) => setReopenReason(e.target.value)} placeholder="Reason to reopen (at least 10 characters)" className="h-7 text-[11px]" />
             <Button size="sm" variant="outline" disabled={reopenReason.trim().length < 10} onClick={() => run("REOPEN", async () => { await store.mutate(c.id, { kind: "reopen", reason: reopenReason }); setReopenReason(""); })}>
               REOPEN
             </Button>
@@ -389,11 +389,11 @@ function CaseDetail({
           {c.events.map((e) => (
             <li key={e.seq} className="relative pb-2.5 pl-4 last:pb-0">
               <span className={cn("absolute -left-[3px] top-1.5 h-[5px] w-[5px]", integrity && !integrity.ok && e.seq >= integrity.at ? "bg-no-go" : "bg-border")} />
-              <p className="mono-font text-[9px] text-muted-foreground">
+              <p className="mono-font text-[10.5px] text-muted-foreground">
                 #{e.seq} · {utc(e.at)} · {store.who(e.actor)}
               </p>
-              <p className="text-[10px] leading-relaxed text-foreground">{describe(e)}</p>
-              <p className="mono-font text-[8px] text-muted-foreground/60">{e.hash.slice(0, 16)}…</p>
+              <p className="text-[11px] leading-relaxed text-foreground">{describe(e)}</p>
+              <p className="mono-font text-[10px] text-muted-foreground/60">{e.hash.slice(0, 16)}…</p>
             </li>
           ))}
         </ol>
@@ -466,7 +466,7 @@ export function OpenInvestigationButton({
         })()
       }
       className={cn(
-        "stencil border border-border px-2 py-1 text-[8px] tracking-[0.2em] text-muted-foreground hover:border-foreground/40 hover:text-foreground",
+        "stencil border border-border px-2 py-1 text-[10px] tracking-[0.14em] text-muted-foreground hover:border-foreground/40 hover:text-foreground",
         className
       )}
     >

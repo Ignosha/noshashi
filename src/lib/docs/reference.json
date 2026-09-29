@@ -18,17 +18,17 @@
     {
       "name": "Credentials",
       "plan": "Free",
-      "summary": "XLS-70 objects held by the wallet, and which domains they unlock."
+      "summary": "XLS-70 credentials held by the wallet and the real mainnet domains they admit it to; a counterparty's credentials (who vouched, expiry); an issuer register (issued, not accepted, expiring, expired), each exportable to CSV."
     },
     {
       "name": "Domain Grid",
       "plan": "Free",
-      "summary": "XLS-80 permissioned domains and their rule sets."
+      "summary": "every XLS-80 permissioned domain on mainnet (from a sweep of the whole ledger), read live by domain ID or owner, and an admission check of any counterparty saved with its ledger index and SHA-256."
     },
     {
       "name": "Audit Trail",
       "plan": "Free",
-      "summary": "wallet history, filterable, exportable to CSV."
+      "summary": "any account's validated history with delivered amounts, destination tags, memos and partial payments; every counterparty screened against the OFAC SDN list and the scam registry; exported as CSV with a SHA-256 manifest."
     },
     {
       "name": "NOSHX",
@@ -129,11 +129,6 @@
       "name": "Asset Passport",
       "plan": "Enterprise",
       "summary": "a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks."
-    },
-    {
-      "name": "Growth",
-      "plan": "Free",
-      "summary": "platform-native drafts built from measured figures."
     },
     {
       "name": "Pricing",
@@ -832,6 +827,7 @@
   "edgeFunctions": [
     "noshashi-checkout",
     "noshashi-exception-decide",
+    "noshashi-ledger-registry",
     "noshashi-password",
     "noshashi-policy-activate",
     "noshashi-stripe-webhook",

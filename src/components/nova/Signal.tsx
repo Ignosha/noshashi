@@ -75,11 +75,11 @@ export function Signal({
     >
       <header className="flex flex-wrap items-center gap-2">
         <StatusDot status={tone.status} size={6} pulse={severity === "critical"} />
-        <span className={cn("stencil text-[8.5px] tracking-[0.24em]", tone.text)}>
+        <span className={cn("stencil text-[10px] tracking-[0.14em]", tone.text)}>
           {kicker}
         </span>
         {stamp && (
-          <span className="ml-auto font-mono text-[9px] tabular-nums text-faint">
+          <span className="ml-auto font-mono text-[10.5px] tabular-nums text-faint">
             {stamp}
           </span>
         )}
@@ -107,7 +107,7 @@ export function Signal({
       {children}
 
       {(confidence || source) && (
-        <dl className="mt-2.5 flex flex-wrap gap-x-6 gap-y-1 border-t border-border/50 pt-2 font-mono text-[9px] tracking-[0.14em] text-faint">
+        <dl className="mt-2.5 flex flex-wrap gap-x-6 gap-y-1 border-t border-border/50 pt-2 font-mono text-[10.5px] tracking-[0.1em] text-faint">
           {confidence && (
             <div className="flex gap-1.5">
               <dt>CONFIDENCE</dt>
@@ -123,7 +123,7 @@ export function Signal({
           {onAcknowledge && !acknowledged && (
             <button
               onClick={onAcknowledge}
-              className="ml-auto tracking-[0.18em] text-faint transition-colors hover:text-foreground"
+              className="ml-auto tracking-[0.14em] text-faint transition-colors hover:text-foreground"
             >
               ACK
             </button>

@@ -54,7 +54,7 @@ function Row({
       <div className="min-w-0">
         <p className="text-[12px] text-foreground">{label}</p>
         {hint && (
-          <p className="mt-0.5 text-[10.5px] leading-snug text-faint">{hint}</p>
+          <p className="mt-0.5 text-[11.5px] leading-snug text-faint">{hint}</p>
         )}
       </div>
       <div className="shrink-0">{children}</div>
@@ -152,12 +152,19 @@ export function AccessibilityWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
-            className="w-[300px] rounded-lg border border-border bg-popover p-4 shadow-[0_24px_70px_-24px_hsl(0_0%_0%/0.9)]"
+            // Never taller or wider than the window it sits in: at 140% the
+            // panel is taller than a laptop screen, and a fixed panel cannot
+            // be scrolled into view any other way.
+            style={{
+              maxHeight: "calc(var(--app-h, 100vh) / var(--text-scale, 1) - 6.5rem)",
+              width: "min(320px, calc(var(--app-w, 100vw) / var(--text-scale, 1) - 1.5rem))",
+            }}
+            className="overflow-y-auto overscroll-contain rounded-lg border border-border bg-popover p-4 shadow-[0_24px_70px_-24px_hsl(0_0%_0%/0.9)]"
           >
-            <p className="font-mono text-[9px] tracking-[0.22em] text-faint">
+            <p className="font-mono text-[10.5px] tracking-[0.14em] text-faint">
               ACCESSIBILITY
             </p>
-            <p className="mt-1.5 text-[10.5px] leading-relaxed text-muted-foreground">
+            <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted-foreground">
               These apply everywhere in NOSHASHI and persist on this device.
             </p>
 
@@ -170,7 +177,7 @@ export function AccessibilityWidget() {
                       onClick={() => setTextScale(s.value)}
                       aria-pressed={textScale === s.value}
                       className={cn(
-                        "rounded border px-1.5 py-1 font-mono text-[9px] transition-colors",
+                        "rounded border px-1.5 py-1 font-mono text-[10.5px] transition-colors",
                         textScale === s.value
                           ? "border-brand text-brand"
                           : "border-border text-muted-foreground hover:text-foreground"
@@ -226,7 +233,7 @@ export function AccessibilityWidget() {
                   setLargeTargets(false);
                   setMotion("system");
                 }}
-                className="mt-3 w-full rounded border border-border py-1.5 font-mono text-[9px] tracking-[0.16em] text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
+                className="mt-3 w-full rounded border border-border py-1.5 font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
               >
                 RESET TO DEFAULTS
               </button>

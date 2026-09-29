@@ -65,13 +65,13 @@ function Readout({
       <Panel className="h-full" bodyClassName="p-3">
         <div className="flex items-start justify-between">
           <div className="min-w-0">
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               {label}
             </p>
             <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
               {typeof value === "number" ? <CountUp value={value} /> : value}
               {suffix && (
-                <span className="ml-1 text-[10px] font-normal text-muted-foreground">
+                <span className="ml-1 text-[11px] font-normal text-muted-foreground">
                   {suffix}
                 </span>
               )}
@@ -308,7 +308,7 @@ export function MissionControlScene({
             className="shrink-0"
             right={
               <span className="flex items-center gap-2">
-                <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+                <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                   {medianCadence === null ? "—" : `${medianCadence.toFixed(1)}s MEDIAN`}
                 </span>
                 <StatusDot status={status} size={5} pulse={connected} />
@@ -319,7 +319,7 @@ export function MissionControlScene({
               <PatternMark element="orbital" size={130} className="-right-8 -top-10" opacity={0.08} />
               {history.length < 2 ? (
                 <div className="flex h-[74px] items-center">
-                  <p className="mono-font animate-pulse text-[10px] text-muted-foreground">
+                  <p className="mono-font animate-pulse text-[11px] text-muted-foreground">
                     LISTENING FOR LEDGER CLOSES…
                   </p>
                 </div>
@@ -340,10 +340,10 @@ export function MissionControlScene({
                       is what made a stalling network invisible here. */}
                   <div className="mt-2 border-t border-border/50 pt-2">
                     <div className="mb-1 flex items-baseline justify-between">
-                      <span className="stencil text-[8px] tracking-[0.14em] text-muted-foreground">
+                      <span className="stencil text-[10px] tracking-[0.1em] text-muted-foreground">
                         THROUGHPUT
                       </span>
-                      <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+                      <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                         AVG {avgTxn} TX · PEAK {Math.max(0, ...txnSeries)} TX
                       </span>
                     </div>
@@ -362,13 +362,13 @@ export function MissionControlScene({
                     />
                   </div>
                   <div className="mt-2 flex items-center justify-between border-t border-border/50 pt-2">
-                    <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+                    <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                       {cadence.length} ARRIVAL INTERVAL{cadence.length === 1 ? "" : "S"}
                       {outOfBand > 0
                         ? ` · ${outOfBand} OUTSIDE ${CADENCE_NORMAL_MIN_S}–${CADENCE_NORMAL_MAX_S}s`
                         : " · ALL IN WINDOW"}
                     </span>
-                    <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+                    <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                       LAST CLOSE {history[history.length - 1]?.closeTime ?? "—"}
                     </span>
                   </div>
@@ -508,7 +508,7 @@ export function MissionControlScene({
                         (heading) => (
                           <th
                             key={heading}
-                            className="stencil px-3 py-1.5 text-[8px] font-medium tracking-[0.2em] text-muted-foreground"
+                            className="stencil px-3 py-1.5 text-[10px] font-medium tracking-[0.14em] text-muted-foreground"
                           >
                             {heading}
                           </th>
@@ -531,27 +531,27 @@ export function MissionControlScene({
                           transition={{ duration: 0.5 }}
                           className="border-b border-border/30 transition-colors hover:bg-secondary/40"
                         >
-                          <td className="mono-font px-3 py-1 text-[9px] text-foreground/80">
+                          <td className="mono-font px-3 py-1 text-[10.5px] text-foreground/80">
                             {event.type}
                           </td>
-                          <td className="mono-font px-3 py-1 text-[9px] text-muted-foreground">
+                          <td className="mono-font px-3 py-1 text-[10.5px] text-muted-foreground">
                             {shortAddress(event.account)}
                           </td>
                           <td
                             className={cn(
-                              "mono-font px-3 py-1 text-[9px]",
+                              "mono-font px-3 py-1 text-[10.5px]",
                               event.result === "tesSUCCESS" ? "text-go" : "text-no-go"
                             )}
                           >
                             {event.result}
                           </td>
-                          <td className="mono-font px-3 py-1 text-[9px] tabular-nums text-foreground/70">
+                          <td className="mono-font px-3 py-1 text-[10.5px] tabular-nums text-foreground/70">
                             {event.amountXrp ? `${event.amountXrp} XRP` : "—"}
                           </td>
-                          <td className="mono-font px-3 py-1 text-[9px] tabular-nums text-muted-foreground">
+                          <td className="mono-font px-3 py-1 text-[10.5px] tabular-nums text-muted-foreground">
                             {event.ledger || "—"}
                           </td>
-                          <td className="mono-font px-3 py-1 text-[9px] tabular-nums text-muted-foreground/70">
+                          <td className="mono-font px-3 py-1 text-[10.5px] tabular-nums text-muted-foreground/70">
                             {timeAgo(event.at)}
                           </td>
                         </motion.tr>
@@ -588,7 +588,7 @@ export function MissionControlScene({
                 <p className="mono-font selectable truncate text-[11px] text-foreground">
                   {account ? account.address : "NO WALLET LOADED"}
                 </p>
-                <p className="mt-1 truncate text-[10px] text-muted-foreground">
+                <p className="mt-1 truncate text-[11px] text-muted-foreground">
                   {account?.unfunded
                     ? "Address valid — not yet funded on mainnet"
                     : (account?.domain ?? "No domain attestation published")}
@@ -606,7 +606,7 @@ export function MissionControlScene({
                 // overflowing into the next one; the figure scales with the
                 // container rather than colliding with its neighbour.
                 <div key={stat.label} className="min-w-0">
-                  <p className="stencil truncate text-[7px] tracking-[0.2em] text-muted-foreground">
+                  <p className="stencil truncate text-[10px] tracking-[0.14em] text-muted-foreground">
                     {stat.label}
                   </p>
                   <p className="data-font mt-0.5 truncate text-[clamp(11px,1.35vw,15px)] font-[600] leading-none tabular-nums text-foreground">
@@ -622,7 +622,7 @@ export function MissionControlScene({
             className="min-h-[210px] flex-1 shrink-0"
             bodyClassName="overflow-y-auto p-3"
             right={
-              <span className="mono-font text-[9px] tabular-nums text-muted-foreground">
+              <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
                 {gate.checks.filter((check) => check.passed).length}/{gate.checks.length}
               </span>
             }
@@ -642,18 +642,18 @@ export function MissionControlScene({
                     )}
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="mono-font truncate text-[9px] text-foreground/85">
+                    <p className="mono-font truncate text-[10.5px] text-foreground/85">
                       {check.id}
                     </p>
                     {!check.passed && (
-                      <p className="mt-0.5 text-[9px] leading-snug text-muted-foreground">
+                      <p className="mt-0.5 text-[10.5px] leading-snug text-muted-foreground">
                         {check.detail}
                       </p>
                     )}
                   </div>
                   <span
                     className={cn(
-                      "stencil shrink-0 text-[8px] tracking-[0.18em]", CHECK_TONE_CLASS[CHECK_STATE_COPY[checkState(check)].tone][0]
+                      "stencil shrink-0 text-[10px] tracking-[0.14em]", CHECK_TONE_CLASS[CHECK_STATE_COPY[checkState(check)].tone][0]
                     )}
                   >
                     {CHECK_STATE_COPY[checkState(check)].label}

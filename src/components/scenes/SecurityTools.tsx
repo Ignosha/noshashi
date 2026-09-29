@@ -43,14 +43,14 @@ const VERDICT_TONE: Record<SignExplanation["verdict"], string> = { "SAFE-LOOKING
 const xrp = (n: number) => `${n.toLocaleString("en-US", { maximumFractionDigits: 6 })} XRP`;
 
 function Tag({ tone, children }: { tone: keyof typeof TONE; children: string }) {
-  return <span className={cn("stencil mr-1.5 text-[8px] tracking-[0.18em]", TONE[tone])}>{children}</span>;
+  return <span className={cn("stencil mr-1.5 text-[10px] tracking-[0.14em]", TONE[tone])}>{children}</span>;
 }
 
 function TxBlock({ tx, id, copied, onCopy }: { tx: Record<string, unknown>; id: string; copied: string | null; onCopy: (id: string, json: string) => void }) {
   const json = JSON.stringify(tx, null, 2);
   return (
     <div className="mt-1 space-y-1">
-      <pre className="mono-font selectable whitespace-pre-wrap break-all text-[9px] text-foreground">{json}</pre>
+      <pre className="mono-font selectable whitespace-pre-wrap break-all text-[10.5px] text-foreground">{json}</pre>
       <Button size="sm" variant="outline" onClick={() => onCopy(id, json)}>
         {copied === id ? "COPIED" : "COPY UNSIGNED TRANSACTION"}
       </Button>
@@ -96,7 +96,7 @@ export function PreSignTab() {
 
   return (
     <section className="max-w-[860px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         Before you sign anything a website, a DM or a wallet prompt asks for: paste the transaction (JSON, or the hex blob) and read what it
         really does. Decoded on this device. Most XRPL thefts are a signature the owner did not understand: a new regular key, an AccountDelete,
         an NFT sold for zero.
@@ -106,38 +106,38 @@ export function PreSignTab() {
         onChange={(e) => setInput(e.target.value)}
         rows={6}
         placeholder='{"TransactionType":"Payment", …}  or  12000022800000002400…'
-        className="mono-font w-full resize-y border border-border bg-transparent p-1.5 text-[9.5px] text-foreground"
+        className="mono-font w-full resize-y border border-border bg-transparent p-1.5 text-[11px] text-foreground"
       />
       <div className="flex gap-1.5">
-        <Input value={me} onChange={(e) => setMe(e.target.value)} placeholder="Your address (optional: flags a transaction for someone else's account)" className="mono-font h-8 text-[10.5px]" />
+        <Input value={me} onChange={(e) => setMe(e.target.value)} placeholder="Your address (optional: flags a transaction for someone else's account)" className="mono-font h-8 text-[11.5px]" />
         <Button size="sm" disabled={busy || !input.trim()} onClick={() => void run()}>
           {busy ? "READING…" : "EXPLAIN"}
         </Button>
       </div>
-      <p className="text-[9.5px] text-muted-foreground">
+      <p className="text-[11px] text-muted-foreground">
         A transaction or blob is not a secret. A seed, secret key or "family seed" (starting with s) is: never paste it anywhere.
         {known.length ? ` Lookalikes are checked against the ${known.length} addresses in your SAFE SEND book.` : " Add your usual destinations in SAFE SEND to catch lookalikes."}
       </p>
-      {error && <p className="text-[9.5px] text-hold">{error}</p>}
+      {error && <p className="text-[11px] text-hold">{error}</p>}
       {result && (
         <div className="space-y-2">
           <div className="border border-border p-2">
             <p className={cn("stencil text-[18px] leading-none", VERDICT_TONE[result.verdict])}>{result.verdict}</p>
             {result.summary.map((s) => (
-              <p key={s} className="mt-1 text-[10.5px] text-foreground">
+              <p key={s} className="mt-1 text-[11.5px] text-foreground">
                 {s}
               </p>
             ))}
           </div>
           {result.flags.map((f) => (
-            <p key={f.id} className="border border-border p-2 text-[10px] leading-relaxed text-foreground">
+            <p key={f.id} className="border border-border p-2 text-[11px] leading-relaxed text-foreground">
               <Tag tone={f.severity}>{f.severity === "danger" ? "DANGER" : f.severity.toUpperCase()}</Tag>
               {f.text}
             </p>
           ))}
           <details className="border border-dashed border-border p-2">
-            <summary className="cursor-pointer text-[9px] text-muted-foreground">Every field ({result.format === "blob" ? "decoded from the blob" : "as pasted"})</summary>
-            <pre className="mono-font selectable mt-1 whitespace-pre-wrap break-all text-[9px] text-foreground">{JSON.stringify(result.tx, null, 2)}</pre>
+            <summary className="cursor-pointer text-[10.5px] text-muted-foreground">Every field ({result.format === "blob" ? "decoded from the blob" : "as pasted"})</summary>
+            <pre className="mono-font selectable mt-1 whitespace-pre-wrap break-all text-[10.5px] text-foreground">{JSON.stringify(result.tx, null, 2)}</pre>
           </details>
         </div>
       )}
@@ -202,7 +202,7 @@ export function RecoverTab({ onUpgrade, initial }: { onUpgrade: () => void; init
 
   return (
     <section className="max-w-[900px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         XRP an account can get back: escrows that matured and wait for someone to finish them, expired escrows and payment channels that
         return to you when closed, checks written to you and never cashed, and the owner reserve locked by old trust lines, orders, NFT offers,
         preauthorisations and tickets. Plus everything else the account still holds. Every fix is an unsigned transaction.
@@ -212,7 +212,7 @@ export function RecoverTab({ onUpgrade, initial }: { onUpgrade: () => void; init
         onChange={(e) => setText(e.target.value)}
         rows={paid ? 3 : 1}
         placeholder={paid ? `Up to ${limit} addresses, one per line` : "Your address (r…)"}
-        className="mono-font w-full resize-y border border-border bg-transparent p-1.5 text-[10px] text-foreground"
+        className="mono-font w-full resize-y border border-border bg-transparent p-1.5 text-[11px] text-foreground"
       />
       <div className="flex flex-wrap items-center gap-1.5">
         <Button size="sm" disabled={Boolean(busy) || !addresses.length} onClick={() => void run()}>
@@ -224,21 +224,21 @@ export function RecoverTab({ onUpgrade, initial }: { onUpgrade: () => void; init
           </Button>
         )}
         {!paid && (
-          <span className="text-[9px] text-muted-foreground">
+          <span className="text-[10.5px] text-muted-foreground">
             Free: one address, assets listed. <button className="underline" onClick={onUpgrade}>Pro</button> values assets in XRP and scans 25 at once.
           </span>
         )}
-        {addresses.length > limit && <span className="text-[9px] text-hold">Only the first {limit} will be read on this plan.</span>}
+        {addresses.length > limit && <span className="text-[10.5px] text-hold">Only the first {limit} will be read on this plan.</span>}
       </div>
-      {busy && <p className="mono-font animate-pulse text-[9px] text-muted-foreground">{busy}</p>}
+      {busy && <p className="mono-font animate-pulse text-[10.5px] text-muted-foreground">{busy}</p>}
       {rows?.map((r) => (
         <div key={r.address} className="space-y-1.5 border border-border p-2">
-          <p className="mono-font text-[10px] text-foreground">{r.address}</p>
-          {r.error && <p className="text-[9.5px] text-no-go">{r.error}</p>}
-          {r.report && !r.report.exists && <p className="text-[10px] text-muted-foreground">No account exists at this address.</p>}
+          <p className="mono-font text-[11px] text-foreground">{r.address}</p>
+          {r.error && <p className="text-[11px] text-no-go">{r.error}</p>}
+          {r.report && !r.report.exists && <p className="text-[11px] text-muted-foreground">No account exists at this address.</p>}
           {r.report?.exists && (
             <>
-              <div className="flex flex-wrap gap-4 text-[10px]">
+              <div className="flex flex-wrap gap-4 text-[11px]">
                 <span className="text-go">RECOVERABLE NOW {xrp(r.report.recoverableNowXrp)}</span>
                 <span className="text-foreground">RESERVE YOU COULD FREE {xrp(r.report.optionalReserveXrp)}</span>
                 {r.report.laterXrp > 0 && <span className="text-muted-foreground">ARRIVING LATER {xrp(r.report.laterXrp)}</span>}
@@ -246,23 +246,23 @@ export function RecoverTab({ onUpgrade, initial }: { onUpgrade: () => void; init
                   balance {xrp(r.report.balanceXrp)} · locked {xrp(r.report.lockedXrp)} · ledger {r.report.ledgerIndex.toLocaleString("en-US")}
                 </span>
               </div>
-              {r.report.items.length === 0 && <p className="text-[10px] text-muted-foreground">Nothing stuck: no escrows, checks, channels or reclaimable reserve.</p>}
+              {r.report.items.length === 0 && <p className="text-[11px] text-muted-foreground">Nothing stuck: no escrows, checks, channels or reclaimable reserve.</p>}
               {r.report.items.map((i) => (
                 <div key={i.id} className="border-t border-border pt-1">
-                  <p className="text-[10px] text-foreground">
+                  <p className="text-[11px] text-foreground">
                     <Tag tone={i.when === "now" ? "ok" : i.when === "optional" ? "info" : "warn"}>{i.when.toUpperCase()}</Tag>
                     {i.title}
                   </p>
-                  <p className="text-[9.5px] leading-relaxed text-muted-foreground">{i.detail}</p>
-                  {i.caution && <p className="text-[9.5px] text-hold">Before signing: {i.caution}</p>}
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">{i.detail}</p>
+                  {i.caution && <p className="text-[11px] text-hold">Before signing: {i.caution}</p>}
                   {i.tx && <TxBlock tx={i.tx} id={`${r.address}:${i.id}`} copied={copied} onCopy={copy} />}
                 </div>
               ))}
               <details className="border-t border-border pt-1">
-                <summary className="cursor-pointer text-[9.5px] text-muted-foreground">
+                <summary className="cursor-pointer text-[11px] text-muted-foreground">
                   Close the account entirely: {r.report.deletion.possible ? `AccountDelete returns ${xrp(r.report.deletion.returnsXrp)}` : `blocked by ${r.report.deletion.blockers.join(", ")}`}
                 </summary>
-                <p className="mt-1 text-[9.5px] leading-relaxed text-muted-foreground">
+                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
                   Deleting sends every drop but the {xrp(r.report.balanceXrp - r.report.deletion.returnsXrp)} fee to an account you own, including the base reserve. Only for an
                   account you are finished with: its address can be funded again, but anything sent to it later needs the reserve anew.
                 </p>
@@ -276,7 +276,7 @@ export function RecoverTab({ onUpgrade, initial }: { onUpgrade: () => void; init
                 ALSO HELD {r.inventory.priced ? `· ${xrp(r.inventory.valuedXrp)} AT THE BEST BID` : ""}
               </Eyebrow>
               {r.inventory.items.slice(0, 40).map((it) => (
-                <p key={it.id} className="mono-font text-[9px] text-foreground">
+                <p key={it.id} className="mono-font text-[10.5px] text-foreground">
                   {it.kind.replace("_", " ").toUpperCase()} · {it.label} · {it.kind === "nft" ? "" : it.amount.toLocaleString("en-US", { maximumFractionDigits: 6 })}
                   {it.valueXrp !== null && it.kind !== "open_order" ? ` · ≈ ${xrp(it.valueXrp)}` : ""}
                   {it.note ? <span className="text-muted-foreground"> · {it.note}</span> : null}
@@ -330,7 +330,7 @@ export function ExposureTab({ onUpgrade, initial }: { onUpgrade: () => void; ini
 
   return (
     <section className="max-w-[900px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         The XRP Ledger's "revoke approvals": every standing permission that lets someone else take value later. Checks you wrote, NFT sell offers
         (a zero-price one signed on a phishing site gives the NFT away), funded payment channels, open orders, preauthorisations, the keys and
         signers that can act for you. Each comes with the unsigned transaction that revokes it.
@@ -340,7 +340,7 @@ export function ExposureTab({ onUpgrade, initial }: { onUpgrade: () => void; ini
         onChange={(e) => setText(e.target.value)}
         rows={paid ? 3 : 1}
         placeholder={paid ? `Up to ${limit} addresses, one per line` : "Your address (r…)"}
-        className="mono-font w-full resize-y border border-border bg-transparent p-1.5 text-[10px] text-foreground"
+        className="mono-font w-full resize-y border border-border bg-transparent p-1.5 text-[11px] text-foreground"
       />
       <div className="flex flex-wrap items-center gap-1.5">
         <Button size="sm" disabled={Boolean(busy) || !addresses.length} onClick={() => void run()}>
@@ -352,29 +352,29 @@ export function ExposureTab({ onUpgrade, initial }: { onUpgrade: () => void; ini
           </Button>
         )}
         {!paid && (
-          <span className="text-[9px] text-muted-foreground">
+          <span className="text-[10.5px] text-muted-foreground">
             Free: one address. <button className="underline" onClick={onUpgrade}>Pro</button> audits 25 at once.
           </span>
         )}
       </div>
-      {busy && <p className="mono-font animate-pulse text-[9px] text-muted-foreground">{busy}</p>}
+      {busy && <p className="mono-font animate-pulse text-[10.5px] text-muted-foreground">{busy}</p>}
       {rows?.map((r) => (
         <div key={r.address} className="space-y-1.5 border border-border p-2">
-          <p className="mono-font text-[10px] text-foreground">
+          <p className="mono-font text-[11px] text-foreground">
             {r.address}
             {r.report?.exists ? ` · ${r.report.exposures.length} open permission${r.report.exposures.length === 1 ? "" : "s"}${r.report.atRiskXrp ? ` · up to ${xrp(r.report.atRiskXrp)} others could take` : ""}` : ""}
           </p>
-          {r.error && <p className="text-[9.5px] text-no-go">{r.error}</p>}
-          {r.report && !r.report.exists && <p className="text-[10px] text-muted-foreground">No account exists at this address.</p>}
-          {r.report?.exists && r.report.exposures.length === 0 && <p className="text-[10px] text-go">Nothing open: no one else can take value from this account.</p>}
+          {r.error && <p className="text-[11px] text-no-go">{r.error}</p>}
+          {r.report && !r.report.exists && <p className="text-[11px] text-muted-foreground">No account exists at this address.</p>}
+          {r.report?.exists && r.report.exposures.length === 0 && <p className="text-[11px] text-go">Nothing open: no one else can take value from this account.</p>}
           {r.report?.exposures.map((e) => (
             <div key={e.id} className="border-t border-border pt-1">
-              <p className="text-[10px] text-foreground">
+              <p className="text-[11px] text-foreground">
                 <Tag tone={e.risk}>{e.risk.toUpperCase()}</Tag>
                 {e.title}
               </p>
-              <p className="text-[9.5px] leading-relaxed text-muted-foreground">{e.detail}</p>
-              {e.caution && <p className="text-[9.5px] text-hold">Before signing: {e.caution}</p>}
+              <p className="text-[11px] leading-relaxed text-muted-foreground">{e.detail}</p>
+              {e.caution && <p className="text-[11px] text-hold">Before signing: {e.caution}</p>}
               {e.revoke && <TxBlock tx={e.revoke} id={`${r.address}:${e.id}`} copied={copied} onCopy={copy} />}
             </div>
           ))}
@@ -411,32 +411,32 @@ export function DepositHelpTab() {
 
   return (
     <section className="max-w-[860px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         "I sent XRP and it never arrived." Paste the transaction hash from your wallet. A failed payment moved nothing but its fee; a payment
         that reached an exchange without the right destination tag can be credited by the exchange, and this writes the letter it needs.
       </p>
       <div className="flex flex-wrap gap-1.5">
-        <Input value={hash} onChange={(e) => setHash(e.target.value)} placeholder="Transaction hash (64 characters)" className="mono-font h-8 min-w-[320px] flex-1 text-[10.5px]" />
-        <Input value={tag} onChange={(e) => setTag(e.target.value)} placeholder="Your correct tag (optional)" className="mono-font h-8 w-48 text-[10.5px]" />
+        <Input value={hash} onChange={(e) => setHash(e.target.value)} placeholder="Transaction hash (64 characters)" className="mono-font h-8 min-w-[320px] flex-1 text-[11.5px]" />
+        <Input value={tag} onChange={(e) => setTag(e.target.value)} placeholder="Your correct tag (optional)" className="mono-font h-8 w-48 text-[11.5px]" />
         <Button size="sm" disabled={busy || !/^[0-9A-Fa-f]{64}$/.test(hash.trim())} onClick={() => void run()}>
           {busy ? "READING…" : "EXPLAIN"}
         </Button>
       </div>
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
       {result && (
         <div className="space-y-2">
           <div className="border border-border p-2">
             <p className="text-[11px] text-foreground">{result.headline}</p>
-            <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{result.explanation}</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{result.explanation}</p>
             {result.steps.length > 0 && (
-              <ol className="mt-1 list-decimal pl-4 text-[10px] text-foreground">
+              <ol className="mt-1 list-decimal pl-4 text-[11px] text-foreground">
                 {result.steps.map((s) => (
                   <li key={s}>{s}</li>
                 ))}
               </ol>
             )}
           </div>
-          <div className="mono-font space-y-0.5 border border-border p-2 text-[9px] text-muted-foreground">
+          <div className="mono-font space-y-0.5 border border-border p-2 text-[10.5px] text-muted-foreground">
             <p>result {result.facts.result ?? "—"} · ledger {result.facts.ledger ?? "—"} · {result.facts.at ?? ""}</p>
             <p>from {result.facts.from ?? "—"} → {result.facts.to ?? "—"}{result.facts.destinationTag !== null ? ` tag ${result.facts.destinationTag}` : " (no tag)"}</p>
             <p>requested {result.facts.requested ?? "—"} · delivered {result.facts.delivered ?? "—"}</p>
@@ -445,7 +445,7 @@ export function DepositHelpTab() {
           {result.letter && (
             <div className="space-y-1 border border-dashed border-border p-2">
               <Eyebrow>LETTER TO THE SERVICE · SHA-256 {result.letter.sha256.slice(0, 16)}…</Eyebrow>
-              <pre className="mono-font selectable whitespace-pre-wrap text-[9px] text-foreground">{result.letter.text}</pre>
+              <pre className="mono-font selectable whitespace-pre-wrap text-[10.5px] text-foreground">{result.letter.text}</pre>
               <div className="flex gap-1.5">
                 <Button size="sm" variant="outline" onClick={() => void navigator.clipboard?.writeText(result.letter!.text).then(() => setNote("Letter copied."))}>
                   COPY
@@ -454,7 +454,7 @@ export function DepositHelpTab() {
                   SAVE
                 </Button>
               </div>
-              {note && <p className="text-[9.5px] text-go">{note}</p>}
+              {note && <p className="text-[11px] text-go">{note}</p>}
             </div>
           )}
         </div>
@@ -490,26 +490,26 @@ export function DomainTab({ initial }: { initial?: string }) {
 
   return (
     <section className="max-w-[820px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         Anyone can write "bitstamp.net" into an account's Domain field. The claim is proven only when that website lists the account back in its
         <span className="mono-font"> /.well-known/xrp-ledger.toml</span>. Paste an address to test its claim, or a domain to see which accounts it vouches for.
       </p>
       <div className="flex gap-1.5">
-        <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="r… address or example.com" className="mono-font h-8 text-[10.5px]" />
+        <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="r… address or example.com" className="mono-font h-8 text-[11.5px]" />
         <Button size="sm" disabled={busy || !q} onClick={() => void run()}>
           {busy ? "READING…" : "VERIFY"}
         </Button>
       </div>
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
       {result && (
         <div className="space-y-2">
-          <p className="border border-border p-2 text-[10.5px] leading-relaxed text-foreground">
+          <p className="border border-border p-2 text-[11.5px] leading-relaxed text-foreground">
             <Tag tone={DOMAIN_TONE[result.check.status]}>{result.check.status.replace("_", " ").toUpperCase()}</Tag>
             {result.check.detail}
           </p>
-          {result.check.tomlUrl && <p className="mono-font selectable text-[9px] text-muted-foreground">{result.check.tomlUrl}</p>}
+          {result.check.tomlUrl && <p className="mono-font selectable text-[10.5px] text-muted-foreground">{result.check.tomlUrl}</p>}
           {result.accounts?.map((a) => (
-            <p key={a.address} className="mono-font text-[9.5px] text-foreground">
+            <p key={a.address} className="mono-font text-[11px] text-foreground">
               {a.address} · {a.exists === false ? "does not exist" : a.points_back ? <span className="text-go">names the domain back</span> : <span className="text-hold">does not name it ({a.domain ?? "no domain"})</span>}
             </p>
           ))}
@@ -586,34 +586,34 @@ export function ClusterTab() {
 
   return (
     <section className="max-w-[900px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         From one scam account, the others the same operation runs: who funded it, which accounts it created, where it swept its balance when it
         deleted itself, and which of them share a vanity ending or a memo. Exchanges and other services end a branch. Every link names its
         transaction. {deep ? "Forensic depth: four hops, 200 accounts." : "Two hops, 40 accounts (Enterprise maps four hops and 200)."}
       </p>
       <div className="flex gap-1.5">
-        <Input value={seed} onChange={(e) => setSeed(e.target.value)} placeholder="A known scam or drainer account (r…)" className="mono-font h-8 text-[10.5px]" />
+        <Input value={seed} onChange={(e) => setSeed(e.target.value)} placeholder="A known scam or drainer account (r…)" className="mono-font h-8 text-[11.5px]" />
         <Button size="sm" disabled={busy || !isValidAddress(seed.trim())} onClick={() => void run()}>
           {busy ? "MAPPING…" : "MAP"}
         </Button>
       </div>
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
       {cluster && (
         <div className="space-y-2">
-          <p className="text-[10.5px] text-foreground">
+          <p className="text-[11.5px] text-foreground">
             {cluster.nodes.length} accounts, {cluster.links.length} links{cluster.capped ? " (the account cap stopped the search)" : ""}.
             {cluster.nodes.some((n) => n.sanction) ? " The cluster touches an OFAC-listed address." : ""}
           </p>
           <div className="space-y-0.5 border border-border p-2">
             {cluster.links.slice(0, 120).map((l) => (
-              <p key={l.hash + l.to} className="mono-font text-[9px] text-foreground">
+              <p key={l.hash + l.to} className="mono-font text-[10.5px] text-foreground">
                 {l.kind === "funded" ? "FUNDED" : "SWEPT"} · {shortAddress(l.from)} → {shortAddress(l.to)} · {xrp(l.xrp)} · ledger {l.ledger}
               </p>
             ))}
           </div>
           <div className="space-y-0.5 border border-border p-2">
             {cluster.nodes.map((n) => (
-              <p key={n.address} className="mono-font text-[9px] text-muted-foreground">
+              <p key={n.address} className="mono-font text-[10.5px] text-muted-foreground">
                 hop {n.depth} · <span className="text-foreground">{n.address}</span>
                 {n.exists ? (n.balanceXrp !== null ? ` · ${xrp(n.balanceXrp)}` : "") : " · deleted"}
                 {n.stop ? ` · ${n.stop}, not expanded` : ""}
@@ -621,12 +621,12 @@ export function ClusterTab() {
               </p>
             ))}
             {cluster.vanity.map((v) => (
-              <p key={v.ending} className="text-[9.5px] text-hold">
+              <p key={v.ending} className="text-[11px] text-hold">
                 {v.accounts.length} accounts end in "{v.ending}": a generated vanity series.
               </p>
             ))}
             {cluster.sharedMemos.map((m) => (
-              <p key={m.text} className="text-[9.5px] text-hold">
+              <p key={m.text} className="text-[11px] text-hold">
                 {m.accounts.length} accounts sent the same memo: "{m.text.slice(0, 100)}"
               </p>
             ))}
@@ -656,7 +656,7 @@ export function ClusterTab() {
               </Button>
             )}
           </div>
-          {note && <p className="text-[9.5px] text-go">{note}</p>}
+          {note && <p className="text-[11px] text-go">{note}</p>}
         </div>
       )}
     </section>
@@ -675,7 +675,7 @@ export function PersonalGuardian({ onUpgrade }: { onUpgrade: () => void }) {
   return (
     <section className="max-w-[820px] space-y-2">
       <Eyebrow>PERSONAL GUARDIAN · ON THIS DEVICE</Eyebrow>
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         While NOSHASHI is open, your own addresses are read every minute and a native notification fires the moment a new key or signer list
         appears, the master key is switched, the account is deleted, a large amount leaves, or a phishing lure arrives. The addresses and alerts
         stay on this device. {limit === FREE_ADDRESSES ? `Free for ${FREE_ADDRESSES} addresses; ` : ""}
@@ -697,9 +697,9 @@ export function PersonalGuardian({ onUpgrade }: { onUpgrade: () => void }) {
         }}
         rows={3}
         placeholder="Your addresses, one per line"
-        className="mono-font w-full resize-y border border-border bg-transparent p-1.5 text-[10px] text-foreground"
+        className="mono-font w-full resize-y border border-border bg-transparent p-1.5 text-[11px] text-foreground"
       />
-      <div className="flex flex-wrap items-center gap-3 text-[9.5px] text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
         <label className="flex items-center gap-1">
           <input type="checkbox" checked={g.config.enabled} onChange={(e) => setGuardianConfig({ enabled: e.target.checked })} /> On
         </label>
@@ -721,17 +721,17 @@ export function PersonalGuardian({ onUpgrade }: { onUpgrade: () => void }) {
           </button>
         )}
       </div>
-      {g.lastError && <p className="text-[9.5px] text-hold">{g.lastError}</p>}
+      {g.lastError && <p className="text-[11px] text-hold">{g.lastError}</p>}
       {g.alerts.map((a) => (
         <div key={a.id} className="border border-border p-2">
-          <p className="text-[10px] text-foreground">
+          <p className="text-[11px] text-foreground">
             <Tag tone={a.severity}>{a.severity.toUpperCase()}</Tag>
             {shortAddress(a.address)} · {a.title}
           </p>
-          <p className="text-[9.5px] text-muted-foreground">
+          <p className="text-[11px] text-muted-foreground">
             {a.at?.slice(0, 16).replace("T", " ") ?? `ledger ${a.ledger}`} · {a.detail}
           </p>
-          <p className="mono-font selectable break-all text-[8.5px] text-muted-foreground">{a.hash}</p>
+          <p className="mono-font selectable break-all text-[10px] text-muted-foreground">{a.hash}</p>
         </div>
       ))}
     </section>

@@ -153,7 +153,7 @@ export function CommandPalette({
             <span className="pointer-events-none absolute bottom-0 right-0 h-2.5 w-2.5 border-b border-r border-foreground/60" />
 
             <div className="flex items-center gap-3 border-b border-border px-4">
-              <span className="stencil shrink-0 text-[9px] tracking-[0.28em] text-muted-foreground">
+              <span className="stencil shrink-0 text-[10.5px] tracking-[0.14em] text-muted-foreground">
                 CMD
               </span>
               <input
@@ -176,7 +176,7 @@ export function CommandPalette({
 
               {groups.map(([group, items]) => (
                 <div key={group} className="mb-1 last:mb-0">
-                  <p className="stencil px-4 pb-1 pt-2 text-[8px] tracking-[0.26em] text-muted-foreground/70">
+                  <p className="stencil px-4 pb-1 pt-2 text-[10px] tracking-[0.14em] text-muted-foreground/70">
                     {group}
                   </p>
                   {items.map((command) => {
@@ -205,7 +205,7 @@ export function CommandPalette({
                           {command.hint && (
                             <span
                               className={cn(
-                                "mt-0.5 block truncate text-[10px]",
+                                "mt-0.5 block truncate text-[11px]",
                                 selected ? "text-background/70" : "text-muted-foreground"
                               )}
                             >
@@ -217,7 +217,7 @@ export function CommandPalette({
                           <Kbd keys={command.shortcut} className="shrink-0" />
                         )}
                         {selected && (
-                          <span className="stencil shrink-0 text-[8px] tracking-[0.2em] text-background/70">
+                          <span className="stencil shrink-0 text-[10px] tracking-[0.14em] text-background/70">
                             ↵ RUN
                           </span>
                         )}
@@ -229,12 +229,12 @@ export function CommandPalette({
             </div>
 
             <div className="flex items-center justify-between border-t border-border px-4 py-2">
-              <span className="flex items-center gap-2 text-[9px] text-muted-foreground">
+              <span className="flex items-center gap-2 text-[10.5px] text-muted-foreground">
                 <Kbd keys="up" />
                 <Kbd keys="down" />
                 navigate
               </span>
-              <span className="stencil text-[8px] tracking-[0.24em] text-muted-foreground/70">
+              <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground/70">
                 NOSHASHI COMMAND BUS
               </span>
             </div>

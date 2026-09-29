@@ -118,7 +118,7 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "stencil border px-2 py-1 text-[9px] tracking-[0.2em]",
+              "stencil border px-2 py-1 text-[10.5px] tracking-[0.14em]",
               tab === t.id ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground"
             )}
           >
@@ -210,24 +210,24 @@ function CheckTab({ initial }: { initial?: string }) {
   return (
     <section className="max-w-[820px] space-y-3">
       <div className="flex gap-1.5">
-        <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Your XRP Ledger address (r…)" className="mono-font h-8 text-[10.5px]" />
+        <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Your XRP Ledger address (r…)" className="mono-font h-8 text-[11.5px]" />
         <Button size="sm" disabled={busy || !isValidAddress(address.trim())} onClick={() => void run()}>
           {busy ? "READING…" : "CHECK"}
         </Button>
       </div>
-      <p className="text-[9.5px] text-muted-foreground">
+      <p className="text-[11px] text-muted-foreground">
         Public data only: an address is not a secret. Never paste a secret key or seed anywhere, including here.
       </p>
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
       {result && (
         <div className="space-y-2">
           <div className="flex items-baseline gap-3 border border-border p-2">
             <span className={cn("stencil text-[28px] leading-none", GRADE_TONE[result.assessment.grade])}>{result.assessment.grade}</span>
             <div>
-              <p className="text-[10.5px] text-foreground">
+              <p className="text-[11.5px] text-foreground">
                 {result.assessment.score}/100 · {result.assessment.summary}
               </p>
-              <p className="mono-font text-[9px] text-muted-foreground">
+              <p className="mono-font text-[10.5px] text-muted-foreground">
                 validated ledger {result.posture.ledgerIndex.toLocaleString("en-US")} · {result.posture.historyRead} recent transactions read
                 {result.posture.historyComplete ? "" : " (older history not read)"}
               </p>
@@ -235,19 +235,19 @@ function CheckTab({ initial }: { initial?: string }) {
           </div>
           {result.assessment.findings.map((f) => (
             <div key={f.id} className="border border-border p-2">
-              <p className="text-[10px] text-foreground">
-                <span className={cn("stencil mr-1.5 text-[8px] tracking-[0.18em]", TONE[f.severity])}>{f.severity.toUpperCase()}</span>
+              <p className="text-[11px] text-foreground">
+                <span className={cn("stencil mr-1.5 text-[10px] tracking-[0.14em]", TONE[f.severity])}>{f.severity.toUpperCase()}</span>
                 {f.title}
               </p>
-              <p className="mt-0.5 text-[9.5px] leading-relaxed text-muted-foreground">{f.detail}</p>
-              {f.action && <p className="mt-0.5 text-[9.5px] text-foreground">What to do: {f.action}</p>}
+              <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{f.detail}</p>
+              {f.action && <p className="mt-0.5 text-[11px] text-foreground">What to do: {f.action}</p>}
             </div>
           ))}
           {result.posture.events.length > 0 && (
             <div className="border border-border p-2">
               <Eyebrow>KEY AND SETTINGS HISTORY</Eyebrow>
               {result.posture.events.slice(0, 12).map((e) => (
-                <p key={e.hash + e.kind} className="mono-font text-[9px] text-muted-foreground">
+                <p key={e.hash + e.kind} className="mono-font text-[10.5px] text-muted-foreground">
                   {e.at?.slice(0, 16).replace("T", " ") ?? `ledger ${e.ledger}`} · {e.detail}
                 </p>
               ))}
@@ -260,10 +260,10 @@ function CheckTab({ initial }: { initial?: string }) {
                 const json = JSON.stringify(step.tx, null, 2);
                 return (
                   <div key={step.id} className="space-y-1 border border-border p-1.5">
-                    <p className="text-[10px] text-foreground">{step.title}</p>
-                    <p className="text-[9.5px] text-muted-foreground">{step.why}</p>
-                    {step.caution && <p className="text-[9.5px] text-hold">Before signing: {step.caution}</p>}
-                    <pre className="mono-font selectable whitespace-pre-wrap break-all text-[9px] text-foreground">{json}</pre>
+                    <p className="text-[11px] text-foreground">{step.title}</p>
+                    <p className="text-[11px] text-muted-foreground">{step.why}</p>
+                    {step.caution && <p className="text-[11px] text-hold">Before signing: {step.caution}</p>}
+                    <pre className="mono-font selectable whitespace-pre-wrap break-all text-[10.5px] text-foreground">{json}</pre>
                     <Button
                       size="sm"
                       variant="outline"
@@ -334,11 +334,11 @@ function SafeSendTab() {
 
   return (
     <section className="max-w-[820px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         Address poisoning puts a lookalike of an address you pay into your history, hoping you copy it next time. Keep your real
         destinations here (on this device only) and check every pasted address against them before you sign.
       </p>
-      <label className="block text-[9px] text-muted-foreground">
+      <label className="block text-[10.5px] text-muted-foreground">
         Address book, one per line: <span className="mono-font">rAddress… Exchange deposit</span>
         <textarea
           value={draft ?? book}
@@ -348,18 +348,18 @@ function SafeSendTab() {
             setDraft(null);
           }}
           rows={4}
-          className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[9.5px] text-foreground"
+          className="mono-font mt-0.5 w-full resize-y border border-border bg-transparent p-1 text-[11px] text-foreground"
         />
       </label>
       <div className="flex gap-1.5">
-        <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Address you are about to pay" className="mono-font h-8 text-[10.5px]" />
+        <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Address you are about to pay" className="mono-font h-8 text-[11.5px]" />
         <Button size="sm" disabled={busy || !isValidAddress(destination.trim())} onClick={() => void run()}>
           {busy ? "CHECKING…" : "CHECK"}
         </Button>
       </div>
       {checks?.map((c, i) => (
-        <p key={i} className="text-[10px] leading-relaxed text-foreground">
-          <span className={cn("stencil mr-1.5 text-[8px] tracking-[0.18em]", TONE[c.tone])}>{c.tone === "ok" ? "OK" : c.tone.toUpperCase()}</span>
+        <p key={i} className="text-[11px] leading-relaxed text-foreground">
+          <span className={cn("stencil mr-1.5 text-[10px] tracking-[0.14em]", TONE[c.tone])}>{c.tone === "ok" ? "OK" : c.tone.toUpperCase()}</span>
           {c.text}
         </p>
       ))}
@@ -449,52 +449,52 @@ function IncidentTab() {
 
   return (
     <section className="max-w-[880px] space-y-3">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         For an account that was drained. NOSHASHI follows the value out of it hop by hop (payments and AccountDelete sweeps, past the
         dust thieves spray), says what became of every account it reached, and lists every recovery path that actually exists. A
         validated XRP Ledger transaction cannot be reversed by anyone; these paths work off-ledger. {deep ? "Forensic depth: five hops, 1,000 transactions an account." : "Two hops, 400 transactions an account (Enterprise traces five)."}
       </p>
       <div className="flex flex-wrap gap-1.5">
-        <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="The drained account (r…)" className="mono-font h-8 min-w-[280px] flex-1 text-[10.5px]" />
-        <Input value={since} onChange={(e) => setSince(e.target.value)} placeholder="From ledger (optional)" className="mono-font h-8 w-44 text-[10.5px]" />
+        <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="The drained account (r…)" className="mono-font h-8 min-w-[280px] flex-1 text-[11.5px]" />
+        <Input value={since} onChange={(e) => setSince(e.target.value)} placeholder="From ledger (optional)" className="mono-font h-8 w-44 text-[11.5px]" />
         <Button size="sm" disabled={Boolean(busy) || !isValidAddress(address.trim())} onClick={() => void run()}>
           INVESTIGATE
         </Button>
       </div>
-      {busy && <p className="mono-font animate-pulse text-[9px] text-muted-foreground">{busy}</p>}
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
+      {busy && <p className="mono-font animate-pulse text-[10.5px] text-muted-foreground">{busy}</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
       {result && (
         <div className="space-y-2">
           <Eyebrow>WHAT HAPPENED</Eyebrow>
-          {result.signals.length === 0 && <p className="text-[10px] text-muted-foreground">No value left this account from that ledger in the history read.</p>}
+          {result.signals.length === 0 && <p className="text-[11px] text-muted-foreground">No value left this account from that ledger in the history read.</p>}
           {result.signals.map((s) => (
             <div key={s.id} className="border border-border p-2">
-              <p className="text-[10px] text-foreground">
-                <span className={cn("stencil mr-1.5 text-[8px] tracking-[0.18em]", TONE[s.severity])}>{s.severity.toUpperCase()}</span>
+              <p className="text-[11px] text-foreground">
+                <span className={cn("stencil mr-1.5 text-[10px] tracking-[0.14em]", TONE[s.severity])}>{s.severity.toUpperCase()}</span>
                 {s.title}
               </p>
-              <p className="mt-0.5 text-[9.5px] leading-relaxed text-muted-foreground">{s.detail}</p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{s.detail}</p>
             </div>
           ))}
 
           <Eyebrow>WHERE THE VALUE WENT</Eyebrow>
           <div className="space-y-0.5 border border-border p-2">
             {result.trace.flows.slice(0, 60).map((f) => (
-              <p key={f.hash + f.to} className="mono-font text-[9px] text-foreground">
+              <p key={f.hash + f.to} className="mono-font text-[10.5px] text-foreground">
                 {f.at?.slice(0, 16).replace("T", " ") ?? f.ledger} · {shortAddress(f.from)} → {shortAddress(f.to)}
                 {f.destinationTag !== null ? ` tag ${f.destinationTag}` : ""} · {f.amount.value.toLocaleString("en-US", { maximumFractionDigits: 6 })} {f.amount.currency}
                 {f.kind === "account_delete" ? " · ACCOUNT DELETE" : ""}
               </p>
             ))}
             {result.trace.dust.count > 0 && (
-              <p className="text-[9px] text-muted-foreground">
+              <p className="text-[10.5px] text-muted-foreground">
                 Plus {result.trace.dust.count.toLocaleString("en-US")} payments under {result.trace.minXrp} XRP, not followed: the spray that hides the real transfers.
               </p>
             )}
           </div>
           <div className="space-y-0.5 border border-border p-2">
             {result.trace.nodes.map((n) => (
-              <p key={n.address} className="mono-font text-[9px] text-muted-foreground">
+              <p key={n.address} className="mono-font text-[10.5px] text-muted-foreground">
                 hop {n.depth} · <span className="text-foreground">{n.address}</span> · {n.status.replace("_", " ")}
                 {n.balanceXrp !== null ? ` · ${n.balanceXrp.toLocaleString("en-US")} XRP` : ""}
                 {n.domain ? ` · claims ${n.domain}` : ""}
@@ -502,7 +502,7 @@ function IncidentTab() {
               </p>
             ))}
             {result.trace.vanity.map((v) => (
-              <p key={v.ending} className="text-[9.5px] text-hold">
+              <p key={v.ending} className="text-[11px] text-hold">
                 {v.accounts.length} accounts share the ending "{v.ending}": a generated vanity series, the mark of an organised operation.
               </p>
             ))}
@@ -511,13 +511,13 @@ function IncidentTab() {
           <Eyebrow>RECOVERY PATHS</Eyebrow>
           {result.options.map((o) => (
             <div key={o.id} className="border border-border p-2">
-              <p className="text-[10px] text-foreground">
-                <span className={cn("stencil mr-1.5 text-[8px] tracking-[0.18em]", OUTLOOK[o.outlook].tone)}>{OUTLOOK[o.outlook].label}</span>
+              <p className="text-[11px] text-foreground">
+                <span className={cn("stencil mr-1.5 text-[10px] tracking-[0.14em]", OUTLOOK[o.outlook].tone)}>{OUTLOOK[o.outlook].label}</span>
                 {o.title}
               </p>
-              <p className="mt-0.5 text-[9.5px] leading-relaxed text-muted-foreground">{o.detail}</p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{o.detail}</p>
               {o.evidence?.map((e) => (
-                <p key={e} className="mono-font selectable break-all text-[9px] text-foreground">
+                <p key={e} className="mono-font selectable break-all text-[10.5px] text-foreground">
                   {e}
                 </p>
               ))}
@@ -525,7 +525,7 @@ function IncidentTab() {
           ))}
 
           <div className="flex flex-wrap items-center gap-1.5 border border-dashed border-border p-2">
-            <span className="mono-font selectable break-all text-[9px] text-muted-foreground">DOSSIER SHA-256 {result.dossier.sha256}</span>
+            <span className="mono-font selectable break-all text-[10.5px] text-muted-foreground">DOSSIER SHA-256 {result.dossier.sha256}</span>
             <Button size="sm" variant="outline" onClick={() => void saveTextFile(`noshashi-incident-${result.trace.root}.txt`, result.dossier.text, "text/plain").then((where) => setNote(`Saved: ${where}`))}>
               SAVE DOSSIER
             </Button>
@@ -551,7 +551,7 @@ function IncidentTab() {
               </Button>
             )}
           </div>
-          {note && <p className="text-[9.5px] text-go">{note}</p>}
+          {note && <p className="text-[11px] text-go">{note}</p>}
         </div>
       )}
     </section>
@@ -587,11 +587,11 @@ function GuardianTab() {
   }, [load]);
 
   if (!membership) {
-    return <p className="max-w-[640px] text-[10px] text-muted-foreground">Guardian watches an organization's accounts. Create or join one in the WORKSTATION.</p>;
+    return <p className="max-w-[640px] text-[11px] text-muted-foreground">Guardian watches an organization's accounts. Create or join one in the WORKSTATION.</p>;
   }
   return (
     <section className="max-w-[820px] space-y-2">
-      <p className="text-[10px] leading-relaxed text-muted-foreground">
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
         Every account the organization watches in LEDGER WATCH is read each minute. When one's regular key or signer list changes, its
         master key is disabled or re-enabled, or it is deleted, your webhooks receive a signed <span className="mono-font">security_alert</span>{" "}
         within a minute: the first move in almost every takeover is a key of the thief's own. Subscribe to it under POLICY › WEBHOOKS.
@@ -600,11 +600,11 @@ function GuardianTab() {
         <Eyebrow>SECURITY EVENTS ON WATCHED ACCOUNTS</Eyebrow>
         <Button size="sm" variant="ghost" onClick={() => void load()}>REFRESH</Button>
       </div>
-      {error && <p className="text-[9.5px] text-no-go">{error}</p>}
-      {events?.length === 0 && <p className="text-[10px] text-muted-foreground">None recorded. Quiet is what you want here.</p>}
+      {error && <p className="text-[11px] text-no-go">{error}</p>}
+      {events?.length === 0 && <p className="text-[11px] text-muted-foreground">None recorded. Quiet is what you want here.</p>}
       {events?.map((e) => (
-        <p key={e.id} className="mono-font text-[9.5px] text-foreground">
-          <span className="stencil mr-1.5 text-[8px] tracking-[0.18em] text-hold">{e.type.toUpperCase()}</span>
+        <p key={e.id} className="mono-font text-[11px] text-foreground">
+          <span className="stencil mr-1.5 text-[10px] tracking-[0.14em] text-hold">{e.type.toUpperCase()}</span>
           {e.ledgerTime?.slice(0, 16).replace("T", " ") ?? e.ledgerIndex} · {shortAddress(e.address)} · {JSON.stringify(e.data).slice(0, 160)}
         </p>
       ))}

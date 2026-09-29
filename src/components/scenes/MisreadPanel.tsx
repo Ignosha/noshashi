@@ -27,32 +27,32 @@ export function MisreadPanel() {
       <ol className="mt-3 space-y-3">
         {CASES.map((c) => (
           <li key={c.id} className="border border-border p-2.5">
-            <p className="stencil text-[10px] tracking-[0.18em] text-foreground">{c.title}</p>
+            <p className="stencil text-[11px] tracking-[0.14em] text-foreground">{c.title}</p>
             <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div className="border-l-2 border-hold/60 pl-2">
-                <p className="stencil flex items-center gap-1 text-[8px] tracking-[0.2em] text-hold">
+                <p className="stencil flex items-center gap-1 text-[10px] tracking-[0.14em] text-hold">
                   <StatusDot status="hold" size={5} /> WHAT A BASIC INTERFACE SEES
                 </p>
-                <p className="mt-0.5 text-[9px] text-muted-foreground">{c.basic.label}</p>
+                <p className="mt-0.5 text-[10.5px] text-muted-foreground">{c.basic.label}</p>
                 <p className="data-font text-[12px] text-foreground">{c.basic.value}</p>
               </div>
               <div className="border-l-2 border-go/60 pl-2">
-                <p className="stencil flex items-center gap-1 text-[8px] tracking-[0.2em] text-go">
+                <p className="stencil flex items-center gap-1 text-[10px] tracking-[0.14em] text-go">
                   <StatusDot status="go" size={5} /> WHAT NOSHASHI VERIFIES
                 </p>
-                <p className="mt-0.5 text-[9px] text-muted-foreground">{c.verified.label}</p>
+                <p className="mt-0.5 text-[10.5px] text-muted-foreground">{c.verified.label}</p>
                 <p className="data-font text-[12px] text-foreground">{c.verified.value}</p>
               </div>
             </div>
-            <p className="mt-2 text-[10.5px] leading-relaxed text-foreground/85">{c.why}</p>
+            <p className="mt-2 text-[11.5px] leading-relaxed text-foreground/85">{c.why}</p>
             <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
-              <p className="data-font selectable min-w-0 truncate text-[9px] text-muted-foreground">
+              <p className="data-font selectable min-w-0 truncate text-[10.5px] text-muted-foreground">
                 LEDGER {c.evidence.ledger.toLocaleString("en-US")} · {c.evidence.refLabel.toUpperCase()} {c.evidence.ref} · {c.module}
               </p>
               <button
                 type="button"
                 onClick={() => handOff({ scene: c.scene, from: "learn", value: c.evidence.ref })}
-                className="stencil shrink-0 border border-border px-2 py-1 text-[8px] tracking-[0.2em] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                className="stencil shrink-0 border border-border px-2 py-1 text-[10px] tracking-[0.14em] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
               >
                 {READS_ON_ARRIVAL.has(c.scene) ? "RUN IT LIVE →" : `OPEN ${c.scene.toUpperCase()} →`}
               </button>

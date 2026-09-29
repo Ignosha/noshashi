@@ -26,7 +26,7 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "stencil px-3 py-1.5 text-[9px] tracking-[0.2em] text-muted-foreground transition-colors",
+      "stencil px-3 py-1.5 text-[10.5px] tracking-[0.14em] text-muted-foreground transition-colors",
       "hover:text-foreground",
       "data-[state=active]:bg-foreground data-[state=active]:text-background",
       className

@@ -36,7 +36,7 @@ function Dial({
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2">
-        <span className="stencil text-[8px] tracking-[0.2em] text-muted-foreground">
+        <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
           {label}
         </span>
         <span className="mono-font text-[11px] tabular-nums text-foreground">
@@ -133,7 +133,7 @@ export function RevenueScene() {
         {/* Model */}
         <div className="grid min-w-0 grid-cols-5 gap-3">
           <Panel label="ASSUMPTIONS" corners className="col-span-2" bodyClassName="p-4">
-            <p className="mb-4 text-[10px] leading-relaxed text-muted-foreground">
+            <p className="mb-4 text-[11px] leading-relaxed text-muted-foreground">
               Move any dial. Nothing here is observed revenue — these are the
               inputs to test with the first design partners.
             </p>
@@ -189,7 +189,7 @@ export function RevenueScene() {
             className="col-span-3"
             bodyClassName="relative p-4"
             right={
-              <Badge variant="hold" className="text-[8px]">
+              <Badge variant="hold" className="text-[10px]">
                 UNVALIDATED
               </Badge>
             }
@@ -202,7 +202,7 @@ export function RevenueScene() {
                 <p className="data-font mt-1 text-[38px] font-[700] leading-none text-foreground">
                   <CountUp value={model.mrr} prefix="$" />
                 </p>
-                <p className="mono-font mt-2 text-[10px] tabular-nums text-muted-foreground">
+                <p className="mono-font mt-2 text-[11px] tabular-nums text-muted-foreground">
                   ${formatCompact(model.arr)} annualised
                 </p>
               </div>
@@ -230,7 +230,7 @@ export function RevenueScene() {
             <div className="relative mt-5 border-t border-border pt-3">
               <div className="flex items-center justify-between">
                 <Eyebrow>12-MONTH SHAPE AT 18% MoM</Eyebrow>
-                <span className="mono-font text-[9px] text-muted-foreground">
+                <span className="mono-font text-[10.5px] text-muted-foreground">
                   ILLUSTRATIVE
                 </span>
               </div>
@@ -248,7 +248,7 @@ export function RevenueScene() {
                   {["STREAM", "MODEL", "UNIT", "RATIONALE"].map((heading) => (
                     <th
                       key={heading}
-                      className="stencil px-3 py-2 text-[8px] font-medium tracking-[0.2em] text-muted-foreground"
+                      className="stencil px-3 py-2 text-[10px] font-medium tracking-[0.14em] text-muted-foreground"
                     >
                       {heading}
                     </th>
@@ -261,18 +261,18 @@ export function RevenueScene() {
                     key={stream.id}
                     className="border-b border-border/30 transition-colors last:border-0 hover:bg-secondary/40"
                   >
-                    <td className="mono-font px-3 py-2 text-[10.5px] text-foreground">
+                    <td className="mono-font px-3 py-2 text-[11.5px] text-foreground">
                       {stream.name}
                     </td>
                     <td className="px-3 py-2">
-                      <Badge variant="outline" className="text-[8px]">
+                      <Badge variant="outline" className="text-[10px]">
                         {stream.model.toUpperCase()}
                       </Badge>
                     </td>
-                    <td className="mono-font px-3 py-2 text-[10px] text-muted-foreground">
+                    <td className="mono-font px-3 py-2 text-[11px] text-muted-foreground">
                       {stream.unit}
                     </td>
-                    <td className="px-3 py-2 text-[10px] leading-relaxed text-muted-foreground">
+                    <td className="px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
                       {stream.note}
                     </td>
                   </tr>
@@ -291,7 +291,7 @@ export function RevenueScene() {
                 SUBSCRIPTION TIERS
               </h2>
             </div>
-            <span className="mono-font text-[9px] text-muted-foreground">
+            <span className="mono-font text-[10.5px] text-muted-foreground">
               PROPOSED · NOT YET PRICED WITH BUYERS
             </span>
           </div>
@@ -318,12 +318,12 @@ export function RevenueScene() {
                       <p className="display text-[14px] font-[700] tracking-[0.1em] text-foreground">
                         {tier.name}
                       </p>
-                      <p className="mt-1 text-[9.5px] text-muted-foreground">
+                      <p className="mt-1 text-[11px] text-muted-foreground">
                         {tier.audience}
                       </p>
                     </div>
                     {tier.emphasis && (
-                      <Badge variant="go" className="text-[8px]">
+                      <Badge variant="go" className="text-[10px]">
                         FOCUS
                       </Badge>
                     )}
@@ -333,7 +333,7 @@ export function RevenueScene() {
                     <p className="data-font text-[26px] font-[700] leading-none text-foreground">
                       {tier.price}
                     </p>
-                    <p className="mono-font mt-1 text-[9px] text-muted-foreground">
+                    <p className="mono-font mt-1 text-[10.5px] text-muted-foreground">
                       {tier.cadence}
                     </p>
                   </div>
@@ -342,7 +342,7 @@ export function RevenueScene() {
                     {tier.features.map((feature) => (
                       <li key={feature} className="flex gap-2">
                         <span className="mt-[5px] h-1 w-1 shrink-0 bg-go" />
-                        <span className="text-[10.5px] leading-snug text-muted-foreground">
+                        <span className="text-[11.5px] leading-snug text-muted-foreground">
                           {feature}
                         </span>
                       </li>
@@ -357,7 +357,7 @@ export function RevenueScene() {
         {/* Sequencing */}
         <Panel label="SEQUENCING" className="relative min-w-0" bodyClassName="p-4">
           <PatternMark element="dots" size={200} opacity={0.06} className="-right-12 -top-12" />
-          <p className="mb-4 text-[10px] leading-relaxed text-muted-foreground">
+          <p className="mb-4 text-[11px] leading-relaxed text-muted-foreground">
             Each phase exists to unlock the revenue of the next. Nothing is
             monetised before the thing it depends on is trusted.
           </p>
@@ -378,13 +378,13 @@ export function RevenueScene() {
                     index === 0 ? "bg-go" : "bg-muted-foreground/50"
                   )}
                 />
-                <p className="stencil mt-3 text-[8px] tracking-[0.22em] text-muted-foreground">
+                <p className="stencil mt-3 text-[10px] tracking-[0.14em] text-muted-foreground">
                   {milestone.phase} · {milestone.window}
                 </p>
                 <p className="mt-1.5 text-[11px] leading-snug text-foreground">
                   {milestone.goal}
                 </p>
-                <p className="mt-2 border-l border-border pl-2 text-[9.5px] leading-relaxed text-muted-foreground">
+                <p className="mt-2 border-l border-border pl-2 text-[11px] leading-relaxed text-muted-foreground">
                   {milestone.unlocks}
                 </p>
               </motion.div>
@@ -416,7 +416,7 @@ export function RevenueScene() {
                 <span className="mt-0.5 shrink-0 text-hold">{risk.icon}</span>
                 <div>
                   <p className="text-[11px] font-medium text-foreground">{risk.title}</p>
-                  <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+                  <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
                     {risk.body}
                   </p>
                 </div>

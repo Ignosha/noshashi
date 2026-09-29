@@ -144,7 +144,7 @@ function DeskBody() {
           },
         ].map((stat) => (
           <Panel key={stat.label} bodyClassName="p-3">
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
               {stat.label}
             </p>
             <p
@@ -159,13 +159,13 @@ function DeskBody() {
             >
               <CountUp value={stat.value} decimals={stat.decimals ?? 0} />
               {stat.suffix && (
-                <span className="ml-1 text-[10px] font-normal text-muted-foreground">
+                <span className="ml-1 text-[11px] font-normal text-muted-foreground">
                   {stat.suffix}
                 </span>
               )}
             </p>
             {stat.caveat && (
-              <p className="mono-font mt-1.5 text-[9px] leading-snug text-hold">
+              <p className="mono-font mt-1.5 text-[10.5px] leading-snug text-hold">
                 {stat.caveat}
               </p>
             )}
@@ -221,7 +221,7 @@ function DeskBody() {
                           (heading, index) => (
                             <th
                               key={`${heading}-${index}`}
-                              className="stencil px-3 py-2 text-[8px] font-medium tracking-[0.2em] text-muted-foreground"
+                              className="stencil px-3 py-2 text-[10px] font-medium tracking-[0.14em] text-muted-foreground"
                             >
                               {heading}
                             </th>
@@ -237,20 +237,20 @@ function DeskBody() {
                         >
                           <td className="px-3 py-2">
                             {snapshot.loading ? (
-                              <span className="mono-font animate-pulse text-[9px] text-muted-foreground">
+                              <span className="mono-font animate-pulse text-[10.5px] text-muted-foreground">
                                 ···
                               </span>
                             ) : (
                               <StatusDot status={snapshot.verdict} size={6} />
                             )}
                           </td>
-                          <td className="px-3 py-2 text-[10.5px] text-foreground">
+                          <td className="px-3 py-2 text-[11.5px] text-foreground">
                             {snapshot.label ?? "—"}
                           </td>
-                          <td className="mono-font selectable px-3 py-2 text-[10px] text-muted-foreground">
+                          <td className="mono-font selectable px-3 py-2 text-[11px] text-muted-foreground">
                             {shortAddress(snapshot.address)}
                           </td>
-                          <td className="mono-font px-3 py-2 text-[10px] tabular-nums text-foreground">
+                          <td className="mono-font px-3 py-2 text-[11px] tabular-nums text-foreground">
                             {snapshot.error
                               ? "—"
                               : Number(snapshot.account?.balanceXrp ?? 0).toLocaleString(
@@ -258,13 +258,13 @@ function DeskBody() {
                                   { maximumFractionDigits: 2 }
                                 )}
                           </td>
-                          <td className="mono-font px-3 py-2 text-[10px] tabular-nums text-muted-foreground">
+                          <td className="mono-font px-3 py-2 text-[11px] tabular-nums text-muted-foreground">
                             {snapshot.credentials.length}
                           </td>
                           <td className="px-3 py-2">
                             <Badge
                               variant={snapshot.failing === 0 ? "go" : "no-go"}
-                              className="text-[8px]"
+                              className="text-[10px]"
                             >
                               {snapshot.error ? "ERROR" : `${snapshot.failing}`}
                             </Badge>
@@ -277,7 +277,7 @@ function DeskBody() {
                                 )
                               }
                               aria-label={`Remove ${snapshot.address} from the book`}
-                              className="stencil text-[8px] tracking-[0.18em] text-muted-foreground transition-colors hover:text-no-go"
+                              className="stencil text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-no-go"
                             >
                               REMOVE
                             </button>
@@ -324,16 +324,16 @@ function DeskBody() {
                             </p>
                             <Badge
                               variant={severityTone[alert.severity]}
-                              className="shrink-0 text-[7px]"
+                              className="shrink-0 text-[10px]"
                             >
                               {alert.severity.toUpperCase()}
                             </Badge>
                           </div>
-                          <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
+                          <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
                             {alert.body}
                           </p>
                         </div>
-                        <span className="mono-font shrink-0 self-start text-[8px] uppercase tracking-wider text-muted-foreground/60">
+                        <span className="mono-font shrink-0 self-start text-[10px] uppercase tracking-wider text-muted-foreground/60">
                           {alert.kind.replace(/_/g, " ")}
                         </span>
                       </motion.div>
@@ -384,7 +384,7 @@ function DeskBody() {
           <Panel label="BOOK EXPOSURE" className="min-h-0 flex-1" bodyClassName="overflow-y-auto p-3">
             <Eyebrow className="mb-2">ELIGIBILITY ACROSS DOMAINS</Eyebrow>
             {snapshots.length === 0 ? (
-              <p className="text-[10px] leading-relaxed text-muted-foreground">
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Add a wallet to see which domains this book can settle into.
               </p>
             ) : (
@@ -419,7 +419,7 @@ function DeskBody() {
             )}
 
             <Eyebrow className="mb-1.5 mt-4">RADAR COVERAGE</Eyebrow>
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
               <NovaSat size={12} />
               Reserve, credential expiry, policy drift and domain governance.
             </div>

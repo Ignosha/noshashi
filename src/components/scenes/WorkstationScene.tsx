@@ -181,7 +181,7 @@ function WorkstationBody({
           { label: "NO-GO", value: verdictCounts["no-go"] ?? 0, tone: "no-go" as const },
         ].map((s) => (
           <Panel key={s.label} bodyClassName="p-3">
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">{s.label}</p>
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{s.label}</p>
             <p className={cn(
               "data-font mt-1.5 text-[22px] font-[600] leading-none",
               s.tone === "hold" ? "text-hold" : s.tone === "no-go" ? "text-no-go" : "text-foreground"
@@ -220,14 +220,14 @@ function WorkstationBody({
               <TabsTrigger value="evidence">EVIDENCE</TabsTrigger>
               <TabsTrigger value="cases">
                 CASES
-                {openCases > 0 && <span className="ml-1.5 bg-hold px-1 text-[9px] font-bold text-black">{openCases}</span>}
+                {openCases > 0 && <span className="ml-1.5 bg-hold px-1 text-[10.5px] font-bold text-black">{openCases}</span>}
               </TabsTrigger>
               <TabsTrigger value="policy">POLICY</TabsTrigger>
               <TabsTrigger value="simulate">SIMULATE</TabsTrigger>
               <TabsTrigger value="watch">
                 WATCH
                 {unacknowledged > 0 && (
-                  <span className="ml-1.5 bg-no-go px-1 text-[9px] font-bold text-black">
+                  <span className="ml-1.5 bg-no-go px-1 text-[10.5px] font-bold text-black">
                     {unacknowledged}
                   </span>
                 )}
@@ -246,18 +246,18 @@ function WorkstationBody({
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setPage(0); }}
                 placeholder="Filter by address or label…"
-                className="mono-font h-7 flex-1 text-[10px]"
+                className="mono-font h-7 flex-1 text-[11px]"
               />
               <button
                 onClick={() => setSort(sort === "recent" ? "hhi" : "recent")}
-                className="stencil rounded border border-border px-2 py-1 text-[8px] tracking-[0.18em] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                className="stencil rounded border border-border px-2 py-1 text-[10px] tracking-[0.14em] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
               >
                 SORT · {sort === "recent" ? "RECENT" : "HHI"}
               </button>
             </div>
 
             {!loaded ? (
-              <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING LEDGER…</p>
+              <p className="mono-font animate-pulse p-4 text-[11px] text-muted-foreground">LOADING LEDGER…</p>
             ) : wallets.length === 0 ? (
               <EmptyState
                 icon={<NovaTerminal size={16} />}
@@ -270,7 +270,7 @@ function WorkstationBody({
                   <thead className="sticky top-0 z-10 bg-card">
                     <tr className="border-b border-border">
                       {["", "SUBJECT", "LABEL", "SCANS", "WORST HHI", "LAST SEEN"].map((h, i) => (
-                        <th key={i} className="stencil px-3 py-2 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">{h}</th>
+                        <th key={i} className="stencil px-3 py-2 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -278,16 +278,16 @@ function WorkstationBody({
                     {shown.map((w) => (
                       <tr key={w.subject} className="border-b border-border/30">
                         <td className="px-3 py-2"><StatusDot status={w.lastVerdict} size={6} /></td>
-                        <td className="mono-font selectable px-3 py-2 text-[10px] text-foreground">{shortAddress(w.subject)}</td>
-                        <td className="px-3 py-2 text-[10px] text-muted-foreground">{w.label ?? "—"}</td>
-                        <td className="mono-font px-3 py-2 text-[10px] tabular-nums text-muted-foreground">{w.scans}</td>
+                        <td className="mono-font selectable px-3 py-2 text-[11px] text-foreground">{shortAddress(w.subject)}</td>
+                        <td className="px-3 py-2 text-[11px] text-muted-foreground">{w.label ?? "—"}</td>
+                        <td className="mono-font px-3 py-2 text-[11px] tabular-nums text-muted-foreground">{w.scans}</td>
                         <td className={cn(
-                          "mono-font px-3 py-2 text-[10px] tabular-nums",
+                          "mono-font px-3 py-2 text-[11px] tabular-nums",
                           activePolicy?.params.hhiLimit != null && (w.worstHhi ?? 0) > activePolicy.params.hhiLimit ? "text-no-go" : "text-muted-foreground"
                         )}>
                           {w.worstHhi?.toLocaleString() ?? "—"}
                         </td>
-                        <td className="mono-font px-3 py-2 text-[9px] text-muted-foreground/80">
+                        <td className="mono-font px-3 py-2 text-[10.5px] text-muted-foreground/80">
                           {new Date(w.lastAt).toLocaleString()}
                         </td>
                       </tr>
@@ -303,12 +303,12 @@ function WorkstationBody({
                     <button
                       disabled={page === 0}
                       onClick={() => setPage((p) => Math.max(0, p - 1))}
-                      className="stencil rounded border border-border px-2 py-0.5 text-[8px] tracking-[0.18em] text-muted-foreground disabled:opacity-30 hover:border-foreground/40"
+                      className="stencil rounded border border-border px-2 py-0.5 text-[10px] tracking-[0.14em] text-muted-foreground disabled:opacity-30 hover:border-foreground/40"
                     >PREV</button>
                     <button
                       disabled={page >= pageCount - 1}
                       onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
-                      className="stencil rounded border border-border px-2 py-0.5 text-[8px] tracking-[0.18em] text-muted-foreground disabled:opacity-30 hover:border-foreground/40"
+                      className="stencil rounded border border-border px-2 py-0.5 text-[10px] tracking-[0.14em] text-muted-foreground disabled:opacity-30 hover:border-foreground/40"
                     >NEXT</button>
                   </div>
                 </div>
@@ -354,7 +354,7 @@ function WorkstationBody({
                     key={i.ms}
                     onClick={() => void watch.setCadence(i.ms)}
                     className={cn(
-                      "border px-2 py-1 text-[10px] tracking-wide transition-colors",
+                      "border px-2 py-1 text-[11px] tracking-wide transition-colors",
                       watch.intervalMs === i.ms
                         ? "border-spectral/60 text-spectral"
                         : "border-line/40 text-muted hover:text-spectral"
@@ -381,7 +381,7 @@ function WorkstationBody({
               </div>
             </div>
 
-            <div className="border-b border-line/40 px-4 py-2 text-[10px] leading-relaxed text-muted">
+            <div className="border-b border-line/40 px-4 py-2 text-[11px] leading-relaxed text-muted">
               {watchedIssuers.length === 0
                 ? "No issued-currency positions on this account, so there is nothing to monitor. Load a wallet holding issued balances."
                 : `Baselined ${Object.keys(watch.baseline).length} of ${watchedIssuers.length} issuers.${watch.lastSweep ? ` Last sweep ${new Date(watch.lastSweep).toLocaleTimeString()}.` : ""} An issuer setting lsfGlobalFreeze immobilises your balance the moment it lands; this is the only thing that tells you.`}
@@ -488,7 +488,7 @@ function WorkstationBody({
                 </Button>
               </div>
 
-              <div className="border-b border-line/40 px-4 py-2 text-[10px] leading-relaxed text-muted">
+              <div className="border-b border-line/40 px-4 py-2 text-[11px] leading-relaxed text-muted">
                 Capture validated ledger state while connected, then adjudicate
                 against it on a segregated network. Every offline verdict is
                 stamped with the ledger index and capture time it rests on and
@@ -523,7 +523,7 @@ function WorkstationBody({
                   <p className="mt-1.5 max-w-3xl text-[11px] leading-relaxed">
                     {vault.staleness.disclosure}
                   </p>
-                  <code className="mt-2 block max-w-3xl break-all text-[10px] leading-relaxed text-muted">
+                  <code className="mt-2 block max-w-3xl break-all text-[11px] leading-relaxed text-muted">
                     {provenanceLine(vault.active)}
                   </code>
                 </div>
@@ -550,7 +550,7 @@ function WorkstationBody({
                           void vault.activate(snap.id === vault.activeId ? null : snap.id)
                         }
                         className={cn(
-                          "border px-2 py-1 text-[10px] tracking-wide transition-colors",
+                          "border px-2 py-1 text-[11px] tracking-wide transition-colors",
                           snap.id === vault.activeId
                             ? "border-spectral/60 text-spectral"
                             : "border-line/40 text-muted hover:text-spectral"
@@ -559,11 +559,11 @@ function WorkstationBody({
                         {snap.id === vault.activeId ? "ACTIVE" : "USE"}
                       </button>
                       <span className="min-w-0 flex-1 truncate text-[11px]">{snap.label}</span>
-                      <span className="text-[10px] text-muted">
+                      <span className="text-[11px] text-muted">
                         {snap.credentials.length} cred · {snap.trustLines.length} lines ·{" "}
                         {snap.postures.length} issuers
                       </span>
-                      <span className="text-[10px] text-muted">
+                      <span className="text-[11px] text-muted">
                         {describeAge(snap.capturedAt)}
                       </span>
                       <Button variant="ghost" size="sm" onClick={() => void vault.remove(snap.id)}>
@@ -600,7 +600,7 @@ function WorkstationBody({
                     <NovaShield size={13} />
                     {exporting ? "SIGNING…" : "GENERATE SIGNED REPORT"}
                   </Button>
-                  <span className="mono-font text-[10px] text-muted-foreground">
+                  <span className="mono-font text-[11px] text-muted-foreground">
                     {entries.length.toLocaleString()} records
                   </span>
                 </div>
@@ -613,7 +613,7 @@ function WorkstationBody({
                     className="mt-4 border border-go/40 bg-go-dim p-3"
                   >
                     <Eyebrow className="text-go">CHAIN-OF-CUSTODY SIGNATURE · SHA-256</Eyebrow>
-                    <p className="mono-font selectable mt-1.5 break-all text-[10px] leading-relaxed text-foreground">
+                    <p className="mono-font selectable mt-1.5 break-all text-[11px] leading-relaxed text-foreground">
                       {signature}
                     </p>
                     <button
@@ -621,14 +621,14 @@ function WorkstationBody({
                         void navigator.clipboard.writeText(signature);
                         push({ title: "SIGNATURE COPIED", tone: "info" });
                       }}
-                      className="stencil mt-2 text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2"
+                      className="stencil mt-2 text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2"
                     >COPY</button>
                   </motion.div>
                 )}
 
                 <div className="mt-6 border-t border-border pt-4">
                   <Eyebrow className="mb-2">HOW A RECIPIENT VERIFIES IT</Eyebrow>
-                  <pre className="mono-font overflow-x-auto rounded-md border border-border bg-background p-2.5 text-[9px] leading-relaxed text-muted-foreground">
+                  <pre className="mono-font overflow-x-auto rounded-md border border-border bg-background p-2.5 text-[10.5px] leading-relaxed text-muted-foreground">
 {`# strip the footer, hash the body, compare to sha256(body)
 sed '/^# NOSHASHI audit export/,$d' noshashi-audit-*.csv \\
   | shasum -a 256`}
@@ -647,7 +647,7 @@ sed '/^# NOSHASHI audit export/,$d' noshashi-audit-*.csv \\
                         push({ title: "LEDGER CLEARED", body: "Local adjudication history erased.", tone: "hold" });
                       });
                     }}
-                    className="stencil mt-3 text-[8px] tracking-[0.2em] text-muted-foreground transition-colors hover:text-no-go"
+                    className="stencil mt-3 text-[10px] tracking-[0.14em] text-muted-foreground transition-colors hover:text-no-go"
                   >
                     ERASE LOCAL LEDGER
                   </button>

@@ -1,307 +1,318 @@
-import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SceneHeader } from "./SceneHeader";
 import { Panel, Eyebrow } from "@/components/nova/Panel";
 import { EmptyState } from "@/components/nova/EmptyState";
-import { Sparkline } from "@/components/nova/Charts";
-import { CountUp } from "@/components/nova/CountUp";
-import { NovaBolt, NovaCredit, NovaTerminal, NovaVault } from "@/components/nova/NovaIcon";
+import { NovaCredit, NovaShield, NovaTerminal, NovaVault } from "@/components/nova/NovaIcon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { shortAddress } from "@/lib/xrpl/client";
-import { toCsv, truncateMiddle } from "@/lib/format";
+import { truncateMiddle } from "@/lib/format";
 import { saveTextFile } from "@/lib/export";
+import { useSetting } from "@/lib/store";
 import { useToast } from "@/lib/toast";
+import { evidencePackage, readTrailPage, screenCounterparties, type AuditRow, type Screening } from "@/lib/compliance/audit";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
-import type { WalletTransaction } from "@/lib/xrpl/types";
 import { cn } from "@/lib/utils";
-import { staggerChild, staggerParent } from "@/lib/motion";
 
-type Filter = "all" | "in" | "out" | "cross";
+type Filter = "all" | "in" | "out" | "flagged";
+const ADDRESS = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+/** Pages of 200 read per LOAD MORE. */
+const PAGES_PER_LOAD = 2;
 
 /**
- * HistoryScene — the exportable audit trail.
+ * HistoryScene — the audit trail a compliance officer files.
  *
- * Wallet activity read straight from `account_tx`, annotated with the
- * compliance metadata a regulator or a tax filing actually needs, and
- * exportable as CSV in one action.
+ * Any account's validated history, read from account_tx: what was actually
+ * delivered (partial payments shown for what they are), the destination
+ * tag that ties a payment to a customer, memos, and every counterparty
+ * screened against the OFAC SDN list and the confirmed scam registry. The
+ * export is a CSV plus a manifest naming the CSV's SHA-256 and the ledger
+ * range, so the filed copy can be shown to be the one produced here.
  */
 export function HistoryScene({ data }: { data: XrplState }) {
-  const { transactions, account, loadingAccount, accountError, refreshAccount } = data;
+  const { account } = data;
   const { push } = useToast();
+
+  const [subjectInput, setSubjectInput] = useState("");
+  const [subject, setSubject] = useState<string | null>(null);
+  const [rows, setRows] = useState<AuditRow[]>([]);
+  const [marker, setMarker] = useState<unknown | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [screening, setScreening] = useState<Screening | null>(null);
+  const [screeningBusy, setScreeningBusy] = useState(false);
 
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
+  const [threshold, setThreshold] = useSetting("audit.thresholdXrp", 10_000);
   const [exporting, setExporting] = useState(false);
+
+  // Follow the loaded wallet until the operator audits another account.
+  useEffect(() => {
+    if (!subject && account?.address) {
+      setSubjectInput(account.address);
+      void load(account.address);
+    }
+  }, [account?.address]);
+
+  const screen = useCallback(async (all: AuditRow[]) => {
+    setScreeningBusy(true);
+    try {
+      setScreening(await screenCounterparties(all));
+    } finally {
+      setScreeningBusy(false);
+    }
+  }, []);
+
+  const load = async (who: string, more = false) => {
+    if (!ADDRESS.test(who)) {
+      setError("Enter a classic r-address to audit.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      let next: unknown = more ? marker : undefined;
+      let collected = more ? rows : [];
+      for (let i = 0; i < PAGES_PER_LOAD; i++) {
+        const page = await readTrailPage(who, next);
+        collected = [...collected, ...page.rows];
+        next = page.marker;
+        if (!next) break;
+      }
+      setSubject(who);
+      setRows(collected);
+      setMarker(next ?? null);
+      if (!more) setScreening(null);
+      void screen(collected);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "The ledger could not be read.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const flagOf = useCallback(
+    (r: AuditRow) => {
+      const flags: string[] = [];
+      if (r.counterparty && screening?.sanctions[r.counterparty]) flags.push("OFAC");
+      if (r.counterparty && screening?.threats[r.counterparty]) flags.push("SCAM");
+      if (r.partial) flags.push("PARTIAL");
+      if (r.deliveredXrp !== null && r.deliveredXrp >= threshold) flags.push("≥ THRESHOLD");
+      return flags;
+    },
+    [screening, threshold]
+  );
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return transactions.filter((entry) => {
-      if (filter !== "all" && entry.direction !== filter) return false;
+    return rows.filter((r) => {
+      if (filter === "in" && r.direction !== "in") return false;
+      if (filter === "out" && r.direction !== "out") return false;
+      if (filter === "flagged" && flagOf(r).length === 0) return false;
       if (!needle) return true;
       return (
-        entry.hash.toLowerCase().includes(needle) ||
-        entry.counterparty.toLowerCase().includes(needle) ||
-        entry.transactionType.toLowerCase().includes(needle)
+        r.hash.toLowerCase().includes(needle) ||
+        (r.counterparty ?? "").toLowerCase().includes(needle) ||
+        r.type.toLowerCase().includes(needle) ||
+        String(r.destinationTag ?? "").includes(needle) ||
+        r.memos.some((m) => m.toLowerCase().includes(needle))
       );
     });
-  }, [transactions, filter, query]);
+  }, [rows, filter, query, flagOf]);
 
-  /**
-   * Totals describe what is on screen, not the whole window.
-   *
-   * These previously summed `transactions` while the table and the CSV
-   * export both operated on `filtered`. Selecting a direction tab or
-   * typing a search left the headline reporting the full set directly
-   * above a handful of rows — and the export wrote the handful. On a
-   * screen whose output is a compliance artefact, a headline that does not
-   * describe the exported rows is the worst defect available.
-   */
-  const sum = (rows: typeof transactions) => {
+  const totals = useMemo(() => {
     let inbound = 0;
     let outbound = 0;
     let fees = 0;
-    for (const entry of rows) {
-      fees += Number(entry.feeXrp);
-      if (entry.amountXrp === undefined) continue;
-      if (entry.direction === "in") inbound += entry.amountXrp;
-      if (entry.direction === "out") outbound += entry.amountXrp;
+    for (const r of filtered) {
+      if (r.direction === "out" || (r.direction === "other" && r.counterparty === null)) fees += r.feeXrp;
+      if (r.deliveredXrp === null) continue;
+      if (r.direction === "in") inbound += r.deliveredXrp;
+      if (r.direction === "out") outbound += r.deliveredXrp;
     }
     return { inbound, outbound, fees };
-  };
-
-  const totals = useMemo(() => sum(filtered), [filtered]);
-  /** The unfiltered figures, shown as a secondary line so nothing is hidden. */
-  const windowTotals = useMemo(() => sum(transactions), [transactions]);
-  const isFiltered = filtered.length !== transactions.length;
-
-  /** Running balance delta across what is shown, oldest → newest. */
-  const flowSeries = useMemo(() => {
-    const ordered = [...filtered].reverse();
-    let running = 0;
-    return ordered.map((entry) => {
-      const delta = entry.amountXrp ?? 0;
-      running += entry.direction === "in" ? delta : -delta;
-      return running;
-    });
   }, [filtered]);
 
-  const exportCsv = async () => {
-    if (filtered.length === 0) return;
+  const flagged = rows.filter((r) => flagOf(r).length > 0).length;
+  const sanctionedHits = screening ? Object.keys(screening.sanctions).length : 0;
+  const scamHits = screening ? Object.keys(screening.threats).length : 0;
+
+  const exportEvidence = async () => {
+    if (!subject || filtered.length === 0) return;
     setExporting(true);
     try {
-      const csv = toCsv(
-        filtered.map((entry) => ({
-          hash: entry.hash,
-          ledger_index: entry.ledgerIndex,
-          date: entry.date,
-          type: entry.transactionType,
-          result: entry.result,
-          direction: entry.direction,
-          counterparty: entry.counterparty,
-          amount_xrp: entry.amountXrp ?? "",
-          fee_xrp: entry.feeXrp,
-          subject: account?.address ?? "",
-        }))
-      );
+      const pkg = await evidencePackage(subject, filtered, screening, threshold);
       const stamp = new Date().toISOString().slice(0, 10);
-      const destination = await saveTextFile(
-        `noshashi-audit-${stamp}.csv`,
-        csv
-      );
-      push({
-        title: "AUDIT TRAIL EXPORTED",
-        body: `${filtered.length} records written to ${destination}`,
-        tone: "go",
-      });
-    } catch (error) {
-      push({
-        title: "EXPORT FAILED",
-        body: error instanceof Error ? error.message : "Unable to write file",
-        tone: "no-go",
-      });
+      const base = `noshashi-audit-${subject.slice(0, 8)}-${stamp}`;
+      const csvPath = await saveTextFile(`${base}.csv`, pkg.csv);
+      await saveTextFile(`${base}.manifest.json`, pkg.manifest, "application/json");
+      push({ title: "AUDIT TRAIL EXPORTED", body: `${filtered.length} records · SHA-256 ${pkg.digest.slice(0, 16)}… · ${csvPath}`, tone: "go" });
+    } catch (e) {
+      push({ title: "EXPORT FAILED", body: e instanceof Error ? e.message : "Unable to write file", tone: "no-go" });
     } finally {
       setExporting(false);
     }
   };
 
+  const ledgers = rows.map((r) => r.ledger).filter((n) => n > 0);
+
   return (
-    <div className="flex h-full flex-col gap-3 p-4">
+    <div className="flex h-full flex-col gap-3 overflow-y-auto p-4">
       <SceneHeader
-        index="05"
-        kicker="AUDIT TRAIL · ACCOUNT_TX"
-        title="TRANSACTION HISTORY"
-        sub="Validated wallet activity with the compliance metadata attached to each settlement."
-        status={transactions.length > 0 ? "go" : "hold"}
-        statusLabel={loadingAccount ? "READING" : `${transactions.length} RECORDS`}
+        index="06"
+        kicker="AUDIT TRAIL · ACCOUNT_TX · VALIDATED"
+        title="AUDIT TRAIL"
+        sub="Any account's validated history with delivered amounts, destination tags and memos, every counterparty screened against the OFAC SDN list and the scam registry, exported with a SHA-256 manifest."
+        status={sanctionedHits > 0 ? "no-go" : flagged > 0 ? "hold" : rows.length ? "go" : "hold"}
+        statusLabel={loading ? "READING" : sanctionedHits ? `${sanctionedHits} SANCTIONED` : `${rows.length} RECORDS`}
         right={
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-1.5"
-            onClick={() => void exportCsv()}
-            disabled={exporting || filtered.length === 0}
-          >
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => void exportEvidence()} disabled={exporting || filtered.length === 0}>
             <NovaVault size={13} />
-            {exporting ? "WRITING…" : "EXPORT CSV"}
+            {exporting ? "WRITING…" : "EXPORT EVIDENCE"}
           </Button>
         }
       />
 
-      <motion.div
-        className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4"
-        variants={staggerParent(0.05)}
-        initial="hidden"
-        animate="show"
+      <form
+        className="flex shrink-0 flex-wrap items-center gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void load(subjectInput.trim());
+        }}
       >
-        {[
-          // Direction is not a verdict. INBOUND was rendering in verdict
-          // green, which spends the colour budget that has to make a real
-          // NO-GO stand out.
-          { label: "INBOUND", value: totals.inbound, whole: windowTotals.inbound, icon: <NovaCredit size={14} /> },
-          { label: "OUTBOUND", value: totals.outbound, whole: windowTotals.outbound, icon: <NovaBolt size={14} /> },
-          { label: "FEES PAID", value: totals.fees, whole: windowTotals.fees, icon: <NovaTerminal size={14} /> },
-        ].map((stat) => (
-          <motion.div key={stat.label} variants={staggerChild}>
-            <Panel bodyClassName="p-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <p className="data-font mt-1.5 text-[20px] font-[600] leading-none text-foreground">
-                    <CountUp value={stat.value} decimals={stat.value < 10 ? 4 : 2} />
-                    <span className="ml-1 text-[9px] font-normal text-muted-foreground">
-                      XRP
-                    </span>
-                  </p>
-                  {/* When a filter is on, the unfiltered figure stays
-                      reachable rather than being silently replaced. */}
-                  {isFiltered && (
-                    <p className="mono-font mt-1 text-[9px] tabular-nums text-faint">
-                      of {stat.whole.toLocaleString(undefined, { maximumFractionDigits: 2 })} in window
-                    </p>
-                  )}
-                </div>
-                <span className="text-muted-foreground/70">{stat.icon}</span>
-              </div>
-            </Panel>
-          </motion.div>
-        ))}
+        <Input value={subjectInput} onChange={(e) => setSubjectInput(e.target.value)} placeholder="Account to audit (r-address)" className="mono-font h-8 min-w-[260px] flex-1 text-[12px]" spellCheck={false} aria-label="Account to audit" />
+        <Button size="sm" type="submit" disabled={loading}>
+          {loading ? "READING…" : "READ HISTORY"}
+        </Button>
+        <label className="flex items-center gap-2 text-[11.5px] text-muted-foreground">
+          Flag at or above
+          <Input
+            type="number"
+            min={0}
+            value={threshold}
+            onChange={(e) => setThreshold(Math.max(0, Number(e.target.value) || 0))}
+            className="mono-font h-8 w-[110px] text-[12px]"
+            aria-label="Reporting threshold in XRP"
+          />
+          XRP
+        </label>
+      </form>
 
-        <motion.div variants={staggerChild}>
-          <Panel bodyClassName="p-3">
-            <p className="stencil text-[8px] tracking-[0.24em] text-muted-foreground">
-              NET FLOW
-            </p>
-            {/* Draws in --brand like every other chart. A positive running
-                balance is a direction, not a GO verdict. */}
-            <Sparkline values={flowSeries} height={38} className="mt-1.5" />
-            <p className="mono-font mt-1 text-[9px] tabular-nums text-faint">
-              {flowSeries.length > 0
-                ? `${flowSeries[flowSeries.length - 1] >= 0 ? "+" : ""}${flowSeries[
-                    flowSeries.length - 1
-                  ].toLocaleString(undefined, { maximumFractionDigits: 2 })} XRP NET`
-                : "NO MOVEMENT IN RANGE"}
-            </p>
-          </Panel>
-        </motion.div>
-      </motion.div>
+      <div className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4">
+        <Tile label="INBOUND (DELIVERED)" value={`${totals.inbound.toLocaleString(undefined, { maximumFractionDigits: 2 })} XRP`} icon={<NovaCredit size={14} />} />
+        <Tile label="OUTBOUND (DELIVERED)" value={`${totals.outbound.toLocaleString(undefined, { maximumFractionDigits: 2 })} XRP`} icon={<NovaTerminal size={14} />} />
+        <Tile
+          label="COUNTERPARTY SCREENING"
+          value={screeningBusy ? "SCREENING…" : screening ? `${sanctionedHits + scamHits} HIT${sanctionedHits + scamHits === 1 ? "" : "S"}` : "—"}
+          tone={sanctionedHits ? "no-go" : scamHits ? "hold" : screening ? "go" : undefined}
+          hint={screening ? `${screening.screened} counterparties · OFAC SDN + scam registry${screening.unchecked.length ? ` · NOT CHECKED: ${screening.unchecked.join(", ")}` : ""}` : "Runs after the history is read"}
+          icon={<NovaShield size={14} />}
+        />
+        <Tile label="FLAGGED RECORDS" value={String(flagged)} tone={flagged ? "hold" : undefined} hint={`OFAC, scam registry, partial payments, ≥ ${threshold.toLocaleString()} XRP`} icon={<NovaVault size={14} />} />
+      </div>
 
       <Panel
         label="LEDGER RECORDS"
-        corners
-        className="min-h-0 flex-1"
+        className="min-h-[420px] flex-1"
         bodyClassName="flex min-h-0 flex-col p-0"
         right={
           <div className="flex items-center gap-2">
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Filter by hash, account or type…"
-              className="mono-font h-6 w-[210px] text-[10px]"
-              spellCheck={false}
-            />
-            <Tabs value={filter} onValueChange={(value) => setFilter(value as Filter)}>
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Hash, account, tag, memo…" className="mono-font h-7 w-[200px] text-[12px]" spellCheck={false} aria-label="Filter records" />
+            <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
               <TabsList>
                 <TabsTrigger value="all">ALL</TabsTrigger>
                 <TabsTrigger value="in">IN</TabsTrigger>
                 <TabsTrigger value="out">OUT</TabsTrigger>
-                <TabsTrigger value="cross">CROSS</TabsTrigger>
+                <TabsTrigger value="flagged">FLAGGED</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
         }
       >
-        {accountError ? (
-          <EmptyState
-            icon={<NovaTerminal size={16} />}
-            title="HISTORY UNAVAILABLE"
-            body={accountError}
-            action={
-              <Button size="sm" variant="outline" onClick={() => void refreshAccount()}>
-                RETRY
-              </Button>
-            }
-          />
+        {error ? (
+          <EmptyState className="flex-1" icon={<NovaTerminal size={16} />} title="HISTORY UNAVAILABLE" body={error} />
         ) : filtered.length === 0 ? (
           <EmptyState
+            className="flex-1"
             icon={<NovaCredit size={16} />}
-            title={transactions.length === 0 ? "NO LEDGER ACTIVITY" : "NO MATCHING RECORDS"}
+            title={loading ? "READING THE LEDGER" : rows.length === 0 ? "NO RECORDS" : "NO MATCHING RECORDS"}
             body={
-              transactions.length === 0
-                ? "This account has no validated transactions in the queried window. Fund or transact from it and records appear here."
-                : "No record matches the current filter. Clear the search to see the full trail."
-            }
-            action={
-              transactions.length > 0 ? (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setQuery("");
-                    setFilter("all");
-                  }}
-                >
-                  CLEAR FILTERS
-                </Button>
-              ) : undefined
+              loading
+                ? "Reading validated history, newest first."
+                : rows.length === 0
+                  ? subject
+                    ? "This account has no validated transactions."
+                    : "Enter an account to audit, or load a wallet."
+                  : "No record matches the current filter."
             }
           />
         ) : (
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            <table className="w-full text-left">
+          <div className="min-h-0 flex-1 overflow-auto">
+            <table className="w-full min-w-[980px] text-left">
               <thead className="sticky top-0 z-10 bg-card">
                 <tr className="border-b border-border">
-                  {["", "TYPE", "COUNTERPARTY", "AMOUNT", "FEE", "LEDGER", "RESULT", "DATE"].map(
-                    (heading, index) => (
-                      <th
-                        key={`${heading}-${index}`}
-                        className="stencil px-3 py-2 text-[8px] font-medium tracking-[0.2em] text-muted-foreground"
-                      >
-                        {heading}
-                      </th>
-                    )
-                  )}
+                  {["", "DATE (UTC)", "TYPE", "COUNTERPARTY", "DELIVERED", "TAG", "FLAGS", "RESULT", "HASH"].map((h, i) => (
+                    <th key={`${h}-${i}`} className="stencil px-3 py-2 text-[10.5px] font-medium tracking-[0.1em] text-muted-foreground">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((entry) => (
-                  <HistoryRow key={entry.hash} entry={entry} />
-                ))}
+                {filtered.map((r) => {
+                  const flags = flagOf(r);
+                  return (
+                    <tr key={r.hash} className={cn("border-b border-border/30 transition-colors hover:bg-secondary/40", flags.includes("OFAC") && "bg-no-go/10")}>
+                      <td className="px-3 py-1.5 text-[12px] text-muted-foreground" title={r.direction}>
+                        {r.direction === "in" ? "↓" : r.direction === "out" ? "↑" : "↔"}
+                      </td>
+                      <td className="mono-font whitespace-nowrap px-3 py-1.5 text-[11.5px] text-muted-foreground">{r.date.replace("T", " ").slice(0, 19)}</td>
+                      <td className="mono-font px-3 py-1.5 text-[12px] text-foreground/85">{r.type}</td>
+                      <td className="mono-font selectable px-3 py-1.5 text-[12px] text-muted-foreground">{r.counterparty ? shortAddress(r.counterparty) : "—"}</td>
+                      <td className="mono-font whitespace-nowrap px-3 py-1.5 text-[12px] tabular-nums text-foreground">
+                        {r.delivered ? `${Number(r.delivered.value).toLocaleString(undefined, { maximumFractionDigits: 6 })} ${r.delivered.currency}` : "—"}
+                      </td>
+                      <td className="mono-font px-3 py-1.5 text-[12px] tabular-nums text-muted-foreground">{r.destinationTag ?? "—"}</td>
+                      <td className="px-3 py-1.5">
+                        <span className="flex flex-wrap gap-1">
+                          {flags.map((f) => (
+                            <Badge key={f} variant={f === "OFAC" ? "no-go" : "hold"} className="text-[10px]">
+                              {f}
+                            </Badge>
+                          ))}
+                        </span>
+                      </td>
+                      <td className="px-3 py-1.5">
+                        <Badge variant={r.result === "tesSUCCESS" ? "go" : "no-go"} className="text-[10px]">
+                          {r.result}
+                        </Badge>
+                      </td>
+                      <td className="mono-font selectable px-3 py-1.5 text-[11.5px] text-muted-foreground" title={r.memos.length ? `Memo: ${r.memos.join(" | ")}` : r.hash}>
+                        {truncateMiddle(r.hash, 6, 4)}
+                        {r.memos.length > 0 && <span className="ml-1 text-hold">✉</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
 
-        <div className="flex shrink-0 items-center justify-between border-t border-border px-3 py-1.5">
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-border px-3 py-1.5">
           <Eyebrow>
-            {filtered.length} OF {transactions.length} RECORDS
+            {filtered.length} OF {rows.length} RECORDS{ledgers.length ? ` · LEDGERS ${Math.min(...ledgers).toLocaleString()}–${Math.max(...ledgers).toLocaleString()}` : ""}
           </Eyebrow>
-          <span className="mono-font text-[9px] text-muted-foreground">
-            SUBJECT {account ? shortAddress(account.address) : "—"}
+          <span className="flex items-center gap-2">
+            <span className="mono-font text-[11px] text-muted-foreground">SUBJECT {subject ? shortAddress(subject) : "—"}</span>
+            {marker !== null && subject && (
+              <Button size="sm" variant="outline" disabled={loading} onClick={() => void load(subject, true)}>
+                {loading ? "READING…" : "LOAD OLDER"}
+              </Button>
+            )}
           </span>
         </div>
       </Panel>
@@ -309,52 +320,17 @@ export function HistoryScene({ data }: { data: XrplState }) {
   );
 }
 
-function HistoryRow({ entry }: { entry: WalletTransaction }) {
-  const success = entry.result === "tesSUCCESS";
-
+function Tile({ label, value, hint, icon, tone }: { label: string; value: string; hint?: string; icon: React.ReactNode; tone?: "go" | "hold" | "no-go" }) {
   return (
-    <tr className="border-b border-border/30 transition-colors hover:bg-secondary/40">
-      <td className="px-3 py-1.5">
-        <span
-          className={cn(
-            "mono-font text-[10px]",
-            entry.direction === "in"
-              ? "text-go"
-              : entry.direction === "out"
-                ? "text-foreground/70"
-                : "text-muted-foreground/60"
-          )}
-          title={entry.direction}
-        >
-          {entry.direction === "in" ? "↓" : entry.direction === "out" ? "↑" : "↔"}
-        </span>
-      </td>
-      <td className="mono-font px-3 py-1.5 text-[10px] text-foreground/85">
-        {entry.transactionType}
-      </td>
-      <td className="mono-font selectable px-3 py-1.5 text-[10px] text-muted-foreground">
-        {shortAddress(entry.counterparty)}
-      </td>
-      <td className="mono-font px-3 py-1.5 text-[10px] tabular-nums text-foreground">
-        {entry.amountXrp !== undefined ? `${entry.amountXrp} XRP` : "—"}
-      </td>
-      <td className="mono-font px-3 py-1.5 text-[10px] tabular-nums text-muted-foreground">
-        {entry.feeXrp}
-      </td>
-      <td className="mono-font px-3 py-1.5 text-[10px] tabular-nums text-muted-foreground">
-        {entry.ledgerIndex.toLocaleString()}
-      </td>
-      <td className="px-3 py-1.5">
-        <Badge variant={success ? "go" : "no-go"} className="text-[8px]">
-          {entry.result}
-        </Badge>
-      </td>
-      <td className="mono-font px-3 py-1.5 text-[9px] text-muted-foreground/80" title={entry.hash}>
-        {entry.date}
-        <span className="ml-2 text-muted-foreground/50">
-          {truncateMiddle(entry.hash, 4, 4)}
-        </span>
-      </td>
-    </tr>
+    <Panel bodyClassName="p-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="stencil text-[10.5px] tracking-[0.1em] text-muted-foreground">{label}</p>
+          <p className={cn("data-font mt-1.5 text-[19px] font-[600] leading-none tabular-nums", tone === "no-go" ? "text-no-go" : tone === "hold" ? "text-hold" : tone === "go" ? "text-go" : "text-foreground")}>{value}</p>
+          {hint && <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{hint}</p>}
+        </div>
+        <span className="shrink-0 text-muted-foreground/70">{icon}</span>
+      </div>
+    </Panel>
   );
 }

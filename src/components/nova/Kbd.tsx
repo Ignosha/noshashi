@@ -23,7 +23,7 @@ export function Kbd({ keys, className }: { keys: string; className?: string }) {
       {glyphs.map((glyph, index) => (
         <kbd
           key={`${glyph}-${index}`}
-          className="mono-font grid h-[17px] min-w-[17px] place-items-center rounded-md border border-border bg-secondary px-1 text-[9px] leading-none text-muted-foreground"
+          className="mono-font grid h-[17px] min-w-[17px] place-items-center rounded-md border border-border bg-secondary px-1 text-[10.5px] leading-none text-muted-foreground"
         >
           {glyph}
         </kbd>

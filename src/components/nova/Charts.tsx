@@ -87,7 +87,7 @@ export function Sparkline({
     return (
       <div
         className={cn(
-          "flex items-center justify-center text-[9px] tracking-[0.2em] text-muted-foreground",
+          "flex items-center justify-center text-[10.5px] tracking-[0.14em] text-muted-foreground",
           className
         )}
         style={{ height }}
@@ -205,8 +205,8 @@ export function Sparkline({
         timestamp, which is the whole point of the readout, was the part
         that disappeared. min-w-0 lets the stamp truncate instead.
       */}
-      <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-[9px] tabular-nums text-faint">
-        {label && <span className="shrink-0 tracking-[0.14em]">{label}</span>}
+      <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-[10.5px] tabular-nums text-faint">
+        {label && <span className="shrink-0 tracking-[0.1em]">{label}</span>}
         <span className="shrink-0 text-muted-foreground">{fmt(values[active])}</span>
         {labelAt && (
           <span className="ml-auto min-w-0 truncate" title={labelAt(active)}>
@@ -349,7 +349,7 @@ export function RingGauge({
           {value === null ? "—" : Math.round(pct)}
         </span>
         {label && (
-          <span className="stencil mt-0.5 text-[6px] tracking-[0.18em] text-muted-foreground">
+          <span className="stencil mt-0.5 text-[10px] tracking-[0.14em] text-muted-foreground">
             {label}
           </span>
         )}
@@ -386,7 +386,7 @@ export function Meter({
   return (
     <div className={className}>
       <div className="mb-1.5 flex items-baseline justify-between gap-2">
-        <span className="stencil min-w-0 truncate text-[8px] tracking-[0.14em] text-muted-foreground">
+        <span className="stencil min-w-0 truncate text-[10px] tracking-[0.1em] text-muted-foreground">
           {label}
         </span>
         <span className="data-font text-[11px] tabular-nums text-foreground">
@@ -453,7 +453,7 @@ export function CadenceRibbon({
   if (intervals.length === 0) {
     return (
       <div className={cn("flex items-center", className)} style={{ height }}>
-        <p className="mono-font text-[10px] text-muted-foreground">
+        <p className="mono-font text-[11px] text-muted-foreground">
           TWO CLOSES NEEDED TO MEASURE AN INTERVAL…
         </p>
       </div>
@@ -594,11 +594,11 @@ export function CadenceRibbon({
       </div>
 
       <div className="mt-1.5 flex items-center justify-between gap-2">
-        <span className="mono-font text-[8px] tracking-[0.1em] text-muted-foreground">
+        <span className="mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
           ARRIVAL, MEASURED HERE · BAND {CADENCE_NORMAL_MIN_S}–
           {CADENCE_NORMAL_MAX_S}s · MEDIAN {median.toFixed(2)}s
         </span>
-        <span className="mono-font text-[8px] tabular-nums text-muted-foreground">
+        <span className="mono-font text-[10px] tabular-nums text-muted-foreground">
           NOW{" "}
           <span
             className={cn(
@@ -661,7 +661,7 @@ export function BulletRow({
   return (
     <div className={className}>
       <div className="mb-1.5 flex items-baseline justify-between gap-2">
-        <span className="stencil min-w-0 truncate text-[8px] tracking-[0.14em] text-muted-foreground">
+        <span className="stencil min-w-0 truncate text-[10px] tracking-[0.1em] text-muted-foreground">
           {label}
         </span>
         <span className="flex shrink-0 items-baseline gap-1.5">
@@ -671,7 +671,7 @@ export function BulletRow({
           {threshold !== undefined && (
             // Word beside the mark: the notch alone would be colour-adjacent
             // encoding, and this has to read in forced-colours too.
-            <span className="mono-font text-[8px] tracking-[0.1em] text-muted-foreground">
+            <span className="mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
               {cleared ? "MET" : "SHORT"}
             </span>
           )}
@@ -703,7 +703,7 @@ export function BulletRow({
       </div>
 
       {caption && (
-        <p className="mt-1 text-[9px] leading-snug text-muted-foreground">{caption}</p>
+        <p className="mt-1 text-[10.5px] leading-snug text-muted-foreground">{caption}</p>
       )}
     </div>
   );
@@ -738,7 +738,7 @@ export function StateRow({
   return (
     <div className={className}>
       <div className="flex items-baseline justify-between gap-2">
-        <span className="stencil min-w-0 truncate text-[8px] tracking-[0.14em] text-muted-foreground">
+        <span className="stencil min-w-0 truncate text-[10px] tracking-[0.1em] text-muted-foreground">
           {label}
         </span>
         <span className="flex shrink-0 items-center gap-1.5">
@@ -750,13 +750,13 @@ export function StateRow({
               active ? "bg-go" : "bg-no-go"
             )}
           />
-          <span className="mono-font text-[9px] tracking-[0.1em] text-foreground">
+          <span className="mono-font text-[10.5px] tracking-[0.1em] text-foreground">
             {active ? activeLabel : inactiveLabel}
           </span>
         </span>
       </div>
       {detail && (
-        <p className="mt-1 text-[9px] leading-snug text-muted-foreground">{detail}</p>
+        <p className="mt-1 text-[10.5px] leading-snug text-muted-foreground">{detail}</p>
       )}
     </div>
   );

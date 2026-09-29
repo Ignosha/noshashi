@@ -56,13 +56,13 @@ export function ObserverPanel({ onAsk }: { onAsk: (prompt: string) => void }) {
       <div className="space-y-4 xl:col-span-2">
         <section>
           <div className="flex items-center justify-between">
-            <p className="stencil text-[9px] tracking-[0.2em] text-foreground">WATCHING</p>
-            <label className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+            <p className="stencil text-[10.5px] tracking-[0.14em] text-foreground">WATCHING</p>
+            <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
               <input type="checkbox" checked={s.enabled} onChange={(e) => void observerActions.setEnabled(e.target.checked)} />
               Observe in the background
             </label>
           </div>
-          <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+          <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
             Reads each wallet from validated mainnet on an interval, whatever screen is open, and records what changed:
             freezes, balances, credentials, and the powers of every issuer the wallet holds. The detection is fixed rules,
             not a model. Readings stay on this device.
@@ -72,44 +72,44 @@ export function ObserverPanel({ onAsk }: { onAsk: (prompt: string) => void }) {
             <Button size="sm" onClick={() => void add(address.trim())}>WATCH</Button>
           </div>
           {configured && isValidAddress(configured) && !s.wallets.includes(configured) && (
-            <button type="button" onClick={() => void add(configured)} className="mt-1 text-[10px] text-muted-foreground underline underline-offset-2">
+            <button type="button" onClick={() => void add(configured)} className="mt-1 text-[11px] text-muted-foreground underline underline-offset-2">
               Watch your configured wallet ({shortAddress(configured)})
             </button>
           )}
-          {addError && <p className="mt-1 text-[10px] text-no-go">{addError}</p>}
+          {addError && <p className="mt-1 text-[11px] text-no-go">{addError}</p>}
           <ul className="mt-2 space-y-1">
             {s.wallets.map((w) => {
               const r = s.readings[w];
               return (
                 <li key={w} className="flex items-center justify-between gap-2 border-b border-border/40 pb-1">
                   <span className="min-w-0">
-                    <span className="data-font selectable block truncate text-[10.5px] text-foreground">{w}</span>
-                    <span className="mono-font text-[9px] text-muted-foreground">
+                    <span className="data-font selectable block truncate text-[11.5px] text-foreground">{w}</span>
+                    <span className="mono-font text-[10.5px] text-muted-foreground">
                       {r ? `${r.funded ? `${r.balanceXrp.toLocaleString("en-US")} XRP · ${r.lines.length} lines · ${r.credentials.length} credentials` : "not funded"} · read ${utc(r.readAt)}` : "baseline not read yet"}
                     </span>
                   </span>
-                  <button type="button" onClick={() => void observerActions.removeWallet(w)} className="stencil shrink-0 text-[8px] tracking-[0.18em] text-muted-foreground hover:text-foreground">REMOVE</button>
+                  <button type="button" onClick={() => void observerActions.removeWallet(w)} className="stencil shrink-0 text-[10px] tracking-[0.14em] text-muted-foreground hover:text-foreground">REMOVE</button>
                 </li>
               );
             })}
           </ul>
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <select aria-label="Observer interval" value={s.intervalMs} onChange={(e) => void observerActions.setInterval(Number(e.target.value))} className="mono-font h-7 rounded border border-border bg-background px-1 text-[10px] text-foreground">
+            <select aria-label="Observer interval" value={s.intervalMs} onChange={(e) => void observerActions.setInterval(Number(e.target.value))} className="mono-font h-7 rounded border border-border bg-background px-1 text-[11px] text-foreground">
               {OBSERVER_INTERVALS.map((i) => <option key={i.ms} value={i.ms}>Every {i.label}</option>)}
             </select>
             <Button size="sm" variant="outline" disabled={s.sweeping || !s.wallets.length} onClick={() => void sweep()}>
               {s.sweeping ? "READING…" : "READ NOW"}
             </Button>
-            <span className="mono-font text-[9px] text-muted-foreground">
+            <span className="mono-font text-[10.5px] text-muted-foreground">
               {s.lastSweep ? `Last read ${utc(s.lastSweep)}` : "Not read yet"}
             </span>
           </div>
-          {s.error && <p className="mt-1 text-[10px] text-hold">{s.error}</p>}
+          {s.error && <p className="mt-1 text-[11px] text-hold">{s.error}</p>}
         </section>
 
         <section className="border-t border-border/50 pt-3">
-          <p className="stencil text-[9px] tracking-[0.2em] text-foreground">INVESTIGATE AN ISSUER</p>
-          <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+          <p className="stencil text-[10.5px] tracking-[0.14em] text-foreground">INVESTIGATE AN ISSUER</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
             One click reads the issuer's authority certificate and outstanding obligations from validated state, then hands
             every finding to the agent as one question. The engines decide what is true; the agent explains it.
           </p>
@@ -117,21 +117,21 @@ export function ObserverPanel({ onAsk }: { onAsk: (prompt: string) => void }) {
             <Input value={issuer} onChange={(e) => setIssuer(e.target.value)} placeholder="r… issuer" spellCheck={false} className="h-8 min-w-0 flex-1 font-mono text-[11px]" />
             <Button size="sm" disabled={investigating} onClick={() => void investigate()}>{investigating ? "READING…" : "INVESTIGATE"}</Button>
           </div>
-          {invError && <p className="mt-1 text-[10px] text-no-go">{invError}</p>}
+          {invError && <p className="mt-1 text-[11px] text-no-go">{invError}</p>}
         </section>
       </div>
 
       <section className="min-h-0 xl:col-span-3">
         <div className="flex items-center justify-between">
-          <p className="stencil text-[9px] tracking-[0.2em] text-foreground">
+          <p className="stencil text-[10.5px] tracking-[0.14em] text-foreground">
             OBSERVATIONS · {s.log.length}{serious ? ` · ${serious} NEED ATTENTION` : ""}
           </p>
           {s.log.length > 0 && (
-            <button type="button" onClick={() => void observerActions.clearLog()} className="stencil text-[8px] tracking-[0.18em] text-muted-foreground hover:text-foreground">CLEAR</button>
+            <button type="button" onClick={() => void observerActions.clearLog()} className="stencil text-[10px] tracking-[0.14em] text-muted-foreground hover:text-foreground">CLEAR</button>
           )}
         </div>
         {s.log.length === 0 ? (
-          <p className="mt-2 text-[10.5px] leading-relaxed text-muted-foreground">
+          <p className="mt-2 text-[11.5px] leading-relaxed text-muted-foreground">
             {s.wallets.length === 0
               ? "Nothing is watched yet. Add a wallet: its first reading is the baseline, and every later reading is compared with the one before it."
               : "No change between readings so far. Observations appear here when a later reading differs from the one before it."}
@@ -142,14 +142,14 @@ export function ObserverPanel({ onAsk }: { onAsk: (prompt: string) => void }) {
               <li key={o.id} className="border border-border p-2">
                 <p className="flex items-center gap-1.5">
                   <StatusDot status={TONE[o.severity]} size={6} />
-                  <span className={cn("stencil text-[8px] tracking-[0.2em]", o.severity === "critical" ? "text-no-go" : o.severity === "warn" ? "text-hold" : "text-muted-foreground")}>
+                  <span className={cn("stencil text-[10px] tracking-[0.14em]", o.severity === "critical" ? "text-no-go" : o.severity === "warn" ? "text-hold" : "text-muted-foreground")}>
                     {o.severity.toUpperCase()}
                   </span>
-                  <span className="mono-font text-[9px] text-muted-foreground">{utc(o.at)}</span>
+                  <span className="mono-font text-[10.5px] text-muted-foreground">{utc(o.at)}</span>
                 </p>
                 <p className="mt-0.5 text-[11px] text-foreground">{o.headline}</p>
-                <p className="text-[10px] leading-snug text-muted-foreground">{o.detail}</p>
-                <p className="mono-font selectable mt-0.5 break-all text-[9px] text-muted-foreground">
+                <p className="text-[11px] leading-snug text-muted-foreground">{o.detail}</p>
+                <p className="mono-font selectable mt-0.5 break-all text-[10.5px] text-muted-foreground">
                   {o.evidence.field}: {o.evidence.from} → {o.evidence.to} · {o.evidence.subject}
                 </p>
                 <Button size="sm" variant="outline" className="mt-1.5" onClick={() => onAsk(observationPrompt(o))}>ASK THE AGENT</Button>

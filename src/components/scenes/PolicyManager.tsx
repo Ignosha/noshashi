@@ -93,7 +93,7 @@ export function PolicyManager({ entries }: { entries: LedgerEntry[] }) {
     <>
       <OrgBar />
       {org.state.status === "loading" || org.authLoading ? (
-        <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING POLICY…</p>
+        <p className="mono-font animate-pulse p-4 text-[11px] text-muted-foreground">LOADING POLICY…</p>
       ) : orgMode ? (
         <OrgPolicyManager entries={entries} />
       ) : (
@@ -171,7 +171,7 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
     });
 
   if (store.state.status === "loading") {
-    return <p className="mono-font animate-pulse p-4 text-[10px] text-muted-foreground">LOADING POLICY…</p>;
+    return <p className="mono-font animate-pulse p-4 text-[11px] text-muted-foreground">LOADING POLICY…</p>;
   }
   if (store.state.status === "unavailable") {
     return (
@@ -181,7 +181,7 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
           A verified policy configuration could not be loaded. No institutional verdict will be
           generated until the policy is available. NOSHASHI does not fall back to defaults.
         </p>
-        <p className="mono-font mt-2 text-[10px] text-no-go">{store.state.reason}</p>
+        <p className="mono-font mt-2 text-[11px] text-no-go">{store.state.reason}</p>
       </div>
     );
   }
@@ -202,7 +202,7 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
           <div className="flex items-center justify-between">
             <Eyebrow>ACTIVE POLICY</Eyebrow>
             {active && (
-              <span className="stencil flex items-center gap-1.5 text-[8px] tracking-[0.2em] text-go">
+              <span className="stencil flex items-center gap-1.5 text-[10px] tracking-[0.14em] text-go">
                 <StatusDot status="go" size={6} pulse /> ACTIVE
               </span>
             )}
@@ -212,7 +212,7 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
               <p className="display mt-1.5 text-[15px] font-[600] text-foreground">
                 {active.name} <span className="mono-font text-[12px] text-muted-foreground">v{active.version}</span>
               </p>
-              <p className="mono-font mt-1 text-[9px] leading-relaxed text-muted-foreground">
+              <p className="mono-font mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
                 EFFECTIVE {utc(active.effectiveAt)} · ACTIVATED BY {active.activatedBy}
                 <br />
                 <span className="selectable break-all">SHA-256 {active.hash}</span>
@@ -220,7 +220,7 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
               <ParamGroups params={active.params} />
             </>
           ) : (
-            <p className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground">
+            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
               No policy is active. Gate verdicts apply the domain's rules only and carry no
               institutional policy result. Review the draft and activate it to put thresholds into force.
             </p>
@@ -232,14 +232,14 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
           <div className="flex items-center justify-between">
             <Eyebrow>DRAFT</Eyebrow>
             {draft && (
-              <span className="stencil text-[8px] tracking-[0.2em] text-hold">
+              <span className="stencil text-[10px] tracking-[0.14em] text-hold">
                 ● DRAFT v{draft.version} · DOES NOT AFFECT VERDICTS
               </span>
             )}
           </div>
           {!draft || !form ? (
             <div className="mt-2">
-              <p className="text-[10px] text-muted-foreground">No open draft.</p>
+              <p className="text-[11px] text-muted-foreground">No open draft.</p>
               <Button
                 size="sm"
                 className="mt-2"
@@ -255,7 +255,7 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
             </div>
           ) : (
             <>
-              {draft.origin && <p className="mt-1.5 border-l-2 border-hold/60 pl-2 text-[9.5px] leading-relaxed text-hold">{draft.origin}</p>}
+              {draft.origin && <p className="mt-1.5 border-l-2 border-hold/60 pl-2 text-[11px] leading-relaxed text-hold">{draft.origin}</p>}
               <Field label="POLICY NAME">
                 <Input value={form.name} onChange={(e) => set("name", e.target.value)} className="h-7 text-[11px]" maxLength={60} />
               </Field>
@@ -301,7 +301,7 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
                   DISCARD DRAFT
                 </Button>
                 {errors.length > 0 && (
-                  <span className="stencil text-[8px] tracking-[0.18em] text-no-go">INVALID POLICY VALUE · FIX TO ACTIVATE</span>
+                  <span className="stencil text-[10px] tracking-[0.14em] text-no-go">INVALID POLICY VALUE · FIX TO ACTIVATE</span>
                 )}
               </div>
             </>
@@ -319,9 +319,9 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
           <div>
             <Eyebrow className="mb-2">SIMULATION · DRAFT v{draft.version}{dirty ? " (UNSAVED)" : ""} vs {active ? `ACTIVE v${active.version}` : "NO POLICY"}</Eyebrow>
             {!sim ? (
-              <p className="text-[10px] text-no-go">Fix the invalid values to simulate.</p>
+              <p className="text-[11px] text-no-go">Fix the invalid values to simulate.</p>
             ) : sim.summary.evaluated === 0 ? (
-              <p className="text-[10px] leading-relaxed text-muted-foreground">
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
                 No recorded verdicts carry the facts these rules need yet
                 {sim.summary.skipped ? ` (${sim.summary.skipped} were recorded before facts were stored)` : ""}. Run a gate check in
                 Verification; every verdict from now on records them.
@@ -340,7 +340,7 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
           <thead>
             <tr className="border-b border-border">
               {["VERSION", "STATUS", "EFFECTIVE", "ARCHIVED", "ACTIVATED BY", "SHA-256", ""].map((h) => (
-                <th key={h} className="stencil px-2 py-1.5 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">{h}</th>
+                <th key={h} className="stencil px-2 py-1.5 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">{h}</th>
               ))}
             </tr>
           </thead>
@@ -356,21 +356,21 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
       <section>
         <Eyebrow className="mb-2">POLICY AUDIT TRAIL · {store.audit.length}</Eyebrow>
         {store.audit.length === 0 ? (
-          <p className="text-[10px] text-muted-foreground">No policy changes recorded.</p>
+          <p className="text-[11px] text-muted-foreground">No policy changes recorded.</p>
         ) : (
           <div className="space-y-1.5">
             {store.audit.slice(0, 50).map((e, i) => (
               <div key={`${e.at}-${i}`} className="border-b border-border/30 pb-1.5">
-                <p className="mono-font text-[9.5px] text-foreground">
+                <p className="mono-font text-[11px] text-foreground">
                   {utc(e.at)} · {e.actor} · {e.action.replace("-", " ").toUpperCase()} {e.name} v{e.version}
                   {e.fromVersion ? ` (from v${e.fromVersion})` : ""} · <span className="text-go">{e.status.toUpperCase()}</span>
                 </p>
                 {e.changes.length > 0 && (
-                  <p className="mono-font text-[9px] text-muted-foreground">
+                  <p className="mono-font text-[10.5px] text-muted-foreground">
                     {e.changes.map((c) => `${c.label} ${c.from} → ${c.to}`).join(" · ")}
                   </p>
                 )}
-                <p className="mono-font text-[8.5px] text-muted-foreground/70">SHA-256 {e.hash.slice(0, 16)}…</p>
+                <p className="mono-font text-[10px] text-muted-foreground/70">SHA-256 {e.hash.slice(0, 16)}…</p>
               </div>
             ))}
           </div>
@@ -391,21 +391,21 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
           <div className="max-h-[260px] overflow-y-auto">
             <Eyebrow className="mb-1.5">CHANGES</Eyebrow>
             {diff === null ? (
-              <p className="text-[10px] text-muted-foreground">First activation — every parameter below comes into force.</p>
+              <p className="text-[11px] text-muted-foreground">First activation — every parameter below comes into force.</p>
             ) : diff.length === 0 ? (
-              <p className="text-[10px] text-muted-foreground">No parameter changes from the active version.</p>
+              <p className="text-[11px] text-muted-foreground">No parameter changes from the active version.</p>
             ) : null}
             {(diff ?? (formParams ? describeParams(formParams).map((r) => ({ label: r.label, from: "—", to: r.value, field: r.field })) : [])).map((c) => (
-              <p key={c.field} className="mono-font text-[10px] text-foreground">
+              <p key={c.field} className="mono-font text-[11px] text-foreground">
                 {c.label}: <span className="text-muted-foreground">{c.from}</span> → {c.to}
               </p>
             ))}
             {sim && sim.summary.evaluated > 0 && (
-              <p className="mt-2 text-[10px] text-muted-foreground">
+              <p className="mt-2 text-[11px] text-muted-foreground">
                 Simulated on {sim.summary.evaluated} recorded verdicts: {sim.summary.changed} would have been decided differently.
               </p>
             )}
-            {dirty && <p className="mt-2 text-[10px] text-hold">Unsaved edits will be saved to the draft first.</p>}
+            {dirty && <p className="mt-2 text-[11px] text-hold">Unsaved edits will be saved to the draft first.</p>}
           </div>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setConfirming(false)}>CANCEL</Button>
@@ -418,13 +418,13 @@ function WorkstationPolicyManager({ entries }: { entries: LedgerEntry[] }) {
 }
 
 export function GroupTitle({ children }: { children: React.ReactNode }) {
-  return <p className="stencil mb-1 mt-3 border-b border-border pb-1 text-[8px] tracking-[0.24em] text-muted-foreground">{children}</p>;
+  return <p className="stencil mb-1 mt-3 border-b border-border pb-1 text-[10px] tracking-[0.14em] text-muted-foreground">{children}</p>;
 }
 
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mt-2">
-      <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground">{label}</p>
+      <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-muted-foreground">{label}</p>
       {children}
     </div>
   );
@@ -440,22 +440,22 @@ export function RuleRow({
     <div className="py-1.5">
       <div className="flex flex-wrap items-center gap-2">
         <Switch checked={on} onCheckedChange={(v) => setOn(Boolean(v))} aria-label={`${label} enabled`} />
-        <span className="stencil w-40 text-[8.5px] tracking-[0.16em] text-foreground">{label}</span>
+        <span className="stencil w-40 text-[10px] tracking-[0.1em] text-foreground">{label}</span>
         {on && children}
         {on && (
           <select
             aria-label={`${label} outcome`}
             value={outcome}
             onChange={(e) => setOutcome(e.target.value as RuleOutcome)}
-            className="mono-font h-7 rounded border border-border bg-background px-1 text-[9.5px] text-foreground"
+            className="mono-font h-7 rounded border border-border bg-background px-1 text-[11px] text-foreground"
           >
             <option value="review">→ REVIEW (HOLD)</option>
             <option value="fail">→ FAIL (NO-GO)</option>
           </select>
         )}
       </div>
-      <p className="mt-0.5 pl-11 text-[9px] leading-snug text-muted-foreground">{hint}</p>
-      {error && <p className="mt-0.5 pl-11 text-[9.5px] text-no-go">INVALID POLICY VALUE · {error}</p>}
+      <p className="mt-0.5 pl-11 text-[10.5px] leading-snug text-muted-foreground">{hint}</p>
+      {error && <p className="mt-0.5 pl-11 text-[11px] text-no-go">INVALID POLICY VALUE · {error}</p>}
     </div>
   );
 }
@@ -466,8 +466,8 @@ export function ParamGroups({ params }: { params: PolicyParams }) {
     <div className="mt-2 grid grid-cols-2 gap-x-4">
       {rows.map((r) => (
         <div key={r.field} className="flex justify-between gap-2 border-b border-border/30 py-1">
-          <span className="stencil text-[7.5px] tracking-[0.18em] text-muted-foreground">{r.label.toUpperCase()}</span>
-          <span className="mono-font text-[9.5px] text-foreground">{r.value}</span>
+          <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{r.label.toUpperCase()}</span>
+          <span className="mono-font text-[11px] text-foreground">{r.value}</span>
         </div>
       ))}
     </div>
@@ -482,7 +482,7 @@ export function DiffTable({ from, to, fromLabel, toLabel }: { from: PolicyParams
       <thead>
         <tr className="border-b border-border">
           {["", fromLabel.toUpperCase(), toLabel.toUpperCase()].map((h, i) => (
-            <th key={i} className="stencil px-2 py-1 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">{h}</th>
+            <th key={i} className="stencil px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">{h}</th>
           ))}
         </tr>
       </thead>
@@ -492,9 +492,9 @@ export function DiffTable({ from, to, fromLabel, toLabel }: { from: PolicyParams
           const changed = was !== row.value;
           return (
             <tr key={row.field} className={cn("border-b border-border/30", changed && "bg-hold/10")}>
-              <td className="px-2 py-1 text-[9.5px] text-muted-foreground">{row.label}</td>
-              <td className="mono-font px-2 py-1 text-[9.5px] text-muted-foreground">{was}</td>
-              <td className={cn("mono-font px-2 py-1 text-[9.5px]", changed ? "text-hold" : "text-foreground")}>{row.value}</td>
+              <td className="px-2 py-1 text-[11px] text-muted-foreground">{row.label}</td>
+              <td className="mono-font px-2 py-1 text-[11px] text-muted-foreground">{was}</td>
+              <td className={cn("mono-font px-2 py-1 text-[11px]", changed ? "text-hold" : "text-foreground")}>{row.value}</td>
             </tr>
           );
         })}
@@ -513,14 +513,14 @@ export function SimulationResult({
   const statuses: Status[] = ["go", "hold", "no-go", "insufficient-data"];
   return (
     <div>
-      <p className="stencil mb-1.5 text-[8px] tracking-[0.2em] text-hold">
+      <p className="stencil mb-1.5 text-[10px] tracking-[0.14em] text-hold">
         SIMULATION · RECORDED FACTS · DOES NOT CHANGE THE ACTIVE POLICY OR ANY RECORDED VERDICT
       </p>
       <table className="w-full max-w-[420px] text-left">
         <thead>
           <tr className="border-b border-border">
             {["", "CURRENT", "SIMULATED", "IMPACT"].map((h) => (
-              <th key={h} className="stencil px-2 py-1 text-[8px] font-medium tracking-[0.2em] text-muted-foreground">{h}</th>
+              <th key={h} className="stencil px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">{h}</th>
             ))}
           </tr>
         </thead>
@@ -529,36 +529,36 @@ export function SimulationResult({
             const d = s.candidate[v] - s.baseline[v];
             return (
               <tr key={v} className="border-b border-border/30">
-                <td className={cn("stencil px-2 py-1 text-[8.5px] tracking-[0.16em]", VERDICT_TONE[v])}>{VERDICT_WORD[v]}</td>
-                <td className="mono-font px-2 py-1 text-[10px] tabular-nums text-muted-foreground">{s.baseline[v]}</td>
-                <td className="mono-font px-2 py-1 text-[10px] tabular-nums text-foreground">{s.candidate[v]}</td>
-                <td className={cn("mono-font px-2 py-1 text-[10px] tabular-nums", d ? "text-hold" : "text-muted-foreground")}>{d > 0 ? `+${d}` : d}</td>
+                <td className={cn("stencil px-2 py-1 text-[10px] tracking-[0.1em]", VERDICT_TONE[v])}>{VERDICT_WORD[v]}</td>
+                <td className="mono-font px-2 py-1 text-[11px] tabular-nums text-muted-foreground">{s.baseline[v]}</td>
+                <td className="mono-font px-2 py-1 text-[11px] tabular-nums text-foreground">{s.candidate[v]}</td>
+                <td className={cn("mono-font px-2 py-1 text-[11px] tabular-nums", d ? "text-hold" : "text-muted-foreground")}>{d > 0 ? `+${d}` : d}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      <p className="mt-1.5 text-[9.5px] text-muted-foreground">
+      <p className="mt-1.5 text-[11px] text-muted-foreground">
         {s.evaluated} recorded verdicts re-decided from their stored facts{s.skipped ? `; ${s.skipped} recorded without facts left out` : ""}.
         {" "}{s.changed} would change.
       </p>
       <div className="mt-2">
-        <p className="stencil mb-1 text-[8px] tracking-[0.2em] text-muted-foreground">EXCEPTIONS BY RULE · CURRENT → SIMULATED</p>
+        <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-muted-foreground">EXCEPTIONS BY RULE · CURRENT → SIMULATED</p>
         {(Object.keys(s.exceptions) as RuleKey[]).map((k) => (
-          <p key={k} className="mono-font text-[9.5px] text-muted-foreground">
+          <p key={k} className="mono-font text-[11px] text-muted-foreground">
             {RULE_NAMES[k]}: {s.exceptions[k].baseline} → <span className={s.exceptions[k].candidate !== s.exceptions[k].baseline ? "text-hold" : ""}>{s.exceptions[k].candidate}</span>
           </p>
         ))}
       </div>
       {changed.length > 0 && (
         <>
-          <button onClick={() => setShowChanges(!showChanges)} className="stencil mt-2 text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2">
+          <button onClick={() => setShowChanges(!showChanges)} className="stencil mt-2 text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2">
             {showChanges ? "HIDE CHANGES" : `VIEW CHANGES (${changed.length})`}
           </button>
           {showChanges && (
             <div className="mt-1.5 space-y-0.5">
               {changed.slice(0, 50).map((r) => (
-                <p key={r.entry.id} className="mono-font text-[9px] text-muted-foreground">
+                <p key={r.entry.id} className="mono-font text-[10.5px] text-muted-foreground">
                   {shortAddress(r.entry.subject)} · {r.entry.amountXrp.toLocaleString()} XRP · {new Date(r.entry.at).toLocaleDateString()} ·{" "}
                   <span className={VERDICT_TONE[r.baseline]}>{VERDICT_WORD[r.baseline]}</span> → <span className={VERDICT_TONE[r.candidate]}>{VERDICT_WORD[r.candidate]}</span>
                   {r.drivers.length ? ` · ${r.drivers.join(", ")}` : ""}
@@ -577,14 +577,14 @@ function VersionRow({ v, active, open, toggle }: { v: InstitutionalPolicy; activ
   return (
     <>
       <tr className="border-b border-border/30">
-        <td className="mono-font px-2 py-1.5 text-[10px] text-foreground">{v.name} v{v.version}</td>
-        <td className={cn("stencil px-2 py-1.5 text-[8.5px] tracking-[0.16em]", tone)}>● {v.status.toUpperCase()}</td>
-        <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{utc(v.effectiveAt)}</td>
-        <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{utc(v.archivedAt)}</td>
-        <td className="mono-font px-2 py-1.5 text-[9px] text-muted-foreground">{v.activatedBy ?? "—"}</td>
-        <td className="mono-font selectable px-2 py-1.5 text-[9px] text-muted-foreground">{v.hash.slice(0, 12)}…</td>
+        <td className="mono-font px-2 py-1.5 text-[11px] text-foreground">{v.name} v{v.version}</td>
+        <td className={cn("stencil px-2 py-1.5 text-[10px] tracking-[0.1em]", tone)}>● {v.status.toUpperCase()}</td>
+        <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{utc(v.effectiveAt)}</td>
+        <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{utc(v.archivedAt)}</td>
+        <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{v.activatedBy ?? "—"}</td>
+        <td className="mono-font selectable px-2 py-1.5 text-[10.5px] text-muted-foreground">{v.hash.slice(0, 12)}…</td>
         <td className="px-2 py-1.5">
-          <button onClick={toggle} className="stencil text-[8px] tracking-[0.2em] text-foreground underline underline-offset-2">
+          <button onClick={toggle} className="stencil text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2">
             {open ? "HIDE" : "VIEW"}
           </button>
         </td>
@@ -592,7 +592,7 @@ function VersionRow({ v, active, open, toggle }: { v: InstitutionalPolicy; activ
       {open && (
         <tr>
           <td colSpan={7} className="px-2 pb-3">
-            <p className="mono-font selectable break-all text-[9px] text-muted-foreground">SHA-256 {v.hash}</p>
+            <p className="mono-font selectable break-all text-[10.5px] text-muted-foreground">SHA-256 {v.hash}</p>
             {active && active !== v ? (
               <DiffTable from={v.params} to={active.params} fromLabel={`v${v.version}`} toLabel={`active v${active.version}`} />
             ) : (
