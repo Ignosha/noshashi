@@ -164,7 +164,7 @@ get started by a system that has not noticed you already did.
 > 1. **The key returned a 401.** Nearly always a copy-paste artefact — a
 >    trailing newline, or the `nsh_live_` prefix lost. Confirm the endpoint
 >    and your JSON with the unauthenticated descriptor first:
->    `curl https://api.noshashi.app/v1/compliance`
+>    `curl https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify`
 > 2. **It is waiting on a security review.** Send them the free tier: it
 >    runs entirely locally with no account and no server-side state, which
 >    is usually the fastest way through. I can send the DPA,

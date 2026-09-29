@@ -26,7 +26,7 @@ documents it.
                 └──────────────┬─────────────────────────────────────────┘
                                │ HTTPS + user JWT
                 ┌──────────────▼───── Supabase (schema noshashi) ────────┐
-                │ Postgres + RLS · 9 Edge Functions · pg_cron · pg_net   │
+                │ Postgres + RLS · 11 Edge Functions · pg_cron · pg_net  │
                 └──────────────┬─────────────────────────────────────────┘
                                │
                 ┌──────────────▼───── Website (Vercel) ──────────────────┐
@@ -57,6 +57,11 @@ documents it.
 (billing), `noshashi-support-notify`, `noshashi-xrpl-watch` (deposit and
 account monitoring), `noshashi-ledger-registry` (credential and domain
 directory). Shared code is in `supabase/functions/_shared`.
+
+Two more are deployed whose source is **not in this repository**:
+`noshashi-portal` (Stripe billing portal) and `noshashi-return` (checkout
+return page). Their code should be pulled into `supabase/functions` so it
+is reviewed and versioned like the rest.
 
 ## Scheduled work (pg_cron)
 
