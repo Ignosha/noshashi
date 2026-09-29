@@ -39,7 +39,6 @@ export type PermissionedDomain = {
   transferCeilingXrp: number;
   /** Domains under governance review gate to HOLD rather than GO. */
   governance: "active" | "review" | "suspended";
-  members: number;
 };
 
 /**
@@ -141,50 +140,50 @@ export type PolicyReceipt = {
 };
 
 /**
- * Reference domain registry.
+ * Reference rule profiles for the settlement gate.
  *
- * These are ILLUSTRATIVE FIXTURES, not real permissioned domains, and
- * the operator names are deliberately generic: naming an actual firm
- * here would assert a commercial relationship that does not exist. In
- * production these rows are read from XLS-80 `PermissionedDomain`
- * ledger objects, whose shape is identical.
+ * These are NOT permissioned domains on the ledger: they are six rule sets
+ * (credentials required, per-settlement ceiling, whether the profile is
+ * enforcing) that the gate evaluates a settlement against, so the engine
+ * can be exercised before an institution has its own policy. They carry no
+ * operator, no member count and no institution, because inventing one
+ * would read as a fact about the network. The real domains on mainnet are
+ * in the Domain Grid (noshashi-ledger-registry). The ids are bound into
+ * receipt digests and never change.
  */
 export const DOMAIN_REGISTRY: PermissionedDomain[] = [
   {
     id: "d-dex-us",
     name: "US_REGULATED_DEX",
     code: "DEX-US",
-    institution: "Reference Liquidity Pool",
+    institution: "Reference profile · regulated venue: basic KYC and sanctions clearance",
     requirements: ["KYC_LEVEL_1", "SANCTIONS_CLEARANCE"],
     transferCeilingXrp: 250_000,
     governance: "active",
-    members: 18_422,
   },
   {
     id: "d-lend-inst",
     name: "INSTITUTIONAL_LENDING",
     code: "LEND-INST",
-    institution: "Reference Lending Desk",
+    institution: "Reference profile · institutional lending: accredited investors only",
     requirements: ["ACCREDITED_INVESTOR", "SANCTIONS_CLEARANCE"],
     transferCeilingXrp: 5_000_000,
     governance: "active",
-    members: 4_093,
   },
   {
     id: "d-token-pvt",
     name: "PRIVATE_TOKEN_SALES",
     code: "TOKEN-PVT",
-    institution: "Reference Issuance Agent",
+    institution: "Reference profile · private token sale: accredited, PEP-screened, under review",
     requirements: ["ACCREDITED_INVESTOR", "PEP_SCREENING"],
     transferCeilingXrp: 1_000_000,
     governance: "review",
-    members: 1_207,
   },
   {
     id: "d-mint-us",
     name: "STABLECOIN_MINTING",
     code: "MINT-US",
-    institution: "Reference Stablecoin Reserve",
+    institution: "Reference profile · stablecoin minting: closed to new settlement",
     requirements: [
       "KYC_LEVEL_2",
       "ACCREDITED_INVESTOR",
@@ -193,27 +192,24 @@ export const DOMAIN_REGISTRY: PermissionedDomain[] = [
     ],
     transferCeilingXrp: 0,
     governance: "suspended",
-    members: 77,
   },
   {
     id: "d-custody",
     name: "QUALIFIED_CUSTODY",
     code: "CUST-Q",
-    institution: "Reference Qualified Custodian",
+    institution: "Reference profile · qualified custody: enhanced KYC and custody attestation",
     requirements: ["KYC_LEVEL_2", "INSTITUTIONAL_CUSTODY"],
     transferCeilingXrp: 20_000_000,
     governance: "active",
-    members: 312,
   },
   {
     id: "d-retail",
     name: "RETAIL_SETTLEMENT",
     code: "RTL-OPEN",
-    institution: "Open Payments Rail",
+    institution: "Reference profile · retail settlement: basic KYC, low ceiling",
     requirements: ["KYC_LEVEL_1"],
     transferCeilingXrp: 10_000,
     governance: "active",
-    members: 96_540,
   },
 ];
 

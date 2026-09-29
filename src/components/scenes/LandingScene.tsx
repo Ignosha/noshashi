@@ -160,7 +160,7 @@ export function LandingScene({
 
           <nav className="flex items-center gap-5">
             {[
-              { label: "BUSINESS PLAN", scene: "revenue" },
+              { label: "TRUST & SECURITY", scene: "trust" },
               { label: "LEGAL", scene: "legal" },
               { label: "CONTACT", scene: "legal" },
             ].map((link) => (
@@ -257,9 +257,9 @@ export function LandingScene({
                   </motion.span>
                 </MagneticButton>
 
-                <Button variant="outline" className="gap-2" onClick={() => onNavigate("revenue")}>
+                <Button variant="outline" className="gap-2" onClick={() => onNavigate("trust")}>
                   <NovaBolt size={14} />
-                  SEE THE BUSINESS PLAN
+                  HOW THE EVIDENCE WORKS
                 </Button>
                 <Button variant="ghost" className="gap-2" onClick={() => onNavigate("agent")}>
                   <NovaEye size={14} />

@@ -5,9 +5,11 @@
 # Skipping saves the build, not the deployment: the free plan's limit of
 # 100 deployments a day counts a skipped one too, because Vercel creates
 # it before this runs. What saves the quota is creating fewer. The
-# frontend/ and backend/ projects, which never deploy, now create none
-# (git.deploymentEnabled in their vercel.json); before that every push
-# cost three, which ran the quota out twice on 2026-09-24.
+# frontend/ and backend/ Vercel projects belonged to an earlier product
+# whose code was removed on 2026-09-29; each directory keeps only the
+# vercel.json that stops its project deploying (git.deploymentEnabled).
+# Without it every push cost three deployments, which ran the quota out
+# twice on 2026-09-24.
 #
 # The rule is an allowlist, so a mistake here costs a deployment and
 # never a stale website. It skips only when EVERY changed file is known

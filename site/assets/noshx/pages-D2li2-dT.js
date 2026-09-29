@@ -107,8 +107,7 @@ Desktop app | src/ · src-tauri/ | Tauri shell with a React interface. It reads 
 Website | site/ · scripts/build-site.mjs | Static pages rendered at deploy time, including these docs. |
 Site functions | authority contact contact-status create-checkout-session locale project-feed stripe-status subscribe support-chat xrp-market xrp-news | Vercel functions behind the website: market and news feeds, the project feed, contact and newsletter sign-up, the support chat, checkout and the public authority check. |
 Edge functions | noshashi-checkout noshashi-exception-decide noshashi-ledger-registry noshashi-password noshashi-policy-activate noshashi-stripe-webhook noshashi-support-notify noshashi-verify noshashi-xrpl-watch | Supabase Edge Functions: the Compliance API, checkout and billing, policy activation, exception decisions and password screening. |
-Database | supabase/migrations/ (29 migrations) | Postgres with row-level security: accounts, API keys and rate limits, organizations and roles, policies, exceptions, investigations, webhooks and the audit log. |
-The repository also holds an earlier FastAPI service ( backend/ ) and Next.js interface ( frontend/ ). They are not deployed, and nothing on this site depends on them.` }, { title: "Architecture · NOSHASHI docs › From the ledger to the receipt", source: "https://www.noshashi.app/docs/architecture/", text: `XRPL MAINNET — Public XRP Ledger servers, read over WebSocket and HTTPS.
+Database | supabase/migrations/ (29 migrations) | Postgres with row-level security: accounts, API keys and rate limits, organizations and roles, policies, exceptions, investigations, webhooks and the audit log. |` }, { title: "Architecture · NOSHASHI docs › From the ledger to the receipt", source: "https://www.noshashi.app/docs/architecture/", text: `XRPL MAINNET — Public XRP Ledger servers, read over WebSocket and HTTPS.
 src/lib/xrpl/link.ts · src/lib/xrpl/client.ts
 VALIDATED STATE — Ledger state is read from the last validated ledger, never an open one.
 src/lib/xrpl/client.ts · src/lib/desk/settlement.ts
@@ -159,7 +158,6 @@ Ledger Watch
 Security Center
 Pricing
 Account
-Business Plan
 Legal & Accessibility
 Trust & Security
 Settings` }, { title: "Getting started · NOSHASHI docs › Desk", source: "https://www.noshashi.app/docs/getting-started/", text: `Portfolio & Radar

@@ -268,9 +268,9 @@ export function HomeScene({
                 <NovaShield size={14} />
                 RUN A GATE CHECK
               </Button>
-              <Button variant="outline" className="gap-2" onClick={() => onNavigate("revenue")}>
+              <Button variant="outline" className="gap-2" onClick={() => onNavigate("history")}>
                 <NovaBolt size={14} />
-                READ THE BUSINESS PLAN
+                OPEN THE AUDIT TRAIL
               </Button>
               <Button variant="ghost" className="gap-2" onClick={() => onNavigate("agent")}>
                 <NovaTerminal size={14} />
@@ -637,7 +637,6 @@ export function HomeScene({
             <div className="flex items-center gap-4">
               {[
                 { label: "LEGAL & ACCESSIBILITY", scene: "legal" },
-                { label: "BUSINESS PLAN", scene: "revenue" },
                 { label: "SUPPORT", scene: "agent" },
               ].map((link) => (
                 <button

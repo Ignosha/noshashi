@@ -19,7 +19,7 @@ const domain = (over: Partial<PermissionedDomain> = {}): PermissionedDomain => (
   requirements: ["KYC_LEVEL_1"],
   transferCeilingXrp: 1_000,
   governance: "active",
-  members: 1,
+ 
   ...over,
 });
 

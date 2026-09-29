@@ -317,7 +317,7 @@ describe("policy model", () => {
 /* ── Receipts bind the policy; historical receipts stay valid ─────── */
 
 const domain: PermissionedDomain = {
-  id: "d-test", name: "TEST", code: "TEST", institution: "Test", requirements: [], transferCeilingXrp: 250_000, governance: "active", members: 1,
+  id: "d-test", name: "TEST", code: "TEST", institution: "Test", requirements: [], transferCeilingXrp: 250_000, governance: "active",
 };
 
 describe("receipt policy binding", () => {

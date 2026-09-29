@@ -339,12 +339,12 @@ export function VerificationScene({ data }: { data: XrplState }) {
           </Panel>
 
           <Panel
-            label="TARGET DOMAIN"
+            label="RULE PROFILE"
             className="min-h-0 flex-1"
             bodyClassName="overflow-y-auto p-2"
             right={
               <span className="mono-font text-[10.5px] text-muted-foreground">
-                XLS-80
+                REFERENCE
               </span>
             }
           >
@@ -533,7 +533,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
 
         {/* Right — domain detail and session log */}
         <div className="col-span-1 flex min-h-0 flex-col gap-3">
-          <Panel label="DOMAIN POLICY" className="shrink-0">
+          <Panel label="PROFILE RULES" className="shrink-0">
             <p className="display text-[11px] font-[600] leading-tight text-foreground">
               {domain.name}
             </p>
@@ -561,7 +561,6 @@ export function VerificationScene({ data }: { data: XrplState }) {
                       : "no-go"
                 }
               />
-              <DataRow label="MEMBERS" value={domain.members.toLocaleString()} />
             </div>
             <Eyebrow className="mb-1.5 mt-3">REQUIRED CREDENTIALS</Eyebrow>
             <div className="flex flex-wrap gap-1">

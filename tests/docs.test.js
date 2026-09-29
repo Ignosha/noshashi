@@ -77,8 +77,8 @@ describe("the built pages carry the code's facts", () => {
 
 describe("the developer portal names only endpoints that are served", () => {
   const dev = read("site/developers/index.html");
-  // /api/v1/institutional/* are routes of the FastAPI service in backend/,
-  // which is not deployed; the portal listed them with no host to call.
+  // /api/v1/institutional/* were routes of an earlier FastAPI service that was
+  // never deployed (removed 2026-09-29); the portal listed them with no host.
   it("lists the edge function's verbs and not the undeployed service's routes", () => {
     for (const v of ref.verbs) expect(dev, v.path).toContain(`<code>${html(v.path)}</code>`);
     expect(dev).not.toContain("/api/v1/institutional");

@@ -16,7 +16,7 @@ const params = (over: Partial<PolicyParams> = {}): PolicyParams => ({
 const policy = (p = params()): InstitutionalPolicy => ({
   id: "policy_settlement", name: "Institutional Settlement", version: 4, status: "active", params: p, hash: "A".repeat(64), createdAt: "", updatedAt: "", effectiveAt: "2026-09-23T14:02:00.000Z",
 });
-const domain: PermissionedDomain = { id: "d", name: "D", code: "D", institution: "D", requirements: [], transferCeilingXrp: 1e6, governance: "active", members: 1 };
+const domain: PermissionedDomain = { id: "d", name: "D", code: "D", institution: "D", requirements: [], transferCeilingXrp: 1e6, governance: "active" };
 const pay = (c: string, a: number) => ({ hash: c + a, transactionType: "Payment", result: "tesSUCCESS", ledgerIndex: 1, date: "", timestamp: 0, direction: "out" as const, counterparty: c, amountXrp: a, feeXrp: "0" });
 
 async function entry(p: InstitutionalPolicy, txs: ReturnType<typeof pay>[]) {

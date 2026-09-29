@@ -478,9 +478,12 @@ const SCENES: SceneDef[] = [
   },
   {
     id: "revenue",
-    label: "BUSINESS PLAN",
-    title: "BUSINESS PLAN",
-    hint: "Revenue streams, tiers and sequencing",
+    // The vendor's own revenue model: kept for the team, out of every
+    // customer-facing path (sidebar, landing, overview). Reachable from the
+    // command palette only.
+    label: "BUSINESS MODEL (INTERNAL)",
+    title: "BUSINESS MODEL",
+    hint: "NOSHASHI's own revenue model — internal, not customer data",
     icon: <NovaBolt size={15} />,
     digit: "",
     group: "hidden",

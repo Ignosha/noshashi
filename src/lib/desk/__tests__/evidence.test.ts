@@ -19,7 +19,6 @@ const domain: PermissionedDomain = {
   requirements: ["KYC_LEVEL_1"],
   transferCeilingXrp: 250_000,
   governance: "active",
-  members: 1,
 };
 
 const account: AccountInfo = {
