@@ -35,6 +35,13 @@ export type LedgerEntry = {
   /** True when adjudicated against cached state rather than a live read. */
   offline: boolean;
   /**
+   * The validated ledger the state was read at: the latest validated index
+   * the app had seen when adjudicating live, or the snapshot's index
+   * offline. Recorded beside the receipt, not inside its digest, so every
+   * receipt issued before it existed still verifies. Absent on older entries.
+   */
+  ledgerIndex?: number;
+  /**
    * The domain id and the full check list, kept so the receipt can be
    * re-derived later (src/lib/desk/evidence.ts). Absent on entries
    * written before they were recorded; those cannot be re-verified and
@@ -63,6 +70,7 @@ export function receiptToEntry(
     label?: string;
     hhi?: number;
     offline?: boolean;
+    ledgerIndex?: number;
     measurements?: Measurements;
     policyResults?: RuleResult[];
   }
@@ -82,6 +90,7 @@ export function receiptToEntry(
     latencyMs: receipt.latencyMs,
     at: receipt.evaluatedAt,
     offline: Boolean(extra.offline),
+    ...(extra.ledgerIndex ? { ledgerIndex: extra.ledgerIndex } : {}),
     domainId: receipt.domainId,
     checks: receipt.checks.map((c) => ({ ...c })),
     // Facts are recorded whether or not a policy was active: they do not

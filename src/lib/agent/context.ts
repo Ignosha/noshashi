@@ -147,7 +147,7 @@ export function buildSystemPrompt(
       "- Asset Passport: a signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks. Requires Enterprise.",
       "- Pricing: plans, checkout and verification credits. Free.",
       "- Account: subscription, two-factor authentication and API keys. Free.",
-      "- Business Plan: revenue streams, tiers and sequencing. Free.",
+      "- Business Model (Internal): NOSHASHI's own revenue model, for the team; command palette only, not customer data.",
       "- Legal & Accessibility: policies, accessibility statement and contact routes. Free.",
       "- Trust & Security: the read-only data path from the ledger to the receipt, what NOSHASHI never does (no keys, custody, signing or broadcast), where data goes, and what it does not claim. Free.",
       "- Settings: appearance, accessibility, wallet address, notifications, launch at login, global shortcut and Keychain storage. Free.",

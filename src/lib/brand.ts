@@ -6,7 +6,8 @@
 
 export const BRAND = {
   name: "NOSHASHI",
-  tagline: "Autonomous Compliance Layer",
+  // Not "autonomous": NOSHASHI analyses and proves; people decide.
+  tagline: "XRPL intelligence for institutional decisions",
   /** Substituted from package.json at build time — never edit by hand. */
   version: __APP_VERSION__,
   /** Update when the operating entity is registered. */

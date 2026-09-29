@@ -4,7 +4,7 @@ import { receiptToEntry, type LedgerEntry } from "../ledger";
 import { runPolicy, type PermissionedDomain } from "@/lib/policy";
 import { verifyEntry } from "../evidence";
 
-const domain: PermissionedDomain = { id: "d", name: "D", code: "DEX-US", institution: "D", requirements: ["KYC_LEVEL_1"], transferCeilingXrp: 1e6, governance: "active", members: 1 };
+const domain: PermissionedDomain = { id: "d", name: "D", code: "DEX-US", institution: "D", requirements: ["KYC_LEVEL_1"], transferCeilingXrp: 1e6, governance: "active" };
 const account = { address: "rSubjectAAAA", balanceXrp: "1000", sequence: 3, ownerCount: 1, domain: "x.com" };
 
 async function verdict(held = false): Promise<LedgerEntry> {

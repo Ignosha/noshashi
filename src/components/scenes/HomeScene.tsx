@@ -2,6 +2,7 @@ import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
+import { DecisionCard } from "@/components/nova/DecisionCard";
 import { NovaLogo } from "@/components/nova/NovaLogo";
 import { CountUp } from "@/components/nova/CountUp";
 import { StatusDot } from "@/components/nova/StatusDot";
@@ -268,9 +269,9 @@ export function HomeScene({
                 <NovaShield size={14} />
                 RUN A GATE CHECK
               </Button>
-              <Button variant="outline" className="gap-2" onClick={() => onNavigate("revenue")}>
+              <Button variant="outline" className="gap-2" onClick={() => onNavigate("history")}>
                 <NovaBolt size={14} />
-                READ THE BUSINESS PLAN
+                OPEN THE AUDIT TRAIL
               </Button>
               <Button variant="ghost" className="gap-2" onClick={() => onNavigate("agent")}>
                 <NovaTerminal size={14} />
@@ -279,8 +280,14 @@ export function HomeScene({
             </div>
           </motion.div>
 
+          {/* What was decided, why, and whether it can be proved: the
+              first thing an executive reads, before any telemetry. */}
+          <Reveal delay={0.1} className="mt-8">
+            <DecisionCard onNavigate={onNavigate} />
+          </Reveal>
+
           {/* Live proof strip */}
-          <Reveal delay={0.15} className="mt-8">
+          <Reveal delay={0.15} className="mt-6">
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               {[
                 {
@@ -637,7 +644,6 @@ export function HomeScene({
             <div className="flex items-center gap-4">
               {[
                 { label: "LEGAL & ACCESSIBILITY", scene: "legal" },
-                { label: "BUSINESS PLAN", scene: "revenue" },
                 { label: "SUPPORT", scene: "agent" },
               ].map((link) => (
                 <button

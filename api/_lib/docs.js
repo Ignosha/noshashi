@@ -122,7 +122,7 @@ export const PERMISSION_LABELS = {
 };
 
 /** Scenes that are settings, commerce or help rather than readings of the ledger. */
-const NOT_ANALYSIS = new Set(["Overview", "Agent", "Learn", "Pricing", "Account", "Business Plan", "Legal & Accessibility", "Trust & Security", "Settings"]);
+const NOT_ANALYSIS = new Set(["Overview", "Agent", "Learn", "Pricing", "Account", "Business Model (Internal)", "Legal & Accessibility", "Trust & Security", "Settings"]);
 const PLANS = ["Free", "Desk", "Institution", "Enterprise"];
 
 /* ── the fourteen sections ───────────────────────────────────────── */
@@ -171,7 +171,6 @@ ${table(["Part", "Where", "What it does"], [
   ["Edge functions", ref.edgeFunctions.map(code).join(" "), "Supabase Edge Functions: the Compliance API, checkout and billing, policy activation, exception decisions and password screening."],
   ["Database", `${code("supabase/migrations/")} (${repo.migrations.length} migrations)`, "Postgres with row-level security: accounts, API keys and rate limits, organizations and roles, policies, exceptions, investigations, webhooks and the audit log."],
 ])}
-<p>The repository also holds an earlier FastAPI service (${code("backend/")}) and Next.js interface (${code("frontend/")}). They are not deployed, and nothing on this site depends on them.</p>
 <h2>From the ledger to the receipt</h2>
 <ol class="doc-steps">${ref.stages
         .map((s) => `<li><strong>${esc(s.label)}</strong> — ${esc(s.summary)}<br><span class="doc-where mono">${s.where.map((w) => `<a href="${REPO}/${esc(w)}">${esc(w)}</a>`).join(" · ")}</span></li>`)

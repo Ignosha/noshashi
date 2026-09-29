@@ -1,5 +1,35 @@
 # Changelog
 
+## Unreleased
+
+### One product, three questions: compliance, liquidity, evidence
+
+- **Decision card on Overview.** The latest recorded decision (GO, HOLD,
+  NO-GO or INSUFFICIENT DATA) with what it means, the policy or reference
+  profile, how many rules passed, the ledger it was read at, the receipt
+  re-verified on the spot, how many public nodes are in step right now,
+  and the rules that decided it. No scores or confidence percentages:
+  every line is a record or a count. With no analyses yet it says so and
+  offers the first one.
+- **Executive and Analyst modes.** Executive shows the eight screens that
+  answer the three questions; Analyst shows every tool. New installs start
+  in Executive; the switch is at the top of the sidebar and every screen
+  stays one search away.
+- **Sidebar regrouped** into Overview, Compliance, Liquidity, Evidence,
+  then Issuers & Treasury, Intelligence and Public tools.
+- **Verdicts record their ledger index**, beside the receipt rather than
+  inside its digest, so every earlier receipt still verifies.
+- **Reference rule profiles.** The settlement gate's six built-in profiles
+  are named for what they are, with no invented institutions or member
+  counts.
+- **The vendor's business model** is off every customer path; it remains
+  in the command palette, labelled internal.
+- **The tagline** no longer says "autonomous": NOSHASHI analyses and
+  proves; people decide.
+- **Repository:** code from an earlier, never-deployed product (a FastAPI
+  service, a Next.js site, a Swift menu-bar app) and its plans are removed.
+  `docs/IMPLEMENTATION_PLAN.md` records the audit and the phases.
+
 ## 1.0.15
 
 ### Built for banks and compliance officers: readable, real, filed
