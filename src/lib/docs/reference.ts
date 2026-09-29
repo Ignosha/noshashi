@@ -1,3 +1,4 @@
+import { unknownLedgerAgreementCheck } from "@/lib/net/agreement";
 import { DOMAIN_REGISTRY, VERDICT_COPY, evaluatePolicy } from "@/lib/policy";
 import { WEBHOOK_EVENTS } from "@/lib/org/webhooks";
 import { can, type MemberRole } from "@/lib/org/governance";
@@ -96,7 +97,8 @@ export function verbsOf(verify: string): { path: string; description: string }[]
 export function rulesOf(): DocsRule[] {
   const byKey = new Map<string, DocsRule>();
   for (const domain of DOMAIN_REGISTRY) {
-    const { checks } = evaluatePolicy({ account: null, credentials: [], domain, amountXrp: 0 });
+    // SOURCE_AGREEMENT is added by the verification gate at run time (it needs live nodes); listed here so the docs name it.
+    const { checks } = evaluatePolicy({ account: null, credentials: [], domain, amountXrp: 0, agreement: unknownLedgerAgreementCheck() });
     for (const check of checks) {
       const key = `${check.id}|${check.label}|${check.severity}`;
       const rule = byKey.get(key) ?? { id: check.id, label: check.label, severity: check.severity as "block" | "warn", domains: [] };

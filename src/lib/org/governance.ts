@@ -42,6 +42,21 @@ export type DirectoryEntry = { accountId: string; email: string; displayName: st
 
 export type OrgPolicyStatus = "draft" | "pending" | "active" | "archived";
 
+/**
+ * The lifecycle in the words a reviewer uses: Draft → In review → Approved &
+ * active → Superseded. The database keeps four states; approval and
+ * activation are one four-eyes step (a second authorized person, never the
+ * author, activates), and `archived` is only ever reached when a newer
+ * version is activated (policy_status_guard allows active → archived and
+ * nothing else), so it reads as superseded.
+ */
+export const POLICY_STAGE: Record<OrgPolicyStatus, { label: string; meaning: string }> = {
+  draft: { label: "DRAFT", meaning: "Being written. The only state in which a version can change." },
+  pending: { label: "IN REVIEW", meaning: "Submitted. Frozen. Waiting for a second authorized person to approve and activate it." },
+  active: { label: "APPROVED · ACTIVE", meaning: "Approved by someone other than its author and governing new verdicts." },
+  archived: { label: "SUPERSEDED", meaning: "Replaced by a newer approved version. Receipts issued under it still name it and still verify." },
+};
+
 export type OrgPolicy = {
   organizationId: string;
   id: string;
@@ -110,9 +125,29 @@ export type PolicyException = {
   decidedBy: string | null;
   decidedAt: string | null;
   decisionNote: string | null;
+  /**
+   * When an approval stops covering its verdict. Set on every approval since
+   * 2026-09-29 (migration 20260929140000); null on earlier approvals and on
+   * anything not approved.
+   */
+  expiresAt: string | null;
   /** Evidence requests and the supplements that answered them, oldest first. */
   notes: ExceptionNote[];
 };
+
+export type ExceptionStanding = "open" | "in-force" | "expired" | "no-expiry" | "rejected";
+
+/**
+ * Whether an exception covers its verdict at `now`. An approval with an
+ * expiry in the past is shown as EXPIRED: the record stays exactly as it was
+ * decided, but it no longer covers anything.
+ */
+export function exceptionStanding(x: Pick<PolicyException, "status" | "expiresAt">, now = Date.now()): ExceptionStanding {
+  if (x.status === "rejected") return "rejected";
+  if (x.status !== "approved") return "open";
+  if (!x.expiresAt) return "no-expiry";
+  return Date.parse(x.expiresAt) > now ? "in-force" : "expired";
+}
 
 export type AuditRow = {
   id: number;
@@ -277,7 +312,7 @@ type ExceptionRow = {
   id: string; organization_id: string; subject: string; receipt_digest: string; verdict: string;
   policy_id: string | null; policy_version: number | null; policy_hash: string | null; case_id: string | null;
   reason: string; evidence: ExceptionEvidence; status: ExceptionStatus; requested_by: string; requested_at: string;
-  decided_by: string | null; decided_at: string | null; decision_note: string | null;
+  decided_by: string | null; decided_at: string | null; decision_note: string | null; expires_at?: string | null;
 };
 
 function exceptionFromRow(r: ExceptionRow): PolicyException {
@@ -286,7 +321,7 @@ function exceptionFromRow(r: ExceptionRow): PolicyException {
     verdict: r.verdict, policyId: r.policy_id, policyVersion: r.policy_version, policyHash: r.policy_hash,
     caseId: r.case_id, reason: r.reason, evidence: r.evidence, status: r.status, requestedBy: r.requested_by,
     requestedAt: r.requested_at, decidedBy: r.decided_by, decidedAt: r.decided_at, decisionNote: r.decision_note,
-    notes: [],
+    expiresAt: r.expires_at ?? null, notes: [],
   };
 }
 
@@ -565,10 +600,10 @@ export async function requestException(input: {
  * The only path to an approved or rejected exception, or to one sent back
  * for more evidence: noshashi-exception-decide.
  */
-export const decideException = (x: PolicyException, decision: "approve" | "reject" | "request_evidence", note: string) =>
-  invokeGoverned<{ status: ExceptionStatus; requested_by: string; decided_by?: string; reviewer?: string }>(
+export const decideException = (x: PolicyException, decision: "approve" | "reject" | "request_evidence", note: string, expiresInDays = 30) =>
+  invokeGoverned<{ status: ExceptionStatus; requested_by: string; decided_by?: string; reviewer?: string; expires_at?: string | null }>(
     "noshashi-exception-decide",
-    { exceptionId: x.id, decision, note },
+    { exceptionId: x.id, decision, note, ...(decision === "approve" ? { expiresInDays } : {}) },
     DECISION_FAILED
   );
 

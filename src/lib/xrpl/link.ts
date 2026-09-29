@@ -14,6 +14,8 @@ const ENDPOINTS = [
   "wss://s2.ripple.com",
 ];
 
+import { RequestPacer } from "./pacer";
+
 const REQUEST_TIMEOUT_MS = 12_000;
 const MAX_BACKOFF_MS = 20_000;
 
@@ -49,6 +51,12 @@ class XrplLink {
   private statusHandlers = new Set<StatusHandler>();
   private latencyMs = 0;
   private connected = false;
+  // Every read goes through the pacer: bounded concurrency, and a cool-down
+  // plus retry (then the next server) when a public node says slowDown.
+  private pacer = new RequestPacer(
+    () => void this.reconnect(),
+    (message, code) => new XrplError(message, code)
+  );
 
   /** Round-trip time of the most recent successful command. */
   getLatencyMs(): number {
@@ -86,7 +94,7 @@ class XrplLink {
     }
     for (const [, entry] of this.pending) {
       window.clearTimeout(entry.timer);
-      entry.reject(new XrplError("Connection reset"));
+      entry.reject(new XrplError("Connection reset", "disconnected"));
     }
     this.pending.clear();
     try {
@@ -168,11 +176,11 @@ class XrplLink {
         // Fail every in-flight request rather than leaving them hanging.
         for (const [, entry] of this.pending) {
           window.clearTimeout(entry.timer);
-          entry.reject(new XrplError("Connection closed"));
+          entry.reject(new XrplError("Connection closed", "disconnected"));
         }
         this.pending.clear();
 
-        reject(new XrplError("Connection closed"));
+        reject(new XrplError("Connection closed", "disconnected"));
         this.scheduleReconnect();
       };
     });
@@ -228,8 +236,12 @@ class XrplLink {
     }
   }
 
-  /** Issue a rippled command and await its response. */
-  async request(
+  /** Issue a rippled command and await its response, paced. */
+  request(command: string, params: Record<string, unknown> = {}): Promise<Record<string, any>> {
+    return this.pacer.run(() => this.send(command, params));
+  }
+
+  private async send(
     command: string,
     params: Record<string, unknown> = {}
   ): Promise<Record<string, any>> {

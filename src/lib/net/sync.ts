@@ -220,6 +220,27 @@ export async function readSync(): Promise<SyncReport> {
   };
 }
 
+let shared: { at: number; report: Promise<SyncReport> } | null = null;
+
+/**
+ * One reading of the nodes shared by every screen that only needs a recent
+ * one (the Decision Card, the assistant). Each readSync() opens a socket to
+ * every public node; calling it on every visit to Overview added load the
+ * public servers meter per IP. A reading younger than `maxAgeMs` (or one
+ * still in flight) is reused; Ledger Sync keeps reading fresh on its own
+ * cadence.
+ */
+export function readSyncShared(maxAgeMs = 60_000): Promise<SyncReport> {
+  const now = Date.now();
+  if (shared && now - shared.at < maxAgeMs) return shared.report;
+  const report = readSync();
+  shared = { at: now, report };
+  report.catch(() => {
+    if (shared?.report === report) shared = null;
+  });
+  return report;
+}
+
 export type SyncFinding = {
   id: string;
   severity: "critical" | "warn" | "info" | "ok";

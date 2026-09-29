@@ -266,6 +266,8 @@ export function evaluatePolicy(input: {
   /** Institutional policy checks (src/lib/desk/institutional.ts toChecks). */
   policyChecks?: PolicyCheck[];
   policy?: PolicyRef;
+  /** SOURCE_AGREEMENT (src/lib/net/agreement.ts): whether independent nodes returned this reading. */
+  agreement?: PolicyCheck;
 }): Omit<PolicyReceipt, "digest" | "latencyMs"> {
   const { account, credentials, domain, amountXrp, evidenceUnavailable = [] } = input;
   const held = heldCredentialTypes(credentials);
@@ -376,6 +378,8 @@ export function evaluatePolicy(input: {
       detail: `The ${source} source could not be read from the validated ledger. No conclusion is asserted for this source.`,
     });
   }
+
+  if (input.agreement) checks.push(input.agreement);
 
   checks.push(...(input.policyChecks ?? []));
 

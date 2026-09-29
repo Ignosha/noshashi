@@ -45,6 +45,7 @@ import type { XrplState } from "@/lib/xrpl/useXRPL";
 import type { Status } from "@/lib/xrpl/types";
 import { cn } from "@/lib/utils";
 import { SPRING } from "@/lib/motion";
+import { agreementCheck, offlineAgreementCheck, readAgreement, unknownLedgerAgreementCheck } from "@/lib/net/agreement";
 
 const verdictText: Record<Status, string> = {
   go: "text-go",
@@ -154,8 +155,20 @@ export function VerificationScene({ data }: { data: XrplState }) {
       const facts = gatherFacts();
       const measurements = measure(facts);
       const results = active && measurements ? judge(measurements, active.params) : null;
+      // Before a GO is issued, the reading is asked of every public node at
+      // one validated ledger. Disagreement, a single answering node, or an
+      // account that moved since it was read each withhold the GO.
+      const readAt = data.ledger?.ledgerIndex;
+      const agreement = vault.engaged
+        ? offlineAgreementCheck(vault.active!.ledgerIndex)
+        : !account
+          ? undefined
+          : readAt
+            ? agreementCheck(await readAgreement(account.address, readAt), account)
+            : unknownLedgerAgreementCheck();
       const [result] = await Promise.all([
         runPolicy({
+          agreement,
           account,
           credentials,
           domain,

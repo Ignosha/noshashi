@@ -31,6 +31,8 @@ import {
   createDraft,
   createOrganization,
   decideException,
+  exceptionStanding,
+  POLICY_STAGE,
   addExceptionEvidence,
   evidenceReferences,
   discardDraft,
@@ -503,7 +505,7 @@ function OrgPolicyBody({
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-border">
-                {["VERSION", "STATUS", "AUTHOR", "ACTIVATED BY", "EFFECTIVE", "ARCHIVED", "SHA-256", ""].map((h) => (
+                {["VERSION", "STATUS", "AUTHOR", "APPROVED & ACTIVATED BY", "EFFECTIVE", "SUPERSEDED", "SHA-256", ""].map((h) => (
                   <th key={h} className="stencil px-2 py-1.5 text-[10px] font-medium tracking-[0.14em] text-muted-foreground">{h}</th>
                 ))}
               </tr>
@@ -516,7 +518,7 @@ function OrgPolicyBody({
                   <FragmentRow key={k} open={viewing === k}>
                     <tr className="border-b border-border/30">
                       <td className="mono-font px-2 py-1.5 text-[11px] text-foreground">{v.name} v{v.version}</td>
-                      <td className={cn("stencil px-2 py-1.5 text-[10px] tracking-[0.1em]", tone)}>● {v.status.toUpperCase()}</td>
+                      <td className={cn("stencil px-2 py-1.5 text-[10px] tracking-[0.1em]", tone)}><span title={POLICY_STAGE[v.status].meaning}>● {POLICY_STAGE[v.status].label}</span></td>
                       <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{nameOf(dir, v.createdBy)}</td>
                       <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{v.activatedBy ? nameOf(dir, v.activatedBy) : "—"}</td>
                       <td className="mono-font px-2 py-1.5 text-[10.5px] text-muted-foreground">{utc(v.effectiveAt)}</td>
@@ -604,6 +606,7 @@ function ExceptionsPanel({
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<{ id: string; f: ServerFailure } | null>(null);
   const [refs, setRefs] = useState("");
+  const [expiryDays, setExpiryDays] = useState(30);
   // "Open" means someone still has to act: a reviewer (pending) or the requester (needs_evidence).
   const isOpen = (x: PolicyException) => x.status === "pending" || x.status === "needs_evidence";
   const rows = data.exceptions.filter((x) => filter === "all" || isOpen(x));
@@ -632,7 +635,7 @@ function ExceptionsPanel({
     setBusy(true);
     setFailure(null);
     try {
-      const r = await decideException(x, decision, note);
+      const r = await decideException(x, decision, note, expiryDays);
       if (!r.ok) {
         setFailure({ id: x.id, f: r });
         await refresh();
@@ -643,7 +646,7 @@ function ExceptionsPanel({
       push(
         decision === "request_evidence"
           ? { title: "EVIDENCE REQUESTED", body: `${nameOf(dir, r.requested_by)} is asked to add evidence before a decision`, tone: "info" }
-          : { title: decision === "approve" ? "EXCEPTION APPROVED" : "EXCEPTION REJECTED", body: `Requested by ${nameOf(dir, r.requested_by)} · decided by ${nameOf(dir, r.decided_by ?? null)}`, tone: decision === "approve" ? "go" : "info" }
+          : { title: decision === "approve" ? "EXCEPTION APPROVED" : "EXCEPTION REJECTED", body: `Requested by ${nameOf(dir, r.requested_by)} · decided by ${nameOf(dir, r.decided_by ?? null)}${r.expires_at ? ` · expires ${utc(r.expires_at)}` : ""}`, tone: decision === "approve" ? "go" : "info" }
       );
     } finally {
       setBusy(false);
@@ -682,13 +685,19 @@ function ExceptionsPanel({
                   {x.verdict.toUpperCase()} · {shortAddress(x.subject)} · {x.evidence.amountXrp.toLocaleString("en-US")} XRP
                   {x.policyId ? ` · ${x.policyId} v${x.policyVersion}` : " · no institutional policy"}
                 </p>
-                <span className={cn("stencil text-[10px] tracking-[0.14em]", x.status === "approved" ? "text-go" : x.status === "rejected" ? "text-no-go" : "text-hold")}>
-                  ● {x.status === "needs_evidence" ? "AWAITING EVIDENCE" : x.status.toUpperCase()}
-                </span>
+                {(() => {
+                  const standing = exceptionStanding(x);
+                  return (
+                    <span className={cn("stencil text-[10px] tracking-[0.14em]", standing === "in-force" || standing === "no-expiry" ? "text-go" : standing === "rejected" ? "text-no-go" : standing === "expired" ? "text-muted-foreground" : "text-hold")}>
+                      ● {x.status === "needs_evidence" ? "AWAITING EVIDENCE" : standing === "expired" ? "APPROVED · EXPIRED" : standing === "in-force" ? "APPROVED · IN FORCE" : x.status.toUpperCase()}
+                    </span>
+                  );
+                })()}
               </div>
               <p className="mono-font mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
                 REQUESTED BY {nameOf(dir, x.requestedBy)} · {utc(x.requestedAt)}
                 {x.decidedBy && <> · {x.status === "approved" ? "APPROVED" : "REJECTED"} BY {nameOf(dir, x.decidedBy)} · {utc(x.decidedAt)}</>}
+                {x.status === "approved" && <> · {x.expiresAt ? `${Date.parse(x.expiresAt) > Date.now() ? "EXPIRES" : "EXPIRED"} ${utc(x.expiresAt)}` : "APPROVED BEFORE EXPIRY WAS RECORDED"}</>}
                 <br />
                 RECEIPT <span className="selectable">{x.receiptDigest}</span>
                 {x.policyHash && <><br />POLICY SHA-256 <span className="selectable">{x.policyHash}</span></>}
@@ -742,8 +751,17 @@ function ExceptionsPanel({
                       <p className="mb-1 text-[11px] text-hold">You requested this exception. A second authorized person must decide it; the server refuses your decision.</p>
                     )}
                     <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Decision note (required to reject or to ask for more evidence, at least 10 characters)" className="w-full rounded border border-border bg-background p-2 text-[11.5px] text-foreground" />
+                    <label className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                      AN APPROVAL EXPIRES AFTER
+                      <select aria-label="Approval expires after" value={expiryDays} onChange={(e) => setExpiryDays(Number(e.target.value))} className="mono-font h-7 rounded border border-border bg-background px-1 text-[11px] text-foreground">
+                        {[1, 7, 30, 90, 180, 365].map((d) => (
+                          <option key={d} value={d}>{d} day{d === 1 ? "" : "s"}</option>
+                        ))}
+                      </select>
+                      <span>After that it no longer covers this verdict; the record stays.</span>
+                    </label>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
-                      <Button size="sm" disabled={busy} onClick={() => void decide(x, "approve")}>APPROVE</Button>
+                      <Button size="sm" disabled={busy} onClick={() => void decide(x, "approve")}>APPROVE FOR {expiryDays} DAY{expiryDays === 1 ? "" : "S"}</Button>
                       <Button size="sm" variant="outline" disabled={busy} onClick={() => void decide(x, "reject")}>REJECT</Button>
                       <Button size="sm" variant="outline" disabled={busy} onClick={() => void decide(x, "request_evidence")}>REQUEST MORE EVIDENCE</Button>
                       <Button size="sm" variant="ghost" disabled={busy} onClick={() => setOpen(null)}>CANCEL</Button>
@@ -944,7 +962,7 @@ const AUDIT_WORDS: Record<string, string> = {
   "policy.submitted": "SUBMITTED FOR ACTIVATION",
   "policy.withdrawn": "WITHDRAWN TO DRAFT",
   "policy.activated": "ACTIVATED",
-  "policy.archived": "ARCHIVED",
+  "policy.archived": "SUPERSEDED",
   "exception.requested": "EXCEPTION REQUESTED",
   "exception.approved": "EXCEPTION APPROVED",
   "exception.rejected": "EXCEPTION REJECTED",

@@ -5,7 +5,7 @@ import { NovaShield } from "@/components/nova/NovaIcon";
 import { useLedger, type LedgerEntry } from "@/lib/desk/ledger";
 import { verifyEntry, type ReceiptCheck } from "@/lib/desk/evidence";
 import { checkState, CHECK_STATE_COPY, DOMAIN_REGISTRY } from "@/lib/policy";
-import { readSync, type SyncReport } from "@/lib/net/sync";
+import { readSyncShared, type SyncReport } from "@/lib/net/sync";
 import { shortAddress } from "@/lib/xrpl/client";
 import { cn } from "@/lib/utils";
 
@@ -65,7 +65,7 @@ export function DecisionCard({ onNavigate }: { onNavigate: (scene: string) => vo
 
   useEffect(() => {
     let cancelled = false;
-    void readSync()
+    void readSyncShared()
       .then((r) => {
         if (!cancelled) setSync(r);
       })
@@ -94,6 +94,14 @@ export function DecisionCard({ onNavigate }: { onNavigate: (scene: string) => vo
   const tone = TONE[latest.verdict];
   const profile = DOMAIN_REGISTRY.find((d) => d.id === latest.domainId);
   const list = findings(latest);
+  const agreement = latest.checks?.find((c) => c.id === "SOURCE_AGREEMENT");
+  const sourcesLine = !agreement
+    ? { value: "Not recorded (issued before source agreement)", tone: "muted" as const }
+    : checkState(agreement) === "NOT_APPLICABLE"
+      ? { value: "Snapshot: no live comparison", tone: "muted" as const }
+      : agreement.passed
+        ? { value: agreement.detail.split(" returned")[0].replace("public nodes", "public nodes agreed"), tone: "go" as const }
+        : { value: "Not corroborated: GO withheld", tone: "hold" as const };
   const agreeing = sync ? sync.nodes.filter((n) => n.reachable && n.ledgerSeq !== undefined && sync.leaderSeq !== undefined && sync.leaderSeq - n.ledgerSeq <= 2).length : null;
 
   return (
@@ -121,6 +129,7 @@ export function DecisionCard({ onNavigate }: { onNavigate: (scene: string) => vo
               label="LEDGER"
               value={latest.ledgerIndex ? `#${latest.ledgerIndex.toLocaleString()}${latest.offline ? " (snapshot)" : ""}` : latest.offline ? "Offline snapshot" : "Not recorded (older entry)"}
             />
+            <DataRow label="SOURCES" value={sourcesLine.value} tone={sourcesLine.tone} />
             <DataRow
               label="RECEIPT"
               value={receipt === null ? "Checking…" : receipt.state === "verified" ? "Verified · SHA-256 recomputed" : receipt.state === "mismatch" ? "DOES NOT MATCH" : "Unverifiable (older entry)"}

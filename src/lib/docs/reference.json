@@ -446,6 +446,19 @@
       ]
     },
     {
+      "id": "SOURCE_AGREEMENT",
+      "label": "Independent sources agree on the reading",
+      "severity": "warn",
+      "domains": [
+        "DEX-US",
+        "LEND-INST",
+        "TOKEN-PVT",
+        "MINT-US",
+        "CUST-Q",
+        "RTL-OPEN"
+      ]
+    },
+    {
       "id": "CREDENTIAL_ACCREDITED_INVESTOR",
       "label": "Holds accredited investor",
       "severity": "block",

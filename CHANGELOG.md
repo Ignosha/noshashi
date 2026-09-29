@@ -1,6 +1,18 @@
 # Changelog
 
-## Unreleased
+## 1.0.16
+
+### Fixed: "too much load" errors from the public XRPL servers
+
+- Every ledger read now goes through one pacer: at most four reads are in
+  flight at once, and when a public server answers `slowDown` or `tooBusy`
+  ("You are placing too much load on the server") NOSHASHI waits, retries
+  the same read, and moves to the next public server if the throttling
+  continues. Only if that fails does it say so, in plain words, and nothing
+  is decided on a partial read. Busy screens (Audit Trail paging, registry
+  reads, screening batches) no longer trip the limit.
+- Overview no longer opens a fresh connection to every public node on each
+  visit; one recent reading is shared.
 
 ### One product, three questions: compliance, liquidity, evidence
 
@@ -29,6 +41,27 @@
 - **Repository:** code from an earlier, never-deployed product (a FastAPI
   service, a Next.js site, a Swift menu-bar app) and its plans are removed.
   `docs/IMPLEMENTATION_PLAN.md` records the audit and the phases.
+
+### Compliance: sources must agree, settings explain themselves, exceptions expire
+
+- **No GO without agreement.** Before a verdict is issued, every public node
+  is asked for the ledger hash and the account's state at the same validated
+  ledger. The new SOURCE_AGREEMENT rule, recorded in the receipt, holds the
+  verdict (never GO) when nodes disagree, when fewer than two answer, or
+  when the account changed after it was read. It can lower a verdict to
+  HOLD; it never turns one into NO-GO. Offline verdicts record it as not
+  applicable. The Decision Card shows how many nodes agreed.
+- **Every policy setting is a rule sheet:** its value and unit, what it
+  reads from the ledger, the exact condition that triggers it (with the
+  configured value in it), and what that does to the verdict. Built from the
+  same parameters the engine applies, and tested against them.
+- **Exceptions expire.** Every approval now carries an expiry the approver
+  chooses (1 to 365 days, 30 by default), set in the same transaction as
+  the decision and written to its audit event. An expired approval stays on
+  record, is shown as expired and can no longer be cited to close a case.
+  Approvals made before this change are labelled as such; none were edited.
+- **Policy lifecycle in reviewers' words:** Draft, In review, Approved &
+  active (four-eyes: never by the author), Superseded.
 
 ## 1.0.15
 
