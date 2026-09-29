@@ -100,11 +100,12 @@ export function unfundedAccount(address: string): AccountInfo {
   return { address, balanceXrp: "0.00", sequence: 0, ownerCount: 0, unfunded: true };
 }
 
-export async function fetchAccount(address: string): Promise<AccountInfo> {
+/** `validatedIndex`: "validated", or the index of a ledger already known to be validated (a receipt's). */
+export async function fetchAccount(address: string, validatedIndex: number | "validated" = "validated"): Promise<AccountInfo> {
   try {
     const result = await rpc("account_info", {
       account: address,
-      ledger_index: "validated",
+      ledger_index: validatedIndex,
     });
     const data = result.account_data ?? {};
     return {
@@ -131,11 +132,12 @@ export async function fetchAccount(address: string): Promise<AccountInfo> {
 }
 
 export async function fetchWalletCredentials(
-  address: string
+  address: string,
+  validatedIndex: number | "validated" = "validated"
 ): Promise<CredentialRecord[]> {
   const result = await rpc("account_objects", {
     account: address,
-    ledger_index: "validated",
+    ledger_index: validatedIndex,
     type: "credential",
     limit: 100,
   });
@@ -716,4 +718,22 @@ export async function fetchIssuerObligations(
       unreadable: error instanceof Error ? error.message : "unreadable",
     };
   }
+}
+
+/** The singleton FeeSettings object's index: SHA-512Half of the space key 'e'. */
+const FEE_SETTINGS_INDEX = "4BC50C9B0D8515D3EAAE1E74B29A95804346C491EE1A95BF25E4AAB854A6A651";
+
+/**
+ * The reserve in force at a given validated ledger, read from its
+ * FeeSettings object. Since the XRPFees amendment the object carries
+ * ReserveBaseDrops / ReserveIncrementDrops; before it, ReserveBase /
+ * ReserveIncrement. Either is read; neither present is an error.
+ */
+export async function fetchReserveAt(validatedIndex: number): Promise<{ baseXrp: number; incXrp: number }> {
+  const result = await rpc("ledger_entry", { index: FEE_SETTINGS_INDEX, ledger_index: validatedIndex });
+  const node = result.node ?? {};
+  const base = Number(node.ReserveBaseDrops ?? node.ReserveBase);
+  const inc = Number(node.ReserveIncrementDrops ?? node.ReserveIncrement);
+  if (!Number.isFinite(base) || !Number.isFinite(inc)) throw new XrplError("FeeSettings did not carry reserve values", "noReserve");
+  return { baseXrp: base / 1_000_000, incXrp: inc / 1_000_000 };
 }

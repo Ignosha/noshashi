@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils";
 import { PolicyVerdictBlock } from "./PolicyVerdict";
 import { OpenInvestigationButton } from "./CasesPanel";
 import { RequestExceptionButton } from "./OrgPolicyManager";
+import { ExportReportButton, ReplayButton, ReplayResultView } from "./ReplayPanel";
+import type { ReplayResult } from "@/lib/desk/replay";
 
 const LIST = 60;
 
@@ -46,6 +48,7 @@ export function EvidencePanel({
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [check, setCheck] = useState<ReceiptCheck | null>(null);
+  const [replay, setReplay] = useState<ReplayResult | null>(null);
   const [checking, setChecking] = useState(false);
 
   const list = useMemo(() => {
@@ -67,7 +70,10 @@ export function EvidencePanel({
   );
 
   // A verification result belongs to one entry; drop it when the selection moves.
-  useEffect(() => setCheck(null), [selected?.id]);
+  useEffect(() => {
+    setCheck(null);
+    setReplay(null);
+  }, [selected?.id]);
 
   if (!loaded) {
     return <p className="mono-font animate-pulse p-4 text-[11px] text-muted-foreground">LOADING LEDGER…</p>;
@@ -142,6 +148,8 @@ export function EvidencePanel({
               <NovaShield size={13} />
               {checking ? "RECOMPUTING…" : "VERIFY RECEIPT"}
             </Button>
+            <ReplayButton entry={selected} onResult={setReplay} />
+            <ExportReportButton entry={selected} replay={replay} />
             <OpenInvestigationButton entry={selected} onOpened={onOpenCase} />
             {selected.verdict !== "go" && <RequestExceptionButton entry={selected} />}
             {consistent === false && (
@@ -152,6 +160,7 @@ export function EvidencePanel({
           </div>
 
           {check && <VerifyResult check={check} />}
+          {replay && <ReplayResultView result={replay} />}
 
           <Eyebrow className="mb-2 mt-5">EVIDENCE CHAIN</Eyebrow>
           <ol className="border-l border-border">

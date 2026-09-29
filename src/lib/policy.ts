@@ -419,7 +419,15 @@ async function sha256Hex(canonical: string): Promise<string> {
 export async function receiptDigest(
   body: Omit<PolicyReceipt, "digest" | "latencyMs">
 ): Promise<string> {
-  return sha256Hex(
+  return sha256Hex(receiptCanonical(body));
+}
+
+/**
+ * The exact bytes the receipt digest is taken over. Exported so a report can
+ * print them and anyone can recompute the SHA-256 with a standard tool.
+ */
+export function receiptCanonical(body: Omit<PolicyReceipt, "digest" | "latencyMs">): string {
+  return (
     JSON.stringify({
       verdict: body.verdict,
       domainId: body.domainId,
