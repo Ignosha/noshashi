@@ -98,9 +98,9 @@ merge, and this file updated with what landed.
 | 7 | Security + permissions + audit | `docs/SECURITY_THREAT_MODEL.md` (assets, actors, boundaries, 14 scenarios with the code that mitigates each, residual risks, out of scope); `SECURITY.md` known gaps brought up to date; `core:webview:allow-internal-toggle-devtools` removed from the production capability. *Remaining:* distinct reviewer/auditor roles; login events mirrored into the org audit log | partial |
 | 8 | API + enterprise | `docs/PROCUREMENT.md` (legal, security, identity, data, operations, API; each IMPLEMENTED / PARTIAL / PLANNED). *Remaining:* first-request quick start in `docs/API.md`, `docs/ENTERPRISE.md` | partial |
 | 9 | Tauri + release engineering | macOS signing and notarisation wired in `release.yml`, exported only when the owner's secrets exist (no-op otherwise); `docs/RELEASE_SIGNING.md` (secrets, verification commands, Windows options, release checklist). *Remaining:* Windows Authenticode needs a chosen certificate provider; `docs/DEPLOYMENT.md` | partial |
-| 10 | Website + onboarding | Homepage around "One ledger. Three questions."; workflow section; first-run onboarding (purpose → mode → first analysis → evidence); live/demo labels | |
+| 10 | Website + onboarding | Hero rewritten ("XRPL intelligence for institutional decisions.", 8 languages); "One ledger. Three questions." section with the ledger-to-approval workflow under the hero. *Remaining:* first-run onboarding (purpose → mode → first analysis → evidence) | partial |
 | 11 | Performance + accessibility | Bundle and startup measurements, animation budgets, reduced motion everywhere, focus and labels | |
-| 12 | QA + documentation sync | README rewrite; ARCHITECTURE, DATA_MODEL, POLICY_ENGINE, EVIDENCE, AI_GOVERNANCE, PRIVACY, DR, INCIDENT_RESPONSE, sales docs; single source of truth for version and features | |
+| 12 | QA + documentation sync | README rewritten, operator handbook preserved in `docs/OPERATIONS.md`; sales docs (`SALES_DEMO.md`, `ONE_PAGER.md` + PDF). *Remaining:* ARCHITECTURE, DATA_MODEL, POLICY_ENGINE, EVIDENCE, AI_GOVERNANCE, PRIVACY, DR, INCIDENT_RESPONSE; single source of truth for version and features | partial |
 
 ### Things this plan will not do
 

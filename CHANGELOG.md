@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Website: one ledger, three questions
+
+- The homepage now opens with "XRPL intelligence for institutional
+  decisions." and "Analyze compliance, liquidity and control conditions from
+  validated ledger state — then produce evidence you can verify", in all
+  eight site languages.
+- A new section right under the hero: **One ledger. Three questions.**
+  Compliance (can this move?), Liquidity (can it actually exit?), Evidence
+  (can we prove why?), and the workflow from ledger to approval.
+- The README is rewritten for a first-time reader; the operator handbook
+  moved, unchanged, to `docs/OPERATIONS.md`.
+
 ### Security and procurement documentation; signing ready to switch on
 
 - `docs/SECURITY_THREAT_MODEL.md`: assets, threat actors, trust boundaries,

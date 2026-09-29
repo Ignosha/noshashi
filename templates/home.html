@@ -1071,7 +1071,7 @@
       </div>
 
       <p class="hi-title">NOSHASHI</p>
-      <h1 data-i18n="hero.h1">Am I allowed to move this — and could I actually get out of it?</h1>
+      <h1 data-i18n="hero.h1">XRPL intelligence for institutional decisions.</h1>
       <!-- Filled by site/assets/garden-field.js from the live ledger stream; the text here is what shows without script. -->
       <p class="mono" data-garden-caption translate="no" style="margin:6px 0 0;font-size:11px;color:var(--faint)">The pond answers each validated XRPL ledger as it closes.</p>
 
@@ -1094,9 +1094,8 @@
                        vector-effect="non-scaling-stroke"/>
             </svg>
             <p data-i18n="hero.mission">
-              A zero-trust intelligence workstation for the XRP Ledger — compliance
-              adjudication and market intelligence read from one validated ledger state,
-              in the same second.
+              Analyze compliance, liquidity and control conditions from validated ledger
+              state — then produce evidence you can verify.
             </p>
             <a href="/certificate/" data-i18n="hero.bloom.cta">READ AN AUTHORITY CERTIFICATE →</a>
           </div>
@@ -1133,6 +1132,43 @@
     unchanged: the operating brief, the decision loop and the ticker.
     The redesign replaced the opening screen, not the content under it.
   -->
+  <section id="three-questions" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">One ledger. Three questions.</p>
+      <h2>Can this move? Can it actually exit? Can we prove why?</h2>
+      <p>Every answer is read from validated XRPL state, decided by deterministic rules and
+         your versioned policy, and recorded with a receipt anyone can recompute. People make
+         the institutional decision; NOSHASHI shows them what the ledger supports.</p>
+    </div>
+    <div class="grid g3">
+      <div class="panel">
+        <p class="num">COMPLIANCE</p>
+        <h3>Can this move?</h3>
+        <p>GO, HOLD or NO-GO against your policy: freeze rights, credentials, reserve headroom,
+           concentration, Travel Rule thresholds. Every rule's result and reason is shown, and
+           no GO is issued unless independent public servers agree on the ledger.</p>
+      </div>
+      <div class="panel">
+        <p class="num">LIQUIDITY</p>
+        <h3>Can this actually exit?</h3>
+        <p>What the order book quotes is not what can fill. NOSHASHI counts only what each
+           offer's owner can deliver, simulates the exit against that, and joins it to the
+           issuer's right to freeze.</p>
+      </div>
+      <div class="panel">
+        <p class="num">EVIDENCE</p>
+        <h3>Can we prove why?</h3>
+        <p>Each decision carries a SHA-256 receipt over the rules, the policy version and the
+           ledger it was read at. Re-verify it, replay it at that ledger, or export a report an
+           auditor can check with <code>shasum</code>.</p>
+      </div>
+    </div>
+    <p class="mono" style="margin-top:22px;font-size:11.5px;letter-spacing:.08em;color:var(--muted);text-align:center"
+       aria-label="Workflow: ledger, validate, analyze, adjudicate, explain, prove, approve">
+      LEDGER → VALIDATE → ANALYZE → ADJUDICATE → EXPLAIN → PROVE → <span style="color:var(--ink)">APPROVE</span>
+    </p>
+  </section>
+
   <section class="hero hero-continued">
 
     <div class="hero-brief" aria-label="Institutional operating brief">
