@@ -108,6 +108,43 @@ jobs:
 
       - run: npm install --no-audit --no-fund
 
+      # macOS code signing and notarisation, switched on only when the
+      # owner's Apple credentials are configured as repository secrets
+      # (docs/RELEASE_SIGNING.md). With none set this step exports nothing,
+      # so the build is exactly as before: an empty APPLE_CERTIFICATE in the
+      # environment would make the bundler try, and fail, to import it.
+      - name: Enable macOS signing when configured
+        if: matrix.platform == 'macos-latest'
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ] && [ -n "$APPLE_SIGNING_IDENTITY" ]; then
+            {
+              echo "APPLE_CERTIFICATE=$APPLE_CERTIFICATE"
+              echo "APPLE_CERTIFICATE_PASSWORD=$APPLE_CERTIFICATE_PASSWORD"
+              echo "APPLE_SIGNING_IDENTITY=$APPLE_SIGNING_IDENTITY"
+            } >> "$GITHUB_ENV"
+            echo "macOS signing: on"
+            if [ -n "$APPLE_ID" ] && [ -n "$APPLE_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+              {
+                echo "APPLE_ID=$APPLE_ID"
+                echo "APPLE_PASSWORD=$APPLE_PASSWORD"
+                echo "APPLE_TEAM_ID=$APPLE_TEAM_ID"
+              } >> "$GITHUB_ENV"
+              echo "macOS notarisation: on"
+            else
+              echo "macOS notarisation: off (APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID not all set)"
+            fi
+          else
+            echo "macOS signing: off (APPLE_CERTIFICATE and APPLE_SIGNING_IDENTITY not set)"
+          fi
+
       - name: Build
         uses: tauri-apps/tauri-action@v0
         env:

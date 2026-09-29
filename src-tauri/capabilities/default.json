@@ -21,7 +21,6 @@
     "core:window:allow-is-maximized",
     "core:window:allow-set-focus",
     "core:window:allow-start-dragging",
-    "core:webview:allow-internal-toggle-devtools",
     "notification:default",
     "store:default",
     "autostart:default",

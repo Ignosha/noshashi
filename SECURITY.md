@@ -78,29 +78,30 @@ in adds exactly the data listed in the privacy policy and nothing more.
 
 ## Known gaps
 
-Named rather than hidden:
+Named rather than hidden. Last reviewed 2026-09-29 against the code.
 
-1. **The app is not code-signed or notarized.** Distribution requires an
-   Apple Developer account. Until then macOS Gatekeeper will warn on
-   first launch, and users must right-click → Open.
+1. **Builds are not code-signed or notarised.** macOS Gatekeeper and
+   Windows SmartScreen warn on first launch. Signing needs the company's
+   Apple Developer ID (with notarisation) and a Windows code-signing
+   certificate; `docs/RELEASE_SIGNING.md` lists exactly what to add. Until
+   then each release publishes SHA-256 checksums and updater signatures, and
+   the app hashes its own binary (Settings › Binary integrity).
 2. **`style-src` still allows `'unsafe-inline'`.** Tailwind and the
    animation layer write inline style attributes. Removing this needs a
-   nonce-based build pipeline.
-3. **Edge Functions have no rate limiting.** Add it before the Compliance
-   API is opened to third parties.
-4. **Leaked-password protection is not yet enabled** in Supabase Auth.
-   It is a dashboard toggle: Authentication → Policies → leaked password
-   protection.
-5. **The Compliance API is deployed from the repository but not yet
-   pushed to the Supabase project.** `supabase/functions/noshashi-verify`
-   and its migration (`supabase/migrations/20260820_compliance_api.sql`)
-   are in-tree and ready; run `supabase db push` and
-   `supabase functions deploy noshashi-verify` to make the endpoint live.
-   Until then the Institution-tier API returns 404.
-6. **Model-provider API keys pass through the web view.** They are stored
-   in the OS keyring and read only for the duration of a request, but a
-   web-view compromise could observe one in memory. The fix is to proxy
-   remote model calls through the Rust layer. Local runtimes — the
-   default — are unaffected, because they need no key at all.
-7. **No penetration test has been performed.** Do one before taking real
-   institutional money.
+   nonce-based build pipeline. Scripts are already `'self'` only.
+3. **Supabase Auth's own leaked-password toggle is off.** It is a paid-plan
+   setting. Passwords are screened against known breaches by NOSHASHI's own
+   hook instead (`noshashi-password`); a breached password is refused.
+4. **No independent penetration test or certification** (SOC 2, ISO 27001).
+   Controls are documented in `docs/SECURITY_THREAT_MODEL.md`; do a
+   penetration test before taking institutional production traffic.
+5. **Live posture indicators are not gated on source agreement.** Recorded
+   verdicts are (SOURCE_AGREEMENT); the tray, Mission Control and status-rail
+   indicators evaluate the rules without it. They carry no receipt.
+
+Closed since the last review: Edge Functions and the Compliance API are
+rate limited per key (durable windows in `noshashi.api_rate_windows`); the
+Compliance API (`noshashi-verify`) is deployed; hosted-model API keys are
+held in the OS keyring and used only by the Rust layer (`model_request`),
+never passed through the web view; the web view can no longer toggle
+developer tools (`core:webview:allow-internal-toggle-devtools` removed).

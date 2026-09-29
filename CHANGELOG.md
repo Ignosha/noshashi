@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Security and procurement documentation; signing ready to switch on
+
+- `docs/SECURITY_THREAT_MODEL.md`: assets, threat actors, trust boundaries,
+  fourteen threat scenarios each with the code that mitigates it, residual
+  risks and what is out of scope.
+- `docs/PROCUREMENT.md`: a vendor-risk checklist, every line marked
+  IMPLEMENTED, PARTIAL or PLANNED. Nothing planned is presented as done.
+- `docs/RELEASE_SIGNING.md` and the release workflow: macOS signing and
+  notarisation switch on when the company's Apple credentials are added as
+  repository secrets; until then builds are unchanged.
+- The desktop app can no longer toggle developer tools from the web view.
+- `SECURITY.md`'s known gaps brought up to date with what has since shipped.
+
 ### NOSHX: every answer lists what it rests on
 
 - Each reading NOSHX takes carries a citation: the screen that shows it,
