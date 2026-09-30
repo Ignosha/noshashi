@@ -72,7 +72,7 @@ import {
  * refusal is shown in their own words.
  */
 
-const ROLES: MemberRole[] = ["owner", "admin", "compliance", "risk", "analyst", "viewer"];
+const ROLES: MemberRole[] = ["owner", "admin", "compliance", "reviewer", "risk", "analyst", "auditor", "viewer"];
 
 /** Server refusal or failure, shown exactly as the server worded it. */
 function Refusal({ failure }: { failure: ServerFailure }) {
@@ -395,7 +395,7 @@ function OrgPolicyBody({
               </div>
               {!can.activate(role) && (
                 <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-                  Activation needs an owner, admin or compliance member who did not author this version.
+                  Activation needs an owner, admin, compliance or reviewer member who did not author this version.
                 </p>
               )}
               {can.activate(role) && iAmAuthor && (
@@ -667,7 +667,7 @@ function ExceptionsPanel({
       </div>
       <p className="mb-2 max-w-[720px] text-[11px] leading-snug text-muted-foreground">
         An exception is a person's decision recorded beside a verdict. The verdict and its receipt never change.
-        Requested from a verdict in Verification or Evidence; decided by an owner, admin or compliance member who did not request it.
+        Requested from a verdict in Verification or Evidence; decided by an owner, admin, compliance or reviewer member who did not request it.
       </p>
       {rows.length === 0 ? (
         <p className="text-[11px] text-muted-foreground">
@@ -815,8 +815,9 @@ function MembersPanel({ data, refresh, push }: { data: OrgData; refresh: () => P
         ))}
       </div>
       <p className="mt-1.5 text-[10.5px] leading-snug text-muted-foreground">
-        Owner, admin and compliance may activate policies and decide exceptions. Analysts and risk may draft,
-        simulate, submit and request. Viewers read only. Enforced by the server.
+        Owner, admin and compliance may activate policies and decide exceptions. Reviewers may activate and decide
+        what someone else drafted or requested, and nothing else. Analysts and risk may draft, simulate, submit and
+        request. Auditors read everything, including the audit trail. Viewers read only. Enforced by the server.
       </p>
       {manage && (
         <div className="mt-2 flex flex-wrap items-end gap-2">
@@ -977,6 +978,7 @@ const AUDIT_WORDS: Record<string, string> = {
   "adjudication.recorded": "ADJUDICATION RECORDED",
   "alert.triggered": "CUSTOM ALERT FIRED",
   "stress.scheduled_run": "SCHEDULED STRESS RUN",
+  "member.signed_in": "SIGNED IN",
 };
 
 function AuditPanel({ data }: { data: OrgData }) {
@@ -984,7 +986,7 @@ function AuditPanel({ data }: { data: OrgData }) {
     return (
       <section>
         <Eyebrow className="mb-2">GOVERNANCE AUDIT TRAIL</Eyebrow>
-        <p className="text-[11px] text-muted-foreground">The audit trail is readable by owner, admin, compliance and risk members.</p>
+        <p className="text-[11px] text-muted-foreground">The audit trail is readable by owner, admin, compliance, risk, reviewer and auditor members, and by an examiner seat.</p>
       </section>
     );
   }
@@ -1003,7 +1005,38 @@ function AuditPanel({ data }: { data: OrgData }) {
           ))}
         </div>
       )}
+      <SignInsList data={data} />
     </section>
+  );
+}
+
+/** Sign-ins the server recorded for this organization's members (one per new session). */
+function SignInsList({ data }: { data: OrgData }) {
+  if (!data.signIns) return null;
+  const text = (v: unknown) => (typeof v === "string" && v !== "" ? v : null);
+  return (
+    <div className="mt-4">
+      <Eyebrow className="mb-2">SIGN-INS · SERVER RECORD · LAST {data.signIns.length}</Eyebrow>
+      {data.signIns.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground">No sign-ins recorded yet. Recording began on 2026-09-30; token refreshes are not sign-ins.</p>
+      ) : (
+        <div className="space-y-1">
+          {data.signIns.map((e) => {
+            const aal = text(e.newState?.aal);
+            const ip = text(e.newState?.ip);
+            const agent = text(e.newState?.user_agent);
+            return (
+              <p key={e.id} className="mono-font border-b border-border/30 pb-1 text-[11px] text-foreground">
+                {utc(e.at)} · {nameOf(data.directory, e.actor)}
+                {aal && <span className="text-muted-foreground"> · {aal === "aal2" ? "TWO-FACTOR" : "ONE FACTOR"}</span>}
+                {ip && <span className="selectable text-muted-foreground"> · {ip}</span>}
+                {agent && <span className="text-muted-foreground" title={agent}> · {agent.length > 60 ? `${agent.slice(0, 60)}…` : agent}</span>}
+              </p>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1038,7 +1071,7 @@ export function RequestExceptionButton({ entry, caseId, className }: { entry: Le
       await org.refresh();
       setOpen(false);
       setReason("");
-      push({ title: "EXCEPTION REQUESTED", body: `${data.membership.name} · awaiting an owner, admin or compliance decision`, tone: "info" });
+      push({ title: "EXCEPTION REQUESTED", body: `${data.membership.name} · awaiting an owner, admin, compliance or reviewer decision`, tone: "info" });
     } finally {
       setBusy(false);
     }
@@ -1058,7 +1091,7 @@ export function RequestExceptionButton({ entry, caseId, className }: { entry: Le
             <DialogTitle>REQUEST A POLICY EXCEPTION</DialogTitle>
             <DialogDescription>
               {data.membership.name} · the verdict stays {entry.verdict.toUpperCase()} and its receipt is unchanged. A second
-              person with the owner, admin or compliance role decides.
+              person with the owner, admin, compliance or reviewer role decides.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1">

@@ -13,7 +13,7 @@ import { policyHash, validateParams } from "./policy.ts";
  *    here, with the same rules the app uses (./policy.ts, held in step by
  *    src/lib/desk/__tests__/policy-runtimes.test.ts).
  * 4. noshashi.activate_org_policy then does everything else in ONE
- *    transaction: role (owner/admin/compliance), four-eyes (actor is not
+ *    transaction: role (owner/admin/compliance/reviewer), four-eyes (actor is not
  *    the author), status (pending), hash match, archive the previous
  *    version, activate, audit. It is executable by service_role only, and
  *    a trigger on the table re-checks four-eyes and role on any write that

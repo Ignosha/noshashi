@@ -36,7 +36,7 @@ const REFUSALS: Record<string, string> = {
   NOT_CLOSED: "Only a closed case can be reopened.",
   RATIONALE_REQUIRED: "A written reason of at least 10 characters is required.",
   EXCEPTION_NOT_APPROVED:
-    "Closing as an approved exception needs a policy exception that an owner, admin or compliance member other than the requester has approved.",
+    "Closing as an approved exception needs a policy exception that an owner, admin, compliance or reviewer member other than the requester has approved.",
   MALFORMED: "The entry was not in the expected form. Nothing was written.",
 };
 

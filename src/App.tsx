@@ -35,6 +35,21 @@ import { LandingScene } from "@/components/scenes/LandingScene";
  * Billing, legal, the agent and the desk surfaces are each a separate
  * request that only happens if someone actually opens them.
  */
+const SecurityScene = lazy(() =>
+  import("@/components/scenes/SecurityScene").then((m) => ({ default: m.SecurityScene }))
+);
+const MissionControlScene = lazy(() =>
+  import("@/components/scenes/MissionControlScene").then((m) => ({ default: m.MissionControlScene }))
+);
+const CredentialsScene = lazy(() =>
+  import("@/components/scenes/CredentialsScene").then((m) => ({ default: m.CredentialsScene }))
+);
+const DomainsScene = lazy(() =>
+  import("@/components/scenes/DomainsScene").then((m) => ({ default: m.DomainsScene }))
+);
+const SettingsScene = lazy(() =>
+  import("@/components/scenes/SettingsScene").then((m) => ({ default: m.SettingsScene }))
+);
 const AuthScene = lazy(() =>
   import("@/components/scenes/AuthScene").then((m) => ({ default: m.AuthScene }))
 );
@@ -97,11 +112,7 @@ const AccountScene = lazy(() =>
 );
 import { HomeScene } from "@/components/scenes/HomeScene";
 import { MODE_CHOSEN_KEY } from "@/lib/onboarding";
-import { SecurityScene } from "@/components/scenes/SecurityScene";
-import { MissionControlScene } from "@/components/scenes/MissionControlScene";
 import { VerificationScene } from "@/components/scenes/VerificationScene";
-import { CredentialsScene } from "@/components/scenes/CredentialsScene";
-import { DomainsScene } from "@/components/scenes/DomainsScene";
 const HistoryScene = lazy(() =>
   import("@/components/scenes/HistoryScene").then((m) => ({ default: m.HistoryScene }))
 );
@@ -120,7 +131,6 @@ const GardenScene = lazy(() =>
 const LegalScene = lazy(() =>
   import("@/components/scenes/LegalScene").then((m) => ({ default: m.LegalScene }))
 );
-import { SettingsScene } from "@/components/scenes/SettingsScene";
 import { TrayScene } from "@/components/scenes/TrayScene";
 import { useXRPL } from "@/lib/xrpl/useXRPL";
 import { useSetting } from "@/lib/store";

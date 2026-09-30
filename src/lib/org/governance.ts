@@ -25,7 +25,19 @@ import type { LedgerEntry } from "@/lib/desk/ledger";
  * every write is followed by a fresh read, and nothing is set locally.
  */
 
-export type MemberRole = "owner" | "admin" | "analyst" | "compliance" | "risk" | "viewer" | "api" | "regulator";
+export type MemberRole =
+  | "owner"
+  | "admin"
+  | "analyst"
+  | "compliance"
+  | "risk"
+  | "viewer"
+  | "api"
+  | "regulator"
+  /** Second pair of eyes: activates others' policies and decides others' exceptions. Drafts nothing. */
+  | "reviewer"
+  /** Internal, read-only: reads everything a member can, plus the audit log. Changes nothing. */
+  | "auditor";
 
 export type Membership = {
   organizationId: string;
@@ -162,7 +174,8 @@ export type AuditRow = {
 /* ── What each role is offered (display only — the server decides) ─── */
 
 const AUTHORS: MemberRole[] = ["owner", "admin", "compliance", "risk", "analyst"];
-const APPROVERS: MemberRole[] = ["owner", "admin", "compliance"];
+const APPROVERS: MemberRole[] = ["owner", "admin", "compliance", "reviewer"];
+const SEAT_MANAGERS: MemberRole[] = ["owner", "admin", "compliance"];
 
 export const can = {
   editDraft: (r: MemberRole | null) => r !== null && AUTHORS.includes(r),
@@ -172,9 +185,9 @@ export const can = {
   requestException: (r: MemberRole | null) => r !== null && AUTHORS.includes(r),
   approveException: (r: MemberRole | null) => r !== null && APPROVERS.includes(r),
   manageMembers: (r: MemberRole | null) => r === "owner" || r === "admin",
-  readAudit: (r: MemberRole | null) => r !== null && [...APPROVERS, "risk", "regulator"].includes(r),
+  readAudit: (r: MemberRole | null) => r !== null && [...APPROVERS, "risk", "regulator", "auditor"].includes(r),
   /** Grant and revoke examiner seats. */
-  manageSeats: (r: MemberRole | null) => r !== null && APPROVERS.includes(r),
+  manageSeats: (r: MemberRole | null) => r !== null && SEAT_MANAGERS.includes(r),
   setBrand: (r: MemberRole | null) => r === "owner" || r === "admin",
   /** Record workstation actions (exports, alerts, scheduled runs) in the audit log. */
   recordAudit: (r: MemberRole | null) => r !== null && AUTHORS.includes(r),
@@ -478,15 +491,26 @@ export async function listExceptions(organizationId: string): Promise<PolicyExce
   return exceptions;
 }
 
-/** Policy and exception events. Readable by owner, admin, compliance and risk only (RLS). */
-export async function listGovernanceAudit(organizationId: string): Promise<AuditRow[]> {
+/** Policy and exception events. Readable by owner, admin, compliance, risk, reviewer, auditor and a regulator seat only (RLS). */
+export const listGovernanceAudit = (organizationId: string) =>
+  listAudit(organizationId, ["policy", "policy_exception", "organization"], 100);
+
+/**
+ * Members' sign-ins, newest first. The server writes one per new Supabase
+ * Auth session for every organization the person belongs to
+ * (noshashi.record_sign_in); token refreshes are not sign-ins. Same readers
+ * as the governance trail.
+ */
+export const listSignIns = (organizationId: string) => listAudit(organizationId, ["session"], 50);
+
+async function listAudit(organizationId: string, entityTypes: string[], limit: number): Promise<AuditRow[]> {
   const { data, error } = await db()
     .from("audit_log")
     .select("id, action, entity_type, entity_id, actor_account_id, occurred_at, new_state")
     .eq("organization_id", organizationId)
-    .in("entity_type", ["policy", "policy_exception", "organization"])
+    .in("entity_type", entityTypes)
     .order("occurred_at", { ascending: false })
-    .limit(100);
+    .limit(limit);
   if (error) throw new Error(supabaseErrorMessage(error));
   return (data ?? []).map((r) => ({
     id: r.id as number,

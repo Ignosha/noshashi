@@ -33,7 +33,7 @@ evidence. It never issues a decision and never signs anything.
 - Four-eyes controls: a policy's author cannot activate it; an exception's
   requester cannot approve it; exceptions expire.
 - Organizations with roles (owner, admin, compliance, risk, analyst,
-  viewer, API, regulator), row-level security and an audit log.
+  viewer, API, regulator, reviewer, auditor), row-level security and an audit log.
 - Permissioned domains and credentials read from the real mainnet directory.
 - Audit trail export with delivered amounts (not the Amount field), OFAC
   SDN screening and a SHA-256 manifest.

@@ -206,7 +206,8 @@ change will ever be, and the window closes at first customer.
   (which catches a superuser, or a later migration re-granting by
   accident).
 - RLS: members read their own organizations and roster; owners/admins
-  write; the log is readable only by owner, admin, compliance and risk.
+  write; the log is readable only by owner, admin, compliance and risk
+  (since 2026-09-30 also reviewer, auditor and a regulator seat).
 
 **Verified against a real Postgres 16**, not by reading: a throwaway
 cluster with a harness mirroring the live schema, `service_role` given

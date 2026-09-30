@@ -25,6 +25,8 @@ export type Policy = {
 };
 
 const UPDATED = "20 August 2026";
+/** The privacy policy changed on its own: sign-in records in organization audit logs. */
+const PRIVACY_UPDATED = "30 September 2026";
 
 export const ACCESSIBILITY: Policy = {
   id: "accessibility",
@@ -84,7 +86,7 @@ export const PRIVACY: Policy = {
   id: "privacy",
   title: "PRIVACY POLICY",
   summary: `${BRAND.name} runs without an account and, in that mode, without sending anything about you anywhere. Creating an account changes that, and this policy is explicit about exactly where the line falls.`,
-  updated: UPDATED,
+  updated: PRIVACY_UPDATED,
   sections: [
     {
       heading: "What we do not collect",
@@ -111,6 +113,7 @@ export const PRIVACY: Policy = {
         "Any wallet addresses you add to a portfolio, and any labels you give them. These are public ledger addresses, but the association between them and your account is private to your account.",
         "Verification records written by the Compliance API: a timestamp, the domain, the verdict and the receipt digest.",
         "API keys, stored only as a SHA-256 digest. A stolen database yields no working key, and we cannot show you a key again after it is issued.",
+        "If you belong to an organization: each time you sign in, a record in that organization's audit log of when, the IP address, the browser or app identifier (first 200 characters) and whether a second factor was used. It is readable by the organization's owners, admins, compliance, risk, reviewer and auditor members and any examiner seat, so the organization can account for access. Like the rest of that audit log it cannot be edited, and it is kept for the life of the organization.",
       ],
     },
     {
@@ -148,6 +151,7 @@ export const PRIVACY: Policy = {
       heading: "Retention and deletion",
       body: [
         `Account data is kept while the account exists. Ask us to delete it at ${CONTACT.privacy} and we will remove the account, its portfolios, its API keys and its verification records. Billing records are retained by Stripe for as long as tax and accounting law requires, which is outside our control.`,
+        "Sign-in records in an organization's audit log belong to that organization and stay when your account is deleted, because that log cannot be edited: your name is removed from them, but their time, IP address and browser or app identifier remain.",
         "To remove local data, clear the application's data directory and delete any stored secret from Settings.",
       ],
     },
@@ -178,6 +182,13 @@ export const TERMS: Policy = {
         "Nothing produced by this software — verdicts, receipts, agent responses, or the commercial plan shown in the console — is legal advice, regulatory advice, tax advice, or investment advice.",
         "A GO verdict means the configured rules passed. It is not a representation that a transaction is lawful in your jurisdiction, and it does not discharge any obligation you owe to a regulator. A NO-GO verdict is not a determination that anyone has done anything wrong.",
         "Compliance determinations that carry legal consequence must be reviewed by qualified counsel and the responsible compliance officer.",
+      ],
+    },
+    {
+      heading: "Experimental features and human review",
+      body: [
+        "The XRPL Edge Lab and its downloadable Edge Pack are experimental research features. They may be incomplete, change without notice, or return an unknown result when public ledger data is unavailable. They do not establish ownership, title, solvency, liquidity, recoverability, sanctions status, legality or regulatory status.",
+        "You remain responsible for independently verifying inputs and outputs, applying the laws and policies that govern your activity, protecting personal data, and obtaining review from qualified legal, tax, compliance and technical professionals before acting.",
       ],
     },
     {

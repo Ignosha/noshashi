@@ -31,6 +31,9 @@ export const LENS_FOR_ROLE: Record<MemberRole, Lens> = {
   api: "operations",
   // An examiner reads the compliance record first.
   regulator: "compliance",
+  // A reviewer decides what is waiting; an internal auditor reads the record.
+  reviewer: "compliance",
+  auditor: "compliance",
 };
 
 export type LensMetrics = {

@@ -100,7 +100,7 @@ DRAFT ──submit──► IN REVIEW ──activate (another person)──► A
 ```
 
 - Only drafts change.
-- Activators: owner, admin or compliance, and never the author. The
+- Activators: owner, admin, compliance or reviewer, and never the author. The
   author rule is enforced by a table constraint and a trigger
   in `noshashi.org_policies`, and re-checked in
   `noshashi-policy-activate`.
@@ -113,7 +113,7 @@ An exception is a person's decision recorded beside a verdict. It never
 changes the verdict or its receipt.
 
 - Requester ≠ decider (constraint).
-- Deciders: owner, admin or compliance.
+- Deciders: owner, admin, compliance or reviewer.
 - An approval carries an expiry of 1–365 days (default 30). Standing is
   shown as open, in force, expired, rejected, or no expiry for approvals
   made before expiry was recorded.

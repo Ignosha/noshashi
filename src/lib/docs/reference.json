@@ -708,6 +708,14 @@
       ]
     },
     {
+      "role": "reviewer",
+      "permissions": [
+        "activate",
+        "approveException",
+        "readAudit"
+      ]
+    },
+    {
       "role": "risk",
       "permissions": [
         "editDraft",
@@ -726,6 +734,12 @@
         "submit",
         "requestException",
         "recordAudit"
+      ]
+    },
+    {
+      "role": "auditor",
+      "permissions": [
+        "readAudit"
       ]
     },
     {
