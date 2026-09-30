@@ -1,0 +1,172 @@
+# Restore test: proves the newest encrypted backup can actually be restored.
+#
+# A backup nobody has restored is a guess. This job takes the newest
+# successful "Database backup" artifact, decrypts it with BACKUP_PASSPHRASE,
+# restores it into a throwaway Postgres 17 container on the runner (nothing
+# leaves the runner, and the container is destroyed with it), then compares
+# row counts per table against the live database.
+#
+# SECURITY — this repository is public, so its Actions logs are public. This
+# job prints table names, row counts and error COUNTS only. Never add a step
+# that prints restored rows, pg_restore's raw error text (it can quote
+# values), or the connection string. The plaintext dump is deleted in the
+# step that creates it.
+#
+# Pass: every live `noshashi` table exists in the restore, the restore holds
+# rows, and auth.users came back. Row counts that differ are reported, not
+# failed on: tables such as xrpl_events keep growing after the backup was
+# taken. Restore errors about Supabase-only extensions (pg_net, pg_cron, …)
+# are expected on a plain Postgres and are counted, not hidden.
+
+name: Database restore test
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monthly, the day after the 1st's backup.
+    - cron: "10 6 2 * *"
+
+concurrency:
+  group: db-restore-test
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      scratch:
+        image: postgres:17
+        env:
+          # A disposable container that exists only for this job; not a secret.
+          POSTGRES_PASSWORD: restore-test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      SCRATCH_URL: postgresql://postgres:restore-test@localhost:5432/postgres
+    steps:
+      - name: Install Postgres 17 client
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error \
+            -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+          # Same reason as the backup job: name the 17 binaries, not the wrapper.
+          echo "/usr/lib/postgresql/17/bin" >> "${GITHUB_PATH}"
+
+      - name: Download the newest successful backup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          run_id="$(gh run list -R "${GITHUB_REPOSITORY}" --workflow db-backup.yml \
+            --status success --limit 1 --json databaseId -q '.[0].databaseId')"
+          if [ -z "${run_id}" ]; then echo "::error::no successful Database backup run found"; exit 1; fi
+          echo "Backup run: ${run_id}"
+          gh run download "${run_id}" -R "${GITHUB_REPOSITORY}" -D backup
+          ls -l backup/*/*.dump.gpg
+
+      - name: Decrypt and restore into the scratch database
+        env:
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PASSPHRASE}" ]; then echo "::error::BACKUP_PASSPHRASE is not set"; exit 1; fi
+          file="$(ls backup/*/*.dump.gpg | head -n 1)"
+          echo "Restoring ${file##*/}"
+
+          if ! gpg --batch --yes --quiet --passphrase "${PASSPHRASE}" \
+                --output restore.dump --decrypt "${file}" 2>/dev/null; then
+            echo "::error::decryption failed: BACKUP_PASSPHRASE does not match the passphrase this backup was made with"
+            exit 1
+          fi
+
+          # The roles, schema and extensions Supabase provides, so policies,
+          # defaults and grants in the dump have something to refer to.
+          psql "${SCRATCH_URL}" -v ON_ERROR_STOP=1 -q <<'SQL'
+          do $$
+          declare r text;
+          begin
+            foreach r in array array['anon','authenticated','service_role','authenticator',
+              'supabase_admin','supabase_auth_admin','supabase_storage_admin','dashboard_user']
+            loop
+              if not exists (select 1 from pg_roles where rolname = r) then
+                execute format('create role %I nologin', r);
+              end if;
+            end loop;
+          end $$;
+          create schema if not exists extensions;
+          create extension if not exists pgcrypto with schema extensions;
+          create extension if not exists "uuid-ossp" with schema extensions;
+          SQL
+
+          # pg_restore exits non-zero when any object fails; that is judged
+          # below from the counts, not here.
+          set +e
+          pg_restore --dbname="${SCRATCH_URL}" --no-owner --no-privileges restore.dump 2> restore.err
+          set -e
+          shred --remove restore.dump 2>/dev/null || rm -f restore.dump
+
+          # Counts only: pg_restore's messages can quote values.
+          total="$(grep -c 'error:' restore.err || true)"
+          missing="$(grep 'error:' restore.err | grep -c 'does not exist' || true)"
+          exists="$(grep 'error:' restore.err | grep -c 'already exists' || true)"
+          echo "Restore errors: ${total} (object missing on plain Postgres: ${missing}, already existed: ${exists}, other: $((total - missing - exists)))"
+          rm -f restore.err
+
+      - name: Compare with the live database
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          DB_URL="$(printf '%s' "${DB_URL}" | tr -d '\r\n' | sed -e 's/^[[:space:]"'"'"']*//' -e 's/[[:space:]"'"'"']*$//')"
+
+          count_sql="select table_schema || '.' || table_name,
+                            (xpath('/row/c/text()', query_to_xml(format('select count(*) as c from %I.%I', table_schema, table_name), false, true, '')))[1]::text
+                     from information_schema.tables
+                     where table_type = 'BASE TABLE'
+                       and (table_schema = 'noshashi' or (table_schema = 'auth' and table_name = 'users'))
+                     order by 1"
+
+          psql "${DB_URL}"      -At -F '|' -c "${count_sql}" > live.txt
+          psql "${SCRATCH_URL}" -At -F '|' -c "${count_sql}" > restored.txt
+
+          missing=0; restored_rows=0; differ=0
+          printf '%-45s %12s %12s\n' TABLE LIVE RESTORED
+          while IFS='|' read -r table live; do
+            got="$(awk -F'|' -v t="${table}" '$1 == t { print $2 }' restored.txt)"
+            if [ -z "${got}" ]; then
+              printf '%-45s %12s %12s  MISSING\n' "${table}" "${live}" "-"
+              missing=$((missing + 1))
+              continue
+            fi
+            restored_rows=$((restored_rows + got))
+            note=""
+            if [ "${got}" != "${live}" ]; then note="  differs"; differ=$((differ + 1)); fi
+            printf '%-45s %12s %12s%s\n' "${table}" "${live}" "${got}" "${note}"
+          done < live.txt
+
+          users="$(awk -F'|' '$1 == "auth.users" { print $2 }' restored.txt)"
+          echo
+          echo "Tables missing from the restore: ${missing}"
+          echo "Tables whose count differs from live: ${differ} (expected for tables written since the backup)"
+          echo "Rows restored: ${restored_rows}"
+
+          fail=0
+          if [ "${missing}" -gt 0 ]; then echo "::error::${missing} live table(s) did not restore"; fail=1; fi
+          if [ "${restored_rows}" -eq 0 ]; then echo "::error::the restore holds no rows"; fail=1; fi
+          if [ -z "${users}" ] || [ "${users}" -eq 0 ]; then echo "::error::auth.users did not restore"; fail=1; fi
+          rm -f live.txt restored.txt
+          if [ "${fail}" -ne 0 ]; then exit 1; fi
+          echo "RESTORE TEST PASSED"
