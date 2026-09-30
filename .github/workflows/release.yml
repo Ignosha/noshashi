@@ -193,3 +193,25 @@ jobs:
             src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe
             src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
             src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage
+
+  # The website's download section and release notes are rendered from the
+  # GitHub releases API when the site is built. A release published after
+  # the last site build is invisible there until the next deploy, which
+  # left 1.0.20's page offering 1.0.19. Rebuild the site once every
+  # installer is attached. Releases made with GITHUB_TOKEN do not trigger
+  # other workflows, so this cannot live in refresh-site.yml.
+  refresh-site:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rebuild the website
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK_URL is not set — the site refreshes on its next scheduled run."
+            exit 0
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$HOOK")
+          echo "Deploy hook responded $code"
+          [ "$code" -lt 400 ]
