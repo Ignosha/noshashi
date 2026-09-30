@@ -1,5 +1,49 @@
 # Changelog
 
+## 1.0.20
+
+### Prices
+
+- Enterprise is $120,000 a year and Strategic Infrastructure $250,000 a
+  year. Monthly is the year divided by twelve: $10,000 and $20,833.
+- The app's plan cards now show the yearly price under the monthly one.
+- On the website, the Monthly / Annual prepay switch now changes every
+  plan, including Enterprise and Strategic, and the comparison table
+  lists the yearly price for each paid plan.
+
+### Not offered yet: marked as coming soon
+
+- The 99.9% uptime SLA is off every plan until it is funded.
+- The uptime SLA, single sign-on and dedicated environments are marked
+  "coming soon" on the pricing page and in the app, and the help and
+  NOSHX answers say so if asked.
+
+### Security
+
+- The website no longer runs any inline script. Its security policy
+  allows scripts only from the site itself, which blocks a whole class of
+  injected-script attacks.
+- The home page's "find a real partial payment" example now reads only
+  validated ledgers, as everything else in NOSHASHI does.
+- The privacy and data-processing policies now name every service that
+  handles your data: Vercel hosts the website and its contact form, and
+  Resend delivers contact and support email.
+- An internal security assessment and penetration test ran on 30
+  September 2026. Every attempt to cross an organization boundary, raise
+  a role, or edit or forge the audit log was refused. The report is in
+  `docs/SECURITY_ASSESSMENT_2026-09.md`.
+
+### For procurement
+
+- SOC 2 readiness: policies, risk register and a control map with the
+  remaining gaps (`docs/soc2/`). No SOC 2 report is held yet.
+- Contract templates for institutional customers: master agreement,
+  order form and data processing addendum, plus an SLA schedule that is
+  not offered until it is funded (`docs/legal/`). These await legal
+  review.
+- `docs/FUNDING_NEEDS.md` lists what each "coming soon" item needs, with
+  current prices.
+
 ## 1.0.19
 
 ### Two new organization roles
