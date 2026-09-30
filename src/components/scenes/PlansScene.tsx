@@ -313,6 +313,12 @@ function PlanCard({
             {plan.cadence}
             {total !== null && seats > 1 && ` · $${total.toLocaleString()}/mo for ${seats}`}
           </p>
+          {plan.annualUsd ? (
+            <p className="mono-font mt-0.5 text-[10.5px] text-muted-foreground">
+              or ${plan.annualUsd.toLocaleString("en-US")} {plan.seatBased ? "per seat " : ""}a year
+              {plan.annualUsd === plan.monthlyUsd * 10 ? " · two months free" : ""}
+            </p>
+          ) : null}
         </div>
 
         <ul className="mt-3 flex-1 space-y-1.5">

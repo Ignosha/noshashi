@@ -148,6 +148,24 @@ describe("pricing has one source", () => {
     expect(institution.monthlyUsd).toBeGreaterThan(desk.monthlyUsd);
   });
 
+  it("prices the contracted tiers by the year, monthly being the year divided by twelve", () => {
+    // Set by the owner on 2026-09-30.
+    const enterprise = PLANS.find((p) => p.id === "enterprise")!;
+    const strategic = PLANS.find((p) => p.id === "strategic")!;
+    expect(enterprise.annualUsd).toBe(120_000);
+    expect(strategic.annualUsd).toBe(250_000);
+    for (const plan of [enterprise, strategic]) {
+      expect(plan.monthlyUsd, plan.id).toBe(Math.round(plan.annualUsd! / 12));
+    }
+  });
+
+  it("gives the self-serve tiers two months free a year", () => {
+    for (const id of ["desk", "institution"]) {
+      const plan = PLANS.find((p) => p.id === id)!;
+      expect(plan.annualUsd, id).toBe(plan.monthlyUsd * 10);
+    }
+  });
+
   it("charges 749 for a Desk seat", () => {
     // Pinned explicitly: this is the number the business plan projects
     // from and the number a customer is billed.
