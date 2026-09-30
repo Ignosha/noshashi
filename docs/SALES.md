@@ -212,7 +212,7 @@ alert logic on your thresholds, not ours. The Compliance API — 100,000
 verifications a month, signed webhooks, negotiated rate limits. Signed
 chain-of-custody exports for examiners. Offline adjudication on segregated
 networks. Regulator read-only seats that expire on their own. Travel Rule
-(FATF R.16) scoping. A 99.9% uptime SLA with service credits. Dedicated
+(FATF R.16) scoping. Dedicated
 onboarding and a named support contact. Invoice, ACH, wire, NET-30.
 
 ### The arithmetic

@@ -185,7 +185,6 @@ export const PLANS: Plan[] = [
       "White-label console and reports — your name and colour on the console and on exports",
       "Regulator read-only seats — time-boxed examiner access, every visit logged",
       "100,000 API verifications included",
-      "99.9% uptime SLA with service credits, set in the MSA",
       "Dedicated onboarding and a named support contact",
       "Invoice, ACH, wire, NET-30 — MSA required",
     ],
@@ -239,7 +238,7 @@ export const PLANS: Plan[] = [
       "Deterministic policy engine, adjudication and decision history",
       "Evidence records, hashes, audit exports and review workflow",
       "Institutional API, scoped keys and webhooks",
-      "Dedicated environment, provisioned per contract",
+      "Dedicated environment (coming soon)",
       "Architecture review and named implementation planning",
     ],
     grants: [
@@ -471,7 +470,7 @@ export const FEATURE_CATALOG: Record<
   // grants the same set (entitlement-parity.test.ts) and nothing gates on
   // it; no plan lists SSO as a feature until it exists.
   sso: {
-    label: "Single sign-on (not yet available)",
+    label: "Single sign-on (coming soon)",
     requires: "institution",
     blurb:
       "Not available yet. Sign-in is by email and password with two-factor authentication. SAML 2.0 or OIDC with SCIM provisioning is on the roadmap, not in the product.",
@@ -501,10 +500,10 @@ export const FEATURE_CATALOG: Record<
       "A signed, portable record of an asset's compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks.",
   },
   dedicated_environment: {
-    label: "Dedicated environment",
+    label: "Dedicated environment (coming soon)",
     requires: "enterprise",
     blurb:
-      "Isolated compute and storage for your compliance workload, with your own node endpoints and retention policy, scoped and provisioned per contract after architecture review.",
+      "Coming soon, not offered yet. Planned: isolated compute and storage for your compliance workload, with your own node endpoints and retention policy, scoped and provisioned per contract after architecture review.",
   },
   incident_response: {
     label: "Incident response",

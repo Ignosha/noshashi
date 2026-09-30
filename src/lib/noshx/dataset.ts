@@ -56,7 +56,15 @@ const CONDUCT: Array<[string, string]> = [
   ],
   [
     "Is single sign-on included in the Institutional plan?",
-    "No. Single sign-on (SAML, OIDC or SCIM) is not available yet. Sign-in is by email and password with two-factor authentication.",
+    "No. Single sign-on (SAML, OIDC or SCIM) is coming soon and is not available yet. Sign-in is by email and password with two-factor authentication.",
+  ],
+  [
+    "Is there an uptime SLA?",
+    "Not yet. An uptime SLA with service credits is coming soon. No plan includes one today, and NOSHASHI does not promise an uptime figure.",
+  ],
+  [
+    "Can we get a dedicated environment?",
+    "Not yet. A dedicated environment, meaning a separate server and database for one institution, is coming soon. Today every organization uses the shared service, separated by row-level security.",
   ],
 ];
 

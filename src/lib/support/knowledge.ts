@@ -36,6 +36,13 @@ export const KNOWLEDGE: Answer[] = [
     keywords: ["learn", "lab", "labs", "tutorial", "training", "course", "how", "use", "onboarding", "review", "practice", "quiz", "remember"],
   },
   {
+    id: "coming-soon",
+    question: "Is there an uptime SLA, single sign-on or a dedicated environment?",
+    answer:
+      "Not yet. All three are coming soon. No plan includes an uptime SLA today, and NOSHASHI does not promise an uptime figure. Sign-in is by email and password with two-factor authentication until single sign-on (SAML or OIDC) arrives. Every organization uses the shared service, kept apart by row-level security, until dedicated environments are offered.",
+    keywords: ["sla", "uptime", "availability", "guarantee", "sso", "saml", "oidc", "scim", "single", "sign-on", "dedicated", "environment", "isolated", "private", "coming", "soon"],
+  },
+  {
     id: "regulator-seat",
     question: "How do I give an examiner or regulator access?",
     answer:

@@ -333,7 +333,7 @@ export const TIERS: Tier[] = [
       "Compliance API with webhooks",
       "White-label console and reports",
       "Regulator read-only seats",
-      "Published SLA and named support",
+      "Named support contact (uptime SLA coming soon)",
     ],
   },
   {
@@ -349,7 +349,7 @@ export const TIERS: Tier[] = [
       "Deterministic policy engine, adjudication and decision history",
       "Evidence records, hashes, audit exports and review workflow",
       "Institutional API, scoped keys and webhooks",
-      "Dedicated environment, provisioned per contract",
+      "Dedicated environment (coming soon)",
       "Architecture review and named implementation planning",
     ],
     emphasis: true,
