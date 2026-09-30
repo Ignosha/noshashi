@@ -49,6 +49,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   .policy h2{font-size:20px;letter-spacing:-.01em;margin:6px 0 12px}
   .policy h3{font-size:14px;margin:24px 0 8px;color:var(--ink)}
   .policy p{color:var(--muted);font-size:13.5px;max-width:76ch}
+  .policy ul{color:var(--muted);font-size:13.5px;max-width:76ch;margin:8px 0 0;padding-left:20px}
+  .policy li{margin:4px 0}
   .policy .summary{color:var(--ink);font-size:14px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
   .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;color:var(--faint)}
   footer{border-top:1px solid var(--rule);padding:34px 0;font-size:12px;color:var(--faint)}
@@ -109,10 +111,30 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>What the software does today</h3>
           <p>These are implemented and verifiable in the current build:</p>
+          <ul>
+            <li>Every interactive control is reachable and operable by keyboard alone, in a logical order.</li>
+            <li>Focus is shown with a visible ring on keyboard navigation and suppressed on mouse click, so the focus position is never ambiguous.</li>
+            <li>The interface honours the operating system's reduce-motion setting, and adds an in-app motion control so ambient animation can be stopped without changing an OS preference.</li>
+            <li>A high-contrast mode raises text and rule contrast and removes ambient texture entirely.</li>
+            <li>An interface scale control enlarges type, rules, icons and hit targets together, up to 140%, without an OS-wide zoom.</li>
+            <li>An inverted light theme is available alongside the default dark theme, and both follow the system setting when asked to.</li>
+            <li>A skip link is the first item in the tab order, moving keyboard and screen reader users past the navigation rail in one keystroke.</li>
+            <li>Live regions announce link degradation and critical portfolio alerts to assistive technology, throttled so a fast ledger cannot flood speech.</li>
+            <li>Body text is rendered near-white on pure black, exceeding the 4.5:1 contrast minimum; status colours are never the only signal — every GO / HOLD / NO-GO state also carries a text label.</li>
+            <li>Icon-only controls carry accessible names, and charts expose a text alternative describing what they plot.</li>
+            <li>Data tables use real table semantics with header cells, so a screen reader can announce row and column context.</li>
+            <li>The command palette (Cmd+K) provides a keyboard route to every scene and action without traversing the sidebar.</li>
+          </ul>
         </section>
         <section>
           <h3>Known gaps</h3>
           <p>We would rather name these than let you discover them:</p>
+          <ul>
+            <li>The console is designed for a desktop viewport and has not been tested above 200% screen magnification combined with the 140% interface scale.</li>
+            <li>The live ledger stream and the status ticker are not announced continuously; only link state and critical alerts are. This is deliberate — announcing every validated transaction would make the console unusable with a screen reader — but it means stream detail must be read on demand.</li>
+            <li>Streaming agent responses are not yet chunked into announceable units, so a screen reader reads the reply once it settles rather than as it arrives.</li>
+            <li>Charts expose a text alternative describing what they plot, but not the underlying series as a data table.</li>
+          </ul>
         </section>
         <section>
           <h3>Feedback and enforcement</h3>
@@ -122,7 +144,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       </article>
 
       <article id="privacy" class="policy">
-        <p class="eyebrow">Updated 20 August 2026</p>
+        <p class="eyebrow">Updated 30 September 2026</p>
         <h2>PRIVACY POLICY</h2>
         <p class="summary">NOSHASHI runs without an account and, in that mode, without sending anything about you anywhere. Creating an account changes that, and this policy is explicit about exactly where the line falls.</p>
         
@@ -137,6 +159,16 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>What an account stores</h3>
           <p>Creating an account means we hold data about you. Specifically:</p>
+          <ul>
+            <li>Your email address and, if you supply one, a display name and organisation.</li>
+            <li>A password, stored only as a salted bcrypt hash by our authentication provider. We never see, log, or transmit the password itself, and we cannot recover it.</li>
+            <li>If you enable two-factor authentication, the shared secret for your authenticator, held by the same provider.</li>
+            <li>Your subscription state, mirrored from Stripe: plan, status, seat count and renewal date. We never receive or store your card number — that stays with Stripe.</li>
+            <li>Any wallet addresses you add to a portfolio, and any labels you give them. These are public ledger addresses, but the association between them and your account is private to your account.</li>
+            <li>Verification records written by the Compliance API: a timestamp, the domain, the verdict and the receipt digest.</li>
+            <li>API keys, stored only as a SHA-256 digest. A stolen database yields no working key, and we cannot show you a key again after it is issued.</li>
+            <li>If you belong to an organization: each time you sign in, a record in that organization's audit log of when, the IP address, the browser or app identifier (first 200 characters) and whether a second factor was used. It is readable by the organization's owners, admins, compliance, risk, reviewer and auditor members and any examiner seat, so the organization can account for access. Like the rest of that audit log it cannot be edited, and it is kept for the life of the organization.</li>
+          </ul>
         </section>
         <section>
           <h3>Who processes it</h3>
@@ -145,10 +177,21 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>What stays on your device</h3>
           <p>The following never leaves the machine you are running on:</p>
+          <ul>
+            <li>Your preferences — watched wallet address, notification and automation settings — written to an application data file managed by the desktop runtime.</li>
+            <li>API secrets, held in the operating system keyring (macOS Keychain). The value is written and cleared from the interface but is never read back into the application window.</li>
+            <li>Compliance receipts and session evaluation logs, which exist only in memory for the current session unless you export them or an account is signed in.</li>
+            <li>Everything you type to the compliance agent, provided the agent is pointed at a local runtime — which is the default. If you deliberately select a remote model provider, your prompts go to that provider under their terms, and the interface says so on the screen where you choose it.</li>
+          </ul>
         </section>
         <section>
           <h3>What the software connects to</h3>
           <p>Outbound connections are limited to:</p>
+          <ul>
+            <li>Public XRP Ledger nodes over WebSocket, to read validated ledger data. These requests contain the public account addresses you ask about — which are already public on the ledger — and no other information about you.</li>
+            <li>Google Fonts, to load the typefaces used in the interface.</li>
+            <li>A local model runtime on 127.0.0.1 port 11434, if you have one installed. This connection does not leave your machine.</li>
+          </ul>
         </section>
         <section>
           <h3>Public ledger data</h3>
@@ -157,6 +200,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>Retention and deletion</h3>
           <p>Account data is kept while the account exists. Ask us to delete it at privacy@noshashi.app and we will remove the account, its portfolios, its API keys and its verification records. Billing records are retained by Stripe for as long as tax and accounting law requires, which is outside our control.</p>
+          <p>Sign-in records in an organization's audit log belong to that organization and stay when your account is deleted, because that log cannot be edited: your name is removed from them, but their time, IP address and browser or app identifier remain.</p>
           <p>To remove local data, clear the application's data directory and delete any stored secret from Settings.</p>
         </section>
         <section>
@@ -182,13 +226,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         </section>
         <section>
           <h3>Experimental features and human review</h3>
-          <p>The XRPL Edge Lab and its downloadable Edge Pack are experimental research features. They
-             may be incomplete, change without notice, or return an unknown result when public ledger
-             data is unavailable. They do not establish ownership, title, solvency, liquidity,
-             recoverability, sanctions status, legality or regulatory status.</p>
-          <p>You remain responsible for independently verifying inputs and outputs, applying the laws
-             and policies that govern your activity, protecting personal data, and obtaining review
-             from qualified legal, tax, compliance and technical professionals before acting.</p>
+          <p>The XRPL Edge Lab and its downloadable Edge Pack are experimental research features. They may be incomplete, change without notice, or return an unknown result when public ledger data is unavailable. They do not establish ownership, title, solvency, liquidity, recoverability, sanctions status, legality or regulatory status.</p>
+          <p>You remain responsible for independently verifying inputs and outputs, applying the laws and policies that govern your activity, protecting personal data, and obtaining review from qualified legal, tax, compliance and technical professionals before acting.</p>
         </section>
         <section>
           <h3>The rule set is yours</h3>
@@ -202,6 +241,11 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>Acceptable use</h3>
           <p>You agree not to:</p>
+          <ul>
+            <li>Use the console to evade sanctions screening, conceal the origin of funds, or defeat a compliance obligation.</li>
+            <li>Represent a verdict from this software as an official determination by a regulator or a licensed institution.</li>
+            <li>Present the compliance agent's output as professional advice from a licensed adviser.</li>
+          </ul>
         </section>
         <section>
           <h3>Fees, renewal and cancellation</h3>
@@ -243,6 +287,12 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>What recurs</h3>
           <p>Before you are charged anything, you see all of this at checkout:</p>
+          <ul>
+            <li>Desk is $749 per seat per month and renews every month until cancelled.</li>
+            <li>Institution is $4,000 per month and renews every month until cancelled.</li>
+            <li>Verification credit packs are one-time purchases. They do not renew and they do not expire.</li>
+            <li>The Free plan is free and never asks for a payment method.</li>
+          </ul>
         </section>
         <section>
           <h3>How to cancel</h3>
@@ -276,6 +326,12 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>Subprocessors</h3>
           <p>We use these, and only these, to run the service:</p>
+          <ul>
+            <li>Supabase (United States) — authentication, Postgres database, serverless functions.</li>
+            <li>Stripe (United States) — payment processing, subscription management and invoicing. Stripe is an independent controller of your payment instrument.</li>
+            <li>Public XRP Ledger nodes — read-only queries of public ledger state. These receive the public addresses you look up and nothing about you.</li>
+            <li>That is the complete list. There is no analytics vendor, no email marketing platform, no session-replay tool, no advertising network, and no AI vendor.</li>
+          </ul>
         </section>
         <section>
           <h3>Lawful basis and transfers</h3>
@@ -310,6 +366,14 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>Prohibited uses</h3>
           <p>You may not use the software to:</p>
+          <ul>
+            <li>Evade a sanctions, anti-money-laundering, know-your-customer or reporting obligation, or help anyone else do so.</li>
+            <li>Conceal the origin, ownership or destination of funds.</li>
+            <li>Represent a verdict as a determination by a regulator, an auditor, or a licensed institution.</li>
+            <li>Present the compliance agent's output as advice from a licensed professional.</li>
+            <li>Attack the service — scraping beyond rate limits, credential stuffing, or probing other accounts' data.</li>
+            <li>Resell access, or share an API key outside your organisation.</li>
+          </ul>
         </section>
         <section>
           <h3>Enforcement</h3>
@@ -353,6 +417,16 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         <section>
           <h3>Runtime and framework</h3>
           <p>All permissively licensed; none impose copyleft obligations on this application:</p>
+          <ul>
+            <li>React and React DOM — MIT</li>
+            <li>Tauri, and the Rust crates it depends on — MIT / Apache-2.0</li>
+            <li>Vite and Rollup — MIT</li>
+            <li>Tailwind CSS — MIT</li>
+            <li>Radix UI primitives — MIT</li>
+            <li>Framer Motion — MIT</li>
+            <li>supabase-js — MIT</li>
+            <li>keyring (Rust) — MIT / Apache-2.0</li>
+          </ul>
         </section>
         <section>
           <h3>Typefaces</h3>

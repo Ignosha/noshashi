@@ -7,7 +7,7 @@ is marked:
 - **PARTIAL**: exists in part; the gap is stated.
 - **PLANNED**: does not exist yet. Nothing marked PLANNED should be relied on.
 
-Last reviewed 2026-09-29 against the code and the published legal pages
+Last reviewed 2026-09-30 against the code and the published legal pages
 (<https://www.noshashi.app/legal/>).
 
 ## Legal and commercial
@@ -18,7 +18,7 @@ Last reviewed 2026-09-29 against the code and the published legal pages
 | Privacy Policy | IMPLEMENTED | Published (`/legal/`, "PRIVACY POLICY"). |
 | Data Processing Agreement | PARTIAL | Published data-processing terms and subprocessor list ("DATA PROCESSING & SUBPROCESSORS"); standard contractual clauses referenced for EEA/UK/CH transfers. A countersigned, negotiable DPA is PLANNED. |
 | Subprocessors | IMPLEMENTED | Supabase (database, auth, functions; US region), Stripe (payments), Vercel (website). Hosted AI providers only when a customer configures one with their own key. |
-| SLA | PLANNED | No contractual uptime or response SLA is offered today. |
+| SLA | PLANNED | The price list names a 99.9% uptime SLA for Institutional and above, "set in the MSA". No MSA has been signed, and today's hosting (Supabase Free plan, nightly backups only) could not back that figure. See `docs/ENTERPRISE.md` for what would need to change first. |
 | Contracting (order forms, MSA) | PLANNED | Self-serve checkout today; enterprise paper on request is not yet standardised. |
 | Billing, renewal, refunds | IMPLEMENTED | Published billing terms; cancellation from the Stripe billing portal. |
 | Regulatory disclosures | IMPLEMENTED | Published ("REGULATORY DISCLOSURES"). NOSHASHI does not provide legal advice and does not replace a compliance function. |
@@ -27,7 +27,7 @@ Last reviewed 2026-09-29 against the code and the published legal pages
 
 | Item | Status | Detail |
 |---|---|---|
-| Security documentation | IMPLEMENTED | `SECURITY.md`, `docs/SECURITY_THREAT_MODEL.md`, `docs/ARCHITECTURE.md`, `docs/DATA_MODEL.md`, `docs/AI_GOVERNANCE.md`. |
+| Security documentation | IMPLEMENTED | `SECURITY.md`, `docs/SECURITY_THREAT_MODEL.md`, `docs/ARCHITECTURE.md`, `docs/DATA_MODEL.md`, `docs/AI_GOVERNANCE.md`, `docs/DEPLOYMENT.md`, `docs/ENTERPRISE.md`. |
 | Certifications (SOC 2, ISO 27001) | PLANNED | None held. |
 | Penetration test | PLANNED | None performed. |
 | Encryption in transit | IMPLEMENTED | TLS to Supabase, XRPL servers, Stripe and the website. |
@@ -44,11 +44,11 @@ Last reviewed 2026-09-29 against the code and the published legal pages
 |---|---|---|
 | Authentication | IMPLEMENTED | Email and password with breach screening; TOTP second factor. |
 | SSO (SAML / OIDC) | PLANNED | Not implemented. |
-| Role-based access | IMPLEMENTED | Organization roles: owner, admin, compliance, risk, analyst, viewer, API, regulator (read-only examiner seat). Enforced in the database. |
-| Distinct reviewer and auditor roles | PARTIAL | Exception decisions require owner, admin or compliance; the regulator seat is read-only. A named "reviewer" and "auditor" role is not separate yet. |
+| Role-based access | IMPLEMENTED | Organization roles: owner, admin, compliance, reviewer, risk, analyst, auditor, viewer, API, regulator (time-limited read-only examiner seat). Enforced in the database. |
+| Distinct reviewer and auditor roles | IMPLEMENTED | `reviewer` activates policies and decides exceptions that someone else wrote or requested, and cannot draft, request or administer. `auditor` is an internal read-only seat that also reads the audit log and changes nothing. Both enforced in the database (migrations `20260930120000`, `20260930120100`). |
 | Four-eyes controls | IMPLEMENTED | Policy author cannot activate; exception requester cannot decide. Enforced by database constraints and triggers. |
 | Audit log | IMPLEMENTED | Append-only (`noshashi.audit_log`, UPDATE/DELETE refused); policy, exception, membership, API-key, branding and export events. |
-| Login events in the audit log | PARTIAL | Recorded by Supabase Auth's own audit trail, not mirrored into the organization audit log. |
+| Login events in the audit log | IMPLEMENTED | Every new sign-in session is written to each of the person's organizations' audit logs as `member.signed_in` (time, IP address, client, whether a second factor was used), by a database trigger that can never block the sign-in. Shown under POLICY › GOVERNANCE AUDIT TRAIL › SIGN-INS. Token refreshes are not recorded as sign-ins. Recording began 2026-09-30. |
 
 ## Data
 

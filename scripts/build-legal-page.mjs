@@ -68,7 +68,14 @@ const body = policies
           <h3>${esc(s.heading)}</h3>
           ${(Array.isArray(s.body) ? s.body : [s.body])
             .map((para) => `<p>${esc(para)}</p>`)
-            .join("\n          ")}
+            .join("\n          ")}${
+          s.points?.length
+            ? `
+          <ul>
+            ${s.points.map((pt) => `<li>${esc(pt)}</li>`).join("\n            ")}
+          </ul>`
+            : ""
+        }
         </section>`
           )
           .join("")}
@@ -81,20 +88,25 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
 <title>NOSHASHI — Legal &amp; Accessibility</title>
 <meta name="description" content="Terms, privacy, accessibility statement, billing, data processing, acceptable use and regulatory disclosures for NOSHASHI.">
 <link rel="canonical" href="https://noshashi.app/legal/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Typefaces served from this origin; no font CDN is contacted. -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script>
+(function(){try{var t=localStorage.getItem("noshashi-theme");
+if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+</script>
 <style>
   :root{
-    --ground:#0B0F14;--surface:#11161D;--elevated:#1C2330;
-    --ink:#E6E8EB;--muted:#A3A8B3;--faint:#747C8B;--rule:#2A313C;
-    --brand:#3A82F6;--r:10px;--shell:min(1180px,92vw);
+    --shell:min(1180px,92vw);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -122,6 +134,8 @@ const html = `<!doctype html>
   .policy h2{font-size:20px;letter-spacing:-.01em;margin:6px 0 12px}
   .policy h3{font-size:14px;margin:24px 0 8px;color:var(--ink)}
   .policy p{color:var(--muted);font-size:13.5px;max-width:76ch}
+  .policy ul{color:var(--muted);font-size:13.5px;max-width:76ch;margin:8px 0 0;padding-left:20px}
+  .policy li{margin:4px 0}
   .policy .summary{color:var(--ink);font-size:14px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
   .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;color:var(--faint)}
   footer{border-top:1px solid var(--rule);padding:34px 0;font-size:12px;color:var(--faint)}
@@ -167,8 +181,12 @@ const html = `<!doctype html>
 </div>
 
 <footer>
-  <div class="shell">© 2026 NOSHASHI Labs · Generated from src/lib/legal.ts · XRPL Mainnet</div>
+  <div class="shell">© 2026 NOSHASHI Labs · Generated from src/lib/legal.ts · XRPL Mainnet<br>
+    <a href="/">Home</a> · <a href="/news/">Newsroom</a> · <a href="/progress/">Progress</a> ·
+    <a href="/status/">Status</a> · <a href="/contact/">Contact</a></div>
 </footer>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/i18n.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>
 </body>
 </html>

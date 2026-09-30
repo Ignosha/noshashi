@@ -8,7 +8,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
  * The caller is identified from their JWT. noshashi.decide_policy_exception
  * then checks, in one transaction: the actor exists and belongs to the
  * exception's organization (a non-member gets NOT_FOUND, not a hint), has
- * the owner/admin/compliance role, the exception is still pending, it
+ * the owner/admin/compliance/reviewer role, the exception is still pending, it
  * carries evidence and a receipt, and the approver is not the requester.
  * It records the decision and writes the audit event. It is executable by
  * service_role only; a trigger on the table refuses any approval by a
@@ -54,7 +54,7 @@ function json(request: Request, body: unknown, status = 200) {
 const OUTCOMES: Record<string, { status: number; title: string; message: string }> = {
   NOT_AUTHENTICATED: { status: 401, title: "AUTHORIZATION REQUIRED", message: "Sign in to decide an exception." },
   NOT_FOUND: { status: 404, title: "EXCEPTION NOT FOUND", message: "No such exception in an organization you belong to." },
-  INSUFFICIENT_PERMISSIONS: { status: 403, title: "AUTHORIZATION REQUIRED", message: "Your role cannot approve exceptions. Owner, admin or compliance is required." },
+  INSUFFICIENT_PERMISSIONS: { status: 403, title: "AUTHORIZATION REQUIRED", message: "Your role cannot approve exceptions. Owner, admin, compliance or reviewer is required." },
   FOUR_EYES_REQUIRED: {
     status: 403,
     title: "FOUR-EYES APPROVAL REQUIRED",

@@ -10,6 +10,7 @@ import {
   listDirectory,
   listExceptions,
   listGovernanceAudit,
+  listSignIns,
   listMemberships,
   listPolicies,
   recordRegulatorSession,
@@ -43,6 +44,8 @@ export type OrgData = {
   exceptions: PolicyException[];
   /** Null when the role may not read the audit log (RLS). */
   audit: AuditRow[] | null;
+  /** Members' sign-ins; null exactly when audit is. */
+  signIns: AuditRow[] | null;
   /** Shared investigations, as stored by the server (verified by the client on display). */
   cases: Investigation[];
   active: { ok: true; policy: InstitutionalPolicy | null } | { ok: false; reason: string };
@@ -72,8 +75,8 @@ async function loadOrg(membership: Membership): Promise<OrgData> {
   // An examiner's visit is recorded by the server (at most every 30 minutes).
   if (membership.role === "regulator") void recordRegulatorSession(id);
   const [policies, directory, exceptions, cases] = await Promise.all([listPolicies(id), listDirectory(id), listExceptions(id), listOrgCases(id)]);
-  const audit = can.readAudit(membership.role) ? await listGovernanceAudit(id) : null;
-  return { membership, policies, directory, exceptions, audit, cases, active: await verifiedActive(policies), loadedAt: new Date().toISOString() };
+  const [audit, signIns] = can.readAudit(membership.role) ? await Promise.all([listGovernanceAudit(id), listSignIns(id)]) : [null, null];
+  return { membership, policies, directory, exceptions, audit, signIns, cases, active: await verifiedActive(policies), loadedAt: new Date().toISOString() };
 }
 
 async function load(accountId: string, keepSelection?: string | null) {

@@ -325,7 +325,7 @@ function CaseDetail({
                   approvable.length === 0 ? (
                     <p className="mt-1 text-[10.5px] leading-snug text-no-go">
                       No approved policy exception exists for a verdict in this case. Request one from the verdict; an
-                      owner, admin or compliance member other than the requester must approve it before the case can
+                      owner, admin, compliance or reviewer member other than the requester must approve it before the case can
                       close this way.
                     </p>
                   ) : (

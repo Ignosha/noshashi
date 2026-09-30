@@ -110,7 +110,9 @@ certifications are held; known gaps are listed, not hidden.
 
 - [`docs/PROCUREMENT.md`](docs/PROCUREMENT.md): every control marked
   IMPLEMENTED, PARTIAL or PLANNED.
+- [`docs/ENTERPRISE.md`](docs/ENTERPRISE.md): setting up an organization, roles, controls, and what the price list promises that is not built.
 - [`docs/API.md`](docs/API.md): the Compliance API.
+- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md): how each surface is deployed, secrets by name, scheduled jobs.
 - [`docs/INCIDENT_RESPONSE.md`](docs/INCIDENT_RESPONSE.md), [`docs/DISASTER_RECOVERY.md`](docs/DISASTER_RECOVERY.md).
 - [`docs/ONE_PAGER.md`](docs/ONE_PAGER.md), [`docs/SALES_DEMO.md`](docs/SALES_DEMO.md).
 

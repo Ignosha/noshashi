@@ -30,8 +30,11 @@ Functions and security-definer functions); a client key sees nothing.
 | `organization_members` | (organization, account, role, invited_by) | Members; changes by owner/admin through functions |
 | `password_screens` | SHA-256 of the bcrypt hash of a password screened clean, never the password | Service only |
 
-Roles (`noshashi.member_role`): `owner`, `admin`, `compliance`, `risk`,
-`analyst`, `viewer`, `api`, `regulator` (read-only examiner seat).
+Roles (`noshashi.member_role`): `owner`, `admin`, `compliance`, `reviewer`
+(activates and decides what someone else wrote or requested; drafts
+nothing), `risk`, `analyst`, `auditor` (internal read-only, including the
+audit log), `viewer`, `api`, `regulator` (time-limited read-only examiner
+seat).
 
 ### Governance
 
@@ -78,7 +81,7 @@ only), `support_staff`, `support_staff_invites` (owner-managed in SQL only).
 | Email address | `auth.users`, `accounts` | Sign-in, organization membership, support replies |
 | Password | Supabase Auth (bcrypt) | Sign-in. NOSHASHI's screen stores only a hash of the hash |
 | TOTP secret | Supabase Auth | Second factor |
-| IP address, sign-in events | Supabase Auth audit trail | Security |
+| IP address, sign-in events | Supabase Auth audit trail; and, for members of an organization, `audit_log` rows `member.signed_in` (IP, client identifier cut to 200 characters, assurance level) | Security; the organization's record of who accessed it |
 | Support conversations | `support_*` | Support |
 | XRPL addresses the operator enters | Device store; server only when shared into an organization (cases, watches, exceptions) | The analysis itself |
 
@@ -96,7 +99,7 @@ binding statement; this table describes the implementation behind it.
 | Device verdicts | Newest 10,000 entries per device; older ones drop off |
 | AI use record | Newest 2,000 rows per device |
 | `xrpl_events`, phishing data | Swept daily by `noshashi-xrpl-retention` / `noshashi-phishing-retention`; Strategic plans set their own event retention |
-| `audit_log`, `org_case_events` | Kept; cannot be edited or deleted by any role |
+| `audit_log`, `org_case_events` | Kept; cannot be edited or deleted by any role. Deleting an account blanks its name on these rows (ON DELETE SET NULL); sign-in rows keep their IP and client |
 | Accounts | Until deletion is requested |
 
 ## Backups

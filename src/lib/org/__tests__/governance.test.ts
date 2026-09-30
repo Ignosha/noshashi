@@ -55,7 +55,9 @@ describe("the role table, as the app explains it (the server enforces it)", () =
     owner:      [true,  true,    true,    true],
     admin:      [true,  true,    true,    true],
     compliance: [true,  true,    true,    true],
+    reviewer:   [false, false,   true,    true],
     analyst:    [true,  true,    false,   false],
+    auditor:    [false, false,   false,   false],
     viewer:     [false, false,   false,   false],
   };
   for (const [role, [edit, sim, act, appr]] of Object.entries(table)) {
@@ -74,6 +76,30 @@ describe("the role table, as the app explains it (the server enforces it)", () =
     expect(sql.match(/m\.role in \('owner', 'admin', 'compliance'\)/g)?.length).toBeGreaterThanOrEqual(4);
     expect(sql).not.toMatch(/m\.role in \([^)]*'analyst'/);
     expect(sql).not.toMatch(/m\.role in \([^)]*'viewer'/);
+  });
+
+  it("reviewers approve but never author; auditors only read, including the audit trail", () => {
+    expect(can.requestException("reviewer") || can.submit("reviewer") || can.manageMembers("reviewer") || can.manageSeats("reviewer")).toBe(false);
+    expect(can.readAudit("reviewer") && can.readAudit("auditor")).toBe(true);
+    for (const name of Object.keys(can) as (keyof typeof can)[]) {
+      if (name !== "readAudit") expect(can[name]("auditor")).toBe(false);
+    }
+  });
+
+  it("the reviewer migration adds reviewer to exactly the approval checks, and auditors to the audit read policy", () => {
+    const sql = readFileSync(resolve(root, "supabase/migrations/20260930120100_reviewer_auditor_signin_audit.sql"), "utf8");
+    for (const fn of ["activate_org_policy", "decide_policy_exception", "request_exception_evidence", "org_policies_guard", "policy_exceptions_guard"]) {
+      expect(sql).toContain(`noshashi.${fn}(`);
+    }
+    expect(sql).toContain("m.role in ('owner', 'admin', 'compliance', 'reviewer')");
+    expect(sql).toMatch(/audit_log_select_reviewer[\s\S]*'reviewer', 'auditor'/);
+  });
+
+  it("a sign-in is recorded without ever being able to refuse it", () => {
+    const sql = readFileSync(resolve(root, "supabase/migrations/20260930120100_reviewer_auditor_signin_audit.sql"), "utf8");
+    expect(sql).toMatch(/after insert on auth\.sessions/);
+    expect(sql).toMatch(/exception when others then\s+null;/);
+    expect(sql).toMatch(/revoke execute on function noshashi\.record_sign_in\(\) from public, anon, authenticated/);
   });
 });
 

@@ -85,6 +85,7 @@ is imported by any covered file).
 | T12 | Hosted-model API key stolen from the web view | Keys are stored in the OS keychain and used only in Rust (`model_request`); the web view never receives them. |
 | T13 | Tampered update | The Tauri updater verifies each update against the public key in `tauri.conf.json` before installing; releases publish SHA-256 checksums. |
 | T14 | Throttling by public servers denies service | Requests are paced (at most four in flight), throttled replies cool down and retry, and repeated throttling moves to another server (`src/lib/xrpl/pacer.ts`). |
+| T15 | An account is taken over and used quietly inside an organization | Every new sign-in session is written to each of the person's organizations' audit logs (`member.signed_in`: time, IP, client, one or two factors) by a trigger on `auth.sessions`, readable by owners, admins, compliance, risk, reviewers and auditors. The trigger swallows its own errors, so recording can fail but can never block a sign-in. |
 
 ## 6. Residual risks
 
