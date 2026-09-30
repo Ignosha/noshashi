@@ -3,7 +3,7 @@
 # A backup nobody has restored is a guess. This job takes the newest
 # successful "Database backup" artifact, decrypts it with BACKUP_PASSPHRASE,
 # restores it into a throwaway Postgres 17 container on the runner (nothing
-# leaves the runner, and the container is destroyed with it), then compares
+# leaves the runner, and the container is removed at the end), then compares
 # row counts per table against the live database.
 #
 # SECURITY — this repository is public, so its Actions logs are public. This
@@ -38,19 +38,28 @@ jobs:
   restore:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    services:
-      scratch:
-        image: postgres:17
-        env:
-          # A disposable container that exists only for this job; not a secret.
-          POSTGRES_PASSWORD: restore-test
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s --health-timeout 5s --health-retries 20
     env:
+      # A disposable container that exists only for this job; not a secret.
       SCRATCH_URL: postgresql://postgres:restore-test@localhost:5432/postgres
     steps:
+      # Deliberately not a `services:` container: GitHub prints a service
+      # container's server log at the end of the job, and a failed restore
+      # statement can put a row of data in it. This container logs no
+      # statements or errors, and is removed without printing its log.
+      - name: Start the scratch database
+        run: |
+          set -euo pipefail
+          docker run -d --name scratch -p 5432:5432 \
+            -e POSTGRES_PASSWORD=restore-test \
+            postgres:17 \
+            -c log_min_messages=fatal -c log_min_error_statement=panic \
+            -c log_statement=none > /dev/null
+          for _ in $(seq 1 60); do
+            if docker exec scratch pg_isready -U postgres -q; then echo "scratch database ready"; exit 0; fi
+            sleep 1
+          done
+          echo "::error::scratch database did not start"; exit 1
+
       - name: Install Postgres 17 client
         run: |
           set -euo pipefail
@@ -170,3 +179,7 @@ jobs:
           rm -f live.txt restored.txt
           if [ "${fail}" -ne 0 ]; then exit 1; fi
           echo "RESTORE TEST PASSED"
+
+      - name: Remove the scratch database
+        if: always()
+        run: docker rm -f scratch > /dev/null 2>&1 || true
