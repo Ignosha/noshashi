@@ -69,8 +69,20 @@ Then:
    logs.
 5. Re-verify a known receipt end to end through the Compliance API.
 
-A restore has **not yet been tested**. Test one into a scratch project as
-soon as the first backup succeeds, and record the date here.
+### Restore test
+
+`.github/workflows/db-restore-test.yml` restores the newest backup into a
+throwaway Postgres 17 container on the runner and compares per-table row
+counts with the live database. It runs on the 2nd of each month and on
+demand (Actions → **Database restore test** → Run workflow).
+
+| Date | Backup | Result |
+|---|---|---|
+| 2026-09-30 | `db-backup-20260930T130553Z` | **Passed.** All 44 tables restored (43 in `noshashi` plus `auth.users`), 4,965 rows. One restore error, the expected "schema public already exists". Two tables differed from live because background jobs had added rows since the backup (`ledger_credentials` 207 vs 211, `phishing_scans` 2,402 vs 2,410). |
+
+This proves the data restores. It does not rehearse a full recovery into a
+new Supabase project (Edge Functions, cron jobs, secrets); steps 1–5 above
+cover that and have not been rehearsed.
 
 ### Without a backup
 
