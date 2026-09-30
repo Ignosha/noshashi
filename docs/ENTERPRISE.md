@@ -16,8 +16,8 @@ The tiers and their entitlement flags are defined once in
 | Tier | Monthly | Purchase | In short |
 |---|---|---|---|
 | Institutional | $4,000 ($40,000 a year) | Contact sales; Stripe price exists | Organization with unlimited seats, shared policies and exceptions under four-eyes control, append-only audit log, Compliance API keys and webhooks, examiner seats, white-label |
-| Enterprise | $10,000 ($100,000 a year) | Contract, invoiced per deal (no Stripe price) | Everything in Institutional, plus deposit and withdrawal screening, forensic trace and cluster mapping, the embeddable screening widget, market surveillance, customer protection |
-| Strategic Infrastructure | $20,850 ($208,500 a year) | Contract, invoiced per deal (no Stripe price) | Everything in Enterprise, plus XRPL event feeds, custom export schemas and retention, Security Guardian alerts, phishing feed |
+| Enterprise | $10,000 ($120,000 a year) | Contract, invoiced per deal (no Stripe price) | Everything in Institutional, plus deposit and withdrawal screening, forensic trace and cluster mapping, the embeddable screening widget, market surveillance, customer protection |
+| Strategic Infrastructure | $20,833 ($250,000 a year) | Contract, invoiced per deal (no Stripe price) | Everything in Enterprise, plus XRPL event feeds, custom export schemas and retention, Security Guardian alerts, phishing feed |
 
 ### Coming soon
 

@@ -25,7 +25,7 @@ export type Policy = {
 };
 
 const UPDATED = "20 August 2026";
-/** The privacy policy changed on its own: sign-in records in organization audit logs. */
+/** The privacy and data-processing policies changed on their own: sign-in records, and Vercel and Resend named as processors. */
 const PRIVACY_UPDATED = "30 September 2026";
 
 export const ACCESSIBILITY: Policy = {
@@ -119,7 +119,7 @@ export const PRIVACY: Policy = {
     {
       heading: "Who processes it",
       body: [
-        "Account data is held in Postgres at Supabase (United States region) behind row level security, so a row is only reachable by the account that owns it. Payments are processed by Stripe, which is the controller of your payment instrument — we never receive it. No other processor is involved.",
+        "Account data is held in Postgres at Supabase (United States region) behind row level security, so a row is only reachable by the account that owns it. Payments are processed by Stripe, which is the controller of your payment instrument — we never receive it. The website and its contact form run on Vercel, and messages you send us through the contact form or a support ticket are delivered by email through Resend. No other processor is involved.",
       ],
     },
     {
@@ -347,7 +347,7 @@ export const DATA_PROCESSING: Policy = {
   title: "DATA PROCESSING & SUBPROCESSORS",
   summary:
     "Where account data physically lives, who else touches it, and the rights you can exercise over it. This is the page a procurement team asks for.",
-  updated: UPDATED,
+  updated: PRIVACY_UPDATED,
   sections: [
     {
       heading: "Roles",
@@ -362,8 +362,10 @@ export const DATA_PROCESSING: Policy = {
       points: [
         "Supabase (United States) — authentication, Postgres database, serverless functions.",
         "Stripe (United States) — payment processing, subscription management and invoicing. Stripe is an independent controller of your payment instrument.",
+        "Vercel (United States) — hosts the website and runs its functions, including the contact form, which receives the name, email address and message you send.",
+        "Resend (United States) — delivers transactional email: contact-form messages and support-ticket notifications. It receives the message and the addresses it is sent from and to.",
         "Public XRP Ledger nodes — read-only queries of public ledger state. These receive the public addresses you look up and nothing about you.",
-        "That is the complete list. There is no analytics vendor, no email marketing platform, no session-replay tool, no advertising network, and no AI vendor.",
+        "That is the complete list. There is no analytics vendor, no session-replay tool, no advertising network, and no AI vendor. We send no marketing email.",
       ],
     },
     {

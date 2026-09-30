@@ -307,7 +307,7 @@
         <button type="button" id="cadence-monthly" aria-pressed="true">Monthly</button>
         <button type="button" id="cadence-annual" aria-pressed="false">Annual prepay</button>
       </div>
-      <span class="save" id="cadence-note">Annual is 10 × monthly — two months free</span>
+      <span class="save" id="cadence-note">Pro and Institutional: annual is 10 × monthly, two months free</span>
     </div>
 
     <div class="price">
@@ -451,8 +451,8 @@
       <article class="tier enterprise gauge">
         <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
         <div class="body">
-          <p class="fig">$10,000</p>
-          <p class="per">per month · $120,000 / year</p>
+          <p class="fig" data-monthly="$10,000" data-annual="$120,000">$10,000</p>
+          <p class="per" data-monthly="per month · $120,000 / year" data-annual="per year · $10,000 / month">per month · $120,000 / year</p>
           <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
           <p class="role">Contracted · architecture and commercial review</p>
           <ul class="spec">
@@ -478,8 +478,8 @@
       <article class="tier strategic gauge">
         <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
         <div class="body">
-          <p class="fig">$20,850</p>
-          <p class="per">per month · $250,000 / year</p>
+          <p class="fig" data-monthly="$20,833" data-annual="$250,000">$20,833</p>
+          <p class="per" data-monthly="per month · $250,000 / year" data-annual="per year · $20,833 / month">per month · $250,000 / year</p>
           <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
           <p class="role">Contracted infrastructure · architecture review required</p>
           <ul class="spec">
@@ -511,7 +511,7 @@
         <thead><tr><th scope="col">Capability</th><th scope="col">Free</th><th scope="col">Pro</th><th scope="col">Institutional</th><th scope="col">Enterprise</th><th scope="col">Strategic Infrastructure</th></tr></thead>
         <tbody>
           <tr class="group"><th scope="rowgroup" colspan="6">Commercial</th></tr>
-          <tr><th scope="row">Price</th><td class="tier-price">$0<small>forever</small></td><td class="tier-price">$749<small>/ seat / month</small></td><td class="tier-price">$4,000<small>/ month</small></td><td class="tier-price">$10,000<small>/ month · $120,000 / year</small></td><td class="tier-price">$20,850<small>/ month · $250,000 / year</small></td></tr>
+          <tr><th scope="row">Price</th><td class="tier-price">$0<small>forever</small></td><td class="tier-price">$749<small>/ seat / month · $7,490 / year</small></td><td class="tier-price">$4,000<small>/ month · $40,000 / year</small></td><td class="tier-price">$10,000<small>/ month · $120,000 / year</small></td><td class="tier-price">$20,833<small>/ month · $250,000 / year</small></td></tr>
           <tr><th scope="row">Purchase route</th><td>Download</td><td>Stripe Checkout</td><td>Contact sales</td><td><a class="tier-link" href="/enterprise/">Explore Enterprise ↗</a></td><td><a class="tier-link" href="/strategic-infrastructure/">Build with NOSHASHI ↗</a></td></tr>
           <tr><th scope="row">Commercial status</th><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Asset intelligence &amp; controls</th></tr>
@@ -583,151 +583,9 @@
   </div>
 </footer>
 
-<script>
-/*
- * Billing period switch.
- *
- * Both figures ship in the markup as data attributes rather than being
- * computed here, so the annual price on the page is the annual price in
- * the catalogue — not the monthly one multiplied by a number this script
- * happens to hold. If the two ever disagree, the fix belongs in one place.
- *
- * The page is fully readable with this script blocked: the monthly
- * figures are the rendered ones, and the switch is the only thing that
- * stops working.
- */
-(function () {
-  var monthly = document.getElementById("cadence-monthly");
-  var annual = document.getElementById("cadence-annual");
-  var note = document.getElementById("cadence-note");
-  if (!monthly || !annual) return;
-
-  var fields = document.querySelectorAll("[data-monthly][data-annual]");
-
-  function apply(period) {
-    for (var i = 0; i < fields.length; i += 1) {
-      var value = fields[i].getAttribute("data-" + period);
-      if (value) fields[i].textContent = value;
-    }
-    monthly.setAttribute("aria-pressed", String(period === "monthly"));
-    annual.setAttribute("aria-pressed", String(period === "annual"));
-    // The switch used to change only the rendered figures, so a visitor
-    // who chose "Annual prepay" and paid was put on the monthly price.
-    var cadenceField = document.getElementById("pro-cadence");
-    if (cadenceField) cadenceField.value = period;
-    if (note) {
-      note.textContent =
-        period === "annual"
-          ? "Invoiced once · 10 × monthly, so two months are free"
-          : "Annual is 10 × monthly — two months free";
-    }
-  }
-
-  monthly.addEventListener("click", function () { apply("monthly"); });
-  annual.addEventListener("click", function () { apply("annual"); });
-})();
-</script>
-<script>
-/*
- * Progressive enhancement only: without this the form still posts and
- * the endpoint still redirects to Stripe. This exists so a failure is
- * readable in place instead of a navigation to an error page.
- */
-(function(){
-  document.querySelectorAll(".checkout-form").forEach(function(form){
-    var error=form.querySelector(".checkout-error"),button=form.querySelector("button");
-    form.addEventListener("submit",function(event){
-      event.preventDefault();
-      if(error){error.hidden=true;error.textContent="";}
-      var original=button.textContent;
-      button.disabled=true;button.textContent="OPENING STRIPE…";
-      var payload={};
-      new FormData(form).forEach(function(value,key){payload[key]=value;});
-      fetch(form.action,{
-        method:"POST",
-        headers:{Accept:"application/json","Content-Type":"application/json"},
-        body:JSON.stringify(payload)
-      })
-        .then(function(r){return r.json().then(function(b){return {ok:r.ok,body:b};});})
-        .then(function(result){
-          if(result.ok&&result.body.url){location.href=result.body.url;return;}
-          throw new Error(result.body.error||"Checkout could not start.");
-        })
-        .catch(function(e){
-          button.disabled=false;button.textContent=original;
-          if(error){error.textContent=e.message;error.hidden=false;}
-        });
-    });
-  });
-})();
-</script>
-<script>
-/*
- * Live ledger readout.
- *
- * Deliberately small and deliberately fragile-safe. Three rules:
- *
- *  1. A cell shows cyan only once a real ledger has arrived. Until then
- *     it is an em dash in --faint. DESIGN.md: "a static number in cyan
- *     is a lie about liveness", and this page is sold to people who are
- *     buying the promise that we do not fabricate.
- *  2. Every failure path is silent and leaves the dash. No retry storm,
- *     no fake value, no console noise for a visitor.
- *  3. The socket closes when the tab goes away, so reading a pricing
- *     page does not hold an open connection to a public node forever.
- */
-(function () {
-  var idxEl = document.getElementById("tele-ledger");
-  var ageEl = document.getElementById("tele-age");
-  if (!idxEl || !ageEl || typeof WebSocket === "undefined") return;
-
-  var socket = null, lastClose = 0, ticker = null;
-
-  function show(el, text) { el.textContent = text; el.className = "v live"; }
-
-  function startTicking() {
-    if (ticker) return;
-    ticker = setInterval(function () {
-      if (!lastClose) return;
-      var secs = Math.max(0, Math.round((Date.now() - lastClose) / 1000));
-      ageEl.textContent = secs + "s ago";
-    }, 1000);
-  }
-
-  function teardown() {
-    if (ticker) { clearInterval(ticker); ticker = null; }
-    if (socket) { try { socket.close(); } catch (e) {} socket = null; }
-  }
-
-  try {
-    socket = new WebSocket("wss://xrplcluster.com");
-  } catch (e) {
-    return;                       // leaves both cells as an em dash
-  }
-
-  socket.onopen = function () {
-    try {
-      socket.send(JSON.stringify({ id: 1, command: "subscribe", streams: ["ledger"] }));
-    } catch (e) { teardown(); }
-  };
-
-  socket.onmessage = function (event) {
-    var msg;
-    try { msg = JSON.parse(event.data); } catch (e) { return; }
-    var index = (msg.result && msg.result.ledger_index) || msg.ledger_index;
-    if (!index) return;
-    show(idxEl, Number(index).toLocaleString("en-US"));
-    lastClose = Date.now();
-    show(ageEl, "0s ago");
-    startTicking();
-  };
-
-  socket.onerror = function () { teardown(); };
-  socket.onclose = function () { if (ticker) { clearInterval(ticker); ticker = null; } };
-
-  window.addEventListener("pagehide", teardown);
-})();
-</script>
+<script src="/assets/inline/9b7e5fca6799ab4839b3.js"></script>
+<script src="/assets/inline/16f7b5f5272bad2e2e1c.js"></script>
+<script src="/assets/inline/594a99fcabb4fae55f30.js"></script>
 <script src="/assets/i18n.js" defer></script>
 <script src="/assets/nav.js" defer></script>
 <script src="/assets/support.js" defer></script>

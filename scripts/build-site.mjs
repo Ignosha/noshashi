@@ -45,6 +45,7 @@ import {
   renderProgress, renderRail, renderMarket, renderMarketHead, renderMarketFoot, renderSubscribe,
 } from "../api/_lib/sections.js";
 import { jsonLd } from "../api/_lib/shell.js";
+import { externalizeSite } from "./inline-scripts.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
@@ -104,7 +105,7 @@ async function buildHome({ news, market, feed, status, release }) {
           { "@type": "Offer", name: "Pro", price: "749", priceCurrency: "USD" },
           { "@type": "Offer", name: "Institutional", price: "4000", priceCurrency: "USD" },
           { "@type": "Offer", name: "Enterprise", price: "10000", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Strategic Infrastructure", price: "20850", priceCurrency: "USD" },
+          { "@type": "Offer", name: "Strategic Infrastructure", price: "20833", priceCurrency: "USD" },
         ],
         url: `${ORIGIN}/`,
       },
@@ -1222,8 +1223,8 @@ async function buildPricingEnhancement() {
       <article class="tier enterprise gauge">
         <div class="bezel"><span class="id">04</span><span class="name">ENTERPRISE</span></div>
         <div class="body">
-          <p class="fig">$10,000</p>
-          <p class="per">per month · $120,000 / year</p>
+          <p class="fig" data-monthly="$10,000" data-annual="$120,000">$10,000</p>
+          <p class="per" data-monthly="per month · $120,000 / year" data-annual="per year · $10,000 / month">per month · $120,000 / year</p>
           <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
           <p class="role">Contracted · architecture and commercial review</p>
           <ul class="spec">
@@ -1249,8 +1250,8 @@ async function buildPricingEnhancement() {
       <article class="tier strategic gauge">
         <div class="bezel"><span class="id">05</span><span class="name">STRATEGIC INFRASTRUCTURE</span></div>
         <div class="body">
-          <p class="fig">$20,850</p>
-          <p class="per">per month · $250,000 / year</p>
+          <p class="fig" data-monthly="$20,833" data-annual="$250,000">$20,833</p>
+          <p class="per" data-monthly="per month · $250,000 / year" data-annual="per year · $20,833 / month">per month · $250,000 / year</p>
           <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
           <p class="role">Contracted infrastructure · architecture review required</p>
           <ul class="spec">
@@ -1288,7 +1289,7 @@ async function buildPricingEnhancement() {
         <thead><tr><th scope="col">Capability</th><th scope="col">Free</th><th scope="col">Pro</th><th scope="col">Institutional</th><th scope="col">Enterprise</th><th scope="col">Strategic Infrastructure</th></tr></thead>
         <tbody>
           <tr class="group"><th scope="rowgroup" colspan="6">Commercial</th></tr>
-          <tr><th scope="row">Price</th><td class="tier-price">$0<small>forever</small></td><td class="tier-price">$749<small>/ seat / month</small></td><td class="tier-price">$4,000<small>/ month</small></td><td class="tier-price">$10,000<small>/ month · $120,000 / year</small></td><td class="tier-price">$20,850<small>/ month · $250,000 / year</small></td></tr>
+          <tr><th scope="row">Price</th><td class="tier-price">$0<small>forever</small></td><td class="tier-price">$749<small>/ seat / month · $7,490 / year</small></td><td class="tier-price">$4,000<small>/ month · $40,000 / year</small></td><td class="tier-price">$10,000<small>/ month · $120,000 / year</small></td><td class="tier-price">$20,833<small>/ month · $250,000 / year</small></td></tr>
           <tr><th scope="row">Purchase route</th><td>Download</td><td>Stripe Checkout</td><td>Contact sales</td><td><a class="tier-link" href="/enterprise/">Explore Enterprise ↗</a></td><td><a class="tier-link" href="/strategic-infrastructure/">Build with NOSHASHI ↗</a></td></tr>
           <tr><th scope="row">Commercial status</th><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Asset intelligence &amp; controls</th></tr>
@@ -1675,6 +1676,10 @@ async function main() {
   const docs = await buildDocs();
   await buildSitemap(docs);
   await buildRobots();
+  // Last: every page, generated or committed, loses its inline scripts so
+  // the CSP can be script-src 'self' (scripts/inline-scripts.mjs).
+  const inline = await externalizeSite(SITE);
+  log(`inline scripts: ${inline.files} files for ${inline.pages} pages (${inline.removed} unused removed)`);
 
   log(`canonical origin: ${ORIGIN}`);
   log("done.");

@@ -47,9 +47,11 @@ export type Plan = {
   grants: string[];
 
   /**
-   * Annual prepay. Two months free against twelve at the monthly rate,
-   * so the discount is stated as the arithmetic rather than as a
-   * percentage nobody can check: 10 x monthly.
+   * Annual price. Pro and Institutional: annual prepay, two months free
+   * against twelve at the monthly rate, stated as the arithmetic rather
+   * than a percentage nobody can check (10 x monthly). Enterprise and
+   * Strategic are contracted by the year; their monthly figure is the
+   * annual price divided by twelve, rounded to the dollar.
    */
   annualUsd?: number;
   annualPriceId?: string | null;
@@ -222,7 +224,7 @@ export const PLANS: Plan[] = [
     cadence: "per month",
     // No Stripe price exists yet: contract tiers are invoiced per deal.
     priceId: null,
-    annualUsd: 100_000,
+    annualUsd: 120_000,
     annualPriceId: null,
     purchase: "contact_sales",
     seatBased: false,
@@ -278,12 +280,13 @@ export const PLANS: Plan[] = [
     id: "strategic",
     name: "STRATEGIC INFRASTRUCTURE",
     audience: "Institutions building their own XRPL intelligence layer",
-    priceLabel: "$20,850",
-    monthlyUsd: 20850,
+    priceLabel: "$20,833",
+    // $250,000 a year divided by twelve, rounded to the dollar.
+    monthlyUsd: 20833,
     cadence: "per month",
     // No Stripe price exists yet: contract tiers are invoiced per deal.
     priceId: null,
-    annualUsd: 208_500,
+    annualUsd: 250_000,
     annualPriceId: null,
     purchase: "contact_sales",
     seatBased: false,

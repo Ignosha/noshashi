@@ -22,10 +22,7 @@
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/core.css">
 <link rel="stylesheet" href="/assets/modules.css">
-<script>
-(function(){try{var t=localStorage.getItem("noshashi-theme");
-if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
-</script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Progress","item":"https://www.noshashi.app/progress/"}]}]}</script>
 
 </head>
@@ -39,9 +36,9 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a class="nav-link" href="/progress/" aria-current="page"><span data-i18n="nav.progress">Progress</span></a>
       <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
       <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
-      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
-      <a class="nav-link optional" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
-      <a class="nav-link optional" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link optional" href="/learn/"><span data-i18n="nav.learn">Learn</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
       <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
       <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
@@ -63,8 +60,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 
 <section>
   <div class="rail">
-    <div><span class="label">CURRENT BUILD</span><strong>v1.0.6</strong><small>Beta channel, unsigned, built by CI.</small></div>
-    <div><span class="label">RELEASES SHIPPED</span><strong>8</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
+    <div><span class="label">CURRENT BUILD</span><strong>—</strong><small>Beta channel, unsigned, built by CI.</small></div>
+    <div><span class="label">RELEASES SHIPPED</span><strong>2</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
     <div><span class="label">TESTS PASSING</span><strong>272</strong><small>On the logic that makes claims. Run with npm test.</small></div>
     <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>No sign-up exists. Nothing is held server-side.</small></div>
   </div>
@@ -125,66 +122,21 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
     <div class="log" id="mission-log">
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
-        <time datetime="2026-09-22T14:40:56.000Z">2026-09-22</time>
+        <time datetime="2026-09-29T03:00:00.000Z">2026-09-29</time>
         <span class="log-kind">RELEASE</span>
       </div>
-      <h3>NOSHASHI v1.0.6</h3>
-      <p>Built from 5042553f8da3c940d8d72d366be5c8576a965d03 on ubuntu-22.04. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
-      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.6" rel="noopener">RELEASE NOTES →</a>
+      <h3>1.0.15: real domain and credential registry, audit evidence, readable at any size</h3>
+      <p>Every permissioned domain and credential on mainnet, read by a sweep of the ledger; admission checks with SHA-256 records; audit trails screened against OFAC and the scam registry with a signed manifest. Text is larger, scaling fills the window, and 2FA sign-in is fixed.</p>
+      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
     </article>
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
-        <time datetime="2026-09-22T05:41:26.000Z">2026-09-22</time>
+        <time datetime="2026-09-28T18:00:00.000Z">2026-09-28</time>
         <span class="log-kind">RELEASE</span>
       </div>
-      <h3>NOSHASHI v1.0.5</h3>
-      <p>Built from b4f3d145f17a1bb4a294c158b29415a2b8e47ffa on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
-      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.5" rel="noopener">RELEASE NOTES →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-09-22T03:14:27.000Z">2026-09-22</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>NOSHASHI v1.0.4</h3>
-      <p>Built from 420cf97280de79e7c7497f7cdf44435a5af7bfbe on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
-      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.4" rel="noopener">RELEASE NOTES →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-09-22T01:52:34.000Z">2026-09-22</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>NOSHASHI v1.0.3</h3>
-      <p>Built from c2c816aa4e9bf66ebc9cb2a0551b0092c4572cf6 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
-      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.3" rel="noopener">RELEASE NOTES →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-09-22T01:08:19.000Z">2026-09-22</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>NOSHASHI v1.0.2</h3>
-      <p>Built from f3c8b424e33240d7343f2875c0bdb2bfd6190616 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
-      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.2" rel="noopener">RELEASE NOTES →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-09-21T16:51:51.000Z">2026-09-21</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>NOSHASHI v0.4.3</h3>
-      <p>Built from 4474bb5371526a0df3553b060bc5aa346c879dc2 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
-      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v0.4.3" rel="noopener">RELEASE NOTES →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-09-21T15:47:44.000Z">2026-09-21</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>NOSHASHI v0.4.2</h3>
-      <p>Built from 76602f457af44b5fce42d41f7a8b79f204948121 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
-      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v0.4.2" rel="noopener">RELEASE NOTES →</a>
+      <h3>1.0.14: safer to hold XRP, easier to trust who holds it</h3>
+      <p>An emergency kit for drained accounts, a reviewed scam registry and phishing check, withdrawal screening, and Customer Asset Protection: proof from the XRP Ledger that customer XRP is backed and yours is counted. Verification, not insurance.</p>
+      <a class="log-link" href="/releases/1-0-14/">OPEN →</a>
     </article>
     <article class="log-entry" data-kind="milestone">
       <div class="log-meta">
@@ -193,6 +145,24 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       </div>
       <h3>Every download is now labelled BETA</h3>
       <p>The desktop builds are pre-1.0 and unsigned while the release pipeline is hardened. The download section now says so on every artifact rather than only in the operator note underneath, so the channel is never read as stable by accident.</p>
+      <a class="log-link" href="/#download">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="note">
+      <div class="log-meta">
+        <time datetime="2026-09-17T11:30:00.000Z">2026-09-17</time>
+        <span class="log-kind">NOTE</span>
+      </div>
+      <h3>Public site rebuilt around live feeds</h3>
+      <p>The site now carries a live XRP newsroom, this mission log, a support console and a contact channel. Every page is rendered on the server before it is served, so the content is in the HTML a crawler receives rather than assembled afterwards in the browser.</p>
+      <a class="log-link" href="/status/">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="note">
+      <div class="log-meta">
+        <time datetime="2026-09-17T11:00:00.000Z">2026-09-17</time>
+        <span class="log-kind">NOTE</span>
+      </div>
+      <h3>Accounts and the hosted workspace were withdrawn from the site</h3>
+      <p>Sign-in and the hosted dashboard are gone. NOSHASHI runs on your machine and reads public ledger state; the website no longer asks anyone to create an account to evaluate it. Existing links redirect rather than breaking.</p>
       <a class="log-link" href="/#download">OPEN →</a>
     </article>
   </div>
@@ -238,11 +208,15 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="/progress/">Progress</a>
       <a href="/status/">Status</a>
       <a href="/research/">Findings</a>
+      <a href="/learn/">Learn NOSHASHI (course)</a>
       <a href="/guide/">Plain-language guide</a>
       <a href="/pricing/">Pricing</a>
       <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
+      <a href="/misread/">The ledger can be misread</a>
       <a href="/strategic-infrastructure/">Strategic infrastructure</a>
       <a href="/developers/">Developers</a>
+      <a href="/docs/">Documentation</a>
       <a href="/legal/">Legal &amp; accessibility</a>
       <a href="https://github.com/Ignosha/noshashi">GitHub</a>
     </div>
@@ -253,22 +227,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 <script src="/assets/subscribe.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
-<script>
-(function(){
-  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
-  if(!button)return;
-  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
-    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
-    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
-  sync();
-  button.addEventListener("click",function(){
-    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
-    document.documentElement.setAttribute("data-theme",next);
-    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
-    sync();});
-})();
-</script>
-
 <script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+
 </body>
 </html>

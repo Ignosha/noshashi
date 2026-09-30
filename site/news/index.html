@@ -22,10 +22,7 @@
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/core.css">
 <link rel="stylesheet" href="/assets/modules.css">
-<script>
-(function(){try{var t=localStorage.getItem("noshashi-theme");
-if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
-</script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Newsroom","item":"https://www.noshashi.app/news/"}]}]}</script>
 
 </head>
@@ -39,9 +36,9 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
       <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
       <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
-      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
-      <a class="nav-link optional" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
-      <a class="nav-link optional" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link optional" href="/learn/"><span data-i18n="nav.learn">Learn</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
       <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
       <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
@@ -66,65 +63,14 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   <div class="console" id="xrp-live">
     <div class="console-head">
     <strong>XRP · LIVE MARKET AND NETWORK</strong>
-    <span class="reading live" id="xrp-state">UPDATED just now</span>
+    <span class="reading stale" id="xrp-state">NO SOURCE ANSWERING</span>
   </div>
-    <div class="console-body">
-    <div class="xrp-top">
-      <div class="xrp-quote">
-        <span class="label">XRP / USD · SPOT</span>
-        <strong id="xrp-price">$1.55</strong>
-        <span class="xrp-change" data-dir="up">
-         <span aria-hidden="true">▲</span>
-         <span id="xrp-change">+3.32%</span> over 24h
-       </span>
-      </div>
-      <p class="chart-q">Where has XRP traded this week?</p>
-    </div>
-
-    <figure class="chart" data-chart="xrp-price">
-    <svg viewBox="0 0 1000 260" role="img" preserveAspectRatio="xMidYMid meet"
-         aria-label="XRP price in USD over the last seven days, from $1.386 to $1.555"
-         data-series="{&quot;t0&quot;:1789484400000,&quot;t&quot;:[0,3600000,7200000,10800000,14400000,18000000,21600000,25200000,28800000,32400000,36000000,39600000,43200000,46800000,50400000,54000000,57600000,61200000,64800000,68400000,72000000,75600000,79200000,82800000,86400000,90000000,93600000,97200000,100800000,104400000,108000000,111600000,115200000,118800000,122400000,126000000,129600000,133200000,136800000,140400000,144000000,147600000,151200000,154800000,158400000,162000000,165600000,169200000,172800000,176400000,180000000,183600000,187200000,190800000,194400000,198000000,201600000,205200000,208800000,212400000,216000000,219600000,223200000,226800000,230400000,234000000,237600000,241200000,244800000,248400000,252000000,255600000,259200000,262800000,266400000,270000000,273600000,277200000,280800000,284400000,288000000,291600000,295200000,298800000,302400000,306000000,309600000,313200000,316800000,320400000,324000000,327600000,331200000,334800000,338400000,342000000,345600000,349200000,352800000,356400000,360000000,363600000,367200000,370800000,374400000,378000000,381600000,385200000,388800000,392400000,396000000,399600000,403200000,406800000,410400000,414000000,417600000,421200000,424800000,428400000,432000000,435600000,439200000,442800000,446400000,450000000,453600000,457200000,460800000,464400000,468000000,471600000,475200000,478800000,482400000,486000000,489600000,493200000,496800000,500400000,504000000,507600000,511200000,514800000,518400000,522000000,525600000,529200000,532800000,536400000,540000000,543600000,547200000,550800000,554400000,558000000,561600000,565200000,568800000,572400000,576000000,579600000,583200000,586800000,590400000,594000000,597600000,601200000,604340000],&quot;v&quot;:[1.386212,1.389135,1.387336,1.404977,1.325668,1.29628,1.293184,1.27642,1.288424,1.28328,1.286533,1.274793,1.288539,1.296568,1.30109,1.296164,1.296727,1.28427,1.283894,1.290669,1.288005,1.295212,1.282083,1.274505,1.265502,1.266145,1.267637,1.263047,1.284336,1.300957,1.30167,1.292295,1.285506,1.298304,1.294177,1.299608,1.29912,1.301747,1.298808,1.294416,1.30005,1.300803,1.3027,1.299075,1.294514,1.297667,1.30422,1.30301,1.299829,1.306603,1.30387,1.299928,1.29456,1.294781,1.297689,1.290162,1.294916,1.295449,1.299563,1.303811,1.304801,1.324556,1.323618,1.317047,1.320341,1.32751,1.335428,1.333573,1.330379,1.322639,1.322822,1.360524,1.398538,1.384816,1.380111,1.389175,1.386151,1.40987,1.402761,1.401325,1.398243,1.396,1.408693,1.411924,1.412689,1.417889,1.414553,1.427079,1.42143,1.410431,1.414522,1.41237,1.417899,1.433925,1.432157,1.437103,1.438434,1.430475,1.434329,1.426941,1.429379,1.426982,1.428201,1.409267,1.416023,1.409959,1.405827,1.399621,1.369369,1.382219,1.380437,1.381801,1.380916,1.379202,1.376607,1.383128,1.375629,1.379698,1.379324,1.376877,1.378632,1.389819,1.409729,1.402199,1.404015,1.408843,1.406004,1.401244,1.409472,1.410232,1.425607,1.40771,1.415322,1.422328,1.418902,1.429555,1.435737,1.438748,1.475071,1.473298,1.488768,1.485759,1.486934,1.489427,1.496967,1.494709,1.489454,1.49497,1.509559,1.506594,1.532923,1.550437,1.555592,1.534984,1.521562,1.511515,1.515045,1.515097,1.510943,1.513112,1.519049,1.517321,1.546071,1.540821,1.531317,1.537308,1.542635,1.588158,1.555287],&quot;box&quot;:[8,938,14,234],&quot;range&quot;:[1.2370384929741456,1.614167127059388],&quot;w&quot;:1000,&quot;h&quot;:260}">
-      <defs>
-        <linearGradient id="xrp-price-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="var(--brand)" stop-opacity=".26"/>
-          <stop offset="100%" stop-color="var(--brand)" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-      <line class="grid" x1="8" x2="938" y1="234.00" y2="234.00"/><text class="axis" x="946" y="237.50">$1.237</text><line class="grid" x1="8" x2="938" y1="179.00" y2="179.00"/><text class="axis" x="946" y="182.50">$1.331</text><line class="grid" x1="8" x2="938" y1="124.00" y2="124.00"/><text class="axis" x="946" y="127.50">$1.426</text><line class="grid" x1="8" x2="938" y1="69.00" y2="69.00"/><text class="axis" x="946" y="72.50">$1.520</text><line class="grid" x1="8" x2="938" y1="14.00" y2="14.00"/><text class="axis" x="946" y="17.50">$1.614</text>
-      <path class="area" d="M8.00 146.98 L13.54 145.27 L19.07 146.32 L24.61 136.03 L30.14 182.30 L35.68 199.44 L41.21 201.25 L46.75 211.03 L52.29 204.02 L57.82 207.02 L63.36 205.13 L68.89 211.98 L74.43 203.96 L79.96 199.27 L85.50 196.64 L91.04 199.51 L96.57 199.18 L102.11 206.45 L107.64 206.67 L113.18 202.71 L118.71 204.27 L124.25 200.06 L129.79 207.72 L135.32 212.14 L140.86 217.40 L146.39 217.02 L151.93 216.15 L157.46 218.83 L163.00 206.41 L168.54 196.71 L174.07 196.30 L179.61 201.77 L185.14 205.73 L190.68 198.26 L196.21 200.67 L201.75 197.50 L207.29 197.78 L212.82 196.25 L218.36 197.97 L223.89 200.53 L229.43 197.24 L234.96 196.80 L240.50 195.70 L246.04 197.81 L251.57 200.47 L257.11 198.63 L262.64 194.81 L268.18 195.51 L273.71 197.37 L279.25 193.42 L284.79 195.01 L290.32 197.31 L295.86 200.44 L301.39 200.32 L306.93 198.62 L312.46 203.01 L318.00 200.24 L323.54 199.93 L329.07 197.53 L334.61 195.05 L340.14 194.47 L345.68 182.95 L351.21 183.49 L356.75 187.33 L362.29 185.40 L367.82 181.22 L373.36 176.60 L378.89 177.69 L384.43 179.55 L389.96 184.06 L395.50 183.96 L401.04 161.96 L406.57 139.79 L412.11 147.79 L417.64 150.54 L423.18 145.25 L428.71 147.01 L434.25 133.18 L439.79 137.32 L445.32 138.16 L450.86 139.96 L456.39 141.27 L461.93 133.86 L467.46 131.98 L473.00 131.53 L478.54 128.50 L484.07 130.45 L489.61 123.14 L495.14 126.43 L500.68 132.85 L506.21 130.46 L511.75 131.72 L517.29 128.49 L522.82 119.14 L528.36 120.18 L533.89 117.29 L539.43 116.51 L544.96 121.16 L550.50 118.91 L556.04 123.22 L561.57 121.80 L567.11 123.20 L572.64 122.48 L578.18 133.53 L583.71 129.59 L589.25 133.13 L594.79 135.54 L600.32 139.16 L605.86 156.80 L611.39 149.31 L616.93 150.35 L622.46 149.55 L628.00 150.07 L633.54 151.07 L639.07 152.58 L644.61 148.78 L650.14 153.15 L655.68 150.78 L661.21 151.00 L666.75 152.42 L672.29 151.40 L677.82 144.87 L683.36 133.26 L688.89 137.65 L694.43 136.59 L699.96 133.78 L705.50 135.43 L711.04 138.21 L716.57 133.41 L722.11 132.97 L727.64 124.00 L733.18 134.44 L738.71 130.00 L744.25 125.91 L749.79 127.91 L755.32 121.69 L760.86 118.09 L766.39 116.33 L771.93 95.14 L777.46 96.18 L783.00 87.15 L788.54 88.91 L794.07 88.22 L799.61 86.77 L805.14 82.37 L810.68 83.69 L816.21 86.75 L821.75 83.53 L827.29 75.02 L832.82 76.75 L838.36 61.39 L843.89 51.18 L849.43 48.17 L854.96 60.19 L860.50 68.02 L866.04 73.88 L871.57 71.82 L877.11 71.79 L882.64 74.22 L888.18 72.95 L893.71 69.49 L899.25 70.50 L904.79 53.72 L910.32 56.79 L915.86 62.33 L921.39 58.84 L926.93 55.73 L932.46 29.17 L938.00 48.35 L938.00 234 L8.00 234 Z" fill="url(#xrp-price-fill)"/>
-      <path class="trace" d="M8.00 146.98 L13.54 145.27 L19.07 146.32 L24.61 136.03 L30.14 182.30 L35.68 199.44 L41.21 201.25 L46.75 211.03 L52.29 204.02 L57.82 207.02 L63.36 205.13 L68.89 211.98 L74.43 203.96 L79.96 199.27 L85.50 196.64 L91.04 199.51 L96.57 199.18 L102.11 206.45 L107.64 206.67 L113.18 202.71 L118.71 204.27 L124.25 200.06 L129.79 207.72 L135.32 212.14 L140.86 217.40 L146.39 217.02 L151.93 216.15 L157.46 218.83 L163.00 206.41 L168.54 196.71 L174.07 196.30 L179.61 201.77 L185.14 205.73 L190.68 198.26 L196.21 200.67 L201.75 197.50 L207.29 197.78 L212.82 196.25 L218.36 197.97 L223.89 200.53 L229.43 197.24 L234.96 196.80 L240.50 195.70 L246.04 197.81 L251.57 200.47 L257.11 198.63 L262.64 194.81 L268.18 195.51 L273.71 197.37 L279.25 193.42 L284.79 195.01 L290.32 197.31 L295.86 200.44 L301.39 200.32 L306.93 198.62 L312.46 203.01 L318.00 200.24 L323.54 199.93 L329.07 197.53 L334.61 195.05 L340.14 194.47 L345.68 182.95 L351.21 183.49 L356.75 187.33 L362.29 185.40 L367.82 181.22 L373.36 176.60 L378.89 177.69 L384.43 179.55 L389.96 184.06 L395.50 183.96 L401.04 161.96 L406.57 139.79 L412.11 147.79 L417.64 150.54 L423.18 145.25 L428.71 147.01 L434.25 133.18 L439.79 137.32 L445.32 138.16 L450.86 139.96 L456.39 141.27 L461.93 133.86 L467.46 131.98 L473.00 131.53 L478.54 128.50 L484.07 130.45 L489.61 123.14 L495.14 126.43 L500.68 132.85 L506.21 130.46 L511.75 131.72 L517.29 128.49 L522.82 119.14 L528.36 120.18 L533.89 117.29 L539.43 116.51 L544.96 121.16 L550.50 118.91 L556.04 123.22 L561.57 121.80 L567.11 123.20 L572.64 122.48 L578.18 133.53 L583.71 129.59 L589.25 133.13 L594.79 135.54 L600.32 139.16 L605.86 156.80 L611.39 149.31 L616.93 150.35 L622.46 149.55 L628.00 150.07 L633.54 151.07 L639.07 152.58 L644.61 148.78 L650.14 153.15 L655.68 150.78 L661.21 151.00 L666.75 152.42 L672.29 151.40 L677.82 144.87 L683.36 133.26 L688.89 137.65 L694.43 136.59 L699.96 133.78 L705.50 135.43 L711.04 138.21 L716.57 133.41 L722.11 132.97 L727.64 124.00 L733.18 134.44 L738.71 130.00 L744.25 125.91 L749.79 127.91 L755.32 121.69 L760.86 118.09 L766.39 116.33 L771.93 95.14 L777.46 96.18 L783.00 87.15 L788.54 88.91 L794.07 88.22 L799.61 86.77 L805.14 82.37 L810.68 83.69 L816.21 86.75 L821.75 83.53 L827.29 75.02 L832.82 76.75 L838.36 61.39 L843.89 51.18 L849.43 48.17 L854.96 60.19 L860.50 68.02 L866.04 73.88 L871.57 71.82 L877.11 71.79 L882.64 74.22 L888.18 72.95 L893.71 69.49 L899.25 70.50 L904.79 53.72 L910.32 56.79 L915.86 62.33 L921.39 58.84 L926.93 55.73 L932.46 29.17 L938.00 48.35"/>
-      <text class="axis" x="8.00" y="252" text-anchor="middle">09/15</text><text class="axis" x="140.86" y="252" text-anchor="middle">09/16</text><text class="axis" x="273.71" y="252" text-anchor="middle">09/17</text><text class="axis" x="406.57" y="252" text-anchor="middle">09/18</text><text class="axis" x="539.43" y="252" text-anchor="middle">09/19</text><text class="axis" x="672.29" y="252" text-anchor="middle">09/20</text><text class="axis" x="805.14" y="252" text-anchor="middle">09/21</text>
-      <g class="cross" hidden>
-        <line class="cross-x" y1="14" y2="234"/>
-        <circle class="cross-dot" r="3.5"/>
-      </g>
-    </svg>
-    <div class="chart-tip" hidden aria-hidden="true"></div>
-  </figure>
-
-    <p class="chart-q vol">How much actually changed hands?</p><figure class="chart volume" data-chart="xrp-volume">
-    <svg viewBox="0 0 1000 90" role="img" preserveAspectRatio="xMidYMid meet"
-         aria-label="Reported 24-hour trading volume over the last seven days, peaking at $6.7B">
-      <line class="grid" x1="8" x2="938" y1="74" y2="74"/>
-      <g class="bars"><rect x="9.05" y="28.60" width="3.41" height="45.40"/><rect x="14.55" y="29.19" width="3.41" height="44.81"/><rect x="20.05" y="26.28" width="3.41" height="47.72"/><rect x="25.55" y="25.88" width="3.41" height="48.12"/><rect x="31.06" y="20.68" width="3.41" height="53.32"/><rect x="36.56" y="18.38" width="3.41" height="55.62"/><rect x="42.06" y="17.24" width="3.41" height="56.76"/><rect x="47.57" y="18.17" width="3.41" height="55.83"/><rect x="53.07" y="17.66" width="3.41" height="56.34"/><rect x="58.57" y="17.58" width="3.41" height="56.42"/><rect x="64.08" y="17.02" width="3.41" height="56.98"/><rect x="69.58" y="17.08" width="3.41" height="56.92"/><rect x="75.08" y="16.20" width="3.41" height="57.80"/><rect x="80.58" y="15.66" width="3.41" height="58.34"/><rect x="86.09" y="14.85" width="3.41" height="59.15"/><rect x="91.59" y="15.02" width="3.41" height="58.98"/><rect x="97.09" y="15.11" width="3.41" height="58.89"/><rect x="102.60" y="15.87" width="3.41" height="58.13"/><rect x="108.10" y="15.72" width="3.41" height="58.28"/><rect x="113.60" y="15.63" width="3.41" height="58.37"/><rect x="119.10" y="15.67" width="3.41" height="58.33"/><rect x="124.61" y="15.24" width="3.41" height="58.76"/><rect x="130.11" y="16.58" width="3.41" height="57.42"/><rect x="135.61" y="20.09" width="3.41" height="53.91"/><rect x="141.12" y="21.94" width="3.41" height="52.06"/><rect x="146.62" y="22.30" width="3.41" height="51.70"/><rect x="152.12" y="22.48" width="3.41" height="51.52"/><rect x="157.63" y="22.85" width="3.41" height="51.15"/><rect x="163.13" y="27.76" width="3.41" height="46.24"/><rect x="168.63" y="31.06" width="3.41" height="42.94"/><rect x="174.13" y="33.48" width="3.41" height="40.52"/><rect x="179.64" y="35.00" width="3.41" height="39.00"/><rect x="185.14" y="35.70" width="3.41" height="38.30"/><rect x="190.64" y="35.60" width="3.41" height="38.40"/><rect x="196.15" y="36.09" width="3.41" height="37.91"/><rect x="201.65" y="36.03" width="3.41" height="37.97"/><rect x="207.15" y="36.28" width="3.41" height="37.72"/><rect x="212.66" y="36.72" width="3.41" height="37.28"/><rect x="218.16" y="39.33" width="3.41" height="34.67"/><rect x="223.66" y="38.06" width="3.41" height="35.94"/><rect x="229.16" y="38.03" width="3.41" height="35.97"/><rect x="234.67" y="38.00" width="3.41" height="36.00"/><rect x="240.17" y="38.28" width="3.41" height="35.72"/><rect x="245.67" y="38.09" width="3.41" height="35.91"/><rect x="251.18" y="38.12" width="3.41" height="35.88"/><rect x="256.68" y="38.25" width="3.41" height="35.75"/><rect x="262.18" y="37.61" width="3.41" height="36.39"/><rect x="267.68" y="37.90" width="3.41" height="36.10"/><rect x="273.19" y="38.06" width="3.41" height="35.94"/><rect x="278.69" y="38.40" width="3.41" height="35.60"/><rect x="284.19" y="38.41" width="3.41" height="35.59"/><rect x="289.70" y="40.40" width="3.41" height="33.60"/><rect x="295.20" y="45.30" width="3.41" height="28.70"/><rect x="300.70" y="47.12" width="3.41" height="26.88"/><rect x="306.21" y="48.85" width="3.41" height="25.15"/><rect x="311.71" y="49.43" width="3.41" height="24.57"/><rect x="317.21" y="50.41" width="3.41" height="23.59"/><rect x="322.71" y="50.98" width="3.41" height="23.02"/><rect x="328.22" y="50.24" width="3.41" height="23.76"/><rect x="333.72" y="50.86" width="3.41" height="23.14"/><rect x="339.22" y="50.85" width="3.41" height="23.15"/><rect x="344.73" y="49.27" width="3.41" height="24.73"/><rect x="350.23" y="49.92" width="3.41" height="24.08"/><rect x="355.73" y="48.31" width="3.41" height="25.69"/><rect x="361.23" y="47.80" width="3.41" height="26.20"/><rect x="366.74" y="48.13" width="3.41" height="25.87"/><rect x="372.24" y="47.88" width="3.41" height="26.12"/><rect x="377.74" y="47.25" width="3.41" height="26.75"/><rect x="383.25" y="45.92" width="3.41" height="28.08"/><rect x="388.75" y="47.05" width="3.41" height="26.95"/><rect x="394.25" y="47.25" width="3.41" height="26.75"/><rect x="399.76" y="44.72" width="3.41" height="29.28"/><rect x="405.26" y="41.16" width="3.41" height="32.84"/><rect x="410.76" y="38.87" width="3.41" height="35.13"/><rect x="416.26" y="38.40" width="3.41" height="35.60"/><rect x="421.77" y="37.04" width="3.41" height="36.96"/><rect x="427.27" y="36.79" width="3.41" height="37.21"/><rect x="432.77" y="34.44" width="3.41" height="39.56"/><rect x="438.28" y="33.12" width="3.41" height="40.88"/><rect x="443.78" y="32.61" width="3.41" height="41.39"/><rect x="449.28" y="32.63" width="3.41" height="41.37"/><rect x="454.79" y="32.62" width="3.41" height="41.38"/><rect x="460.29" y="30.90" width="3.41" height="43.10"/><rect x="465.79" y="30.23" width="3.41" height="43.77"/><rect x="471.29" y="29.66" width="3.41" height="44.34"/><rect x="476.80" y="30.01" width="3.41" height="43.99"/><rect x="482.30" y="32.86" width="3.41" height="41.14"/><rect x="487.80" y="29.31" width="3.41" height="44.69"/><rect x="493.31" y="29.47" width="3.41" height="44.53"/><rect x="498.81" y="30.38" width="3.41" height="43.62"/><rect x="504.31" y="30.81" width="3.41" height="43.19"/><rect x="509.81" y="31.47" width="3.41" height="42.53"/><rect x="515.32" y="31.51" width="3.41" height="42.49"/><rect x="520.82" y="31.26" width="3.41" height="42.74"/><rect x="526.32" y="31.03" width="3.41" height="42.97"/><rect x="531.83" y="31.87" width="3.41" height="42.13"/><rect x="537.33" y="34.19" width="3.41" height="39.81"/><rect x="542.83" y="38.94" width="3.41" height="35.06"/><rect x="548.34" y="37.47" width="3.41" height="36.53"/><rect x="553.84" y="38.20" width="3.41" height="35.80"/><rect x="559.34" y="40.28" width="3.41" height="33.72"/><rect x="564.84" y="39.36" width="3.41" height="34.64"/><rect x="570.35" y="40.49" width="3.41" height="33.51"/><rect x="575.85" y="40.70" width="3.41" height="33.30"/><rect x="581.35" y="40.47" width="3.41" height="33.53"/><rect x="586.86" y="40.73" width="3.41" height="33.27"/><rect x="592.36" y="43.58" width="3.41" height="30.42"/><rect x="597.86" y="42.53" width="3.41" height="31.47"/><rect x="603.37" y="44.33" width="3.41" height="29.67"/><rect x="608.87" y="43.85" width="3.41" height="30.15"/><rect x="614.37" y="44.33" width="3.41" height="29.67"/><rect x="619.87" y="45.58" width="3.41" height="28.42"/><rect x="625.38" y="46.05" width="3.41" height="27.95"/><rect x="630.88" y="46.53" width="3.41" height="27.47"/><rect x="636.38" y="46.85" width="3.41" height="27.15"/><rect x="641.89" y="44.90" width="3.41" height="29.10"/><rect x="647.39" y="45.23" width="3.41" height="28.77"/><rect x="652.89" y="47.39" width="3.41" height="26.61"/><rect x="658.39" y="48.11" width="3.41" height="25.89"/><rect x="663.90" y="49.67" width="3.41" height="24.33"/><rect x="669.40" y="49.89" width="3.41" height="24.11"/><rect x="674.90" y="49.89" width="3.41" height="24.11"/><rect x="680.41" y="48.85" width="3.41" height="25.15"/><rect x="685.91" y="49.21" width="3.41" height="24.79"/><rect x="691.41" y="49.66" width="3.41" height="24.34"/><rect x="696.92" y="49.96" width="3.41" height="24.04"/><rect x="702.42" y="51.12" width="3.41" height="22.88"/><rect x="707.92" y="50.65" width="3.41" height="23.35"/><rect x="713.42" y="50.99" width="3.41" height="23.01"/><rect x="718.93" y="50.66" width="3.41" height="23.34"/><rect x="724.43" y="49.02" width="3.41" height="24.98"/><rect x="729.93" y="48.20" width="3.41" height="25.80"/><rect x="735.44" y="50.31" width="3.41" height="23.69"/><rect x="740.94" y="49.65" width="3.41" height="24.35"/><rect x="746.44" y="49.44" width="3.41" height="24.56"/><rect x="751.94" y="48.71" width="3.41" height="25.29"/><rect x="757.45" y="48.83" width="3.41" height="25.17"/><rect x="762.95" y="46.37" width="3.41" height="27.63"/><rect x="768.45" y="41.85" width="3.41" height="32.15"/><rect x="773.96" y="39.52" width="3.41" height="34.48"/><rect x="779.46" y="36.89" width="3.41" height="37.11"/><rect x="784.96" y="35.50" width="3.41" height="38.50"/><rect x="790.47" y="34.22" width="3.41" height="39.78"/><rect x="795.97" y="31.13" width="3.41" height="42.87"/><rect x="801.47" y="28.61" width="3.41" height="45.39"/><rect x="806.97" y="29.39" width="3.41" height="44.61"/><rect x="812.48" y="27.53" width="3.41" height="46.47"/><rect x="817.98" y="26.39" width="3.41" height="47.61"/><rect x="823.48" y="24.71" width="3.41" height="49.29"/><rect x="828.99" y="23.34" width="3.41" height="50.66"/><rect x="834.49" y="19.58" width="3.41" height="54.42"/><rect x="839.99" y="16.19" width="3.41" height="57.81"/><rect x="845.50" y="13.08" width="3.41" height="60.92"/><rect x="851.00" y="15.37" width="3.41" height="58.63"/><rect x="856.50" y="13.36" width="3.41" height="60.64"/><rect x="862.00" y="13.57" width="3.41" height="60.43"/><rect x="867.51" y="13.19" width="3.41" height="60.81"/><rect x="873.01" y="12.35" width="3.41" height="61.65"/><rect x="878.51" y="11.40" width="3.41" height="62.60"/><rect x="884.02" y="10.50" width="3.41" height="63.50"/><rect x="889.52" y="10.39" width="3.41" height="63.61"/><rect x="895.02" y="13.98" width="3.41" height="60.02"/><rect x="900.52" y="8.38" width="3.41" height="65.62"/><rect x="906.03" y="8.00" width="3.41" height="66.00"/><rect x="911.53" y="10.32" width="3.41" height="63.68"/><rect x="917.03" y="16.02" width="3.41" height="57.98"/><rect x="922.54" y="15.76" width="3.41" height="58.24"/><rect x="928.04" y="16.01" width="3.41" height="57.99"/><rect x="933.54" y="12.70" width="3.41" height="61.30"/></g>
-      <text class="axis" x="946" y="18">$6.7B</text>
-      <text class="axis" x="946" y="77">$0</text>
-    </svg>
-  </figure>
-  </div>
-
-  <div class="rail bare">
-    <div><span class="label">MARKET CAP</span><strong>$97.75B</strong>
-      <small>Reported across tracked venues.</small></div>
-    <div><span class="label">24H VOLUME</span><strong>$6.32B</strong>
-      <small>Reported, not fillable. The book is the fillable number.</small></div>
-    <div><span class="label">VALIDATED LEDGER</span><strong>107,161,176</strong>
-      <small>Read from xrplcluster.com.</small></div>
-    <div><span class="label">BASE FEE</span><strong>0.00001 XRP</strong><small>39 peers on that node.</small></div>
-  </div>
+    <div class="console-body"><div class="chart-empty">
+      No market source answered when this page was rendered. Nothing is shown rather than a
+      figure carried over from the last successful read.
+    </div></div>
     <div class="console-foot">
-    <span>READ SERVER-SIDE · SPOT, HISTORY, LEDGER ANSWERING</span>
+    <span>READ SERVER-SIDE · NOTHING ANSWERING · SPOT, HISTORY, LEDGER UNAVAILABLE</span>
     <span>MARKET DATA, NOT A VERDICT</span>
   </div>
   </div>
@@ -138,114 +84,16 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
   <div class="console">
     <div class="console-head">
     <strong>XRP / XRPL NEWSROOM</strong>
-    <span class="reading live" id="news-state">UPDATED just now</span>
+    <span class="reading stale" id="news-state">NO SOURCE ANSWERING</span>
   </div>
     <div class="console-body flush">
-      <div class="feed cols bare" id="news-feed">
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Cryptonews.net</span><time datetime="2026-09-22T14:44:33.000Z">10m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiW0FVX3lxTE5aTnU0ZXdTOEwzc0ltaFJMMXE5VFJFZ3FiOU1MN3NnWHNuQi13S3p0WV9wNDNEcjhjaGNIZ0c3THJGeVpFcVhWWjkzeHZRVm5DckxfTkN4QlFlYTA?oc=5" rel="noopener nofollow" target="_blank">Higher Price Targets Emerge as XRP Approaches $1.56 Resistance for Fifth Time This Year</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Pluang</span><time datetime="2026-09-22T14:35:24.000Z">19m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMihAFBVV95cUxNY2tXT3VOemJnZ21rM1dLYTQ1UHVsWUE2T1RRelQwNVFVb0ZySjZjVFBJYU4tdG9VRlBHc3VaSTREeVRUM3htbW5YVU5USG9MLUhSRWhYdUFRcTNvcVJuZUpJc2x0X1otQXRZM3dVdkptTGkwYlh1WUJ5UW8tRk8xaVV5c2k?oc=5" rel="noopener nofollow" target="_blank">XRP&#39;s potential to surpass Bitcoin resurfaces a...</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">CCN.com</span><time datetime="2026-09-22T14:34:37.000Z">20m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiggFBVV95cUxOMEFNT1Q1MHBKXzQyeV9BQmgwcHFFcUpCYmlLUWVWVURBellIcTc4MllNazBRQ2hLVG5lOHRNc0xDTzh6ZWthMjNTQ2RrVlRUSnZ4N0MzTk56eVpOUmd2R29EdkJRcFZPZ1FvbnNVY1c2X2l4bXBVczk5VklpZy1OXzJR?oc=5" rel="noopener nofollow" target="_blank">Veteran Trader Peter Brandt Says XRP Could Explode to $5.40 — But Issues a Blunt Warning</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Pluang</span><time datetime="2026-09-22T14:22:52.000Z">31m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMisAFBVV95cUxPWVJvbmZPQjh5SUZzRV9yZjZQSkg2YW9kZVZNeGhvOHNSVmRpSTl0UHNBRy1veFRDX1VXeVpCcVViR3huUXZWaUF3NEs3RktRcGZVb29pNjlwbmZKUzJ5akhaX3FkdUtHeHdhV1hqVU1ZZjFUVG40bnlnUmV4MWZwRGZrTnlERjY5U1poenFXbzM0d2E2VTVrN2lCVUt4dzlpUDJNeU15M1ItejhjTkNMdA?oc=5" rel="noopener nofollow" target="_blank">XRP whales withdrew $165M from exchanges, signa...</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">DailyCoin</span><time datetime="2026-09-22T14:07:00.000Z">47m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiggFBVV95cUxQZGRRbGY5NVNoT2JaMXgxZmRwUWxMWmUtTEIwT2NPT1VSQ1lnWVpxSHJlYzFpcTV5am52akNlYlRzM2F4RXM3Mnd5REZ4QVVxU0tJbVp6MllpM0htc1JOZUxDQndCRHgzd1lUSjhsaHFWNHcxaFNaZHJnVmI0YlZHaV9n?oc=5" rel="noopener nofollow" target="_blank">XRP To $5? Brandt’s Chart Just Put It On The Table</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">CoinMarketCap</span><time datetime="2026-09-22T14:05:00.000Z">49m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE5XR0w0Q01KcDdGY0JHZTZGd1UwV0FlSk1rSFpPYmU4ZVREcnBuRmdCTGhHNjhXSVV0U0R6LWZ2UFctcHZZUG9TdURycm1NajlrYV9YY0hYRE9hOF82NnV5cERYNlFXRWFpOFZFT0hKbWQ?oc=5" rel="noopener nofollow" target="_blank">XRP Surges 3.3% on Short Squeeze, Whale Accumulation</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Robinhood</span><time datetime="2026-09-22T14:04:09.000Z">50m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMirwFBVV95cUxOX0VkcFNxSWFkUzY4ZkxLSWQzemFlOEl4TTE1b0R5a21lYjAxcjZOWFR2d2lDRWJTQXpZTUtGZ1hjMlkyWUJDX3FzTFV3R0lsME9wdllsZTZBTVVVeDUxWEdod2oweVZ6X2dORk9RVEplejN3QzlBcWxrd0xzdmZfcE8xZFl6bFgyLXVXMEVPdkhnMEtoWm5XcmlpU0FkTGxfalNKY1RDbzZ5aXRldldr?oc=5" rel="noopener nofollow" target="_blank">XRP price at Sep 22, 2026 at 11am EDT Crypto Prediction Market</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">CryptoRank</span><time datetime="2026-09-22T14:02:10.000Z">52m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxPeDNaclZCdGdtZVNSWUV3UDNybC1MOTFjSUhweTlkN0RVMHFzNnVVQkl2RG1XUmZ1UzRqZ2VoZ1VmTUljV2Q1TTBoTm9ibGZ0UmxwSFk1THBBN0RMLVppMlA5X0hBU3FvRFlIOUpUUGpzR19xMlNOaTZNeUxSTE1ncXIydGJVU3JYOEcyNHJUMlVzRXlWaDJLcG9OMWlMbFI2?oc=5" rel="noopener nofollow" target="_blank">Absa Launches Digital Asset Custody Service Powered by Ripple</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">GlobeNewswire</span><time datetime="2026-09-22T13:55:47.000Z">59m ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMijgJBVV95cUxQQ0RIb3JGb0dxaEowRUhvSlN3eVZyUXc0a2JlWVExeTVVR0pnTmpndVBHa2VESlpuSGZqZm1CRS1QVVp0SFZ2Ym5QZWpCa1VGM05XT2Z2M2hrUkxJYzBKaWFTVFFGdkJiblIydS1HSWJwMFBPRVBDQnN1dHdad3d6YllrWWxNRGZTY2Z2TmtWRERFVUl4Q0ZnUU9zNG9BX05NcDl1TlFwMVBYN0RCN0lQd0FNVzRsLVdGaWxzMl9wcmNmX1JaYW41ZkJtSUViZlctaVU5LXVaOHhZVjNXcXBQMmx5d1p6LUZTTnR6elpqemJScFpYeHJkc1dJaGNkMEZRMEpIUXJ2Uk5SWmItSUE?oc=5" rel="noopener nofollow" target="_blank">Crypto News: Remittix Strengthens Its PayFi Security While the XRP Price Prediction Eyes $27 and Crypto Rallies</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Legacy obituary</span><time datetime="2026-09-22T13:50:06.000Z">1h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMihgFBVV95cUxObjBUcFRZY19JeU9DY3Q4SEtJWlZ6SHBmUC11ZU92dTNteEJZZ0Nwc1BDVmJ3VlN1YlBrSTlmUF91T2lvbXdzTldsQkFMWERZMzdYWWdjdHJxbXJmamVvOGZ1UWlZZkFvLWRYSXY2X3ZHM0NDUGNES0FtVlYzOFNYQkJpTFMyUQ?oc=5" rel="noopener nofollow" target="_blank">Greg Daubenspeck</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Coinpedia</span><time datetime="2026-09-22T13:47:45.000Z">1h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMirAFBVV95cUxQYlVVdkxfMGp6R09OaWxGT2hQLVQ4LXVqOHFHLVplZktXSGNhbEZaLXprYzgySWdJNm5WdDh1NjhDMDl3VjdMVHp3RUV4ckFydFVDZWwtY2dXanNEdlBoR3ZIZ3hqUDh0bWF3Yk1sbDhfTFRvOVpabFhMeGdIV2dSV0ZiOUlZWkdwUXBIdURBcWdCRURHLWRjYTF1ZG5JeVdqbXdXdnIxVEs0THN40gGyAUFVX3lxTFBaRm9GX3JZd1JOQnhKTUxrclc3M0pfNFo5SnY1TGd6LWxTdkpyUU51a05pZHEtTms4UHpCRE1mcEJFX3MxVFZYZkltdmlWWWlHcmVKLXMwTGxLUUlLMTNuTG5sRDhEUVNEclR1el9RMFVBUW5sb0NVQVItZnJSWU9aYXpacTlsQTEwMV9mVXVycFJHUlV6VHdsOFJhOHc2Zm5xRXFyc3Bzb2FGcDVxSzZsT2c?oc=5" rel="noopener nofollow" target="_blank">Ripple News: Europe’s New Digital Euro Rail Has XRP Holders Doing The Math On $1,000</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">tradingview.com</span><time datetime="2026-09-22T13:40:49.000Z">1h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxNZ1ZzWjI2RWlzbjJHc1VXeGpQY0JtU2JRU3dWSURVdng2NHl0VU9yMGcxT2hmX3FOc1ptSXo3OU5oRVczR2hjREZYUE1fQzdLSlNqSHJzR3JGSF9ZVFlFZFFuTF9qVjY3NWE2dDRJSGlDeDBvVzN0VlpmejI4RTl6MXd1alVyQUcwQUdNUmp3MWhMMlhqM1MzN1ZlMGNNdFJZU0lwSWNOc3hhc182REhpTGFRcHh5Y0xqVzlLZ3ZBVzk?oc=5" rel="noopener nofollow" target="_blank">Forget Dogecoin: PEPE Is Outrunning Bitcoin and XRP—Is FLOKI Next?</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">99Bitcoins</span><time datetime="2026-09-22T13:17:13.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMieEFVX3lxTE1nMDJFRlFEbjA0YW8yNmM2VGZoQTI0MkU0Wi1jbE02czhDbUdoOGMyaXpaQXF0NVRGa1ZWTEhxT3BSenNYc0piVGpLcHNrT0NTZmlXb09WUzVxb3NRdk9BbkQ5djh5XzVKcmRrbE5UMG1sbFViSHhXWQ?oc=5" rel="noopener nofollow" target="_blank">XRP Price Analysis: Ripple Breaches $1.50, is $2 Coming This Week?</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">99Bitcoins</span><time datetime="2026-09-22T13:17:13.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMihwFBVV95cUxOUHVyelV5Z1V3X3VyWGF0bTBzTFJzYTdlUGpKeWh4N0Y2Y3Z1Q2VVb2R5R0VveHpFZXNLaFVra2ItS19ZVGlBY3N4d1dsNm9WM3FTQ0s3SnZNbWRzdjRMUUFIcUF1U2oxSG54RG1OUnBsWXg1bW9rNW1XUGswMTk3Nl9OY21WV2M?oc=5" rel="noopener nofollow" target="_blank">XRPL Permission Delegation Begins Final Test for October Activation</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">coingape.com</span><time datetime="2026-09-22T13:12:53.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMipgFBVV95cUxPdzBmVWw4MWhzWDlqMUZRek9XN1ZWYkN5bU1OLWRxcnVjZVBhdVNSZExVZldWNGcxQ04wck5pbnd4bXdQWlR1N1lwZzBFM1VHZVhFOHhTWm44TlYtdTBVbTFWOHhSbi10cjdUZTlOZkF4X3lyTFZUdG5mWG5hUTBHdzVLRGM5Z0ZyMDhqWTRUR3lyV3lMSEtaVUJHTU5OVGdXY3R5dkp3?oc=5" rel="noopener nofollow" target="_blank">SoFi, Mastercard Launch Stablecoin Settlement Using SoFiUSD Following Ripple’s RLUSD</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">CCN.com</span><time datetime="2026-09-22T13:09:37.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMikwFBVV95cUxNXzd4RGY5bXZ1aVdyNkpndUp0ZkZEcVV4c2lvRjY4U3pLdk9pRHlVMnBxb3VOWGRqNVRpNkM1clBMSXEtZ1hPWHdIeHZBVlloVVhqTHBRdmpHLTkwV29hWHRfV3hrVjBlQnI0X01pdTJYalpEZUpjNzhEaWkyZ3N2ZHlHTmtpVGM4b2MwMlRTdnUwQ3M?oc=5" rel="noopener nofollow" target="_blank">Apple Pay Crypto Adoption Rumors Grow as $1,000 XRP Prediction Returns</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">coingape.com</span><time datetime="2026-09-22T13:03:08.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMivAFBVV95cUxPeFdVbk9JRW54MzZ4V0x3OWpTSzMySEZ6ZkhVQzFZLUxSVFNoRGVzMF94N2pwbndpeHlia1pZaGstMlY1YVJNZkpfLVRzMGtJVU1mRkJVTDBOZEMzNkJzRzNyMFUySWo2SExaV2hEaVlJYUZvRzg3SFVVY2JCaEpyeEoyYmw3OW12eHYtWUZyTExCUmZXZHh0QVVLelZkQ2RZY210dWZMTzZycHl0NE9td0NUTER2dWk0cVhUVg?oc=5" rel="noopener nofollow" target="_blank">XRP Price Prediction as Ripple-Backed PAC Launches $30M Campaign After CLARITY Act Collapse</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">CryptoRank</span><time datetime="2026-09-22T12:55:52.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNSFBEdTZBbGlIRS03V3otRUdaS0RIMnJEeW15RWdZU21OdFVhUVlDUXRaN2p3aDhFREk2ZGs3YWxiejdTdTYzQnpOU1JFMXdkQVJ4V21TY01mbGtFMTR5bGtwS2kzLXB6bDdTZHRlamdnaHZ5MEl6anpUdU45NThaZjF1cUhRYjFLeUxNZXRSaW1UYUt4em81ajdUQ1Vvb1FZM2c?oc=5" rel="noopener nofollow" target="_blank">XRP Price Prediction: Veteran Trader Predicts 260% Rally for XRP</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Inside Outer Space</span><time datetime="2026-09-22T12:51:31.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiggFBVV95cUxORmt2NEJXOWlkMzlJUnF0X3dRc3lZN0NDampuVktzVmRKS05CZkFOV3ZQbTYwRXZCSWNqek1aSkNWS3VnbXNVZ3d6OHk4NW80MGZIODVtU0RPdkVCY3NHNEJXampvbm9rdnZ2YXdyRjFrdVg2cjJlWHMtYUtFbW9DanRB?oc=5" rel="noopener nofollow" target="_blank">Curiosity Mars Rover: Exploring a Ripple Effect</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Bitcoin Foundation</span><time datetime="2026-09-22T12:36:51.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMikAFBVV95cUxQSUhLckR1ZDBCNUlvRjlLaEstX1RZS1dGSVdyWklVNm5wYk9jZGVEbE10bkwtcFBlV0RsdnlSM0ZuVzBfN1dEVnBpa1hGMTBkVFdsZi04UUJ5ZGtYaWJhS2Jhdlk5RE1QZy1qd3lxTEtKcHVkV1pHRS1xOTJsVDNrRmo3azlBeG9EX2dMUG5zNWw?oc=5" rel="noopener nofollow" target="_blank">XRP Ledger’s Biggest Upgrade Yet? Why Asset Managers Are Getting Ready for Batch V1.1</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">tradingview.com</span><time datetime="2026-09-22T12:35:26.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxNUUFQN196Um9ZbHRTbHF1WUlpM2Q2eVBoQWRCaVdMOERoTkU3RDFOcWszeU91Zm9Tbjlsc1NKdmxJYmhzRDItcXdFS05lR1dpal9YbnBicWNjbkhvUXdfQ082RUR2TXRjblUxbE9QR2ltOURXNlNFMlhHN0tfQW1Td3k3V3VoR19JUjV3cENxalN0TVVPTmgwZElYLUZPeEExLV9NN1hEQURFNnk0NUR4dUtfLW81dFdFaDNn?oc=5" rel="noopener nofollow" target="_blank">Cardano Joins Solana, XRP in AI Payments Race as ADA Surges 8%</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Crowdfund Insider</span><time datetime="2026-09-22T12:30:21.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMizwFBVV95cUxONHpjMjdHOG1uRmxrZXc3NlFsTTZxMzMzOEtYMndGN3hiWHhrbHpwM2djVmRoNEJ1MTZ2ekJfcFkzZ0tmWnVNeTQwZHNkTDF4U3NQSkY1UVRZWkFFalc1ZVdmZkx5NzUySnhKNWJkRzlBRUtnYzdWU0U5d2cwZS1SRHQ4Ni1sUjFQYkNFMVdxb2R5RHZJQlZ1SF9VU3B1bDgxcDlqTVBlOGNlRXFGUmhKeWlzVWVOb0xiZmJkbEt0QXd5LVpEQmQ2M3Z1VE85Ykk?oc=5" rel="noopener nofollow" target="_blank">Evernorth Holdings Commits $30M in Notes to Acquire XRP Tokens and Fund Ecosystem Work</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">FXStreet</span><time datetime="2026-09-22T12:30:00.000Z">2h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMi0wFBVV95cUxOQ2FoRHA2dEZTcWtCd2N4MUQxZ0cwZW05c1lDY3lrLVZna2VmcFdDYlEtZ3J3ZDYyU0hYeWVDZ1IxQ1JKV0dJVEthaFJHd0V3S2wxbjdmODFHU2Q2UDNobnh2bG14b1VRUEk4eXQ3TEFHY0NVMTd0Ty1CNGZBRmQydTNDQ3dCUi1EU1o3RU50d1pVTXNFR0xPSmkzaWNCNmx0OFVMcHFnbVU3SGVGOElEc09jRk45bmo0YTJONEdZSERKeW9fcElDZmpONF9YTVItSWtJ?oc=5" rel="noopener nofollow" target="_blank">Is XRP poised to extend its uptrend?</a>
-    </article>
-    <article class="feed-item">
-      <span class="feed-meta"><span class="src">Coinpedia</span><time datetime="2026-09-22T12:21:05.000Z">3h ago</time></span>
-      <a class="headline" href="https://news.google.com/rss/articles/CBMiogFBVV95cUxPUS1vbXNfUWt5N1JqdGhEaVpuX0RKcG9MT2NBM1pzVFVHX1ZiR18yZldKaUp5WHJTZUZRdC1QY2poeC1SUzFoaHBfaGFNOHptWkFtRTlFTldTelNrYng3LVFZXzNDd2FlZGhFV0doYnZXS01XOVpDeDh0OUZWbWxrQ1RRSTJHWk13M1N3NUtpSmlYNXJoVnBvLUFNRXpIOGR4ZmfSAacBQVVfeXFMTUxrZU9TY2UyYzduOHJ4blFNSmJIaUlCT1YwTmhXY0xZUnNOQXFFUHZsU0pNS2cyWEdpejN4YVVPTV9GSVkzLXFIRmVqdDduWWJ6aFZoYi12UnFQeHhIOFloR0ZSSFdwdEdiQnVkNFVkYjFtR1Z4dWRWTzVjSEktQi1Qb3ZneVRoeVFjbUdXZThyaDdFR1FmSkdhU0Z3aUZYemVpQUxEVE0?oc=5" rel="noopener nofollow" target="_blank">What’s Next For Bitcoin, Ethereum And XRP Prices As Crypto Market Hits $3 Trillion?</a>
-    </article>
-  </div>
-  <p class="feed-note" id="news-note">
-    Merged from Google News, Cointelegraph, CoinDesk. Headlines link to the publisher and are reproduced as titles only.
-    They are news about the XRP Ledger, not a NOSHASHI reading, and no verdict is implied by any of them.
-  </p>
+      <div class="feed"><div class="feed-empty">
+      No source answered just now, so there is nothing to show. This section stays empty rather
+      than holding yesterday's headlines on screen as though they were current.
+    </div></div>
     </div>
     <div class="console-foot">
-      <span>RENDERED 2026-09-22 14:54 UTC</span>
+      <span>RENDERED 2026-09-30 17:16 UTC</span>
       <span>REFRESHES IN THIS TAB · NO ACCOUNT, NO TRACKING</span>
     </div>
   </div>
@@ -282,11 +130,15 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="/progress/">Progress</a>
       <a href="/status/">Status</a>
       <a href="/research/">Findings</a>
+      <a href="/learn/">Learn NOSHASHI (course)</a>
       <a href="/guide/">Plain-language guide</a>
       <a href="/pricing/">Pricing</a>
       <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
+      <a href="/misread/">The ledger can be misread</a>
       <a href="/strategic-infrastructure/">Strategic infrastructure</a>
       <a href="/developers/">Developers</a>
+      <a href="/docs/">Documentation</a>
       <a href="/legal/">Legal &amp; accessibility</a>
       <a href="https://github.com/Ignosha/noshashi">GitHub</a>
     </div>
@@ -297,50 +149,8 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 <script src="/assets/subscribe.js" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
-<script>
-(function(){
-  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
-  if(!button)return;
-  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
-    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
-    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
-  sync();
-  button.addEventListener("click",function(){
-    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
-    document.documentElement.setAttribute("data-theme",next);
-    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
-    sync();});
-})();
-</script>
-<script>
-(function(){
-  var feed=document.getElementById("news-feed"),state=document.getElementById("news-state");
-  if(!feed)return;
-  function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
-  function ago(iso){var t=Date.parse(iso);if(!isFinite(t))return"";
-    var s=Math.max(0,Math.round((Date.now()-t)/1000));if(s<90)return"just now";
-    var m=Math.round(s/60);if(m<60)return m+"m ago";var h=Math.round(m/60);
-    if(h<24)return h+"h ago";var d=Math.round(h/24);if(d<30)return d+"d ago";
-    var mo=Math.round(d/30);return mo<12?mo+"mo ago":Math.round(mo/12)+"y ago";}
-  function load(){
-    fetch("/api/xrp-news?limit=24",{headers:{Accept:"application/json"}})
-      .then(function(r){return r.ok?r.json():null;})
-      .then(function(d){
-        if(!d||!d.items||!d.items.length)return;
-        feed.innerHTML=d.items.map(function(i){
-          var w=i.publishedAt?'<time datetime="'+esc(i.publishedAt)+'">'+esc(ago(i.publishedAt))+"</time>":"";
-          var u=/^https?:\/\//.test(i.url||"")?i.url:"#";
-          return '<article class="feed-item"><span class="feed-meta"><span class="src">'+
-            esc(i.publisher)+"</span>"+w+'</span><a class="headline" href="'+esc(u)+
-            '" rel="noopener nofollow" target="_blank">'+esc(i.title)+"</a></article>";}).join("");
-        if(state){state.textContent="UPDATED "+ago(d.fetchedAt);state.className="reading live";}
-      }).catch(function(){});
-  }
-  document.addEventListener("visibilitychange",function(){if(!document.hidden)load();});
-  setTimeout(load,20000);
-})();
-</script>
 <script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/inline/78b1b7cd05d1ef90f641.js"></script>
 </body>
 </html>

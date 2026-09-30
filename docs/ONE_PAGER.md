@@ -57,7 +57,7 @@ proves how the conclusion was reached.
 ## Plans
 
 Free · Pro $749/seat/month · Institutional $4,000/month ·
-Enterprise $10,000/month · Strategic Infrastructure $20,850/month.
+Enterprise $10,000/month ($120,000/year) · Strategic Infrastructure $20,833/month ($250,000/year).
 Details: <https://www.noshashi.app>
 
 **Try it:** <https://github.com/Ignosha/noshashi/releases/latest>

@@ -14,6 +14,19 @@ function pageFiles(root: string): string[] {
 }
 
 /**
+ * The build moves each page's inline scripts to /assets/inline/<hash>.js
+ * (scripts/inline-scripts.mjs) so the site's CSP can forbid inline script.
+ * Some pages keep data there (the Learn page's word list and quiz), so
+ * put each one back in place before reading the page.
+ */
+function withInlineScripts(site: string, html: string): string {
+  return html.replace(/<script([^>]*?)\ssrc="\/assets\/inline\/([0-9a-f]{20}\.js)"><\/script>/g, (whole, attrs: string, name: string) => {
+    const file = path.join(site, "assets", "inline", name);
+    return fs.existsSync(file) ? `<script${attrs}>${fs.readFileSync(file, "utf8")}</script>` : whole;
+  });
+}
+
+/**
  * NOSHX's knowledge of the published pages, compiled when the app is
  * built. `import("virtual:noshx-pages")` gives the passages' text only:
  * no HTML to fetch or parse at run time, in one chunk that loads when
@@ -34,7 +47,7 @@ export function noshxPages(): Plugin {
       const passages: Passage[] = [];
       for (const file of pageFiles(root)) {
         this.addWatchFile(file);
-        passages.push(...pagePassages(file.split(path.sep).join("/"), fs.readFileSync(file, "utf8")));
+        passages.push(...pagePassages(file.split(path.sep).join("/"), withInlineScripts(path.join(root, "site"), fs.readFileSync(file, "utf8"))));
       }
       return `export default ${JSON.stringify(passages)};`;
     },

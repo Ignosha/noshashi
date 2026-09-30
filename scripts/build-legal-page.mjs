@@ -19,6 +19,7 @@ import { pathToFileURL } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { MARK } from "../api/_lib/brand-mark.js";
+import { externalizeInlineScripts, INLINE_DIR } from "./inline-scripts.mjs";
 
 const tmp = join(tmpdir(), `noshashi-legal-${Date.now()}.mjs`);
 
@@ -192,8 +193,12 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 </html>
 `;
 
+// The site's CSP forbids inline script (scripts/inline-scripts.mjs).
+const page = externalizeInlineScripts(html);
+mkdirSync(`site/${INLINE_DIR}`, { recursive: true });
+for (const [name, body] of page.files) writeFileSync(`site/${INLINE_DIR}/${name}`, body);
 mkdirSync("site/legal", { recursive: true });
-writeFileSync("site/legal/index.html", html);
+writeFileSync("site/legal/index.html", page.html);
 console.log(
-  `wrote site/legal/index.html — ${policies.length} policies, ${Math.round(html.length / 1024)} KB`
+  `wrote site/legal/index.html — ${policies.length} policies, ${Math.round(page.html.length / 1024)} KB`
 );

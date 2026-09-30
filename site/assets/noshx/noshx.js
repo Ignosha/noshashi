@@ -2648,7 +2648,7 @@ const zs = [
     cadence: "per month",
     // No Stripe price exists yet: contract tiers are invoiced per deal.
     priceId: null,
-    annualUsd: 1e5,
+    annualUsd: 12e4,
     annualPriceId: null,
     purchase: "contact_sales",
     seatBased: !1,
@@ -2704,12 +2704,13 @@ const zs = [
     id: "strategic",
     name: "STRATEGIC INFRASTRUCTURE",
     audience: "Institutions building their own XRPL intelligence layer",
-    priceLabel: "$20,850",
-    monthlyUsd: 20850,
+    priceLabel: "$20,833",
+    // $250,000 a year divided by twelve, rounded to the dollar.
+    monthlyUsd: 20833,
     cadence: "per month",
     // No Stripe price exists yet: contract tiers are invoiced per deal.
     priceId: null,
-    annualUsd: 208500,
+    annualUsd: 25e4,
     annualPriceId: null,
     purchase: "contact_sales",
     seatBased: !1,
@@ -2851,7 +2852,7 @@ function Qs(e) {
   Ot = e, Q = null;
 }
 function Ct() {
-  return Q ?? (Q = import("./pages-C0RJfpSZ.js").then(({ default: e }) => Vs([...Gs(), ...Ot, ...e]))), Q;
+  return Q ?? (Q = import("./pages-bX6Tbaez.js").then(({ default: e }) => Vs([...Gs(), ...Ot, ...e]))), Q;
 }
 function Zs() {
   if (Q) return;
@@ -5549,7 +5550,7 @@ const M = {
     // src/site/__tests__/noshx-web.test.ts fails if they drift apart.
     keywords: ["which", "plan", "right", "choose", "suit", "custodian", "custodians", "exchange", "venue", "desk", "fund", "team", "institution", "bank"],
     q: "Which plan is right for me?",
-    a: "Free is for individuals and single desks. Pro ($749 per seat per month) is for trading desks and funds. Institutional ($4,000 a month) is for regulated venues and custodians. Enterprise ($10,000 a month) is for institutional teams operating at scale. Strategic Infrastructure ($20,850 a month) is for institutions building their own XRPL intelligence layer. The pricing page lists what each one includes.",
+    a: "Free is for individuals and single desks. Pro ($749 per seat per month) is for trading desks and funds. Institutional ($4,000 a month) is for regulated venues and custodians. Enterprise ($10,000 a month, $120,000 a year) is for institutional teams operating at scale. Strategic Infrastructure ($20,833 a month, $250,000 a year) is for institutions building their own XRPL intelligence layer. The pricing page lists what each one includes.",
     links: [{ label: "Compare plans", href: "/pricing/" }]
   },
   {

@@ -22,10 +22,7 @@
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/core.css">
 <link rel="stylesheet" href="/assets/modules.css">
-<script>
-(function(){try{var t=localStorage.getItem("noshashi-theme");
-if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
-</script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Release notes","item":"https://www.noshashi.app/docs/release-notes/"}]}]}</script>
 <style>
 .docs{display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px;align-items:start}
@@ -72,7 +69,16 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 </header>
 <main class="shell">
 <div class="page-head"><p class="eyebrow"><a href="/docs/">DOCUMENTATION</a></p><h1>Release notes</h1><p>What changed in each release.</p></div>
-<section class="docs"><nav class="docs-nav" aria-label="Documentation"><a href="/docs/getting-started/">Getting started</a><a href="/docs/architecture/">Architecture</a><a href="/docs/xrpl-data/">XRPL data</a><a href="/docs/analysis/">Analysis engines</a><a href="/docs/ai/">AI</a><a href="/docs/policies/">Policies</a><a href="/docs/evidence/">Evidence</a><a href="/docs/receipts/">Receipts</a><a href="/docs/api/">API</a><a href="/docs/webhooks/">Webhooks</a><a href="/docs/security/">Security</a><a href="/docs/enterprise/">Enterprise</a><a href="/docs/troubleshooting/">Troubleshooting</a><a href="/docs/release-notes/" aria-current="page">Release notes</a></nav><article class="doc-body"><h3>1.0.19</h3>
+<section class="docs"><nav class="docs-nav" aria-label="Documentation"><a href="/docs/getting-started/">Getting started</a><a href="/docs/architecture/">Architecture</a><a href="/docs/xrpl-data/">XRPL data</a><a href="/docs/analysis/">Analysis engines</a><a href="/docs/ai/">AI</a><a href="/docs/policies/">Policies</a><a href="/docs/evidence/">Evidence</a><a href="/docs/receipts/">Receipts</a><a href="/docs/api/">API</a><a href="/docs/webhooks/">Webhooks</a><a href="/docs/security/">Security</a><a href="/docs/enterprise/">Enterprise</a><a href="/docs/troubleshooting/">Troubleshooting</a><a href="/docs/release-notes/" aria-current="page">Release notes</a></nav><article class="doc-body"><h3>1.0.20</h3>
+<h4>Prices</h4>
+<ul><li>Enterprise is $120,000 a year and Strategic Infrastructure $250,000 a year. Monthly is the year divided by twelve: $10,000 and $20,833.</li><li>The app&#39;s plan cards now show the yearly price under the monthly one.</li><li>On the website, the Monthly / Annual prepay switch now changes every plan, including Enterprise and Strategic, and the comparison table lists the yearly price for each paid plan.</li></ul>
+<h4>Not offered yet: marked as coming soon</h4>
+<ul><li>The 99.9% uptime SLA is off every plan until it is funded.</li><li>The uptime SLA, single sign-on and dedicated environments are marked &quot;coming soon&quot; on the pricing page and in the app, and the help and NOSHX answers say so if asked.</li></ul>
+<h4>Security</h4>
+<ul><li>The website no longer runs any inline script. Its security policy allows scripts only from the site itself, which blocks a whole class of injected-script attacks.</li><li>The home page&#39;s &quot;find a real partial payment&quot; example now reads only validated ledgers, as everything else in NOSHASHI does.</li><li>The privacy and data-processing policies now name every service that handles your data: Vercel hosts the website and its contact form, and Resend delivers contact and support email.</li><li>An internal security assessment and penetration test ran on 30 September 2026. Every attempt to cross an organization boundary, raise a role, or edit or forge the audit log was refused. The report is in <code>docs/SECURITY_ASSESSMENT_2026-09.md</code>.</li></ul>
+<h4>For procurement</h4>
+<ul><li>SOC 2 readiness: policies, risk register and a control map with the remaining gaps (<code>docs/soc2/</code>). No SOC 2 report is held yet.</li><li>Contract templates for institutional customers: master agreement, order form and data processing addendum, plus an SLA schedule that is not offered until it is funded (<code>docs/legal/</code>). These await legal review.</li><li><code>docs/FUNDING_NEEDS.md</code> lists what each &quot;coming soon&quot; item needs, with current prices.</li></ul>
+<h3>1.0.19</h3>
 <h4>Two new organization roles</h4>
 <ul><li><strong>Reviewer</strong>: the second pair of eyes. A reviewer can activate a policy someone else wrote and decide an exception someone else raised, including asking for more evidence. They cannot draft, request or administer anything, so four-eyes holds by construction.</li><li><strong>Auditor</strong>: an internal read-only seat that can also read the audit trail. It changes nothing. Unlike an examiner seat, it does not expire.</li><li>Both are enforced by the database. The app&#39;s role picker, role table and messages name them.</li></ul>
 <h4>Sign-ins in the audit trail</h4>
@@ -286,21 +292,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>
-<script>
-(function(){
-  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
-  if(!button)return;
-  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
-    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
-    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
-  sync();
-  button.addEventListener("click",function(){
-    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
-    document.documentElement.setAttribute("data-theme",next);
-    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
-    sync();});
-})();
-</script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
 
 </body>
 </html>
