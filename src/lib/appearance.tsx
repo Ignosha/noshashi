@@ -5,6 +5,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
+import { MotionConfig } from "framer-motion";
 import { useSetting } from "./store";
 
 /**
@@ -178,8 +179,15 @@ export function AppearanceProvider({ children }: { children: React.ReactNode }) 
     ]
   );
 
+  // framer-motion animations run in JavaScript, so the CSS reduced-motion
+  // rules in index.css do not reach them. MotionConfig applies the same
+  // choice to every motion component: follow the OS, or the operator's
+  // explicit override in Settings › Appearance.
+  const reducedMotion = motion === "reduced" ? "always" : motion === "full" ? "never" : "user";
   return (
-    <AppearanceContext.Provider value={value}>{children}</AppearanceContext.Provider>
+    <AppearanceContext.Provider value={value}>
+      <MotionConfig reducedMotion={reducedMotion}>{children}</MotionConfig>
+    </AppearanceContext.Provider>
   );
 }
 

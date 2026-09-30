@@ -85,7 +85,7 @@ export function StatusRail({
       {/* Live ticker — duplicated once so the marquee wraps seamlessly */}
       <div className="relative min-w-0 flex-1 overflow-hidden">
         {ticker.length === 0 ? (
-          <span className="mono-font block truncate text-[10.5px] text-muted-foreground/70">
+          <span className="mono-font block truncate text-[10.5px] text-muted-foreground">
             AWAITING VALIDATED TRANSACTIONS…
           </span>
         ) : (
@@ -131,7 +131,7 @@ export function StatusRail({
       {onOpenLegal && (
         <button
           onClick={onOpenLegal}
-          className="sr-optional mono-font shrink-0 text-[10.5px] text-muted-foreground/70 underline-offset-4 transition-colors hover:text-foreground hover:underline"
+          className="sr-optional mono-font shrink-0 text-[10.5px] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
         >
           {copyrightLine()}
         </button>

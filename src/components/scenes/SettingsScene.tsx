@@ -262,6 +262,7 @@ export function SettingsScene({
                 description="Raises rule and text contrast, and removes ambient texture."
               >
                 <Switch
+                  aria-label="High contrast"
                   checked={appearance.highContrast}
                   onCheckedChange={(value) => appearance.setHighContrast(Boolean(value))}
                 />
@@ -370,6 +371,7 @@ export function SettingsScene({
                 description="Route gate verdicts through Notification Center."
               >
                 <Switch
+                  aria-label="Native notifications"
                   checked={notificationsEnabled}
                   onCheckedChange={(value) => onNotificationsChange(Boolean(value))}
                 />
@@ -385,6 +387,7 @@ export function SettingsScene({
                 }
               >
                 <Switch
+                  aria-label="Launch at login"
                   checked={launchAtLogin}
                   disabled={!isTauri}
                   onCheckedChange={(value) => void toggleLaunchAtLogin(Boolean(value))}
@@ -399,6 +402,7 @@ export function SettingsScene({
                 <span className="flex items-center gap-2">
                   <Kbd keys="mod+shift+x" />
                   <Switch
+                    aria-label="Global shortcut"
                     checked={shortcutOn}
                     disabled={!isTauri}
                     onCheckedChange={(value) => void toggleShortcut(Boolean(value))}
@@ -694,7 +698,7 @@ function AutomaticUpdates() {
           title="Check automatically"
           description="Once at launch, at most every six hours. No installs without a click."
         >
-          <Switch checked={autoCheck} onCheckedChange={setAutoCheck} />
+          <Switch aria-label="Check for updates automatically" checked={autoCheck} onCheckedChange={setAutoCheck} />
         </SettingRow>
       </div>
 

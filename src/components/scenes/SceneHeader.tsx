@@ -39,7 +39,7 @@ export function SceneHeader({
       <div className="flex items-end justify-between gap-4">
         <div className="flex min-w-0 items-end gap-3">
           {index && (
-            <span className="display shrink-0 text-[20px] font-[700] leading-none text-muted-foreground/25">
+            <span aria-hidden className="display shrink-0 text-[20px] font-[700] leading-none text-muted-foreground/70">
               {index}
             </span>
           )}

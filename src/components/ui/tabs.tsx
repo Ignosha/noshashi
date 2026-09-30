@@ -24,6 +24,11 @@ const TabsTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.Trigger
+    // Radix points aria-controls at a TabsContent panel, but most screens
+    // here render their panel themselves, so the reference would name an
+    // element that does not exist (an ARIA error for screen readers).
+    // aria-controls is optional for tabs; a caller can still pass one.
+    aria-controls={undefined}
     ref={ref}
     className={cn(
       "stencil px-3 py-1.5 text-[10.5px] tracking-[0.14em] text-muted-foreground transition-colors",
