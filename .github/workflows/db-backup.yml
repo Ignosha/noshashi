@@ -66,7 +66,14 @@ jobs:
             | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
           sudo apt-get update -qq
           sudo apt-get install -y -qq postgresql-client-17
-          pg_dump --version
+          # Installing 17 is not enough: /usr/bin/pg_dump is a wrapper that can
+          # still pick the runner's preinstalled 16, which refuses a 17 server
+          # ("aborting because of server version mismatch"). Name the binary.
+          PG_DUMP=/usr/lib/postgresql/17/bin/pg_dump
+          version="$("${PG_DUMP}" --version)"
+          echo "${version}"
+          case "${version}" in *" 17."*) ;; *) echo "::error::expected pg_dump 17 at ${PG_DUMP}"; exit 1 ;; esac
+          echo "PG_DUMP=${PG_DUMP}" >> "${GITHUB_ENV}"
 
       - name: Dump and encrypt
         env:
@@ -100,7 +107,7 @@ jobs:
           # noshashi holds the application data; public holds what little lives
           # outside it; auth holds the accounts, without which a restore gives
           # you rows nobody can log in to reach.
-          pg_dump "${DB_URL}" \
+          "${PG_DUMP}" "${DB_URL}" \
             --schema=noshashi \
             --schema=public \
             --schema=auth \

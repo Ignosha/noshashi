@@ -36,15 +36,17 @@ billing, monitoring and the Compliance API.
 - `.github/workflows/db-backup.yml` takes a nightly `pg_dump` of the
   `noshashi`, `public` and `auth` schemas, encrypts it with GPG (AES-256)
   before upload, and keeps it as a 90-day workflow artifact.
-- **Current state: not working.** Every run since the workflow was added
-  (2026-09-10) has failed: the `SUPABASE_DB_URL` repository secret is set
-  but is not a `postgresql://` connection string, so `pg_dump` falls back to
-  a local socket. The workflow now strips stray quotes and
-  whitespace and reports this precisely. **To fix:** set `SUPABASE_DB_URL`
-  to the **Session pooler** connection string from Supabase → Project
-  Settings → Database, with the real password in place of
-  `[YOUR-PASSWORD]`, then run the workflow once by hand and confirm the
-  artifact appears.
+- **History.** Every run from 2026-09-10 to 2026-09-30 failed. First the
+  `SUPABASE_DB_URL` secret was not a `postgresql://` connection string, so
+  `pg_dump` fell back to a local socket. After the secret was corrected
+  (2026-09-30), the runner's default `pg_dump` 16 refused the Postgres 17
+  server. The workflow now calls `pg_dump` 17 by path, and checks the
+  version before dumping. The latest run of **Database backup** under
+  GitHub Actions shows the current state; a green run carries an artifact
+  named `db-backup-<timestamp>`.
+- The secret must be the **Session pooler** connection string from
+  Supabase (Connect → Session pooler), with the real password in place of
+  `[YOUR-PASSWORD]` and any `@ : / ? # %` in the password percent-encoded.
 - Keep `BACKUP_PASSPHRASE` somewhere that survives the loss of this
   repository. A backup you cannot decrypt is not a backup.
 
