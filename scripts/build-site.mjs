@@ -1201,6 +1201,7 @@ async function buildPricingEnhancement() {
     .tier-compare .optional{color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare .no{color:var(--faint)}
+    .tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
     .tier-compare caption{caption-side:bottom;padding:12px;color:var(--faint);text-align:left;font-size:11px}
     .tier-compare .tier-price{font-size:13px;font-weight:700;color:var(--ink)}
     .tier-compare .tier-price small{display:block;margin-top:3px;color:var(--faint);font:10px "IBM Plex Mono",monospace;font-weight:400}
@@ -1210,6 +1211,9 @@ async function buildPricingEnhancement() {
     @media(max-width:760px){.tier-compare{margin-right:calc((100vw - var(--shell))/2 * -1);margin-left:calc((100vw - var(--shell))/2 * -1);padding-left:4vw;padding-right:4vw}.tier-compare th,.tier-compare td{padding:12px 10px}}
   </style>`;
   if (!html.includes("id=\"noshashi-tier-comparison\"")) html = html.replace("</style>", `${css}</style>`);
+  // Rules added after the committed page first received the block above.
+  const soonRule = '.tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}';
+  if (!html.includes(".tier-compare .soon{")) html = html.replace(".tier-compare .no{color:var(--faint)}", `.tier-compare .no{color:var(--faint)}\n    ${soonRule}`);
   // The committed pricing page is also the input to this enhancement. Remove
   // prior generated copies so repeated site builds remain idempotent.
   html = html.replace(/\s*<!-- NOSHASHI-TIER-COMPARISON -->[\s\S]*?(?=\s*<\/main>)/g, "");
@@ -1236,7 +1240,7 @@ async function buildPricingEnhancement() {
             <li>Embeddable screening widget for your own site</li>
             <li>Forensic trace five hops deep, straight into an investigation case</li>
             <li>Scam cluster mapping four hops deep, 200 accounts, opened as a case</li>
-            <li>Dedicated environment, provisioned per contract</li>
+            <li>Dedicated environment · coming soon</li>
             <li>Architecture review and named implementation planning</li>
           </ul>
           <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
@@ -1255,7 +1259,7 @@ async function buildPricingEnhancement() {
             <li>XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API</li>
             <li>Custom export schemas, bulk export and event retention you set</li>
             <li>Custom data integrations for risk, custody, trading and compliance</li>
-            <li>Dedicated environment, provisioned per contract</li>
+            <li>Dedicated environment · coming soon</li>
             <li>Security Guardian: signed alerts the minute a watched account's keys change or it is deleted, for a theft trail or a whole scam cluster</li>
             <li>Protection alerts: a signed webhook the day reserves fall below customer balances, and the phishing link feed as an API</li>
             <li>Strategic architecture review and integration roadmap</li>
@@ -1326,13 +1330,14 @@ async function buildPricingEnhancement() {
           <tr class="group"><th scope="rowgroup" colspan="6">API &amp; delivery</th></tr>
           <tr><th scope="row">API access</th><td class="no">Unavailable</td><td>5,000 / month</td><td>100,000 / month</td><td class="contracted">Institutional API</td><td class="contracted">High-volume API</td></tr>
           <tr><th scope="row">Webhooks &amp; event feeds</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Webhooks</td><td class="contracted">Webhooks</td><td class="contracted">Event feeds</td></tr>
-          <tr><th scope="row">Dedicated environment</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Per contract</td><td class="contracted">Per contract</td><td class="contracted">Per contract</td></tr>
           <tr><th scope="row">Embedded / white-label</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Console &amp; reports</td><td class="yes">Screening widget</td><td class="yes">Screening widget</td></tr>
           <tr><th scope="row">Architecture review</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="yes">Included</td><td class="contracted">Included</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">Governance</th></tr>
           <tr><th scope="row">Regulator access</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Contracted scope</td></tr>
-          <tr><th scope="row">SSO / SCIM</th><td class="no">Not yet available</td><td class="no">Not yet available</td><td class="no">Not yet available</td><td class="no">Not yet available</td><td class="no">Not yet available</td></tr>
-          <tr><th scope="row">SLA</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="contracted">99.9% contracted</td><td class="contracted">Contracted</td><td class="contracted">Contracted</td></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Coming soon · not offered yet</th></tr>
+          <tr><th scope="row">Uptime SLA with service credits</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="soon">Coming soon</td><td class="soon">Coming soon</td><td class="soon">Coming soon</td></tr>
+          <tr><th scope="row">Dedicated environment</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="soon">Coming soon</td><td class="soon">Coming soon</td></tr>
+          <tr><th scope="row">Single sign-on (SAML / OIDC, SCIM)</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="soon">Coming soon</td><td class="soon">Coming soon</td><td class="soon">Coming soon</td></tr>
         </tbody>
       </table>
     </div>

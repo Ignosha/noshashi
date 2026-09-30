@@ -56,7 +56,7 @@ const AUDIENCES = [
       "Adjudicate every settlement against your own rule set before it is signed — not after it settles.",
       "Hand an examiner a receipt lineage instead of a spreadsheet: each verdict hashed, timestamped and reproducible.",
       "No custody, no keys, no client assets ever touch this software. It reads and it rules; it never holds.",
-      "Read-only regulator seats, a published verification SLA, and a white-labelled wallet under your own brand.",
+      "Read-only regulator seats and a white-labelled console under your own brand.",
     ],
   },
   {

@@ -156,11 +156,11 @@ seats**, plus:
 | | |
 |---|---|
 | Payment | **Invoice, ACH, wire, NET-30.** Not card |
-| Why not card | The tier carries an SLA, a DPA and regulator access, none of which exist until a contract is signed. A card payment completing first would provision an account whose obligations nobody had agreed to |
-| Contract | **MSA required.** DPA and SLA as schedules |
+| Why not card | The tier carries a DPA and regulator access, none of which exist until a contract is signed. A card payment completing first would provision an account whose obligations nobody had agreed to |
+| Contract | **MSA required.** DPA as a schedule; an SLA schedule is coming soon |
 | Default term | 12 months, 30 days' notice before renewal — a proposal, not a policy |
 | Longer terms | Negotiable as part of the MSA |
-| **SLA** | **99.9% monthly uptime with service credits.** Response targets per severity. See the SLA schedule |
+| **SLA** | **Coming soon.** Not offered until it is funded; see `docs/FUNDING_NEEDS.md` |
 | Onboarding | **Dedicated.** Named engineer, scoped implementation plan, key issuance and first successful API call walked through live |
 | Support | **Named contact**, not a shared queue |
 | Procurement pack | Security questionnaire, DPA, sub-processor list, insurance certificates, W-9 — available before commitment |
@@ -197,7 +197,7 @@ the tier name.
 | `travel_rule` | — | — | ✅ |
 | `signed_export` | — | — | ✅ |
 | `offline_mode` | — | — | ✅ |
-| `sla` | — | — | ✅ |
+| `sla` (flag only; SLA coming soon) | — | — | ✅ |
 | `sso` (flag only; SSO not built) | — | — | ✅ |
 | `audit_log` | — | — | ✅ |
 | `bulk_monitoring` | — | — | ✅ |

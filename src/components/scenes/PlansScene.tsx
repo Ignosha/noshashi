@@ -334,9 +334,9 @@ function PlanCard({
           raised against it — and this used to read `plan.priceId ?` and
           offer it as a card purchase. The pricing page promises the
           opposite in as many words: "Not available by card. Institutional
-          access requires an executed MSA." The tier carries a 99.9%
-          uptime SLA with service credits, a DPA, regulator read-only
-          seats and white labelling, so a card that cleared here would
+          access requires an executed MSA." The tier carries a DPA,
+          regulator read-only seats and white labelling (an uptime SLA is
+          coming soon), so a card that cleared here would
           have created every one of those obligations against nobody's
           signature.
         */}

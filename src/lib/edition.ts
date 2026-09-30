@@ -44,7 +44,7 @@ export const DEMO_LOCKED: Record<string, string> = {
   webhooks: "Webhooks are part of the Institutional plan.",
   regulator_seats: "Regulator seats are part of the Institutional plan.",
   white_label: "White labelling is part of the Institutional plan.",
-  sla: "The published SLA is part of the Institutional plan.",
+  sla: "An uptime SLA is coming soon. It is not offered on any plan yet.",
 };
 
 /** What the demo *does* include, stated plainly so it can be trusted. */

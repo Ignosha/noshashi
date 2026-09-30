@@ -143,6 +143,13 @@ export const ENTRIES = [
     links: [{ label: "Newsroom", href: "/news/" }],
   },
   {
+    id: "coming-soon",
+    keywords: ["sla", "uptime", "availability", "guarantee", "sso", "saml", "oidc", "scim", "sign-on", "dedicated", "environment", "isolated", "coming"],
+    q: "Is there an uptime SLA, single sign-on or a dedicated environment?",
+    a: "Not yet. All three are coming soon and are marked that way on the pricing page. No plan includes an uptime SLA today, and NOSHASHI does not promise an uptime figure. Sign-in is by email and password with two-factor authentication until single sign-on arrives, and every organization uses the shared service until dedicated environments are offered.",
+    links: [{ label: "Pricing", href: "/pricing/#compare" }],
+  },
+  {
     id: "status",
     keywords: ["status", "down", "outage", "maintenance", "incident", "broken", "uptime", "working", "progress", "roadmap", "next", "eta", "soon", "release", "shipping", "timeline", "update"],
     q: "Is something broken, and what are you working on?",

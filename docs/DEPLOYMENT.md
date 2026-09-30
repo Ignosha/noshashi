@@ -141,7 +141,8 @@ against this list.
 
 ## A dedicated environment
 
-Enterprise contracts list one; none has been provisioned. It would be a
+Shown as coming soon on Enterprise and Strategic; none has been
+provisioned, and it waits on funding ([FUNDING_NEEDS.md](FUNDING_NEEDS.md)). It would be a
 second Supabase project built from this repository: apply every migration,
 deploy every function in the table (after recovering the two missing
 sources), set the secrets above, re-create the cron jobs, and ship an app

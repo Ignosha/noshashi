@@ -18,7 +18,7 @@ Last reviewed 2026-09-30 against the code and the published legal pages
 | Privacy Policy | IMPLEMENTED | Published (`/legal/`, "PRIVACY POLICY"). |
 | Data Processing Agreement | PARTIAL | Published data-processing terms and subprocessor list ("DATA PROCESSING & SUBPROCESSORS"); standard contractual clauses referenced for EEA/UK/CH transfers. A countersigned, negotiable DPA is PLANNED. |
 | Subprocessors | IMPLEMENTED | Supabase (database, auth, functions; US region), Stripe (payments), Vercel (website). Hosted AI providers only when a customer configures one with their own key. |
-| SLA | PLANNED | The price list names a 99.9% uptime SLA for Institutional and above, "set in the MSA". No MSA has been signed, and today's hosting (Supabase Free plan, nightly backups only) could not back that figure. See `docs/ENTERPRISE.md` for what would need to change first. |
+| SLA | PLANNED | Shown as "coming soon" on the pricing page; not offered on any plan. Waiting on funding (`docs/FUNDING_NEEDS.md`): today's hosting (Supabase Free plan, nightly backups only) could not back an uptime commitment. |
 | Contracting (order forms, MSA) | PLANNED | Self-serve checkout today; enterprise paper on request is not yet standardised. |
 | Billing, renewal, refunds | IMPLEMENTED | Published billing terms; cancellation from the Stripe billing portal. |
 | Regulatory disclosures | IMPLEMENTED | Published ("REGULATORY DISCLOSURES"). NOSHASHI does not provide legal advice and does not replace a compliance function. |
@@ -43,7 +43,7 @@ Last reviewed 2026-09-30 against the code and the published legal pages
 | Item | Status | Detail |
 |---|---|---|
 | Authentication | IMPLEMENTED | Email and password with breach screening; TOTP second factor. |
-| SSO (SAML / OIDC) | PLANNED | Not implemented. |
+| SSO (SAML / OIDC) | PLANNED | Not implemented; shown as "coming soon". Supabase supports SAML on its Pro plan (`docs/FUNDING_NEEDS.md`). |
 | Role-based access | IMPLEMENTED | Organization roles: owner, admin, compliance, reviewer, risk, analyst, auditor, viewer, API, regulator (time-limited read-only examiner seat). Enforced in the database. |
 | Distinct reviewer and auditor roles | IMPLEMENTED | `reviewer` activates policies and decides exceptions that someone else wrote or requested, and cannot draft, request or administer. `auditor` is an internal read-only seat that also reads the audit log and changes nothing. Both enforced in the database (migrations `20260930120000`, `20260930120100`). |
 | Four-eyes controls | IMPLEMENTED | Policy author cannot activate; exception requester cannot decide. Enforced by database constraints and triggers. |

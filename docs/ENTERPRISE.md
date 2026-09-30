@@ -19,17 +19,19 @@ The tiers and their entitlement flags are defined once in
 | Enterprise | $10,000 ($100,000 a year) | Contract, invoiced per deal (no Stripe price) | Everything in Institutional, plus deposit and withdrawal screening, forensic trace and cluster mapping, the embeddable screening widget, market surveillance, customer protection |
 | Strategic Infrastructure | $20,850 ($208,500 a year) | Contract, invoiced per deal (no Stripe price) | Everything in Enterprise, plus XRPL event feeds, custom export schemas and retention, Security Guardian alerts, phishing feed |
 
-### Promised but not built
+### Coming soon
 
-These appear in the price list or the entitlement flags. None of them is
-backed by code today. Do not sign a contract that relies on them without
-the work below.
+These three are marked **coming soon** on the pricing page and in the
+app (since 2026-09-30); none is offered or sold yet. Each is waiting on
+funding. [FUNDING_NEEDS.md](FUNDING_NEEDS.md) has the costs and the order
+to spend in. Do not sign a contract that relies on them before the work
+below is done.
 
-| Item | Where it is promised | What exists | What it would take |
+| Item | Where it is shown | What exists | What it would take |
 |---|---|---|---|
-| 99.9% uptime SLA with service credits | Institutional features, pricing page | Nothing. No MSA has been signed. The server runs on the Supabase **Free** plan with nightly backups and no point-in-time recovery ([DISASTER_RECOVERY.md](DISASTER_RECOVERY.md)) | Supabase Pro (daily managed backups, PITR add-on), status monitoring with alerting, and an on-call arrangement, before an SLA is signed |
-| SSO (SAML / OIDC) | `sso` flag on Institutional and above | Nothing reads the flag. Sign-in is email and password with TOTP | Supabase SSO (a paid Supabase feature) and an organization-to-identity-provider mapping |
-| Dedicated environment | Enterprise features | Nothing reads the `dedicated_environment` flag. Every customer uses the shared project | A separate Supabase project per contract, provisioned by hand from `supabase/migrations` and `supabase/functions` (see [DEPLOYMENT.md](DEPLOYMENT.md)), and an app build pointing at it |
+| Uptime SLA with service credits | Pricing page comparison, "coming soon" on Institutional and above | Nothing. No MSA has been signed. The server runs on the Supabase **Free** plan with nightly backups and no point-in-time recovery ([DISASTER_RECOVERY.md](DISASTER_RECOVERY.md)) | Supabase Pro (daily managed backups, PITR add-on), status monitoring with alerting, and an on-call arrangement, before an SLA is signed |
+| SSO (SAML / OIDC) | Pricing page comparison, "coming soon" on Institutional and above; `sso` flag | Nothing reads the flag. Sign-in is email and password with TOTP | Supabase SSO (a paid Supabase feature) and an organization-to-identity-provider mapping |
+| Dedicated environment | Enterprise and Strategic features, "coming soon" | Nothing reads the `dedicated_environment` flag. Every customer uses the shared project | A separate Supabase project per contract, provisioned by hand from `supabase/migrations` and `supabase/functions` (see [DEPLOYMENT.md](DEPLOYMENT.md)), and an app build pointing at it |
 
 ## Setting up an organization
 
