@@ -2808,7 +2808,8 @@
       /* A ledger's transactions come back flat: the fields sit on the object
          itself with metaData beside them, not under a tx_json wrapper. */
       function scan(r) {
-        var txs = (r && r.ledger && r.ledger.transactions) || [];
+        if (!r || r.validated !== true) return null;
+        var txs = (r.ledger && r.ledger.transactions) || [];
         for (var i = 0; i < txs.length; i++) {
           var t = txs[i], tx = t.tx_json || t, m = t.meta || t.metaData;
           if (!tx || tx.TransactionType !== "Payment" || !m) continue;
@@ -2822,8 +2823,10 @@
         return null;
       }
 
-      rpc("ledger_current", {}).then(function (c) {
-        var idx = c.ledger_current_index - 2;
+      // Start at the newest validated ledger and walk back: every ledger
+      // below it is validated too, so nothing here reads unsettled state.
+      rpc("ledger", { ledger_index: "validated" }).then(function (c) {
+        var validatedIndex = Number(c.ledger_index);
         function round() {
           if (scanned >= LEDGERS) {
             throw new Error("No partial payment in the last " + scanned + " ledgers (" +
@@ -2832,7 +2835,7 @@
           }
           var batch = [];
           for (var k = 0; k < BATCH; k++) {
-            batch.push(rpc("ledger", { ledger_index: idx--, transactions: true, expand: true })
+            batch.push(rpc("ledger", { ledger_index: validatedIndex--, transactions: true, expand: true })
               .catch(function () { return null; }));
             scanned += 1;
           }
@@ -2917,7 +2920,7 @@
             (phantom < 1 ? "This book is fully backed."
               : num(phantom, 1) + "% of this book’s visible depth could not fill.") + "</p>" +
           '<p class="sub">' + nt(label) + " · measured just now against validated ledger " +
-            esc(r.ledger_index || r.ledger_current_index || "state") + "</p>" +
+            esc(r.ledger_index || "state") + "</p>" +
           '<div class="depth">' +
             '<div><div class="lab"><span>Advertised</span><em>' + num(adv) + "</em></div>" +
             '<div class="bar"><i style="width:100%"></i></div></div>' +

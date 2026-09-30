@@ -1,0 +1,2 @@
+
+(function(){var b=document.getElementById("theme"),t="";try{t=localStorage.getItem("noshashi-theme")||""}catch(e){}if(t)document.documentElement.setAttribute("data-theme",t);function u(){var l=document.documentElement.getAttribute("data-theme")==="light";b.textContent=l?"DARK":"LIGHT"}u();b.onclick=function(){var n=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("noshashi-theme",n)}catch(e){}u()}})();

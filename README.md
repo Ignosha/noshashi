@@ -113,6 +113,8 @@ certifications are held; known gaps are listed, not hidden.
 - [`docs/ENTERPRISE.md`](docs/ENTERPRISE.md): setting up an organization, roles, controls, and what the price list promises that is not built.
 - [`docs/API.md`](docs/API.md): the Compliance API.
 - [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md): how each surface is deployed, secrets by name, scheduled jobs.
+- [`docs/SECURITY_ASSESSMENT_2026-09.md`](docs/SECURITY_ASSESSMENT_2026-09.md): the internal penetration test and its findings; [`docs/soc2/`](docs/soc2/README.md): SOC 2 readiness, policies and risk register.
+- [`docs/legal/`](docs/legal/README.md): contract templates (MSA, Order Form, DPA, SLA schedule), pending legal review.
 - [`docs/FUNDING_NEEDS.md`](docs/FUNDING_NEEDS.md): what is waiting on funding (uptime SLA, single sign-on, dedicated environments, code signing), with costs.
 - [`docs/INCIDENT_RESPONSE.md`](docs/INCIDENT_RESPONSE.md), [`docs/DISASTER_RECOVERY.md`](docs/DISASTER_RECOVERY.md).
 - [`docs/ONE_PAGER.md`](docs/ONE_PAGER.md), [`docs/SALES_DEMO.md`](docs/SALES_DEMO.md).

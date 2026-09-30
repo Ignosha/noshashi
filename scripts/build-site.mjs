@@ -45,6 +45,7 @@ import {
   renderProgress, renderRail, renderMarket, renderMarketHead, renderMarketFoot, renderSubscribe,
 } from "../api/_lib/sections.js";
 import { jsonLd } from "../api/_lib/shell.js";
+import { externalizeSite } from "./inline-scripts.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
@@ -1675,6 +1676,10 @@ async function main() {
   const docs = await buildDocs();
   await buildSitemap(docs);
   await buildRobots();
+  // Last: every page, generated or committed, loses its inline scripts so
+  // the CSP can be script-src 'self' (scripts/inline-scripts.mjs).
+  const inline = await externalizeSite(SITE);
+  log(`inline scripts: ${inline.files} files for ${inline.pages} pages (${inline.removed} unused removed)`);
 
   log(`canonical origin: ${ORIGIN}`);
   log("done.");

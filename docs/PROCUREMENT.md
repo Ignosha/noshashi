@@ -16,10 +16,10 @@ Last reviewed 2026-09-30 against the code and the published legal pages
 |---|---|---|
 | Terms of Service | IMPLEMENTED | Published: Terms of Use (`/legal/`, "TERMS OF USE"). |
 | Privacy Policy | IMPLEMENTED | Published (`/legal/`, "PRIVACY POLICY"). |
-| Data Processing Agreement | PARTIAL | Published data-processing terms and subprocessor list ("DATA PROCESSING & SUBPROCESSORS"); standard contractual clauses referenced for EEA/UK/CH transfers. A countersigned, negotiable DPA is PLANNED. |
-| Subprocessors | IMPLEMENTED | Supabase (database, auth, functions; US region), Stripe (payments), Vercel (website). Hosted AI providers only when a customer configures one with their own key. |
+| Data Processing Agreement | PARTIAL | Published data-processing terms and subprocessor list ("DATA PROCESSING & SUBPROCESSORS"); a signable DPA template with security measures and subprocessors is in `docs/legal/DPA.md`, pending legal review; standard contractual clauses to be attached for EEA/UK/CH transfers. |
+| Subprocessors | IMPLEMENTED | Supabase (database, auth, functions; US region), Stripe (payments), Vercel (website and contact form), Resend (transactional email: contact-form messages, support notifications). Named in the published data-processing terms since 2026-09-30. Hosted AI providers only when a customer configures one with their own key. |
 | SLA | PLANNED | Shown as "coming soon" on the pricing page; not offered on any plan. Waiting on funding (`docs/FUNDING_NEEDS.md`): today's hosting (Supabase Free plan, nightly backups only) could not back an uptime commitment. |
-| Contracting (order forms, MSA) | PLANNED | Self-serve checkout today; enterprise paper on request is not yet standardised. |
+| Contracting (order forms, MSA) | PARTIAL | Templates drafted 2026-09-30 in `docs/legal/`: Master Subscription Agreement, Order Form, Data Processing Addendum, and an SLA schedule that is not offered until funded. Legal review pending before first use. |
 | Billing, renewal, refunds | IMPLEMENTED | Published billing terms; cancellation from the Stripe billing portal. |
 | Regulatory disclosures | IMPLEMENTED | Published ("REGULATORY DISCLOSURES"). NOSHASHI does not provide legal advice and does not replace a compliance function. |
 
@@ -28,8 +28,8 @@ Last reviewed 2026-09-30 against the code and the published legal pages
 | Item | Status | Detail |
 |---|---|---|
 | Security documentation | IMPLEMENTED | `SECURITY.md`, `docs/SECURITY_THREAT_MODEL.md`, `docs/ARCHITECTURE.md`, `docs/DATA_MODEL.md`, `docs/AI_GOVERNANCE.md`, `docs/DEPLOYMENT.md`, `docs/ENTERPRISE.md`. |
-| Certifications (SOC 2, ISO 27001) | PLANNED | None held. |
-| Penetration test | PLANNED | None performed. |
+| Certifications (SOC 2, ISO 27001) | PLANNED | None held. SOC 2 readiness work started 2026-09-30: policies, risk register, criteria mapping and gaps in `docs/soc2/`. |
+| Penetration test | PARTIAL | Internal assessment and penetration test on 2026-09-30 (`docs/SECURITY_ASSESSMENT_2026-09.md`): 2 medium findings fixed, 5 low recorded. No independent third-party test yet. |
 | Encryption in transit | IMPLEMENTED | TLS to Supabase, XRPL servers, Stripe and the website. |
 | Encryption at rest (server) | IMPLEMENTED | Provided by Supabase's managed Postgres. |
 | Encryption at rest (desktop store) | PARTIAL | Relies on the operating system account; the app's local store is not separately encrypted. Secrets (API keys) are in the OS keychain. |

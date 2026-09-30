@@ -15,10 +15,7 @@
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/core.css">
 <link rel="stylesheet" href="/assets/modules.css">
-<script>
-(function(){try{var t=localStorage.getItem("noshashi-theme");
-if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
-</script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
 <style>
   :root{
     --shell:min(1180px,92vw);
@@ -172,7 +169,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
         </section>
         <section>
           <h3>Who processes it</h3>
-          <p>Account data is held in Postgres at Supabase (United States region) behind row level security, so a row is only reachable by the account that owns it. Payments are processed by Stripe, which is the controller of your payment instrument — we never receive it. No other processor is involved.</p>
+          <p>Account data is held in Postgres at Supabase (United States region) behind row level security, so a row is only reachable by the account that owns it. Payments are processed by Stripe, which is the controller of your payment instrument — we never receive it. The website and its contact form run on Vercel, and messages you send us through the contact form or a support ticket are delivered by email through Resend. No other processor is involved.</p>
         </section>
         <section>
           <h3>What stays on your device</h3>
@@ -314,7 +311,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       </article>
 
       <article id="data-processing" class="policy">
-        <p class="eyebrow">Updated 20 August 2026</p>
+        <p class="eyebrow">Updated 30 September 2026</p>
         <h2>DATA PROCESSING &amp; SUBPROCESSORS</h2>
         <p class="summary">Where account data physically lives, who else touches it, and the rights you can exercise over it. This is the page a procurement team asks for.</p>
         
@@ -329,8 +326,10 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
           <ul>
             <li>Supabase (United States) — authentication, Postgres database, serverless functions.</li>
             <li>Stripe (United States) — payment processing, subscription management and invoicing. Stripe is an independent controller of your payment instrument.</li>
+            <li>Vercel (United States) — hosts the website and runs its functions, including the contact form, which receives the name, email address and message you send.</li>
+            <li>Resend (United States) — delivers transactional email: contact-form messages and support-ticket notifications. It receives the message and the addresses it is sent from and to.</li>
             <li>Public XRP Ledger nodes — read-only queries of public ledger state. These receive the public addresses you look up and nothing about you.</li>
-            <li>That is the complete list. There is no analytics vendor, no email marketing platform, no session-replay tool, no advertising network, and no AI vendor.</li>
+            <li>That is the complete list. There is no analytics vendor, no session-replay tool, no advertising network, and no AI vendor. We send no marketing email.</li>
           </ul>
         </section>
         <section>

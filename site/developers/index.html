@@ -22,10 +22,7 @@
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/core.css">
 <link rel="stylesheet" href="/assets/modules.css">
-<script>
-(function(){try{var t=localStorage.getItem("noshashi-theme");
-if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
-</script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"DEVELOPER PORTAL","item":"https://www.noshashi.app/developers/"}]}]}</script>
 
 </head>
@@ -39,7 +36,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
       <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
       <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
-      <a class="nav-link optional" href="/guide/"><span data-i18n="nav.guide">XRP guide</span></a>
+      <a class="nav-link optional" href="/learn/"><span data-i18n="nav.learn">Learn</span></a>
       <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
       <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
       <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
@@ -65,6 +62,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
       <a href="/progress/">Progress</a>
       <a href="/status/">Status</a>
       <a href="/research/">Findings</a>
+      <a href="/learn/">Learn NOSHASHI (course)</a>
       <a href="/guide/">Plain-language guide</a>
       <a href="/pricing/">Pricing</a>
       <a href="/enterprise/">Enterprise</a>
@@ -84,21 +82,7 @@ if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>
-<script>
-(function(){
-  var button=document.getElementById("themeToggle"),label=document.getElementById("themeLabel");
-  if(!button)return;
-  function sync(){var light=document.documentElement.getAttribute("data-theme")==="light";
-    if(label)label.textContent=(window.__NOSHASHI_I18N||{})[light?"theme.dark":"theme.light"]||(light?"DARK":"LIGHT");
-    button.setAttribute("aria-label",(window.__NOSHASHI_I18N||{})[light?"theme.ariaDark":"theme.ariaLight"]||(light?"Switch to dark mode":"Switch to light mode"));}
-  sync();
-  button.addEventListener("click",function(){
-    var next=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
-    document.documentElement.setAttribute("data-theme",next);
-    try{localStorage.setItem("noshashi-theme",next);}catch(e){}
-    sync();});
-})();
-</script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
 
 </body>
 </html>
