@@ -24,7 +24,7 @@ billing, monitoring and the Compliance API.
 
 | Component | RTO | RPO |
 |---|---|---|
-| Server (Supabase) | 24 hours | 24 hours, once nightly backups run (see below) |
+| Server (Supabase) | 24 hours | 24 hours (nightly backup) |
 | Website | 1 hour (redeploy from `main`) | None; generated from the repository |
 | Desktop releases | 1 day (re-run the release workflow) | None; built from tags |
 | Device data (verdicts, local policies) | Customer's own device backups | Customer's own device backups |
@@ -41,9 +41,9 @@ billing, monitoring and the Compliance API.
   `pg_dump` fell back to a local socket. After the secret was corrected
   (2026-09-30), the runner's default `pg_dump` 16 refused the Postgres 17
   server. The workflow now calls `pg_dump` 17 by path, and checks the
-  version before dumping. The latest run of **Database backup** under
-  GitHub Actions shows the current state; a green run carries an artifact
-  named `db-backup-<timestamp>`.
+  version before dumping. The first successful backup ran on
+  2026-09-30 (artifact `db-backup-20260930T130553Z`). The latest run of
+  **Database backup** under GitHub Actions shows the current state.
 - The secret must be the **Session pooler** connection string from
   Supabase (Connect → Session pooler), with the real password in place of
   `[YOUR-PASSWORD]` and any `@ : / ? # %` in the password percent-encoded.

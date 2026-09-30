@@ -96,8 +96,9 @@ is imported by any covered file).
 - **Public XRPL servers are the only data sources.** Agreement between them
   reduces, but does not remove, the risk of a shared upstream fault.
 - **`style-src 'unsafe-inline'`** remains in the CSP.
-- **No working database backup yet.** The Supabase project is on the Free
-  plan and the nightly encrypted dump has not succeeded; see
+- **Backups are nightly only, and untested.** The Supabase project is on the
+  Free plan (no point-in-time recovery). The nightly encrypted dump has
+  succeeded since 2026-09-30, but no restore has been tested; see
   `docs/DISASTER_RECOVERY.md`.
 - **No penetration test, no SOC 2 or ISO 27001.**
 - **Live posture indicators** (tray, Mission Control) are not gated on
