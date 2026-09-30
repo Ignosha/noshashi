@@ -1,5 +1,55 @@
 # Changelog
 
+## 1.0.19
+
+### Two new organization roles
+
+- **Reviewer**: the second pair of eyes. A reviewer can activate a policy
+  someone else wrote and decide an exception someone else raised,
+  including asking for more evidence. They cannot draft, request or
+  administer anything, so four-eyes holds by construction.
+- **Auditor**: an internal read-only seat that can also read the audit
+  trail. It changes nothing. Unlike an examiner seat, it does not expire.
+- Both are enforced by the database. The app's role picker, role table and
+  messages name them.
+
+### Sign-ins in the audit trail
+
+- Each time a member signs in, the organization's audit trail records
+  when, from which IP address and client, and whether a second factor was
+  used. It is shown under the governance audit trail as SIGN-INS.
+- Recording can never stop anyone signing in: if writing the record fails,
+  the sign-in goes ahead unrecorded. Token refreshes are not counted as
+  sign-ins. Recording began on 30 September 2026.
+- The privacy policy now says this, including what stays in an
+  organization's trail after an account is deleted.
+
+### Faster, calmer, easier to use without a mouse
+
+- Five of the heaviest screens load when first opened, not at startup.
+- The *Reduced motion* setting now governs every animation in the app.
+- An automated accessibility check (axe-core) of 11 screens in dark and
+  light themes now finds no violations. Fixed: tabs pointing screen
+  readers at panels that were not there, switches with no name, and
+  light-theme status and brand colours below WCAG AA contrast. Every
+  control shows keyboard focus.
+
+### Public legal page
+
+- The bulleted lists in the published policies (what an account stores,
+  what stays on your device, and others) had been missing from the
+  website's legal page, though present in the app. They are back, and the
+  page is again generated from the same source as the app's.
+
+### For reviewers and operators
+
+- New: `docs/ENTERPRISE.md` (organization setup, roles, controls,
+  integration, and what the price list names that is not built yet) and
+  `docs/DEPLOYMENT.md` (every surface, secrets by name, scheduled jobs,
+  release checklist).
+- The version number is now checked in every place it is written. A
+  release where they disagree fails its tests.
+
 ## 1.0.18
 
 ### Getting started, on Home
