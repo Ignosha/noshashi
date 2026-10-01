@@ -28,6 +28,7 @@
     "check:functions": "cd supabase/functions && deno check */index.ts",
     "check:brand": "node scripts/gen-brand.mjs --check",
     "check:garden": "node scripts/build-garden-field.mjs --check",
+    "check:intelligence": "node scripts/build-intelligence.mjs --check",
     "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg",
     "check:noshx-web": "npm run -s site:noshx && git diff --exit-code --stat site/assets/noshx && test -z \"$(git status --porcelain site/assets/noshx)\""
   },

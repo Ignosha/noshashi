@@ -502,6 +502,7 @@
 .nav-panel-foot a{justify-content:center;min-height:46px;border:1px solid var(--rule);
   border-radius:var(--r);padding:0 14px;font-size:13px;font-weight:600;color:var(--ink)}
 .nav-panel-foot a:last-child{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.nav-panel-foot a:only-child{grid-column:1 / -1}
 
 /*
  * 920px, and this number is measured rather than reasoned.

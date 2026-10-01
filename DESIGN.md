@@ -298,6 +298,33 @@ does not claim an affiliation.
 **This exception does not travel.** Decoration behind a reading stays banned,
 and "decorative data" stays banned without qualification.
 
+### The Intelligence Core and the live network (homepage, 2D only)
+
+The homepage hero carries the **Intelligence Core**: the owner's flower
+artwork, about a third of the hero's width, inside three thin rings, at the
+centre of the pond (it is the pond's `[data-garden-origin]`, so the rings
+start there and the XRP mark sits behind it). It is still by default. On each
+validated ledger it takes one breath sized by that ledger's transaction count,
+and its outer ring takes the HOLD hue while the live assessment below is
+elevated. Under `prefers-reduced-motion` it does neither. This is not a return
+of the 1.0.7 animated flower hero: there is no loop, and every movement
+answers a ledger.
+
+Below the hero, "The network is alive" draws a Canvas 2D graph and
+"Intelligence with evidence" shows an assessment. Both are **data, not
+decoration**, and so follow the data rules rather than an exception: every
+figure is computed in the browser from validated XRPL ledgers
+(`src/lib/intelligence/analyze.ts`, bundled to `site/assets/intelligence.js`),
+the ledger range and server are printed beside it, agreement is claimed only
+when a second server's hash was compared, and the HTML carries no figures.
+Until a ledger is read the page says it is reading; when no server answers it
+says so and draws nothing. The network is 2D by rule: no Three.js, WebGL or 3D
+scene on the website.
+
+The `--faint` and `--tele` light-theme values were darkened (to `#55705A` and
+`#117549`) so small labels on the pale ground meet WCAG AA (4.5:1); the dark
+theme is unchanged.
+
 ## Signals
 
 An alert is a **reading**, not a coloured box — `src/components/nova/Signal.tsx`.
