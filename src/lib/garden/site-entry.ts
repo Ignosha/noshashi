@@ -30,6 +30,16 @@ const fields: Array<{ field: GardenField; scale: number }> = [];
 
 const ORIGINS = "[data-garden-origin], .hi-bloom g[transform^='translate']";
 
+/**
+ * Adaptive density. Each character is a cell the field computes every
+ * frame, so a phone gets larger characters (a quarter fewer cells or
+ * better) and a slower background, and a visitor who asked the browser to
+ * save data gets the background at its slowest.
+ */
+const compact = () => window.matchMedia("(max-width: 720px)").matches;
+type NavigatorWithConnection = Navigator & { connection?: { saveData?: boolean } };
+const saveData = Boolean((navigator as NavigatorWithConnection).connection?.saveData);
+
 function mount(host: HTMLElement) {
   const blooms = Array.from(host.querySelectorAll<Element>(ORIGINS));
   const flowers = (): Flower[] => {
@@ -59,7 +69,7 @@ function mount(host: HTMLElement) {
       // No flowers in the hero: the mark sits on its own, right of the text.
       return main ? { x: main.x, y: main.y, size: main.r * 1.9 } : { x: 0.72, y: 0.42, size: 0.3 };
     },
-    fontSize: Number(host.dataset.gardenFont) || 11,
+    fontSize: Number(host.dataset.gardenFont) || (compact() ? 13 : 11),
     pulse: 6,
   });
   fields.push({ field, scale: 1 });
@@ -99,9 +109,9 @@ function mountPage(live: boolean) {
 
   const field = mountGardenField(layer, {
     color: () => getComputedStyle(document.documentElement).getPropertyValue("--brand"),
-    fontSize: 13,
+    fontSize: compact() ? 16 : 13,
     intensity: 0.9,
-    fps: 20,
+    fps: saveData ? 10 : compact() ? 15 : 20,
     live,
     ambient: live ? undefined : 9,
     paused: () => heroShare >= 0.6,
@@ -127,9 +137,14 @@ function start() {
       const strength = ledgerRingStrength(txnCount);
       fields.forEach(({ field, scale }) => field.ripple(strength * scale));
       caption(`Each ring is a validated XRPL ledger closing · #${index.toLocaleString("en-US")} · ${txnCount} transactions`);
+      // The homepage's intelligence layer (src/lib/intelligence/site-entry.ts)
+      // follows the same stream through this event rather than opening a
+      // second subscription.
+      window.dispatchEvent(new CustomEvent("noshashi:ledger", { detail: { index, txnCount } }));
     },
     (live) => {
-      if (!live) caption("Ledger stream reconnecting — the pond is still until a validated ledger arrives.");
+      if (!live) caption("Ledger stream reconnecting. The pond is still until a validated ledger arrives.");
+      window.dispatchEvent(new CustomEvent("noshashi:stream", { detail: { live } }));
     }
   );
 }

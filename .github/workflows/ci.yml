@@ -87,6 +87,11 @@ jobs:
       - name: Garden field is rebuilt
         run: npm run check:garden
 
+      # site/assets/intelligence.js is the homepage's live network and
+      # evidence panel, bundled the same way.
+      - name: Live intelligence is rebuilt
+        run: npm run check:intelligence
+
       # templates/hero-bloom.svg is generated output that is committed.
       - name: Hero bloom is regenerated
         run: npm run check:bloom

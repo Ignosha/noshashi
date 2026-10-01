@@ -73,15 +73,26 @@
   });
   panel.appendChild(list);
 
-  /* Contact is in the bar as a button and is the one thing someone
-     opening a menu on a phone is most likely to want. Repeat it at the
-     foot of the panel rather than making them close the menu to find
-     a control that was behind it. */
+  /* The bar's buttons (Contact, Download, or a page's own primary
+     action) are hidden on a phone once the menu exists, so the panel
+     repeats them at its foot, with the same labels, rather than making
+     someone close the menu to find a control that was behind it. A page
+     whose bar has no buttons gets Contact and Download. */
   var foot = document.createElement("div");
   foot.className = "nav-panel-foot";
-  foot.innerHTML =
-    '<a href="/contact/">Contact</a>' +
-    '<a href="/#download">Download beta</a>';
+  var ctas = [].slice.call(bar.querySelectorAll("a.btn"));
+  if (ctas.length) {
+    ctas.forEach(function (cta) {
+      var copy = document.createElement("a");
+      copy.href = cta.getAttribute("href");
+      copy.textContent = cta.textContent.trim();
+      foot.appendChild(copy);
+    });
+  } else {
+    foot.innerHTML =
+      '<a href="/contact/">Contact</a>' +
+      '<a href="/#download">Download beta</a>';
+  }
   panel.appendChild(foot);
 
   header.appendChild(panel);

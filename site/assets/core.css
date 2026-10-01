@@ -22,8 +22,8 @@
 }
 html[data-theme="light"]{
   --ground:#F2F8F0; --surface:#FFFFFF; --elevated:#E5F0E2;
-  --ink:#0B160D; --muted:#3F5843; --faint:#66806A; --rule:#C4D7C5;
-  --brand:#247A3B; --tele:#168A55; --on-brand:#FFFFFF;
+  --ink:#0B160D; --muted:#3F5843; --faint:#55705A; --rule:#C4D7C5;
+  --brand:#247A3B; --tele:#117549; --on-brand:#FFFFFF;
   --go:#247A3B; --hold:#8B6500; --nogo:#B42332;
 }
 
