@@ -46,6 +46,17 @@ path that signs or submits a transaction, and it never asks for a key.
 - **Executive and Analyst modes**: eight core screens by default; every tool
   one switch or one search away.
 
+## Free tools, no account
+
+- **Issuer authority certificate**: <https://www.noshashi.app/certificate/>.
+  Paste any XRPL issuer address to see what that issuer can still do to
+  holders: freeze, require permission to hold, sign for the account. The
+  result is bound to a ledger index and a SHA-256 digest.
+- The same reading as JSON:
+  `GET https://www.noshashi.app/api/authority?issuer=r…`
+- **How the ledger can be misread**: <https://www.noshashi.app/misread/>.
+- **Learn**: <https://www.noshashi.app/learn/>.
+
 ## Screenshots
 
 The website shows the current app: <https://www.noshashi.app>.
