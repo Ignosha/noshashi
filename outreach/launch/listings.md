@@ -16,7 +16,7 @@ tools or analytics section:
 - Name: NOSHASHI
 - Site: https://www.noshashi.app
 - Platforms: macOS, Windows, Linux, Web
-- License: package.json says MIT, but the repo has no LICENSE file yet. Add one before listing the license, or leave the field blank.
+- License: MIT (see LICENSE in the repo)
 - Short description:
 
 ```

@@ -18,7 +18,7 @@ Every post follows the same rules as outreach:
 | # | Channel | File | Who | Status |
 |---|---|---|---|---|
 | 1 | GitHub repo topics, description, homepage (see below) | repo settings | Joshua | to do |
-| 2 | README "Free tools" section | `README.md` | Claude | in PR |
+| 2 | README "Free tools" section, LICENSE file | `README.md`, `LICENSE` | Claude | done |
 | 3 | XRPL Developers Discord, project showcase channel | `discord.md` | Joshua | to post |
 | 4 | Show HN (Hacker News) | `show-hn.md` | Joshua | to post |
 | 5 | Weekly finding on X and LinkedIn | `weekly-finding-01.md` | Joshua | to post |
