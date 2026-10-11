@@ -18,8 +18,8 @@
  * mistake and caching it would serve the mistake to everyone.
  */
 
-import { readAuthoritySurface, certificateFrom, ADDRESS_RE } from "./_lib/authority.js";
-import { flatBadge, cardBadge } from "./_lib/badge.js";
+import { readAuthoritySurface, certificateFrom, ADDRESS_RE } from "../authority.js";
+import { flatBadge, cardBadge } from "../badge.js";
 
 function send(res, svg, sMaxAge, swr) {
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");

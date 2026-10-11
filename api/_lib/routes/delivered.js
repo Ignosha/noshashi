@@ -22,9 +22,9 @@
  *                anyone can check the rows against the source
  */
 
-import { rippleRpc, ADDRESS_RE } from "./_lib/authority.js";
-import { deliveredRows, toCsv, summarize, RIPPLE_EPOCH } from "./_lib/delivered.js";
-import { take, clientKey } from "./_lib/rate-limit.js";
+import { rippleRpc, ADDRESS_RE } from "../authority.js";
+import { deliveredRows, toCsv, summarize, RIPPLE_EPOCH } from "../delivered.js";
+import { take, clientKey } from "../rate-limit.js";
 
 const PAGE_LIMIT = 400;
 const MAX_PAGES = 25;

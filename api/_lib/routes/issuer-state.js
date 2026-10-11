@@ -11,7 +11,7 @@
  * Free, unauthenticated, one account per request, a minute at the edge.
  */
 
-import { rippleRpc, ADDRESS_RE } from "./_lib/authority.js";
+import { rippleRpc, ADDRESS_RE } from "../authority.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {

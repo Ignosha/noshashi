@@ -10,8 +10,8 @@
  * trust this code.
  */
 
-import { rippleRpc, ADDRESS_RE } from "./_lib/authority.js";
-import { assembleBook, quotedVsFillable, DISCLOSURES } from "./_lib/book.js";
+import { rippleRpc, ADDRESS_RE } from "../authority.js";
+import { assembleBook, quotedVsFillable, DISCLOSURES } from "../book.js";
 
 const LEVELS = 100;
 // Three-letter codes, or the 40-hex form for longer tickers.
@@ -35,26 +35,26 @@ export default async function handler(req, res) {
   try {
     // Both sides at the SAME ledger: read the validated index once and pin it.
     const ledger = await rippleRpc("ledger", { ledger_index: "validated" });
-    const ledgerIndex = Number(ledger.ledger_index ?? ledger.ledger?.ledger_index);
+    const validatedIndex = Number(ledger.ledger_index ?? ledger.ledger?.ledger_index);
     const [bidRes, askRes] = await Promise.all([
-      rippleRpc("book_offers", { taker_gets: { currency: "XRP" }, taker_pays: issued, ledger_index: ledgerIndex, limit: LEVELS }),
-      rippleRpc("book_offers", { taker_gets: issued, taker_pays: { currency: "XRP" }, ledger_index: ledgerIndex, limit: LEVELS }),
+      rippleRpc("book_offers", { taker_gets: { currency: "XRP" }, taker_pays: issued, ledger_index: validatedIndex, limit: LEVELS }),
+      rippleRpc("book_offers", { taker_gets: issued, taker_pays: { currency: "XRP" }, ledger_index: validatedIndex, limit: LEVELS }),
     ]);
 
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
     res.setHeader("Access-Control-Allow-Origin", "*");
 
     if (req.query?.format === "raw") {
-      return res.status(200).json({ currency: issued.currency, issuer, ledger_index: ledgerIndex, bids: bidRes.offers ?? [], asks: askRes.offers ?? [] });
+      return res.status(200).json({ currency: issued.currency, issuer, ledger_index: validatedIndex, bids: bidRes.offers ?? [], asks: askRes.offers ?? [] });
     }
 
-    const book = assembleBook(bidRes.offers ?? [], askRes.offers ?? [], ledgerIndex);
+    const book = assembleBook(bidRes.offers ?? [], askRes.offers ?? [], validatedIndex);
     const q = quotedVsFillable(book);
     return res.status(200).json({
       pair: `XRP/${issued.currency}`,
       currency: issued.currency,
       issuer,
-      ledger_index: ledgerIndex,
+      ledger_index: validatedIndex,
       read_at: new Date().toISOString(),
       levels_requested: LEVELS,
       offers_read: { bids: (bidRes.offers ?? []).length, asks: (askRes.offers ?? []).length },
