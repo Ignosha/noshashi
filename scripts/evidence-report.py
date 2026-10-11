@@ -80,6 +80,29 @@ def get(path, params, timeout=90):
         return {"ok": False, "url": url, "error": str(error)}
 
 
+def display_currency(code):
+    """A 40-hex currency code as its ticker, when it decodes to printable text."""
+    code = str(code or "")
+    if len(code) == 40 and all(c in "0123456789ABCDEFabcdef" for c in code):
+        text = bytes.fromhex(code).rstrip(b"\x00").decode("ascii", "replace")
+        if text and all(32 <= ord(c) < 127 for c in text) and text.upper() != "XRP":
+            return text
+    return code
+
+
+def domain_text(hex_value):
+    """The Domain field decoded, with the raw hex kept beside it."""
+    if not hex_value:
+        return "none"
+    try:
+        text = bytes.fromhex(hex_value).decode("ascii")
+        if all(32 <= ord(c) < 127 for c in text):
+            return f"{text} (hex {hex_value})"
+    except ValueError:
+        pass
+    return f"hex {hex_value} (not printable text)"
+
+
 def esc(value):
     return (str(value if value is not None else "")
             .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
@@ -232,7 +255,7 @@ def build(args):
         rows += [[name, "set" if flags & bit else "clear"] for name, bit in bits]
         rows += [["RegularKey", esc(data.get("RegularKey", "none"))],
                  ["TransferRate", esc(data.get("TransferRate", "not set (0%)"))],
-                 ["Domain (hex)", esc(data.get("Domain", "none"))],
+                 ["Domain", esc(domain_text(data.get("Domain")))],
                  ["Signer list", (f"quorum {lists[0].get('SignerQuorum')} of {len(lists[0].get('SignerEntries', []))}"
                                   if lists else "none")]]
         story.append(table([[Paragraph(a, s["cell"]), Paragraph(str(b), s["mono"])] for a, b in rows],
@@ -256,8 +279,9 @@ def build(args):
                 ["Offers read", esc(b["offers_read"]["bids"]), esc(b["offers_read"]["asks"])]]
         story.append(table([[Paragraph(str(x), s["cell"]) for x in r] for r in rows], [40 * mm, 65 * mm, 65 * mm]))
         ref = b.get("reference", {})
-        story.append(Paragraph(f"Quantities in {esc(b.get('currency'))}. Reference mid {num(ref.get('mid'), 6)} XRP per "
-                               f"{esc(b.get('currency'))} at ledger {esc(b.get('ledger_index'))}"
+        name = b.get("currency_label") or display_currency(b.get("currency"))
+        story.append(Paragraph(f"Quantities in {esc(name)}. Reference mid {num(ref.get('mid'), 6)} XRP per "
+                               f"{esc(name)} at ledger {esc(b.get('ledger_index'))}"
                                + (" (the raw touch was crossed and was not used)." if ref.get("touch_crossed") else "."), s["small"]))
         story.append(Spacer(1, 4))
         story.append(Paragraph("<b>Disclosures</b>", s["small"]))

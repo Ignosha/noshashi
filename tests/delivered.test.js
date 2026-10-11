@@ -65,3 +65,38 @@ describe("which ledger refusals move on to the next server", () => {
     expect(isBusy({ code: "invalidParams", message: "Invalid parameters." })).toBe(false);
   });
 });
+
+import { deliveredRows, summarize } from "../api/_lib/delivered.js";
+import { readFileSync } from "node:fs";
+
+/* Real account_tx entries, unmodified (tests/fixtures/README.md). */
+const page = JSON.parse(readFileSync("tests/fixtures/account-tx-solo-107587061.json", "utf8"));
+
+describe("rows from a real account_tx page", () => {
+  it("books what arrived for the account, and only its own payments", () => {
+    const rows = deliveredRows(page.account, page.transactions);
+    // Two payments into SOLO's issuer; the routed self-conversions and the
+    // OfferCancel are not its payments and are left out.
+    expect(rows.map((r) => r.tx_hash.slice(0, 12))).toEqual(["33C313E12DD8", "7DFCD11863AE"]);
+    expect(rows[0]).toMatchObject({
+      direction: "in", counterparty: "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR", currency: "SOLO",
+      amount_stated: "0.067791435856414", amount_delivered: "0.067791435856414",
+      partial_payment: "no", fee_xrp: "", ledger_index: 107585451, date_utc: "2026-10-11T14:26:32Z",
+    });
+  });
+
+  it("flags a real partial payment that delivered less than it stated", () => {
+    const rows = deliveredRows("rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6", page.transactions);
+    const csc = rows.find((r) => r.tx_hash.startsWith("F3B8B18E6AEF"));
+    expect(csc).toMatchObject({
+      direction: "self", currency: "CSC", partial_payment: "yes", delivered_less_than_stated: "yes",
+      amount_stated: "162.6994990013102", amount_delivered: "161.1605415577872",
+    });
+    const solo = rows.find((r) => r.tx_hash.startsWith("84B464CB48ED"));
+    // Short by 0.000000000014687: caught exactly, where a float would not care.
+    expect(solo).toMatchObject({ partial_payment: "yes", delivered_less_than_stated: "yes",
+      amount_stated: "1.064341457878901", amount_delivered: "1.064341457864214" });
+    expect(summarize(rows)).toMatchObject({ payments: 2, partial_payments: 2, delivered_less_than_stated: 2 });
+    expect(solo.fee_xrp).not.toBe("");
+  });
+});

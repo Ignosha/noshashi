@@ -10,7 +10,7 @@
  * trust this code.
  */
 
-import { rippleRpc, ADDRESS_RE } from "../authority.js";
+import { rippleRpc, ADDRESS_RE, decodeCurrency } from "../authority.js";
 import { assembleBook, quotedVsFillable, DISCLOSURES } from "../book.js";
 
 const LEVELS = 100;
@@ -49,9 +49,14 @@ export default async function handler(req, res) {
     }
 
     const book = assembleBook(bidRes.offers ?? [], askRes.offers ?? [], validatedIndex);
+    // The raw code is what the ledger holds and stays in `currency`; the
+    // display name is for people. A 40-hex code for a long ticker reads as
+    // "524C5553…" otherwise.
+    const label = decodeCurrency(issued.currency);
     const q = quotedVsFillable(book);
     return res.status(200).json({
-      pair: `XRP/${issued.currency}`,
+      pair: `XRP/${label}`,
+      currency_label: label,
       currency: issued.currency,
       issuer,
       ledger_index: validatedIndex,
@@ -63,7 +68,7 @@ export default async function handler(req, res) {
       fillable: { bid: q.fillableBid, ask: q.fillableAsk },
       fillable_ratio: { bid: q.bidRatio ?? null, ask: q.askRatio ?? null },
       band: q.band ?? null,
-      units: `quantities in ${issued.currency}; prices in XRP per ${issued.currency}`,
+      units: `quantities in ${label}; prices in XRP per ${label}`,
       disclosures: DISCLOSURES,
     });
   } catch (error) {
