@@ -8,6 +8,12 @@
   "functions": {
     "api/authority.js": {
       "maxDuration": 60
+    },
+    "api/badge.js": {
+      "maxDuration": 30
+    },
+    "api/delivered.js": {
+      "maxDuration": 60
     }
   },
   "redirects": [

@@ -56,6 +56,10 @@ export const FOOTER_LINKS = [
   // known layout fault worse. The page is reached from the free-tools
   // section on the landing page and from here.
   { href: "/certificate/", label: "Authority certificate" },
+  { href: "/badge/", label: "Issuer badge" },
+  { href: "/alerts/", label: "Issuer alerts" },
+  { href: "/delivered/", label: "Delivered-amount export" },
+  { href: "/xapp/", label: "Check an address" },
   { href: "/news/", label: "Newsroom" },
   { href: "/progress/", label: "Progress" },
   { href: "/status/", label: "Status" },

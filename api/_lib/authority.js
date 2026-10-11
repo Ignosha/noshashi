@@ -132,7 +132,7 @@ class RippledError extends Error {
   }
 }
 
-async function rippleRpc(command, params, timeout = 8000) {
+export async function rippleRpc(command, params, timeout = 8000) {
   let lastError = null;
   for (const endpoint of RIPPLE_HTTP) {
     try {

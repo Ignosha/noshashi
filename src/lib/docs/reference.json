@@ -849,6 +849,7 @@
   "edgeFunctions": [
     "noshashi-checkout",
     "noshashi-exception-decide",
+    "noshashi-issuer-alerts",
     "noshashi-ledger-registry",
     "noshashi-password",
     "noshashi-policy-activate",

@@ -54,6 +54,9 @@ export default async function handler(req, res) {
     // only as good as the ledger it names — which the body states. Five
     // minutes at the edge, an hour of stale-while-revalidate.
     cacheHeaders(res, 300, 3600);
+    // Public ledger facts: readable from any page, so the SDK works in a
+    // browser too. No cookies are read or set, so this exposes nothing.
+    res.setHeader("Access-Control-Allow-Origin", "*");
     return res.status(200).json({
       ...certificate,
       // Telemetry, outside the digest deliberately: this describes how
