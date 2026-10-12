@@ -127,18 +127,31 @@ export function minimumSignersForQuorum(signers: SignerEntry[], quorum: number):
   return Infinity; // quorum unreachable — a locked account
 }
 
+/**
+ * The signer list from account_info with signer_lists: true. API v2 puts it
+ * at the top level, v1 inside account_data. A reply with neither did not
+ * answer the question: that is "could not look", never "there is none".
+ */
+export function signerListOf(info: Record<string, any>): { list?: Record<string, any>; unreadable?: string } {
+  const lists = Array.isArray(info?.signer_lists)
+    ? info.signer_lists
+    : Array.isArray(info?.account_data?.signer_lists)
+      ? info.account_data.signer_lists
+      : null;
+  if (!lists) return { unreadable: "the server did not return signer_lists" };
+  return { list: lists[0] };
+}
+
 export async function readControlSurface(address: string): Promise<ControlSurface> {
-  const [info, server, signerRes, escrowRes] = await Promise.all([
-    rpc("account_info", { account: address, ledger_index: "validated" }),
+  const [info, server, escrowRes] = await Promise.all([
+    // signer_lists: true, NOT account_objects { type: "signer_list" }. The
+    // typed account_objects query pages through the whole owner directory,
+    // and with limit 10 it returned an empty page for RLUSD's issuer (19
+    // owned objects, the list further on), so its 26-member signer list
+    // read as absent. Found live on 2026-10-11; mirrored in
+    // api/_lib/authority.js.
+    rpc("account_info", { account: address, ledger_index: "validated", signer_lists: true }),
     rpc("server_info").catch(() => ({}) as Record<string, any>),
-    rpc("account_objects", {
-      account: address,
-      type: "signer_list",
-      ledger_index: "validated",
-      limit: 10,
-    }).catch((error: unknown) => ({
-      __unreadable: error instanceof Error ? error.message : String(error),
-    }) as Record<string, any>),
     rpc("account_objects", {
       account: address,
       type: "escrow",
@@ -151,7 +164,8 @@ export async function readControlSurface(address: string): Promise<ControlSurfac
   const flags = Number(data.Flags ?? 0);
   const validated = server.info?.validated_ledger ?? {};
 
-  const list = (signerRes.account_objects ?? [])[0] as Record<string, any> | undefined;
+  const { list, unreadable } = signerListOf(info);
+  const signerRes: Record<string, any> = { __unreadable: unreadable };
   const entries: SignerEntry[] = ((list?.SignerEntries ?? []) as Array<Record<string, any>>)
     .map((e) => ({
       account: String(e.SignerEntry?.Account ?? ""),
@@ -204,7 +218,7 @@ export async function readControlSurface(address: string): Promise<ControlSurfac
     balanceXrp: Number(data.Balance ?? 0) / 1_000_000,
     escrows,
     escrowedXrp: escrows.reduce((sum, e) => sum + e.amountXrp, 0),
-    truncated: Boolean(escrowRes.marker || signerRes.marker),
+    truncated: Boolean(escrowRes.marker),
     ledgerIndex: Number(info.ledger_index ?? 0),
     readAt: new Date().toISOString(),
   };

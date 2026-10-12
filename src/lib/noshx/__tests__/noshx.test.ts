@@ -19,6 +19,16 @@ vi.mock("@/lib/xrpl/client", async (original) => ({
   }),
 }));
 
+// The sanctions read is a real fetch to the screening service with an
+// 8-second timeout, longer than this suite's 5-second test limit: on a CI
+// runner a slow reply timed the "unreachable ledger" test out. Unreachable
+// here too, which is what that test is about. Nothing in this suite
+// expects a sanctions hit.
+vi.mock("@/lib/xrpl/sanctions", async (original) => ({
+  ...(await original<typeof import("@/lib/xrpl/sanctions")>()),
+  sanctionsFor: vi.fn(async () => null),
+}));
+
 type Reply = { status: number; body: string; chunks?: string[] };
 const replies: Reply[] = [];
 const sent: Array<{ url: string; body: any; headers?: Record<string, string> }> = [];

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Issuer alerts — Discord and Telegram, when an XRPL issuer&#39;s powers change</title>
+<meta name="description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee. Read every five minutes from validated ledger state.">
+<link rel="canonical" href="https://www.noshashi.app/alerts/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/alerts/">
+<meta property="og:title" content="Issuer alerts — Discord and Telegram, when an XRPL issuer&#39;s powers change">
+<meta property="og:description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee. Read every five minutes from validated ledger state.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Issuer alerts — Discord and Telegram, when an XRPL issuer&#39;s powers change">
+<meta name="twitter:description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee. Read every five minutes from validated ledger state.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Issuer alerts","item":"https://www.noshashi.app/alerts/"}]}]}</script>
+<style>
+.tool-form{display:grid;gap:14px;max-width:640px;margin-bottom:22px}
+.tool-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.tool-row .form-field{flex:1 1 260px}
+.tool-out{border:1px solid var(--rule);border-radius:var(--r);padding:20px 22px;margin:14px 0}
+.tool-out h2{font-size:16px;margin:0 0 10px}
+.tool-snip{font:11.5px "IBM Plex Mono",monospace;background:var(--surface);border:1px solid var(--rule);
+  border-radius:var(--r);padding:12px 14px;white-space:pre-wrap;word-break:break-all;margin:6px 0 12px;user-select:all}
+.tool-preview{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;margin:6px 0 16px}
+.tool-preview img{max-width:100%;height:auto}
+.tool-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.tool-table th,.tool-table td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:top}
+.tool-table td.mono{font:11px "IBM Plex Mono",monospace;word-break:break-all}
+.tool-table .flag{color:var(--nogo);font-weight:600}
+.tool-scroll{overflow-x:auto;max-width:100%}
+.tool-facts{display:grid;gap:6px;margin:8px 0}
+.tool-facts div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--rule);padding:6px 0;font-size:13px}
+.tool-facts b{font:11px "IBM Plex Mono",monospace;letter-spacing:.08em}
+.t-go{color:var(--go)} .t-hold{color:var(--hold)} .t-nogo{color:var(--nogo)} .t-unknown{color:var(--muted)}
+.tool-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/news/"><span data-i18n="nav.news">Newsroom</span></a>
+      <a class="nav-link" href="/progress/"><span data-i18n="nav.progress">Progress</span></a>
+      <a class="nav-link optional" href="/status/"><span data-i18n="nav.status">Status</span></a>
+      <a class="nav-link optional" href="/research/"><span data-i18n="nav.findings">Findings</span></a>
+      <a class="nav-link optional" href="/learn/"><span data-i18n="nav.learn">Learn</span></a>
+      <a class="nav-link optional wide" href="/enterprise/"><span data-i18n="nav.enterprise">Enterprise</span></a>
+      <a class="nav-link optional wide" href="/strategic-infrastructure/"><span data-i18n="nav.infrastructure">Infrastructure</span></a>
+      <a class="nav-link" href="/#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head">
+  <p class="eyebrow">Free for up to 3 issuers per channel</p>
+  <h1>Know the moment an issuer's powers change.</h1>
+  <p>A freeze switched on, a new key that signs alone, clawback enabled, a fee raised. Each one is a
+     single transaction, visible on the ledger the instant it validates. Few holders notice until the
+     power is used. NOSHASHI reads every watched issuer every five minutes and posts any change to
+     your Discord channel or Telegram chat.</p>
+</div>
+<section>
+  <div class="grid g2">
+    <div class="panel">
+      <p class="num">DISCORD</p>
+      <form class="tool-form" id="alert-form" novalidate style="margin:8px 0 0">
+        <div class="form-field"><label for="alert-issuer">Issuing account to watch</label>
+          <input id="alert-issuer" type="text" spellcheck="false" autocomplete="off" placeholder="r…" maxlength="40" required></div>
+        <div class="form-field"><label for="alert-webhook">Discord channel webhook URL</label>
+          <input id="alert-webhook" type="url" spellcheck="false" autocomplete="off" placeholder="https://discord.com/api/webhooks/…" required></div>
+        <button class="btn" type="submit" id="alert-go">Watch this issuer</button>
+        <p class="form-status" id="alert-status" role="status" aria-live="polite"></p>
+      </form>
+      <p class="tool-note">To get the webhook URL in Discord, open Server Settings, then Integrations,
+         then Webhooks. Choose New Webhook, pick the channel and click Copy Webhook URL. The confirmation
+         and every alert go only to that channel, and the stop link is in each message.</p>
+    </div>
+    <div class="panel">
+      <p class="num">TELEGRAM</p>
+      <p>Message the NOSHASHI bot:</p>
+      <div class="tool-snip">/watch r…
+/unwatch r…
+/list</div>
+      <p class="tool-note" id="tg-link">The bot reads only public ledger state. It never asks for
+         keys, seeds or balances. Anyone who asks for those in its name is not NOSHASHI.</p>
+    </div>
+  </div>
+  <div id="alert-out" hidden></div>
+  <div class="panel" style="margin-top:14px"><p class="num">WHAT COUNTS AS A CHANGE</p>
+    <p>Global freeze on or off. Clawback enabled. Regular key set, changed or removed. Signer list or
+       quorum changed. Master key disabled or re-enabled. Permissioned holding switched on or off.
+       Transfer fee changed. Freeze permanently surrendered. Domain changed. Each alert names the ledger
+       it was read at and links to the full certificate. If the ledger could not be read, that round is
+       skipped. A failed read is never reported as a change.</p></div>
+  <p class="tool-note" style="margin-top:14px">Need more than three issuers, a shared team feed or signed
+     webhooks into your own systems? Event feeds are part of the
+     <a href="/strategic-infrastructure/">Strategic plan</a>.</p>
+</section>
+</main>
+<footer>
+  <div class="shell foot">
+    <p class="mono">© 2026 NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
+    <div class="foot-links">
+      <a href="/contact/">Contact</a>
+      <a href="/certificate/">Authority certificate</a>
+      <a href="/badge/">Issuer badge</a>
+      <a href="/alerts/">Issuer alerts</a>
+      <a href="/delivered/">Delivered-amount export</a>
+      <a href="/xapp/">Check an address</a>
+      <a href="/news/">Newsroom</a>
+      <a href="/progress/">Progress</a>
+      <a href="/status/">Status</a>
+      <a href="/research/">Findings</a>
+      <a href="/learn/">Learn NOSHASHI (course)</a>
+      <a href="/guide/">Plain-language guide</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/enterprise/">Enterprise</a>
+      <a href="/trust/">Trust &amp; security</a>
+      <a href="/misread/">The ledger can be misread</a>
+      <a href="/strategic-infrastructure/">Strategic infrastructure</a>
+      <a href="/developers/">Developers</a>
+      <a href="/docs/">Documentation</a>
+      <a href="/legal/">Legal &amp; accessibility</a>
+      <a href="https://github.com/Ignosha/noshashi">GitHub</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/inline/0adeb206c8183f1b02ba.js"></script>
+</body>
+</html>

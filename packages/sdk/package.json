@@ -1,0 +1,16 @@
+{
+  "name": "@noshashi/sdk",
+  "version": "0.1.0",
+  "description": "Screen XRP Ledger addresses, issuers and payments before you move value. Free public checks plus the NOSHASHI Compliance API.",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": { ".": { "types": "./index.d.ts", "default": "./index.js" } },
+  "files": ["index.js", "index.d.ts", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "engines": { "node": ">=18" },
+  "keywords": ["xrpl", "xrp", "compliance", "aml", "kyt", "sanctions", "ofac", "screening", "issuer", "freeze", "clawback"],
+  "homepage": "https://www.noshashi.app/developers/",
+  "repository": { "type": "git", "url": "git+https://github.com/Ignosha/noshashi.git", "directory": "packages/sdk" },
+  "license": "MIT"
+}

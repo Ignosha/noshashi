@@ -132,7 +132,11 @@ class RippledError extends Error {
   }
 }
 
-async function rippleRpc(command, params, timeout = 8000) {
+const BUSY_CODES = new Set(["tooBusy", "slowDown", "noNetwork", "noCurrent", "noClosed", "notReady", "failedToForward"]);
+export const isBusy = (error) =>
+  BUSY_CODES.has(error?.code) || /rate.?limit|quota|too busy|slow down/i.test(String(error?.message ?? ""));
+
+export async function rippleRpc(command, params, timeout = 8000) {
   let lastError = null;
   for (const endpoint of RIPPLE_HTTP) {
     try {
@@ -156,7 +160,14 @@ async function rippleRpc(command, params, timeout = 8000) {
       }
       return result;
     } catch (error) {
-      if (error instanceof RippledError) throw error;
+      // A refusal about the request (actNotFound, invalidParams) is the
+      // ledger's answer and the next server would give the same one. A
+      // server that is busy or has rate-limited this caller has said
+      // nothing about the ledger, so the next server is asked. xrplcluster
+      // answers an exhausted quota inside `result` with HTTP 200 — found
+      // live on 2026-10-11, when it stopped a delivered-amount export that
+      // s1/s2 could have served.
+      if (error instanceof RippledError && !isBusy(error)) throw error;
       lastError = error instanceof Error ? error : new Error(String(error));
     }
   }
@@ -199,24 +210,40 @@ function hhiOf(values) {
 
 /* ── Reads ────────────────────────────────────────────────────────── */
 
+/**
+ * The signer list from an account_info reply requested with
+ * signer_lists: true. API v2 puts it at the top level, v1 inside
+ * account_data. A reply with neither is a server that did not answer the
+ * question, which is "could not look", never "there is none".
+ */
+export function signerListOf(info) {
+  const lists = Array.isArray(info?.signer_lists)
+    ? info.signer_lists
+    : Array.isArray(info?.account_data?.signer_lists)
+      ? info.account_data.signer_lists
+      : null;
+  if (!lists) return { list: undefined, unreadable: "the server did not return signer_lists" };
+  return { list: lists[0], unreadable: undefined };
+}
+
 async function readControl(issuer) {
-  const [info, signerRes] = await Promise.all([
-    rippleRpc("account_info", { account: issuer, ledger_index: "validated" }),
-    // Tolerated so one failed object read does not lose the whole
-    // control surface — but the failure is carried into the result,
-    // because "no signer list" and "could not look" are different
-    // answers and only one of them is reassuring.
-    rippleRpc("account_objects", {
-      account: issuer,
-      type: "signer_list",
-      ledger_index: "validated",
-      limit: 10,
-    }).catch((error) => ({ __unreadable: error?.message ?? String(error) })),
-  ]);
+  // The signer list comes from account_info itself (signer_lists: true),
+  // not from account_objects. account_objects with a type filter pages
+  // through the WHOLE owner directory: with `limit: 10` it returned an
+  // empty page and a marker for RLUSD's issuer (19 owned objects, the
+  // signer list on a later page), and the certificate published "no
+  // signer list is present" about an issuer with a 26-member list.
+  // Found live on 2026-10-11. Mirrored in src/lib/desk/control.ts.
+  const info = await rippleRpc("account_info", {
+    account: issuer,
+    ledger_index: "validated",
+    signer_lists: true,
+  });
 
   const data = info.account_data ?? {};
   const flags = Number(data.Flags ?? 0);
-  const list = (signerRes.account_objects ?? [])[0];
+  const { list, unreadable } = signerListOf(info);
+  const signerRes = { __unreadable: unreadable };
   const signers = ((list?.SignerEntries ?? []))
     .map((e) => ({
       account: String(e.SignerEntry?.Account ?? ""),
