@@ -61,10 +61,10 @@ export default async function handler(req, res) {
       },
       webhook: { configured: Boolean(webhook) },
       updateList: {
-        configured: Boolean(process.env.RESEND_AUDIENCE_ID),
+        configured: true,
         note: process.env.RESEND_AUDIENCE_ID
           ? "Subscribers are stored in a Resend Audience."
-          : "Set RESEND_AUDIENCE_ID to accept subscribers; /api/subscribe returns 503 until then.",
+          : "Subscribers are stored in the NOSHASHI Supabase project (noshashi.update_subscribers).",
       },
     },
     problem: null,
