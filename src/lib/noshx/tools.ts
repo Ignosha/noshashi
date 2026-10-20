@@ -244,7 +244,7 @@ export const NOSHX_TOOLS: NoshxTool[] = [
     description:
       "A token from the issuer's side: currencies issued, outstanding obligations, holder lines read, the largest holder, concentration, and enforcement history (freezes and clawbacks).",
     input_schema: schema({ issuer: addr("Issuer's classic address") }),
-    feature: "portfolios",
+    feature: "issuance_surveillance",
     screen: "Issuance",
     run: (input) => readIssuance(address(input, "issuer")),
   },

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
 import { DecisionCard } from "@/components/nova/DecisionCard";
 import { FirstRunGuide } from "@/components/scenes/FirstRunGuide";
+import { QuestionShowcase } from "@/components/scenes/QuestionShowcase";
 import { NovaLogo } from "@/components/nova/NovaLogo";
 import { CountUp } from "@/components/nova/CountUp";
 import { StatusDot } from "@/components/nova/StatusDot";
@@ -19,7 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CAPABILITIES, CONCEPTS, type Maturity } from "@/lib/roadmap";
+import { CAPABILITIES, type Maturity } from "@/lib/roadmap";
 import { BRAND, CONTACT, LINKS, copyrightLine } from "@/lib/brand";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import { cn } from "@/lib/utils";
@@ -145,8 +146,7 @@ function RelayWorld({
         </span>
       </div>
       <p className="px-3 pb-3 pt-2 text-[10.5px] leading-relaxed text-muted-foreground">
-        Packet lanes represent live ledger-event cadence through the observed relay topology. This
-        is not transaction geolocation: XRPL publishes ledger events and node responses, not physical origin.
+        Illustrative map of live ledger events. Not where transactions came from.
       </p>
       <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border/40 px-3 pb-3 pt-2 mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
         <span><i className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[hsl(var(--telemetry))]" />RELAY NODE</span>
@@ -261,14 +261,11 @@ export function HomeScene({
               </div>
             </div>
 
-            <p className="max-w-[680px] text-[15px] leading-relaxed text-foreground/85">
-              Whether an XRPL asset or transaction can move under your policy,
-              whether enough real liquidity exists to execute, and why. Every
-              settlement is analysed <em className="not-italic text-foreground">before</em> it is
-              signed, answered <span className="text-go">GO</span> /{" "}
+            <p className="max-w-[680px] text-[16px] leading-relaxed text-foreground/85">
+              Check any XRPL token or payment before you sign:{" "}
+              <span className="text-go">GO</span> /{" "}
               <span className="text-hold">HOLD</span> /{" "}
-              <span className="text-no-go">NO-GO</span> from validated ledger state,
-              and recorded with a receipt an auditor can verify.
+              <span className="text-no-go">NO-GO</span>, with a receipt.
             </p>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -287,7 +284,12 @@ export function HomeScene({
             </div>
           </motion.div>
 
-          {/* First run: purpose, then view → analysis → evidence → policy. */}
+          {/* The three questions, shown live rather than described. */}
+          <Reveal delay={0.03} className="mt-8">
+            <QuestionShowcase connected={connected} onNavigate={onNavigate} />
+          </Reveal>
+
+          {/* First run: view → analysis → evidence → policy. */}
           <Reveal delay={0.05} className="mt-8">
             <FirstRunGuide mode={mode} modeChosen={modeChosen} onChooseMode={onChooseMode} onNavigate={onNavigate} />
           </Reveal>
@@ -386,58 +388,13 @@ export function HomeScene({
           </div>
         </Reveal>
 
-        {/* ── Problem / answer ─────────────────────────────────── */}
-        <Reveal className="mt-10">
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-            <Panel label="THE PROBLEM" corners bodyClassName="p-4">
-              <div className="space-y-3">
-                {[
-                  "Compliance is checked after the fact, so the first signal that a transaction was ineligible is that it failed.",
-                  "Every venue re-runs the same identity checks, and users re-disclose the same private data to each one.",
-                  "Verification lives in private logs. Nobody outside the checking party can prove a check ever happened.",
-                  "Assistants that could explain any of this ship your transaction context to a vendor's API.",
-                ].map((line, index) => (
-                  <div key={line} className="flex gap-3">
-                    <span className="display shrink-0 text-[11px] font-[700] text-no-go/60">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <p className="text-[11.5px] leading-relaxed text-muted-foreground">
-                      {line}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Panel>
-
-            <Panel label="THE ANSWER" corners bodyClassName="p-4">
-              <div className="space-y-3">
-                {[
-                  "Adjudicate before signing. The gate runs against the destination domain's rule set and returns the exact rule that decided it.",
-                  "Prove one predicate, not an identity. Selective disclosure lets a venue learn eligibility and nothing else.",
-                  "Hash every verdict. A canonical SHA-256 receipt makes the check verifiable without exposing the payload.",
-                  "Run the analyst on-device. The model sees everything; the network sees nothing.",
-                ].map((line, index) => (
-                  <div key={line} className="flex gap-3">
-                    <span className="display shrink-0 text-[11px] font-[700] text-go/70">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <p className="text-[11.5px] leading-relaxed text-muted-foreground">
-                      {line}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Panel>
-          </div>
-        </Reveal>
-
         {/* ── Capabilities ─────────────────────────────────────── */}
         <Reveal className="mt-10">
           <div className="flex items-end justify-between gap-4">
             <div>
               <Eyebrow>CAPABILITY MATRIX</Eyebrow>
               <h2 className="display mt-1.5 text-[20px] font-[700] text-foreground">
-                WHAT THE CONSOLE DOES
+                EVERYTHING IT DOES
               </h2>
             </div>
             <Tabs value={filter} onValueChange={(value) => setFilter(value as typeof filter)}>
@@ -479,9 +436,6 @@ export function HomeScene({
                       {maturityLabel[capability.maturity]}
                     </Badge>
                   </div>
-                  <p className="mt-2 text-[11.5px] leading-relaxed text-muted-foreground">
-                    {capability.blurb}
-                  </p>
                   {capability.scene && (
                     <p className="stencil mt-3 border-t border-border pt-2 text-[10px] tracking-[0.14em] text-muted-foreground/70">
                       → {capability.scene}
@@ -491,84 +445,6 @@ export function HomeScene({
               </motion.div>
             ))}
           </motion.div>
-        </Reveal>
-
-        {/* ── Differentiated bets ──────────────────────────────── */}
-        <Reveal className="mt-10">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <Eyebrow>DIFFERENTIATED BETS</Eyebrow>
-              <h2 className="display mt-1.5 text-[20px] font-[700] text-foreground">
-                WHAT NOBODY HAS BUILT HERE
-              </h2>
-            </div>
-            <span className="mono-font text-[10.5px] text-muted-foreground">
-              {CONCEPTS.length} CONCEPTS
-            </span>
-          </div>
-          <div className="mt-3 h-px bg-border" />
-
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            {CONCEPTS.map((concept, index) => (
-              <Reveal key={concept.id} delay={Math.min(0.2, index * 0.04)}>
-                <Panel className="hud-corner h-full" bodyClassName="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="display text-[13px] font-[700] leading-tight text-foreground">
-                      {concept.title}
-                    </p>
-                    <span className="mono-font shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                      {concept.weight}
-                    </span>
-                  </div>
-                  <p className="mt-2.5 border-l border-no-go/40 pl-2.5 text-[11.5px] leading-relaxed text-muted-foreground">
-                    <span className="stencil mr-1.5 text-[10px] tracking-[0.14em] text-no-go">
-                      GAP
-                    </span>
-                    {concept.gap}
-                  </p>
-                  <p className="mt-2.5 text-[11px] leading-relaxed text-foreground/80">
-                    {concept.detail}
-                  </p>
-                </Panel>
-              </Reveal>
-            ))}
-          </div>
-        </Reveal>
-
-        {/* ── Edge Lab handoff ─────────────────────────────────── */}
-        <Reveal className="mt-10">
-          <Panel label="XRPL EDGE LAB · EXPERIMENTAL" bodyClassName="p-4">
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div className="max-w-[680px]">
-                <p className="display text-[17px] font-[700] text-foreground">
-                  Test the question before you trust the answer.
-                </p>
-                <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-                  The portable Edge Pack documents three read-only analyses: liquidity escape
-                  paths, amendment drift and counterparty recovery dependencies. It is research
-                  material, not an automated action path or a compliance conclusion.
-                </p>
-              </div>
-              <div className="flex shrink-0 flex-wrap gap-2">
-                <a
-                  href="https://noshashi.app/downloads/xrpl-edge-pack/"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-primary-foreground transition-colors hover:bg-primary/85"
-                >
-                  OPEN EDGE PACK
-                </a>
-                <a
-                  href="https://noshashi.app/docs/NOSHASHI_XRPL_Edge_Lab_Brief.pdf"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-[11px] font-semibold tracking-[0.08em] text-foreground transition-colors hover:border-brand/50"
-                >
-                  READ PDF BRIEF
-                </a>
-              </div>
-            </div>
-          </Panel>
         </Reveal>
 
         {/* ── Standards & contact ──────────────────────────────── */}
@@ -624,9 +500,7 @@ export function HomeScene({
             <Panel label="POSITION" bodyClassName="relative p-3.5">
               <PatternMark element="orbit" size={130} className="-bottom-8 -right-8" opacity={0.08} />
               <p className="relative text-[11.5px] leading-relaxed text-muted-foreground">
-                Mainnet only. No testnet path exists in this build — every reading
-                on every screen is the real ledger, because compliance software
-                that demos on a testnet has proven nothing.
+                Live mainnet only. Every number on every screen is the real ledger.
               </p>
               <div className="relative mt-3 flex flex-wrap gap-1.5">
                 {["MAINNET ONLY", "ZERO EGRESS", "AUDITABLE", "DARK BY DEFAULT"].map(

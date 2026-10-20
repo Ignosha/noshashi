@@ -450,7 +450,7 @@
   .measure td.before{color:var(--nogo)}
   .measure td.after{color:var(--go)}
 
-  .price{display:grid;gap:14px;grid-template-columns:repeat(5,minmax(0,1fr))}
+  .price{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
   .tier{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;position:relative;overflow:hidden}
   .tier.focus{border-color:color-mix(in srgb,var(--brand) 45%,var(--rule))}
   .tier .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--rule)}
@@ -468,7 +468,7 @@
   .tier .amt{font-size:34px;font-weight:700;margin:18px 0 2px;letter-spacing:-.02em}
   .tier .per{color:var(--faint);font-size:11px;font-family:"IBM Plex Mono",monospace}
   .tier .who{color:var(--faint);font-size:12px;margin-top:4px}
-  .tier ul{list-style:none;margin-top:22px;flex:1;display:grid;gap:9px}
+  .tier ul{list-style:none;margin-top:22px;flex:1;display:grid;gap:9px;align-content:start}
   .tier li{display:flex;gap:9px;font-size:13px;color:var(--muted);line-height:1.5}
   .tier li::before{content:"";width:3px;height:3px;background:var(--go);margin-top:8px;flex:none;border-radius:50%}
 
@@ -964,16 +964,14 @@
       <span>NOSHASHI</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a class="nav-link" href="#platform"><span data-i18n="nav2.platform">Platform</span></a>
-      <a class="nav-link" href="#intelligence"><span data-i18n="nav2.intelligence">Intelligence</span></a>
-      <a class="nav-link" href="#ecosystem"><span data-i18n="nav2.network">Network</span></a>
-      <a class="nav-link" href="#institutions"><span data-i18n="nav2.institutions">Institutions</span></a>
-      <a class="nav-link optional" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
-      <a class="nav-link optional" href="#thesis"><span data-i18n="nav2.about">About</span></a>
+      <a class="nav-link" href="#problem">Problem</a>
+      <a class="nav-link" href="#public">Try it free</a>
+      <a class="nav-link" href="#who">Who it's for</a>
+      <a class="nav-link optional" href="#pricing">Pricing</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
         <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
       </button>
-      <a class="btn" href="#download"><span data-i18n="nav2.enter">Enter platform</span></a>
+      <a class="btn" href="#download">Download free</a>
     </nav>
   </div>
 </header>
@@ -1063,14 +1061,14 @@
       </dl>
 
       <p class="hi-title">NOSHASHI</p>
-      <h1><span class="h1-a" data-i18n="hero2.h1">Decentralized intelligence</span></h1>
-      <p class="hi-sub" data-i18n="hero2.sub">AI-powered intelligence for decentralized financial ecosystems, with the evidence behind every answer.</p>
+      <h1><span class="h1-a">Check XRPL risk before you move money</span></h1>
+      <p class="hi-sub">Can this token be frozen? Can you actually sell it? Can you prove your decision? NOSHASHI answers from the live ledger, with a receipt.</p>
       <!-- Filled by site/assets/garden-field.js from the live ledger stream; the text here is what shows without script. -->
       <p class="mono hi-caption" data-garden-caption translate="no">The pond answers each validated XRPL ledger as it closes.</p>
 
       <div class="hi-actions">
-        <a class="hi-cta" href="#platform"><span data-i18n="hero2.cta1">Explore platform</span></a>
-        <a class="hi-cta ghost" href="#intelligence"><span data-i18n="hero2.cta2">View intelligence</span></a>
+        <a class="hi-cta" href="#public">Try it free</a>
+        <a class="hi-cta ghost" href="/contact/?topic=institutions">Book a call</a>
       </div>
     </div>
   </section>
@@ -1098,514 +1096,81 @@
     </div>
   </section>
 
-  <!--
-    The intelligence narrative. Four sections between the proof strip and
-    the operating brief: the path from ledger to decision, the live
-    network, the live assessment with its evidence, and the institutional
-    uses. Every number in the second and third is computed in the
-    visitor's browser by site/assets/intelligence.js from validated XRPL
-    ledgers (source: src/lib/intelligence). The HTML carries no figures;
-    until a ledger is read the page says it is reading.
-  -->
-  <section id="platform" class="story reveal" aria-labelledby="storyTitle">
-    <div class="story-head">
-      <p class="eyebrow">From ledger to decision</p>
-      <h2 id="storyTitle">Five steps, one evidence trail</h2>
-    </div>
-    <div class="story-track">
-      <svg class="story-stem" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path d="M0 20 C 120 4, 220 36, 340 20 S 560 4, 680 20 S 880 36, 1000 20"/>
-      </svg>
-    <ol class="story-rail">
-      <li style="--i:0">
-        <span class="step mono">01</span>
-        <h3>Observe</h3>
-        <p class="lead">See the ecosystem.</p>
-        <p>Every validated ledger as it closes, read from public XRPL servers. Nothing is read from a ledger that can still change.</p>
-        <a class="mono" href="#ecosystem">Watch it live</a>
-      </li>
-      <li style="--i:1">
-        <span class="step mono">02</span>
-        <h3>Analyze</h3>
-        <p class="lead">Identify meaningful signals.</p>
-        <p>Concentration, velocity, failures, issuer powers and funded order-book depth, measured from ledger state rather than estimated.</p>
-        <a class="mono" href="#intelligence">See the signals</a>
-      </li>
-      <li style="--i:2">
-        <span class="step mono">03</span>
-        <h3>Understand</h3>
-        <p class="lead">Translate complex network behavior.</p>
-        <p>Each result names its rule, its threshold and the ledger it was read at. The AI assistant explains results in plain language and cites them.</p>
-        <a class="mono" href="#mechanism">How it decides</a>
-      </li>
-      <li style="--i:3">
-        <span class="step mono">04</span>
-        <h3>Investigate</h3>
-        <p class="lead">Explore entities and relationships.</p>
-        <p>Trace source of funds across hops, open a case from any verdict and keep a hash-chained case log your team shares.</p>
-        <a class="mono" href="/enterprise/">Institutional tools</a>
-      </li>
-      <li style="--i:4">
-        <span class="step mono">05</span>
-        <h3>Act</h3>
-        <p class="lead">Support informed professional workflows.</p>
-        <p>GO, HOLD or NO-GO against your own versioned policy, with a SHA-256 receipt an auditor can recompute. People decide.</p>
-        <a class="mono" href="#three-questions">The three questions</a>
-      </li>
-    </ol>
-    </div>
-  </section>
+  <!-- Live mainnet ticker: real data over the same public WebSocket the
+       desktop app uses. If it cannot connect it says so. -->
+  <div class="ticker" id="ticker" aria-live="polite" aria-label="Live XRP Ledger telemetry">
+    <span class="tk"><b id="tk-state">CONNECTING</b><i>LIVE LINK</i></span>
+    <span class="tk"><b id="tk-xrp">—</b><i>XRP / RLUSD PRICE</i></span>
+    <span class="tk"><b id="tk-spread">—</b><i>SPREAD YOU CAN FILL</i></span>
+    <span class="tk"><b id="tk-ledger">—</b><i>LATEST LEDGER</i></span>
+    <span class="tk"><b id="tk-tx">—</b><i>TRANSACTIONS</i></span>
+    <span class="tk"><b id="tk-fee">—</b><i>FEE</i></span>
+    <span class="tk"><b id="tk-close">—</b><i>CLOSE TIME</i></span>
+  </div>
 
-  <section id="ecosystem" class="eco reveal" data-live-read aria-labelledby="ecoTitle">
-    <div class="eco-head">
-      <h2 id="ecoTitle">The network is alive</h2>
-      <p>A decentralized ledger behaves like a garden. Accounts appear, relationships form, clusters bloom around markets and signals travel through them. This is the XRP Ledger now, read in your browser from its latest validated ledgers.</p>
-    </div>
-
-    <ol class="pipeline" aria-label="From transactions to an assessment, counted from the same ledgers">
-      <li><span class="n mono" data-count="transactions">&nbsp;</span><span class="k">Transactions</span></li>
-      <li><span class="n mono" data-count="entities">&nbsp;</span><span class="k">Entities</span></li>
-      <li><span class="n mono" data-count="relationships">&nbsp;</span><span class="k">Relationships</span></li>
-      <li><span class="n mono" data-count="clusters">&nbsp;</span><span class="k">Clusters</span></li>
-      <li><span class="n mono" data-count="signals">&nbsp;</span><span class="k">Signals</span></li>
-      <li class="end"><span class="n mono" data-count="assessment">&nbsp;</span><span class="k">Intelligence</span></li>
-    </ol>
-
-    <figure class="net" data-net-state="reading">
-      <div class="net-bar mono">
-        <span class="net-pill"><i aria-hidden="true"></i><b class="st-reading">READING</b><b class="st-live">LIVE · XRPL MAINNET</b><b class="st-offline">OFFLINE</b></span>
-        <span data-net-range translate="no">Waiting for the first validated ledger</span>
-      </div>
-      <div class="net-stage">
-        <canvas data-net-canvas aria-hidden="true"></canvas>
-        <div class="net-tip mono" data-net-tip hidden></div>
-        <p class="net-empty mono">Reading the latest validated ledgers&hellip;</p>
-      </div>
-      <figcaption>
-        <p data-net-summary>The graph appears when this browser has read a validated XRPL ledger. Nothing is drawn from stored or sample data.</p>
-        <ul class="net-key mono" aria-label="Legend">
-          <li><i class="k-acct" aria-hidden="true"></i>Account</li>
-          <li><i class="k-clus" aria-hidden="true"></i>In a cluster</li>
-          <li><i class="k-hub" aria-hidden="true"></i>DEX or AMM hub</li>
-          <li><i class="k-flag" aria-hidden="true"></i>Named by a signal</li>
-        </ul>
-        <p class="net-note">Up to 80 of the most active entities are drawn (42 on small screens). Order-book and AMM activity has no counterparty field, so it gathers at a hub. Addresses are shown as the ledger records them; this page does not say who owns them.</p>
-      </figcaption>
-    </figure>
-  </section>
-
-  <section id="intelligence" class="ev reveal" data-live-read aria-labelledby="evTitle">
-    <div class="ev-head">
-      <h2 id="evTitle">Intelligence with evidence</h2>
-      <p>An assessment is only as good as the trail behind it. Every line below comes from the same ledgers as the network above, and every one can be checked.</p>
-    </div>
-
-    <div class="ev-grid">
-      <article class="ev-panel" data-evidence data-state="reading" aria-label="Live assessment">
-        <ol class="ev-chain">
-          <li class="ev-row ev-assess">
-            <span class="ev-k mono">Assessment</span>
-            <div>
-              <span class="ev-chip mono" data-ev="state">READING</span>
-              <p class="ev-headline" data-ev="headline">Reading the latest validated ledgers</p>
-            </div>
-          </li>
-          <li class="ev-row">
-            <span class="ev-k mono">Signals</span>
-            <ul class="ev-signals" data-ev-signals><li class="sig sk"><span class="sig-name">&nbsp;</span></li><li class="sig sk"><span class="sig-name">&nbsp;</span></li><li class="sig sk"><span class="sig-name">&nbsp;</span></li></ul>
-          </li>
-          <li class="ev-row">
-            <span class="ev-k mono">Evidence</span>
-            <p class="mono" data-ev="evidence" translate="no">&nbsp;</p>
-          </li>
-          <li class="ev-row">
-            <span class="ev-k mono">Source</span>
-            <p class="mono" data-ev="source" translate="no">&nbsp;</p>
-          </li>
-          <li class="ev-row">
-            <span class="ev-k mono">Updated</span>
-            <p class="mono" data-ev="updated" translate="no">&nbsp;</p>
-          </li>
-          <li class="ev-row">
-            <span class="ev-k mono">Agreement</span>
-            <p class="mono" data-ev="agreement" data-state="pending" translate="no">Asked of a second server after the first read.</p>
-          </li>
-        </ol>
-        <p class="ev-rule" data-ev="rule">The rule is shown here with the first result.</p>
-      </article>
-
-      <aside class="ev-method" aria-label="How this assessment is produced">
-        <h3>How this is produced</h3>
-        <dl>
-          <dt>Deterministic</dt>
-          <dd>Fixed thresholds, stated beside the result. The same ledgers always give the same answer.</dd>
-          <dt>Validated only</dt>
-          <dd>Read from ledgers a server marks validated. A closed but unvalidated ledger is never used.</dd>
-          <dt>Two sources</dt>
-          <dd>A second, independent server is asked for the same ledger hash. Agreement is claimed only when two hashes were compared.</dd>
-          <dt>AI explains, it does not decide</dt>
-          <dd>In the app, the NOSHX assistant explains a result and cites the rule and ledger behind it. It never produces the verdict.</dd>
-        </dl>
-        <p class="ev-limits">This public read runs on live mainnet data with fixed demonstration thresholds. It is not a finding about any person or business, and it is not legal or investment advice. In the app, your own versioned policy sets the rules.</p>
-      </aside>
-    </div>
-  </section>
-
-  <section id="institutions" class="inst reveal" aria-labelledby="instTitle">
-    <div class="inst-head">
-      <h2 id="instTitle">Built for institutional work</h2>
-      <p>Five kinds of question, one source of truth. Each one is answered from validated ledger state and leaves a record.</p>
-      <p class="inst-links mono"><a href="/enterprise/">Institutional overview</a><a href="/trust/">Security and trust</a></p>
-    </div>
-    <ol class="inst-list">
-      <li>
-        <h3>Risk intelligence</h3>
-        <p>Understand the signals that matter to a position: issuer freeze and clawback powers, reserve headroom, concentration and the depth that can actually fill an exit.</p>
-        <p class="in-app mono">In the app: Decision Card, exit simulation against funded depth</p>
-      </li>
-      <li>
-        <h3>Counterparty intelligence</h3>
-        <p>Explore who an address deals with, how concentrated that is, and whether its funds touch sanctioned or reported addresses.</p>
-        <p class="in-app mono">In the app: deposit and withdrawal screening, multi-hop source of funds, exchange attribution</p>
-      </li>
-      <li>
-        <h3>Network analysis</h3>
-        <p>See how the ecosystem is structured and what changes from ledger to ledger: clusters, hubs and the amendments actually in force.</p>
-        <p class="in-app mono">In the app: Ledger Watch event feeds, amendment status read from the ledger</p>
-      </li>
-      <li>
-        <h3>Policy analysis</h3>
-        <p>Compare observed activity with the conditions you configure, and see exactly which rule held and which blocked.</p>
-        <p class="in-app mono">In the app: versioned policies with four-eyes activation, GO, HOLD or NO-GO with receipts</p>
-      </li>
-      <li>
-        <h3>Research</h3>
-        <p>Turn ledger activity into findings you can cite, with the ledger index and hash attached to each one.</p>
-        <p class="in-app mono">In the app: investigation cases with hash-chained logs and exportable reports. <a href="/research/">Published findings</a></p>
-      </li>
-    </ol>
-    <p class="inst-note">NOSHASHI supports compliance work. It does not certify compliance and does not replace your own review.</p>
-  </section>
-
-  <!--
-    Everything the old hero carried below the fold continues here,
-    unchanged: the operating brief, the decision loop and the ticker.
-    The redesign replaced the opening screen, not the content under it.
-  -->
-  <section id="three-questions" class="reveal">
+  <section id="problem" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">One ledger. Three questions.</p>
-      <h2>Can this move? Can it actually exit? Can we prove why?</h2>
-      <p>Every answer is read from validated XRPL state, decided by deterministic rules and
-         your versioned policy, and recorded with a receipt anyone can recompute. People make
-         the institutional decision; NOSHASHI shows them what the ledger supports.</p>
+      <p class="eyebrow">The problem</p>
+      <h2>What you see on the XRP Ledger is not always what you get</h2>
     </div>
     <div class="grid g3">
       <div class="panel">
-        <p class="num">COMPLIANCE</p>
-        <h3>Can this move?</h3>
-        <p>GO, HOLD or NO-GO against your policy: freeze rights, credentials, reserve headroom,
-           concentration, Travel Rule thresholds. Every rule's result and reason is shown, and
-           no GO is issued unless independent public servers agree on the ledger.</p>
+        <p class="num">FREEZE RISK</p>
+        <h3>Tokens can be frozen</h3>
+        <p>Most token issuers keep the right to freeze or claw back your balance. Few apps show it.</p>
       </div>
       <div class="panel">
-        <p class="num">LIQUIDITY</p>
-        <h3>Can this actually exit?</h3>
-        <p>What the order book quotes is not what can fill. NOSHASHI counts only what each
-           offer's owner can deliver, simulates the exit against that, and joins it to the
-           issuer's right to freeze.</p>
+        <p class="num">FAKE DEPTH</p>
+        <h3>Order books overstate liquidity</h3>
+        <p>Offers stay listed after their owners spend the funds. The real exit is often much smaller.</p>
       </div>
       <div class="panel">
-        <p class="num">EVIDENCE</p>
-        <h3>Can we prove why?</h3>
-        <p>Each decision carries a SHA-256 receipt over the rules, the policy version and the
-           ledger it was read at. Re-verify it, replay it at that ledger, or export a report an
-           auditor can check with <code>shasum</code>.</p>
+        <p class="num">SHORT PAYMENTS</p>
+        <h3>"Successful" payments can deliver less</h3>
+        <p>A partial payment can succeed and deliver a fraction of the amount shown. Exchanges have lost money this way.</p>
       </div>
     </div>
-    <p class="mono" style="margin-top:22px;font-size:11.5px;letter-spacing:.08em;color:var(--muted);text-align:center"
-       aria-label="Workflow: ledger, validate, analyze, adjudicate, explain, prove, approve">
-      LEDGER → VALIDATE → ANALYZE → ADJUDICATE → EXPLAIN → PROVE → <span style="color:var(--ink)">APPROVE</span>
-    </p>
+    <details class="traps" style="margin-top:18px">
+      <summary class="btn ghost">See 6 real examples from mainnet</summary>
+      <div style="margin-top:18px">
+        <!--SLOT:MISREAD-->
+        <p class="micro" style="margin-top:12px"><a href="/misread/">Each example, with the code behind it</a></p>
+      </div>
+    </details>
   </section>
 
-  <section class="hero hero-continued">
-
-    <div class="hero-brief" aria-label="Institutional operating brief">
-      <div class="hero-brief-cell">
-        <span class="label">THE INSTITUTIONAL QUESTION</span>
-        <strong>Can this decision survive review?</strong>
-        <p>One validated state, one deterministic rule set, one receipt an examiner can replay.</p>
-      </div>
-      <div class="hero-brief-cell">
-        <span class="label">INPUT</span>
-        <strong>Public ledger state</strong>
-        <p>Flags, trust lines, credentials, domains, book depth and amendments.</p>
-      </div>
-      <div class="hero-brief-cell">
-        <span class="label">OUTPUT</span>
-        <strong class="signal">GO · HOLD · NO-GO</strong>
-        <p>The exact rule, evidence and timestamp behind the answer.</p>
-      </div>
-      <div class="hero-brief-cell">
-        <span class="label">CONTROL</span>
-        <strong>Before the signature</strong>
-        <p>Read-only by design. No custody, key storage or broadcast path.</p>
-      </div>
-    </div>
-    <div class="decision-loop" aria-label="NOSHASHI decision loop">
-      <div class="decision-step"><b>01 / READ</b><span>Validated state</span><small>same ledger snapshot</small></div>
-      <div class="decision-step"><b>02 / TEST</b><span>Policy engine</span><small>deterministic checks</small></div>
-      <div class="decision-step"><b>03 / PROVE</b><span>SHA-256 receipt</span><small>byte-stable evidence</small></div>
-      <div class="decision-step"><b>04 / HAND OVER</b><span>Review-ready export</span><small>traceable custody</small></div>
-    </div>
-
-    <!-- Live mainnet ticker. Real data over the same public WebSocket the
-         desktop app uses; if it cannot connect it says so rather than
-         showing a plausible number. -->
-    <div class="ticker" id="ticker" aria-live="polite" aria-label="Live XRP Ledger telemetry">
-      <span class="tk"><b id="tk-state">CONNECTING</b><i>LINK</i></span>
-      <span class="tk"><b id="tk-xrp">—</b><i>XRP / RLUSD · DEX MID</i></span>
-      <span class="tk"><b id="tk-spread">—</b><i>SPREAD YOU CAN FILL</i></span>
-      <span class="tk"><b id="tk-ledger">—</b><i>VALIDATED LEDGER</i></span>
-      <span class="tk"><b id="tk-tx">—</b><i>TX IN LAST CLOSE</i></span>
-      <span class="tk"><b id="tk-fee">—</b><i>OPEN LEDGER FEE</i></span>
-      <span class="tk"><b id="tk-close">—</b><i>CLOSE INTERVAL</i></span>
-    </div>
-    <p class="micro" id="tk-note">Price is the midpoint of the XRPL DEX order book for XRP against
-       RLUSD, counting only offers their owners can actually honour. It is the ledger's own
-       price, not a feed from a centralised exchange, and the two can differ.</p>
-    <div class="operator-brief" aria-label="NOSHASHI operating model">
-      <div class="brief-cell">
-        <span class="brief-label">OPERATING MODEL</span>
-        <strong>Read → adjudicate → hand over</strong>
-        <p>One validated state becomes a decision an examiner can replay.</p>
-      </div>
-      <div class="brief-cell">
-        <span class="brief-label">EVIDENCE</span>
-        <strong>SHA-256 receipts</strong>
-        <p>Byte-stable output for review and retention.</p>
-      </div>
-      <div class="brief-cell">
-        <span class="brief-label">BOUNDARY</span>
-        <strong>Never signs</strong>
-        <p>No keys, custody, transaction builder or broadcast path.</p>
-      </div>
-      <div class="brief-cell">
-        <span class="brief-label">DEPLOYMENT</span>
-        <strong class="signal">On-device first</strong>
-        <p>Run the instrument beside the workflow it informs.</p>
-      </div>
-    </div>
-    <div class="relay-console" aria-label="Illustrative XRPL relay connectivity visualization">
-      <div class="relay-console-head">
-        <strong>XRPL RELAY TOPOLOGY · LIVE SIGNAL</strong>
-        <span><span class="dot" style="display:inline-block;background:var(--tele);margin-right:6px"></span>MAINNET LINK · 04 REGIONS</span>
-      </div>
-      <svg class="relay-map" viewBox="0 0 100 42" role="img" aria-label="Illustrative relay regions connected to the validated XRPL fabric">
-        <path class="land" d="M4 15 13 11 22 13 28 10 36 15 43 12 51 14 59 11 68 14 78 12 91 16 97 13V28L88 31 79 29 70 34 60 30 50 34 41 29 31 33 21 29 11 31 4 27Z"/>
-        <path class="route" d="M17 21C30 12 42 11 51 21M51 21C62 12 76 16 84 23M51 21C60 25 72 28 84 34M17 21C33 27 42 24 51 21"/>
-        <path class="route secondary" d="M17 21C25 29 35 31 50 34M28 16C43 18 60 12 76 18M51 21C58 16 66 25 84 23M17 21C25 15 35 14 43 12"/>
-        <path class="route packet" d="M17 21C30 12 42 11 51 21"/>
-        <path class="route packet" d="M51 21C62 12 76 16 84 23"/>
-        <path class="route packet" d="M17 21C33 27 42 24 51 21"/>
-        <g>
-          <circle class="node-pulse" cx="17" cy="21" r="2"/><circle class="node" cx="17" cy="21" r="1"/>
-          <circle class="node-pulse" cx="51" cy="21" r="2"/><circle class="node" cx="51" cy="21" r="1"/>
-          <circle class="node-pulse" cx="84" cy="23" r="2"/><circle class="node" cx="84" cy="23" r="1"/>
-          <circle class="node-pulse" cx="84" cy="34" r="2"/><circle class="node" cx="84" cy="34" r="1"/>
-        </g>
-        <g fill="none" stroke="currentColor" stroke-width=".12" opacity=".28">
-          <ellipse cx="50" cy="21" rx="41" ry="12"/><ellipse cx="50" cy="21" rx="33" ry="20"/>
-          <path d="M9 21h82M15 12c20 5 50 5 70 0M15 30c20-5 50-5 70 0"/>
-        </g>
-        <text x="19" y="18" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">AMERICAS · 01</text>
-        <text x="53" y="18" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">EUROPE</text>
-        <text x="86" y="20" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">APAC</text>
-        <text x="86" y="31" fill="currentColor" font-size="2.2" font-family="IBM Plex Mono,monospace">OCEANIA</text>
-      </svg>
-      <div class="relay-console-foot"><span>PACKETS = LIVE LEDGER EVENTS · RELAY REGIONS 04</span><span>TOPOLOGY MODEL · NOT GEOLOCATION</span></div>
-      <div class="relay-console-legend"><span><i class="node-key"></i>RELAY NODE</span><span><i></i>EVENT LANE</span><span><i class="secondary-key"></i>SECONDARY ROUTE</span></div>
-    </div>
-  </section>
-
-  <div class="zen-band" aria-hidden="true">
-    <svg viewBox="0 0 1200 140" preserveAspectRatio="xMidYMid slice" focusable="false">
-      <defs><mask id="zen-rake" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="140"><rect width="1200" height="140" fill="#fff"/><ellipse cx="250" cy="70" rx="89" ry="52" fill="#000"/><ellipse cx="720" cy="62" rx="97" ry="56" fill="#000"/><ellipse cx="1010" cy="82" rx="81" ry="48" fill="#000"/></mask></defs>
-      <g class="zr" mask="url(#zen-rake)"><path d="M0 10H1200"/><path d="M0 21H1200"/><path d="M0 32H1200"/><path d="M0 43H1200"/><path d="M0 54H1200"/><path d="M0 65H1200"/><path d="M0 76H1200"/><path d="M0 87H1200"/><path d="M0 98H1200"/><path d="M0 109H1200"/><path d="M0 120H1200"/><path d="M0 131H1200"/></g>
-      <g class="zr"><ellipse cx="250" cy="70" rx="40" ry="23"/><ellipse cx="250" cy="70" rx="54" ry="31"/><ellipse cx="250" cy="70" rx="68" ry="39"/><ellipse cx="250" cy="70" rx="82" ry="47"/><ellipse cx="720" cy="62" rx="48" ry="27"/><ellipse cx="720" cy="62" rx="62" ry="35"/><ellipse cx="720" cy="62" rx="76" ry="43"/><ellipse cx="720" cy="62" rx="90" ry="51"/><ellipse cx="1010" cy="82" rx="32" ry="19"/><ellipse cx="1010" cy="82" rx="46" ry="27"/><ellipse cx="1010" cy="82" rx="60" ry="35"/><ellipse cx="1010" cy="82" rx="74" ry="43"/></g>
-      <path class="zs" d="M224 73.0C226.6 56.5 255.2 53.5 270.8 62.5C279.9 68.5 274.7 83.5 252.6 85C234.4 85.75 222.7 81.25 224 73.0Z"/><path class="zs" d="M686 65.8C689.4 44.9 726.8 41.099999999999994 747.2 52.5C759.1 60.1 752.3 79.1 723.4 81C699.6 81.95 684.3 76.25 686 65.8Z"/><path class="zs" d="M992 84.2C993.8 72.1 1013.6 69.9 1024.4 76.5C1030.7 80.9 1027.1 91.9 1011.8 93C999.2 93.55 991.1 90.25 992 84.2Z"/>
-    </svg>
-  </div>
-
-  <section id="thesis" class="reveal">
+  <section id="how" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">01 · The thesis</p>
-      <h2>An asset is two facts, not one</h2>
-      <p>An issued balance is only an asset if the issuer cannot immobilise it <em>and</em>
-         somebody will buy it. Either alone is a half-answer.</p>
+      <p class="eyebrow">How it works</p>
+      <h2>Read. Decide. Prove.</h2>
     </div>
-    <div class="grid g2">
+    <div class="grid g3">
       <div class="panel">
-        <p class="num">THE COMPLIANCE HALF</p>
-        <h3>Who can take this away from you?</h3>
-        <p>XRPL publishes freeze rights in account flags that no wallet reads. We read every
-           issuer behind every position and report which can freeze you out, which have
-           permanently surrendered the right, and — via XLS-77 deep freeze — which can stop
-           you receiving as well as sending.</p>
+        <p class="num">01 · READ</p>
+        <h3>Live ledger data</h3>
+        <p>Only from validated ledgers, checked against a second server.</p>
       </div>
       <div class="panel">
-        <p class="num">THE MARKET HALF</p>
-        <h3>Would anyone buy it if they didn't?</h3>
-        <p>We walk the live DEX book and the AMM pool for every position you hold and compute
-           what a full exit would actually achieve — fill rate, price impact, and the depth
-           genuinely reachable rather than the depth nominally resting.</p>
+        <p class="num">02 · DECIDE</p>
+        <h3>GO, HOLD or NO-GO</h3>
+        <p>Against your own written policy. Every rule shows its result and reason.</p>
+      </div>
+      <div class="panel">
+        <p class="num">03 · PROVE</p>
+        <h3>A receipt for every decision</h3>
+        <p>A SHA-256 receipt and audit log your auditor can re-check.</p>
       </div>
     </div>
-  </section>
-
-  <section id="measured" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">02 · Why the second half is hard</p>
-      <h2>Book depth is mostly fiction</h2>
-      <p>Summing every resting offer counts bids at a thousandth of the market as though they
-         were an exit. Measured on mainnet, GateHub USD/XRP:</p>
-    </div>
-    <div class="panel">
-      <table class="measure">
-        <thead><tr><th>Metric</th><th>Naive</th><th>NOSHASHI</th></tr></thead>
-        <tbody>
-          <tr><td>Spread</td><td class="before">−18,675 bps</td><td class="after">20 bps</td></tr>
-          <tr><td>Full-exit slippage</td><td class="before">9,340 bps</td><td class="after">10 bps</td></tr>
-          <tr><td>Usable bid depth</td><td class="before">12,692,991 USD</td><td class="after">13,894 USD</td></tr>
-        </tbody>
-      </table>
-      <p style="margin-top:20px;color:var(--muted);font-size:13.5px;line-height:1.62">
-        The book advertised 12.7 million USD of depth. <strong style="color:var(--ink)">13,894 is
-        reachable — a 913× overstatement.</strong> The touch was poisoned by a single stale offer
-        priced at 29× the real market; the rest was lowball bids nobody would ever fill against.
-      </p>
-    </div>
-  </section>
-
-  <section id="mechanism" class="reveal">
-    <div class="field" aria-hidden="true">
-      <svg style="right:-6%;top:-10%;width:420px;height:420px;opacity:.06" viewBox="0 0 240 240">
-        <g stroke="currentColor" stroke-width=".7" fill="none">
-          <circle cx="120" cy="120" r="44"/><circle cx="120" cy="120" r="76"/><circle cx="120" cy="120" r="108"/>
-        </g>
-        <g stroke="currentColor" stroke-width=".7"><path d="M120 4v232M4 120h232"/></g>
-      </svg>
-    </div>
-
-    <div class="kicker-block">
-      <p class="eyebrow">03 · How a verdict is made</p>
-      <h2>One ledger read, two questions, one receipt</h2>
-      <p>Both halves are answered from the same validated ledger state, in the same pass.
-         That is the whole architecture — and it is why the two answers can be trusted
-         against each other rather than compared across two tools reading at two moments.</p>
-    </div>
-
-    <div class="flow">
-      <svg viewBox="0 0 960 286" role="img"
-           aria-label="Validated mainnet state feeds a compliance read and a market read in parallel; both enter a deterministic policy engine, which emits a GO, HOLD or NO-GO verdict and a SHA-256 receipt digest.">
-        <defs>
-          <marker id="fl-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-            <path d="M0 0 10 5 0 10z" style="fill:var(--faint)"/>
-          </marker>
-        </defs>
-
-        <!-- Source -->
-        <rect x="1" y="98" width="176" height="90" rx="8"
-              style="fill:var(--elevated);stroke:var(--rule)"/>
-        <text x="89" y="128" text-anchor="middle"
-              style="fill:var(--ink);font:600 15px 'Space Grotesk',sans-serif">Validated ledger</text>
-        <text x="89" y="150" text-anchor="middle"
-              style="fill:var(--faint);font:400 11.5px 'IBM Plex Mono',monospace">XRPL MAINNET</text>
-        <text x="89" y="168" text-anchor="middle"
-              style="fill:var(--faint);font:400 11.5px 'IBM Plex Mono',monospace">4 NODES COMPARED</text>
-
-        <!-- Split -->
-        <path d="M177 143h42q10 0 10-10V72q0-10 10-10h32" fill="none"
-              style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
-        <path d="M177 143h42q10 0 10 10v61q0 10 10 10h32" fill="none"
-              style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
-
-        <!-- Compliance half -->
-        <rect x="277" y="26" width="232" height="92" rx="8"
-              style="fill:var(--surface);stroke:var(--rule)"/>
-        <text x="297" y="52" style="fill:var(--brand);font:400 10px 'IBM Plex Mono',monospace;letter-spacing:.18em">THE COMPLIANCE HALF</text>
-        <text x="297" y="76" style="fill:var(--ink);font:600 14.5px 'Space Grotesk',sans-serif">Am I allowed to move this?</text>
-        <text x="297" y="99" style="fill:var(--muted);font:400 12px 'Space Grotesk',sans-serif">Flags · credentials · freeze rights · quorum</text>
-
-        <!-- Market half -->
-        <rect x="277" y="168" width="232" height="92" rx="8"
-              style="fill:var(--surface);stroke:var(--rule)"/>
-        <text x="297" y="194" style="fill:var(--brand);font:400 10px 'IBM Plex Mono',monospace;letter-spacing:.18em">THE MARKET HALF</text>
-        <text x="297" y="218" style="fill:var(--ink);font:600 14.5px 'Space Grotesk',sans-serif">Could I actually get out?</text>
-        <text x="297" y="241" style="fill:var(--muted);font:400 12px 'Space Grotesk',sans-serif">Book · AMM · fillable depth · impact</text>
-
-        <!-- Join -->
-        <path d="M509 72h32q10 0 10 10v51q0 10 10 10h20" fill="none"
-              style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
-        <path d="M509 214h32q10 0 10-10v-51q0-10 10-10h20" fill="none"
-              style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
-
-        <!-- Engine -->
-        <rect x="601" y="98" width="164" height="90" rx="8"
-              style="fill:var(--elevated);stroke:var(--rule)"/>
-        <text x="683" y="127" text-anchor="middle"
-              style="fill:var(--ink);font:600 15px 'Space Grotesk',sans-serif">Policy engine</text>
-        <text x="683" y="149" text-anchor="middle"
-              style="fill:var(--faint);font:400 11.5px 'IBM Plex Mono',monospace">DETERMINISTIC</text>
-        <text x="683" y="167" text-anchor="middle"
-              style="fill:var(--faint);font:400 11.5px 'IBM Plex Mono',monospace">policy.ts</text>
-
-        <path d="M765 143h30" fill="none" style="stroke:var(--faint)" stroke-width="1.2" marker-end="url(#fl-ar)"/>
-
-        <!-- Verdict -->
-        <rect x="805" y="98" width="154" height="90" rx="8"
-              style="fill:var(--surface);stroke:var(--rule)"/>
-        <text x="822" y="128" style="font:700 15px 'Space Grotesk',sans-serif">
-          <tspan style="fill:var(--go)">GO</tspan><tspan style="fill:var(--faint)"> / </tspan><tspan style="fill:var(--hold)">HOLD</tspan>
-        </text>
-        <text x="822" y="150" style="fill:var(--nogo);font:700 15px 'Space Grotesk',sans-serif">NO-GO</text>
-        <text x="822" y="171" style="fill:var(--faint);font:400 10.5px 'IBM Plex Mono',monospace">+ SHA-256 RECEIPT</text>
-      </svg>
-
-      <div class="flowcap">
-        <p><b>SAME STATE</b>Both halves read one validated snapshot. A freeze right found at
-           ledger <em>n</em> is weighed against depth measured at ledger <em>n</em>, not against
-           a book that has since moved.</p>
-        <p><b>NO SIGNING PATH</b>The engine is pure. It takes state and returns a verdict — it
-           cannot hold a key, build a transaction or broadcast one, because none of that exists
-           in the build.</p>
-        <p><b>BYTE-STABLE</b>The receipt digest covers the verdict and every check id and result.
-           Restyling cannot change it; a changed digest would invalidate every receipt ever
-           issued, so the engine is fixed by test.</p>
-      </div>
-    </div>
+    <p class="micro" style="text-align:center;margin-top:18px">Read-only: NOSHASHI never holds keys, signs or moves funds.</p>
   </section>
 
   <section id="public" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">04 · For everyone</p>
-      <h2>Check it before you pay it</h2>
-      <p>Three tools that read mainnet from this page: who you are paying, what a payment
-         actually delivered, and how much of a book could really fill. Free, no account,
-         nothing is signed — and each re-measures a finding <a href="/research/">we publish</a>,
-         so you never have to take the number on trust.</p>
+      <p class="eyebrow">Try it free</p>
+      <h2>Check an address, a payment or an order book now</h2>
+      <p>Runs in your browser on live XRP Ledger data. No account needed.</p>
     </div>
 
-      <!-- The free check, running here rather than described here. Three reads
-           against a public XRPL node: account_info for the flags and the fee,
-           gateway_balances for what an issuer actually owes, and the signer
-           list for how few keys can move the account. Nothing is signed and
-           nothing leaves the browser except the address itself. -->
-      <!-- Three free tools, each one reproducing a finding this site publishes.
-           They run in the browser against a public XRPL node. Nothing is
-           signed, no account exists, and nothing leaves the page except the
-           address, hash or currency pair being read. -->
       <div class="tools">
         <div class="tabs" role="tablist" aria-label="Free tools">
           <button role="tab" id="tab-addr" aria-controls="pane-addr" aria-selected="true"  class="tab on">Address</button>
@@ -1717,553 +1282,112 @@
         </div>
       </div>
 
-    <div class="grid g3">
-      <div class="panel">
-        <p class="num">WHAT IT TELLS YOU</p>
-        <h3>Published facts</h3>
-        <p>Whether they can freeze your balance, what they charge to transfer, what they have
-           issued and how much is outstanding, what credentials they hold, and who they have
-           actually dealt with.</p>
-      </div>
-      <div class="panel">
-        <p class="num">WHAT IT WILL NOT DO</p>
-        <h3>No invented reputation</h3>
-        <p>There is no bad-actor list behind this and no reputation score, because we do not have
-           one. Inventing a number people act on would be the worst thing this product could do.</p>
-      </div>
-      <div class="panel">
-        <p class="num">WHY IT IS SAFE</p>
-        <h3>A lookup, not a wallet</h3>
-        <p>It moves no money, holds no key and signs nothing. That is deliberate: it keeps a
-           public utility a public utility, with none of the weight of a custodian or a ramp.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="enterprise" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">05 · For institutions</p>
-      <h2>Built only on what the network has actually activated</h2>
-      <p>XRPL ships features as amendments, and a feature exists in three states: specified,
-         implemented in rippled, and <em>activated by validator majority</em>. Only the third one
-         works. NOSHASHI reads the ledger's own amendments object and refuses to offer anything
-         that is not genuinely live.</p>
-    </div>
-    <div class="grid g3">
-      <div class="panel">
-        <p class="num">XLS-70 · XLS-80 · XLS-81</p>
-        <h3>Credentials, domains, permissioned DEX</h3>
-        <p>Adjudicate every settlement against a domain's published rule set. Walled gardens where
-           only holders of named credentials may transact, and order books restricted to an
-           approved membership.</p>
-      </div>
-      <div class="panel">
-        <p class="num">XLS-77 · CLAWBACK</p>
-        <h3>Freeze and recovery posture</h3>
-        <p>Deep freeze blocks a sanctioned holder from sending <em>and</em> receiving — an
-           ordinary freeze leaves them able to keep accepting funds. We read both, plus issuer
-           clawback rights on your positions.</p>
-      </div>
-      <div class="panel">
-        <p class="num">FATF R.16 · HHI</p>
-        <h3>Travel Rule and concentration</h3>
-        <p>Scope every transfer against your jurisdiction's threshold, and score the settlement
-           book with the Herfindahl-Hirschman Index — the same measure a regulator uses.</p>
-      </div>
-      <div class="panel">
-        <p class="num">DELIVERED ≠ REQUESTED</p>
-        <h3>What a payment actually moved</h3>
-        <p>An XRPL payment carries the amount it asked to deliver and, separately, the amount
-           that arrived. On a partial payment those differ and the transaction still succeeds.
-           A real mainnet transfer we read asked for
-           <span class="mono">999,332.87</span> and delivered
-           <span class="mono">3,958.64</span> — <em>0.4%</em> — returning
-           <span class="mono">tesSUCCESS</span>. Credit the requested figure and you are out by
-           two hundred and fifty times. This is the mistake that has drained exchanges, and it
-           is one field.</p>
-      </div>
-      <div class="panel">
-        <p class="num">SIGNER WEIGHT · NOT HEADCOUNT</p>
-        <h3>How few people can move a treasury</h3>
-        <p>XRPL compares a multi-signature quorum against the <em>sum of signing weights</em>,
-           not a count of signers. Five signers where one carries the quorum is a single-key
-           account wearing a committee's clothes. We report the minimum number who must
-           actually agree, which is the only number that means anything.</p>
-      </div>
-    </div>
-  </section>
-
-
-  <section id="traps" class="reveal">
-    <div class="field" aria-hidden="true">
-      <svg style="left:-8%;bottom:-14%;width:380px;height:280px;opacity:.055" viewBox="0 0 380 280">
-        <defs>
-          <pattern id="tr-hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
-            <line x1="0" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width=".9"/>
-          </pattern>
-        </defs>
-        <rect width="380" height="280" fill="url(#tr-hatch)"/>
-      </svg>
-    </div>
-
-    <div class="kicker-block">
-      <p class="eyebrow">06 · The ledger can be transparent and still be misread</p>
-      <h2>Every field is public. Not every reading is right.</h2>
-      <p>Six real mainnet replies, each read two ways: the obvious field at face value, and
-         what NOSHASHI reports. The right-hand column is not written for this page — it is what
-         NOSHASHI's own code returns for the recorded reply, and a test fails the build if the
-         two ever disagree.</p>
-    </div>
-
-    <!--SLOT:MISREAD-->
-
-    <p class="micro" style="margin-top:18px">
-      Each case links the object it was read from on the public explorer.
-      <a href="/misread/" style="color:var(--brand)">The same cases, with the module behind each reading</a>;
-      thirteen traps in all are documented in the
-      <a href="https://github.com/Ignosha/noshashi" rel="noopener" style="color:var(--brand)">repository README</a>.
+    <p class="cta" style="margin-top:18px">
+      <a class="btn ghost" href="/book-health/">Book health</a>
+      <a class="btn ghost" href="/treasury/">Treasury report</a>
+      <a class="btn ghost" href="/research/">Published findings</a>
     </p>
   </section>
 
-  <section id="network" class="reveal">
+  <section id="who" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">07 · Network reality</p>
-      <h2>A feature exists in three states and only the third one works</h2>
-      <p>XRPL ships features as amendments: <em>specified</em>, <em>implemented in rippled</em>,
-         and <em>activated by validator majority</em>. Until the third, every transaction of that
-         type is rejected by every validator on the network. NOSHASHI reads the ledger's own
-         amendments object and computes each id locally — SHA-512Half of the feature name — so no
-         lookup table can drift, and anything not activated is never offered.</p>
+      <p class="eyebrow">Who it's for</p>
+      <h2>Teams that move or hold value on the XRP Ledger</h2>
     </div>
-
-    <div class="amend">
-      <div class="amend-col live">
-        <span class="cap"></span>
-        <h3>ACTIVATED — BUILT ON</h3>
-        <div class="chips">
-          <span class="chip">Credentials · XLS-70</span>
-          <span class="chip">PermissionedDomains · XLS-80</span>
-          <span class="chip">PermissionedDEX · XLS-81</span>
-          <span class="chip">DeepFreeze · XLS-77</span>
-          <span class="chip">TokenEscrow · XLS-85</span>
-          <span class="chip">MPTokensV1</span>
-          <span class="chip">Clawback</span>
-          <span class="chip">AMMClawback</span>
-          <span class="chip">DID</span>
-          <span class="chip">PriceOracle</span>
-        </div>
-      </div>
-      <div class="amend-col dormant">
-        <span class="cap"></span>
-        <h3>NOT ACTIVATED — NOT OFFERED</h3>
-        <div class="chips">
-          <span class="chip">SingleAssetVault · XLS-65</span>
-          <span class="chip">LendingProtocol · XLS-66</span>
-          <span class="chip">ConfidentialMPT · XLS-96</span>
-          <span class="chip">DynamicMPT</span>
-          <span class="chip">Batch</span>
-          <span class="chip">PermissionDelegation</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="eck" style="margin-top:14px">
-      <div>
-        <p class="step">01</p>
-        <h3>Read</h3>
-        <p>Validated mainnet state, with four public nodes compared and their disagreement
-           reported rather than averaged away.</p>
-      </div>
-      <div>
-        <p class="step">02</p>
-        <h3>Adjudicate</h3>
-        <p>A deterministic rule set. The same state and the same rules return the same verdict,
-           on your machine and through the API.</p>
-      </div>
-      <div>
-        <p class="step">03</p>
-        <h3>Digest</h3>
-        <p>SHA-256 over the verdict and every check id and result. Byte-stable, so a receipt
-           can be re-verified years later.</p>
-      </div>
-      <div>
-        <p class="step">04</p>
-        <h3>Hand over</h3>
-        <p>Signed export with a chain of custody an examiner can follow, plus the request id
-           that names the same adjudication in your logs and ours.</p>
-      </div>
-    </div>
-
-    <p class="micro" style="margin-top:18px">
-      Amendment state verified against mainnet on 2026-08-24 — rippled 3.3.0, 93 amendments
-      active. The app re-reads it live; this list is the state at the last audit of this page.
-    </p>
-  </section>
-
-  <section id="newsroom" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">08 · <span data-i18n="sec.xrp">XRP, live</span></p>
-      <h2>The asset, the network, and what is being said about both</h2>
-      <p>Price and seven days of history, the validated ledger the network is on right now, and
-         headlines from three public feeds — all read on the server before this page was sent.
-         Context, not signal: nothing in this section is a NOSHASHI reading, and no verdict
-         follows from any of it.</p>
-    </div>
-
-    <div class="console" id="xrp-live">
-      <!--SLOT:MARKETHEAD-->
-      <!--SLOT:MARKET-->
-      <!--SLOT:MARKETFOOT-->
-    </div>
-
-    <div class="console" style="margin-top:14px">
-      <!--SLOT:NEWSHEAD-->
-      <div class="console-body flush">
-        <!--SLOT:NEWS-->
-      </div>
-      <div class="console-foot">
-        <span>PUBLIC RSS · MERGED SERVER-SIDE</span>
-        <span>TITLES AND LINKS ONLY · NO ARTICLE TEXT IS COPIED</span>
-      </div>
-    </div>
-
-    <div class="cta" style="margin-top:18px">
-      <a class="btn ghost" href="/news/">Open the newsroom</a>
+    <div class="grid g2">
+      <div class="panel"><h3>Exchanges and custodians</h3><p>Screen deposits and withdrawals: fake tokens, phishing dust, lookalike addresses, sanctioned senders up to three hops back.</p></div>
+      <div class="panel"><h3>Token issuers</h3><p>Show holders exactly what powers you keep, and prove it from the ledger.</p></div>
+      <div class="panel"><h3>Funds and treasuries</h3><p>Know the real exit for a position before you size it.</p></div>
+      <div class="panel"><h3>Auditors</h3><p>Check a fair-value mark against depth that can actually fill, with the ledger it was read at.</p></div>
     </div>
   </section>
-
-
-  <section id="edge-lab" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">09 · XRPL Edge Lab</p>
-      <h2>New questions for a public ledger</h2>
-      <p>Three experimental analyses built from validated XRPL state. They are designed to expose
-         operational blind spots, not to predict markets or replace an accountable review.</p>
-    </div>
-    <div class="edge-lab" aria-label="Experimental XRPL analyses">
-      <div>
-        <span class="edge-tag">EDGE PACK / 0.1</span>
-        <h3>Download the lab</h3>
-        <p>Get the portable manifest, replay checklist and data dictionary for controlled review.
-           The pack contains no signing keys and cannot submit transactions.</p>
-        <a class="btn" href="/downloads/xrpl-edge-pack/">Open download system</a>
-      </div>
-      <div>
-        <span class="edge-tag">EXIT PATH</span>
-        <h3>Liquidity escape map</h3>
-        <p>Trace the shortest credible path from a held issued asset to an XRP exit, including
-           issuer controls, trust-line constraints and observed book depth.</p>
-        <span class="edge-state">READ-ONLY · EXPERIMENTAL</span>
-      </div>
-      <div>
-        <span class="edge-tag">STATE DRIFT</span>
-        <h3>Amendment drift radar</h3>
-        <p>Compare the active amendment set with the rule assumptions used in an evidence receipt,
-           so a previously valid control cannot quietly age into a false comfort.</p>
-        <span class="edge-state">REPLAYABLE · NO PREDICTION</span>
-      </div>
-      <div>
-        <span class="edge-tag">COUNTERPARTY</span>
-        <h3>Recovery graph</h3>
-        <p>Surface issuer, signer-list and credential dependencies that can change who is able to
-           remediate a blocked position. Unknown data stays unknown.</p>
-        <span class="edge-state">PUBLIC DATA · REVIEW REQUIRED</span>
-      </div>
-    </div>
-    <p class="micro">Experimental means the rule definitions and coverage may change. Do not use an
-       Edge Lab output as the sole basis for a trade, filing, customer decision or legal conclusion.</p>
-  </section>
-
-  <section id="download" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">10 · <span data-i18n="sec.download">Download</span></p>
-      <h2>Take the instrument offline</h2>
-      <p>The full build, free to download. Bring the same adjudication engine to a
-         controlled workstation, then verify the artifact before it ever touches a desk.</p>
-    </div>
-
-    <!--SLOT:DOWNLOADS-->
-
-    <div class="grid g2" style="margin-top:14px">
-      <div class="panel">
-        <p class="num">VERIFY BEFORE YOU RUN IT</p>
-        <p style="margin-bottom:14px">Check the download matches the hash above:</p>
-        <!--SLOT:VERIFYCMD-->
-        <p class="note">
-          The app also hashes its own running binary — Settings › Binary integrity — so you can
-          confirm nothing changed between this page and execution. That check is free on every
-          tier; charging for the ability to verify we are not malicious would be perverse.
-        </p>
-        <p class="note" style="margin-top:12px">
-          You can go further and read the code. Every build on this page was produced by CI
-          from a public commit, and the logic that makes claims carries 272 tests.
-          <a href="https://github.com/Ignosha/noshashi" rel="noopener">Source on GitHub &rarr;</a>
-        </p>
-      </div>
-
-      <div class="panel">
-        <p class="num">WHAT YOU GET FREE</p>
-        <ul class="dl-list">
-          <li class="on">Live XRPL mainnet telemetry</li>
-          <li class="on">GO / HOLD / NO-GO adjudication, unlimited</li>
-          <li class="on">Cryptographic receipts</li>
-          <li class="on">Credential registry and domain grid</li>
-          <li class="on">10 address checks per month</li>
-          <li class="on">Animated explainers</li>
-          <li class="on">On-device compliance agent</li>
-          <li class="off">Exit liquidity, freeze-rights and control-surface analysis</li>
-          <li class="off">Persistent adjudication ledger</li>
-          <li class="off">Travel Rule scoping and signed export</li>
-        </ul>
-        <p class="note">
-          Not code-signed or notarised yet. macOS will warn about an unidentified developer —
-          right-click the app and choose Open the first time. Better said here than as a surprise.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section id="mission" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">11 · <span data-i18n="sec.mission">Mission log</span></p>
-      <h2>Every change, with the build that proves it</h2>
-      <p>Releases reach this log from the GitHub Releases API, which means an entry cannot appear
-         without CI having produced an artifact first. Maintenance and incidents are written in the
-         repository and reviewed like code. Neither is typed into a box on a marketing page.</p>
-    </div>
-
-    <!--SLOT:CLOCK-->
-
-    <div class="grid g2" style="margin-top:14px">
-      <div>
-        <p class="num">FLIGHT READINESS</p>
-        <!--SLOT:BOARD-->
-      </div>
-      <div>
-        <p class="num">RECENT ENTRIES</p>
-        <div class="console"><div class="console-body"><!--SLOT:LOG--></div></div>
-      </div>
-    </div>
-
-    <div class="cta" style="margin-top:18px">
-      <a class="btn ghost" href="/status/">Full status and log</a>
-      <a class="btn ghost" href="/progress/">Where the project is going</a>
-    </div>
-
-    <!--SLOT:SUBSCRIBE-->
-  </section>
-
 
   <section id="pricing" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">12 · <span data-i18n="sec.pricing">Pricing</span></p>
-      <h2>Free where a human decides</h2>
-      <p>The console is free forever. Paid tiers begin where a desk needs something an individual
-         does not.</p>
+      <p class="eyebrow">Pricing</p>
+      <h2>Start free. Pay when your team needs more.</h2>
     </div>
     <div class="price">
       <div class="tier">
         <span class="cap"></span>
         <p class="name">FREE</p>
-        <p class="amt">Free</p><p class="per">forever</p>
-        <p class="who">Individuals and single desks</p>
+        <p class="amt">$0</p><p class="per">forever</p>
         <ul>
-          <li>Full console and menu bar HUD</li>
-            <li>Ledger sync — four public nodes compared</li>
-            <li>Inbox — spot impersonated tokens sent to you</li>
-            <li>Token rights — check an NFT before you buy it</li>
-          <li>Unlimited GO / HOLD / NO-GO gate checks</li>
-          <li>10 address checks per month</li>
-          <li>On-device compliance agent</li>
-          <li>CSV audit export</li>
-          <li>Binary integrity verification</li>
+          <li>Desktop app and free web tools</li>
+          <li>Unlimited GO / HOLD / NO-GO checks</li>
+          <li>10 address checks a month</li>
         </ul>
-        <a class="btn ghost block" href="#download" style="margin-top:22px">Download the beta</a>
+        <a class="btn ghost block" href="#download" style="margin-top:22px">Download</a>
       </div>
       <div class="tier focus">
         <span class="cap"></span>
         <p class="name">PRO</p>
         <p class="amt">$749</p><p class="per">per seat / month</p>
-        <p class="who">Trading desks and funds</p>
         <ul>
-          <li>Everything in Free</li>
           <li>Unlimited address checks</li>
-          <li>Exit liquidity — freeze risk × depth × concentration</li>
-            <li>Settlement forensics — delivered vs requested</li>
-            <li>Order book integrity — quoted vs fillable depth</li>
-            <li>Counterparty provenance — age and funding source</li>
-            <li>Treasury control surface — signers and locked value</li>
-            <li>AMM pool governance — fee votes and auction slot</li>
-          <li>Issuer freeze-rights and XLS-77 deep freeze analysis</li>
-          <li>Counterparty concentration (HHI)</li>
-          <li>Persistent adjudication ledger — 10,000 verdicts</li>
-          <li>Wallet explorer and editable policy rule set</li>
-          <li>Issuer drift monitor with native alerts</li>
-          <li>5,000 API verifications · priority support</li>
+          <li>Real exit liquidity and freeze analysis</li>
+          <li>Saved decisions and alerts</li>
         </ul>
-        <!--
-          Posts to the checkout endpoint rather than linking to a Stripe
-          payment link: the session is created server-side, which is what
-          lets the success and cancel URLs point back here and what makes
-          a misconfiguration visible as a real error instead of a dead
-          link. The endpoint answers JSON when asked for JSON, so the
-          script below can show the reason rather than navigating away.
-        -->
         <form class="checkout-form" action="/api/create-checkout-session" method="post" style="margin-top:22px">
-          <button class="btn block" type="submit">Subscribe with card</button>
+          <button class="btn block" type="submit">Subscribe</button>
           <p class="checkout-error" role="alert" hidden></p>
         </form>
       </div>
       <div class="tier inst">
         <span class="cap"></span>
         <p class="name">INSTITUTIONAL</p>
-        <p class="amt">$4,000</p><p class="per">per month</p>
-        <p class="who">Regulated venues and custodians</p>
+        <p class="amt">$40,000</p><p class="per">per year</p>
         <ul>
-          <li>Everything in Pro</li>
-          <li>Issuance surveillance — holder concentration</li>
-            <li>Travel Rule (FATF R.16) scoping</li>
-          <li>Signed audit export — SHA-256 chain of custody</li>
-          <li>Offline adjudication on segregated networks</li>
           <li>Compliance API and webhooks</li>
-          <li>White-label console &amp; reports · regulator read-only seats</li>
-          <li>100,000 API verifications</li>
+          <li>Issuer surveillance: who holds your tokens</li>
+          <li>Signed audit exports</li>
         </ul>
         <a class="btn ghost block" href="/contact/?topic=institutions" style="margin-top:22px">Talk to us</a>
       </div>
       <div class="tier enterprise">
         <span class="cap"></span>
         <p class="name">ENTERPRISE</p>
-        <p class="amt">$10,000</p><p class="per">per month</p>
-        <p class="who">Institutional teams and regulated operations</p>
+        <p class="amt">From $120,000</p><p class="per">per year</p>
         <ul>
-          <li>Everything in Institutional</li>
-          <li>Asset passports and issuer intelligence</li>
-          <li>Counterparty and liquidity intelligence</li>
-          <li>Policy engine, adjudication and decision history</li>
-          <li>Evidence records, audit exports and review workflow</li>
-          <li>Scoped API keys and webhooks</li>
-          <li>Architecture review and implementation planning</li>
+          <li>Everything above, at scale</li>
+          <li>High-volume API and event feeds</li>
+          <li>Architecture review</li>
         </ul>
-        <a class="btn ghost block" href="/enterprise/" style="margin-top:22px">Explore Enterprise</a>
-      </div>
-      <div class="tier strategic">
-        <span class="cap"></span>
-        <p class="name">STRATEGIC INFRASTRUCTURE</p>
-        <p class="amt">$20,833</p><p class="per">per month</p>
-        <p class="who">Teams building their own XRPL intelligence layer</p>
-        <ul>
-          <li>Everything in Enterprise</li>
-          <li>High-volume API capacity and burst limits</li>
-          <li>XRPL event feeds and machine-readable delivery</li>
-          <li>Custom export schemas, bulk export and event retention you set</li>
-          <li>Custom integrations · dedicated environment coming soon</li>
-          <li>Embeddable screening widget for your own site</li>
-          <li>Strategic architecture review and roadmap</li>
-        </ul>
-        <a class="btn ghost block" href="/strategic-infrastructure/" style="margin-top:22px">Build with NOSHASHI</a>
+        <a class="btn ghost block" href="/enterprise/" style="margin-top:22px">Learn more</a>
       </div>
     </div>
-    <div class="cta" style="margin-top:26px">
-      <a class="btn" href="/pricing/">Full pricing and comparison</a>
-      <a class="btn ghost" href="/contact/?topic=institutions">Contact sales</a>
+    <p class="micro" style="margin-top:18px;text-align:center">API checks also sold in prepaid packs. <a href="/pricing/">Full pricing</a></p>
+  </section>
+
+  <section id="download" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">Download</p>
+      <h2>Free for macOS, Windows and Linux</h2>
+      <p>Not code-signed yet: on a Mac, right-click the app and choose Open the first time.</p>
     </div>
-    <p class="micro" style="margin-top:18px">
-      Subscriptions renew automatically until cancelled. Cancel any time in two clicks.
-      Full refund within 14 days of a first charge if no paid capability was used.
-      NOSHASHI sells software. It does not transmit money, hold customer funds, or take custody of any asset.
-    </p>
+    <!--SLOT:DOWNLOADS-->
   </section>
 
   <section id="questions" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">13 · <span data-i18n="sec.questions">Common questions</span></p>
-      <h2>The things people ask before they download it</h2>
-      <p>The same answers the support console gives, from the same file. If the two ever disagree,
-         this page is right and the console is a bug.</p>
+      <p class="eyebrow">Questions</p>
+      <h2>Common questions</h2>
     </div>
     <!--SLOT:FAQ-->
-    <p class="micro">Something not here? The support console, bottom right, answers from this same
-       set — and hands anything it cannot answer to a person.</p>
-  </section>
-
-
-  <section id="security" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">14 · <span data-i18n="sec.security">Security posture</span></p>
-      <h2>The smallest possible attack surface</h2>
-      <p>The safest data is data nobody holds. Without an account there is no server-side state at
-         all — no analytics, no telemetry, no crash reporting.</p>
-    </div>
-    <div class="trust">
-      <div><b>MAINNET ONLY</b><span>No testnet path exists in the build.</span></div>
-      <div><b>ZERO EGRESS</b><span>The AI agent runs on your own machine.</span></div>
-      <div><b>NO CUSTODY</b><span>It cannot hold, sign or move an asset.</span></div>
-      <div><b>OS KEYCHAIN</b><span>Secrets held by the system, never by the app.</span></div>
-      <div><b>ROW-LEVEL SECURITY</b><span>Every table scoped to its owning account.</span></div>
-      <div><b>NO CARD DATA</b><span>Payments handled entirely by Stripe.</span></div>
-    </div>
   </section>
 
   <section id="contact-cta" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">15 · <span data-i18n="sec.contact">Contact</span></p>
-      <h2>Talk to somebody who built it</h2>
-      <p>There is no sales qualification funnel and no account to create first. Say what you are
-         trying to work out and you will get a straight answer.</p>
+      <p class="eyebrow">Contact</p>
+      <h2>Talk to the founder</h2>
+      <p>Book a 30-minute call or send a question. You get a straight answer.</p>
     </div>
-    <div class="eck">
-      <div>
-        <p class="step">01 · PRODUCT</p>
-        <h3>Support</h3>
-        <p>How something works, a build that will not open, a reading you do not trust.</p>
-      </div>
-      <div>
-        <p class="step">02 · DESKS</p>
-        <h3>Institutions</h3>
-        <p>Deployment on a controlled network, seats, the compliance API, procurement questions.</p>
-      </div>
-      <div>
-        <p class="step">03 · DISCLOSURE</p>
-        <h3>Security</h3>
-        <p>Vulnerability reports. Send them here before anywhere else and they get acted on.</p>
-      </div>
-      <div>
-        <p class="step">04 · DATA</p>
-        <h3>Privacy</h3>
-        <p>What is held, what is not, and what happens to a message sent through the form.</p>
-      </div>
-    </div>
-    <div class="cta" style="margin-top:22px">
-      <a class="btn" href="/contact/">Open the contact form</a>
+    <div class="cta">
+      <a class="btn" href="/contact/?topic=institutions">Book a call</a>
       <a class="btn ghost" href="mailto:support@noshashi.app">support@noshashi.app</a>
     </div>
+    <p class="micro" style="margin-top:28px;text-align:center">Not legal, tax or investment advice. A GO means your rules passed; it does not make a transaction lawful. NOSHASHI sells software and never holds funds.</p>
   </section>
-
-
-  <section class="reveal">
-    <div class="disclaimer">
-      <strong style="color:var(--muted)">Not advice.</strong>
-      Nothing produced by this software is legal, regulatory, tax or investment advice. A GO verdict
-      means the configured rules passed — it is not a representation that a transaction is lawful in
-      any jurisdiction and it does not discharge any obligation owed to a regulator. Determinations
-      carrying legal consequence must be reviewed by qualified counsel and the responsible compliance
-      officer. NOSHASHI Labs is not a bank, broker-dealer, money services business, money transmitter,
-      qualified custodian or registered investment adviser.
-      Experimental Edge Lab outputs are research features, may be incomplete, and are not a
-      representation of liquidity, solvency, legality, ownership, title or recoverability. You are
-      responsible for independent verification, jurisdiction-specific review, sanctions screening,
-      privacy compliance and decisions made from the software.
-    </div>
-  </section>
-  <div class="zen-band" aria-hidden="true">
-    <svg viewBox="0 0 1200 140" preserveAspectRatio="xMidYMid slice" focusable="false">
-      <defs><mask id="zen-rake-2" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="140"><rect width="1200" height="140" fill="#fff"/><ellipse cx="250" cy="70" rx="89" ry="52" fill="#000"/><ellipse cx="720" cy="62" rx="97" ry="56" fill="#000"/><ellipse cx="1010" cy="82" rx="81" ry="48" fill="#000"/></mask></defs>
-      <g class="zr" mask="url(#zen-rake-2)"><path d="M0 10H1200"/><path d="M0 21H1200"/><path d="M0 32H1200"/><path d="M0 43H1200"/><path d="M0 54H1200"/><path d="M0 65H1200"/><path d="M0 76H1200"/><path d="M0 87H1200"/><path d="M0 98H1200"/><path d="M0 109H1200"/><path d="M0 120H1200"/><path d="M0 131H1200"/></g>
-      <g class="zr"><ellipse cx="250" cy="70" rx="40" ry="23"/><ellipse cx="250" cy="70" rx="54" ry="31"/><ellipse cx="250" cy="70" rx="68" ry="39"/><ellipse cx="250" cy="70" rx="82" ry="47"/><ellipse cx="720" cy="62" rx="48" ry="27"/><ellipse cx="720" cy="62" rx="62" ry="35"/><ellipse cx="720" cy="62" rx="76" ry="43"/><ellipse cx="720" cy="62" rx="90" ry="51"/><ellipse cx="1010" cy="82" rx="32" ry="19"/><ellipse cx="1010" cy="82" rx="46" ry="27"/><ellipse cx="1010" cy="82" rx="60" ry="35"/><ellipse cx="1010" cy="82" rx="74" ry="43"/></g>
-      <path class="zs" d="M224 73.0C226.6 56.5 255.2 53.5 270.8 62.5C279.9 68.5 274.7 83.5 252.6 85C234.4 85.75 222.7 81.25 224 73.0Z"/><path class="zs" d="M686 65.8C689.4 44.9 726.8 41.099999999999994 747.2 52.5C759.1 60.1 752.3 79.1 723.4 81C699.6 81.95 684.3 76.25 686 65.8Z"/><path class="zs" d="M992 84.2C993.8 72.1 1013.6 69.9 1024.4 76.5C1030.7 80.9 1027.1 91.9 1011.8 93C999.2 93.55 991.1 90.25 992 84.2Z"/>
-    </svg>
-  </div>
 </main>
 
 <footer>
@@ -2271,6 +1395,7 @@
     <p class="mono">© 2026 <span data-i18n="foot.rights">NOSHASHI Labs · XRPL Mainnet · All builds BETA</span></p>
     <nav class="foot-links" aria-label="Site">
       <a href="#public">Free tools</a>
+      <a href="/brief/">Product brief</a>
       <a href="#download">Download</a>
       <a href="/enterprise/">Institutions</a>
       <a href="/trust/">Security &amp; trust</a>

@@ -115,9 +115,15 @@ async function buildHome({ news, market, feed, status, release }) {
     ]),
   };
 
+  // The short homepage leaves out the newsroom, mission log and edge lab;
+  // their slots are optional so those panels can come back without code.
+  const OPTIONAL = new Set(["MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
-    if (!html.includes(token)) throw new Error(`templates/home.html is missing ${token}`);
+    if (!html.includes(token)) {
+      if (OPTIONAL.has(name)) continue;
+      throw new Error(`templates/home.html is missing ${token}`);
+    }
     html = html.split(token).join(value);
   }
 
@@ -1150,8 +1156,8 @@ async function buildAuthConfirmed() {
 
 /* ── institutional product pages ─────────────────────────────────── */
 const PRODUCT_PAGES = [
-  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "Institutional intelligence for the XRP Ledger.", "Evidence-backed intelligence, deterministic policy analysis, monitoring and reviewable adjudication.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Operating evidence</p><h2>Make every decision reviewable.</h2><p>Enterprise brings the same validated-ledger reading used in the public certificate into a governed workflow: the observation, policy result and adjudication remain connected.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">CONSOLE</p><h2>Operate with evidence.</h2><p>Asset passports, issuer intelligence, liquidity, counterparties, policies, monitoring and audit trails.</p><ul class="proof-list"><li>Evidence attached to each policy result</li><li>Decision history suitable for second-line review</li></ul></div><div class="panel"><p class="eyebrow">PIPELINE</p><h2>Collect → Calculate → Evaluate → Adjudicate</h2><p>Deterministic policy results remain the source of truth, while teams retain the context required to act on them.</p><ul class="proof-list"><li>Validated state before interpretation</li><li>Exportable records for internal controls</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">SALES</p><h2>Talk to institutional sales.</h2><p>Architecture and commercial scope are confirmed before any contracted capability is promised.</p><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Trust &amp; security</a></p></div></section>`],
-  ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build your institutional XRPL intelligence layer with NOSHASHI.", "Connect validated XRPL data, intelligence, monitoring, evidence and policy infrastructure to your own systems.", `<section class="institutional-proof"><div class="section-head"><p class="eyebrow">01 / Delivery evidence</p><h2>Build on a source you can inspect.</h2><p>Strategic infrastructure connects validated XRPL observations to the systems your institution already governs. Delivery, retention and integration boundaries are explicit rather than implied.</p></div><div class="grid g2"><div class="panel"><p class="eyebrow">DATA</p><h2>Machine-readable intelligence.</h2><p>APIs, event feeds, webhooks, bulk exports and custom schemas.</p><ul class="proof-list"><li>Stable records for downstream controls</li><li>Evidence and timestamps travel with the result</li></ul></div><div class="panel"><p class="eyebrow">CAPACITY</p><h2>Contracted high-volume access.</h2><p>Capacity, retention and delivery are based on deployment requirements and commercial scope.</p><ul class="proof-list"><li>Architecture review before commitment</li><li>Scope documented against the integration</li></ul></div></div></section><section><div class="panel"><p class="eyebrow">REVIEW</p><h2>Request architecture review.</h2><p>We will map data sources, operating boundaries and delivery requirements before proposing a contracted design.</p><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>`],
+  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "XRPL compliance for regulated teams.", "Screen deposits and withdrawals, check token risk and keep an audit trail, in one place.", `<section class="institutional-proof"><div class="grid g2"><div class="panel"><p class="eyebrow">WHAT YOU GET</p><h2>Everything in Institutional, plus:</h2><ul class="proof-list"><li>Deposit and withdrawal screening before you credit or sign</li><li>Market surveillance</li><li>A public page proving your customer protection fund</li><li>Investigation cases and audit exports</li></ul></div><div class="panel"><p class="eyebrow">HOW IT STARTS</p><h2>A call, then a scoped plan.</h2><p>We agree what you need before you sign anything. From $120,000 a year.</p><ul class="proof-list"><li>Every decision gets a receipt</li><li>Read-only: no keys, no custody</li></ul></div></div></section><section><div class="panel"><h2>Talk to us.</h2><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Security &amp; trust</a></p></div></section>`],
+  ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build on NOSHASHI's XRPL data.", "Plug our ledger readings, alerts and evidence into your own systems.", `<section class="institutional-proof"><div class="grid g2"><div class="panel"><p class="eyebrow">WHAT YOU GET</p><h2>Everything in Enterprise, plus:</h2><ul class="proof-list"><li>High-volume API and event feeds</li><li>Signed webhooks and bulk exports</li><li>Custom data formats and retention</li><li>Account takeover alerts</li></ul></div><div class="panel"><p class="eyebrow">HOW IT STARTS</p><h2>An architecture review.</h2><p>We map what you need, then propose a contract. From $250,000 a year.</p><ul class="proof-list"><li>Evidence travels with every result</li><li>Scope written down before you commit</li></ul></div></div></section><section><div class="panel"><h2>Talk to us.</h2><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>`],
   // The verbs are the edge function's own list (reference.json), not a
   // roadmap: an endpoint named here is one that answers today.
   ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.", `<div class="panel"><p class="eyebrow">REFERENCE</p><h2>Compliance API verbs</h2><p>One edge function serves every verb: <code>https://&lt;project&gt;.supabase.co/functions/v1/noshashi-verify/&lt;verb&gt;</code>.</p><ul>${DOCS_REF.verbs.map((v) => `<li><code>${esc(v.path)}</code> — ${esc(v.description)}</li>`).join("")}</ul><p>Request and response shapes, authentication, scopes and rate limits: <a href="/docs/api/">API reference</a>. Signed event delivery: <a href="/docs/webhooks/">Webhooks</a>. Everything else: <a href="/docs/">documentation</a>.</p></div>`],
@@ -1227,26 +1233,18 @@ async function buildPricingEnhancement() {
         <div class="body">
           <p class="fig" data-monthly="$10,000" data-annual="$120,000">$10,000</p>
           <p class="per" data-monthly="per month · $120,000 / year" data-annual="per year · $10,000 / month">per month · $120,000 / year</p>
-          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
-          <p class="role">Contracted · architecture and commercial review</p>
+          <p class="who">For regulated teams screening customer deposits and withdrawals.</p>
+          <p class="role">Annual contract · scoped with you first</p>
           <ul class="spec">
             <li>Everything in Institutional</li>
-            <li>Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit</li>
-            <li>Withdrawal screening: bounces, brand-new and hours-old destinations, lookalikes of past destinations, OFAC and the scam registry three hops back, before you sign</li>
-            <li>Customer Asset Protection: a protection fund with a per-customer limit, verified on the ledger and published on a page your customers can check (verification, not insurance)</li>
-            <li>Market surveillance: re-quoted orders that never fill, concentration and trades between accounts of one funder</li>
-            <li>Asset passports and issuer intelligence at institutional scope</li>
-            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
-            <li>Deterministic policy engine, adjudication and decision history</li>
-            <li>Evidence records, hashes, audit exports and review workflow</li>
-            <li>Institutional API, scoped keys and webhooks</li>
-            <li>Embeddable screening widget for your own site</li>
-            <li>Forensic trace five hops deep, straight into an investigation case</li>
-            <li>Scam cluster mapping four hops deep, 200 accounts, opened as a case</li>
-            <li>Dedicated environment · coming soon</li>
-            <li>Architecture review and named implementation planning</li>
+            <li>Deposit screening before you credit: fake tokens, phishing dust, sanctioned senders</li>
+            <li>Withdrawal screening before you sign: new or lookalike destinations</li>
+            <li>Market surveillance</li>
+            <li>Public page proving your customer protection fund</li>
+            <li>Investigation cases with five-hop tracing</li>
+            <li>Screening widget for your own site</li>
           </ul>
-          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">We agree the scope before you sign.</p></div>
         </div>
       </article>
       <article class="tier strategic gauge">
@@ -1254,20 +1252,17 @@ async function buildPricingEnhancement() {
         <div class="body">
           <p class="fig" data-monthly="$20,833" data-annual="$250,000">$20,833</p>
           <p class="per" data-monthly="per month · $250,000 / year" data-annual="per year · $20,833 / month">per month · $250,000 / year</p>
-          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
-          <p class="role">Contracted infrastructure · architecture review required</p>
+          <p class="who">For platforms building their own products on NOSHASHI data.</p>
+          <p class="role">Annual contract · architecture review first</p>
           <ul class="spec">
             <li>Everything in Enterprise</li>
-            <li>High-volume API capacity and contracted burst limits</li>
-            <li>XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API</li>
-            <li>Custom export schemas, bulk export and event retention you set</li>
-            <li>Custom data integrations for risk, custody, trading and compliance</li>
-            <li>Dedicated environment · coming soon</li>
-            <li>Security Guardian: signed alerts the minute a watched account's keys change or it is deleted, for a theft trail or a whole scam cluster</li>
-            <li>Protection alerts: a signed webhook the day reserves fall below customer balances, and the phishing link feed as an API</li>
-            <li>Strategic architecture review and integration roadmap</li>
+            <li>High-volume API</li>
+            <li>Live event feeds and signed webhooks</li>
+            <li>Custom export formats and data retention</li>
+            <li>Alerts when a watched account's keys change</li>
+            <li>Alerts when reserves fall below customer balances</li>
           </ul>
-          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity and scope are written into the contract.</p></div>
         </div>
       </article>`;
   // Remove generated Enterprise/Strategic blocks independently of the
@@ -1282,8 +1277,8 @@ async function buildPricingEnhancement() {
   <section id="compare" class="tier-comparison">
     <div class="kicker-block">
       <p class="eyebrow">02 / Comparison</p>
-      <h2>Five operating layers. One evidence standard.</h2>
-      <p>Every row names the actual entitlement. Included, limited, contracted, optional and unavailable are intentionally different promises.</p>
+      <h2>Every feature, plan by plan</h2>
+      <p>What each plan includes. "Contracted" means it is set in your contract.</p>
     </div>
     <div class="tier-compare">
       <table>
@@ -1347,17 +1342,11 @@ async function buildPricingEnhancement() {
   </section>`;
   const pricingTranslations = {
     "02 / Comparison": "pricing.comparison.eyebrow",
-    "Five operating layers. One evidence standard.": "pricing.comparison.title",
-    "Every row names the actual entitlement. Included, limited, contracted, optional and unavailable are intentionally different promises.": "pricing.comparison.body",
     "Commercial, intelligence and infrastructure entitlements. Contracted scope is confirmed during architecture review; no live integration or certification is implied.": "pricing.comparison.caption",
     "ENTERPRISE": "pricing.enterprise.name",
     "STRATEGIC INFRASTRUCTURE": "pricing.strategic.name",
     "Explore Enterprise": "pricing.enterprise.cta",
     "Build with NOSHASHI": "pricing.strategic.cta",
-    "Contracted · architecture and commercial review": "pricing.enterprise.role",
-    "Contracted infrastructure · architecture review required": "pricing.strategic.role",
-    "Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.": "pricing.enterprise.who",
-    "Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.": "pricing.strategic.who",
     "Everything in Institutional": "pricing.enterprise.institutional",
     "Everything in Enterprise": "pricing.strategic.enterprise",
   };
@@ -1497,7 +1486,7 @@ async function buildTrust() {
 .trust-flows th,.trust-flows td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
 .trust-flows thead th{font:12px "IBM Plex Mono",monospace;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
 </style>`,
-    body: `<div class="page-head"><p class="eyebrow">TRUST &amp; SECURITY</p><h1>Read-only by construction.</h1><p>NOSHASHI reads the XRP Ledger and applies your rules. It holds no keys, takes no custody, signs nothing and broadcasts nothing — and the claims on this page are checked against the code by test.</p></div>${content}`,
+    body: `<div class="page-head"><p class="eyebrow">TRUST &amp; SECURITY</p><h1>Read-only. No keys. No custody.</h1><p>NOSHASHI only reads the XRP Ledger. It never holds keys, signs or moves funds. Automated tests check every claim on this page against the code.</p></div>${content}`,
     structured: [breadcrumb("Trust & security", "/trust/")],
   }));
 }

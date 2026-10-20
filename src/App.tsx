@@ -359,7 +359,7 @@ const SCENES: SceneDef[] = [
     icon: <NovaVault size={15} />,
     digit: "",
     group: "primary",
-    requires: "compliance_api",
+    requires: "issuance_surveillance",
   },
   {
     id: "authority",

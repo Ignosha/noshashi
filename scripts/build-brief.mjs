@@ -107,6 +107,7 @@ export const PAID_FEATURES = [
   ["Immutable audit log", "institution", "Append-only record of who changed what, and when."],
   ["Bulk portfolio monitoring", "institution", "Unlimited watched wallets with scheduled stress runs."],
   ["Custom alert logic", "institution", "Your own triggers over measured facts, sent where you choose."],
+  ["Issuance surveillance", "institution", "Who holds an issuer's tokens and how concentrated they are, read from the ledger."],
   ["Proof of reserves", "institution", "A Merkle sum tree built on your machine, with reserve accounts attested daily from the ledger."],
   ["Shared scam registry", "institution", "Reviewed scam reports that screen deposits and withdrawals for every organization."],
   ["Single sign-on (coming soon)", "institution", "Not available yet; sign-in is by email, password and two-factor authentication."],

@@ -115,6 +115,12 @@ export type IssuanceReport = {
   truncated: boolean;
   /** Set when the walk stopped because a page failed, rather than on the cap. */
   walkError?: string;
+  /**
+   * Set when gateway_balances could not be read. Outstanding supply is then
+   * unknown, every currency's coverage is 0, and no concentration figure
+   * can be measured; the holder lines that were walked are still reported.
+   */
+  obligationsError?: string;
   requiresAuth: boolean;
   canFreeze: boolean;
   globalFreeze: boolean;
@@ -136,9 +142,21 @@ export async function readIssuance(
   issuer: string,
   onProgress?: (p: IssuanceProgress) => void
 ): Promise<IssuanceReport> {
+  /*
+   * gateway_balances sums every trust line on the server's side, so for a
+   * large issuer (Bitstamp, GateHub) a public server can time out or refuse
+   * it while account_info and the paged walk still answer. It used to fail
+   * the whole survey; now it is recorded and the walk goes ahead.
+   */
+  let obligationsError: string | undefined;
   const [info, balances] = await Promise.all([
     rpc("account_info", { account: issuer, ledger_index: "validated" }),
-    rpc("gateway_balances", { account: issuer, ledger_index: "validated" }),
+    rpc("gateway_balances", { account: issuer, ledger_index: "validated" }).catch(
+      (caught: unknown): Record<string, any> => {
+        obligationsError = caught instanceof Error ? caught.message : "gateway_balances failed";
+        return {};
+      }
+    ),
   ]);
 
   const data = info.account_data ?? {};
@@ -202,13 +220,18 @@ export async function readIssuance(
     if (pages >= MAX_PAGES) truncated = true;
   }
 
-  const currencies: CurrencySurveillance[] = Object.keys(outstanding)
+  // Without obligations, the currencies are the ones the walk saw. Their
+  // outstanding stays 0, so coverage is 0 and nothing is measurable.
+  const issued = obligationsError
+    ? [...new Set(lines.map((l) => l.currency))]
+    : Object.keys(outstanding);
+  const currencies: CurrencySurveillance[] = issued
     .map((currency) => {
       const forCurrency = lines.filter((l) => l.currency === currency);
       const active = forCurrency.filter((l) => l.held > 0).sort((a, b) => b.held - a.held);
       const held = active.map((l) => l.held);
       const observedHeld = held.reduce((a, b) => a + b, 0);
-      const supply = outstanding[currency];
+      const supply = outstanding[currency] ?? 0;
 
       return {
         currency,
@@ -228,7 +251,7 @@ export async function readIssuance(
         top: active.slice(0, 10),
       };
     })
-    .sort((a, b) => b.outstanding - a.outstanding);
+    .sort((a, b) => b.outstanding - a.outstanding || b.observedHeld - a.observedHeld);
 
   return {
     issuer,
@@ -247,6 +270,7 @@ export async function readIssuance(
     linesWalked: lines.length,
     truncated,
     walkError,
+    obligationsError,
     requiresAuth: (flags & LSF_REQUIRE_AUTH) !== 0,
     canFreeze: (flags & LSF_NO_FREEZE) === 0,
     globalFreeze: (flags & LSF_GLOBAL_FREEZE) !== 0,
@@ -270,6 +294,16 @@ const COVERAGE_FLOOR = 0.95;
 
 export function issuanceFindings(report: IssuanceReport): IssuanceFinding[] {
   const out: IssuanceFinding[] = [];
+
+  if (report.obligationsError) {
+    out.push({
+      id: "obligations-unreadable",
+      severity: "warn",
+      title: "Outstanding supply could not be read",
+      detail: `The public server did not answer gateway_balances for this issuer: ${report.obligationsError}. Large issuers can take longer than a public server allows. Holder lines were still read, but without the outstanding figure no coverage or concentration can be measured.`,
+      action: "Run the survey again in a minute; a different public server often answers.",
+    });
+  }
 
   if (report.walkError) {
     out.push({

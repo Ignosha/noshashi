@@ -196,11 +196,15 @@ function buildVerdict(
 }
 
 export async function buildPassport(options: PassportOptions): Promise<AssetPassport> {
+  // One holder walk, shared: for a large issuer two concurrent walks are
+  // 500 paged reads at once, which public servers throttle.
+  const walk = readIssuance(options.issuer);
   const [surface, issuance] = await Promise.all([
     readAuthoritySurface(options.issuer, {
       walkSupply: options.walkSupply ?? true,
+      issuance: walk,
     }),
-    readIssuance(options.issuer),
+    walk,
   ]);
 
   const currency = options.currency ?? issuance.currencies[0]?.currency ?? "";
