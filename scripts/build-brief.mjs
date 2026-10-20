@@ -208,8 +208,9 @@ export const WEB_TOOLS = [
   ["/alerts/", "Issuer alerts", "A Discord message when an issuer's powers change."],
   ["/delivered/", "Delivered-amount export", "Every payment's stated and delivered amounts in a CSV, partial payments flagged."],
   ["/treasury/", "Treasury report", "Period-end holdings, who can move them, and what funded offers could absorb. Prints to PDF."],
+  ["/book-health/", "Book health", "Quoted versus funded depth on the main XRP books, today and at each of the last seven daily closes."],
   ["/xapp/", "Check an address", "Screen an address before you pay it, from any phone browser."],
-  ["/developers/", "Public JSON endpoints", "/api/authority, /api/book, /api/issuer-state, /api/delivered and /api/treasury, free and without a key."],
+  ["/developers/", "Public JSON endpoints", "/api/authority, /api/book, /api/book-health, /api/issuer-state, /api/delivered and /api/treasury, free and without a key."],
   ["/learn/", "Learn NOSHASHI", "A free course on reading the ledger the way the product does."],
 ];
 

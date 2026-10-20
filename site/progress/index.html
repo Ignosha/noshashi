@@ -61,8 +61,8 @@
 <section>
   <div class="rail">
     <div><span class="label">CURRENT BUILD</span><strong>—</strong><small>Beta channel, unsigned, built by CI.</small></div>
-    <div><span class="label">RELEASES SHIPPED</span><strong>2</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
-    <div><span class="label">TESTS PASSING</span><strong>272</strong><small>On the logic that makes claims. Run with npm test.</small></div>
+    <div><span class="label">RELEASES SHIPPED</span><strong>3</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
+    <div><span class="label">TESTS PASSING</span><strong>1,200+</strong><small>Across the app, the API and the website. Run with npm test.</small></div>
     <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>No sign-up exists. Nothing is held server-side.</small></div>
   </div>
 </section>
@@ -86,9 +86,9 @@
       <p class="prog-note">Ledger sync across four public nodes, cadence measured from arrival, and the DEX-derived price used on this site&#39;s ticker.</p>
     </div>
     <div class="prog-line" data-state="done">
-      <div class="prog-head"><b>Free public tools</b><span>6 of 6 tools</span></div>
+      <div class="prog-head"><b>Free public tools</b><span>shipped</span></div>
       <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
-      <p class="prog-note">Address, payment, order book, exposure, NFT and node checks, all on the landing page without an account.</p>
+      <p class="prog-note">Address, payment, order book, exposure, NFT and node checks on the landing page, plus the authority certificate, issuer badge and alerts, delivered-amount export, treasury report and book health. No account needed.</p>
     </div>
     <div class="prog-line" data-state="done">
       <div class="prog-head"><b>Public website</b><span>server-rendered</span></div>
@@ -100,10 +100,10 @@
       <div class="prog-track"><div class="prog-fill" style="width:25%"></div></div>
       <p class="prog-note">Builds are reproducible from CI and hash-verified, but not yet code-signed or notarised. This is the single largest thing standing between the beta channel and a 1.0.</p>
     </div>
-    <div class="prog-line" data-state="open">
-      <div class="prog-head"><b>Compliance API and webhooks</b><span>institutional tier</span></div>
-      <div class="prog-track"><div class="prog-fill" style="width:40%"></div></div>
-      <p class="prog-note">The verification surface exists in the product; the hosted API and webhook delivery are being built out against the institutional tier.</p>
+    <div class="prog-line" data-state="done">
+      <div class="prog-head"><b>Compliance API and webhooks</b><span>shipped</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
+      <p class="prog-note">Scoped API keys, the same verdicts and receipts as the console, and signed webhooks (deposit_screened, custom_alert, xrpl_event). Shipped in 1.0.13; the uptime SLA that would sit on top of it is not offered yet.</p>
     </div>
     <div class="prog-line" data-state="open">
       <div class="prog-head"><b>Independent security review</b><span>not started</span></div>
@@ -120,6 +120,42 @@
   </div>
   <div class="console"><div class="console-body">
     <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="milestone">
+      <div class="log-meta">
+        <time datetime="2026-10-20T01:00:00.000Z">2026-10-20</time>
+        <span class="log-kind">MILESTONE</span>
+      </div>
+      <h3>Book health: quoted versus funded depth on the main XRP books, live</h3>
+      <p>A free page that reads the Bitstamp, GateHub, RLUSD and SOLO books from validated ledgers and shows how much of the advertised depth is actually funded, today and at each of the last seven daily closes. Nothing is stored; every day is re-read at the ledger index shown.</p>
+      <a class="log-link" href="/book-health/">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="milestone">
+      <div class="log-meta">
+        <time datetime="2026-10-20T00:35:00.000Z">2026-10-20</time>
+        <span class="log-kind">MILESTONE</span>
+      </div>
+      <h3>Product brief: the problems NOSHASHI solves, how it earns, every feature</h3>
+      <p>One page with the XRP Ledger problems the product addresses, the plans and prices checkout charges, every screen and paid feature in the build, and what is not built yet. A test keeps it in step with the app and the billing catalogue.</p>
+      <a class="log-link" href="/brief/">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="milestone">
+      <div class="log-meta">
+        <time datetime="2026-10-20T00:12:00.000Z">2026-10-20</time>
+        <span class="log-kind">MILESTONE</span>
+      </div>
+      <h3>Treasury report for companies that hold XRP</h3>
+      <p>Holdings, reserves and who can move each wallet at a period end, and how much of the holding funded dollar offers could absorb. Read from validated ledgers with a SHA-256 digest; prints to PDF.</p>
+      <a class="log-link" href="/treasury/">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-09-30T18:00:00.000Z">2026-09-30</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>1.0.20: annual prices, coming-soon items marked, a stricter website</h3>
+      <p>Enterprise and Strategic are priced by the year; the uptime SLA, single sign-on and dedicated environments are marked coming soon. The website runs no inline script. An internal security assessment ran on 30 September, and SOC 2 readiness documents and contract templates were added.</p>
+      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
+    </article>
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
         <time datetime="2026-09-29T03:00:00.000Z">2026-09-29</time>
@@ -155,15 +191,6 @@
       <h3>Public site rebuilt around live feeds</h3>
       <p>The site now carries a live XRP newsroom, this mission log, a support console and a contact channel. Every page is rendered on the server before it is served, so the content is in the HTML a crawler receives rather than assembled afterwards in the browser.</p>
       <a class="log-link" href="/status/">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="note">
-      <div class="log-meta">
-        <time datetime="2026-09-17T11:00:00.000Z">2026-09-17</time>
-        <span class="log-kind">NOTE</span>
-      </div>
-      <h3>Accounts and the hosted workspace were withdrawn from the site</h3>
-      <p>Sign-in and the hosted dashboard are gone. NOSHASHI runs on your machine and reads public ledger state; the website no longer asks anyone to create an account to evaluate it. Existing links redirect rather than breaking.</p>
-      <a class="log-link" href="/#download">OPEN →</a>
     </article>
   </div>
   </div></div>
@@ -209,6 +236,7 @@
       <a href="/alerts/">Issuer alerts</a>
       <a href="/delivered/">Delivered-amount export</a>
       <a href="/treasury/">Treasury report</a>
+      <a href="/book-health/">Book health</a>
       <a href="/xapp/">Check an address</a>
       <a href="/news/">Newsroom</a>
       <a href="/progress/">Progress</a>
