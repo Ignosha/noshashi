@@ -59,6 +59,7 @@ export const FOOTER_LINKS = [
   { href: "/badge/", label: "Issuer badge" },
   { href: "/alerts/", label: "Issuer alerts" },
   { href: "/delivered/", label: "Delivered-amount export" },
+  { href: "/treasury/", label: "Treasury report" },
   { href: "/xapp/", label: "Check an address" },
   { href: "/news/", label: "Newsroom" },
   { href: "/progress/", label: "Progress" },

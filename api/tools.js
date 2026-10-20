@@ -5,8 +5,9 @@
  *   /api/book          -> api/_lib/routes/book.js
  *   /api/delivered     -> api/_lib/routes/delivered.js
  *   /api/issuer-state  -> api/_lib/routes/issuer-state.js
+ *   /api/treasury      -> api/_lib/routes/treasury.js
  *
- * They share one function, not four, because the Hobby plan deploys at most
+ * They share one function, not five, because the Hobby plan deploys at most
  * twelve and the site already used eleven (a deployment over the limit
  * fails outright). The public URLs are unchanged: vercel.json rewrites each
  * to /api/tools?tool=<name>, keeping the caller's own query string.
@@ -17,8 +18,9 @@ import badge from "./_lib/routes/badge.js";
 import book from "./_lib/routes/book.js";
 import delivered from "./_lib/routes/delivered.js";
 import issuerState from "./_lib/routes/issuer-state.js";
+import treasury from "./_lib/routes/treasury.js";
 
-const ROUTES = { badge, book, delivered, "issuer-state": issuerState };
+const ROUTES = { badge, book, delivered, "issuer-state": issuerState, treasury };
 
 export default function handler(req, res) {
   const route = ROUTES[String(req.query?.tool ?? "")];

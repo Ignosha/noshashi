@@ -134,6 +134,10 @@
     {
       "source": "/api/issuer-state",
       "destination": "/api/tools?tool=issuer-state"
+    },
+    {
+      "source": "/api/treasury",
+      "destination": "/api/tools?tool=treasury"
     }
   ]
 }
