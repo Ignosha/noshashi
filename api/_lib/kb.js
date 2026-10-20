@@ -35,7 +35,7 @@ export const ENTRIES = [
     keywords: ["what", "noshashi", "do", "product", "about", "purpose", "explain", "is"],
     q: "What does NOSHASHI do?",
     a: "NOSHASHI reads validated XRP Ledger state and answers two questions from it at the same moment: whether a transfer is permitted under the rules you configured, and whether you could actually exit the position. It returns a GO, HOLD or NO-GO verdict with the evidence attached. It is informational tooling — it never holds, signs or moves an asset.",
-    links: [{ label: "The thesis", href: "/#thesis" }],
+    links: [{ label: "The product brief", href: "/brief/" }],
   },
   {
     id: "advice",
@@ -47,7 +47,7 @@ export const ENTRIES = [
                "pump", "dump", "hodl", "rally", "target"],
     q: "Will XRP go up? Should I buy?",
     a: "That is outside what this tool does, and outside what anyone here will tell you. NOSHASHI reports whether a transfer is permitted under the rules you configured and whether you could actually exit the position. It does not forecast a price, and nothing it produces is investment, legal, regulatory or tax advice.",
-    links: [{ label: "What it actually does", href: "/#thesis" }, { label: "Legal", href: "/legal/" }],
+    links: [{ label: "What it actually does", href: "/brief/" }, { label: "Legal", href: "/legal/" }],
   },
   {
     id: "price",
@@ -89,14 +89,14 @@ export const ENTRIES = [
     keywords: ["account", "sign", "signup", "login", "register", "dashboard", "workspace", "password"],
     q: "Do I need an account?",
     a: "No. There are no accounts on this site — sign-in and the hosted workspace were withdrawn. The application runs on your machine and reads public ledger state directly, so there is no server-side state to log into. A paid subscription is managed through Stripe and does not create a website login.",
-    links: [{ label: "Security posture", href: "/#security" }],
+    links: [{ label: "Security posture", href: "/trust/" }],
   },
   {
     id: "privacy",
     keywords: ["privacy", "data", "telemetry", "analytics", "tracking", "collect", "gdpr", "store", "egress"],
     q: "What data do you collect?",
     a: "Without an account there is no server-side state: no analytics, no telemetry, no crash reporting. The compliance agent runs on your own machine with zero egress. Secrets are held by the OS keychain rather than by the app. Typefaces are self-hosted, so opening a page does not announce you to a font CDN.",
-    links: [{ label: "Security posture", href: "/#security" }, { label: "Legal", href: "/legal/" }],
+    links: [{ label: "Security posture", href: "/trust/" }, { label: "Legal", href: "/legal/" }],
   },
   {
     id: "custody",

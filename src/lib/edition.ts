@@ -40,7 +40,7 @@ export const isDemo: boolean = EDITION === "demo";
 export const DEMO_LOCKED: Record<string, string> = {
   portfolios: "Multi-wallet portfolios are part of the Pro plan.",
   alerts: "Drift and expiry alerts are part of the Pro plan.",
-  compliance_api: "The compliance API is part of the Institutional plan.",
+  compliance_api: "The compliance API is part of the Pro plan.",
   webhooks: "Webhooks are part of the Institutional plan.",
   regulator_seats: "Regulator seats are part of the Institutional plan.",
   white_label: "White labelling is part of the Institutional plan.",

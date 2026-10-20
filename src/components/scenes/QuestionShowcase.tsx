@@ -21,6 +21,7 @@ function useLiveDepth(connected: boolean) {
   useEffect(() => {
     if (!connected || reading) return;
     let cancelled = false;
+    setFailed(false);
     fetchOrderBook(SHOWCASE_BOOK.currency, SHOWCASE_BOOK.issuer)
       .then((book) => !cancelled && setReading(quotedVsFillable(book)))
       .catch(() => !cancelled && setFailed(true));
@@ -120,7 +121,11 @@ export function QuestionShowcase({
           </div>
         ) : (
           <p className="mono-font text-[11px] text-muted-foreground">
-            {failed ? "Ledger did not answer. Open the order book to retry." : "Reading the live order book…"}
+            {failed
+              ? "Ledger did not answer. Open the order book to retry."
+              : reading
+                ? `Nothing quoted on the ${SHOWCASE_BOOK.label} sell side at ledger ${reading.ledgerIndex.toLocaleString()}.`
+                : "Reading the live order book…"}
           </p>
         )}
       </Card>
