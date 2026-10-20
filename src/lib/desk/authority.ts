@@ -174,7 +174,11 @@ export const AUTHORITY_RULES_VERSION = 2;
 
 export async function readAuthoritySurface(
   issuer: string,
-  options: { walkSupply?: boolean } = {}
+  options: {
+    walkSupply?: boolean;
+    /** A walk already in flight for this issuer, reused instead of starting a second one. */
+    issuance?: Promise<IssuanceReport>;
+  } = {}
 ): Promise<AuthoritySurface> {
   const unreadable: string[] = [];
 
@@ -190,10 +194,20 @@ export async function readAuthoritySurface(
     // The supply walk is the expensive read, so it is opt-in. When it is
     // skipped the concentration checks abstain rather than assume.
     options.walkSupply
-      ? readIssuance(issuer).catch((error: unknown) => {
-          unreadable.push(`issuance: ${error instanceof Error ? error.message : String(error)}`);
-          return null;
-        })
+      ? (options.issuance ?? readIssuance(issuer)).then(
+          (report) => {
+            // Without obligations the walk has no denominator, and an empty
+            // currency list would read as "nothing issued": a failed read
+            // passing as NOT_APPLICABLE. It is recorded as a failed walk.
+            if (!report.obligationsError) return report;
+            unreadable.push(`issuance: outstanding supply unreadable (${report.obligationsError})`);
+            return null;
+          },
+          (error: unknown) => {
+            unreadable.push(`issuance: ${error instanceof Error ? error.message : String(error)}`);
+            return null;
+          }
+        )
       : Promise.resolve(null),
   ]);
 

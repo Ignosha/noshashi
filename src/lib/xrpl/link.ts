@@ -17,6 +17,16 @@ const ENDPOINTS = [
 import { RequestPacer } from "./pacer";
 
 const REQUEST_TIMEOUT_MS = 12_000;
+/**
+ * Commands a server answers by scanning every trust line an account has.
+ * For a large issuer (Bitstamp has hundreds of thousands) that takes longer
+ * than 12 s on a public server, and the read was timing out before the
+ * answer arrived.
+ */
+const HEAVY_COMMANDS: ReadonlySet<string> = new Set(["gateway_balances", "account_lines"]);
+const HEAVY_TIMEOUT_MS = 45_000;
+export const timeoutFor = (command: string) =>
+  HEAVY_COMMANDS.has(command) ? HEAVY_TIMEOUT_MS : REQUEST_TIMEOUT_MS;
 const MAX_BACKOFF_MS = 20_000;
 
 export class XrplError extends Error {
@@ -253,7 +263,7 @@ class XrplLink {
       const timer = window.setTimeout(() => {
         this.pending.delete(id);
         reject(new XrplError(`Timed out: ${command}`));
-      }, REQUEST_TIMEOUT_MS);
+      }, timeoutFor(command));
 
       this.pending.set(id, {
         resolve: (result) => {
