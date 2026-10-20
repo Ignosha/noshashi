@@ -450,12 +450,12 @@
   .measure td.before{color:var(--nogo)}
   .measure td.after{color:var(--go)}
 
-  .price{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .price{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
   .tier{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;position:relative;overflow:hidden}
   .tier.focus{border-color:color-mix(in srgb,var(--brand) 45%,var(--rule))}
   .tier .cap{position:absolute;inset:0 0 auto 0;height:2px;background:var(--rule)}
   .tier.focus .cap{background:var(--brand)}
-  .tier.inst .cap{background:var(--tele)}
+  .tier.institutional .cap{background:var(--tele)}
   .tier.enterprise{border-color:color-mix(in srgb,var(--tele) 55%,var(--rule))}
   .tier.enterprise .cap{background:var(--tele)}
   .tier.enterprise .name{color:var(--tele)}
@@ -464,7 +464,7 @@
   .tier.strategic .name{color:#b69cff}
   html[data-theme="light"] .tier.strategic .name{color:#5B3FB8}
   .tier .name{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--muted)}
-  .tier.focus .name{color:var(--brand)} .tier.inst .name{color:var(--tele)}
+  .tier.focus .name{color:var(--brand)} .tier.institutional .name{color:var(--tele)}
   .tier .amt{font-size:34px;font-weight:700;margin:18px 0 2px;letter-spacing:-.02em}
   .tier .per{color:var(--faint);font-size:11px;font-family:"IBM Plex Mono",monospace}
   .tier .who{color:var(--faint);font-size:12px;margin-top:4px}
@@ -964,7 +964,10 @@
       <span>NOSHASHI</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="#problem">Problem</a>
+      <a class="nav-link" href="#how">How it works</a>
       <a class="nav-link" href="#public">Try it free</a>
+      <a class="nav-link" href="#who">Who it's for</a>
       <a class="nav-link optional" href="#pricing">Pricing</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
         <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
@@ -1060,7 +1063,7 @@
 
       <p class="hi-title">NOSHASHI</p>
       <h1><span class="h1-a">Check XRPL risk before you move money</span></h1>
-      <p class="hi-sub">See if a token can be frozen or sold before you pay. Free.</p>
+      <p class="hi-sub">Can this token be frozen? Can you actually sell it? Did that payment arrive in full? NOSHASHI checks the live ledger and gives you a clear answer, with a receipt.</p>
       <!-- Filled by site/assets/garden-field.js from the live ledger stream; the text here is what shows without script. -->
       <p class="mono hi-caption" data-garden-caption translate="no">The pond answers each validated XRPL ledger as it closes.</p>
 
@@ -1071,24 +1074,62 @@
     </div>
   </section>
 
-  <!-- Live mainnet ticker: real data over the public WebSocket. If it
-       cannot connect it says so. -->
+  <section class="proof-strip" aria-label="NOSHASHI proof strip" data-i18n-aria-label="proof.aria" data-i18n-aria-label-en="NOSHASHI proof strip">
+    <div class="proof-stat">
+      <span class="label" data-i18n="proof.ledger.label">VALIDATED LEDGER</span>
+      <strong data-i18n="proof.ledger.value">XRPL mainnet</strong>
+      <small data-i18n="proof.ledger.note">same state going into every decision</small>
+    </div>
+    <div class="proof-stat">
+      <span class="label" data-i18n="proof.rules.label">RULES</span>
+      <strong data-i18n="proof.rules.value">GO · HOLD · NO-GO</strong>
+      <small data-i18n="proof.rules.note">deterministic, replayable policy checks</small>
+    </div>
+    <div class="proof-stat">
+      <span class="label" data-i18n="proof.receipt.label">RECEIPT</span>
+      <strong data-i18n="proof.receipt.value">SHA-256</strong>
+      <small data-i18n="proof.receipt.note">byte-stable evidence for review</small>
+    </div>
+    <div class="proof-stat">
+      <span class="label" data-i18n="proof.control.label">CONTROL</span>
+      <strong data-i18n="proof.control.value">Read-only</strong>
+      <small data-i18n="proof.control.note">no custody, no keys, no broadcast path</small>
+    </div>
+  </section>
+
+  <!-- Live mainnet ticker: real data over the same public WebSocket the
+       desktop app uses. If it cannot connect it says so. -->
   <div class="ticker" id="ticker" aria-live="polite" aria-label="Live XRP Ledger telemetry">
-    <span class="tk"><b id="tk-state">CONNECTING</b><i>LIVE</i></span>
-    <span class="tk"><b id="tk-xrp">—</b><i>XRP PRICE</i></span>
-    <span class="tk"><b id="tk-spread">—</b><i>REAL SPREAD</i></span>
-    <span class="tk"><b id="tk-ledger">—</b><i>LEDGER</i></span>
+    <span class="tk"><b id="tk-state">CONNECTING</b><i>LIVE LINK</i></span>
+    <span class="tk"><b id="tk-xrp">—</b><i>XRP / RLUSD PRICE</i></span>
+    <span class="tk"><b id="tk-spread">—</b><i>SPREAD YOU CAN FILL</i></span>
+    <span class="tk"><b id="tk-ledger">—</b><i>LATEST LEDGER</i></span>
+    <span class="tk"><b id="tk-tx">—</b><i>TRANSACTIONS</i></span>
+    <span class="tk"><b id="tk-fee">—</b><i>FEE</i></span>
+    <span class="tk"><b id="tk-close">—</b><i>CLOSE TIME</i></span>
   </div>
 
   <section id="problem" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">Why it matters</p>
-      <h2>Three things that cost people money</h2>
+      <p class="eyebrow">The problem</p>
+      <h2>What you see on the XRP Ledger is not always what you get</h2>
     </div>
     <div class="grid g3">
-      <div class="panel"><h3>Tokens can be frozen</h3><p>See who can freeze yours.</p></div>
-      <div class="panel"><h3>Order books can lie</h3><p>See what you could really sell.</p></div>
-      <div class="panel"><h3>Payments can come up short</h3><p>See what actually arrived.</p></div>
+      <div class="panel">
+        <p class="num">FREEZE RISK</p>
+        <h3>Tokens can be frozen</h3>
+        <p>Most token issuers keep the right to freeze or claw back your balance. Few apps show it.</p>
+      </div>
+      <div class="panel">
+        <p class="num">FAKE DEPTH</p>
+        <h3>Order books overstate liquidity</h3>
+        <p>Offers stay listed after their owners spend the funds. The real exit is often much smaller.</p>
+      </div>
+      <div class="panel">
+        <p class="num">SHORT PAYMENTS</p>
+        <h3>"Successful" payments can deliver less</h3>
+        <p>A partial payment can succeed and deliver a fraction of the amount shown. Exchanges have lost money this way.</p>
+      </div>
     </div>
     <details class="traps" style="margin-top:18px">
       <summary class="btn ghost">See 6 real examples from mainnet</summary>
@@ -1154,11 +1195,36 @@
     </details>
   </section>
 
+  <section id="how" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">How it works</p>
+      <h2>Read. Decide. Prove.</h2>
+    </div>
+    <div class="grid g3">
+      <div class="panel">
+        <p class="num">01 · READ</p>
+        <h3>Live ledger data</h3>
+        <p>Only from validated ledgers, checked against a second server.</p>
+      </div>
+      <div class="panel">
+        <p class="num">02 · DECIDE</p>
+        <h3>GO, HOLD or NO-GO</h3>
+        <p>Against your own written policy. Every rule shows its result and reason.</p>
+      </div>
+      <div class="panel">
+        <p class="num">03 · PROVE</p>
+        <h3>A receipt for every decision</h3>
+        <p>A SHA-256 receipt and audit log your auditor can re-check.</p>
+      </div>
+    </div>
+    <p class="micro" style="text-align:center;margin-top:18px">Read-only: NOSHASHI never holds keys, signs or moves funds.</p>
+  </section>
+
   <section id="public" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">Try it free</p>
-      <h2>Paste an address. Get the answer.</h2>
-      <p>Live data. No account.</p>
+      <h2>Check an address, a payment or an order book now</h2>
+      <p>Runs in your browser on live XRP Ledger data. No account needed.</p>
     </div>
 
       <div class="tools">
@@ -1166,40 +1232,47 @@
           <button role="tab" id="tab-addr" aria-controls="pane-addr" aria-selected="true"  class="tab on">Address</button>
           <button role="tab" id="tab-pay"  aria-controls="pane-pay"  aria-selected="false" class="tab">Payment</button>
           <button role="tab" id="tab-book" aria-controls="pane-book" aria-selected="false" class="tab">Order book</button>
+          <button role="tab" id="tab-exp"  aria-controls="pane-exp"  aria-selected="false" class="tab">Exposure</button>
+          <button role="tab" id="tab-nft"  aria-controls="pane-nft"  aria-selected="false" class="tab">NFT</button>
+          <button role="tab" id="tab-node" aria-controls="pane-node" aria-selected="false" class="tab">Nodes</button>
         </div>
 
         <div class="pane on" id="pane-addr" role="tabpanel" aria-labelledby="tab-addr">
-          <p class="ask">Can this account freeze your tokens?</p>
+          <p class="ask">Can this account freeze what it issues you, and what does it charge?</p>
           <form id="checkForm" class="checkbar" autocomplete="off">
             <label class="sr-only" for="addr">XRPL address</label>
             <input id="addr" name="addr" type="text" spellcheck="false"
-                   placeholder="Paste an XRPL address (starts with r)">
-            <button class="btn" type="submit" id="checkBtn">Check</button>
+                   placeholder="Paste an XRPL address — it starts with r">
+            <button class="btn" type="submit" id="checkBtn">Read the ledger</button>
           </form>
           <p class="checknote">Try
-            <button type="button" class="sample" data-a="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">Bitstamp</button>
+            <button type="button" class="sample" data-a="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">a major USD issuer</button>
             <span aria-hidden="true">·</span>
-            <button type="button" class="sample" data-a="rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh">an exchange</button>
+            <button type="button" class="sample" data-a="rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh">an exchange account</button>
+            <span aria-hidden="true">·</span>
+            <button type="button" class="sample" data-a="rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn">an account with several signers</button>
           </p>
           <div id="checkOut" class="checkout" hidden aria-live="polite"></div>
         </div>
 
         <div class="pane" id="pane-pay" role="tabpanel" aria-labelledby="tab-pay" hidden>
-          <p class="ask">Did this payment deliver the full amount?</p>
+          <p class="ask">A payment succeeded. Did it deliver what it said it would?</p>
           <form id="payForm" class="checkbar" autocomplete="off">
             <label class="sr-only" for="txh">Transaction hash</label>
             <input id="txh" name="txh" type="text" spellcheck="false"
-                   placeholder="Paste a transaction hash">
-            <button class="btn" type="submit" id="payBtn">Check</button>
+                   placeholder="Paste a transaction hash — 64 hex characters">
+            <button class="btn" type="submit" id="payBtn">Read the transaction</button>
           </form>
           <p class="checknote">
-            <button type="button" class="sample" id="findPartial">Find a short payment happening now</button>
+            A payment can show as successful and still deliver only part of the amount.
+            Exchanges have lost money crediting the full figure.
+            <button type="button" class="sample" id="findPartial">Find one happening right now</button>
           </p>
           <div id="payOut" class="checkout" hidden aria-live="polite"></div>
         </div>
 
         <div class="pane" id="pane-book" role="tabpanel" aria-labelledby="tab-book" hidden>
-          <p class="ask">How much could you really sell?</p>
+          <p class="ask">How much of this book could actually fill?</p>
           <form id="bookForm" class="checkbar" autocomplete="off">
             <label class="sr-only" for="pair">Currency pair</label>
             <select id="pair" name="pair">
@@ -1208,18 +1281,83 @@
               <option value="EUR|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">EUR / GateHub &rarr; XRP</option>
               <option value="524C555344000000000000000000000000000000|rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">RLUSD / Ripple &rarr; XRP</option>
             </select>
-            <button class="btn" type="submit" id="bookBtn">Check</button>
+            <button class="btn" type="submit" id="bookBtn">Measure the depth</button>
           </form>
-
+          <p class="checknote">
+            Offers stay listed even when their owner no longer has the funds, so the book
+            looks deeper than it is. This shows what could really fill.
+            <a href="/research/">How we measure it</a>.
+          </p>
           <div id="bookOut" class="checkout" hidden aria-live="polite"></div>
         </div>
+
+        <div class="pane" id="pane-exp" role="tabpanel" aria-labelledby="tab-exp" hidden>
+          <p class="ask">What are you holding, and who can freeze it?</p>
+          <form id="expForm" class="checkbar" autocomplete="off">
+            <label class="sr-only" for="expAddr">XRPL address</label>
+            <input id="expAddr" name="expAddr" type="text" spellcheck="false"
+                   placeholder="Paste the address whose holdings you want to read">
+            <button class="btn" type="submit" id="expBtn">Read the lines</button>
+          </form>
+          <p class="checknote">
+            Lists every token an account holds and whether each issuer can still freeze it.
+            <button type="button" class="sample" data-e="rMZKeAt1vMjhuNCWDiB4SdzJRiymdpERw4">try an account with holdings</button>
+          </p>
+          <div id="expOut" class="checkout" hidden aria-live="polite"></div>
+        </div>
+
+        <div class="pane" id="pane-nft" role="tabpanel" aria-labelledby="tab-nft" hidden>
+          <p class="ask">Who issued this NFT, and what did they keep the right to do?</p>
+          <form id="nftForm" class="checkbar" autocomplete="off">
+            <label class="sr-only" for="nftId">NFTokenID</label>
+            <input id="nftId" name="nftId" type="text" spellcheck="false"
+                   placeholder="Paste an NFTokenID — 64 hex characters">
+            <button class="btn" type="submit" id="nftBtn">Decode it</button>
+          </form>
+          <p class="checknote">
+            Shows who issued the NFT, the royalty they take, and whether they can take it back.
+            <button type="button" class="sample" data-n="00080BB84F44098667FBB6C8E7F589183B68708A94C05FC94A2640BA05E9E81F">try one</button>
+          </p>
+          <div id="nftOut" class="checkout" hidden aria-live="polite"></div>
+        </div>
+
+        <div class="pane" id="pane-node" role="tabpanel" aria-labelledby="tab-node" hidden>
+          <p class="ask">Do the public nodes agree on what the ledger says?</p>
+          <form id="nodeForm" class="checkbar" autocomplete="off">
+            <button class="btn" type="submit" id="nodeBtn">Compare the nodes</button>
+          </form>
+          <p class="checknote">
+            Every app reads the ledger through someone's server. This checks that the public
+            servers agree, so you know the data is right.
+          </p>
+          <div id="nodeOut" class="checkout" hidden aria-live="polite"></div>
+        </div>
       </div>
+
+    <p class="cta" style="margin-top:18px">
+      <a class="btn ghost" href="/book-health/">Book health</a>
+      <a class="btn ghost" href="/treasury/">Treasury report</a>
+      <a class="btn ghost" href="/research/">Published findings</a>
+    </p>
+  </section>
+
+  <section id="who" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">Who it's for</p>
+      <h2>Teams that move or hold value on the XRP Ledger</h2>
+    </div>
+    <div class="grid g2">
+      <div class="panel"><h3>Exchanges and custodians</h3><p>Screen deposits and withdrawals: fake tokens, phishing dust, lookalike addresses, sanctioned senders up to three hops back.</p></div>
+      <div class="panel"><h3>Token issuers</h3><p>Show holders exactly what powers you keep, and prove it from the ledger.</p></div>
+      <div class="panel"><h3>Funds and treasuries</h3><p>Know the real exit for a position before you size it.</p></div>
+      <div class="panel"><h3>Auditors</h3><p>Check a fair-value mark against depth that can actually fill, with the ledger it was read at.</p></div>
+    </div>
   </section>
 
   <section id="pricing" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">Pricing</p>
-      <h2>Start free</h2>
+      <h2>Start free. Pay when your team needs more.</h2>
     </div>
     <div class="price">
       <div class="tier">
@@ -1227,7 +1365,8 @@
         <p class="name">FREE</p>
         <p class="amt">$0</p><p class="per">forever</p>
         <ul>
-          <li>Desktop app and web tools</li>
+          <li>Desktop app and free web tools</li>
+          <li>Unlimited GO / HOLD / NO-GO checks</li>
           <li>10 address checks a month</li>
         </ul>
         <a class="btn ghost block" href="#download" style="margin-top:22px">Download</a>
@@ -1237,33 +1376,46 @@
         <p class="name">PRO</p>
         <p class="amt">$749</p><p class="per">per seat / month</p>
         <ul>
-          <li>Unlimited checks</li>
-          <li>Real exit liquidity</li>
+          <li>Unlimited address checks</li>
+          <li>Real exit liquidity and freeze analysis</li>
+          <li>Saved decisions and alerts</li>
         </ul>
         <form class="checkout-form" action="/api/create-checkout-session" method="post" style="margin-top:22px">
           <button class="btn block" type="submit">Subscribe</button>
           <p class="checkout-error" role="alert" hidden></p>
         </form>
       </div>
-      <div class="tier enterprise">
+      <div class="tier institutional">
         <span class="cap"></span>
-        <p class="name">TEAMS</p>
-        <p class="amt">$40,000+</p><p class="per">per year</p>
+        <p class="name">INSTITUTIONAL</p>
+        <p class="amt">$40,000</p><p class="per">per year</p>
         <ul>
-          <li>API and audit exports</li>
-          <li>Issuer surveillance</li>
+          <li>Compliance API and webhooks</li>
+          <li>Issuer surveillance: who holds your tokens</li>
+          <li>Signed audit exports</li>
         </ul>
         <a class="btn ghost block" href="/contact/?topic=institutions" style="margin-top:22px">Talk to us</a>
       </div>
+      <div class="tier enterprise">
+        <span class="cap"></span>
+        <p class="name">ENTERPRISE</p>
+        <p class="amt">From $120,000</p><p class="per">per year</p>
+        <ul>
+          <li>Everything above, at scale</li>
+          <li>High-volume API and event feeds</li>
+          <li>Architecture review</li>
+        </ul>
+        <a class="btn ghost block" href="/enterprise/" style="margin-top:22px">Learn more</a>
+      </div>
     </div>
-    <p class="micro" style="margin-top:18px;text-align:center"><a href="/pricing/">Compare all plans</a></p>
+    <p class="micro" style="margin-top:18px;text-align:center">API checks also sold in prepaid packs. <a href="/pricing/">Full pricing</a></p>
   </section>
 
   <section id="download" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">Download</p>
-      <h2>Free for Mac, Windows and Linux</h2>
-      <p>On a Mac, right-click the app and choose Open the first time.</p>
+      <h2>Free for macOS, Windows and Linux</h2>
+      <p>Not code-signed yet: on a Mac, right-click the app and choose Open the first time.</p>
     </div>
     <div class="download-note">
       <span class="signal" aria-hidden="true"></span>
@@ -1318,12 +1470,13 @@
     <div class="kicker-block">
       <p class="eyebrow">Contact</p>
       <h2>Talk to the founder</h2>
+      <p>Book a 30-minute call or send a question. You get a straight answer.</p>
     </div>
     <div class="cta">
       <a class="btn" href="/contact/?topic=institutions">Book a call</a>
       <a class="btn ghost" href="mailto:support@noshashi.app">support@noshashi.app</a>
     </div>
-    <p class="micro" style="margin-top:28px;text-align:center">Not financial or legal advice. NOSHASHI never holds your funds or keys.</p>
+    <p class="micro" style="margin-top:28px;text-align:center">Not legal, tax or investment advice. A GO means your rules passed; it does not make a transaction lawful. NOSHASHI sells software and never holds funds.</p>
   </section>
 </main>
 
