@@ -186,32 +186,31 @@ export function welcomeEmail({ unsubscribeUrl } = {}) {
   const body = `
     ${eyebrow("Subscribed")}
     <h1 style="margin:0 0 16px;font-family:${SANS};font-size:28px;font-weight:700;letter-spacing:-.02em;
-      color:${T.ink};line-height:1.2;">You'll hear when something ships.</h1>
+      color:${T.ink};line-height:1.2;">You're on the list.</h1>
     <p style="margin:0 0 18px;font-family:${SANS};font-size:15px;color:${T.muted};line-height:1.65;">
-      Not a newsletter. You will get an email when a build ships, when a capability lands, and when
-      something is being worked on that affects you &mdash; drawn from the same mission log the site
-      publishes, so an email cannot claim something the site does not.
+      You'll get an email when we ship a new release or a new free check, or find a risk on the
+      XRP Ledger worth knowing about. Only when there is news, and nothing else.
     </p>
     ${panel(`
-      ${eyebrow("What NOSHASHI is")}
+      ${eyebrow("What NOSHASHI does")}
       <p style="margin:0 0 14px;font-family:${SANS};font-size:14px;color:${T.ink};line-height:1.6;">
-        A zero-trust intelligence workstation for the XRP Ledger.</p>
+        Checks XRP Ledger risk before you move money.</p>
       <p style="margin:0;font-family:${SANS};font-size:13.5px;color:${T.muted};line-height:1.62;">
-        It answers two questions about the same position, from the same validated ledger state:
-        whether you are allowed to move it, and whether you could actually get out of it.
+        Can this token be frozen? Could you actually sell it? Did that payment arrive in full?
+        NOSHASHI answers from the live ledger and gives you a receipt for the decision.
       </p>`, { accent: T.brand })}
     <p style="margin:0 0 4px;font-family:${SANS};font-size:15px;color:${T.muted};line-height:1.65;">
-      The console is free and there is no account to create.
+      The app is free, and you don't need an account to try it.
     </p>
-    ${button("Download the beta", `${SITE}/#download`)}
+    ${button("Download the app", `${SITE}/#download`)}
     <p style="margin:18px 0 0;font-family:${MONO};font-size:11px;letter-spacing:.1em;color:${T.faint};">
-      BETA CHANNEL &nbsp;·&nbsp; UNSIGNED BUILDS &nbsp;·&nbsp; VERIFY THE SHA-256</p>`;
+      FREE &nbsp;·&nbsp; MACOS, WINDOWS, LINUX &nbsp;·&nbsp; READ-ONLY, NEVER HOLDS YOUR KEYS</p>`;
 
   return {
     subject: "NOSHASHI — you're subscribed",
     html: shell({
       title: "You're subscribed",
-      preheader: "You'll get an email when a build ships or a capability lands. Nothing else.",
+      preheader: "You'll get an email when we ship something new or find an XRPL risk worth knowing about.",
       body,
       unsubscribeUrl,
     }),

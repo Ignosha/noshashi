@@ -35,6 +35,7 @@
         email: email,
         elapsed: Date.now() - opened,
         company_website: document.getElementById("subscribe_company").value,
+        source: "inline:" + location.pathname,
       }),
     })
       .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
@@ -108,20 +109,24 @@
           '<span class="ring"></span><span class="ring"></span>' +
           '<img src="/assets/flower-mark-128.png" alt="" width="44" height="44" decoding="async">' +
         '</div>' +
-        '<h2 id="sub-dlg-title">Hear when something ships.</h2>' +
-        '<p class="lede">An email when a build ships or a capability lands — drawn from the same ' +
-          'mission log this site publishes, so an email cannot claim something the site does not. ' +
-          'No schedule, no digest, one click to leave.</p>' +
+        '<h2 id="sub-dlg-title">Stay ahead of XRPL risk</h2>' +
+        '<p class="lede">Get an email when we ship something new or find a risk on the ' +
+          'XRP Ledger worth knowing about.</p>' +
+        '<ul class="sub-gets">' +
+          '<li>New desktop app releases</li>' +
+          '<li>New free checks on this website</li>' +
+          '<li>Real findings: frozen tokens, fake order-book depth, short payments</li>' +
+        '</ul>' +
         '<form id="sub-dlg-form" novalidate>' +
           '<label class="sr-only" for="sub-dlg-email">Your email address</label>' +
           '<input id="sub-dlg-email" type="email" autocomplete="email" maxlength="200" ' +
-            'placeholder="you@institution.com" required>' +
-          '<button class="btn" type="submit" id="sub-dlg-send">Subscribe</button>' +
+            'placeholder="you@company.com" required>' +
+          '<button class="btn" type="submit" id="sub-dlg-send">Get updates</button>' +
           '<p class="form-status" id="sub-dlg-status" role="status" aria-live="polite"></p>' +
         '</form>' +
         '<button class="sub-later" type="button" data-close>No thanks</button>' +
-        '<p class="sub-terms">Product updates only. Your address is stored with our email ' +
-          'provider and used for nothing else.</p>' +
+        '<p class="sub-terms">Only when there is news. One click to leave. We never share ' +
+          'your address or use it for anything else.</p>' +
       '</div>';
     document.body.appendChild(wrap);
     return wrap;
@@ -186,7 +191,7 @@
       fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email, elapsed: Date.now() - opened }),
+        body: JSON.stringify({ email: email, elapsed: Date.now() - opened, source: "popup:" + location.pathname }),
       })
         .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
         .then(function (result) {
