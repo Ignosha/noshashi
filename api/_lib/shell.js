@@ -61,6 +61,7 @@ export const FOOTER_LINKS = [
   { href: "/alerts/", label: "Issuer alerts" },
   { href: "/delivered/", label: "Delivered-amount export" },
   { href: "/treasury/", label: "Treasury report" },
+  { href: "/book-health/", label: "Book health" },
   { href: "/xapp/", label: "Check an address" },
   { href: "/news/", label: "Newsroom" },
   { href: "/progress/", label: "Progress" },

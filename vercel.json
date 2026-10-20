@@ -138,6 +138,10 @@
     {
       "source": "/api/treasury",
       "destination": "/api/tools?tool=treasury"
+    },
+    {
+      "source": "/api/book-health",
+      "destination": "/api/tools?tool=book-health"
     }
   ]
 }

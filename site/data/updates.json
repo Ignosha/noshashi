@@ -1,5 +1,33 @@
 [
   {
+    "date": "2026-10-20T01:00:00Z",
+    "kind": "milestone",
+    "title": "Book health: quoted versus funded depth on the main XRP books, live",
+    "body": "A free page that reads the Bitstamp, GateHub, RLUSD and SOLO books from validated ledgers and shows how much of the advertised depth is actually funded, today and at each of the last seven daily closes. Nothing is stored; every day is re-read at the ledger index shown.",
+    "link": "/book-health/"
+  },
+  {
+    "date": "2026-10-20T00:35:00Z",
+    "kind": "milestone",
+    "title": "Product brief: the problems NOSHASHI solves, how it earns, every feature",
+    "body": "One page with the XRP Ledger problems the product addresses, the plans and prices checkout charges, every screen and paid feature in the build, and what is not built yet. A test keeps it in step with the app and the billing catalogue.",
+    "link": "/brief/"
+  },
+  {
+    "date": "2026-10-20T00:12:00Z",
+    "kind": "milestone",
+    "title": "Treasury report for companies that hold XRP",
+    "body": "Holdings, reserves and who can move each wallet at a period end, and how much of the holding funded dollar offers could absorb. Read from validated ledgers with a SHA-256 digest; prints to PDF.",
+    "link": "/treasury/"
+  },
+  {
+    "date": "2026-09-30T18:00:00Z",
+    "kind": "release",
+    "title": "1.0.20: annual prices, coming-soon items marked, a stricter website",
+    "body": "Enterprise and Strategic are priced by the year; the uptime SLA, single sign-on and dedicated environments are marked coming soon. The website runs no inline script. An internal security assessment ran on 30 September, and SOC 2 readiness documents and contract templates were added.",
+    "link": "/docs/release-notes/"
+  },
+  {
     "date": "2026-09-29T03:00:00Z",
     "kind": "release",
     "title": "1.0.15: real domain and credential registry, audit evidence, readable at any size",

@@ -455,6 +455,96 @@ async function buildTreasury(write) {
   }));
 }
 
+/* ── /book-health/ ────────────────────────────────────────────────── */
+/*
+ * Quoted against fillable on the main XRPL books, today and at the close of
+ * each of the last seven days. Every number is read live from /api/book-health,
+ * which reads validated ledgers; history is re-read from the ledger, not kept.
+ */
+async function buildBookHealth(write) {
+  const body = `<div class="page-head">
+  <p class="eyebrow">Free · live from mainnet</p>
+  <h1>Book health: how much of the XRP Ledger's order books can actually fill?</h1>
+  <p>An offer stays on the book at its full size after its owner has spent the money behind it.
+     This page reads the main XRP books from validated ledger state and separates what is
+     <strong>quoted</strong> from what is <strong>funded</strong>, for today and for the close of each
+     of the last seven days. Nothing is stored: every day is re-read from the ledger at the index shown.</p>
+</div>
+<section>
+  <p class="form-status" id="bh-status" role="status" aria-live="polite">Reading the latest validated ledger…</p>
+  <div id="bh-now"></div>
+  <h2 style="margin-top:28px">The last seven days</h2>
+  <p class="tool-note">Share of the quoted ask that was funded, at the last ledger to close each day (UTC). The ask side is the
+     depth an XRP holder sells into.</p>
+  <div class="tool-scroll"><table class="tool-table" id="bh-hist"><thead><tr><th>Book</th></tr></thead><tbody></tbody></table></div>
+  <div class="grid g2" style="margin-top:28px">
+    <div class="panel"><p class="num">HOW TO READ IT</p>
+      <p>Quoted is what the offers advertise within 10% of the book's reference mid. Funded is the part
+         the accounts making those offers still held at that ledger. A low funded share means a
+         counterparty's tooling sees far more depth than could trade. AMM pools are shown beside each book
+         and are not added to it.</p></div>
+    <div class="panel"><p class="num">CHECK IT YOURSELF</p>
+      <p>Every reading names its ledger index. <a href="/api/book-health">The JSON</a> for today, or add
+         <code>?at=YYYY-MM-DD</code> for a past day. Each book's raw offers are at <code>/api/book?…&amp;format=raw</code>.
+         For a company's own holdings against these books, use the <a href="/treasury/">treasury report</a>.</p></div>
+  </div>
+</section>`;
+
+  const head = TOOL_CSS + `<style>
+.bh-bar{display:inline-block;height:6px;border-radius:3px;background:var(--rule);width:64px;vertical-align:middle;margin-left:6px;position:relative;overflow:hidden}
+.bh-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
+.tool-table td.num,.tool-table th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bh-low{color:var(--nogo);font-weight:600}
+</style>`;
+
+  const script = `<script>
+(function(){${COMMON_JS}
+  var status=document.getElementById("bh-status"), now=document.getElementById("bh-now"), hist=document.getElementById("bh-hist");
+  if(!status)return;
+  function n(v,d){if(v===null||v===undefined||!isFinite(v))return "—";return Number(v).toLocaleString("en-US",{maximumFractionDigits:d==null?0:d});}
+  function pct(r){if(r===null||r===undefined)return "—";var p=r*100;return '<span class="'+(r<0.5?"bh-low":"")+'">'+p.toLocaleString("en-US",{maximumFractionDigits:1})+'%</span><span class="bh-bar" aria-hidden="true"><i style="width:'+Math.max(0,Math.min(100,p))+'%"></i></span>';}
+  function get(q){return fetch("/api/book-health"+q).then(function(r){return r.json().then(function(b){if(!r.ok)throw new Error(b.error||"unreadable");return b;});});}
+  get("").then(function(b){
+    say(status,"Ledger "+n(b.ledger_index)+" · closed "+b.close_time.replace("T"," ").replace(".000Z"," UTC"),"");
+    var h='<div class="tool-scroll"><table class="tool-table"><thead><tr><th>Book</th><th class="num">Price (per XRP)</th><th class="num">Ask quoted</th><th class="num">Ask funded</th><th class="num">Ask funded share</th><th class="num">Bid funded share</th><th>AMM pool (not counted)</th></tr></thead><tbody>';
+    b.books.forEach(function(k){
+      var a=k.amm, price=k.mid_xrp_per_unit?1/k.mid_xrp_per_unit:null, cur=esc(k.currency_label);
+      h+='<tr><td>'+esc(k.label)+'</td><td class="num">'+n(price,price&&price<0.01?8:4)+' '+cur+'</td><td class="num">'+n(k.quoted.ask,2)+' '+cur+'</td><td class="num">'+n(k.fillable.ask,2)+' '+cur+'</td>'+
+        '<td class="num">'+pct(k.fillable_ratio.ask)+'</td><td class="num">'+pct(k.fillable_ratio.bid)+'</td>'+
+        '<td>'+(a?n(Number(a.xrp))+' XRP · '+n(Number(a.asset&&a.asset.value),2)+' '+esc(a.asset?a.asset.currency:""):"No pool")+'</td></tr>';
+    });
+    now.innerHTML=h+'</tbody></table></div><p class="tool-note">'+b.disclosures.map(esc).join(" ")+'</p>';
+    history(b.books.map(function(k){return k.label;}));
+  }).catch(function(e){say(status,"The ledger could not be read just now: "+e.message+" Try again shortly.","bad");});
+
+  function history(labels){
+    var days=[];for(var i=1;i<=7;i++){var d=new Date(Date.now()-i*864e5);days.push(d.toISOString().slice(0,10));}
+    var head=hist.querySelector("thead tr"), body=hist.querySelector("tbody");
+    days.forEach(function(d){var th=document.createElement("th");th.className="num";th.textContent=d.slice(5);head.appendChild(th);});
+    labels.forEach(function(l,r){var tr=document.createElement("tr");tr.innerHTML='<td>'+esc(l)+'</td>'+days.map(function(){return '<td class="num">…</td>';}).join("");body.appendChild(tr);});
+    var col=0;
+    function next(){
+      if(col>=days.length)return; var c=col++, d=days[c];
+      get("?at="+d).then(function(b){
+        b.books.forEach(function(k,r){var cell=body.rows[r]&&body.rows[r].cells[c+1];if(cell){cell.innerHTML=pct(k.fillable_ratio.ask);cell.title="Ledger "+b.ledger_index;}});
+      }).catch(function(){for(var r=0;r<body.rows.length;r++)body.rows[r].cells[c+1].textContent="—";}).finally(next);
+    }
+    next(); next();
+  }
+})();
+</script>`;
+
+  await write("book-health/index.html", renderPage({
+    title: "Book health — quoted versus fillable depth on the XRP Ledger's main order books",
+    description: "Free, live: how much of the advertised depth on the main XRP Ledger order books is actually funded, today and at each of the last seven daily closes. Read from validated ledgers, nothing stored.",
+    path: "/book-health/",
+    head,
+    body,
+    structured: [breadcrumb("Book health", "/book-health/")],
+    scripts: script,
+  }));
+}
+
 /* ── /xapp/ ───────────────────────────────────────────────────────── */
 /*
  * The screening page Xaman opens as an xApp (and that works in any phone
@@ -547,6 +637,7 @@ export async function buildTools(write) {
   await buildAlerts(write);
   await buildDelivered(write);
   await buildTreasury(write);
+  await buildBookHealth(write);
   await buildXapp(write);
 }
 
@@ -555,5 +646,6 @@ export const TOOL_PAGES = [
   ["/alerts/", "monthly", "0.8"],
   ["/delivered/", "monthly", "0.8"],
   ["/treasury/", "monthly", "0.8"],
+  ["/book-health/", "daily", "0.8"],
   ["/xapp/", "monthly", "0.6"],
 ];

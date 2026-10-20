@@ -309,7 +309,7 @@ async function buildProgress({ feed, release, releases }) {
   const rail = renderRail([
     { label: "CURRENT BUILD", value: release?.tag || "—", note: "Beta channel, unsigned, built by CI." },
     { label: "RELEASES SHIPPED", value: String(shipped), note: `Since ${isoDate("2026-08-29T00:00:00Z")}, every one from a public commit.` },
-    { label: "TESTS PASSING", value: "272", note: "On the logic that makes claims. Run with npm test." },
+    { label: "TESTS PASSING", value: "1,200+", note: "Across the app, the API and the website. Run with npm test." },
     { label: "ACCOUNTS REQUIRED", value: "0", note: "No sign-up exists. Nothing is held server-side." },
   ]);
 
@@ -328,8 +328,8 @@ async function buildProgress({ feed, release, releases }) {
       note: "Ledger sync across four public nodes, cadence measured from arrival, and the DEX-derived price used on this site's ticker.",
     },
     {
-      title: "Free public tools", state: "done", percent: 100, reading: "6 of 6 tools",
-      note: "Address, payment, order book, exposure, NFT and node checks, all on the landing page without an account.",
+      title: "Free public tools", state: "done", percent: 100, reading: "shipped",
+      note: "Address, payment, order book, exposure, NFT and node checks on the landing page, plus the authority certificate, issuer badge and alerts, delivered-amount export, treasury report and book health. No account needed.",
     },
     {
       title: "Public website", state: "done", percent: 100, reading: "server-rendered",
@@ -340,8 +340,8 @@ async function buildProgress({ feed, release, releases }) {
       note: "Builds are reproducible from CI and hash-verified, but not yet code-signed or notarised. This is the single largest thing standing between the beta channel and a 1.0.",
     },
     {
-      title: "Compliance API and webhooks", state: "open", percent: 40, reading: "institutional tier",
-      note: "The verification surface exists in the product; the hosted API and webhook delivery are being built out against the institutional tier.",
+      title: "Compliance API and webhooks", state: "done", percent: 100, reading: "shipped",
+      note: "Scoped API keys, the same verdicts and receipts as the console, and signed webhooks (deposit_screened, custom_alert, xrpl_event). Shipped in 1.0.13; the uptime SLA that would sit on top of it is not offered yet.",
     },
     {
       title: "Independent security review", state: "open", percent: 0, reading: "not started",
