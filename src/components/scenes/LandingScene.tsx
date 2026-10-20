@@ -8,16 +8,13 @@ import { StatusDot } from "@/components/nova/StatusDot";
 import { Panel, Eyebrow } from "@/components/nova/Panel";
 import {
   NovaBolt,
-  NovaCredit,
   NovaEye,
-  NovaGrid,
   NovaSat,
   NovaShield,
   NovaTerminal,
-  NovaVault,
 } from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
-import { CONCEPTS } from "@/lib/roadmap";
+import { QuestionShowcase } from "@/components/scenes/QuestionShowcase";
 import { BRAND, CONTACT, copyrightLine } from "@/lib/brand";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import { cn } from "@/lib/utils";
@@ -50,59 +47,32 @@ const AUDIENCES = [
   {
     id: "institutions",
     kicker: "FOR INSTITUTIONS",
-    title: "Compliance that clears before the trade",
+    title: "Check before you sign",
     icon: <NovaShield size={16} />,
     points: [
-      "Adjudicate every settlement against your own rule set before it is signed — not after it settles.",
-      "Hand an examiner a receipt lineage instead of a spreadsheet: each verdict hashed, timestamped and reproducible.",
-      "No custody, no keys, no client assets ever touch this software. It reads and it rules; it never holds.",
-      "Read-only regulator seats and a white-labelled console under your own brand.",
+      "Every settlement checked against your rules first.",
+      "A receipt for every decision, ready for your auditor.",
     ],
   },
   {
     id: "builders",
     kicker: "FOR VENUES & BUILDERS",
-    title: "One call between your checkout and a violation",
+    title: "One API call",
     icon: <NovaTerminal size={16} />,
     points: [
-      "Ask the same question the console asks and get the same answer, with the same receipt attached.",
-      "Map your venue to an XLS-80 permissioned domain and let the rule set — not your backend — carry the policy.",
-      "Webhooks on credential revocation and domain drift, so eligibility changes reach you before your users do.",
-      "Deterministic rules, so the same inputs always produce the same verdict in staging and in production.",
+      "Same answer as the app, with the same receipt.",
+      "Webhooks when something changes.",
     ],
   },
   {
     id: "public",
-    kicker: "FOR EVERYONE ELSE",
-    title: "Know the answer before you send",
+    kicker: "FOR EVERYONE",
+    title: "Know before you send",
     icon: <NovaEye size={16} />,
     points: [
-      "See GO, HOLD or NO-GO with the exact rule behind it — no rejected transaction, no burnt fee, no guessing.",
-      "Prove one fact about yourself instead of disclosing an identity. Accredited. Of age. Not sanctioned.",
-      "Carry your credentials between venues rather than re-running the same KYC at every door.",
-      "Free forever for individuals, and the assistant runs on your own machine.",
+      "GO, HOLD or NO-GO, with the reason.",
+      "Free for individuals. No account needed.",
     ],
-  },
-];
-
-const STEPS = [
-  {
-    step: "01",
-    title: "DESCRIBE",
-    body: "Name the settlement — destination, amount, and the permissioned domain it is headed into.",
-    icon: <NovaCredit size={18} />,
-  },
-  {
-    step: "02",
-    title: "ADJUDICATE",
-    body: "The engine evaluates credentials, reserve, ceiling and governance in a fixed order, and returns the rule that decided it.",
-    icon: <NovaGrid size={18} />,
-  },
-  {
-    step: "03",
-    title: "RECEIPT",
-    body: "A canonical SHA-256 digest of the verdict — verifiable by anyone, readable by no one who should not read it.",
-    icon: <NovaVault size={18} />,
   },
 ];
 
@@ -222,20 +192,14 @@ export function LandingScene({
               {/* The ripple field runs behind this column; a soft ground under
                   the copy keeps it legible without hiding the field. */}
               <div className="relative max-w-[720px] rounded-lg bg-background/80 p-4 -m-4 shadow-[0_0_40px_24px_hsl(var(--background)/0.8)]">
-                <Eyebrow>THE OBJECTIVE</Eyebrow>
-                <p className="mt-3 text-[19px] leading-[1.55] text-foreground/90">
-                  Make regulated value move on the XRP Ledger without anyone
-                  guessing whether it is allowed to.
+                <p className="text-[24px] font-[600] leading-[1.35] text-foreground">
+                  Check XRPL risk before you move money.
                 </p>
-                <p className="mt-4 text-[13px] leading-relaxed text-muted-foreground">
-                  Compliance today is a report written after the fact. NOSHASHI turns
-                  it into infrastructure that runs <em className="not-italic text-foreground">before</em> the
-                  signature: every settlement adjudicated against a published rule
-                  set, answered <span className="text-go">GO</span> /{" "}
+                <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+                  Can it be frozen? Can you actually sell it? Can you prove your decision?
+                  Answered <span className="text-go">GO</span> /{" "}
                   <span className="text-hold">HOLD</span> /{" "}
-                  <span className="text-no-go">NO-GO</span> with the exact rule that
-                  decided it, and handed back with a receipt an auditor can verify
-                  without ever seeing your identity.
+                  <span className="text-no-go">NO-GO</span> from the live ledger, with a receipt.
                 </p>
               </div>
 
@@ -302,40 +266,17 @@ export function LandingScene({
             </div>
           </Reveal>
 
-          {/* ── How it works ───────────────────────────────────── */}
+          {/* ── The three questions, live ─────────────────────── */}
           <section className="py-16">
             <Reveal>
-              <Eyebrow>THE MECHANISM</Eyebrow>
+              <Eyebrow>SEE IT WORK</Eyebrow>
               <h2 className="display mt-2 text-[26px] font-[700] text-foreground">
-                THREE STEPS, NO SIGNATURE REQUIRED
+                THREE QUESTIONS, ANSWERED LIVE
               </h2>
-              <p className="mt-3 max-w-[620px] text-[12.5px] leading-relaxed text-muted-foreground">
-                Nothing here touches the ledger. The gate runs entirely on read
-                operations, which is why it can run before a transaction exists.
-              </p>
             </Reveal>
-
-            <div className="relative mt-8 grid grid-cols-3 gap-4">
-              <div className="pointer-events-none absolute left-0 right-0 top-[22px] hidden h-px bg-border md:block" />
-              {STEPS.map((step, index) => (
-                <Reveal key={step.step} delay={index * 0.1}>
-                  <div className="relative">
-                    <div className="relative z-10 mb-4 grid h-11 w-11 place-items-center rounded-md border border-border bg-background text-foreground">
-                      {step.icon}
-                    </div>
-                    <p className="display text-[11px] font-[700] tracking-[0.14em] text-muted-foreground/50">
-                      {step.step}
-                    </p>
-                    <p className="display mt-1 text-[15px] font-[700] tracking-[0.1em] text-foreground">
-                      {step.title}
-                    </p>
-                    <p className="mt-2.5 text-[11.5px] leading-relaxed text-muted-foreground">
-                      {step.body}
-                    </p>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
+            <Reveal delay={0.08} className="mt-6">
+              <QuestionShowcase connected={connected} onNavigate={onNavigate} />
+            </Reveal>
           </section>
 
           {/* ── Audiences ──────────────────────────────────────── */}
@@ -343,7 +284,7 @@ export function LandingScene({
             <Reveal>
               <Eyebrow>WHO THIS IS FOR</Eyebrow>
               <h2 className="display mt-2 text-[26px] font-[700] text-foreground">
-                THREE VERY DIFFERENT PROBLEMS
+                ONE ANSWER, THREE KINDS OF USER
               </h2>
             </Reveal>
 
@@ -351,7 +292,7 @@ export function LandingScene({
               {AUDIENCES.map((audience, index) => (
                 <Reveal key={audience.id} delay={index * 0.08}>
                   <Panel className="hud-corner" bodyClassName="p-5">
-                    <div className="grid grid-cols-[260px_1fr] gap-8">
+                    <div className="grid grid-cols-[260px_1fr] items-center gap-8">
                       <div>
                         <div className="mb-3 grid h-9 w-9 place-items-center rounded-md border border-border text-foreground">
                           {audience.icon}
@@ -385,12 +326,10 @@ export function LandingScene({
             <Reveal>
               <Eyebrow>SECURITY POSTURE</Eyebrow>
               <h2 className="display mt-2 text-[26px] font-[700] text-foreground">
-                THE SMALLEST POSSIBLE ATTACK SURFACE
+                SAFE BY DESIGN
               </h2>
               <p className="mt-3 max-w-[640px] text-[12.5px] leading-relaxed text-muted-foreground">
-                The safest way to protect data is not to hold it. This build has no
-                server, no account system, no session token and no key material —
-                so there is nothing on our side to breach.
+                Read-only. No keys, no custody, nothing to breach.
               </p>
             </Reveal>
 
@@ -413,39 +352,6 @@ export function LandingScene({
             </div>
           </section>
 
-          {/* ── Differentiators ────────────────────────────────── */}
-          <section className="pb-16">
-            <Reveal>
-              <Eyebrow>WHAT NOBODY HAS BUILT HERE</Eyebrow>
-              <h2 className="display mt-2 text-[26px] font-[700] text-foreground">
-                THE BETS THAT MAKE THIS DIFFERENT
-              </h2>
-            </Reveal>
-
-            <div className="mt-6 grid grid-cols-4 gap-3">
-              {CONCEPTS.slice(0, 4).map((concept, index) => (
-                <Reveal key={concept.id} delay={index * 0.06}>
-                  <Panel className="h-full" bodyClassName="p-4">
-                    <p className="display text-[13px] font-[700] leading-tight text-foreground">
-                      {concept.title}
-                    </p>
-                    <p className="mt-2.5 text-[11.5px] leading-relaxed text-muted-foreground">
-                      {concept.detail}
-                    </p>
-                  </Panel>
-                </Reveal>
-              ))}
-            </div>
-
-            <Reveal delay={0.1}>
-              <button
-                onClick={() => onNavigate("home")}
-                className="stencil mt-4 text-[10px] tracking-[0.14em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-              >
-                SEE ALL {CONCEPTS.length} CONCEPTS →
-              </button>
-            </Reveal>
-          </section>
 
           {/* ── Final CTA ──────────────────────────────────────── */}
           <Reveal>
@@ -458,8 +364,7 @@ export function LandingScene({
                   RUN YOUR FIRST GATE CHECK
                 </h2>
                 <p className="mx-auto mt-3 max-w-[460px] text-[12px] leading-relaxed text-muted-foreground">
-                  It reads mainnet, evaluates a real rule set, and returns a real
-                  receipt. No signup, no wallet connection, nothing signed.
+                  Live mainnet data. No signup, no wallet, nothing signed.
                 </p>
                 <div className="mt-6 flex items-center justify-center gap-3">
                   <MagneticButton

@@ -15,7 +15,7 @@ describe("first-run steps", () => {
 
   it("blocks the evidence step until a verdict exists", () => {
     const before = firstRunSteps(fresh).find((s) => s.id === "evidence")!;
-    expect(before.blockedBy).toMatch(/Run an analysis first/);
+    expect(before.blockedBy).toMatch(/Run a check first/);
     const after = firstRunSteps({ ...fresh, verdicts: 1 }).find((s) => s.id === "evidence")!;
     expect(after.blockedBy).toBeUndefined();
   });

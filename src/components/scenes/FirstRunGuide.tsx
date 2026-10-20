@@ -69,9 +69,8 @@ export function FirstRunGuide({
       bodyClassName="p-4"
     >
       <p className="text-[13.5px] leading-relaxed text-foreground/85">
-        <span className="font-[600] text-foreground">One ledger. Three questions.</span> Can this move under our
-        policy? Is there enough real liquidity to exit? Can we prove why? NOSHASHI answers each from validated XRPL
-        state and records evidence you can check. It reads only; it never signs or asks for a key.
+        <span className="font-[600] text-foreground">Four steps to your first decision.</span> NOSHASHI only reads
+        the ledger: it never asks for a key.
       </p>
 
       <ol className="mt-4 grid gap-2 md:grid-cols-2">
