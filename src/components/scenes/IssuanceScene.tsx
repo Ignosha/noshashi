@@ -43,7 +43,7 @@ export function IssuanceScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
         statusLabel="INSTITUTION"
       />
       <Gated
-        feature="compliance_api"
+        feature="issuance_surveillance"
         onUpgrade={onUpgrade}
         onSignIn={onSignIn}
         className="min-h-0 flex-1"

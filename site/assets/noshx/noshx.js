@@ -2651,7 +2651,8 @@ const Gs = [
       "incident_response",
       "asset_recovery",
       "proof_of_reserves",
-      "threat_registry"
+      "threat_registry",
+      "issuance_surveillance"
     ]
   },
   {
@@ -2710,6 +2711,7 @@ const Gs = [
       "asset_recovery",
       "proof_of_reserves",
       "threat_registry",
+      "issuance_surveillance",
       "customer_protection",
       "withdrawal_screening",
       "market_surveillance"
@@ -2769,6 +2771,7 @@ const Gs = [
       "asset_recovery",
       "proof_of_reserves",
       "threat_registry",
+      "issuance_surveillance",
       "customer_protection",
       "withdrawal_screening",
       "market_surveillance",
@@ -2867,7 +2870,7 @@ function na(e) {
   Dt = e, Q = null;
 }
 function Ct() {
-  return Q ?? (Q = import("./pages-Cnu9sTyf.js").then(({ default: e }) => ea([...Js(), ...Dt, ...e]))), Q;
+  return Q ?? (Q = import("./pages-CDe19NAI.js").then(({ default: e }) => ea([...Js(), ...Dt, ...e]))), Q;
 }
 function sa() {
   if (Q) return;
@@ -4609,7 +4612,7 @@ const T = (e, t = Object.keys(e)) => ({ type: "object", properties: e, required:
     name: "read_issuance",
     description: "A token from the issuer's side: currencies issued, outstanding obligations, holder lines read, the largest holder, concentration, and enforcement history (freezes and clawbacks).",
     input_schema: T({ issuer: A("Issuer's classic address") }),
-    feature: "portfolios",
+    feature: "issuance_surveillance",
     screen: "Issuance",
     run: (e) => Et(I(e, "issuer"))
   },

@@ -213,6 +213,7 @@ export const PLANS: Plan[] = [
       "asset_recovery",
       "proof_of_reserves",
       "threat_registry",
+      "issuance_surveillance",
     ],
   },
   {
@@ -271,6 +272,7 @@ export const PLANS: Plan[] = [
       "asset_recovery",
       "proof_of_reserves",
       "threat_registry",
+      "issuance_surveillance",
       "customer_protection",
       "withdrawal_screening",
       "market_surveillance",
@@ -330,6 +332,7 @@ export const PLANS: Plan[] = [
       "asset_recovery",
       "proof_of_reserves",
       "threat_registry",
+      "issuance_surveillance",
       "customer_protection",
       "withdrawal_screening",
       "market_surveillance",
@@ -446,6 +449,12 @@ export const FEATURE_CATALOG: Record<
     requires: "desk",
     blurb:
       "Seven questions about one issuance, answered from validated ledger state at a named ledger index, and digested so the answer can be re-checked months later by anyone holding it. Deliberately not a score and deliberately not a legal finding: it reports what authority the issuer has kept, and leaves the conclusion to whoever is required to draw it.",
+  },
+  issuance_surveillance: {
+    label: "Issuance surveillance",
+    requires: "institution",
+    blurb:
+      "Who holds an issuer's tokens and how concentrated they are, with dormant lines and freezes, read from the ledger.",
   },
   compliance_api: {
     label: "Compliance API",
