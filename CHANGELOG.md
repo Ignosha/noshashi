@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.0.21
+
+### Fixed
+
+- Issuer screens no longer fail on large issuers such as Bitstamp. The
+  read of an issuer's total supply can take longer than a public server
+  allows. When it does, the survey still shows the holders it read and
+  says the supply could not be read, instead of showing an error.
+- Reads that scan every trust line now get 45 seconds instead of 12.
+- The asset passport reads an issuer's holders once instead of twice at
+  the same time, which public servers were throttling.
+- When an issuer's supply cannot be read, the authority certificate says
+  there is not enough data. It never treats it as "nothing issued".
+- The Issuer screen now unlocks on the Institutional plan, as the pricing
+  page says. It had been unlocking on Pro.
+
+### Easier to read
+
+- The welcome screen and Overview now open with three live cards. One for
+  each question: can it move, can you actually sell, can you prove it.
+  The liquidity card reads a real order book and shows what is quoted
+  against what can fill.
+- Much less text on the welcome screen, Overview and getting-started
+  guide.
+- The website homepage goes from 23 sections to 8, and the pricing,
+  Enterprise, Strategic and Trust pages are shorter.
+
 ## 1.0.20
 
 ### Prices
