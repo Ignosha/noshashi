@@ -247,19 +247,11 @@
 
   <section class="hero">
     <span class="badge"><span class="dot"></span>Live on XRPL Mainnet · priced per desk, not per query</span>
-    <h1>Two questions. One ledger read. One answer.</h1>
+    <h1>Simple plans. Start free.</h1>
     <p class="sub">
-      Compliance tooling reads account flags and never opens the order book. Market
-      terminals read the book and never look at who can freeze the balance. A desk
-      holding an issued asset has to answer both — <em>am I allowed to move this</em>,
-      and <em>could I actually get out of it</em> — and answering them from two systems
-      at two moments produces a position that looks fine in each and is not.
-      NOSHASHI reads both sides of the same validated ledger state, in the same second,
-      and reconciles them into one verdict.
-    </p>
-    <p class="micro">
-      All plans read XRPL Mainnet. There is no testnet mode, because a compliance
-      answer about a test network is not an answer.
+      Every plan answers the same two questions from the live XRP Ledger:
+      <em>can I move this?</em> and <em>can I actually sell it?</em>
+      Pay when your team needs more seats, more checks or an audit trail.
     </p>
 
     <!-- Live telemetry.
@@ -296,9 +288,11 @@
   <section id="plans">
     <div class="kicker-block">
       <p class="eyebrow">01 / Plans</p>
-      <h2>Five operating layers, and one of them is not a product</h2>
+      <h2>Pick the plan that fits your team</h2>
       <p>
-        Free is the proof surface. Pro is the working tool for a desk. Institutional is the contract, controls and API. Enterprise adds operational evidence; Strategic Infrastructure is the contracted data plane for teams building on NOSHASHI.
+        Free to try. Pro for a desk. Institutional for regulated teams. Enterprise and
+        Strategic for large operations. Every feature is listed in the
+        <a href="#compare">comparison table</a> below.
       </p>
     </div>
 
@@ -322,27 +316,21 @@
         <p class="fig">$0</p>
         <p class="per">forever · no card, no trial clock</p>
         <p class="who">
-          One operator, one address at a time. Everything runs on your own machine
-          against public nodes.
+          For trying NOSHASHI on your own addresses.
         </p>
-        <p class="role">How we prove the product before you pay</p>
+        <p class="role">Check our numbers before you pay</p>
         <ul class="spec">
-          <li>Full console and menu bar HUD</li>
-          <li>Unlimited local gate checks</li>
-          <li>Ledger sync — four public nodes compared side by side</li>
-          <li>Inbox — spot impersonated tokens addressed to you</li>
-          <li>Token rights — check an NFT before you buy it</li>
-          <li>On-device compliance agent</li>
-          <li>CSV audit export</li>
-          <li><strong>Security Center</strong> — account check, pre-sign check, safe send, stuck-funds and reserve recovery, exposure audit, deposit help, domain check, emergency kit and drainer check, who-is-this, scam registry and phishing link lookups, and Personal Guardian on 3 addresses</li>
-          <li>Binary integrity verification</li>
-          <li>Community support</li>
+          <li>Desktop app on macOS, Windows and Linux</li>
+          <li>Unlimited GO / HOLD / NO-GO checks</li>
+          <li>Spot fake tokens sent to you</li>
+          <li>Security Center: account check, safe send, scam lookups</li>
+          <li>On-device assistant</li>
+          <li>CSV export</li>
         </ul>
         <div class="act">
           <a class="ibtn ghost" href="/#download">Download the console</a>
           <p class="terms">
-            No account required to run a check. Nothing you type is sent anywhere
-            we control.
+            No account needed.
           </p>
         </div>
         </div>
@@ -358,27 +346,17 @@
         <p class="fig" data-monthly="$749" data-annual="$7,490">$749</p>
         <p class="per" data-monthly="per seat / month" data-annual="per seat / year · two months free">per seat / month</p>
         <p class="who">
-          Trading desks and funds carrying a book of issued assets across more than
-          one wallet.
+          For trading desks and funds holding XRPL tokens.
         </p>
         <p class="role">Self-serve · card · start in a minute</p>
         <ul class="spec">
           <li>Everything in Free</li>
-          <li><strong>Redemption stress testing</strong> — what the whole book would actually realise, routed across the DEX and the AMM together and shocked for depth that walks away</li>
-          <li>Multi-wallet portfolios with live gate status</li>
-          <li>Settlement forensics — what a transaction delivered, not what it requested</li>
-          <li>Order book integrity — quoted depth against depth that can actually fill</li>
-          <li>Counterparty provenance — account age and who funded it</li>
-          <li>Issuer freeze-rights analysis — know who can immobilise your balance</li>
-          <li>Counterparty concentration (HHI) across the settlement book</li>
-          <li>Treasury control surface — how few signers can move a balance</li>
-          <li>AMM pool governance — who votes the fee, and who holds the discount</li>
-          <li>Persistent adjudication ledger — 10,000 verdicts, survives restart</li>
-          <li>Editable policy rule set — your thresholds, not ours</li>
-          <li>Issuer drift monitor — native alert the moment an issuer freezes you</li>
-          <li><strong>Incident response and recovery</strong> — stolen value followed hop by hop with a SHA-256 dossier, scam cluster mapping, assets valued in XRP, recovery scans across 25 addresses, Personal Guardian on 50</li>
-          <li>5,000 API verifications included</li>
-          <li>Priority support — one business day</li>
+          <li>Real exit liquidity: what you could actually sell</li>
+          <li>Freeze-rights analysis for every token you hold</li>
+          <li>Multiple wallets, with alerts if an issuer freezes you</li>
+          <li>Saved decisions (10,000) and your own policy rules</li>
+          <li>Incident response: trace stolen funds hop by hop</li>
+          <li>5,000 API checks a month · next-business-day support</li>
         </ul>
         <div class="act">
           <form class="checkout-form" action="/api/create-checkout-session" method="post">
@@ -398,8 +376,7 @@
                style="margin-top:10px;font-size:12px;line-height:1.55;color:var(--hold)"></p>
           </form>
           <p class="terms">
-            Stripe Checkout. Cancel any time from the billing portal; access runs to
-            the end of the period you have paid for. Per seat, and a seat is a person.
+            Pay by card. Cancel any time; access runs to the end of the paid period.
           </p>
         </div>
         </div>
@@ -415,35 +392,22 @@
         <p class="fig" data-monthly="$4,000" data-annual="$40,000">$4,000</p>
         <p class="per" data-monthly="per month · unlimited seats" data-annual="per year · two months free · unlimited seats">per month · unlimited seats</p>
         <p class="who">
-          Regulated venues, custodians, issuers and anyone whose adjudications an
-          examiner will eventually read.
+          For exchanges, custodians and token issuers who answer to auditors.
         </p>
         <p class="role">Contact sales · MSA required · invoice</p>
         <ul class="spec">
           <li>Everything in Pro, unlimited seats</li>
-          <li>Immutable audit log of every adjudication, export, key issuance and settings change</li>
-          <li>Bulk portfolio monitoring — unlimited wallets, stress runs on a schedule</li>
-          <li>Custom alert logic — your own thresholds, expressions and destinations</li>
-          <li>Recovery and exposure scans across 500 addresses in one run, exported for the audit file</li>
-          <li>Proof of reserves: customer balances proven backed by the accounts you name, each customer given their own inclusion proof, attested daily and hash-chained</li>
-          <li>Report scam addresses to the shared registry that screens every organization's deposits and withdrawals</li>
-          <li>Compliance API keys and webhooks</li>
-          <li>Issuance surveillance — who holds your paper, and how concentrated</li>
-          <li>Travel Rule (FATF R.16) scoping across every settlement</li>
-          <li>Signed audit export — SHA-256 chain-of-custody for examiners</li>
-          <li>Offline adjudication — run on a segregated network from captured state</li>
-          <li>Regulator read-only seats — time-boxed examiner access, every visit logged</li>
-          <li>White-label console and reports — your name and colour on the console and on exports</li>
-          <li>100,000 API verifications included</li>
-          <li>Dedicated onboarding and a named support contact</li>
-          <li>Invoice, ACH, wire or NET-30 terms</li>
+          <li>Compliance API and webhooks · 100,000 checks a month</li>
+          <li>Tamper-proof audit log and signed exports</li>
+          <li>Proof of reserves, attested daily</li>
+          <li>Travel Rule scoping</li>
+          <li>Read-only seats for regulators</li>
+          <li>Named support contact · invoice or wire</li>
         </ul>
         <div class="act">
           <a class="ibtn tele" href="mailto:institutions@noshashi.app?subject=NOSHASHI%20Institutional%20enquiry">Contact sales</a>
           <p class="terms">
-            Not available by card. Institutional access requires an executed MSA,
-            and a payment that clears before anyone has signed one would create an
-            entitlement with no contract behind it.
+            Signed agreement first, then invoice. Not sold by card.
           </p>
         </div>
         </div>
@@ -453,26 +417,18 @@
         <div class="body">
           <p class="fig" data-monthly="$10,000" data-annual="$120,000">$10,000</p>
           <p class="per" data-monthly="per month · $120,000 / year" data-annual="per year · $10,000 / month">per month · $120,000 / year</p>
-          <p class="who">Institutional teams operating asset intelligence, policy, evidence and monitoring across risk, compliance and trading.</p>
-          <p class="role">Contracted · architecture and commercial review</p>
+          <p class="who">For regulated teams screening customer deposits and withdrawals.</p>
+          <p class="role">Annual contract · scoped with you first</p>
           <ul class="spec">
             <li>Everything in Institutional</li>
-            <li>Deposit screening: partial payments, counterfeit tokens, phishing dust, address poisoning, OFAC-listed senders and three-hop source of funds, before you credit</li>
-            <li>Withdrawal screening: bounces, brand-new and hours-old destinations, lookalikes of past destinations, OFAC and the scam registry three hops back, before you sign</li>
-            <li>Customer Asset Protection: a protection fund with a per-customer limit, verified on the ledger and published on a page your customers can check (verification, not insurance)</li>
-            <li>Market surveillance: re-quoted orders that never fill, concentration and trades between accounts of one funder</li>
-            <li>Asset passports and issuer intelligence at institutional scope</li>
-            <li>Portfolio monitoring, counterparty and liquidity intelligence</li>
-            <li>Deterministic policy engine, adjudication and decision history</li>
-            <li>Evidence records, hashes, audit exports and review workflow</li>
-            <li>Institutional API, scoped keys and webhooks</li>
-            <li>Embeddable screening widget for your own site</li>
-            <li>Forensic trace five hops deep, straight into an investigation case</li>
-            <li>Scam cluster mapping four hops deep, 200 accounts, opened as a case</li>
-            <li>Dedicated environment · coming soon</li>
-            <li>Architecture review and named implementation planning</li>
+            <li>Deposit screening before you credit: fake tokens, phishing dust, sanctioned senders</li>
+            <li>Withdrawal screening before you sign: new or lookalike destinations</li>
+            <li>Market surveillance</li>
+            <li>Public page proving your customer protection fund</li>
+            <li>Investigation cases with five-hop tracing</li>
+            <li>Screening widget for your own site</li>
           </ul>
-          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">Contracted capabilities are confirmed during technical and commercial review.</p></div>
+          <div class="act"><a class="ibtn tele" href="/enterprise/">Explore Enterprise</a><p class="terms">We agree the scope before you sign.</p></div>
         </div>
       </article>
       <article class="tier strategic gauge">
@@ -480,20 +436,17 @@
         <div class="body">
           <p class="fig" data-monthly="$20,833" data-annual="$250,000">$20,833</p>
           <p class="per" data-monthly="per month · $250,000 / year" data-annual="per year · $20,833 / month">per month · $250,000 / year</p>
-          <p class="who">Institutions building their own XRPL intelligence layer with NOSHASHI data, events, schemas and integration support.</p>
-          <p class="role">Contracted infrastructure · architecture review required</p>
+          <p class="who">For platforms building their own products on NOSHASHI data.</p>
+          <p class="role">Annual contract · architecture review first</p>
           <ul class="spec">
             <li>Everything in Enterprise</li>
-            <li>High-volume API capacity and contracted burst limits</li>
-            <li>XRPL event feeds: watched accounts read every minute, signed webhooks, JSON/NDJSON feed and history API</li>
-            <li>Custom export schemas, bulk export and event retention you set</li>
-            <li>Custom data integrations for risk, custody, trading and compliance</li>
-            <li>Dedicated environment · coming soon</li>
-            <li>Security Guardian: signed alerts the minute a watched account's keys change or it is deleted, for a theft trail or a whole scam cluster</li>
-            <li>Protection alerts: a signed webhook the day reserves fall below customer balances, and the phishing link feed as an API</li>
-            <li>Strategic architecture review and integration roadmap</li>
+            <li>High-volume API</li>
+            <li>Live event feeds and signed webhooks</li>
+            <li>Custom export formats and data retention</li>
+            <li>Alerts when a watched account's keys change</li>
+            <li>Alerts when reserves fall below customer balances</li>
           </ul>
-          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity, data sources and integration scope are confirmed by contract.</p></div>
+          <div class="act"><a class="ibtn" href="/strategic-infrastructure/">Build with NOSHASHI</a><p class="terms">Capacity and scope are written into the contract.</p></div>
         </div>
       </article>
 
@@ -502,8 +455,8 @@
   <section id="compare" class="tier-comparison">
     <div class="kicker-block">
       <p class="eyebrow"><span data-i18n="pricing.comparison.eyebrow">02 / Comparison</span></p>
-      <h2><span data-i18n="pricing.comparison.title">Five operating layers. One evidence standard.</span></h2>
-      <p><span data-i18n="pricing.comparison.body">Every row names the actual entitlement. Included, limited, contracted, optional and unavailable are intentionally different promises.</span></p>
+      <h2>Every feature, plan by plan</h2>
+      <p>What each plan includes. "Contracted" means it is set in your contract.</p>
     </div>
     <div class="tier-compare">
       <table>
