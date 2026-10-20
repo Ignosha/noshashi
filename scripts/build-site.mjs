@@ -47,6 +47,7 @@ import {
 import { jsonLd } from "../api/_lib/shell.js";
 import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
+import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
@@ -1577,6 +1578,7 @@ async function buildSitemap(docs = []) {
     // somebody who will never install anything.
     ["/certificate/", "weekly", "0.9"],
     ...TOOL_PAGES,
+    ...BRIEF_PAGES,
     ["/protection/", "weekly", "0.8"],
     ["/releases/1-0-14/", "monthly", "0.7"],
     ["/pricing/", "monthly", "0.9"],
@@ -1669,6 +1671,7 @@ async function main() {
   await buildContact();
   await buildCertificate();
   await buildTools(write);
+  await buildBrief(write);
   await buildProtection();
   await buildRelease1014();
   await buildAuthConfirmed();

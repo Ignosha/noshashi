@@ -51,6 +51,7 @@ export const NAV = [
 
 export const FOOTER_LINKS = [
   { href: "/contact/", label: "Contact" },
+  { href: "/brief/", label: "Product brief" },
   // Not in NAV deliberately. The primary nav already carries eight
   // links and overflows its container below 900px; a ninth makes a
   // known layout fault worse. The page is reached from the free-tools
