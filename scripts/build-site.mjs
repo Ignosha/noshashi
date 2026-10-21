@@ -125,12 +125,13 @@ async function buildHome({ news, market, feed, status, release }) {
         // that says "stable" in the markup and "beta" in the copy is
         // the kind of mismatch structured data exists to avoid.
         releaseNotes: "https://github.com/Ignosha/noshashi/releases",
+        // Monthly list prices, as on /pricing/ (annual billing is discounted there).
         offers: [
           { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Pro", price: "749", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Institutional", price: "4000", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Enterprise", price: "10000", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Strategic Infrastructure", price: "20833", priceCurrency: "USD" },
+          ...[["Pro", "749"], ["Institutional", "4000"], ["Enterprise", "10000"], ["Strategic Infrastructure", "20833"]].map(([name, price]) => ({
+            "@type": "Offer", name, price, priceCurrency: "USD",
+            priceSpecification: { "@type": "UnitPriceSpecification", price, priceCurrency: "USD", unitCode: "MON" },
+          })),
         ],
         url: `${ORIGIN}/`,
       },
@@ -140,7 +141,7 @@ async function buildHome({ news, market, feed, status, release }) {
 
   // The short homepage leaves out the newsroom, mission log and edge lab;
   // their slots are optional so those panels can come back without code.
-  const OPTIONAL = new Set(["MISREAD", "VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
+  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
     if (!html.includes(token)) {

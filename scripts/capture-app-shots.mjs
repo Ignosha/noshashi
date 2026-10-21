@@ -56,11 +56,11 @@ async function shoot(name, alt) {
   // Let any last data render and the cursor leave the frame.
   await page.mouse.move(1430, 450);
   await page.waitForTimeout(1500);
-  // "Degraded" means one public node lagged the others; it usually clears
-  // within a few ledgers. Offline or reconnecting is a failure.
-  await until((b) => !/DEGRADED/.test(b), 30_000, "a healthy node set").catch(() => console.log(`${name}: still degraded, capturing the real state`));
+  // The top bar reads ONLINE only when the ledger link is up and the
+  // public nodes agree; DEGRADED (a lagging node) usually clears within
+  // a few ledgers. Anything else is not a screen worth publishing.
+  await until((b) => /\bONLINE\b/.test(b), 45_000, `${name}: the top bar to read ONLINE`);
   const body = await text();
-  if (/RECONNECTING|Ledger link offline/i.test(body)) throw new Error(`${name}: the app is not connected to mainnet`);
   const png = await page.screenshot({ type: "png" });
   shots.push({ name, alt, png, ledger: ledgerOf(body), at: new Date().toISOString() });
   console.log(`captured ${name} at ledger ${ledgerOf(body) ?? "?"}`);

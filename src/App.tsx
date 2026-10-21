@@ -906,7 +906,9 @@ function ConsoleApp() {
             ledgerError
               ? `Ledger link degraded: ${ledgerError}`
               : connected
-                ? ""
+                ? // Announced rather than left blank: the region otherwise
+                  // keeps saying "offline" after the link is back.
+                  "Ledger link connected."
                 : "Ledger link offline. Reconnecting."
           }
         />

@@ -1008,6 +1008,10 @@
   .cx-link{display:inline-block;margin-top:18px;font-weight:600;color:var(--ink);text-decoration:none;
     border-bottom:1px solid var(--rule);padding-bottom:2px}
   .cx-link:hover{border-color:var(--ink)}
+  .cx-traps{margin-top:clamp(48px,7vw,80px);text-align:center}
+  .cx-traps > summary{list-style:none;cursor:pointer}
+  .cx-traps > summary::-webkit-details-marker{display:none}
+  .cx-traps[open] > div{text-align:left}
   .cx-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
   .cx-card{display:block;padding:26px;border:1px solid var(--rule);border-radius:16px;background:var(--surface);
     color:inherit;text-decoration:none;transition:border-color .2s ease,transform .2s ease}
@@ -1118,6 +1122,68 @@
       </div>
       
     </article>
+    <details class="traps cx-traps">
+      <summary class="cx-btn ghost">See real cases from mainnet</summary>
+      <div style="margin-top:18px">
+        <div class="traps">
+      <div class="trap mis">
+        <div>
+          <p class="tf">delivered_amount ≠ Amount</p>
+          <p class="tw">A successful (tesSUCCESS) payment carries the amount it asked to deliver and, separately, what arrived. With the partial-payment flag set they differ and the transaction still succeeds. Crediting the Amount field would over-credit by 1,295,975×. This one is an account paying itself through the exchange; the same flag on a payment to an exchange is how deposits get over-credited.</p>
+          <p class="te">Ledger 107,194,530 · transaction <a href="https://livenet.xrpl.org/transactions/307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA" rel="noopener">307662378F…</a></p>
+        </div>
+        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Amount field</p><p class="mv">100,000 XRP paid</p></div>
+        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">delivered_amount</p><p class="mv">0.077162 XRP arrived — 0.00008% of the stated amount</p></div>
+      </div>
+      <div class="trap mis">
+        <div>
+          <p class="tf">Quoted depth ≠ fillable depth</p>
+          <p class="tw">An offer stays in the book whether or not its owner still holds the asset, and an expired offer is removed only when something touches it. Summing the advertised figures counts exits that cannot happen.</p>
+          <p class="te">Ledger 107,194,532 · 60 USD.Bitstamp offers for XRP <a href="https://livenet.xrpl.org/accounts/rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B" rel="noopener">rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B</a></p>
+        </div>
+        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Sum of offers</p><p class="mv">128,309.49 USD on offer</p></div>
+        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">Funded and unexpired</p><p class="mv">42,328.77 USD can fill — 33% of what is shown; 31 of 60 offers cannot fill at all</p></div>
+      </div>
+      <div class="trap mis">
+        <div>
+          <p class="tf">Sequence ≠ transaction count</p>
+          <p class="tw">Since the DeletableAccounts amendment, a new account&#39;s Sequence starts at the ledger index it was created in. It says when the account began, not what it has done.</p>
+          <p class="te">Ledger 107,194,965 · account <a href="https://livenet.xrpl.org/accounts/rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am" rel="noopener">rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am</a></p>
+        </div>
+        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Sequence</p><p class="mv">86,795,414 transactions sent</p></div>
+        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">Sequence − creation ledger</p><p class="mv">0 transactions sent. The account was created in ledger 86,795,414, and as an AMM pseudo-account it cannot send any.</p></div>
+      </div>
+      <div class="trap mis">
+        <div>
+          <p class="tf">Quorum ≠ signer headcount</p>
+          <p class="tw">XRPL compares a multi-signature quorum against the sum of signing weights, not the number of signers. The number that describes control is the fewest signers who can reach the quorum.</p>
+          <p class="te">Ledger 107,194,532 · signer list owner <a href="https://livenet.xrpl.org/accounts/rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX" rel="noopener">rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX</a></p>
+        </div>
+        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Signers listed</p><p class="mv">3 signers control the account</p></div>
+        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">Minimum who must agree</p><p class="mv">2 of 3 can sign: quorum 2 against weights 1, 1, 1</p></div>
+      </div>
+      <div class="trap mis">
+        <div>
+          <p class="tf">Absent ≠ false</p>
+          <p class="tw">The ledger answered actNotFound: there is no account at this address. That is not an account holding nothing; a payment to it would have to create it, and nothing about it can be verified.</p>
+          <p class="te">Ledger 107,194,798 · address <a href="https://livenet.xrpl.org/accounts/rPGJe8F1FzegsNDJEMkq3hUrupovdBjQMi" rel="noopener">rPGJe8F1FzegsNDJEMkq3hUrupovdBjQMi</a></p>
+        </div>
+        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Balance</p><p class="mv">0 XRP</p></div>
+        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">Account activated on mainnet</p><p class="mv">FAIL — Address is well-formed but has never been funded on mainnet.</p></div>
+      </div>
+      <div class="trap mis">
+        <div>
+          <p class="tf">Ripple epoch ≠ Unix epoch</p>
+          <p class="tw">Ledger times count seconds from 2000-01-01, not 1970-01-01. Both readings are plausible dates and only one is right; the wrong one is 30 years early.</p>
+          <p class="te">Ledger 107,194,530 · transaction <a href="https://livenet.xrpl.org/transactions/307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA" rel="noopener">307662378F…</a></p>
+        </div>
+        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">date as Unix time</p><p class="mv">1996-09-24 02:42:12 UTC</p></div>
+        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">date from 2000-01-01</p><p class="mv">2026-09-24 02:42:12 UTC</p></div>
+      </div>
+    </div>
+        <p class="micro" style="margin-top:12px"><a href="/misread/">Each case, with the code behind it</a></p>
+      </div>
+    </details>
   </section>
 
   <section id="surfaces" class="cx-surfaces">
@@ -1434,7 +1500,7 @@
 <script src="/assets/support.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>
 <script src="/assets/intelligence.js" defer></script>
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"SoftwareApplication","name":"NOSHASHI","applicationCategory":"FinanceApplication","operatingSystem":"macOS, Windows, Linux","releaseNotes":"https://github.com/Ignosha/noshashi/releases","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"USD"},{"@type":"Offer","name":"Pro","price":"749","priceCurrency":"USD"},{"@type":"Offer","name":"Institutional","price":"4000","priceCurrency":"USD"},{"@type":"Offer","name":"Enterprise","price":"10000","priceCurrency":"USD"},{"@type":"Offer","name":"Strategic Infrastructure","price":"20833","priceCurrency":"USD"}],"url":"https://www.noshashi.app/"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does NOSHASHI do?","acceptedAnswer":{"@type":"Answer","text":"NOSHASHI reads validated XRP Ledger state and answers two questions from it at the same moment: whether a transfer is permitted under the rules you configured, and whether you could actually exit the position. It returns a GO, HOLD or NO-GO verdict with the evidence attached. It is informational tooling — it never holds, signs or moves an asset."}},{"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"The console is free forever, including unlimited GO/HOLD/NO-GO checks, live mainnet telemetry and 10 address checks a month. Pro is $749 per seat per month and adds unlimited address checks, exit-liquidity and freeze-rights analysis, the persistent adjudication ledger and 5,000 API verifications. Institutional is $4,000 a month and adds Travel Rule scoping, signed audit export, offline adjudication and 100,000 API verifications."}},{"@type":"Question","name":"Is this production-ready?","acceptedAnswer":{"@type":"Answer","text":"No — every build on this site is labelled BETA. It is pre-1.0, the binaries are not code-signed or notarised yet, and the release pipeline is still being hardened. Treat it as an evaluation build: verify the SHA-256, run it through your own software admission process, and do not make it the sole basis of a decision carrying legal consequence."}},{"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No. There are no accounts on this site — sign-in and the hosted workspace were withdrawn. The application runs on your machine and reads public ledger state directly, so there is no server-side state to log into. A paid subscription is managed through Stripe and does not create a website login."}},{"@type":"Question","name":"macOS or Windows blocks the app — is that expected?","acceptedAnswer":{"@type":"Answer","text":"Yes. The builds are not code-signed or notarised while the release pipeline is being hardened, so macOS reports an unidentified developer and Windows SmartScreen warns. On macOS, right-click the app and choose Open the first time. Verify the SHA-256 published next to the download first — that check is what actually tells you the file is the one CI built."}},{"@type":"Question","name":"Can it move my funds?","acceptedAnswer":{"@type":"Answer","text":"No, and it cannot be made to. NOSHASHI has no signing path and no custody: it reads ledger state and reports on it. It is not a bank, broker-dealer, money services business, money transmitter, qualified custodian or registered investment adviser, and nothing it produces is legal, regulatory, tax or investment advice."}},{"@type":"Question","name":"What data do you collect?","acceptedAnswer":{"@type":"Answer","text":"Without an account there is no server-side state: no analytics, no telemetry, no crash reporting. The compliance agent runs on your own machine with zero egress. Secrets are held by the OS keychain rather than by the app. Typefaces are self-hosted, so opening a page does not announce you to a font CDN."}},{"@type":"Question","name":"How do billing, cancellation and refunds work?","acceptedAnswer":{"@type":"Answer","text":"Payments run entirely through Stripe — no card data ever reaches NOSHASHI. Subscriptions renew automatically until cancelled and can be cancelled at any time, taking effect at the end of the period already paid for. A first charge is fully refundable within 14 days if no paid capability was used."}}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"SoftwareApplication","name":"NOSHASHI","applicationCategory":"FinanceApplication","operatingSystem":"macOS, Windows, Linux","releaseNotes":"https://github.com/Ignosha/noshashi/releases","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"USD"},{"@type":"Offer","name":"Pro","price":"749","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"749","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Institutional","price":"4000","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"4000","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Enterprise","price":"10000","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"10000","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Strategic Infrastructure","price":"20833","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"20833","priceCurrency":"USD","unitCode":"MON"}}],"url":"https://www.noshashi.app/"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does NOSHASHI do?","acceptedAnswer":{"@type":"Answer","text":"NOSHASHI reads validated XRP Ledger state and answers two questions from it at the same moment: whether a transfer is permitted under the rules you configured, and whether you could actually exit the position. It returns a GO, HOLD or NO-GO verdict with the evidence attached. It is informational tooling — it never holds, signs or moves an asset."}},{"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"The console is free forever, including unlimited GO/HOLD/NO-GO checks, live mainnet telemetry and 10 address checks a month. Pro is $749 per seat per month and adds unlimited address checks, exit-liquidity and freeze-rights analysis, the persistent adjudication ledger and 5,000 API verifications. Institutional is $4,000 a month and adds Travel Rule scoping, signed audit export, offline adjudication and 100,000 API verifications."}},{"@type":"Question","name":"Is this production-ready?","acceptedAnswer":{"@type":"Answer","text":"No — every build on this site is labelled BETA. It is pre-1.0, the binaries are not code-signed or notarised yet, and the release pipeline is still being hardened. Treat it as an evaluation build: verify the SHA-256, run it through your own software admission process, and do not make it the sole basis of a decision carrying legal consequence."}},{"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No. There are no accounts on this site — sign-in and the hosted workspace were withdrawn. The application runs on your machine and reads public ledger state directly, so there is no server-side state to log into. A paid subscription is managed through Stripe and does not create a website login."}},{"@type":"Question","name":"macOS or Windows blocks the app — is that expected?","acceptedAnswer":{"@type":"Answer","text":"Yes. The builds are not code-signed or notarised while the release pipeline is being hardened, so macOS reports an unidentified developer and Windows SmartScreen warns. On macOS, right-click the app and choose Open the first time. Verify the SHA-256 published next to the download first — that check is what actually tells you the file is the one CI built."}},{"@type":"Question","name":"Can it move my funds?","acceptedAnswer":{"@type":"Answer","text":"No, and it cannot be made to. NOSHASHI has no signing path and no custody: it reads ledger state and reports on it. It is not a bank, broker-dealer, money services business, money transmitter, qualified custodian or registered investment adviser, and nothing it produces is legal, regulatory, tax or investment advice."}},{"@type":"Question","name":"What data do you collect?","acceptedAnswer":{"@type":"Answer","text":"Without an account there is no server-side state: no analytics, no telemetry, no crash reporting. The compliance agent runs on your own machine with zero egress. Secrets are held by the OS keychain rather than by the app. Typefaces are self-hosted, so opening a page does not announce you to a font CDN."}},{"@type":"Question","name":"How do billing, cancellation and refunds work?","acceptedAnswer":{"@type":"Answer","text":"Payments run entirely through Stripe — no card data ever reaches NOSHASHI. Subscriptions renew automatically until cancelled and can be cancelled at any time, taking effect at the end of the period already paid for. A first charge is fully refundable within 14 days if no paid capability was used."}}]}]}</script>
 <script src="/assets/inline/0770f1dbd04a806f825c.js"></script>
 
 <script src="/assets/inline/4d3e560082cffe04e4d4.js"></script>

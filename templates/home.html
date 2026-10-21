@@ -1008,6 +1008,10 @@
   .cx-link{display:inline-block;margin-top:18px;font-weight:600;color:var(--ink);text-decoration:none;
     border-bottom:1px solid var(--rule);padding-bottom:2px}
   .cx-link:hover{border-color:var(--ink)}
+  .cx-traps{margin-top:clamp(48px,7vw,80px);text-align:center}
+  .cx-traps > summary{list-style:none;cursor:pointer}
+  .cx-traps > summary::-webkit-details-marker{display:none}
+  .cx-traps[open] > div{text-align:left}
   .cx-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
   .cx-card{display:block;padding:26px;border:1px solid var(--rule);border-radius:16px;background:var(--surface);
     color:inherit;text-decoration:none;transition:border-color .2s ease,transform .2s ease}
@@ -1097,6 +1101,13 @@
       </div>
       <!--SLOT:SHOTADDRESS-->
     </article>
+    <details class="traps cx-traps">
+      <summary class="cx-btn ghost">See real cases from mainnet</summary>
+      <div style="margin-top:18px">
+        <!--SLOT:MISREAD-->
+        <p class="micro" style="margin-top:12px"><a href="/misread/">Each case, with the code behind it</a></p>
+      </div>
+    </details>
   </section>
 
   <section id="surfaces" class="cx-surfaces">
