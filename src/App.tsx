@@ -111,7 +111,8 @@ const AccountScene = lazy(() =>
   import("@/components/scenes/AccountScene").then((m) => ({ default: m.AccountScene }))
 );
 import { HomeScene } from "@/components/scenes/HomeScene";
-import { MODE_CHOSEN_KEY } from "@/lib/onboarding";
+import { MODE_CHOSEN_KEY, TUTORIAL_URL } from "@/lib/onboarding";
+import { openExternal } from "@/lib/external";
 import { VerificationScene } from "@/components/scenes/VerificationScene";
 const HistoryScene = lazy(() =>
   import("@/components/scenes/HistoryScene").then((m) => ({ default: m.HistoryScene }))
@@ -773,6 +774,14 @@ function ConsoleApp() {
         icon: item.icon,
         run: () => setScene(item.id),
       })),
+      {
+        id: "action-tutorial",
+        label: "Open the tutorial",
+        group: "ACTIONS",
+        hint: "Every screen, what it answers and how to use it",
+        icon: <NovaShield size={15} />,
+        run: () => void openExternal(TUTORIAL_URL),
+      },
       {
         id: "action-resync",
         label: "Resync mainnet state",

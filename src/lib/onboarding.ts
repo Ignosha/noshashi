@@ -97,3 +97,6 @@ export function showGuide(steps: FirstRunStep[], dismissed: boolean): boolean {
 export function markEvidenceChecked(): Promise<void> {
   return writeSetting(EVIDENCE_CHECKED_KEY, true);
 }
+
+/** The step-by-step guide to every screen, on the website. */
+export const TUTORIAL_URL = "https://www.noshashi.app/tutorial/";

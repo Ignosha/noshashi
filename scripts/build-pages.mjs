@@ -190,6 +190,7 @@ ${band("Not sure where you fit?", "Tell us the workflow. We will show what exist
 /* ── /resources/ ──────────────────────────────────────────────────── */
 const RESOURCES = [
   ["Learn", [
+    ["/tutorial/", "Desktop app tutorial", "Every screen in the app, and how to use it, in ten minutes."],
     ["/learn/", "Learn NOSHASHI", "A short course on reading the ledger correctly."],
     ["/guide/", "Plain-language guide", "Every term on the site, explained simply."],
     ["/misread/", "The ledger can be misread", "Real mainnet cases where a basic reading is wrong."],

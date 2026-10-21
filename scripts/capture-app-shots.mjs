@@ -54,7 +54,9 @@ async function go(label) {
   await page.waitForTimeout(1200);
 }
 function ledgerOf(body) {
-  const m = body.match(/ledger ([\d,]{9,})/i) || body.match(/LGR\s+([\d,]{9,})/);
+  // The status bar's LGR is the ledger on screen right now; a "ledger N"
+  // elsewhere can be an older one the screen is describing.
+  const m = body.match(/LGR\s+([\d,]{9,})/) || body.match(/ledger ([\d,]{9,})/i);
   return m ? Number(m[1].replace(/,/g, "")) : null;
 }
 
@@ -79,7 +81,7 @@ await page.waitForTimeout(3000);
 if (await start.count()) await start.click();
 await until((b) => /CONNECTED · XRPL MAINNET/i.test(b) && /is real/i.test(b), 60_000, "a live mainnet connection");
 // The getting-started card is for first runs; the screenshot shows the product.
-const hide = page.getByRole("button", { name: /^hide$/i }).first();
+const hide = page.getByRole("button", { name: /hide the getting-started guide/i }).first();
 await hide.waitFor({ timeout: 10_000 }).then(() => hide.click()).catch(() => {});
 await page.waitForTimeout(800);
 await shoot("overview", "NOSHASHI desktop app overview, connected to XRPL mainnet, showing how much of the Bitstamp USD order book can actually fill.");
@@ -113,6 +115,59 @@ await page.getByPlaceholder(/^r…$/).first().fill(ACCOUNT);
 await page.getByRole("button", { name: /CHECK THIS ADDRESS/i }).click();
 await page.waitForTimeout(8000);
 await shoot("address", "Address check: what an XRPL account is, who controls it and what it can do, read from the ledger.");
+
+/* ── Screens for /tutorial/. Each is optional: one that does not reach a
+   real result is skipped (and the tutorial shows that screen without a
+   picture) rather than captured empty. ── */
+async function optional(name, fn) {
+  try { await fn(); } catch (e) { console.log(`skipped ${name}: ${e.message}`); }
+}
+
+await optional("learn", async () => {
+  await go("LEARN");
+  await shoot("learn", "Learn screen: hands-on labs that walk through the real screens with mainnet data, plus short explainers.");
+});
+
+await optional("noshx", async () => {
+  await go("NOSHX");
+  await page.getByRole("button", { name: /^Can Bitstamp/ }).first().click();
+  await until((b) => /■ STOP/.test(b), 15_000, "NOSHX to start answering");
+  await until((b) => !/■ STOP/.test(b), 120_000, "NOSHX to finish answering");
+  await shoot("noshx", "NOSHX answering whether Bitstamp's USD issuer can freeze a balance, from live ledger reads.");
+});
+
+// The rest live in the Analyst view.
+await page.getByText("ANALYST", { exact: true }).first().click();
+await page.waitForTimeout(800);
+
+await optional("control", async () => {
+  await go("MISSION CONTROL");
+  await page.waitForTimeout(6000);
+  await shoot("control", "Mission Control: live XRPL mainnet telemetry, ledger by ledger.");
+});
+
+await optional("domains", async () => {
+  await go("DOMAIN GRID");
+  await until((b) => !/DOMAIN GRID\s+OFFLINE/.test(b), 30_000, "the domain list");
+  await page.waitForTimeout(3000);
+  await shoot("domains", "Domain Grid: every permissioned domain on XRPL mainnet and the credentials each requires.");
+});
+
+await optional("security", async () => {
+  await go("SECURITY CENTER");
+  const field = page.getByPlaceholder("Your XRP Ledger address (r…)").first();
+  await field.fill(ACCOUNT);
+  await page.getByRole("button", { name: /^CHECK$/ }).first().click();
+  await until((b) => !/READING…/.test(b), 30_000, "the account check");
+  await page.waitForTimeout(1500);
+  await shoot("security", "Security Center: an account check showing how an XRPL account can be taken over, read from the ledger.");
+});
+
+await optional("sync", async () => {
+  await go("LEDGER SYNC");
+  await page.waitForTimeout(10000);
+  await shoot("sync", "Ledger Sync: what four public XRPL nodes each report, side by side.");
+});
 
 await browser.close();
 if (errors.length) console.log("page errors:", errors);

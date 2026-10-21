@@ -47,6 +47,7 @@ import {
 import { jsonLd } from "../api/_lib/shell.js";
 import { buildRedesignPages, REDESIGN_PAGES } from "./build-pages.mjs";
 import { buildWorkspace, WORKSPACE_PAGES } from "./build-workspace.mjs";
+import { buildTutorial, TUTORIAL_PAGES } from "./build-tutorial.mjs";
 import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
@@ -1609,6 +1610,7 @@ async function buildSitemap(docs = []) {
     ["/pricing/", "monthly", "0.9"],
     ...REDESIGN_PAGES,
     ...WORKSPACE_PAGES,
+    ...TUTORIAL_PAGES,
     ["/enterprise/", "monthly", "0.9"],
     ["/trust/", "monthly", "0.8"],
     ["/misread/", "monthly", "0.8"],
@@ -1706,6 +1708,7 @@ async function main() {
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildRedesignPages(write);
   await buildWorkspace(write, { release });
+  await buildTutorial(write, { site: SITE });
   await buildTrust();
   await buildMisread();
   const docs = await buildDocs();

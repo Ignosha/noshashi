@@ -4,11 +4,15 @@ name: App screenshots
 # mainnet (scripts/capture-app-shots.mjs) and commits them to the branch
 # that ran it. A GitHub runner is used because it can reach public XRPL
 # nodes; the script fails, and nothing is committed, if the app is not
-# connected or a screen does not reach a real result.
+# connected or a screen does not reach a real result. Run it by hand
+# (workflow_dispatch) on a branch to refresh the screenshots.
 
 on:
   workflow_dispatch:
   push:
+    # Never main: the capture commits, and main only takes reviewed
+    # changes. Screenshots reach main through the pull request.
+    branches-ignore: [main]
     paths:
       - scripts/capture-app-shots.mjs
       - .github/workflows/app-screenshots.yml
@@ -46,6 +50,7 @@ jobs:
           node scripts/capture-app-shots.mjs
 
       - name: Commit the screenshots
+        if: github.ref != 'refs/heads/main'
         run: |
           git add site/assets/shots
           if git diff --cached --quiet; then echo "No change."; exit 0; fi
