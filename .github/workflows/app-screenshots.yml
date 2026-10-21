@@ -51,4 +51,6 @@ jobs:
           if git diff --cached --quiet; then echo "No change."; exit 0; fi
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "Desktop app screenshots from XRPL mainnet"
-          git push
+          # The branch may have moved while the capture ran.
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
