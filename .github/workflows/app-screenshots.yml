@@ -50,6 +50,7 @@ jobs:
           node scripts/capture-app-shots.mjs
 
       - name: Commit the screenshots
+        if: github.ref != 'refs/heads/main'
         run: |
           git add site/assets/shots
           if git diff --cached --quiet; then echo "No change."; exit 0; fi
