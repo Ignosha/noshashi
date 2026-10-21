@@ -25,6 +25,13 @@ const BASE = process.env.APP_URL || "http://localhost:4174/";
 const OUT = process.env.SHOTS_DIR || "site/assets/shots";
 // Bitstamp's USD issuer: a long-lived, public institutional account.
 const ACCOUNT = "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B";
+// For the audit trail, busy exchange deposit accounts, so the screen shows
+// payments that delivered something. The first with inbound XRP is used.
+const DEPOSIT_ACCOUNTS = [
+  "rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh",
+  "rLNaPoKeeBjZe2qs6x52yVPZpZ8td4dc6w",
+  ACCOUNT,
+];
 
 const sharp = (await import("sharp")).default;
 const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
@@ -73,7 +80,8 @@ if (await start.count()) await start.click();
 await until((b) => /CONNECTED · XRPL MAINNET/i.test(b) && /is real/i.test(b), 60_000, "a live mainnet connection");
 // The getting-started card is for first runs; the screenshot shows the product.
 const hide = page.getByRole("button", { name: /^hide$/i }).first();
-if (await hide.count()) await hide.click();
+await hide.waitFor({ timeout: 10_000 }).then(() => hide.click()).catch(() => {});
+await page.waitForTimeout(800);
 await shoot("overview", "NOSHASHI desktop app overview, connected to XRPL mainnet, showing how much of the Bitstamp USD order book can actually fill.");
 
 await go("VERIFICATION");
@@ -81,12 +89,23 @@ await page.getByPlaceholder(/^r…/).first().fill(ACCOUNT);
 await page.getByRole("button", { name: /^1,000$/ }).first().click();
 await page.getByRole("button", { name: /RUN COMPLIANCE GATE/i }).first().click();
 await until((b) => !/NO EVALUATION YET/.test(b) && /\b(GO|HOLD|NO-GO)\b/.test(b), 60_000, "a gate verdict");
+// Let the verdict toast clear so it does not cover the result.
+await until((b) => !/GATE (GO|HOLD|NO-GO)/.test(b), 20_000, "the toast to clear").catch(() => {});
 await shoot("verification", "Verification screen: a 1,000 XRP settlement to Bitstamp's account evaluated against a rule profile, with the verdict and its reasons.");
 
 await go("AUDIT TRAIL");
-await page.getByLabel(/Account to audit/i).fill(ACCOUNT);
-await page.getByRole("button", { name: /READ HISTORY/i }).click();
-await until((b) => /[1-9][\d,]* OF [\d,]+ RECORDS/i.test(b), 90_000, "audit records");
+for (const account of DEPOSIT_ACCOUNTS) {
+  await page.getByLabel(/Account to audit/i).fill(account);
+  await page.getByRole("button", { name: /READ HISTORY/i }).click();
+  await until((b) => /[1-9][\d,]* OF [\d,]+ RECORDS/i.test(b), 90_000, "audit records").catch(() => {});
+  const body = await text();
+  if (!/INBOUND \(DELIVERED\)\s*0 XRP/i.test(body) && /[1-9][\d,]* OF [\d,]+ RECORDS/i.test(body)) {
+    const inbound = page.getByRole("button", { name: /^IN$/ }).first();
+    if (await inbound.count()) await inbound.click();
+    console.log(`audit trail: ${account}`);
+    break;
+  }
+}
 await shoot("audit", "Audit trail screen: an account's validated payment history with delivered amounts and counterparty screening.");
 
 await go("CHECK AN ADDRESS");
