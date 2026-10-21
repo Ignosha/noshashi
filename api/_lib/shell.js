@@ -40,6 +40,7 @@ export { MARK };
 export const NAV = [
   { href: "/platform/", label: "Platform", key: "platform", i18n: "nav.platform" },
   { href: "/solutions/", label: "Solutions", key: "solutions", i18n: "nav.solutions" },
+  { href: "/institutional-demo/", label: "Demo", key: "demo", i18n: "nav.demo2" },
   { href: "/#public", label: "Free tools", i18n: "nav.tools", optional: true },
   { href: "/resources/", label: "Resources", key: "resources", i18n: "nav.resources" },
   { href: "/pricing/", label: "Pricing", i18n: "nav.pricing" },
@@ -52,6 +53,7 @@ export const NAV = [
 export const FOOTER_GROUPS = [
   { title: "Platform", links: [
     { href: "/platform/", label: "Platform overview" },
+    { href: "/institutional-demo/", label: "Interactive demo" },
     { href: "/#public", label: "Free tools" },
     { href: "/#download", label: "Download" },
     { href: "/pricing/", label: "Pricing" },
@@ -115,6 +117,9 @@ export function renderHeader(current = "") {
       ${links}
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
         <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme">
+        <span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span>
       </button>
       <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
       <a class="btn" href="/#download"><span data-i18n="nav.download">Download</span></a>
@@ -253,6 +258,8 @@ export function renderPage({
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/core.css">
 <link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
 ${THEME_BOOT}
 ${jsonLd([ORGANIZATION, ...structured])}
 ${head}

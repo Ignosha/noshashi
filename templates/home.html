@@ -15,7 +15,7 @@
 <meta property="og:image" content="<!--SLOT:ORIGIN-->/assets/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="NOSHASHI: the intelligence core over the ASCII ledger pond">
+<meta property="og:image:alt" content="NOSHASHI: XRPL asset intelligence over the live ASCII ledger field">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="NOSHASHI · Decentralized Intelligence">
 <meta name="twitter:description" content="Live signals, deterministic rules and verifiable evidence for the XRP Ledger.">
@@ -34,6 +34,8 @@
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/modules.css">
 <link rel="stylesheet" href="/assets/intelligence.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
 <style>
   :root{
     /* Brand board, section 05 */
@@ -787,24 +789,6 @@
     background:radial-gradient(circle at 40% 60%,color-mix(in srgb,var(--tele) 6%,transparent) 0%,transparent 70%);
     border-radius:50%;
   }
-  .leaf-accent{
-    position:absolute;pointer-events:none;opacity:.06;z-index:0;
-    color:var(--brand);
-  }
-  .leaf-accent.bottom-left{bottom:6%;left:3%;width:220px;height:220px}
-  .leaf-accent.mid{top:58%;right:4%;width:130px;height:130px;transform:rotate(-20deg);opacity:.045}
-  /* Karesansui band: raked sand parted around three stones. Replaces a
-     plain rule at two section breaks. Pure line work at low weight so it
-     reads as a quiet pause, the way a garden reads, not as illustration. */
-  .zen-band{height:120px;margin:28px 0;overflow:hidden;
-    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
-            mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-  .zen-band svg{display:block;width:100%;height:100%}
-  .zen-band .zr{fill:none;stroke:color-mix(in srgb,var(--brand) 26%,transparent);stroke-width:1;
-    vector-effect:non-scaling-stroke}
-  .zen-band .zs{fill:color-mix(in srgb,var(--ink) 9%,var(--surface));
-    stroke:color-mix(in srgb,var(--brand) 22%,transparent);stroke-width:1;vector-effect:non-scaling-stroke}
-  @media(max-width:640px){.zen-band{height:84px;margin:16px 0}}
   /* Organic divider instead of straight rule */
   .organic-rule{
     height:2px;border:0;margin:0;
@@ -971,22 +955,6 @@
 </head>
 <body>
 <div class="garden-bg">
-  <!-- A leaf spray, lower left, and a lotus pad, right. Static, at the
-       opacity of paper texture: atmosphere, never a picture. -->
-  <svg class="leaf-accent bottom-left" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-    <path d="M28 184C60 140 110 80 172 26" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-    <g fill="currentColor">
-      <path transform="translate(58 146) rotate(-62)" d="M0 0C9 -8 22.5 -8 30 0C22.5 8 9 8 0 0Z"/>
-      <path transform="translate(80 118) rotate(28)" d="M0 0C10 -9 25.5 -9 34 0C25.5 9 10 9 0 0Z"/>
-      <path transform="translate(102 92) rotate(-58)" d="M0 0C11 -10 27 -10 36 0C27 10 11 10 0 0Z"/>
-      <path transform="translate(126 68) rotate(32)" d="M0 0C9.6 -9 24 -9 32 0C24 9 9.6 9 0 0Z"/>
-      <path transform="translate(148 48) rotate(-54)" d="M0 0C7.8 -7 19.5 -7 26 0C19.5 7 7.8 7 0 0Z"/>
-    </g>
-  </svg>
-  <svg class="leaf-accent mid" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-    <path fill="currentColor" d="M50 8A42 42 0 1 0 92 50H50Z"/>
-    <path stroke="currentColor" stroke-width=".8" d="M50 50L20 20M50 50L10 55M50 50L30 88M50 50L70 90"/>
-  </svg>
 </div>
 <div class="layer">
 <a class="skip" href="#main">Skip to content</a>
@@ -1071,7 +1039,7 @@
       <h1><span class="h1-a">Know what you're holding. Know what can happen.</span></h1>
       <p class="hi-sub">Analyze XRPL assets, verify payment outcomes, and understand issuer controls and real market liquidity using evidence from the ledger.</p>
       <!-- Filled by site/assets/garden-field.js from the live ledger stream; the text here is what shows without script. -->
-      <p class="mono hi-caption" data-garden-caption translate="no">The pond answers each validated XRPL ledger as it closes.</p>
+      <p class="mono hi-caption" data-garden-caption translate="no">The field answers each validated XRPL ledger as it closes.</p>
 
       <div class="hi-actions">
         <a class="hi-cta" href="#public">Explore free tools</a>
@@ -1320,7 +1288,7 @@
       </div>
     </div>
     <p class="micro" style="text-align:center">Free tools stay free and public. Paid plans add saved decisions, alerts, the Compliance API and audit exports.</p>
-    <p class="cta" style="margin-top:18px"><a class="btn" href="/design-partners/">Become a design partner</a></p>
+    <p class="cta" style="margin-top:18px"><a class="btn" href="/design-partners/">Become a design partner</a><a class="btn ghost" href="/institutional-demo/">Try the interactive demo</a></p>
   </section>
 
   <section id="pricing" class="reveal">

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Institutional demo · NOSHASHI</title>
+<meta name="description" content="Evaluate NOSHASHI on live XRPL data: issuer risk, payment verification and liquidity, in a guided five-step demo. No wallet, no keys.">
+<link rel="canonical" href="https://www.noshashi.app/institutional-demo/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/institutional-demo/">
+<meta property="og:title" content="Institutional demo · NOSHASHI">
+<meta property="og:description" content="Evaluate NOSHASHI on live XRPL data: issuer risk, payment verification and liquidity, in a guided five-step demo. No wallet, no keys.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Institutional demo · NOSHASHI">
+<meta name="twitter:description" content="Evaluate NOSHASHI on live XRPL data: issuer risk, payment verification and liquidity, in a guided five-step demo. No wallet, no keys.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Institutional demo","item":"https://www.noshashi.app/institutional-demo/"}]}]}</script>
+
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
+      <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/" aria-current="page"><span data-i18n="nav.demo2">Demo</span></a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/resources/"><span data-i18n="nav.resources">Resources</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme">
+        <span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.download">Download</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head"><p class="eyebrow">NOSHASHI INSTITUTIONAL ACCESS</p>
+  <h1>Understand the ledger. Evaluate the evidence.</h1>
+  <p>Explore NOSHASHI's XRPL intelligence tools, test real workflows, and help shape the next generation of asset analysis and transaction verification.</p>
+  <p class="cta" style="margin-top:22px"><a class="btn" href="#demo">Launch interactive demo</a><a class="btn ghost" href="/design-partners/#apply">Apply for early access</a></p>
+  <p class="micro">Evaluate available tools using public ledger data, without connecting a wallet or exposing private keys.</p>
+</div>
+
+<section>
+  <div class="grid g3">
+    <div class="panel"><p class="num">01 · EXPLORE</p><h3>Explore</h3><p>Experience the available NOSHASHI tools through guided demonstrations.</p></div>
+    <div class="panel"><p class="num">02 · EVALUATE</p><h3>Evaluate</h3><p>Complete practical tasks based on real XRPL workflows.</p></div>
+    <div class="panel"><p class="num">03 · INFLUENCE</p><h3>Influence</h3><p>Share feedback directly with the NOSHASHI team and help prioritize future improvements.</p></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="sec-head"><p class="eyebrow">Interactive demo</p><h2>Three workflows, live on mainnet.</h2>
+    <p>Pick a scenario, use the example or your own input, and follow the five steps. Every figure is read from the XRP Ledger when you press the button.</p></div>
+  <div class="dtabs" role="tablist" aria-label="Demo scenarios">
+    <button type="button" role="tab" class="dtab on" aria-selected="true" data-scenario-tab="issuer">A · Issuer risk</button>
+    <button type="button" role="tab" class="dtab" aria-selected="false" data-scenario-tab="payment">B · Payment verification</button>
+    <button type="button" role="tab" class="dtab" aria-selected="false" data-scenario-tab="liquidity">C · Liquidity</button>
+  </div>
+
+  <div class="dpanel panel" data-scenario="issuer">
+    <p class="dgoal"><b>You are testing:</b> which issuer controls could affect a token you hold or accept.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dIssuer">Issuer address</label>
+      <input id="dIssuer" type="text" spellcheck="false" placeholder="Issuer address (starts with r)">
+      <button class="btn" type="submit">Read the issuer</button>
+    </form>
+    <p class="checknote">Examples: <button type="button" class="sample" data-example="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">Bitstamp (USD)</button> · <button type="button" class="sample" data-example="rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">GateHub (EUR)</button> · <button type="button" class="sample" data-example="rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">Ripple (RLUSD)</button></p>
+    <div class="dprog"><span class="dcount">Step 1 of 5</span><span class="dbar"><i></i></span></div>
+  <ol class="dsteps"><li class="dstep active"><span class="dnum" aria-hidden="true">1</span><p class="dh">Select an issuer <span class="dwhy">A public XRPL issuer address.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">2</span><p class="dh">Inspect its settings <span class="dwhy">Freeze, clawback, authorization, transfer fee and keys, at the validated ledger.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">3</span><p class="dh">What the controls mean <span class="dwhy">Each setting in plain language.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">4</span><p class="dh">The ledger evidence <span class="dwhy">The ledger index and fields the answer came from.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">5</span><p class="dh">Check the source <span class="dwhy">Open the same data somewhere we do not control.</span></p><div class="dout" aria-live="polite"></div></li></ol>
+  </div>
+
+  <div class="dpanel panel" data-scenario="payment" hidden>
+    <p class="dgoal"><b>You are testing:</b> what a payment actually delivered, rather than what it asked for.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dHash">Transaction hash</label>
+      <input id="dHash" type="text" spellcheck="false" placeholder="Transaction hash (64 hex characters)">
+      <button class="btn" type="submit">Verify the payment</button>
+    </form>
+    <p class="checknote">No hash to hand? <button type="button" class="sample" data-find>Find a real payment from the last few ledgers</button></p>
+    <div class="dprog"><span class="dcount">Step 1 of 5</span><span class="dbar"><i></i></span></div>
+  <ol class="dsteps"><li class="dstep active"><span class="dnum" aria-hidden="true">1</span><p class="dh">Load a transaction <span class="dwhy">Any public payment hash.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">2</span><p class="dh">Retrieve it <span class="dwhy">The validated transaction and its result.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">3</span><p class="dh">Requested against delivered <span class="dwhy">The Amount field beside delivered_amount.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">4</span><p class="dh">What it means <span class="dwhy">The result, and its limits.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">5</span><p class="dh">Verify independently <span class="dwhy">The same transaction on a public explorer.</span></p><div class="dout" aria-live="polite"></div></li></ol>
+  </div>
+
+  <div class="dpanel panel" data-scenario="liquidity" hidden>
+    <p class="dgoal"><b>You are testing:</b> how much of an order book could actually trade, not just what it advertises.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dPair">Trading pair</label>
+      <select id="dPair">
+        <option value="USD|rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">USD · Bitstamp</option>
+        <option value="USD|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">USD · GateHub</option>
+        <option value="EUR|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">EUR · GateHub</option>
+        <option value="524C555344000000000000000000000000000000|rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">RLUSD · Ripple</option>
+      </select>
+      <button class="btn" type="submit">Measure the book</button>
+    </form>
+    <div class="dprog"><span class="dcount">Step 1 of 5</span><span class="dbar"><i></i></span></div>
+  <ol class="dsteps"><li class="dstep active"><span class="dnum" aria-hidden="true">1</span><p class="dh">Select a pair <span class="dwhy">XRP against an issued currency.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">2</span><p class="dh">Retrieve the book <span class="dwhy">Both sides at one validated ledger, and how fresh it is.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">3</span><p class="dh">Advertised depth <span class="dwhy">What the book quotes within the band.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">4</span><p class="dh">Executable liquidity <span class="dwhy">What the offers' owners can actually fund, and the spread.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">5</span><p class="dh">Limits of the calculation <span class="dwhy">Band, AMM pools, depth cap and slippage.</span></p><div class="dout" aria-live="polite"></div></li></ol>
+  </div>
+
+  <p class="micro">Not in the demo yet: tester accounts and order-size slippage curves. Neither is offered yet; shipped work appears on the <a href="/progress/">progress page</a>.</p>
+</section>
+
+<section id="tasks">
+  <div class="sec-head"><p class="eyebrow">Test scenarios</p><h2>Five tasks for an evaluation.</h2>
+    <p>Do them in any order. Progress is saved in this browser only.</p></div>
+  <div class="panel dtaskcard">
+    <div class="dprog" style="margin-top:0"><span class="dcount" id="taskMeter">0 of 5 complete</span><span class="dbar"><i id="taskBar" style="width:0"></i></span></div>
+    <ul class="dtasks">
+      <li><label><input type="checkbox" data-task="scenario-issuer"> Run scenario A on an issuer your team holds or lists.</label></li>
+      <li><label><input type="checkbox" data-task="scenario-payment"> Run scenario B on a payment your team received.</label></li>
+      <li><label><input type="checkbox" data-task="scenario-liquidity"> Run scenario C on a pair you trade or price.</label></li>
+      <li><label><input type="checkbox" data-task="compare"> Compare one result with the tool you use today.</label></li>
+      <li><label><input type="checkbox" data-task="feedback"> Send the feedback below.</label></li>
+    </ul>
+    <button type="button" class="sample" id="taskReset" style="margin-top:14px">Reset progress</button>
+  </div>
+</section>
+
+<section id="feedback">
+  <div class="dsplit">
+    <div class="sec-head"><p class="eyebrow">Feedback</p><h2>Tell us what you found.</h2>
+      <p>Five questions. Answer the ones that apply; the founder reads every reply.</p>
+      <p class="dnote">Never send private keys, seed phrases or credentials. This demo never needs them.</p></div>
+    <div class="panel dformcard">
+  <form class="form-grid compact" id="feedbackForm" novalidate>
+    <div class="form-row split">
+      <div class="form-field"><label for="fbScenario">Scenario</label><select id="fbScenario" name="scenario"><option>Issuer risk</option><option>Payment verification</option><option>Liquidity</option><option>General</option></select></div>
+      <div class="form-field"><label for="fbEmail">Work email</label><input id="fbEmail" name="email" type="email" autocomplete="email" maxlength="200" required></div>
+    </div>
+    <div class="form-row split">
+      <div class="form-field"><label for="fbName">Name <span style="text-transform:none;letter-spacing:0">(optional)</span></label><input id="fbName" name="name" type="text" autocomplete="name" maxlength="120"></div>
+      <div class="form-field"><label for="fbOrg">Organization <span style="text-transform:none;letter-spacing:0">(optional)</span></label><input id="fbOrg" name="org" type="text" autocomplete="organization" maxlength="160"></div>
+    </div>
+    <div class="form-row"><div class="form-field"><label for="fbExpected">What did you expect the tool to do?</label><textarea id="fbExpected" name="expected" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbConfusing">What was confusing or missing?</label><textarea id="fbConfusing" name="confusing" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbToday">How do you solve this problem today?</label><textarea id="fbToday" name="today" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbValue">Would solving it save time, reduce risk or improve a decision?</label><textarea id="fbValue" name="value" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbPay">What would NOSHASHI need to deliver for your organization to pay for it?</label><textarea id="fbPay" name="pay" maxlength="800"></textarea></div></div>
+    <div class="form-trap" aria-hidden="true"><label for="fb_company">Leave this field empty</label><input id="fb_company" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>
+    <div class="form-actions"><button class="btn" type="submit">Send feedback</button><p class="form-status" id="feedbackStatus" role="status" aria-live="polite"></p></div>
+  </form>
+    </div>
+  </div>
+</section>
+
+<section id="issue">
+  <details class="ddrawer">
+    <summary>Got a wrong or confusing result? Report it</summary>
+    <div class="panel dformcard" style="margin-top:14px">
+  <form class="form-grid compact" id="issueForm" novalidate>
+    <div class="form-row split">
+      <div class="form-field"><label for="isScenario">Scenario</label><select id="isScenario" name="scenario"><option>Issuer risk</option><option>Payment verification</option><option>Liquidity</option><option>Other</option></select></div>
+      <div class="form-field"><label for="isEmail">Email</label><input id="isEmail" name="email" type="email" autocomplete="email" maxlength="200" required></div>
+    </div>
+    <div class="form-row"><div class="form-field"><label for="isInput">Address, hash or pair you used</label><input id="isInput" name="input" type="text" spellcheck="false" maxlength="200"></div></div>
+    <div class="form-row"><div class="form-field"><label for="isWhat">What happened</label><textarea id="isWhat" name="what" maxlength="1500" required></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="isExpected">What you expected</label><textarea id="isExpected" name="expected" maxlength="800"></textarea></div></div>
+    <div class="form-trap" aria-hidden="true"><label for="is_company">Leave this field empty</label><input id="is_company" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>
+    <div class="form-actions"><button class="btn" type="submit">Report the issue</button><p class="form-status" id="issueStatus" role="status" aria-live="polite"></p></div>
+  </form>
+    </div>
+  </details>
+</section>
+
+<section><div class="band"><div><h2>Want a 20-minute walkthrough?</h2><p>One real problem, the evidence NOSHASHI produces, and your chance to challenge it.</p></div><div class="cta"><a class="btn ghost" href="/contact/?topic=institutions">Request a meeting</a><a class="btn" href="/design-partners/#apply">Apply for early access</a></div></div></section>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/news/">Newsroom</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/demo.js" defer></script>
+</body>
+</html>

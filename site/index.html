@@ -15,7 +15,7 @@
 <meta property="og:image" content="https://www.noshashi.app/assets/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="NOSHASHI: the intelligence core over the ASCII ledger pond">
+<meta property="og:image:alt" content="NOSHASHI: XRPL asset intelligence over the live ASCII ledger field">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="NOSHASHI · Decentralized Intelligence">
 <meta name="twitter:description" content="Live signals, deterministic rules and verifiable evidence for the XRP Ledger.">
@@ -34,6 +34,8 @@
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/modules.css">
 <link rel="stylesheet" href="/assets/intelligence.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
 <style>
   :root{
     /* Brand board, section 05 */
@@ -787,24 +789,6 @@
     background:radial-gradient(circle at 40% 60%,color-mix(in srgb,var(--tele) 6%,transparent) 0%,transparent 70%);
     border-radius:50%;
   }
-  .leaf-accent{
-    position:absolute;pointer-events:none;opacity:.06;z-index:0;
-    color:var(--brand);
-  }
-  .leaf-accent.bottom-left{bottom:6%;left:3%;width:220px;height:220px}
-  .leaf-accent.mid{top:58%;right:4%;width:130px;height:130px;transform:rotate(-20deg);opacity:.045}
-  /* Karesansui band: raked sand parted around three stones. Replaces a
-     plain rule at two section breaks. Pure line work at low weight so it
-     reads as a quiet pause, the way a garden reads, not as illustration. */
-  .zen-band{height:120px;margin:28px 0;overflow:hidden;
-    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
-            mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-  .zen-band svg{display:block;width:100%;height:100%}
-  .zen-band .zr{fill:none;stroke:color-mix(in srgb,var(--brand) 26%,transparent);stroke-width:1;
-    vector-effect:non-scaling-stroke}
-  .zen-band .zs{fill:color-mix(in srgb,var(--ink) 9%,var(--surface));
-    stroke:color-mix(in srgb,var(--brand) 22%,transparent);stroke-width:1;vector-effect:non-scaling-stroke}
-  @media(max-width:640px){.zen-band{height:84px;margin:16px 0}}
   /* Organic divider instead of straight rule */
   .organic-rule{
     height:2px;border:0;margin:0;
@@ -971,22 +955,6 @@
 </head>
 <body>
 <div class="garden-bg">
-  <!-- A leaf spray, lower left, and a lotus pad, right. Static, at the
-       opacity of paper texture: atmosphere, never a picture. -->
-  <svg class="leaf-accent bottom-left" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-    <path d="M28 184C60 140 110 80 172 26" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-    <g fill="currentColor">
-      <path transform="translate(58 146) rotate(-62)" d="M0 0C9 -8 22.5 -8 30 0C22.5 8 9 8 0 0Z"/>
-      <path transform="translate(80 118) rotate(28)" d="M0 0C10 -9 25.5 -9 34 0C25.5 9 10 9 0 0Z"/>
-      <path transform="translate(102 92) rotate(-58)" d="M0 0C11 -10 27 -10 36 0C27 10 11 10 0 0Z"/>
-      <path transform="translate(126 68) rotate(32)" d="M0 0C9.6 -9 24 -9 32 0C24 9 9.6 9 0 0Z"/>
-      <path transform="translate(148 48) rotate(-54)" d="M0 0C7.8 -7 19.5 -7 26 0C19.5 7 7.8 7 0 0Z"/>
-    </g>
-  </svg>
-  <svg class="leaf-accent mid" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-    <path fill="currentColor" d="M50 8A42 42 0 1 0 92 50H50Z"/>
-    <path stroke="currentColor" stroke-width=".8" d="M50 50L20 20M50 50L10 55M50 50L30 88M50 50L70 90"/>
-  </svg>
 </div>
 <div class="layer">
 <a class="skip" href="#main">Skip to content</a>
@@ -996,12 +964,16 @@
     <nav class="nav-links" aria-label="Primary">
       <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
       <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/"><span data-i18n="nav.demo2">Demo</span></a>
       <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
       <a class="nav-link" href="/resources/"><span data-i18n="nav.resources">Resources</span></a>
       <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
       <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
         <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme">
+        <span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span>
       </button>
       <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
       <a class="btn" href="/#download"><span data-i18n="nav.download">Download</span></a>
@@ -1088,7 +1060,7 @@
       <h1><span class="h1-a">Know what you're holding. Know what can happen.</span></h1>
       <p class="hi-sub">Analyze XRPL assets, verify payment outcomes, and understand issuer controls and real market liquidity using evidence from the ledger.</p>
       <!-- Filled by site/assets/garden-field.js from the live ledger stream; the text here is what shows without script. -->
-      <p class="mono hi-caption" data-garden-caption translate="no">The pond answers each validated XRPL ledger as it closes.</p>
+      <p class="mono hi-caption" data-garden-caption translate="no">The field answers each validated XRPL ledger as it closes.</p>
 
       <div class="hi-actions">
         <a class="hi-cta" href="#public">Explore free tools</a>
@@ -1392,7 +1364,7 @@
       </div>
     </div>
     <p class="micro" style="text-align:center">Free tools stay free and public. Paid plans add saved decisions, alerts, the Compliance API and audit exports.</p>
-    <p class="cta" style="margin-top:18px"><a class="btn" href="/design-partners/">Become a design partner</a></p>
+    <p class="cta" style="margin-top:18px"><a class="btn" href="/design-partners/">Become a design partner</a><a class="btn ghost" href="/institutional-demo/">Try the interactive demo</a></p>
   </section>
 
   <section id="pricing" class="reveal">
@@ -1547,7 +1519,7 @@
 <footer>
   <div class="shell foot">
     <nav class="foot-map" aria-label="Site map">
-      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
       <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
       <div class="foot-group"><p class="foot-h">Free tools</p><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
       <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/news/">Newsroom</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>

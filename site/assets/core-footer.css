@@ -10,3 +10,8 @@
 @media (max-width:420px){.foot-map{grid-template-columns:1fr}}
 /* Primary nav button text: the page's `.nav-links a` colour is more specific than `.btn`. */
 .nav-links a.btn:not(.ghost){color:#08100B}
+/* The GREEN / BLUE switch, styled like the shared theme toggle. */
+.accent-toggle{display:inline-flex;align-items:center;gap:7px;background:transparent;
+  color:var(--muted);border:1px solid var(--rule);border-radius:var(--r);padding:8px 11px;
+  font:11px "IBM Plex Mono",monospace;cursor:pointer;white-space:nowrap}
+.accent-toggle:hover,.accent-toggle:focus-visible{color:var(--ink);border-color:var(--brand)}
