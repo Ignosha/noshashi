@@ -70,10 +70,26 @@ async function write(relative, html) {
 const FAQ_IDS = ["what", "price", "beta", "account", "unsigned", "custody", "privacy", "billing"];
 const FAQ = FAQ_IDS.map((id) => KB.find((e) => e.id === id)).filter(Boolean);
 
+/* A desktop-app screenshot with the ledger and date it was read at. */
+function renderShot(manifest, name, { eager = false } = {}) {
+  const shot = manifest?.shots?.find((s) => s.name === name);
+  if (!shot) return "";
+  const when = shot.captured_at ? new Date(shot.captured_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) : "";
+  const where = shot.ledger ? `ledger ${shot.ledger.toLocaleString("en-US")}` : "XRPL mainnet";
+  return `<figure class="cx-shot">
+        <img src="/assets/shots/${name}.webp" srcset="/assets/shots/${name}.webp 1440w, /assets/shots/${name}@2x.webp 2880w" sizes="(min-width:1240px) 1180px, 100vw"
+          width="1440" height="900" alt="${esc(shot.alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">
+        <figcaption>Desktop app · live on XRPL mainnet · ${esc(where)}${when ? ` · ${esc(when)}` : ""}</figcaption>
+      </figure>`;
+}
+
 /* ── The landing page ─────────────────────────────────────────────── */
 async function buildHome({ news, market, feed, status, release }) {
   let html = await readFile(path.join(ROOT, "templates", "home.html"), "utf8");
   const misread = JSON.parse(await readFile(path.join(ROOT, "src/lib/learn/misread.rendered.json"), "utf8"));
+  // Real screenshots of the desktop app, captured on mainnet by
+  // scripts/capture-app-shots.mjs. Without them the rows show text only.
+  const shots = JSON.parse(await readFile(path.join(SITE, "assets/shots/manifest.json"), "utf8").catch(() => "null"));
 
   const slots = {
     ORIGIN: ORIGIN,
@@ -93,6 +109,10 @@ async function buildHome({ news, market, feed, status, release }) {
     FAQ: renderFaq(FAQ),
     SUBSCRIBE: renderSubscribe(),
     MISREAD: renderMisread(misread),
+    SHOTHERO: renderShot(shots, "overview", { eager: true }),
+    SHOTVERIFICATION: renderShot(shots, "verification"),
+    SHOTAUDIT: renderShot(shots, "audit"),
+    SHOTADDRESS: renderShot(shots, "address"),
     JSONLD: jsonLd([
       ORGANIZATION,
       {
@@ -120,7 +140,7 @@ async function buildHome({ news, market, feed, status, release }) {
 
   // The short homepage leaves out the newsroom, mission log and edge lab;
   // their slots are optional so those panels can come back without code.
-  const OPTIONAL = new Set(["MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
+  const OPTIONAL = new Set(["MISREAD", "VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
     if (!html.includes(token)) {

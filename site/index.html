@@ -951,6 +951,76 @@
     .hi-bottom{margin-top:32px}
   }
 
+  /* ── Codex-style landing (hero, feature rows, surfaces) ─────────────
+     One idea per screen: a short headline, the product itself, then a
+     row per question with the real screen beside two sentences. */
+  .cx-hero{position:relative;overflow:hidden;text-align:center;
+    padding:clamp(56px,9vw,112px) 0 0;isolation:isolate}
+  .cx-hero > .garden-field{z-index:-1;opacity:.32;
+    -webkit-mask-image:linear-gradient(180deg,#000 30%,transparent 75%);
+            mask-image:linear-gradient(180deg,#000 30%,transparent 75%)}
+  html[data-theme="light"] .cx-hero > .garden-field{opacity:.22}
+  .cx-hero .core-anchor{position:absolute;left:50%;top:22%;width:1px;height:1px}
+  .cx-hero-text{max-width:760px;margin:0 auto;padding:0 4px}
+  .cx-pill{display:inline-flex;align-items:center;gap:8px;margin:0 0 26px;padding:6px 14px;
+    border:1px solid var(--rule);border-radius:999px;background:color-mix(in srgb,var(--surface) 70%,transparent);
+    font:500 11.5px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.08em;color:var(--muted);
+    backdrop-filter:blur(6px)}
+  .cx-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--hold)}
+  .cx-pill:has([data-state="operational"]) .dot{background:var(--go)}
+  .cx-pill:has([data-state="reconnecting"]) .dot{background:var(--nogo)}
+  .cx-pill .sep{color:var(--faint)}
+  .cx-hero h1{margin:0 auto;max-width:15ch;font-size:clamp(40px,6.4vw,76px);line-height:1.02;
+    letter-spacing:-.035em;font-weight:600;color:var(--ink);text-wrap:balance}
+  .cx-sub{margin:22px auto 0;max-width:46ch;font-size:clamp(17px,1.6vw,20px);line-height:1.5;color:var(--muted);text-wrap:balance}
+  .cx-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:32px}
+  .cx-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;
+    border-radius:999px;background:var(--ink);color:var(--ground);font-weight:600;font-size:15px;
+    text-decoration:none;border:1px solid var(--ink);transition:transform .2s ease,background .2s ease}
+  .cx-btn:hover,.cx-btn:focus-visible{transform:translateY(-1px)}
+  .cx-btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+  .cx-btn.ghost:hover{border-color:var(--ink)}
+  .cx-trust{margin:16px 0 0;font-size:13px;color:var(--faint)}
+
+  /* The product, framed: a glow in the brand colour behind a plain window. */
+  .cx-shot{margin:0;position:relative}
+  .cx-shot img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--rule);
+    background:var(--surface);box-shadow:0 1px 0 rgb(255 255 255 / .04) inset,0 30px 80px -30px rgb(0 0 0 / .6)}
+  .cx-shot figcaption{margin-top:12px;font:500 11.5px/1.5 "IBM Plex Mono",ui-monospace,monospace;
+    letter-spacing:.04em;color:var(--faint);text-align:center}
+  .cx-hero .cx-shot{max-width:1180px;margin:56px auto 0;padding:0 2px}
+  .cx-hero .cx-shot::before{content:"";position:absolute;inset:8% 6% -4%;z-index:-1;border-radius:40px;
+    background:radial-gradient(60% 60% at 50% 40%,color-mix(in srgb,var(--brand) 38%,transparent),transparent 70%);
+    filter:blur(40px)}
+
+  .cx-head{text-align:center;max-width:680px;margin:0 auto 48px}
+  .cx-head h2{margin:0;font-size:clamp(30px,4vw,46px);line-height:1.08;letter-spacing:-.03em;font-weight:600;text-wrap:balance}
+  .cx-head p{margin:14px 0 0;color:var(--muted);font-size:17px}
+  .cx-features,.cx-surfaces{padding:clamp(72px,10vw,128px) 0 0}
+  .cx-row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:clamp(28px,5vw,64px);
+    align-items:center;margin-top:clamp(56px,8vw,96px)}
+  .cx-row:first-of-type{margin-top:0}
+  .cx-row.flip .cx-copy{order:2}
+  .cx-copy h3{margin:6px 0 0;font-size:clamp(24px,2.6vw,32px);line-height:1.15;letter-spacing:-.02em;font-weight:600}
+  .cx-copy p{color:var(--muted);font-size:17px;line-height:1.55;margin:14px 0 0;max-width:38ch}
+  .cx-eyebrow{margin:0;font:500 12px/1.4 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--brand)}
+  .cx-link{display:inline-block;margin-top:18px;font-weight:600;color:var(--ink);text-decoration:none;
+    border-bottom:1px solid var(--rule);padding-bottom:2px}
+  .cx-link:hover{border-color:var(--ink)}
+  .cx-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .cx-card{display:block;padding:26px;border:1px solid var(--rule);border-radius:16px;background:var(--surface);
+    color:inherit;text-decoration:none;transition:border-color .2s ease,transform .2s ease}
+  .cx-card:hover,.cx-card:focus-visible{border-color:var(--brand);transform:translateY(-2px)}
+  .cx-card h3{margin:10px 0 0;font-size:20px;letter-spacing:-.01em}
+  .cx-card p:last-child{margin:8px 0 0;color:var(--muted);font-size:15px}
+  @media (max-width:900px){
+    .cx-row,.cx-row.flip{grid-template-columns:1fr}
+    .cx-row.flip .cx-copy{order:0}
+    .cx-cards{grid-template-columns:1fr}
+  }
+  @media (max-width:520px){ .cx-pill .opt{display:none} .cx-btn{flex:1 1 100%} }
+  @media (prefers-reduced-motion:reduce){ .cx-btn,.cx-card{transition:none} .cx-btn:hover,.cx-card:hover{transform:none} }
 </style>
 </head>
 <body>
@@ -983,94 +1053,26 @@
 
 <main class="shell" id="main">
   <!--
-    Instrument hero.
-
-    One screen: what this reads, what it answers with, and one action.
-    The architecture — fixed gutter, measured grid, three wired nodes,
-    a bottom row of action plus a chamfered note — is adapted from a
-    reference composition. Everything IN it is this project's own.
-
-    Four substitutions, each recorded in the CSS above rather than
-    made quietly: no third-party CloudFront video (CSP would refuse
-    it, and it is not ours), no Graphik from a font-piracy CDN
-    (licensed commercially, and `font-src 'self'` would refuse it), no
-    invented wallet address (this site does not print figures it did
-    not read), and --brand rather than a borrowed accent.
-
-    There is no nav in here. The page already has a real <header>
-    above with the theme toggle, the i18n hooks and the responsive
-    collapse; a second nav inside the hero would be a duplicate that
-    drifts.
-
-    Every string below keeps the data-i18n key it already had, so the
-    translations in site/data/i18n continue to resolve. The mission,
-    the badges, the headline and the CTA are the existing copy, moved
-    rather than rewritten.
+    Hero, after the shape of chatgpt.com/codex: one short headline, one
+    line under it, two actions, then the product itself. The screenshot
+    is the real desktop app on live mainnet (scripts/capture-app-shots.mjs);
+    its caption carries the ledger it was taken at. The ASCII field stays
+    behind the hero, answering each validated ledger.
   -->
-  <section class="hero-instrument" data-garden-field>
-
-    <div class="hi-grid" aria-hidden="true">
-      <span class="hi-v" style="left:12.6%;animation-delay:.30s"></span>
-      <span class="hi-v" style="left:37.5%;animation-delay:.40s"></span>
-      <span class="hi-v" style="left:61.9%;animation-delay:.50s"></span>
-      <span class="hi-v" style="left:86.2%;animation-delay:.60s"></span>
-      <span class="hi-h" style="top:32.7%;animation-delay:.50s"></span>
-      <span class="hi-h" style="top:71.4%;animation-delay:.65s"></span>
-      <span class="hi-x" style="top:32.7%;left:12.6%;animation-delay:.70s"></span>
-      <span class="hi-x" style="top:32.7%;left:37.5%;animation-delay:.76s"></span>
-      <span class="hi-x" style="top:32.7%;left:61.9%;animation-delay:.82s"></span>
-      <span class="hi-x" style="top:32.7%;left:86.2%;animation-delay:.88s"></span>
-      <span class="hi-x" style="top:71.4%;left:12.6%;animation-delay:.94s"></span>
-      <span class="hi-x" style="top:71.4%;left:37.5%;animation-delay:1.00s"></span>
-      <span class="hi-x" style="top:71.4%;left:61.9%;animation-delay:1.06s"></span>
-      <span class="hi-x" style="top:71.4%;left:86.2%;animation-delay:1.12s"></span>
-    </div>
-
-    <!--
-      Intelligence Core. The brand flower at the centre of the pond: the
-      garden field treats [data-garden-origin] as the flower its rings
-      start from and keeps a clear pool around it, and the XRP mark sits
-      behind it. site/assets/intelligence.js makes it answer each
-      validated ledger (a breath sized by that ledger's transaction
-      count) and tints its outer ring by the live assessment below.
-      2D only: one image, three SVG rings, CSS.
-    -->
-    <!-- The flower is gone from the hero; this empty box keeps the point
-         the ASCII field's ripples start from (garden-field.js reads
-         [data-garden-origin]). -->
+  <section class="cx-hero" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
-
-    <div class="hi-face">
-      <!--
-        System strip. Each value is a fact: the field's state comes from
-        the live ledger stream (CONNECTING until the first validated
-        ledger arrives, RECONNECTING when it drops), the ledger number is
-        the last one that closed, and the build is the release tag
-        substituted at deploy. Nothing here is typed in as "live".
-      -->
-      <dl class="sys" aria-label="System status">
-        <div><dt>Intelligence field</dt><dd><i class="dot" aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span></dd></div>
-        <div><dt>Network</dt><dd>XRPL mainnet</dd></div>
-        <div><dt>Ledger</dt><dd data-sys-ledger translate="no">waiting</dd></div>
-        <div><dt>Analysis</dt><dd>Rules + AI</dd></div>
-        <div class="opt"><dt>Build</dt><dd translate="no">beta</dd></div>
-      </dl>
-
-      <p class="hi-title">XRPL ASSET INTELLIGENCE</p>
-      <h1><span class="h1-a">Know what you're holding. Know what can happen.</span></h1>
-      <p class="hi-sub">Analyze XRPL assets, verify payment outcomes, and understand issuer controls and real market liquidity using evidence from the ledger.</p>
-      <!-- Filled by site/assets/garden-field.js from the live ledger stream; the text here is what shows without script. -->
-      <p class="mono hi-caption" data-garden-caption translate="no">The field answers each validated XRPL ledger as it closes.</p>
-
-      <div class="hi-actions">
-        <a class="hi-cta" href="/app/">Open workspace</a>
-        <a class="hi-cta ghost" href="#public">Explore free tools</a>
-        <a class="hi-cta ghost" href="/contact/?topic=institutions">Request an institutional demo</a>
+    <div class="cx-hero-text">
+      <p class="cx-pill"><i class="dot" aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span><span class="sep" aria-hidden="true">·</span>XRPL mainnet<span class="sep" aria-hidden="true">·</span><span data-sys-ledger translate="no">waiting</span></p>
+      <h1>Know what you hold before you act.</h1>
+      <p class="cx-sub">Issuer controls, delivered amounts and real liquidity, read straight from the XRP Ledger.</p>
+      <div class="cx-actions">
+        <a class="cx-btn" href="#download">Download the app</a>
+        <a class="cx-btn ghost" href="/app/">Open workspace</a>
       </div>
-      <p class="hi-trust">Read-only by design. No custody. No private-key storage. No transaction signing.</p>
+      <p class="cx-trust">Free · Read-only · No wallet, no keys</p>
     </div>
+    
   </section>
-
 
   <!-- Live mainnet ticker: real data over the same public WebSocket the
        desktop app uses. If it cannot connect it says so. -->
@@ -1084,113 +1086,67 @@
     <span class="tk"><b id="tk-close">—</b><i>CLOSE TIME</i></span>
   </div>
 
-  <section id="problem" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">The problem</p>
-      <h2>Public data. Hidden risks.</h2>
-      <p>The XRP Ledger is open, but the parts that cost money are easy to miss.</p>
+  <section id="features" class="cx-features">
+    <div class="cx-head">
+      <h2>Three answers before you sign.</h2>
+      <p>Each one read from validated ledgers, with the evidence attached.</p>
     </div>
-    <div class="grid g3">
-      <a class="panel card-link" href="/certificate/">
-        <p class="num">ISSUER RISK</p>
-        <h3>Who can freeze or claw back your asset?</h3>
-        <p>Understand which issuer controls may affect what you hold.</p>
-        <span class="go">Check an issuer &rarr;</span>
-      </a>
-      <a class="panel card-link" href="/delivered/">
-        <p class="num">PAYMENT VERIFICATION</p>
-        <h3>Did the payment arrive in full?</h3>
-        <p>A "successful" payment can deliver less. Check what it actually delivered.</p>
-        <span class="go">Verify a payment &rarr;</span>
-      </a>
-      <a class="panel card-link" href="/book-health/">
-        <p class="num">REAL LIQUIDITY</p>
-        <h3>Could you actually sell it?</h3>
-        <p>Measure what an order book could realistically execute, not what it advertises.</p>
-        <span class="go">Measure a book &rarr;</span>
-      </a>
-    </div>
-    <details class="traps" style="margin-top:18px">
-      <summary class="btn ghost">See real examples from mainnet</summary>
-      <div style="margin-top:18px">
-        <div class="traps">
-      <div class="trap mis">
-        <div>
-          <p class="tf">delivered_amount ≠ Amount</p>
-          <p class="tw">A successful (tesSUCCESS) payment carries the amount it asked to deliver and, separately, what arrived. With the partial-payment flag set they differ and the transaction still succeeds. Crediting the Amount field would over-credit by 1,295,975×. This one is an account paying itself through the exchange; the same flag on a payment to an exchange is how deposits get over-credited.</p>
-          <p class="te">Ledger 107,194,530 · transaction <a href="https://livenet.xrpl.org/transactions/307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA" rel="noopener">307662378F…</a></p>
-        </div>
-        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Amount field</p><p class="mv">100,000 XRP paid</p></div>
-        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">delivered_amount</p><p class="mv">0.077162 XRP arrived — 0.00008% of the stated amount</p></div>
+    <article class="cx-row">
+      <div class="cx-copy">
+        <p class="cx-eyebrow">Verification</p>
+        <h3>Can this move under your rules?</h3>
+        <p>Enter an account and an amount. Get GO, HOLD or NO-GO, every reason, and a SHA-256 receipt.</p>
+        <a class="cx-link" href="/institutional-demo/">Try the guided demo &rarr;</a>
       </div>
-      <div class="trap mis">
-        <div>
-          <p class="tf">Quoted depth ≠ fillable depth</p>
-          <p class="tw">An offer stays in the book whether or not its owner still holds the asset, and an expired offer is removed only when something touches it. Summing the advertised figures counts exits that cannot happen.</p>
-          <p class="te">Ledger 107,194,532 · 60 USD.Bitstamp offers for XRP <a href="https://livenet.xrpl.org/accounts/rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B" rel="noopener">rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B</a></p>
-        </div>
-        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Sum of offers</p><p class="mv">128,309.49 USD on offer</p></div>
-        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">Funded and unexpired</p><p class="mv">42,328.77 USD can fill — 33% of what is shown; 31 of 60 offers cannot fill at all</p></div>
+      
+    </article>
+    <article class="cx-row flip">
+      <div class="cx-copy">
+        <p class="cx-eyebrow">Audit trail</p>
+        <h3>What actually moved?</h3>
+        <p>Delivered amounts, not requested ones. Every counterparty screened against OFAC and known scams.</p>
+        <a class="cx-link" href="/app/payment/">Verify a payment &rarr;</a>
       </div>
-      <div class="trap mis">
-        <div>
-          <p class="tf">Sequence ≠ transaction count</p>
-          <p class="tw">Since the DeletableAccounts amendment, a new account&#39;s Sequence starts at the ledger index it was created in. It says when the account began, not what it has done.</p>
-          <p class="te">Ledger 107,194,965 · account <a href="https://livenet.xrpl.org/accounts/rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am" rel="noopener">rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am</a></p>
-        </div>
-        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Sequence</p><p class="mv">86,795,414 transactions sent</p></div>
-        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">Sequence − creation ledger</p><p class="mv">0 transactions sent. The account was created in ledger 86,795,414, and as an AMM pseudo-account it cannot send any.</p></div>
+      
+    </article>
+    <article class="cx-row">
+      <div class="cx-copy">
+        <p class="cx-eyebrow">Address check</p>
+        <h3>Who is on the other side?</h3>
+        <p>Who controls an account, what it can do, and whether its issuer can freeze or claw back.</p>
+        <a class="cx-link" href="/app/asset/">Analyze an account &rarr;</a>
       </div>
-      <div class="trap mis">
-        <div>
-          <p class="tf">Quorum ≠ signer headcount</p>
-          <p class="tw">XRPL compares a multi-signature quorum against the sum of signing weights, not the number of signers. The number that describes control is the fewest signers who can reach the quorum.</p>
-          <p class="te">Ledger 107,194,532 · signer list owner <a href="https://livenet.xrpl.org/accounts/rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX" rel="noopener">rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX</a></p>
-        </div>
-        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Signers listed</p><p class="mv">3 signers control the account</p></div>
-        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">Minimum who must agree</p><p class="mv">2 of 3 can sign: quorum 2 against weights 1, 1, 1</p></div>
-      </div>
-      <div class="trap mis">
-        <div>
-          <p class="tf">Absent ≠ false</p>
-          <p class="tw">The ledger answered actNotFound: there is no account at this address. That is not an account holding nothing; a payment to it would have to create it, and nothing about it can be verified.</p>
-          <p class="te">Ledger 107,194,798 · address <a href="https://livenet.xrpl.org/accounts/rPGJe8F1FzegsNDJEMkq3hUrupovdBjQMi" rel="noopener">rPGJe8F1FzegsNDJEMkq3hUrupovdBjQMi</a></p>
-        </div>
-        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">Balance</p><p class="mv">0 XRP</p></div>
-        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">Account activated on mainnet</p><p class="mv">FAIL — Address is well-formed but has never been funded on mainnet.</p></div>
-      </div>
-      <div class="trap mis">
-        <div>
-          <p class="tf">Ripple epoch ≠ Unix epoch</p>
-          <p class="tw">Ledger times count seconds from 2000-01-01, not 1970-01-01. Both readings are plausible dates and only one is right; the wrong one is 30 years early.</p>
-          <p class="te">Ledger 107,194,530 · transaction <a href="https://livenet.xrpl.org/transactions/307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA" rel="noopener">307662378F…</a></p>
-        </div>
-        <div class="mis-b"><p class="mk">What a basic interface sees</p><p class="ml">date as Unix time</p><p class="mv">1996-09-24 02:42:12 UTC</p></div>
-        <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">date from 2000-01-01</p><p class="mv">2026-09-24 02:42:12 UTC</p></div>
-      </div>
-    </div>
-        <p class="micro" style="margin-top:12px"><a href="/misread/">Each example, with the code behind it</a></p>
-      </div>
-    </details>
+      
+    </article>
   </section>
 
-  <section id="how" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">How it works</p>
-      <h2>From ledger data to verifiable evidence.</h2>
+  <section id="surfaces" class="cx-surfaces">
+    <div class="cx-head">
+      <h2>Use it where you work.</h2>
     </div>
-    <ol class="steps4">
-      <li><p class="num">01 · READ</p><h3>Read the ledger</h3><p>Inspect the relevant XRPL data from validated ledgers.</p></li>
-      <li><p class="num">02 · ANALYZE</p><h3>Run the checks</h3><p>Issuer controls, delivered amounts, fillable depth and account settings.</p></li>
-      <li><p class="num">03 · VERIFY</p><h3>See the evidence</h3><p>The result, the rule behind it and the ledger it was read at.</p></li>
-      <li><p class="num">04 · EXPORT</p><h3>Keep the proof</h3><p>A SHA-256 receipt and exportable evidence for review.</p></li>
-    </ol>
+    <div class="cx-cards">
+      <a class="cx-card" href="#download">
+        <p class="cx-eyebrow">Desktop app</p>
+        <h3>macOS, Windows, Linux</h3>
+        <p>Every screen, your policy, receipts and exports.</p>
+      </a>
+      <a class="cx-card" href="/app/">
+        <p class="cx-eyebrow">Web workspace</p>
+        <h3>Nothing to install</h3>
+        <p>Issuer, payment, liquidity and asset checks in the browser.</p>
+      </a>
+      <a class="cx-card" href="/developers/">
+        <p class="cx-eyebrow">API</p>
+        <h3>Wire it into your stack</h3>
+        <p>The same checks as JSON, with webhooks for alerts.</p>
+      </a>
+    </div>
   </section>
 
   <section id="public" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">The product, live</p>
-      <h2>See the evidence for yourself.</h2>
+      <h2>Try it here, on live data.</h2>
       <p>These are the real tools, running in your browser on live XRP Ledger data. No account needed.</p>
     </div>
 
@@ -1306,66 +1262,6 @@
       <a class="btn ghost" href="/treasury/">Treasury report</a>
       <a class="btn ghost" href="/research/">Published findings</a>
     </p>
-  </section>
-
-  <section id="who" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">Who it's for</p>
-      <h2>Built for people who need to know.</h2>
-    </div>
-    <div class="grid g2">
-      <div class="panel"><p class="num">EXCHANGES &amp; PAYMENT OPERATORS</p><p>Screen deposits and withdrawals for counterfeit tokens, phishing dust and lookalike addresses, and credit what a payment actually delivered.</p></div>
-      <div class="panel"><p class="num">TRADING &amp; LIQUIDITY TEAMS</p><p>See what an order book can really fill before you size or exit a position.</p></div>
-      <div class="panel"><p class="num">TOKEN ISSUERS &amp; TREASURY</p><p>Show holders exactly which controls you keep, proven from the ledger, and know your treasury's real exit.</p></div>
-      <div class="panel"><p class="num">COMPLIANCE &amp; RISK</p><p>Decide GO, HOLD or NO-GO against a written policy, with an audit log and a receipt for every decision.</p></div>
-    </div>
-    <p class="cta" style="margin-top:22px"><a class="btn ghost" href="/solutions/">See solutions by team</a></p>
-  </section>
-
-  <section id="why" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">Why NOSHASHI</p>
-      <h2>Evidence over assumptions.</h2>
-      <p>Instead of combining explorers, spreadsheets and guesswork, every answer comes with what it was read from.</p>
-    </div>
-    <div class="grid g2 why">
-      <div class="panel"><span class="chip ok">Available now</span><h3>Reads the ledger directly</h3><p>Answers come from public, validated XRPL ledger data, not a third party's summary.</p></div>
-      <div class="panel"><span class="chip ok">Available now</span><h3>Delivered, not requested</h3><p>Separates what a payment asked for from what it actually delivered.</p></div>
-      <div class="panel"><span class="chip ok">Available now</span><h3>Liquidity that can execute</h3><p>Counts only offers whose owners can fund them, so the depth you see is depth you can use.</p></div>
-      <div class="panel"><span class="chip ok">Available now</span><h3>Traceable evidence</h3><p>Each decision carries a SHA-256 receipt and the ledger it was read at.</p></div>
-    </div>
-    <p class="micro" style="text-align:center">Work in progress is shown openly on the <a href="/progress/">progress page</a>, never marketed as finished.</p>
-  </section>
-
-  <section id="early" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">Early access</p>
-      <h2>Help shape the next generation of XRPL intelligence.</h2>
-      <p>Work directly with the NOSHASHI team to evaluate real workflows, identify operational gaps, and help prioritize the next stage of development.</p>
-    </div>
-    <div class="grid g2 early">
-      <div class="panel">
-        <p class="num">WHY START NOW</p>
-        <ul class="ticks">
-          <li>Issuer, payment and liquidity checks in one place instead of several tools.</li>
-          <li>Test it against a workflow you already run, before you commit budget.</li>
-          <li>A direct line to the people building it. Your feedback sets priorities.</li>
-          <li>Set up your workflow early, then scale it across your team.</li>
-        </ul>
-      </div>
-      <div class="panel">
-        <p class="num">HOW A PILOT WORKS</p>
-        <ol class="pilot">
-          <li>You name an operational problem.</li>
-          <li>We show the existing capability that addresses it.</li>
-          <li>We agree how success will be measured.</li>
-          <li>You test it against your current workflow.</li>
-          <li>The results decide a paid pilot, a contract or what we build next.</li>
-        </ol>
-      </div>
-    </div>
-    <p class="micro" style="text-align:center">Free tools stay free and public. Paid plans add saved decisions, alerts, the Compliance API and audit exports.</p>
-    <p class="cta" style="margin-top:18px"><a class="btn" href="/design-partners/">Become a design partner</a><a class="btn ghost" href="/institutional-demo/">Try the interactive demo</a></p>
   </section>
 
   <section id="pricing" class="reveal">
