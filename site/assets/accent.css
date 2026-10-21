@@ -1,0 +1,33 @@
+/*
+ * The blue theme. Same layout, type and components as the green brand
+ * board; only the colour tokens change. Chosen with the GREEN / BLUE
+ * switch in the header (site/assets/accent.js), remembered per browser.
+ *
+ * The selectors carry two attributes so they win over every page's own
+ * :root and [data-theme="light"] tokens whatever order the sheets load in.
+ * GO / HOLD / NO-GO stay green / amber / red in both themes: they are
+ * verdicts, not decoration.
+ */
+html[data-accent="blue"]:not([data-theme="light"]){
+  --ground:#070D17; --surface:#0C1525; --elevated:#132036;
+  --ink:#E8EEF8; --muted:#A3B2C9; --faint:#6E7F99; --rule:#21324E;
+  --brand:#5AA9FF; --tele:#4FD1E8; --on-brand:#06101F;
+  --go:#5FD39A; --hold:#E7C766; --nogo:#FF7B7B;
+}
+html[data-accent="blue"][data-theme="light"]{
+  --ground:#F1F5FB; --surface:#FFFFFF; --elevated:#E2EBF7;
+  --ink:#0A1426; --muted:#3B4E69; --faint:#52657F; --rule:#C3D1E6;
+  --brand:#1D5FC4; --tele:#0E7490; --on-brand:#FFFFFF;
+  --go:#1E7A46; --hold:#8B6500; --nogo:#B42332;
+}
+/* The flower mark keeps its shape and takes the theme's hue. */
+html[data-accent="blue"] .brand-mark,
+html[data-accent="blue"] .brand img,
+html[data-accent="blue"] .brand svg{filter:hue-rotate(118deg) saturate(1.1)}
+.accent-toggle .swatch{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--brand)}
+/* On a phone the switch is just its colour dot, so the header still fits. */
+@media (max-width:640px){
+  .accent-toggle [data-accent-label]{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .accent-toggle{padding-inline:11px}
+  .accent-toggle .swatch{width:11px;height:11px}
+}
