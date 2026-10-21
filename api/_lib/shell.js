@@ -40,6 +40,7 @@ export { MARK };
 export const NAV = [
   { href: "/platform/", label: "Platform", key: "platform", i18n: "nav.platform" },
   { href: "/solutions/", label: "Solutions", key: "solutions", i18n: "nav.solutions" },
+  { href: "/institutional-demo/", label: "Demo", key: "demo", i18n: "nav.demo2" },
   { href: "/#public", label: "Free tools", i18n: "nav.tools", optional: true },
   { href: "/resources/", label: "Resources", key: "resources", i18n: "nav.resources" },
   { href: "/pricing/", label: "Pricing", i18n: "nav.pricing" },
@@ -52,6 +53,7 @@ export const NAV = [
 export const FOOTER_GROUPS = [
   { title: "Platform", links: [
     { href: "/platform/", label: "Platform overview" },
+    { href: "/institutional-demo/", label: "Interactive demo" },
     { href: "/#public", label: "Free tools" },
     { href: "/#download", label: "Download" },
     { href: "/pricing/", label: "Pricing" },

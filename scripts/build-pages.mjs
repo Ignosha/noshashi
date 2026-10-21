@@ -308,7 +308,7 @@ async function buildDesignPartners(write) {
 
 <section id="apply">
   <div class="sec-head"><p class="eyebrow">Apply</p><h2>Tell us what you want to solve.</h2>
-    <p>Five fields. A person reads every one and replies.</p></div>
+    <p>Five fields. A person reads every one and replies. Want to see it first? <a href="/institutional-demo/">Try the interactive demo</a>.</p></div>
   <form class="form-grid" id="partner-form" novalidate style="max-width:760px">
     <div class="form-row split">
       <div class="form-field"><label for="p-name">Name</label><input id="p-name" name="name" type="text" autocomplete="name" maxlength="120" required></div>
@@ -341,7 +341,172 @@ async function buildDesignPartners(write) {
   }));
 }
 
+
+/* ── /institutional-demo/ ─────────────────────────────────────────── */
+/*
+ * The self-serve evaluation: a guided, live walk through the three
+ * workflows the product already supports, a test checklist, structured
+ * feedback and an issue form. Every figure is read when the visitor
+ * presses a button (site/assets/demo.js); nothing on the page is sample
+ * data. Scenarios the code cannot run yet are listed, not demoed.
+ */
+function stepList(items) {
+  return `<div class="dprog"><span class="dcount">Step 1 of ${items.length}</span><span class="dbar"><i></i></span></div>
+  <ol class="dsteps">${items.map(([t, why], i) => `<li class="dstep${i === 0 ? " active" : ""}"><p class="dh">${t}</p><p class="dwhy">${why}</p><div class="dout" aria-live="polite"></div></li>`).join("")}</ol>`;
+}
+
+async function buildInstitutionalDemo(write) {
+  const body = `<div class="page-head"><p class="eyebrow">NOSHASHI INSTITUTIONAL ACCESS</p>
+  <h1>Understand the ledger. Evaluate the evidence.</h1>
+  <p>Explore NOSHASHI's XRPL intelligence tools, test real workflows, and help shape the next generation of asset analysis and transaction verification.</p>
+  <p class="cta" style="margin-top:22px"><a class="btn" href="#demo">Launch interactive demo</a><a class="btn ghost" href="/design-partners/#apply">Apply for early access</a></p>
+  <p class="micro">Evaluate available tools using public ledger data, without connecting a wallet or exposing private keys.</p>
+</div>
+
+<section>
+  <div class="grid g3">
+    <div class="panel"><p class="num">01 · EXPLORE</p><h3>Explore</h3><p>Experience the available NOSHASHI tools through guided demonstrations.</p></div>
+    <div class="panel"><p class="num">02 · EVALUATE</p><h3>Evaluate</h3><p>Complete practical tasks based on real XRPL workflows.</p></div>
+    <div class="panel"><p class="num">03 · INFLUENCE</p><h3>Influence</h3><p>Share feedback directly with the NOSHASHI team and help prioritize future improvements.</p></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="sec-head"><p class="eyebrow">Interactive demo</p><h2>Three workflows, live on mainnet.</h2>
+    <p>Pick a scenario, use the example or your own input, and follow the five steps. Every figure is read from the XRP Ledger when you press the button.</p></div>
+  <div class="dtabs" role="tablist" aria-label="Demo scenarios">
+    <button type="button" role="tab" class="dtab on" aria-selected="true" data-scenario-tab="issuer">A · Issuer risk</button>
+    <button type="button" role="tab" class="dtab" aria-selected="false" data-scenario-tab="payment">B · Payment verification</button>
+    <button type="button" role="tab" class="dtab" aria-selected="false" data-scenario-tab="liquidity">C · Liquidity</button>
+  </div>
+
+  <div class="dpanel panel" data-scenario="issuer">
+    <p class="dgoal"><b>You are testing:</b> which issuer controls could affect a token you hold or accept.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dIssuer">Issuer address</label>
+      <input id="dIssuer" type="text" spellcheck="false" placeholder="Issuer address (starts with r)">
+      <button class="btn" type="submit">Read the issuer</button>
+    </form>
+    <p class="checknote">Examples: <button type="button" class="sample" data-example="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">Bitstamp (USD)</button> · <button type="button" class="sample" data-example="rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">GateHub (EUR)</button> · <button type="button" class="sample" data-example="rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">Ripple (RLUSD)</button></p>
+    ${stepList([
+      ["1 · Select an issuer", "A public XRPL issuer address."],
+      ["2 · Inspect its settings", "Freeze, clawback, authorization, transfer fee and keys, at the validated ledger."],
+      ["3 · What the controls mean", "Each setting in plain language."],
+      ["4 · The ledger evidence", "The ledger index and fields the answer came from."],
+      ["5 · Check the source", "Open the same data somewhere we do not control."],
+    ])}
+  </div>
+
+  <div class="dpanel panel" data-scenario="payment" hidden>
+    <p class="dgoal"><b>You are testing:</b> what a payment actually delivered, rather than what it asked for.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dHash">Transaction hash</label>
+      <input id="dHash" type="text" spellcheck="false" placeholder="Transaction hash (64 hex characters)">
+      <button class="btn" type="submit">Verify the payment</button>
+    </form>
+    <p class="checknote">No hash to hand? <button type="button" class="sample" data-find>Find a real payment from the last few ledgers</button></p>
+    ${stepList([
+      ["1 · Load a transaction", "Any public payment hash."],
+      ["2 · Retrieve it", "The validated transaction and its result."],
+      ["3 · Requested against delivered", "The Amount field beside delivered_amount."],
+      ["4 · What it means", "The result, and its limits."],
+      ["5 · Verify independently", "The same transaction on a public explorer."],
+    ])}
+  </div>
+
+  <div class="dpanel panel" data-scenario="liquidity" hidden>
+    <p class="dgoal"><b>You are testing:</b> how much of an order book could actually trade, not just what it advertises.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dPair">Trading pair</label>
+      <select id="dPair">
+        <option value="USD|rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">USD · Bitstamp</option>
+        <option value="USD|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">USD · GateHub</option>
+        <option value="EUR|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">EUR · GateHub</option>
+        <option value="524C555344000000000000000000000000000000|rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">RLUSD · Ripple</option>
+      </select>
+      <button class="btn" type="submit">Measure the book</button>
+    </form>
+    ${stepList([
+      ["1 · Select a pair", "XRP against an issued currency."],
+      ["2 · Retrieve the book", "Both sides at one validated ledger, and how fresh it is."],
+      ["3 · Advertised depth", "What the book quotes within the band."],
+      ["4 · Executable liquidity", "What the offers' owners can actually fund, and the spread."],
+      ["5 · Limits of the calculation", "Band, AMM pools, depth cap and slippage."],
+    ])}
+  </div>
+
+  <p class="micro">Not in the live demo yet, because the code cannot run them here: a saved tester portal with accounts, and order-size slippage curves. Neither is offered yet; shipped work appears on the <a href="/progress/">progress page</a>.</p>
+</section>
+
+<section id="tasks">
+  <div class="sec-head"><p class="eyebrow">Test scenarios</p><h2>Five tasks for an evaluation.</h2>
+    <p>Do them in any order. Progress is saved in this browser only. <span id="taskMeter" class="mono"></span></p></div>
+  <div class="panel">
+    <ul class="dtasks">
+      <li><label><input type="checkbox" data-task="scenario-issuer"> Run scenario A on an issuer your team holds or lists.</label></li>
+      <li><label><input type="checkbox" data-task="scenario-payment"> Run scenario B on a payment your team received.</label></li>
+      <li><label><input type="checkbox" data-task="scenario-liquidity"> Run scenario C on a pair you trade or price.</label></li>
+      <li><label><input type="checkbox" data-task="compare"> Compare one result with the tool you use today.</label></li>
+      <li><label><input type="checkbox" data-task="feedback"> Send the feedback below.</label></li>
+    </ul>
+    <button type="button" class="btn ghost" id="taskReset" style="margin-top:14px">Reset progress</button>
+  </div>
+</section>
+
+<section id="feedback">
+  <div class="sec-head"><p class="eyebrow">Feedback</p><h2>Tell us what you found.</h2>
+    <p>Five questions. Answer the ones that apply; the founder reads every reply.</p></div>
+  <form class="form-grid" id="feedbackForm" novalidate style="max-width:820px">
+    <div class="form-row split">
+      <div class="form-field"><label for="fbScenario">Scenario</label><select id="fbScenario" name="scenario"><option>Issuer risk</option><option>Payment verification</option><option>Liquidity</option><option>General</option></select></div>
+      <div class="form-field"><label for="fbEmail">Work email</label><input id="fbEmail" name="email" type="email" autocomplete="email" maxlength="200" required></div>
+    </div>
+    <div class="form-row split">
+      <div class="form-field"><label for="fbName">Name <span style="text-transform:none;letter-spacing:0">(optional)</span></label><input id="fbName" name="name" type="text" autocomplete="name" maxlength="120"></div>
+      <div class="form-field"><label for="fbOrg">Organization <span style="text-transform:none;letter-spacing:0">(optional)</span></label><input id="fbOrg" name="org" type="text" autocomplete="organization" maxlength="160"></div>
+    </div>
+    <div class="form-row"><div class="form-field"><label for="fbExpected">What did you expect the tool to do?</label><textarea id="fbExpected" name="expected" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbConfusing">What was confusing or missing?</label><textarea id="fbConfusing" name="confusing" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbToday">How do you solve this problem today?</label><textarea id="fbToday" name="today" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbValue">Would solving it save time, reduce risk or improve a decision?</label><textarea id="fbValue" name="value" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbPay">What would NOSHASHI need to deliver for your organization to pay for it?</label><textarea id="fbPay" name="pay" maxlength="800"></textarea></div></div>
+    <div class="form-trap" aria-hidden="true"><label for="fb_company">Leave this field empty</label><input id="fb_company" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>
+    <div class="form-actions"><button class="btn" type="submit">Send feedback</button><p class="form-status" id="feedbackStatus" role="status" aria-live="polite"></p></div>
+  </form>
+</section>
+
+<section id="issue">
+  <div class="sec-head"><p class="eyebrow">Report an issue</p><h2>A wrong or confusing result?</h2>
+    <p>Tell us the input you used. Never send private keys, seed phrases or credentials; this demo never needs them.</p></div>
+  <form class="form-grid" id="issueForm" novalidate style="max-width:820px">
+    <div class="form-row split">
+      <div class="form-field"><label for="isScenario">Scenario</label><select id="isScenario" name="scenario"><option>Issuer risk</option><option>Payment verification</option><option>Liquidity</option><option>Other</option></select></div>
+      <div class="form-field"><label for="isEmail">Email</label><input id="isEmail" name="email" type="email" autocomplete="email" maxlength="200" required></div>
+    </div>
+    <div class="form-row"><div class="form-field"><label for="isInput">Address, hash or pair you used</label><input id="isInput" name="input" type="text" spellcheck="false" maxlength="200"></div></div>
+    <div class="form-row"><div class="form-field"><label for="isWhat">What happened</label><textarea id="isWhat" name="what" maxlength="1500" required></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="isExpected">What you expected</label><textarea id="isExpected" name="expected" maxlength="800"></textarea></div></div>
+    <div class="form-trap" aria-hidden="true"><label for="is_company">Leave this field empty</label><input id="is_company" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>
+    <div class="form-actions"><button class="btn" type="submit">Report the issue</button><p class="form-status" id="issueStatus" role="status" aria-live="polite"></p></div>
+  </form>
+</section>
+
+${band("Want a 20-minute walkthrough?", "One real problem, the evidence NOSHASHI produces, and your chance to challenge it.",
+    `<a class="btn ghost" href="/contact/?topic=institutions">Request a meeting</a><a class="btn" href="/design-partners/#apply">Apply for early access</a>`)}`;
+
+  await write("institutional-demo/index.html", renderPage({
+    title: "Institutional demo · NOSHASHI",
+    description: "Evaluate NOSHASHI on live XRPL data: issuer risk, payment verification and liquidity, in a guided five-step demo. No wallet, no keys.",
+    path: "/institutional-demo/",
+    current: "demo",
+    body,
+    scripts: `<script src="/assets/demo.js" defer></script>`,
+    structured: [breadcrumb("Institutional demo", "/institutional-demo/")],
+  }));
+}
+
 export async function buildRedesignPages(write) {
+  await buildInstitutionalDemo(write);
   await buildPlatform(write);
   await buildSolutions(write);
   await buildResources(write);
@@ -350,6 +515,7 @@ export async function buildRedesignPages(write) {
 }
 
 export const REDESIGN_PAGES = [
+  ["/institutional-demo/", "weekly", "0.9"],
   ["/platform/", "monthly", "0.9"],
   ["/solutions/", "monthly", "0.9"],
   ["/resources/", "monthly", "0.7"],

@@ -131,7 +131,7 @@ function start() {
   mountPage(heroes.length > 0);
   heroes.forEach(mount);
   if (!heroes.length) return;
-  caption("The pond is still until a validated XRPL ledger arrives.");
+  caption("The field is still until a validated XRPL ledger arrives.");
   followLedger(
     ({ index, txnCount }) => {
       const strength = ledgerRingStrength(txnCount);
@@ -143,7 +143,7 @@ function start() {
       window.dispatchEvent(new CustomEvent("noshashi:ledger", { detail: { index, txnCount } }));
     },
     (live) => {
-      if (!live) caption("Ledger stream reconnecting. The pond is still until a validated ledger arrives.");
+      if (!live) caption("Ledger stream reconnecting. The field is still until a validated ledger arrives.");
       window.dispatchEvent(new CustomEvent("noshashi:stream", { detail: { live } }));
     }
   );
