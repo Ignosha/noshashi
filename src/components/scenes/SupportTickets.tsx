@@ -23,6 +23,9 @@ import {
   type TicketStatus,
 } from "@/lib/support/tickets";
 import { useToast } from "@/lib/toast";
+import { allowSupportAccess, shareDiagnostics } from "@/lib/support/repair";
+import { recentErrors } from "@/lib/support/errorLog";
+import { SupportAccess } from "./SupportAccess";
 import { cn } from "@/lib/utils";
 
 /** How often an open screen re-reads tickets, so replies appear without a click. */
@@ -253,11 +256,14 @@ function NewTicket({
   onOpened: (id: string, number: number) => void | Promise<void>;
 }) {
   const { push } = useToast();
-  const [subject, setSubject] = useState(initialBody ? initialBody.slice(0, 120) : "");
+  const [subject, setSubject] = useState(initialBody ? initialBody.split("\n")[0].slice(0, 120) : "");
   const [category, setCategory] = useState<TicketCategory>("bug");
   const [priority, setPriority] = useState<TicketPriority>("normal");
   const [body, setBody] = useState(initialBody ?? "");
   const [includeEnvironment, setIncludeEnvironment] = useState(true);
+  const [includeErrors, setIncludeErrors] = useState(true);
+  const [allowAccess, setAllowAccess] = useState(false);
+  const errorCount = useMemo(() => recentErrors().length, []);
   const [sending, setSending] = useState(false);
   const env = useMemo(() => environmentLine(), []);
 
@@ -269,6 +275,12 @@ function NewTicket({
     setSending(true);
     try {
       const { id, number } = await openTicket({ subject, category, priority, body, includeEnvironment });
+      // Diagnostics and access go with the ticket only when the person chose
+      // them, and a failure here never loses the ticket itself.
+      const extras: Promise<unknown>[] = [];
+      if (includeErrors) extras.push(shareDiagnostics(id));
+      if (allowAccess) extras.push(allowSupportAccess(id, 24));
+      await Promise.allSettled(extras);
       await onOpened(id, number);
     } catch (e) {
       push({ title: "TICKET NOT OPENED", body: e instanceof Error ? e.message : "Try again in a moment.", tone: "no-go" });
@@ -324,6 +336,19 @@ function NewTicket({
         <input id="ticket-env" type="checkbox" checked={includeEnvironment} onChange={(e) => setIncludeEnvironment(e.target.checked)} className="mt-0.5" />
         <span>
           Include the app version and platform ({env.appVersion} · {env.platform}). Nothing else about this computer is sent.
+        </span>
+      </label>
+      <label className="flex items-start gap-2 text-[11px] text-muted-foreground">
+        <input id="ticket-errors" type="checkbox" checked={includeErrors} onChange={(e) => setIncludeErrors(e.target.checked)} className="mt-0.5" />
+        <span>
+          Share the app's recent error messages ({errorCount} on this device) so support can see what failed. Keys, seeds,
+          tokens and email addresses are removed first.
+        </span>
+      </label>
+      <label className="flex items-start gap-2 text-[11px] text-muted-foreground">
+        <input id="ticket-access" type="checkbox" checked={allowAccess} onChange={(e) => setAllowAccess(e.target.checked)} className="mt-0.5" />
+        <span>
+          Let NOSHASHI support view this account, read-only, for 24 hours. You can revoke it from the ticket at any time.
         </span>
       </label>
       <div className="flex items-center gap-2">
@@ -450,6 +475,8 @@ function Thread({ ticket, me, staff, onChanged }: { ticket: Ticket; me: string; 
           )}
         </div>
       </div>
+
+      {isOwner && <SupportAccess ticketId={ticket.id} />}
 
       <div className="flex-1 space-y-2.5 p-4">
         {!loaded ? (

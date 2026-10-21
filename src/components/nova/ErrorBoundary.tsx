@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { recordError } from "@/lib/support/errorLog";
 import { NovaLogo } from "./NovaLogo";
 import { CONTACT } from "@/lib/brand";
 
@@ -29,8 +30,11 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // Logged locally only — there is no telemetry endpoint by design.
+    // Logged locally only — there is no telemetry endpoint by design. The
+    // scrubbed copy in the error log travels only with a ticket, and only
+    // when the person chooses to share diagnostics.
     console.error(`[${this.props.scope}]`, error, info.componentStack);
+    recordError(error, this.props.scope);
     this.setState({ info: info.componentStack ?? null });
   }
 

@@ -953,6 +953,12 @@ function ConsoleApp() {
     return () => window.removeEventListener("noshashi:export", onExport);
   }, []);
 
+  // A repair approved on a support ticket reconnects the ledger this way.
+  useEffect(() => {
+    window.addEventListener("noshashi:resync", resync);
+    return () => window.removeEventListener("noshashi:resync", resync);
+  }, [resync]);
+
   // The first-run guide on Home starts the tour this way.
   useEffect(() => {
     window.addEventListener("noshashi:tour", startTour);

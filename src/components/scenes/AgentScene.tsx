@@ -1005,8 +1005,14 @@ export function AgentScene({ data }: { data: XrplState }) {
                 <span>Not answered?</span>
                 <button
                   onClick={() => {
-                    const lastQuestion = [...turns].reverse().find((t) => t.role === "user")?.content;
-                    setTicketDraft(lastQuestion);
+                    // The ticket carries the whole support conversation, so the
+                    // person answering in NOSHREPAIR sees what was already tried.
+                    const lastQuestion = [...turns].reverse().find((t) => t.role === "user")?.content ?? "";
+                    const transcript = turns
+                      .slice(-12)
+                      .map((t) => `${t.role === "user" ? "Me" : "Support assistant"}: ${t.content}`)
+                      .join("\n\n");
+                    setTicketDraft(`${lastQuestion}\n\n--- Conversation with the support assistant ---\n${transcript}`.slice(0, 7800));
                     setView("tickets");
                   }}
                   className="stencil text-[10px] tracking-[0.14em] text-foreground underline underline-offset-2"

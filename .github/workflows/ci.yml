@@ -44,6 +44,10 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      # NOSHREPAIR, the support staff console, has its own tsconfig.
+      - name: Typecheck NOSHREPAIR
+        run: npx tsc -p noshrepair --noEmit
+
       # The Edge Functions are Deno, and nothing else in this pipeline
       # looks at them. tsconfig.json includes only `src`, so `npx tsc
       # --noEmit` above walks straight past supabase/functions — which
@@ -115,6 +119,9 @@ jobs:
       - name: Build public website
         run: npm run site:build
 
+      - name: Build NOSHREPAIR
+        run: npm run noshrepair:build
+
       - name: Audit production dependencies
         # Only what ships. The dev toolchain carries known vite/esbuild
         # dev-server advisories that cannot reach a built artefact, and
@@ -124,3 +131,26 @@ jobs:
         # transitive dependency is triaged, not allowed to wedge every PR.
         continue-on-error: true
         run: npm audit --omit=dev --audit-level=high
+
+  # Row level security and the database functions are the security boundary
+  # for NOSHREPAIR (and for much else). tests/sql plays each role against
+  # the real migrations on a throwaway Postgres that exists only on this
+  # runner. Nothing here touches the production database.
+  sql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start a scratch Postgres
+        run: |
+          set -euo pipefail
+          docker run -d --name scratch -p 5432:5432 -e POSTGRES_PASSWORD=sql-test postgres:17 -c log_min_messages=fatal > /dev/null
+          for _ in $(seq 1 60); do docker exec scratch pg_isready -U postgres -q && exit 0; sleep 1; done
+          exit 1
+      - name: Database tests
+        run: scripts/test-sql.sh postgresql://postgres:sql-test@localhost:5432/postgres
+      - name: Remove the scratch Postgres
+        if: always()
+        run: docker rm -f scratch > /dev/null 2>&1 || true
