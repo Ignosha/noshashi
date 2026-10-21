@@ -21,11 +21,15 @@ import delivered from "./_lib/routes/delivered.js";
 import issuerState from "./_lib/routes/issuer-state.js";
 import treasury from "./_lib/routes/treasury.js";
 import bookHealth from "./_lib/routes/book-health.js";
+import { queryOf } from "./_lib/query.js";
 
 const ROUTES = { badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth };
 
 export default function handler(req, res) {
-  const route = ROUTES[String(req.query?.tool ?? "")];
+  // vercel.json adds ?tool=; the public path (/api/book) names it too, in
+  // case the rewritten query is not what reaches the function.
+  const q = queryOf(req);
+  const route = ROUTES[String(q.tool ?? "")] ?? ROUTES[String(q.__path ?? "").replace(/^\/api\//, "").replace(/\/$/, "")];
   if (!route) return res.status(404).json({ error: "Not found", routes: Object.keys(ROUTES).map((r) => `/api/${r}`) });
   return route(req, res);
 }

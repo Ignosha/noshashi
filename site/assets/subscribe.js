@@ -64,7 +64,9 @@
  *   - It shows once. A dismissal is remembered for 90 days, a
  *     subscription for ever, and neither is re-asked.
  *   - It never appears on /contact/, where the visitor is already doing
- *     the thing, and never when the inline form is on screen.
+ *     the thing, never when the inline form is on screen, and never
+ *     while the live tools are on screen or a field has focus: it waits
+ *     until the visitor has moved on.
  *   - Escape closes it, focus is trapped while open and returned on
  *     close, and the close control is a 40px target.
  *
@@ -221,19 +223,31 @@
     return r.top < window.innerHeight && r.bottom > 0;
   }
 
+  /* Never interrupt someone using the live tools or typing. */
+  function busy() {
+    var el = document.activeElement;
+    if (el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName)) return true;
+    var tools = document.getElementById("public");
+    if (!tools) return false;
+    var r = tools.getBoundingClientRect();
+    return r.top < window.innerHeight && r.bottom > 0;
+  }
+
+  var due = false;
   function maybeOpen() {
-    if (shown || inlineFormVisible()) return;
+    if (shown) return;
+    due = true;
+    if (inlineFormVisible() || busy()) return;
     open();
   }
 
   setTimeout(maybeOpen, DELAY_MS);
 
   var onScroll = function () {
+    if (shown) { window.removeEventListener("scroll", onScroll); return; }
     var max = document.documentElement.scrollHeight - window.innerHeight;
-    if (max > 0 && window.scrollY / max >= SCROLL_TRIGGER) {
-      window.removeEventListener("scroll", onScroll);
-      maybeOpen();
-    }
+    // Once due, try again as the visitor scrolls past what blocked it.
+    if (due || (max > 0 && window.scrollY / max >= SCROLL_TRIGGER)) maybeOpen();
   };
   window.addEventListener("scroll", onScroll, { passive: true });
 

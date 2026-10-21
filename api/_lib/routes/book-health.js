@@ -17,6 +17,7 @@
 import { rippleRpc, decodeCurrency } from "../authority.js";
 import { assembleBook, quotedVsFillable, DISCLOSURES } from "../book.js";
 import { RIPPLE_EPOCH, rippleTimeToIso, ledgerAtOrBefore, ammOf } from "../treasury.js";
+import { queryOf } from "../query.js";
 
 const LEVELS = 100;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ error: "Method not allowed" });
   }
-  const at = String(req.query?.at ?? "").trim();
+  const at = String(queryOf(req).at ?? "").trim();
   if (at && !DATE_RE.test(at)) return res.status(400).json({ error: "Pass ?at= a date as YYYY-MM-DD (UTC), or nothing for now." });
 
   try {

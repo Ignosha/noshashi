@@ -1,0 +1,56 @@
+name: App screenshots
+
+# Captures the desktop app's screens for the website on live XRPL
+# mainnet (scripts/capture-app-shots.mjs) and commits them to the branch
+# that ran it. A GitHub runner is used because it can reach public XRPL
+# nodes; the script fails, and nothing is committed, if the app is not
+# connected or a screen does not reach a real result.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/capture-app-shots.mjs
+      - .github/workflows/app-screenshots.yml
+
+concurrency:
+  group: app-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund sharp
+          npx playwright install --with-deps chromium
+
+      - name: Build the app
+        run: npx vite build
+
+      - name: Capture on mainnet
+        run: |
+          npx vite preview --port 4174 --strictPort &
+          npx wait-on -t 30000 http://localhost:4174/ || sleep 5
+          node scripts/capture-app-shots.mjs
+
+      - name: Commit the screenshots
+        run: |
+          git add site/assets/shots
+          if git diff --cached --quiet; then echo "No change."; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Desktop app screenshots from XRPL mainnet"
+          # The branch may have moved while the capture ran.
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

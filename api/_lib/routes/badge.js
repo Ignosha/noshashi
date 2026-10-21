@@ -20,6 +20,7 @@
 
 import { readAuthoritySurface, certificateFrom, ADDRESS_RE } from "../authority.js";
 import { flatBadge, cardBadge } from "../badge.js";
+import { queryOf } from "../query.js";
 
 function send(res, svg, sMaxAge, swr) {
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
@@ -39,12 +40,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const issuer = String(req.query?.issuer ?? "").trim();
+  const issuer = String(queryOf(req).issuer ?? "").trim();
   if (!ADDRESS_RE.test(issuer)) {
     return res.status(400).json({ error: "Pass ?issuer= an XRPL classic address. They begin with r." });
   }
-  const style = req.query?.style === "card" ? "card" : "flat";
-  const theme = req.query?.theme === "dark" ? "dark" : "light";
+  const style = queryOf(req).style === "card" ? "card" : "flat";
+  const theme = queryOf(req).theme === "dark" ? "dark" : "light";
   const render = style === "card" ? cardBadge : flatBadge;
 
   try {

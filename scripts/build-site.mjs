@@ -46,6 +46,7 @@ import {
 } from "../api/_lib/sections.js";
 import { jsonLd } from "../api/_lib/shell.js";
 import { buildRedesignPages, REDESIGN_PAGES } from "./build-pages.mjs";
+import { buildWorkspace, WORKSPACE_PAGES } from "./build-workspace.mjs";
 import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
@@ -69,10 +70,26 @@ async function write(relative, html) {
 const FAQ_IDS = ["what", "price", "beta", "account", "unsigned", "custody", "privacy", "billing"];
 const FAQ = FAQ_IDS.map((id) => KB.find((e) => e.id === id)).filter(Boolean);
 
+/* A desktop-app screenshot with the ledger and date it was read at. */
+function renderShot(manifest, name, { eager = false } = {}) {
+  const shot = manifest?.shots?.find((s) => s.name === name);
+  if (!shot) return "";
+  const when = shot.captured_at ? new Date(shot.captured_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) : "";
+  const where = shot.ledger ? `ledger ${shot.ledger.toLocaleString("en-US")}` : "XRPL mainnet";
+  return `<figure class="cx-shot">
+        <img src="/assets/shots/${name}.webp" srcset="/assets/shots/${name}.webp 1440w, /assets/shots/${name}@2x.webp 2880w" sizes="(min-width:1240px) 1180px, 100vw"
+          width="1440" height="900" alt="${esc(shot.alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">
+        <figcaption>Desktop app · live on XRPL mainnet · ${esc(where)}${when ? ` · ${esc(when)}` : ""}</figcaption>
+      </figure>`;
+}
+
 /* ── The landing page ─────────────────────────────────────────────── */
 async function buildHome({ news, market, feed, status, release }) {
   let html = await readFile(path.join(ROOT, "templates", "home.html"), "utf8");
   const misread = JSON.parse(await readFile(path.join(ROOT, "src/lib/learn/misread.rendered.json"), "utf8"));
+  // Real screenshots of the desktop app, captured on mainnet by
+  // scripts/capture-app-shots.mjs. Without them the rows show text only.
+  const shots = JSON.parse(await readFile(path.join(SITE, "assets/shots/manifest.json"), "utf8").catch(() => "null"));
 
   const slots = {
     ORIGIN: ORIGIN,
@@ -92,6 +109,10 @@ async function buildHome({ news, market, feed, status, release }) {
     FAQ: renderFaq(FAQ),
     SUBSCRIBE: renderSubscribe(),
     MISREAD: renderMisread(misread),
+    SHOTHERO: renderShot(shots, "overview", { eager: true }),
+    SHOTVERIFICATION: renderShot(shots, "verification"),
+    SHOTAUDIT: renderShot(shots, "audit"),
+    SHOTADDRESS: renderShot(shots, "address"),
     JSONLD: jsonLd([
       ORGANIZATION,
       {
@@ -104,12 +125,13 @@ async function buildHome({ news, market, feed, status, release }) {
         // that says "stable" in the markup and "beta" in the copy is
         // the kind of mismatch structured data exists to avoid.
         releaseNotes: "https://github.com/Ignosha/noshashi/releases",
+        // Monthly list prices, as on /pricing/ (annual billing is discounted there).
         offers: [
           { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Pro", price: "749", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Institutional", price: "4000", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Enterprise", price: "10000", priceCurrency: "USD" },
-          { "@type": "Offer", name: "Strategic Infrastructure", price: "20833", priceCurrency: "USD" },
+          ...[["Pro", "749"], ["Institutional", "4000"], ["Enterprise", "10000"], ["Strategic Infrastructure", "20833"]].map(([name, price]) => ({
+            "@type": "Offer", name, price, priceCurrency: "USD",
+            priceSpecification: { "@type": "UnitPriceSpecification", price, priceCurrency: "USD", unitCode: "MON" },
+          })),
         ],
         url: `${ORIGIN}/`,
       },
@@ -119,7 +141,7 @@ async function buildHome({ news, market, feed, status, release }) {
 
   // The short homepage leaves out the newsroom, mission log and edge lab;
   // their slots are optional so those panels can come back without code.
-  const OPTIONAL = new Set(["MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
+  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
     if (!html.includes(token)) {
@@ -1378,7 +1400,7 @@ async function buildPricingEnhancement() {
     `<a href="${item.href}"${item.optional ? ' class="optional"' : ""}${item.href === "/pricing/" ? ' aria-current="page"' : ""}>${item.label}</a>`
   ).join("\n        ");
   html = html.replace(/<nav class="nav-links" aria-label="Primary">[\s\S]*?<\/nav>\n    <\/nav>/,
-    `<nav class="nav-links" aria-label="Primary">\n        ${navLinks}\n        <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme"><span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span></button>\n        <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>\n        <a class="btn" href="/#download">Download</a>\n      </nav>\n    </nav>`);
+    `<nav class="nav-links" aria-label="Primary">\n        ${navLinks}\n        <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme"><span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span></button>\n        <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>\n        <a class="btn" href="/app/">Open workspace</a>\n      </nav>\n    </nav>`);
   html = html.replace(/<footer>[\s\S]*?<\/footer>/, renderFooter());
   const footStyle = '<link rel="stylesheet" href="/assets/core-footer.css">';
   if (!html.includes(footStyle)) html = html.replace('<link rel="stylesheet" href="/assets/modules.css">', `<link rel="stylesheet" href="/assets/modules.css">\n${footStyle}`);
@@ -1586,6 +1608,7 @@ async function buildSitemap(docs = []) {
     ["/releases/1-0-14/", "monthly", "0.7"],
     ["/pricing/", "monthly", "0.9"],
     ...REDESIGN_PAGES,
+    ...WORKSPACE_PAGES,
     ["/enterprise/", "monthly", "0.9"],
     ["/trust/", "monthly", "0.8"],
     ["/misread/", "monthly", "0.8"],
@@ -1682,6 +1705,7 @@ async function main() {
   await buildPricingEnhancement();
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildRedesignPages(write);
+  await buildWorkspace(write, { release });
   await buildTrust();
   await buildMisread();
   const docs = await buildDocs();

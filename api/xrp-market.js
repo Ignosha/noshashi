@@ -8,6 +8,7 @@
  */
 import { getMarket } from "./_lib/market.js";
 import { cacheHeaders } from "./_lib/html.js";
+import { queryOf } from "./_lib/query.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {
@@ -15,7 +16,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const days = Math.min(30, Math.max(1, Number(req.query?.days) || 7));
+  const days = Math.min(30, Math.max(1, Number(queryOf(req).days) || 7));
   const market = await getMarket({ days });
 
   cacheHeaders(res, 120, 900);

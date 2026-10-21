@@ -12,6 +12,7 @@
 
 import { rippleRpc, ADDRESS_RE, decodeCurrency } from "../authority.js";
 import { assembleBook, quotedVsFillable, DISCLOSURES } from "../book.js";
+import { queryOf } from "../query.js";
 
 const LEVELS = 100;
 // Three-letter codes, or the 40-hex form for longer tickers.
@@ -22,8 +23,8 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ error: "Method not allowed" });
   }
-  const currency = String(req.query?.currency ?? "").trim();
-  const issuer = String(req.query?.issuer ?? "").trim();
+  const currency = String(queryOf(req).currency ?? "").trim();
+  const issuer = String(queryOf(req).issuer ?? "").trim();
   if (!CURRENCY_RE.test(currency) || currency.toUpperCase() === "XRP") {
     return res.status(400).json({ error: "Pass ?currency= a 3-character code or a 40-hex currency code (not XRP)." });
   }
@@ -44,7 +45,7 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
     res.setHeader("Access-Control-Allow-Origin", "*");
 
-    if (req.query?.format === "raw") {
+    if (queryOf(req).format === "raw") {
       return res.status(200).json({ currency: issued.currency, issuer, ledger_index: validatedIndex, bids: bidRes.offers ?? [], asks: askRes.offers ?? [] });
     }
 

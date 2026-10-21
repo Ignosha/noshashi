@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Institutional demo · NOSHASHI workspace</title>
+<meta name="description" content="Guided XRPL scenarios on live public data: issuer risk, payment verification and liquidity.">
+<link rel="canonical" href="https://www.noshashi.app/app/demo/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<link rel="stylesheet" href="/assets/workspace.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/workspace-boot.js"></script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]}</script>
+</head>
+<body class="ws-body-root">
+<a class="skip" href="#ws-main">Skip to content</a>
+<div class="ws-app" data-tool="demo">
+<aside class="ws-side" id="ws-side" aria-label="Workspace">
+  <div class="ws-brand">
+    <a class="ws-home" href="/app/" title="NOSHASHI workspace"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <button class="ws-icon-btn ws-collapse" type="button" data-ws-collapse aria-label="Collapse sidebar" aria-expanded="true" aria-controls="ws-side"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 3.5h13v13h-13zM8 3.5v13"/></svg></button>
+  </div>
+  <nav class="ws-nav" aria-label="Tools">
+    <a class="ws-link" href="/app/" title="Overview"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h6v6H3zM11 3h6v4h-6zM11 9h6v8h-6zM3 11h6v6H3z"/></svg><span>Overview</span></a>
+    <a class="ws-link" href="/app/asset/" title="Asset intelligence"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 6v8M7 8.5h4.5a1.5 1.5 0 0 1 0 3H8.5a1.5 1.5 0 0 0 0 3H13"/></svg><span>Asset intelligence</span></a>
+    <a class="ws-link" href="/app/issuer/" title="Issuer analysis"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5 3.5 5v4.5c0 4 2.8 6.9 6.5 8 3.7-1.1 6.5-4 6.5-8V5z"/><path d="m7.5 10 1.8 1.8 3.4-3.6"/></svg><span>Issuer analysis</span></a>
+    <a class="ws-link" href="/app/payment/" title="Payment verification"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11l-3-3M17 13H6l3 3"/></svg><span>Payment verification</span></a>
+    <a class="ws-link" href="/app/liquidity/" title="Liquidity analysis"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17V9M7.5 17V5M12 17v-6M16.5 17V3"/></svg><span>Liquidity analysis</span></a>
+    <a class="ws-link" href="/app/demo/" aria-current="page" title="Institutional demo"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="m8.5 7 4 3-4 3z"/></svg><span>Institutional demo</span></a>
+  </nav>
+  <nav class="ws-nav ws-nav-more" aria-label="More">
+    <p class="ws-sec">More</p>
+    <a class="ws-link" href="/docs/" title="Documentation"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 2.5h7l3 3v12H5z"/><path d="M12 2.5v3h3M7.5 10h5M7.5 13h5"/></svg><span>Documentation</span></a>
+    <a class="ws-link" href="/developers/" title="API access"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 6-4 4 4 4M13 6l4 4-4 4"/></svg><span>API access</span></a>
+    <button class="ws-link" type="button" data-ctx-open="feedback" title="Feedback"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 4h13v9H9l-4 3.5V13H3.5z"/></svg><span>Feedback</span></button>
+    <button class="ws-link" type="button" data-ctx-open="settings" title="Settings"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="2.6"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg><span>Settings</span></button>
+  </nav>
+  <div class="ws-foot">
+    <a class="ws-link" href="/contact/" title="Help and support"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M8 8a2 2 0 1 1 2.8 1.8c-.5.3-.8.7-.8 1.2v.5M10 14v.01"/></svg><span>Help &amp; support</span></a>
+    <a class="ws-link" href="/status/" title="Status"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 10h3l2-5 3 10 2-5h5"/></svg><span>Status · <span class="mono">beta</span></span></a>
+    <a class="ws-link" href="/" title="Back to the website"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4H4v12h12v-4M11 3h6v6M17 3l-8 8"/></svg><span>noshashi.app</span></a>
+  </div>
+</aside>
+<div class="ws-col">
+  <header class="ws-top">
+    <button class="ws-icon-btn ws-menu" type="button" data-ws-drawer aria-label="Open navigation" aria-controls="ws-side" aria-expanded="false"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14"/></svg></button>
+    <p class="ws-crumb"><a href="/app/">Workspace</a> <span aria-hidden="true">/</span> Institutional demo</p>
+    <div class="ws-top-actions">
+      
+      <a class="ws-btn" href="/contact/?topic=institutions">Request a demo</a>
+    </div>
+  </header>
+  <main class="ws-main" id="ws-main">
+<h1 class="ws-title">Institutional demo</h1>
+<p class="ws-lede">Guided scenarios on live public XRPL data. No wallet, no keys.</p>
+<p class="ws-fine">Every result below is read live when you press a button. Nothing is illustrative.</p>
+<div class="ws-demo"><section id="demo">
+  <div class="sec-head"><p class="eyebrow">Interactive demo</p><h2>Three workflows, live on mainnet.</h2>
+    <p>Pick a scenario, use the example or your own input, and follow the five steps. Every figure is read from the XRP Ledger when you press the button.</p></div>
+  <div class="dtabs" role="tablist" aria-label="Demo scenarios">
+    <button type="button" role="tab" class="dtab on" aria-selected="true" data-scenario-tab="issuer">A · Issuer risk</button>
+    <button type="button" role="tab" class="dtab" aria-selected="false" data-scenario-tab="payment">B · Payment verification</button>
+    <button type="button" role="tab" class="dtab" aria-selected="false" data-scenario-tab="liquidity">C · Liquidity</button>
+  </div>
+
+  <div class="dpanel panel" data-scenario="issuer">
+    <p class="dgoal"><b>You are testing:</b> which issuer controls could affect a token you hold or accept.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dIssuer">Issuer address</label>
+      <input id="dIssuer" type="text" spellcheck="false" placeholder="Issuer address (starts with r)">
+      <button class="btn" type="submit">Read the issuer</button>
+    </form>
+    <p class="checknote">Examples: <button type="button" class="sample" data-example="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">Bitstamp (USD)</button> · <button type="button" class="sample" data-example="rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">GateHub (EUR)</button> · <button type="button" class="sample" data-example="rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">Ripple (RLUSD)</button></p>
+    <div class="dprog"><span class="dcount">Step 1 of 5</span><span class="dbar"><i></i></span></div>
+  <ol class="dsteps"><li class="dstep active"><span class="dnum" aria-hidden="true">1</span><p class="dh">Select an issuer <span class="dwhy">A public XRPL issuer address.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">2</span><p class="dh">Inspect its settings <span class="dwhy">Freeze, clawback, authorization, transfer fee and keys, at the validated ledger.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">3</span><p class="dh">What the controls mean <span class="dwhy">Each setting in plain language.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">4</span><p class="dh">The ledger evidence <span class="dwhy">The ledger index and fields the answer came from.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">5</span><p class="dh">Check the source <span class="dwhy">Open the same data somewhere we do not control.</span></p><div class="dout" aria-live="polite"></div></li></ol>
+  </div>
+
+  <div class="dpanel panel" data-scenario="payment" hidden>
+    <p class="dgoal"><b>You are testing:</b> what a payment actually delivered, rather than what it asked for.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dHash">Transaction hash</label>
+      <input id="dHash" type="text" spellcheck="false" placeholder="Transaction hash (64 hex characters)">
+      <button class="btn" type="submit">Verify the payment</button>
+    </form>
+    <p class="checknote">No hash to hand? <button type="button" class="sample" data-find>Find a real payment from the last few ledgers</button></p>
+    <div class="dprog"><span class="dcount">Step 1 of 5</span><span class="dbar"><i></i></span></div>
+  <ol class="dsteps"><li class="dstep active"><span class="dnum" aria-hidden="true">1</span><p class="dh">Load a transaction <span class="dwhy">Any public payment hash.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">2</span><p class="dh">Retrieve it <span class="dwhy">The validated transaction and its result.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">3</span><p class="dh">Requested against delivered <span class="dwhy">The Amount field beside delivered_amount.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">4</span><p class="dh">What it means <span class="dwhy">The result, and its limits.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">5</span><p class="dh">Verify independently <span class="dwhy">The same transaction on a public explorer.</span></p><div class="dout" aria-live="polite"></div></li></ol>
+  </div>
+
+  <div class="dpanel panel" data-scenario="liquidity" hidden>
+    <p class="dgoal"><b>You are testing:</b> how much of an order book could actually trade, not just what it advertises.</p>
+    <form class="checkbar" autocomplete="off">
+      <label class="sr-only" for="dPair">Trading pair</label>
+      <select id="dPair">
+        <option value="USD|rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">USD · Bitstamp</option>
+        <option value="USD|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">USD · GateHub</option>
+        <option value="EUR|rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">EUR · GateHub</option>
+        <option value="524C555344000000000000000000000000000000|rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">RLUSD · Ripple</option>
+      </select>
+      <button class="btn" type="submit">Measure the book</button>
+    </form>
+    <div class="dprog"><span class="dcount">Step 1 of 5</span><span class="dbar"><i></i></span></div>
+  <ol class="dsteps"><li class="dstep active"><span class="dnum" aria-hidden="true">1</span><p class="dh">Select a pair <span class="dwhy">XRP against an issued currency.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">2</span><p class="dh">Retrieve the book <span class="dwhy">Both sides at one validated ledger, and how fresh it is.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">3</span><p class="dh">Advertised depth <span class="dwhy">What the book quotes within the band.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">4</span><p class="dh">Executable liquidity <span class="dwhy">What the offers' owners can actually fund, and the spread.</span></p><div class="dout" aria-live="polite"></div></li><li class="dstep"><span class="dnum" aria-hidden="true">5</span><p class="dh">Limits of the calculation <span class="dwhy">Band, AMM pools, depth cap and slippage.</span></p><div class="dout" aria-live="polite"></div></li></ol>
+  </div>
+
+  <p class="micro">Not in the demo yet: tester accounts and order-size slippage curves. Neither is offered yet; shipped work appears on the <a href="/progress/">progress page</a>.</p>
+</section>
+
+<section id="tasks">
+  <div class="sec-head"><p class="eyebrow">Test scenarios</p><h2>Five tasks for an evaluation.</h2>
+    <p>Do them in any order. Progress is saved in this browser only.</p></div>
+  <div class="panel dtaskcard">
+    <div class="dprog" style="margin-top:0"><span class="dcount" id="taskMeter">0 of 5 complete</span><span class="dbar"><i id="taskBar" style="width:0"></i></span></div>
+    <ul class="dtasks">
+      <li><label><input type="checkbox" data-task="scenario-issuer"> Run scenario A on an issuer your team holds or lists.</label></li>
+      <li><label><input type="checkbox" data-task="scenario-payment"> Run scenario B on a payment your team received.</label></li>
+      <li><label><input type="checkbox" data-task="scenario-liquidity"> Run scenario C on a pair you trade or price.</label></li>
+      <li><label><input type="checkbox" data-task="compare"> Compare one result with the tool you use today.</label></li>
+      <li><label><input type="checkbox" data-task="feedback"> Send the feedback below.</label></li>
+    </ul>
+    <button type="button" class="sample" id="taskReset" style="margin-top:14px">Reset progress</button>
+  </div>
+</section>
+
+<section id="feedback">
+  <div class="dsplit">
+    <div class="sec-head"><p class="eyebrow">Feedback</p><h2>Tell us what you found.</h2>
+      <p>Five questions. Answer the ones that apply; the founder reads every reply.</p>
+      <p class="dnote">Never send private keys, seed phrases or credentials. This demo never needs them.</p></div>
+    <div class="panel dformcard">
+  <form class="form-grid compact" id="feedbackForm" novalidate>
+    <div class="form-row split">
+      <div class="form-field"><label for="fbScenario">Scenario</label><select id="fbScenario" name="scenario"><option>Issuer risk</option><option>Payment verification</option><option>Liquidity</option><option>General</option></select></div>
+      <div class="form-field"><label for="fbEmail">Work email</label><input id="fbEmail" name="email" type="email" autocomplete="email" maxlength="200" required></div>
+    </div>
+    <div class="form-row split">
+      <div class="form-field"><label for="fbName">Name <span style="text-transform:none;letter-spacing:0">(optional)</span></label><input id="fbName" name="name" type="text" autocomplete="name" maxlength="120"></div>
+      <div class="form-field"><label for="fbOrg">Organization <span style="text-transform:none;letter-spacing:0">(optional)</span></label><input id="fbOrg" name="org" type="text" autocomplete="organization" maxlength="160"></div>
+    </div>
+    <div class="form-row"><div class="form-field"><label for="fbExpected">What did you expect the tool to do?</label><textarea id="fbExpected" name="expected" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbConfusing">What was confusing or missing?</label><textarea id="fbConfusing" name="confusing" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbToday">How do you solve this problem today?</label><textarea id="fbToday" name="today" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbValue">Would solving it save time, reduce risk or improve a decision?</label><textarea id="fbValue" name="value" maxlength="800"></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="fbPay">What would NOSHASHI need to deliver for your organization to pay for it?</label><textarea id="fbPay" name="pay" maxlength="800"></textarea></div></div>
+    <div class="form-trap" aria-hidden="true"><label for="fb_company">Leave this field empty</label><input id="fb_company" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>
+    <div class="form-actions"><button class="btn" type="submit">Send feedback</button><p class="form-status" id="feedbackStatus" role="status" aria-live="polite"></p></div>
+  </form>
+    </div>
+  </div>
+</section>
+
+<section id="issue">
+  <details class="ddrawer">
+    <summary>Got a wrong or confusing result? Report it</summary>
+    <div class="panel dformcard" style="margin-top:14px">
+  <form class="form-grid compact" id="issueForm" novalidate>
+    <div class="form-row split">
+      <div class="form-field"><label for="isScenario">Scenario</label><select id="isScenario" name="scenario"><option>Issuer risk</option><option>Payment verification</option><option>Liquidity</option><option>Other</option></select></div>
+      <div class="form-field"><label for="isEmail">Email</label><input id="isEmail" name="email" type="email" autocomplete="email" maxlength="200" required></div>
+    </div>
+    <div class="form-row"><div class="form-field"><label for="isInput">Address, hash or pair you used</label><input id="isInput" name="input" type="text" spellcheck="false" maxlength="200"></div></div>
+    <div class="form-row"><div class="form-field"><label for="isWhat">What happened</label><textarea id="isWhat" name="what" maxlength="1500" required></textarea></div></div>
+    <div class="form-row"><div class="form-field"><label for="isExpected">What you expected</label><textarea id="isExpected" name="expected" maxlength="800"></textarea></div></div>
+    <div class="form-trap" aria-hidden="true"><label for="is_company">Leave this field empty</label><input id="is_company" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>
+    <div class="form-actions"><button class="btn" type="submit">Report the issue</button><p class="form-status" id="issueStatus" role="status" aria-live="polite"></p></div>
+  </form>
+    </div>
+  </details>
+</section>
+
+</div>
+  </main>
+</div>
+<aside class="ws-ctx" id="ws-ctx" aria-label="Context" hidden>
+  <div class="ws-ctx-head">
+    <p class="ws-ctx-title" data-ctx-title>Details</p>
+    <button class="ws-icon-btn" type="button" data-ctx-close aria-label="Close panel"><svg class="ws-i" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button>
+  </div>
+  <div class="ws-ctx-view" data-ctx-view="details">
+    <div data-ctx-details><p class="ws-muted">Run an analysis to see its source, timestamps and method here.</p></div>
+  </div>
+  <div class="ws-ctx-view" data-ctx-view="feedback" hidden>
+    <p class="ws-muted">Wrong result, confusing wording, missing feature or a data discrepancy? Tell us. It goes privately to the founder; nothing is published.</p>
+    <form class="ws-form" id="wsFeedback" novalidate>
+      <label for="wsFbKind">Type</label>
+      <select id="wsFbKind" name="kind"><option>Incorrect result</option><option>Confusing explanation</option><option>Missing functionality</option><option>Data discrepancy</option><option>Feature request</option></select>
+      <label for="wsFbWhat">What happened</label>
+      <textarea id="wsFbWhat" name="what" maxlength="1500" rows="4" required></textarea>
+      <label for="wsFbEmail">Email for a reply</label>
+      <input id="wsFbEmail" name="email" type="email" autocomplete="email" maxlength="200" required>
+      <div class="form-trap" aria-hidden="true"><label for="wsFbTrap">Leave empty</label><input id="wsFbTrap" name="company_website" tabindex="-1" autocomplete="off"></div>
+      <button class="ws-btn primary" type="submit">Send feedback</button>
+      <p class="ws-status" role="status" aria-live="polite" data-fb-status></p>
+    </form>
+    <p class="ws-fine">The page and the last input you analyzed are attached so we can reproduce it. Never send keys or seed phrases.</p>
+  </div>
+  <div class="ws-ctx-view" data-ctx-view="settings" hidden>
+    <p class="ws-ctx-label">Appearance</p>
+    <div class="ws-seg" role="group" aria-label="Brightness">
+      <button type="button" class="ws-seg-b" data-set-theme="dark">Dark</button>
+      <button type="button" class="ws-seg-b" data-set-theme="light">Light</button>
+    </div>
+    <div class="ws-seg" role="group" aria-label="Colour">
+      <button type="button" class="ws-seg-b" data-set-accent="green">Green</button>
+      <button type="button" class="ws-seg-b" data-set-accent="blue">Blue</button>
+    </div>
+    <p class="ws-ctx-label">History</p>
+    <p class="ws-muted">Recent analyses are kept in this browser only.</p>
+    <button type="button" class="ws-btn" data-clear-history>Clear recent analyses</button>
+  </div>
+</aside>
+</div>
+<div class="ws-scrim" data-ws-scrim hidden></div>
+<script src="/assets/workspace.js" defer></script>
+<script src="/assets/demo.js" defer></script>
+</body>
+</html>

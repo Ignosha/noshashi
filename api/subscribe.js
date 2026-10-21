@@ -19,6 +19,7 @@
 import { clientKey, take } from "./_lib/rate-limit.js";
 import { fetchWithTimeout } from "./_lib/html.js";
 import { welcomeEmail } from "./_lib/email.js";
+import { queryOf } from "./_lib/query.js";
 
 const EMAIL = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
 const API = "https://api.resend.com";
@@ -52,7 +53,7 @@ a{color:#9be15d}</style></head><body><main><h1>${title}</h1><p>${text}</p>
 }
 
 async function unsubscribe(req, res) {
-  const token = String(req.query?.unsubscribe || "");
+  const token = String(queryOf(req).unsubscribe || "");
   if (!TOKEN.test(token)) return page(res, 400, "Link not recognised", "This unsubscribe link is incomplete. Email support@noshashi.app and we will remove you by hand.");
   try {
     const r = await supabaseRpc("noshashi_unsubscribe", { p_token: token });
@@ -67,7 +68,7 @@ async function unsubscribe(req, res) {
 }
 
 export default async function handler(req, res) {
-  if (req.method === "GET" && req.query?.unsubscribe !== undefined) return unsubscribe(req, res);
+  if (req.method === "GET" && queryOf(req).unsubscribe !== undefined) return unsubscribe(req, res);
   if (req.method !== "POST") {
     res.setHeader("Allow", "GET, POST");
     return res.status(405).json({ error: "Method not allowed" });

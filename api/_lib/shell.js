@@ -53,6 +53,7 @@ export const NAV = [
 export const FOOTER_GROUPS = [
   { title: "Platform", links: [
     { href: "/platform/", label: "Platform overview" },
+    { href: "/app/", label: "Workspace" },
     { href: "/institutional-demo/", label: "Interactive demo" },
     { href: "/#public", label: "Free tools" },
     { href: "/#download", label: "Download" },
@@ -122,7 +123,7 @@ export function renderHeader(current = "") {
         <span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span>
       </button>
       <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
-      <a class="btn" href="/#download"><span data-i18n="nav.download">Download</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
     </nav>
   </div>
 </header>`;
