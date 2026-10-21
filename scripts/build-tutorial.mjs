@@ -10,183 +10,24 @@
  * picture rather than with a mockup.
  */
 import { readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { renderPage, breadcrumb } from "../api/_lib/shell.js";
 import { esc } from "../api/_lib/html.js";
 
+// The content is shared with the desktop app's own guide and tour
+// (src/components/nova/Guide.tsx), so the two can never disagree.
+// Steps use **bold** and `key` marks; html() turns them into markup.
+const CONTENT = JSON.parse(readFileSync(new URL("../src/lib/tutorial/screens.json", import.meta.url), "utf8"));
 const FREE = "Free";
 const PRO = "Pro";
 const INST = "Institutional";
 const ENT = "Enterprise";
+const html = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`(.+?)`/g, "<kbd>$1</kbd>");
 
-// [app label, plan, what it answers, steps, screenshot name]
-const GROUPS = [
-  ["overview", "Overview", "Where you start, and the live state of the ledger.", [
-    ["Overview", FREE, "What NOSHASHI checks, and the ledger it is reading right now.", [
-      "Check the top bar says <b>ONLINE</b> and shows the latest ledger.",
-      "Read the three cards: can it move, can you sell it, can you prove it. The middle one is a live order book.",
-      "Use <b>Run a gate check</b>, <b>Open the audit trail</b> or <b>Ask the agent</b> to jump straight in.",
-    ], "overview"],
-    ["Mission Control", FREE, "Every validated ledger as it closes, through the lens of your role.", [
-      "Pick a lens at the top: Executive, Compliance, Risk, Trading or Operations.",
-      "Watch ledgers, credentials and settlement paths update as each ledger closes.",
-      "Press <b>Run gate check</b> to test a payment from here.",
-    ], "control"],
-  ]],
-  ["compliance", "Compliance", "Can this payment or asset move under your rules?", [
-    ["Verification", FREE, "GO, HOLD or NO-GO for a payment, before anyone signs it.", [
-      "Paste the destination account and enter an amount (or tap 100, 1,000, 25,000 or 500,000).",
-      "Pick a rule profile, for example US_REGULATED_DEX.",
-      "Press <b>Run compliance gate</b> (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Enter</kbd>). Read the verdict, each rule's pass or fail, and the receipt.",
-    ], "verification", "#first-check"],
-    ["Ledger Watch", ENT, "Screen deposits before you credit them.", [
-      "Add your deposit addresses, each with a label.",
-      "Every incoming payment is judged: what really arrived, whether the token is genuine, phishing dust, and who funded the sender up to three hops back.",
-      "Receive the results as signed webhooks and a feed.",
-    ]],
-    ["Credentials", FREE, "Which on-ledger credentials (XLS-70) an account holds.", [
-      "Paste a counterparty address, and the issuer's if you know it.",
-      "Press <b>Read</b>.",
-      "See each credential, who issued it and whether it is still valid. Switch between Grid and Table.",
-    ]],
-    ["Domain Grid", FREE, "Every permissioned domain (XLS-80) on mainnet, and who qualifies.", [
-      "Browse the list, or paste a domain ID or owner address and press <b>Read live</b>.",
-      "Open a domain to see the credentials it requires.",
-      "Paste a counterparty and press <b>Check</b> to see whether it would be admitted.",
-    ], "domains"],
-    ["Provenance", PRO, "How old an account is and who funded it.", [
-      "Paste the account (r…).",
-      "Read when it was created and who sent its first XRP.",
-      "Follow the funding chain as far as the node can prove it.",
-    ]],
-    ["Authority", PRO, "What an asset's issuer can still do to it.", [
-      "Paste the issuer (r…).",
-      "Read freeze, clawback and signing powers, and how concentrated the holdings are.",
-      "Keep the digest: anyone can re-check the same reading later.",
-    ]],
-    ["Security Center", FREE, "Protect an account, check who you are paying, and recover from a theft.", [
-      "Pick a tool from the tabs along the top. Start with <b>Account check</b>: paste your own address and press <b>Check</b>.",
-      "Read the grade and each finding in plain English. Fixes come as unsigned transactions you copy and sign in your own wallet.",
-      "Before paying someone, use <b>Pre-sign check</b> or <b>Safe send</b>. If an account was drained, use <b>Recover funds</b> or <b>Incident response</b>. Tabs that need a paid plan say so.",
-    ], "security"],
-  ]],
-  ["liquidity", "Liquidity", "Is there real depth to buy or sell?", [
-    ["Exposure Analysis", PRO, "Freeze rights, Travel Rule scope and counterparty concentration.", [
-      "Load a wallet.",
-      "See which issuers could freeze what it holds.",
-      "See which payments fall under the Travel Rule, and where exposure is concentrated.",
-    ]],
-    ["Order Book", PRO, "How much of the quoted depth can actually fill.", [
-      "Enter a currency code (for example USD) and its issuer.",
-      "Compare <b>quoted</b> against <b>can fill</b> on each side.",
-      "Offers whose owners no longer hold the asset are not counted.",
-    ]],
-    ["Pool Governance", PRO, "Who controls an AMM pool's trading fee.", [
-      "Paste the AMM's account (r…).",
-      "See each fee vote and the share of liquidity behind it.",
-      "See who holds the auction slot, and its discount, right now.",
-    ]],
-    ["Portfolio & Radar", PRO, "Many wallets, one rule set, failures first.", [
-      "Add wallets with a label, for example Treasury · hot wallet.",
-      "Each one is checked against the same rules.",
-      "Failures are listed first, so you know where to look.",
-    ]],
-  ]],
-  ["evidence", "Evidence", "Can you prove what happened?", [
-    ["Audit Trail", FREE, "An account's validated history, with what each payment really delivered.", [
-      "Paste the account and press <b>Read history</b>. Set the <b>Flag at or above</b> amount if you need one.",
-      "Filter by All, In, Out or Flagged, or search by hash, tag or memo.",
-      "Press <b>Export evidence</b> for a file with a SHA-256 manifest.",
-    ], "audit"],
-    ["Ledger & Policy", PRO, "Every verdict you have run, your policy, and a signed export.", [
-      "Write or activate your institution's policy.",
-      "Every verdict is kept on this device with the rules that produced it.",
-      "Export a signed record an examiner can verify.",
-    ]],
-    ["Settlement", PRO, "What a transaction actually delivered, not what it asked for.", [
-      "Paste the transaction hash (64 characters).",
-      "Compare the requested amount with the delivered amount.",
-      "Partial payments are called out, so you never credit the wrong figure.",
-    ]],
-  ]],
-  ["issuers", "Issuers & treasury", "Who controls a treasury, and who holds your tokens?", [
-    ["Control Surface", PRO, "Who can move a treasury.", [
-      "Paste the treasury account.",
-      "See its signers and the quorum it needs, and whether the master key is on.",
-      "See how much of the balance is locked and cannot be spent.",
-    ]],
-    ["Issuance", INST, "Who holds an issuer's tokens.", [
-      "Paste the issuer.",
-      "See how concentrated holdings are, plus dormant lines and freezes.",
-      "Review its enforcement history.",
-    ]],
-    ["Passport", ENT, "A signed, portable record of an asset's posture.", [
-      "Enter the issuer.",
-      "Get one signed record: authority, freeze rights, concentration and eligibility.",
-      "Share it. Any counterparty can verify it without re-running the checks.",
-    ]],
-  ]],
-  ["intelligence", "Intelligence", "Ask questions in plain English.", [
-    ["NOSHX", FREE, "An assistant that reads the live ledger to answer you. Advisory only.", [
-      "Type a question, paste a transaction hash, or tap a suggested question.",
-      "Read the answer and the ledger reads it is based on.",
-      "It runs on your device by default. You can choose another model under <b>Change runtime</b>.",
-    ], "noshx"],
-    ["Ledger Garden", PRO, "Follow the chain from issuer to asset to holder to transaction.", [
-      "Paste an address or a transaction hash.",
-      "Expand each branch. Every one is read from validated ledgers.",
-      "Hand any point to NOSHX to ask about it.",
-    ]],
-  ]],
-  ["public", "Public tools", "Free checks anyone can run.", [
-    ["Check an Address", FREE, "What the ledger publishes about an account before you pay it.", [
-      "Paste the address and press <b>Check this address</b>.",
-      "Read <b>Things to know first</b>: freeze rights, transfer fees and the domain it claims.",
-      "Free accounts get 10 checks a month.",
-    ], "address"],
-    ["Inbox", FREE, "What strangers have sent an account, and whether those tokens are real.", [
-      "Paste the account and press <b>Read claims</b>.",
-      "See each unsolicited offer and whether the token exists at all.",
-      "Never act on a claim the ledger cannot back.",
-    ]],
-    ["Token Rights", FREE, "What an NFT's issuer can still do to it after you own it.", [
-      "Paste the NFT's ID (64 characters).",
-      "Press <b>Read token rights</b>.",
-      "See whether the issuer can burn it, whether it can be resold, and the issuer's cut of each sale.",
-    ]],
-    ["Ledger Sync", FREE, "What four public nodes each report, and where they disagree.", [
-      "Open the screen. Nothing to enter.",
-      "Compare each node's latest ledger and timing.",
-      "A node that lags is shown, so you know which reading to trust.",
-    ], "sync"],
-    ["Learn", FREE, "Hands-on labs and short explainers.", [
-      "Pick a lab. Each one walks you through a real screen with real mainnet data.",
-      "Each right answer comes back for a short review after 1, 3, 7, 16 and 35 days, so it sticks.",
-      "Watch the explainers for the ideas behind the checks.",
-    ], "learn"],
-  ]],
-  ["account", "Your account", "Plans, sign-in, security and settings.", [
-    ["Pricing", FREE, "Plans, checkout and credits.", [
-      "Compare Free, Pro, Institutional and Enterprise.",
-      "Press <b>Get Pro</b> to subscribe. Checkout opens on Stripe in your browser.",
-      "Buy credits for automated API checks.",
-    ]],
-    ["Account", FREE, "Your subscription, two-factor sign-in and API keys.", [
-      "The app works without an account.",
-      "Sign in to carry a subscription, portfolios and API keys.",
-      "Turn on two-factor authentication here.",
-    ]],
-    ["Trust & Security", FREE, "What NOSHASHI reads, what it never does, and where your data goes.", [
-      "Read each claim, for example that it never signs or broadcasts.",
-      "Each one says how it is enforced and tested.",
-    ]],
-    ["Settings", FREE, "Appearance, accessibility and the desktop app.", [
-      "Choose dark, light or system theme, and reduced motion.",
-      "Set the wallet you want to watch.",
-      "Turn on the menu bar HUD (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>).",
-    ]],
-  ]],
-];
+// [app label, plan, what it answers, steps (markup), screenshot name, more link]
+export const GROUPS = CONTENT.groups.map((g) => [g.id, g.title, g.intro,
+  g.screens.map((f) => [f.label, f.plan, f.answers, f.steps.map(html), f.shot, f.more])]);
 
 const PLAN_CLASS = { [FREE]: "free", [PRO]: "pro", [INST]: "inst", [ENT]: "ent" };
 const slug = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

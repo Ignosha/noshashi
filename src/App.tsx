@@ -7,6 +7,8 @@ import { Preloader } from "@/components/nova/Preloader";
 import { NovaLogo } from "@/components/nova/NovaLogo";
 import { ErrorBoundary } from "@/components/nova/ErrorBoundary";
 import { CommandPalette, type Command } from "@/components/nova/CommandPalette";
+import { GuideDialog, TourCard } from "@/components/nova/Guide";
+import { tourStops } from "@/lib/tutorial";
 import {
   Tooltip,
   TooltipContent,
@@ -588,6 +590,8 @@ function TrayApp() {
 
 function ConsoleApp() {
   const [scene, setScene] = useState<SceneId>("home");
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [tourIndex, setTourIndex] = useState<number | null>(null);
   /**
    * boot → the launch sequence, landing → the mission brief,
    * console → the instrument. Returning operators skip the brief.
@@ -619,6 +623,27 @@ function ConsoleApp() {
     },
     [setConsoleMode, setModeChosen]
   );
+
+  // The tour visits the screens this view shows, plus the account screens
+  // every view keeps in its System section.
+  const stops = useMemo(
+    () =>
+      tourStops((id) => {
+        const def = SCENES.find((item) => item.id === id);
+        return Boolean(def) && (consoleMode === "analyst" || EXECUTIVE_SCENES.has(id as SceneId) || def!.group === "utility");
+      }),
+    [consoleMode]
+  );
+  const startTour = useCallback(() => {
+    setGuideOpen(false);
+    setPaletteOpen(false);
+    setTourIndex(0);
+  }, []);
+  useEffect(() => {
+    if (tourIndex === null) return;
+    const stop = stops[tourIndex];
+    if (stop) setScene(stop.scene as SceneId);
+  }, [tourIndex, stops]);
   useEffect(() => {
     const check = () => setShortRail(window.innerHeight / textScale < 720);
     check();
@@ -775,6 +800,23 @@ function ConsoleApp() {
         run: () => setScene(item.id),
       })),
       {
+        id: "action-guide",
+        label: "Explain this screen",
+        group: "ACTIONS",
+        hint: "What it answers and how to use it, in three steps",
+        shortcut: "?",
+        icon: <NovaShield size={15} />,
+        run: () => setGuideOpen(true),
+      },
+      {
+        id: "action-tour",
+        label: "Start the tour",
+        group: "ACTIONS",
+        hint: "Walk every screen with a plain explanation of each",
+        icon: <NovaShield size={15} />,
+        run: startTour,
+      },
+      {
         id: "action-tutorial",
         label: "Open the tutorial",
         group: "ACTIONS",
@@ -864,12 +906,22 @@ function ConsoleApp() {
         run: () => setScene("agent"),
       },
     ],
-    [address, resync, toggleTray, push, user, entitlement.tier, signOut]
+    [address, resync, toggleTray, push, user, entitlement.tier, signOut, startTour]
   );
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const mod = event.metaKey || event.ctrlKey;
+      // `?` explains the current screen, unless the operator is typing.
+      if (!mod && event.key === "?") {
+        const target = event.target as HTMLElement | null;
+        const typing = target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+        if (!typing) {
+          event.preventDefault();
+          setGuideOpen(true);
+        }
+        return;
+      }
       if (!mod) return;
 
       const key = event.key.toLowerCase();
@@ -900,6 +952,12 @@ function ConsoleApp() {
     window.addEventListener("noshashi:export", onExport);
     return () => window.removeEventListener("noshashi:export", onExport);
   }, []);
+
+  // The first-run guide on Home starts the tour this way.
+  useEffect(() => {
+    window.addEventListener("noshashi:tour", startTour);
+    return () => window.removeEventListener("noshashi:tour", startTour);
+  }, [startTour]);
 
   return (
     <TooltipProvider delayDuration={220}>
@@ -1139,6 +1197,7 @@ function ConsoleApp() {
               statusLabel={linkLabel}
               onClose={() => setStage("landing")}
               onCommand={() => setPaletteOpen(true)}
+              onGuide={() => setGuideOpen(true)}
               freshness={ledgerAgeSeconds}
             />
 
@@ -1297,6 +1356,11 @@ function ConsoleApp() {
           onOpenChange={setPaletteOpen}
           commands={commands}
         />
+
+        <GuideDialog scene={scene} open={guideOpen} onOpenChange={setGuideOpen} onStartTour={startTour} />
+        {tourIndex !== null && (
+          <TourCard stops={stops} index={tourIndex} onIndex={setTourIndex} onClose={() => setTourIndex(null)} />
+        )}
       </div>
       </HandoffProvider>
     </TooltipProvider>

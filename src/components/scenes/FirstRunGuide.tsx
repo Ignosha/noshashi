@@ -71,15 +71,23 @@ export function FirstRunGuide({
     >
       <p className="text-[13.5px] leading-relaxed text-foreground/85">
         <span className="font-[600] text-foreground">Four steps to your first decision.</span> NOSHASHI only reads
-        the ledger: it never asks for a key.{" "}
+        the ledger: it never asks for a key.
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <Button size="sm" onClick={() => window.dispatchEvent(new Event("noshashi:tour"))}>
+          TAKE THE TOUR
+        </Button>
         <button
           type="button"
           onClick={() => void openExternal(TUTORIAL_URL)}
-          className="font-[600] text-go underline-offset-2 hover:underline"
+          className="text-[12px] font-[600] text-go underline-offset-2 hover:underline"
         >
-          Every screen, explained: the 10-minute tutorial
+          Read the 10-minute tutorial
         </button>
-      </p>
+        <span className="text-[11.5px] text-faint">
+          Or press <kbd className="rounded border border-border px-1 font-mono">?</kbd> on any screen for a short explanation.
+        </span>
+      </div>
 
       <ol className="mt-4 grid gap-2 md:grid-cols-2">
         {steps.map((step, i) => {

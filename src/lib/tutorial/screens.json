@@ -1,0 +1,400 @@
+{
+  "groups": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "intro": "Where you start, and the live state of the ledger.",
+      "screens": [
+        {
+          "scene": "home",
+          "label": "Overview",
+          "plan": "Free",
+          "answers": "What NOSHASHI checks, and the ledger it is reading right now.",
+          "steps": [
+            "Check the top bar says **ONLINE** and shows the latest ledger.",
+            "Read the three cards: can it move, can you sell it, can you prove it. The middle one is a live order book.",
+            "Use **Run a gate check**, **Open the audit trail** or **Ask the agent** to jump straight in."
+          ],
+          "shot": "overview"
+        },
+        {
+          "scene": "control",
+          "label": "Mission Control",
+          "plan": "Free",
+          "answers": "Every validated ledger as it closes, through the lens of your role.",
+          "steps": [
+            "Pick a lens at the top: Executive, Compliance, Risk, Trading or Operations.",
+            "Watch ledgers, credentials and settlement paths update as each ledger closes.",
+            "Press **Run gate check** to test a payment from here."
+          ],
+          "shot": "control"
+        }
+      ]
+    },
+    {
+      "id": "compliance",
+      "title": "Compliance",
+      "intro": "Can this payment or asset move under your rules?",
+      "screens": [
+        {
+          "scene": "verify",
+          "label": "Verification",
+          "plan": "Free",
+          "answers": "GO, HOLD or NO-GO for a payment, before anyone signs it.",
+          "steps": [
+            "Paste the destination account and enter an amount (or tap 100, 1,000, 25,000 or 500,000).",
+            "Pick a rule profile, for example US_REGULATED_DEX.",
+            "Press **Run compliance gate** (`Ctrl`/`⌘`+`Enter`). Read the verdict, each rule's pass or fail, and the receipt."
+          ],
+          "shot": "verification",
+          "more": "#first-check"
+        },
+        {
+          "scene": "ledgerwatch",
+          "label": "Ledger Watch",
+          "plan": "Enterprise",
+          "answers": "Screen deposits before you credit them.",
+          "steps": [
+            "Add your deposit addresses, each with a label.",
+            "Every incoming payment is judged: what really arrived, whether the token is genuine, phishing dust, and who funded the sender up to three hops back.",
+            "Receive the results as signed webhooks and a feed."
+          ]
+        },
+        {
+          "scene": "credentials",
+          "label": "Credentials",
+          "plan": "Free",
+          "answers": "Which on-ledger credentials (XLS-70) an account holds.",
+          "steps": [
+            "Paste a counterparty address, and the issuer's if you know it.",
+            "Press **Read**.",
+            "See each credential, who issued it and whether it is still valid. Switch between Grid and Table."
+          ]
+        },
+        {
+          "scene": "domains",
+          "label": "Domain Grid",
+          "plan": "Free",
+          "answers": "Every permissioned domain (XLS-80) on mainnet, and who qualifies.",
+          "steps": [
+            "Browse the list, or paste a domain ID or owner address and press **Read live**.",
+            "Open a domain to see the credentials it requires.",
+            "Paste a counterparty and press **Check** to see whether it would be admitted."
+          ],
+          "shot": "domains"
+        },
+        {
+          "scene": "provenance",
+          "label": "Provenance",
+          "plan": "Pro",
+          "answers": "How old an account is and who funded it.",
+          "steps": [
+            "Paste the account (r…).",
+            "Read when it was created and who sent its first XRP.",
+            "Follow the funding chain as far as the node can prove it."
+          ]
+        },
+        {
+          "scene": "authority",
+          "label": "Authority",
+          "plan": "Pro",
+          "answers": "What an asset's issuer can still do to it.",
+          "steps": [
+            "Paste the issuer (r…).",
+            "Read freeze, clawback and signing powers, and how concentrated the holdings are.",
+            "Keep the digest: anyone can re-check the same reading later."
+          ]
+        },
+        {
+          "scene": "security",
+          "label": "Security Center",
+          "plan": "Free",
+          "answers": "Protect an account, check who you are paying, and recover from a theft.",
+          "steps": [
+            "Pick a tool from the tabs along the top. Start with **Account check**: paste your own address and press **Check**.",
+            "Read the grade and each finding in plain English. Fixes come as unsigned transactions you copy and sign in your own wallet.",
+            "Before paying someone, use **Pre-sign check** or **Safe send**. If an account was drained, use **Recover funds** or **Incident response**. Tabs that need a paid plan say so."
+          ],
+          "shot": "security"
+        }
+      ]
+    },
+    {
+      "id": "liquidity",
+      "title": "Liquidity",
+      "intro": "Is there real depth to buy or sell?",
+      "screens": [
+        {
+          "scene": "risk",
+          "label": "Exposure Analysis",
+          "plan": "Pro",
+          "answers": "Freeze rights, Travel Rule scope and counterparty concentration.",
+          "steps": [
+            "Load a wallet.",
+            "See which issuers could freeze what it holds.",
+            "See which payments fall under the Travel Rule, and where exposure is concentrated."
+          ]
+        },
+        {
+          "scene": "book",
+          "label": "Order Book",
+          "plan": "Pro",
+          "answers": "How much of the quoted depth can actually fill.",
+          "steps": [
+            "Enter a currency code (for example USD) and its issuer.",
+            "Compare **quoted** against **can fill** on each side.",
+            "Offers whose owners no longer hold the asset are not counted."
+          ]
+        },
+        {
+          "scene": "amm",
+          "label": "Pool Governance",
+          "plan": "Pro",
+          "answers": "Who controls an AMM pool's trading fee.",
+          "steps": [
+            "Paste the AMM's account (r…).",
+            "See each fee vote and the share of liquidity behind it.",
+            "See who holds the auction slot, and its discount, right now."
+          ]
+        },
+        {
+          "scene": "desk",
+          "label": "Portfolio & Radar",
+          "plan": "Pro",
+          "answers": "Many wallets, one rule set, failures first.",
+          "steps": [
+            "Add wallets with a label, for example Treasury · hot wallet.",
+            "Each one is checked against the same rules.",
+            "Failures are listed first, so you know where to look."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evidence",
+      "title": "Evidence",
+      "intro": "Can you prove what happened?",
+      "screens": [
+        {
+          "scene": "history",
+          "label": "Audit Trail",
+          "plan": "Free",
+          "answers": "An account's validated history, with what each payment really delivered.",
+          "steps": [
+            "Paste the account and press **Read history**. Set the **Flag at or above** amount if you need one.",
+            "Filter by All, In, Out or Flagged, or search by hash, tag or memo.",
+            "Press **Export evidence** for a file with a SHA-256 manifest."
+          ],
+          "shot": "audit"
+        },
+        {
+          "scene": "workstation",
+          "label": "Ledger & Policy",
+          "plan": "Pro",
+          "answers": "Every verdict you have run, your policy, and a signed export.",
+          "steps": [
+            "Write or activate your institution's policy.",
+            "Every verdict is kept on this device with the rules that produced it.",
+            "Export a signed record an examiner can verify."
+          ]
+        },
+        {
+          "scene": "settlement",
+          "label": "Settlement",
+          "plan": "Pro",
+          "answers": "What a transaction actually delivered, not what it asked for.",
+          "steps": [
+            "Paste the transaction hash (64 characters).",
+            "Compare the requested amount with the delivered amount.",
+            "Partial payments are called out, so you never credit the wrong figure."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "issuers",
+      "title": "Issuers & treasury",
+      "intro": "Who controls a treasury, and who holds your tokens?",
+      "screens": [
+        {
+          "scene": "treasury",
+          "label": "Control Surface",
+          "plan": "Pro",
+          "answers": "Who can move a treasury.",
+          "steps": [
+            "Paste the treasury account.",
+            "See its signers and the quorum it needs, and whether the master key is on.",
+            "See how much of the balance is locked and cannot be spent."
+          ]
+        },
+        {
+          "scene": "issuance",
+          "label": "Issuance",
+          "plan": "Institutional",
+          "answers": "Who holds an issuer's tokens.",
+          "steps": [
+            "Paste the issuer.",
+            "See how concentrated holdings are, plus dormant lines and freezes.",
+            "Review its enforcement history."
+          ]
+        },
+        {
+          "scene": "passport",
+          "label": "Passport",
+          "plan": "Enterprise",
+          "answers": "A signed, portable record of an asset's posture.",
+          "steps": [
+            "Enter the issuer.",
+            "Get one signed record: authority, freeze rights, concentration and eligibility.",
+            "Share it. Any counterparty can verify it without re-running the checks."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intelligence",
+      "title": "Intelligence",
+      "intro": "Ask questions in plain English.",
+      "screens": [
+        {
+          "scene": "agent",
+          "label": "NOSHX",
+          "plan": "Free",
+          "answers": "An assistant that reads the live ledger to answer you. Advisory only.",
+          "steps": [
+            "Type a question, paste a transaction hash, or tap a suggested question.",
+            "Read the answer and the ledger reads it is based on.",
+            "It runs on your device by default. You can choose another model under **Change runtime**."
+          ],
+          "shot": "noshx"
+        },
+        {
+          "scene": "garden",
+          "label": "Ledger Garden",
+          "plan": "Pro",
+          "answers": "Follow the chain from issuer to asset to holder to transaction.",
+          "steps": [
+            "Paste an address or a transaction hash.",
+            "Expand each branch. Every one is read from validated ledgers.",
+            "Hand any point to NOSHX to ask about it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "public",
+      "title": "Public tools",
+      "intro": "Free checks anyone can run.",
+      "screens": [
+        {
+          "scene": "safeshop",
+          "label": "Check an Address",
+          "plan": "Free",
+          "answers": "What the ledger publishes about an account before you pay it.",
+          "steps": [
+            "Paste the address and press **Check this address**.",
+            "Read **Things to know first**: freeze rights, transfer fees and the domain it claims.",
+            "Free accounts get 10 checks a month."
+          ],
+          "shot": "address"
+        },
+        {
+          "scene": "claims",
+          "label": "Inbox",
+          "plan": "Free",
+          "answers": "What strangers have sent an account, and whether those tokens are real.",
+          "steps": [
+            "Paste the account and press **Read claims**.",
+            "See each unsolicited offer and whether the token exists at all.",
+            "Never act on a claim the ledger cannot back."
+          ]
+        },
+        {
+          "scene": "nft",
+          "label": "Token Rights",
+          "plan": "Free",
+          "answers": "What an NFT's issuer can still do to it after you own it.",
+          "steps": [
+            "Paste the NFT's ID (64 characters).",
+            "Press **Read token rights**.",
+            "See whether the issuer can burn it, whether it can be resold, and the issuer's cut of each sale."
+          ]
+        },
+        {
+          "scene": "network",
+          "label": "Ledger Sync",
+          "plan": "Free",
+          "answers": "What four public nodes each report, and where they disagree.",
+          "steps": [
+            "Open the screen. Nothing to enter.",
+            "Compare each node's latest ledger and timing.",
+            "A node that lags is shown, so you know which reading to trust."
+          ],
+          "shot": "sync"
+        },
+        {
+          "scene": "learn",
+          "label": "Learn",
+          "plan": "Free",
+          "answers": "Hands-on labs and short explainers.",
+          "steps": [
+            "Pick a lab. Each one walks you through a real screen with real mainnet data.",
+            "Each right answer comes back for a short review after 1, 3, 7, 16 and 35 days, so it sticks.",
+            "Watch the explainers for the ideas behind the checks."
+          ],
+          "shot": "learn"
+        }
+      ]
+    },
+    {
+      "id": "account",
+      "title": "Your account",
+      "intro": "Plans, sign-in, security and settings.",
+      "screens": [
+        {
+          "scene": "plans",
+          "label": "Pricing",
+          "plan": "Free",
+          "answers": "Plans, checkout and credits.",
+          "steps": [
+            "Compare Free, Pro, Institutional and Enterprise.",
+            "Press **Get Pro** to subscribe. Checkout opens on Stripe in your browser.",
+            "Buy credits for automated API checks."
+          ]
+        },
+        {
+          "scene": "account",
+          "label": "Account",
+          "plan": "Free",
+          "answers": "Your subscription, two-factor sign-in and API keys.",
+          "steps": [
+            "The app works without an account.",
+            "Sign in to carry a subscription, portfolios and API keys.",
+            "Turn on two-factor authentication here."
+          ]
+        },
+        {
+          "scene": "trust",
+          "label": "Trust & Security",
+          "plan": "Free",
+          "answers": "What NOSHASHI reads, what it never does, and where your data goes.",
+          "steps": [
+            "Read each claim, for example that it never signs or broadcasts.",
+            "Each one says how it is enforced and tested."
+          ]
+        },
+        {
+          "scene": "settings",
+          "label": "Settings",
+          "plan": "Free",
+          "answers": "Appearance, accessibility and the desktop app.",
+          "steps": [
+            "Choose dark, light or system theme, and reduced motion.",
+            "Set the wallet you want to watch.",
+            "Turn on the menu bar HUD (`Ctrl`/`⌘`+`Shift`+`X`)."
+          ]
+        }
+      ]
+    }
+  ]
+}

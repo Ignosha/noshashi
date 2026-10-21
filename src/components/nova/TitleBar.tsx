@@ -19,6 +19,7 @@ export function TitleBar({
   statusLabel,
   onClose,
   onCommand,
+  onGuide,
   freshness,
 }: {
   title: string;
@@ -27,6 +28,8 @@ export function TitleBar({
   onClose?: () => void;
   /** Opens the command palette from the board's search field. */
   onCommand?: () => void;
+  /** Explains the current screen (the in-app guide). */
+  onGuide?: () => void;
   /** How old the newest validated read is, in seconds. */
   freshness?: number;
 }) {
@@ -166,6 +169,21 @@ export function TitleBar({
       )}
 
       <div data-tauri-drag-region className="flex min-w-0 items-center justify-end gap-3">
+        {onGuide && (
+          <>
+            <button
+              type="button"
+              onClick={onGuide}
+              className="flex h-6 shrink-0 items-center gap-1.5 rounded-full border border-border px-2.5 text-muted-foreground transition-colors hover:border-brand/40 hover:text-foreground"
+              aria-label="Explain this screen"
+              title="Explain this screen (?)"
+            >
+              <span aria-hidden className="mono-font text-[11px] leading-none">?</span>
+              <span className="stencil text-[10px] tracking-[0.14em]">GUIDE</span>
+            </button>
+            <span className="h-3.5 w-px bg-border" />
+          </>
+        )}
         <span className="flex shrink-0 items-center gap-1.5">
           <StatusDot status={status} size={5} pulse={status === "go"} />
           <span
