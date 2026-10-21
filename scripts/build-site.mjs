@@ -46,6 +46,7 @@ import {
 } from "../api/_lib/sections.js";
 import { jsonLd } from "../api/_lib/shell.js";
 import { buildRedesignPages, REDESIGN_PAGES } from "./build-pages.mjs";
+import { buildWorkspace, WORKSPACE_PAGES } from "./build-workspace.mjs";
 import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
@@ -1378,7 +1379,7 @@ async function buildPricingEnhancement() {
     `<a href="${item.href}"${item.optional ? ' class="optional"' : ""}${item.href === "/pricing/" ? ' aria-current="page"' : ""}>${item.label}</a>`
   ).join("\n        ");
   html = html.replace(/<nav class="nav-links" aria-label="Primary">[\s\S]*?<\/nav>\n    <\/nav>/,
-    `<nav class="nav-links" aria-label="Primary">\n        ${navLinks}\n        <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme"><span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span></button>\n        <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>\n        <a class="btn" href="/#download">Download</a>\n      </nav>\n    </nav>`);
+    `<nav class="nav-links" aria-label="Primary">\n        ${navLinks}\n        <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme"><span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span></button>\n        <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>\n        <a class="btn" href="/app/">Open workspace</a>\n      </nav>\n    </nav>`);
   html = html.replace(/<footer>[\s\S]*?<\/footer>/, renderFooter());
   const footStyle = '<link rel="stylesheet" href="/assets/core-footer.css">';
   if (!html.includes(footStyle)) html = html.replace('<link rel="stylesheet" href="/assets/modules.css">', `<link rel="stylesheet" href="/assets/modules.css">\n${footStyle}`);
@@ -1586,6 +1587,7 @@ async function buildSitemap(docs = []) {
     ["/releases/1-0-14/", "monthly", "0.7"],
     ["/pricing/", "monthly", "0.9"],
     ...REDESIGN_PAGES,
+    ...WORKSPACE_PAGES,
     ["/enterprise/", "monthly", "0.9"],
     ["/trust/", "monthly", "0.8"],
     ["/misread/", "monthly", "0.8"],
@@ -1682,6 +1684,7 @@ async function main() {
   await buildPricingEnhancement();
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildRedesignPages(write);
+  await buildWorkspace(write, { release });
   await buildTrust();
   await buildMisread();
   const docs = await buildDocs();

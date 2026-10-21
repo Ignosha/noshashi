@@ -1,0 +1,217 @@
+/*
+ * The NOSHASHI workspace (/app/). Three areas: a compact sidebar, the
+ * main workspace, and a context panel that opens only on demand.
+ *
+ * Every colour and font comes from the site's own tokens in core.css
+ * (and accent.css for the blue theme), so the workspace is the same brand
+ * in a calmer, denser arrangement. No new palette is introduced here.
+ */
+.ws-body-root{background:var(--ground);min-height:100vh}
+.ws-app{
+  --side:244px; --ctx:0px;
+  display:grid;grid-template-columns:var(--side) minmax(0,1fr) var(--ctx);
+  min-height:100vh;
+}
+html[data-ws-side="rail"] .ws-app{--side:64px}
+.ws-app.ctx-open{--ctx:360px}
+
+/* ── Area A: sidebar ─────────────────────────────────────────────── */
+.ws-side{position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;gap:6px;padding:12px 10px;
+  border-right:1px solid var(--rule);background:color-mix(in srgb,var(--surface) 70%,var(--ground))}
+.ws-brand{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 4px 12px}
+.ws-home{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+  font:600 13px "Space Grotesk",system-ui,sans-serif;letter-spacing:.18em;min-width:0}
+.ws-home .brand-mark{width:24px;height:24px;flex:0 0 auto}
+.ws-nav{display:flex;flex-direction:column;gap:2px}
+.ws-nav-more{margin-top:14px}
+.ws-sec{font:500 10px "IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);padding:6px 10px 4px}
+.ws-link{display:flex;align-items:center;gap:11px;width:100%;padding:8px 10px;border-radius:8px;
+  color:var(--muted);text-decoration:none;font:500 13.5px "Space Grotesk",system-ui,sans-serif;
+  background:none;border:0;cursor:pointer;text-align:left;white-space:nowrap}
+.ws-link:hover{background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--ink)}
+.ws-link[aria-current="page"]{background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--ink)}
+.ws-link[aria-current="page"] .ws-i{color:var(--brand)}
+.ws-link span{overflow:hidden;text-overflow:ellipsis}
+.ws-i{flex:0 0 auto}
+.ws-foot{margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:12px;border-top:1px solid var(--rule)}
+html[data-ws-side="rail"] .ws-side{padding-inline:8px}
+html[data-ws-side="rail"] .ws-link span,
+html[data-ws-side="rail"] .ws-home span,
+html[data-ws-side="rail"] .ws-sec{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+html[data-ws-side="rail"] .ws-link{justify-content:center;padding:9px 0}
+html[data-ws-side="rail"] .ws-brand{flex-direction:column;gap:10px}
+
+/* ── Area B: top bar and main workspace ──────────────────────────── */
+.ws-col{min-width:0;display:flex;flex-direction:column}
+.ws-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;height:56px;padding:0 24px;
+  border-bottom:1px solid var(--rule);background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(8px)}
+.ws-crumb{font:12px "IBM Plex Mono",monospace;color:var(--faint);letter-spacing:.04em;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-crumb a{color:var(--muted);text-decoration:none}
+.ws-crumb a:hover{color:var(--ink)}
+.ws-top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.ws-menu{display:none}
+.ws-main{width:100%;max-width:960px;margin:0 auto;padding:36px 40px 80px}
+.ws-title{font:600 clamp(24px,3vw,32px)/1.15 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;margin:0;color:var(--ink)}
+.ws-lede{margin:8px 0 24px;color:var(--muted);font-size:15px;max-width:62ch}
+.ws-h2{font:600 15px "Space Grotesk",system-ui,sans-serif;margin:0 0 12px;color:var(--ink)}
+.ws-sec-block{margin-top:36px}
+.ws-muted{color:var(--muted);font-size:13.5px;line-height:1.55;margin:0 0 12px}
+.ws-fine{color:var(--faint);font-size:12px;line-height:1.55;margin:10px 0 0}
+
+/* Buttons */
+.ws-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;border:1px solid var(--rule);
+  background:var(--surface);color:var(--ink);font:500 13px "Space Grotesk",system-ui,sans-serif;text-decoration:none;cursor:pointer;white-space:nowrap}
+.ws-btn:hover{border-color:color-mix(in srgb,var(--brand) 50%,var(--rule))}
+.ws-btn.primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.ws-btn.primary:hover{filter:brightness(1.06)}
+.ws-btn[disabled]{opacity:.55;cursor:progress}
+.ws-icon-btn{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;border:1px solid transparent;
+  background:none;color:var(--muted);cursor:pointer;flex:0 0 auto}
+.ws-icon-btn:hover,.ws-icon-btn[aria-expanded="true"]{color:var(--ink);background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.ws-actions{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Search / input */
+.ws-search{display:flex;gap:8px;max-width:720px}
+.ws-search input,.ws-search select{flex:1;min-width:0;padding:11px 14px;border-radius:10px;border:1px solid var(--rule);
+  background:var(--surface);color:var(--ink);font:14px "IBM Plex Mono",monospace}
+.ws-search input::placeholder{color:var(--faint);font-family:"Space Grotesk",system-ui,sans-serif}
+.ws-search input:focus,.ws-search select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
+.ws-search .ws-btn{padding-inline:18px}
+.ws-search [aria-invalid="true"]{border-color:var(--nogo)}
+.ws-examples{font-size:12.5px;color:var(--faint);margin:10px 0 0}
+.ws-error{color:var(--nogo);font-size:13px;margin:8px 0 0}
+
+/* Empty state */
+.ws-empty{margin-top:24px;padding:22px;border:1px dashed var(--rule);border-radius:12px;color:var(--muted);font-size:14px;line-height:1.6}
+.ws-empty p{margin:0 0 6px}
+.ws-empty b{color:var(--ink);font-weight:600}
+.ws-empty-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px!important}
+
+/* Tools list (overview) */
+.ws-tool-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ws-tool{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--rule);border-radius:10px;text-decoration:none;color:var(--ink);background:var(--surface)}
+.ws-tool:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--rule))}
+.ws-tool .ws-i{color:var(--brand);margin-top:2px}
+.ws-tool b{display:block;font-weight:600;font-size:14px}
+.ws-tool small{display:block;color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:2px}
+
+/* Results */
+.ws-result{margin-top:28px}
+.ws-result-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:14px}
+.ws-result-head h2{font:600 18px "Space Grotesk",system-ui,sans-serif;margin:0;color:var(--ink);word-break:break-all}
+.ws-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.ws-metric{background:var(--surface);padding:14px 16px}
+.ws-metric dt{font:500 10.5px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.ws-metric dd{margin:6px 0 0;font:600 18px "Space Grotesk",system-ui,sans-serif;color:var(--ink)}
+.ws-metric dd small{display:block;font:400 12px "Space Grotesk",system-ui,sans-serif;color:var(--muted);margin-top:2px}
+.t-go{color:var(--go)!important} .t-hold{color:var(--hold)!important} .t-nogo{color:var(--nogo)!important}
+.ws-block{margin-top:22px}
+.ws-table-wrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px}
+.ws-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.ws-table th,.ws-table td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+.ws-table tr:last-child td,.ws-table tr:last-child th{border-bottom:0}
+.ws-table thead th{font:500 10.5px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);background:color-mix(in srgb,var(--surface) 60%,var(--ground))}
+.ws-table tbody th{font-weight:500;color:var(--muted);width:40%}
+.ws-table td{color:var(--ink)}
+.ws-table .mono,.ws-table code{font-family:"IBM Plex Mono",monospace;font-size:12.5px;word-break:break-all}
+.ws-notes{margin:0;padding-left:18px;display:grid;gap:6px;color:var(--muted);font-size:13.5px;line-height:1.55}
+.ws-details{margin-top:16px;border:1px solid var(--rule);border-radius:10px}
+.ws-details summary{cursor:pointer;padding:10px 14px;font-size:13px;color:var(--muted);list-style:none}
+.ws-details summary::-webkit-details-marker{display:none}
+.ws-details summary::before{content:"+ ";color:var(--brand)}
+.ws-details[open] summary::before{content:"– "}
+.ws-details pre{margin:0;padding:12px 14px;border-top:1px solid var(--rule);overflow-x:auto;font:12px/1.55 "IBM Plex Mono",monospace;color:var(--muted);max-height:340px}
+.ws-next{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:20px}
+.ws-bars{display:grid;gap:10px}
+.ws-bar-row{display:grid;grid-template-columns:110px minmax(0,1fr) 74px;gap:12px;align-items:center;font-size:13px;color:var(--muted)}
+.ws-bar{height:10px;border-radius:6px;background:color-mix(in srgb,var(--ink) 8%,transparent);overflow:hidden}
+.ws-bar i{display:block;height:100%;background:var(--brand)}
+.ws-bar-row b{color:var(--ink);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+
+/* Status indicators */
+.ws-badge{display:inline-flex;align-items:center;gap:6px;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.06em;
+  padding:3px 8px;border-radius:999px;border:1px solid var(--rule);color:var(--muted)}
+.ws-badge::before,.ws-dot{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.ws-badge.live::before,.ws-dot.ok{background:var(--go)}
+.ws-badge.cached::before{background:var(--hold)}
+.ws-dot.bad{background:var(--nogo)}
+.ws-badge.live{color:var(--go)}
+.ws-dot{margin-right:8px;vertical-align:1px}
+.ws-loading{color:var(--muted);font-size:13.5px}
+.ws-loading::before{content:"";display:inline-block;width:12px;height:12px;margin-right:8px;vertical-align:-1px;border-radius:50%;
+  border:2px solid color-mix(in srgb,var(--brand) 30%,transparent);border-top-color:var(--brand);animation:wsSpin .8s linear infinite}
+@keyframes wsSpin{to{transform:rotate(360deg)}}
+
+/* History list */
+.ws-history{list-style:none;margin:0;padding:0;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.ws-history li+li{border-top:1px solid var(--rule)}
+.ws-history a{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;padding:10px 14px;text-decoration:none;color:var(--ink);font-size:13.5px}
+.ws-history a:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.ws-history .k{color:var(--muted)}
+.ws-history .v{font-family:"IBM Plex Mono",monospace;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ws-history .t{color:var(--faint);font-size:12px}
+
+/* ── Area C: context panel ───────────────────────────────────────── */
+.ws-ctx{position:sticky;top:0;height:100vh;overflow-y:auto;border-left:1px solid var(--rule);
+  background:color-mix(in srgb,var(--surface) 70%,var(--ground));padding:12px 18px 24px;font-size:13.5px}
+.ws-ctx[hidden]{display:none}
+.ws-ctx-head{display:flex;align-items:center;justify-content:space-between;height:44px;margin-bottom:8px}
+.ws-ctx-title{font:600 14px "Space Grotesk",system-ui,sans-serif;margin:0;color:var(--ink)}
+.ws-ctx-label{font:500 10.5px "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:18px 0 8px}
+.ws-ctx-list{margin:0;padding-left:16px;display:grid;gap:7px;color:var(--muted);line-height:1.55}
+.ws-ctx dl{margin:0;display:grid;gap:8px}
+.ws-ctx dt{font-size:11.5px;color:var(--faint)}
+.ws-ctx dd{margin:0;color:var(--ink);word-break:break-all;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+.ws-ctx a{color:var(--brand)}
+.ws-form{display:grid;gap:8px}
+.ws-form label{font-size:12px;color:var(--muted)}
+.ws-form input,.ws-form select,.ws-form textarea{padding:9px 11px;border-radius:8px;border:1px solid var(--rule);background:var(--ground);color:var(--ink);font:13.5px "Space Grotesk",system-ui,sans-serif}
+.ws-form textarea{resize:vertical;min-height:90px}
+.ws-form .ws-btn{justify-self:start;margin-top:4px}
+.ws-status{font-size:12.5px;margin:4px 0 0;color:var(--muted)}
+.ws-status[data-tone="good"]{color:var(--go)} .ws-status[data-tone="bad"]{color:var(--nogo)}
+.ws-seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:0 8px 8px 0}
+.ws-seg-b{background:none;border:0;padding:7px 14px;color:var(--muted);font:500 12.5px "Space Grotesk",system-ui,sans-serif;cursor:pointer}
+.ws-seg-b[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
+
+/* The demo inside the workspace keeps its components, without the
+   marketing page's large section spacing. */
+.ws-demo section{padding:0;margin-top:28px}
+.ws-demo .sec-head h2{font-size:18px}
+
+/* Focus and motion */
+.ws-app a:focus-visible,.ws-app button:focus-visible,.ws-app select:focus-visible,.ws-app input:focus-visible,.ws-app textarea:focus-visible,.ws-app summary:focus-visible{
+  outline:2px solid var(--brand);outline-offset:2px}
+.ws-scrim{position:fixed;inset:0;z-index:30;background:rgb(0 0 0 / .45)}
+.ws-scrim[hidden]{display:none}
+
+/* ── Narrow desktop and tablet: the context panel overlays ───────── */
+@media (max-width:1180px){
+  .ws-app.ctx-open{--ctx:0px}
+  .ws-ctx{position:fixed;right:0;top:0;bottom:0;z-index:40;width:min(380px,92vw);box-shadow:-20px 0 40px rgb(0 0 0 / .25)}
+}
+/* ── Phone and small tablet: the sidebar is a drawer ─────────────── */
+@media (max-width:900px){
+  .ws-app,html[data-ws-side="rail"] .ws-app{--side:0px}
+  .ws-side{position:fixed;left:0;top:0;bottom:0;z-index:40;width:272px;transform:translateX(-100%);transition:transform .2s ease;visibility:hidden}
+  html[data-ws-drawer="open"] .ws-side{transform:none;visibility:visible}
+  html[data-ws-side="rail"] .ws-side .ws-link span,html[data-ws-side="rail"] .ws-side .ws-home span,html[data-ws-side="rail"] .ws-side .ws-sec{position:static;width:auto;height:auto;clip:auto}
+  html[data-ws-side="rail"] .ws-side .ws-link{justify-content:flex-start;padding:8px 10px}
+  html[data-ws-side="rail"] .ws-brand{flex-direction:row}
+  .ws-collapse{display:none}
+  .ws-menu{display:inline-grid}
+  .ws-top{padding:0 12px}
+  .ws-main{padding:24px 16px 64px}
+  .ws-search{flex-direction:column}
+  .ws-search .ws-btn{justify-content:center}
+  .ws-tool-list{grid-template-columns:1fr}
+  .ws-history a{grid-template-columns:1fr auto}
+  .ws-history .k{display:none}
+  .ws-top-actions .ws-btn{display:none}
+  .ws-bar-row{grid-template-columns:88px minmax(0,1fr) 64px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ws-side{transition:none}
+  .ws-loading::before{animation:none}
+}

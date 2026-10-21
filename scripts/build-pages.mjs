@@ -355,23 +355,12 @@ function stepList(items) {
   <ol class="dsteps">${items.map(([t, why], i) => `<li class="dstep${i === 0 ? " active" : ""}"><span class="dnum" aria-hidden="true">${i + 1}</span><p class="dh">${t.replace(/^\d+ · /, "")} <span class="dwhy">${why}</span></p><div class="dout" aria-live="polite"></div></li>`).join("")}</ol>`;
 }
 
-async function buildInstitutionalDemo(write) {
-  const body = `<div class="page-head"><p class="eyebrow">NOSHASHI INSTITUTIONAL ACCESS</p>
-  <h1>Understand the ledger. Evaluate the evidence.</h1>
-  <p>Explore NOSHASHI's XRPL intelligence tools, test real workflows, and help shape the next generation of asset analysis and transaction verification.</p>
-  <p class="cta" style="margin-top:22px"><a class="btn" href="#demo">Launch interactive demo</a><a class="btn ghost" href="/design-partners/#apply">Apply for early access</a></p>
-  <p class="micro">Evaluate available tools using public ledger data, without connecting a wallet or exposing private keys.</p>
-</div>
-
-<section>
-  <div class="grid g3">
-    <div class="panel"><p class="num">01 · EXPLORE</p><h3>Explore</h3><p>Experience the available NOSHASHI tools through guided demonstrations.</p></div>
-    <div class="panel"><p class="num">02 · EVALUATE</p><h3>Evaluate</h3><p>Complete practical tasks based on real XRPL workflows.</p></div>
-    <div class="panel"><p class="num">03 · INFLUENCE</p><h3>Influence</h3><p>Share feedback directly with the NOSHASHI team and help prioritize future improvements.</p></div>
-  </div>
-</section>
-
-<section id="demo">
+/*
+ * The guided demo, test checklist, feedback and issue forms. Shared by
+ * /institutional-demo/ and the workspace's /app/demo/; demo.js drives both.
+ */
+export function demoSections() {
+  return `<section id="demo">
   <div class="sec-head"><p class="eyebrow">Interactive demo</p><h2>Three workflows, live on mainnet.</h2>
     <p>Pick a scenario, use the example or your own input, and follow the five steps. Every figure is read from the XRP Ledger when you press the button.</p></div>
   <div class="dtabs" role="tablist" aria-label="Demo scenarios">
@@ -500,6 +489,26 @@ async function buildInstitutionalDemo(write) {
   </details>
 </section>
 
+`;
+}
+
+async function buildInstitutionalDemo(write) {
+  const body = `<div class="page-head"><p class="eyebrow">NOSHASHI INSTITUTIONAL ACCESS</p>
+  <h1>Understand the ledger. Evaluate the evidence.</h1>
+  <p>Explore NOSHASHI's XRPL intelligence tools, test real workflows, and help shape the next generation of asset analysis and transaction verification.</p>
+  <p class="cta" style="margin-top:22px"><a class="btn" href="#demo">Launch interactive demo</a><a class="btn ghost" href="/design-partners/#apply">Apply for early access</a></p>
+  <p class="micro">Evaluate available tools using public ledger data, without connecting a wallet or exposing private keys.</p>
+</div>
+
+<section>
+  <div class="grid g3">
+    <div class="panel"><p class="num">01 · EXPLORE</p><h3>Explore</h3><p>Experience the available NOSHASHI tools through guided demonstrations.</p></div>
+    <div class="panel"><p class="num">02 · EVALUATE</p><h3>Evaluate</h3><p>Complete practical tasks based on real XRPL workflows.</p></div>
+    <div class="panel"><p class="num">03 · INFLUENCE</p><h3>Influence</h3><p>Share feedback directly with the NOSHASHI team and help prioritize future improvements.</p></div>
+  </div>
+</section>
+
+${demoSections()}
 ${band("Want a 20-minute walkthrough?", "One real problem, the evidence NOSHASHI produces, and your chance to challenge it.",
     `<a class="btn ghost" href="/contact/?topic=institutions">Request a meeting</a><a class="btn" href="/design-partners/#apply">Apply for early access</a>`)}`;
 
