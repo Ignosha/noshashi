@@ -20,6 +20,7 @@
 
 import { readAuthoritySurface, certificateFrom, ADDRESS_RE } from "./_lib/authority.js";
 import { cacheHeaders } from "./_lib/html.js";
+import { queryOf } from "./_lib/query.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const issuer = String(req.query?.issuer ?? "").trim();
+  const issuer = String(queryOf(req).issuer ?? "").trim();
   if (!issuer) {
     return res.status(400).json({
       error: "Pass ?issuer= an XRPL classic address.",
@@ -44,7 +45,7 @@ export default async function handler(req, res) {
 
   // Off by default. The walk is several round trips and most callers
   // want the flags; asking for it is a decision to wait.
-  const walkSupply = req.query?.walk === "1" || req.query?.walk === "true";
+  const walkSupply = queryOf(req).walk === "1" || queryOf(req).walk === "true";
 
   try {
     const surface = await readAuthoritySurface(issuer, { walkSupply });

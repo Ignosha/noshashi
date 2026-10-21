@@ -32,6 +32,7 @@ import {
   ledgerAtOrBefore,
   treasuryDigest,
 } from "../treasury.js";
+import { queryOf } from "../query.js";
 
 const LEVELS = 100;
 /** The FeeSettings singleton's ledger key. Fixed by the protocol. */
@@ -54,14 +55,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const wallets = [...new Set(String(req.query?.wallets ?? "").split(/[\s,]+/).filter(Boolean))];
+  const wallets = [...new Set(String(queryOf(req).wallets ?? "").split(/[\s,]+/).filter(Boolean))];
   if (wallets.length === 0) return res.status(400).json({ error: "Pass ?wallets= one or more XRPL classic addresses, comma-separated." });
   if (wallets.length > MAX_WALLETS) return res.status(400).json({ error: `At most ${MAX_WALLETS} wallets per report.` });
   const bad = wallets.find((w) => !ADDRESS_RE.test(w));
   if (bad) return res.status(400).json({ error: `${bad.slice(0, 40)} is not an XRPL classic address. They begin with r.` });
 
-  const at = String(req.query?.at ?? "").trim();
-  const pinned = String(req.query?.ledger ?? "").trim();
+  const at = String(queryOf(req).at ?? "").trim();
+  const pinned = String(queryOf(req).ledger ?? "").trim();
   if (at && !DATE_RE.test(at)) return res.status(400).json({ error: "Pass ?at= a date as YYYY-MM-DD (UTC)." });
   if (pinned && !/^\d{1,10}$/.test(pinned)) return res.status(400).json({ error: "Pass ?ledger= a ledger index." });
 
@@ -129,7 +130,7 @@ export default async function handler(req, res) {
     );
     res.setHeader("Access-Control-Allow-Origin", "*");
 
-    if (req.query?.format === "raw") {
+    if (queryOf(req).format === "raw") {
       return res.status(200).json({
         ledger_index: validatedIndex,
         ledger: header.ledger,

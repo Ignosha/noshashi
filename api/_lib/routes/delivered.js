@@ -25,6 +25,7 @@
 import { rippleRpc, ADDRESS_RE } from "../authority.js";
 import { deliveredRows, toCsv, summarize, RIPPLE_EPOCH } from "../delivered.js";
 import { take, clientKey } from "../rate-limit.js";
+import { queryOf } from "../query.js";
 
 const PAGE_LIMIT = 400;
 const MAX_PAGES = 25;
@@ -51,19 +52,19 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const account = String(req.query?.account ?? "").trim();
+  const account = String(queryOf(req).account ?? "").trim();
   if (!ADDRESS_RE.test(account)) {
     return res.status(400).json({ error: "Pass ?account= an XRPL classic address. They begin with r." });
   }
-  const fromMs = parseDate(String(req.query?.from ?? ""), false);
-  const toMs = parseDate(String(req.query?.to ?? ""), true);
+  const fromMs = parseDate(String(queryOf(req).from ?? ""), false);
+  const toMs = parseDate(String(queryOf(req).to ?? ""), true);
   if (Number.isNaN(fromMs) || Number.isNaN(toMs)) {
     return res.status(400).json({ error: "Dates are YYYY-MM-DD, in UTC." });
   }
   if (fromMs !== null && toMs !== null && fromMs > toMs) {
     return res.status(400).json({ error: "`from` is after `to`." });
   }
-  const format = ["json", "raw"].includes(req.query?.format) ? req.query.format : "csv";
+  const format = ["json", "raw"].includes(queryOf(req).format) ? queryOf(req).format : "csv";
 
   // A full read is up to 25 ledger round trips. A person downloads a
   // year once; a loop downloading it every second is not a person.
@@ -154,8 +155,8 @@ export default async function handler(req, res) {
   if (format === "json") {
     return res.status(200).json({
       account,
-      from: req.query?.from || null,
-      to: req.query?.to || null,
+      from: queryOf(req).from || null,
+      to: queryOf(req).to || null,
       complete,
       stopped_because: stoppedBecause,
       pages_read: pages,
@@ -170,7 +171,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const name = `xrpl-delivered-${account}${req.query?.from ? `-${req.query.from}` : ""}${req.query?.to ? `-to-${req.query.to}` : ""}.csv`;
+  const name = `xrpl-delivered-${account}${queryOf(req).from ? `-${queryOf(req).from}` : ""}${queryOf(req).to ? `-to-${queryOf(req).to}` : ""}.csv`;
   res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
   res.setHeader("X-NOSHASHI-Complete", String(complete));

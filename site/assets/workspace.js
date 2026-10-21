@@ -36,13 +36,19 @@
         body: JSON.stringify({ method: method, params: [params] })
       }).then(function (r) { return r.json(); }).then(function (j) {
         if (!j || !j.result) throw new Error("no result");
-        if (j.result.error) throw new Error(j.result.error_message || j.result.error);
+        if (j.result.error) {
+          // The ledger answered; another node would answer the same.
+          var answer = new Error(j.result.error_message || j.result.error);
+          answer.ledger = j.result.error;
+          throw answer;
+        }
         return j.result;
       }).catch(function (e) {
+        if (e.ledger) throw e;
         i += 1;
         if (i < NODES.length) return go();
-        // A network failure surfaces as "Failed to fetch"; say it plainly.
-        throw e instanceof TypeError ? new Error("Could not reach a public XRPL node right now. Try again in a moment.") : e;
+        // Network failures and unreadable replies: say it plainly.
+        throw new Error("Could not reach a public XRPL node right now. Try again in a moment.");
       });
     }
     return go();
@@ -205,7 +211,9 @@
   var clear = document.querySelector("[data-clear-history]");
   if (clear) clear.addEventListener("click", function () {
     try { localStorage.removeItem(HISTORY); } catch (e) {}
+    var was = clear.textContent;
     clear.textContent = "Cleared";
+    setTimeout(function () { clear.textContent = was; }, 2000);
     renderHistory();
   });
 
@@ -246,11 +254,13 @@
     list.unshift({ tool: tool, q: q, label: label, summary: summary, at: new Date().toISOString() });
     try { localStorage.setItem(HISTORY, JSON.stringify(list.slice(0, 12))); } catch (e) {}
   }
+  var historyBox = document.querySelector("[data-history-list]");
+  var historyEmpty = historyBox ? historyBox.innerHTML : "";
   function renderHistory() {
-    var box = document.querySelector("[data-history-list]");
+    var box = historyBox;
     if (!box) return;
     var list = loadHistory();
-    if (!list.length) return;
+    if (!list.length) { box.innerHTML = historyEmpty; return; }
     box.innerHTML = '<ul class="ws-history">' + list.map(function (h) {
       var when = new Date(h.at);
       return '<li><a href="/app/' + esc(h.tool) + "/?q=" + encodeURIComponent(h.q) + '"><span class="k">' + esc(TOOL_NAMES[h.tool] || h.tool) +
@@ -386,6 +396,8 @@
     setDetails('<p class="ws-ctx-label">This result</p><dl><dt>Transaction</dt><dd>' + esc(hash) + "</dd><dt>Validated ledger</dt><dd>" + fmt(ledger, 0) +
       "</dd><dt>Source</dt><dd>tx from a public XRPL node</dd><dt>Read at</dt><dd>" + esc(new Date().toISOString()) + "</dd></dl>");
     input.value = hash;
+    lastInput = hash;
+    history.replaceState(null, "", location.pathname + "?q=" + encodeURIComponent(hash));
     remember("payment", hash, short(hash, 18), known ? (shortPay ? "Short payment" : "Delivered in full") : "Delivered not recorded");
     wireInline();
   }
@@ -455,6 +467,7 @@
     show('<p class="ws-loading">Reading both sides of the book at one validated ledger…</p>');
     busy(true);
     return api("/api/book?format=json&currency=" + encodeURIComponent(parts[0]) + "&issuer=" + encodeURIComponent(parts[1])).then(function (b) {
+      if (!b.quoted || !b.fillable) throw new Error("The order book reply was incomplete. Try again in a moment.");
       var u = b.currency_label || cur(parts[0]);
       var ref = b.reference || {};
       var spread = ref.bid && ref.ask && ref.mid ? ((ref.ask - ref.bid) / ref.mid) * 100 : null;
@@ -545,22 +558,32 @@
 
   if (form && RUN[form.getAttribute("data-run")]) {
     var run = RUN[form.getAttribute("data-run")];
+    var running = false;
+    var submit = function () {
+      if (form.requestSubmit) form.requestSubmit();
+      else form.dispatchEvent(new Event("submit", { cancelable: true }));
+    };
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      if (running) return;
       input.removeAttribute("aria-invalid");
       lastInput = String(input.value).trim();
       if (!lastInput) return invalid("Enter something to analyze first.");
       history.replaceState(null, "", location.pathname + "?q=" + encodeURIComponent(lastInput));
-      run(lastInput);
+      var p = run(lastInput);
+      if (p && p.then) {
+        running = true;
+        p.then(function () { running = false; }, function () { running = false; });
+      }
     });
     document.querySelectorAll("[data-example]").forEach(function (b) {
-      b.addEventListener("click", function () { input.value = b.getAttribute("data-example"); form.requestSubmit(); });
+      b.addEventListener("click", function () { if (running) return; input.value = b.getAttribute("data-example"); submit(); });
     });
     var q0 = new URLSearchParams(location.search).get("q");
     if (q0) {
       if (input.tagName === "SELECT") { if ([].some.call(input.options, function (o) { return o.value === q0; })) input.value = q0; }
       else input.value = q0;
-      form.requestSubmit();
+      submit();
     }
   }
 })();

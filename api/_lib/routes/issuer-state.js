@@ -12,13 +12,14 @@
  */
 
 import { rippleRpc, ADDRESS_RE } from "../authority.js";
+import { queryOf } from "../query.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ error: "Method not allowed" });
   }
-  const issuer = String(req.query?.issuer ?? "").trim();
+  const issuer = String(queryOf(req).issuer ?? "").trim();
   if (!ADDRESS_RE.test(issuer)) {
     return res.status(400).json({ error: "Pass ?issuer= an XRPL classic address. They begin with r." });
   }

@@ -9,6 +9,7 @@
  */
 import { getNews } from "./_lib/news.js";
 import { cacheHeaders } from "./_lib/html.js";
+import { queryOf } from "./_lib/query.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET" && req.method !== "HEAD") {
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const limit = Math.min(30, Math.max(1, Number(req.query?.limit) || 12));
+  const limit = Math.min(30, Math.max(1, Number(queryOf(req).limit) || 12));
   const news = await getNews({ limit });
 
   cacheHeaders(res, 300, 3600);
