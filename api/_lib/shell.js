@@ -54,6 +54,7 @@ export const FOOTER_GROUPS = [
   { title: "Platform", links: [
     { href: "/platform/", label: "Platform overview" },
     { href: "/app/", label: "Workspace" },
+    { href: "/tutorial/", label: "Desktop app tutorial" },
     { href: "/institutional-demo/", label: "Interactive demo" },
     { href: "/#public", label: "Free tools" },
     { href: "/#download", label: "Download" },

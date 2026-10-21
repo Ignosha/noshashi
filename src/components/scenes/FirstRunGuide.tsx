@@ -4,8 +4,9 @@ import { useBilling } from "@/lib/billing/useEntitlements";
 import { useLedger } from "@/lib/desk/ledger";
 import { usePolicyStore } from "@/lib/desk/policyStore";
 import { useHandoff } from "@/lib/nav/handoff";
-import { EVIDENCE_CHECKED_KEY, GUIDE_DISMISSED_KEY, firstRunSteps, nextStep, showGuide } from "@/lib/onboarding";
+import { EVIDENCE_CHECKED_KEY, GUIDE_DISMISSED_KEY, TUTORIAL_URL, firstRunSteps, nextStep, showGuide } from "@/lib/onboarding";
 import { useSetting } from "@/lib/store";
+import { openExternal } from "@/lib/external";
 import { cn } from "@/lib/utils";
 
 type Mode = "executive" | "analyst";
@@ -70,7 +71,14 @@ export function FirstRunGuide({
     >
       <p className="text-[13.5px] leading-relaxed text-foreground/85">
         <span className="font-[600] text-foreground">Four steps to your first decision.</span> NOSHASHI only reads
-        the ledger: it never asks for a key.
+        the ledger: it never asks for a key.{" "}
+        <button
+          type="button"
+          onClick={() => void openExternal(TUTORIAL_URL)}
+          className="font-[600] text-go underline-offset-2 hover:underline"
+        >
+          Every screen, explained: the 10-minute tutorial
+        </button>
       </p>
 
       <ol className="mt-4 grid gap-2 md:grid-cols-2">

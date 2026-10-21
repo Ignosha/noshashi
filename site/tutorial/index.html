@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Desktop app tutorial · NOSHASHI</title>
+<meta name="description" content="Learn the NOSHASHI desktop app in ten minutes: every screen, what it answers, how to use it in three steps, and which plan it needs.">
+<link rel="canonical" href="https://www.noshashi.app/tutorial/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/tutorial/">
+<meta property="og:title" content="Desktop app tutorial · NOSHASHI">
+<meta property="og:description" content="Learn the NOSHASHI desktop app in ten minutes: every screen, what it answers, how to use it in three steps, and which plan it needs.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Desktop app tutorial · NOSHASHI">
+<meta name="twitter:description" content="Learn the NOSHASHI desktop app in ten minutes: every screen, what it answers, how to use it in three steps, and which plan it needs.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Desktop app tutorial","item":"https://www.noshashi.app/tutorial/"}]}]}</script>
+<link rel="stylesheet" href="/assets/tutorial.css">
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
+      <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/"><span data-i18n="nav.demo2">Demo</span></a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/resources/" aria-current="page"><span data-i18n="nav.resources">Resources</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme">
+        <span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="tu-hero">
+  <p class="eyebrow">Desktop app tutorial</p>
+  <h1>Learn NOSHASHI in ten minutes.</h1>
+  <p>Every screen in the app, what it answers, and how to use it in three steps. 17 of the 30 screens are free.</p>
+  <p class="cta"><a class="btn" href="/#download">Download the app</a><a class="btn ghost" href="/app/">Try it in the browser</a></p>
+</div>
+
+<div class="tu-layout">
+  <nav class="tu-toc" aria-label="On this page">
+    <p class="tu-toc-h">On this page</p>
+    <ol>
+      <li><a href="#start">Get started</a></li>
+      <li><a href="#first-check">Your first check</a></li>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#compliance">Compliance</a></li>
+      <li><a href="#liquidity">Liquidity</a></li>
+      <li><a href="#evidence">Evidence</a></li>
+      <li><a href="#issuers">Issuers &amp; treasury</a></li>
+      <li><a href="#intelligence">Intelligence</a></li>
+      <li><a href="#public">Public tools</a></li>
+      <li><a href="#account">Your account</a></li>
+      <li><a href="#keys">Shortcuts</a></li>
+      <li><a href="#questions">Questions</a></li>
+    </ol>
+  </nav>
+  <div class="tu-body">
+
+  <section id="start" class="tu-section">
+    <h2>Get started</h2>
+    <ol class="tu-cards">
+      <li><b>Install it.</b> Download for macOS, Windows or Linux. The builds are not code-signed yet. On a Mac, right-click the app and choose <b>Open</b> the first time. On Windows, choose <b>More info</b> then <b>Run anyway</b>.</li>
+      <li><b>Press Get started.</b> The app connects to the XRP Ledger. The top bar reads <b>ONLINE</b> when it is live.</li>
+      <li><b>Pick a view.</b> <b>Executive</b> shows the eight key screens. <b>Analyst</b> shows every tool. Switch any time at the top of the sidebar.</li>
+      <li><b>Jump anywhere.</b> Press <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> and type a screen, a wallet or a command.</li>
+    </ol>
+    <p class="tu-note">NOSHASHI only reads the ledger. It never asks for a private key or seed phrase, and it never signs anything.</p>
+  </section>
+
+  <section id="first-check" class="tu-section">
+    <h2>Your first check</h2>
+    <p class="tu-lede">Find out whether a payment can go ahead, before anyone signs it.</p>
+    <ol class="tu-steps big">
+      <li>Open <b>Verification</b> in the sidebar.</li>
+      <li>Paste the account you would pay into <b>Destination account</b>.</li>
+      <li>Enter the amount in XRP, or tap 100, 1,000, 25,000 or 500,000.</li>
+      <li>Pick a rule profile under <b>Rule profile</b>. Each one lists the credentials it requires.</li>
+      <li>Press <b>Run compliance gate</b>.</li>
+    </ol>
+    <figure class="tu-shot">
+        <img src="/assets/shots/verification.webp" srcset="/assets/shots/verification.webp 1440w, /assets/shots/verification@2x.webp 2880w" sizes="(min-width:1100px) 760px, 100vw"
+          width="1440" height="900" alt="Verification screen: a 1,000 XRP settlement to Bitstamp&#39;s account evaluated against a rule profile, with the verdict and its reasons." loading="lazy" decoding="async">
+        <figcaption>Live on XRPL mainnet · ledger 107,796,388 · 21 Oct 2026</figcaption>
+      </figure>
+    <div class="tu-verdicts">
+      <div><span class="t-go">GO</span><p>Every blocking rule passed.</p></div>
+      <div><span class="t-hold">HOLD</span><p>Blocking rules passed, but an advisory rule failed. Someone should sign it off.</p></div>
+      <div><span class="t-nogo">NO-GO</span><p>A blocking rule failed. Do not send it.</p></div>
+    </div>
+    <p>Under the verdict, each rule shows <b>Pass</b> or <b>Fail</b> with the reason. The <b>cryptographic receipt</b> (SHA-256) proves which facts and rules produced the result. Every run is kept in the <b>Session log</b>.</p>
+  </section>
+
+  <section id="overview" class="tu-section">
+    <h2>Overview</h2>
+    <p class="tu-lede">Where you start, and the live state of the ledger.</p>
+    <article class="tu-feature" id="overview">
+      <header><h3>Overview</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">What NOSHASHI checks, and the ledger it is reading right now.</p>
+      <ol class="tu-steps"><li>Check the top bar says <b>ONLINE</b> and shows the latest ledger.</li><li>Read the three cards: can it move, can you sell it, can you prove it. The middle one is a live order book.</li><li>Use <b>Run a gate check</b>, <b>Open the audit trail</b> or <b>Ask the agent</b> to jump straight in.</li></ol>
+      
+      <figure class="tu-shot">
+        <img src="/assets/shots/overview.webp" srcset="/assets/shots/overview.webp 1440w, /assets/shots/overview@2x.webp 2880w" sizes="(min-width:1100px) 760px, 100vw"
+          width="1440" height="900" alt="NOSHASHI desktop app overview, connected to XRPL mainnet, showing how much of the Bitstamp USD order book can actually fill." loading="lazy" decoding="async">
+        <figcaption>Live on XRPL mainnet · ledger 107,796,384 · 21 Oct 2026</figcaption>
+      </figure>
+    </article>
+    <article class="tu-feature" id="mission-control">
+      <header><h3>Mission Control</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">Every validated ledger as it closes, through the lens of your role.</p>
+      <ol class="tu-steps"><li>Pick a lens at the top: Executive, Compliance, Risk, Trading or Operations.</li><li>Watch ledgers, credentials and settlement paths update as each ledger closes.</li><li>Press <b>Run gate check</b> to test a payment from here.</li></ol>
+      
+      
+    </article>
+  </section>
+
+  <section id="compliance" class="tu-section">
+    <h2>Compliance</h2>
+    <p class="tu-lede">Can this payment or asset move under your rules?</p>
+    <article class="tu-feature" id="verification">
+      <header><h3>Verification</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">GO, HOLD or NO-GO for a payment, before anyone signs it.</p>
+      <ol class="tu-steps"><li>Paste the destination account and enter an amount (or tap 100, 1,000, 25,000 or 500,000).</li><li>Pick a rule profile, for example US_REGULATED_DEX.</li><li>Press <b>Run compliance gate</b> (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Enter</kbd>). Read the verdict, each rule's pass or fail, and the receipt.</li></ol>
+      <p class="tu-more"><a href="#first-check">Full walkthrough &rarr;</a></p>
+      <figure class="tu-shot">
+        <img src="/assets/shots/verification.webp" srcset="/assets/shots/verification.webp 1440w, /assets/shots/verification@2x.webp 2880w" sizes="(min-width:1100px) 760px, 100vw"
+          width="1440" height="900" alt="Verification screen: a 1,000 XRP settlement to Bitstamp&#39;s account evaluated against a rule profile, with the verdict and its reasons." loading="lazy" decoding="async">
+        <figcaption>Live on XRPL mainnet · ledger 107,796,388 · 21 Oct 2026</figcaption>
+      </figure>
+    </article>
+    <article class="tu-feature" id="ledger-watch">
+      <header><h3>Ledger Watch</h3><span class="tu-plan ent">Enterprise</span></header>
+      <p class="tu-answers">Screen deposits before you credit them.</p>
+      <ol class="tu-steps"><li>Add your deposit addresses, each with a label.</li><li>Every incoming payment is judged: what really arrived, whether the token is genuine, phishing dust, and who funded the sender up to three hops back.</li><li>Receive the results as signed webhooks and a feed.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="credentials">
+      <header><h3>Credentials</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">Which on-ledger credentials (XLS-70) an account holds.</p>
+      <ol class="tu-steps"><li>Paste a counterparty address, and the issuer's if you know it.</li><li>Press <b>Read</b>.</li><li>See each credential, who issued it and whether it is still valid. Switch between Grid and Table.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="domain-grid">
+      <header><h3>Domain Grid</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">Every permissioned domain (XLS-80) on mainnet, and who qualifies.</p>
+      <ol class="tu-steps"><li>Browse the list, or paste a domain ID or owner address and press <b>Read live</b>.</li><li>Open a domain to see the credentials it requires.</li><li>Paste a counterparty and press <b>Check</b> to see whether it would be admitted.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="provenance">
+      <header><h3>Provenance</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">How old an account is and who funded it.</p>
+      <ol class="tu-steps"><li>Paste the account (r…).</li><li>Read when it was created and who sent its first XRP.</li><li>Follow the funding chain as far as the node can prove it.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="authority">
+      <header><h3>Authority</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">What an asset&#39;s issuer can still do to it.</p>
+      <ol class="tu-steps"><li>Paste the issuer (r…).</li><li>Read freeze, clawback and signing powers, and how concentrated the holdings are.</li><li>Keep the digest: anyone can re-check the same reading later.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="security-center">
+      <header><h3>Security Center</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">Protect an account and check who you are about to pay.</p>
+      <ol class="tu-steps"><li>On <b>Account check</b>, paste your own address and press <b>Check</b> to see how it could be taken over: keys, signers and recent changes.</li><li>Use <b>Safe send</b> to check an address before you pay it, and catch lookalikes.</li><li>If an account was drained, <b>Recover funds</b> walks you through what happened.</li></ol>
+      
+      
+    </article>
+  </section>
+
+  <section id="liquidity" class="tu-section">
+    <h2>Liquidity</h2>
+    <p class="tu-lede">Is there real depth to buy or sell?</p>
+    <article class="tu-feature" id="exposure-analysis">
+      <header><h3>Exposure Analysis</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">Freeze rights, Travel Rule scope and counterparty concentration.</p>
+      <ol class="tu-steps"><li>Load a wallet.</li><li>See which issuers could freeze what it holds.</li><li>See which payments fall under the Travel Rule, and where exposure is concentrated.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="order-book">
+      <header><h3>Order Book</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">How much of the quoted depth can actually fill.</p>
+      <ol class="tu-steps"><li>Enter a currency code (for example USD) and its issuer.</li><li>Compare <b>quoted</b> against <b>can fill</b> on each side.</li><li>Offers whose owners no longer hold the asset are not counted.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="pool-governance">
+      <header><h3>Pool Governance</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">Who controls an AMM pool&#39;s trading fee.</p>
+      <ol class="tu-steps"><li>Paste the AMM's account (r…).</li><li>See each fee vote and the share of liquidity behind it.</li><li>See who holds the auction slot, and its discount, right now.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="portfolio-and-radar">
+      <header><h3>Portfolio &amp; Radar</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">Many wallets, one rule set, failures first.</p>
+      <ol class="tu-steps"><li>Add wallets with a label, for example Treasury · hot wallet.</li><li>Each one is checked against the same rules.</li><li>Failures are listed first, so you know where to look.</li></ol>
+      
+      
+    </article>
+  </section>
+
+  <section id="evidence" class="tu-section">
+    <h2>Evidence</h2>
+    <p class="tu-lede">Can you prove what happened?</p>
+    <article class="tu-feature" id="audit-trail">
+      <header><h3>Audit Trail</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">An account&#39;s validated history, with what each payment really delivered.</p>
+      <ol class="tu-steps"><li>Paste the account and press <b>Read history</b>. Set the <b>Flag at or above</b> amount if you need one.</li><li>Filter by All, In, Out or Flagged, or search by hash, tag or memo.</li><li>Press <b>Export evidence</b> for a file with a SHA-256 manifest.</li></ol>
+      
+      <figure class="tu-shot">
+        <img src="/assets/shots/audit.webp" srcset="/assets/shots/audit.webp 1440w, /assets/shots/audit@2x.webp 2880w" sizes="(min-width:1100px) 760px, 100vw"
+          width="1440" height="900" alt="Audit trail screen: an account&#39;s validated payment history with delivered amounts and counterparty screening." loading="lazy" decoding="async">
+        <figcaption>Live on XRPL mainnet · ledger 107,796,392 · 21 Oct 2026</figcaption>
+      </figure>
+    </article>
+    <article class="tu-feature" id="ledger-and-policy">
+      <header><h3>Ledger &amp; Policy</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">Every verdict you have run, your policy, and a signed export.</p>
+      <ol class="tu-steps"><li>Write or activate your institution's policy.</li><li>Every verdict is kept on this device with the rules that produced it.</li><li>Export a signed record an examiner can verify.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="settlement">
+      <header><h3>Settlement</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">What a transaction actually delivered, not what it asked for.</p>
+      <ol class="tu-steps"><li>Paste the transaction hash (64 characters).</li><li>Compare the requested amount with the delivered amount.</li><li>Partial payments are called out, so you never credit the wrong figure.</li></ol>
+      
+      
+    </article>
+  </section>
+
+  <section id="issuers" class="tu-section">
+    <h2>Issuers &amp; treasury</h2>
+    <p class="tu-lede">Who controls a treasury, and who holds your tokens?</p>
+    <article class="tu-feature" id="control-surface">
+      <header><h3>Control Surface</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">Who can move a treasury.</p>
+      <ol class="tu-steps"><li>Paste the treasury account.</li><li>See its signers and the quorum it needs, and whether the master key is on.</li><li>See how much of the balance is locked and cannot be spent.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="issuance">
+      <header><h3>Issuance</h3><span class="tu-plan inst">Institutional</span></header>
+      <p class="tu-answers">Who holds an issuer&#39;s tokens.</p>
+      <ol class="tu-steps"><li>Paste the issuer.</li><li>See how concentrated holdings are, plus dormant lines and freezes.</li><li>Review its enforcement history.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="passport">
+      <header><h3>Passport</h3><span class="tu-plan ent">Enterprise</span></header>
+      <p class="tu-answers">A signed, portable record of an asset&#39;s posture.</p>
+      <ol class="tu-steps"><li>Enter the issuer.</li><li>Get one signed record: authority, freeze rights, concentration and eligibility.</li><li>Share it. Any counterparty can verify it without re-running the checks.</li></ol>
+      
+      
+    </article>
+  </section>
+
+  <section id="intelligence" class="tu-section">
+    <h2>Intelligence</h2>
+    <p class="tu-lede">Ask questions in plain English.</p>
+    <article class="tu-feature" id="noshx">
+      <header><h3>NOSHX</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">An assistant that reads the live ledger to answer you. Advisory only.</p>
+      <ol class="tu-steps"><li>Type a question, paste a transaction hash, or tap a suggested question.</li><li>Read the answer and the ledger reads it is based on.</li><li>It runs on your device by default. You can choose another model under <b>Change runtime</b>.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="ledger-garden">
+      <header><h3>Ledger Garden</h3><span class="tu-plan pro">Pro</span></header>
+      <p class="tu-answers">Follow the chain from issuer to asset to holder to transaction.</p>
+      <ol class="tu-steps"><li>Paste an address or a transaction hash.</li><li>Expand each branch. Every one is read from validated ledgers.</li><li>Hand any point to NOSHX to ask about it.</li></ol>
+      
+      
+    </article>
+  </section>
+
+  <section id="public" class="tu-section">
+    <h2>Public tools</h2>
+    <p class="tu-lede">Free checks anyone can run.</p>
+    <article class="tu-feature" id="check-an-address">
+      <header><h3>Check an Address</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">What the ledger publishes about an account before you pay it.</p>
+      <ol class="tu-steps"><li>Paste the address and press <b>Check this address</b>.</li><li>Read <b>Things to know first</b>: freeze rights, transfer fees and the domain it claims.</li><li>Free accounts get 10 checks a month.</li></ol>
+      
+      <figure class="tu-shot">
+        <img src="/assets/shots/address.webp" srcset="/assets/shots/address.webp 1440w, /assets/shots/address@2x.webp 2880w" sizes="(min-width:1100px) 760px, 100vw"
+          width="1440" height="900" alt="Address check: what an XRPL account is, who controls it and what it can do, read from the ledger." loading="lazy" decoding="async">
+        <figcaption>Live on XRPL mainnet · ledger 107,796,395 · 21 Oct 2026</figcaption>
+      </figure>
+    </article>
+    <article class="tu-feature" id="inbox">
+      <header><h3>Inbox</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">What strangers have sent an account, and whether those tokens are real.</p>
+      <ol class="tu-steps"><li>Paste the account and press <b>Read claims</b>.</li><li>See each unsolicited offer and whether the token exists at all.</li><li>Never act on a claim the ledger cannot back.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="token-rights">
+      <header><h3>Token Rights</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">What an NFT&#39;s issuer can still do to it after you own it.</p>
+      <ol class="tu-steps"><li>Paste the NFT's ID (64 characters).</li><li>Press <b>Read token rights</b>.</li><li>See whether the issuer can burn it, whether it can be resold, and the issuer's cut of each sale.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="ledger-sync">
+      <header><h3>Ledger Sync</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">What four public nodes each report, and where they disagree.</p>
+      <ol class="tu-steps"><li>Open the screen. Nothing to enter.</li><li>Compare each node's latest ledger and timing.</li><li>A node that lags is shown, so you know which reading to trust.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="learn">
+      <header><h3>Learn</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">Hands-on labs and short explainers.</p>
+      <ol class="tu-steps"><li>Pick a lab. Each one walks you through a real screen with real mainnet data.</li><li>Come back for the short reviews it schedules, so it sticks.</li><li>Watch the explainers for the ideas behind the checks.</li></ol>
+      
+      
+    </article>
+  </section>
+
+  <section id="account" class="tu-section">
+    <h2>Your account</h2>
+    <p class="tu-lede">Plans, sign-in, security and settings.</p>
+    <article class="tu-feature" id="pricing">
+      <header><h3>Pricing</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">Plans, checkout and credits.</p>
+      <ol class="tu-steps"><li>Compare Free, Pro, Institutional and Enterprise.</li><li>Press <b>Get Pro</b> to subscribe. Checkout opens on Stripe in your browser.</li><li>Buy credits for automated API checks.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="account">
+      <header><h3>Account</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">Your subscription, two-factor sign-in and API keys.</p>
+      <ol class="tu-steps"><li>The app works without an account.</li><li>Sign in to carry a subscription, portfolios and API keys.</li><li>Turn on two-factor authentication here.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="trust-and-security">
+      <header><h3>Trust &amp; Security</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">What NOSHASHI reads, what it never does, and where your data goes.</p>
+      <ol class="tu-steps"><li>Read each claim, for example that it never signs or broadcasts.</li><li>Each one says how it is enforced and tested.</li></ol>
+      
+      
+    </article>
+    <article class="tu-feature" id="settings">
+      <header><h3>Settings</h3><span class="tu-plan free">Free</span></header>
+      <p class="tu-answers">Appearance, accessibility and the desktop app.</p>
+      <ol class="tu-steps"><li>Choose dark, light or system theme, and reduced motion.</li><li>Set the wallet you want to watch.</li><li>Turn on the menu bar HUD (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>).</li></ol>
+      
+      
+    </article>
+  </section>
+
+  <section id="keys" class="tu-section">
+    <h2>Shortcuts</h2>
+    <table class="tu-keys">
+      <tbody>
+        <tr><th scope="row"><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd></th><td>Search screens, wallets and commands</td></tr>
+        <tr><th scope="row"><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Enter</kbd></th><td>Run the compliance gate on Verification</td></tr>
+        <tr><th scope="row"><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>1</kbd>…<kbd>9</kbd></th><td>Jump to a screen</td></tr>
+        <tr><th scope="row"><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>R</kbd></th><td>Re-read the ledger</td></tr>
+        <tr><th scope="row"><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd></th><td>Show or hide the menu bar HUD</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="questions" class="tu-section">
+    <h2>Questions</h2>
+    <details><summary>Do I need a wallet, a key or an account?</summary><p>No. The app reads public ledger data. It never asks for a private key or seed phrase and never signs. An account is only needed to carry a paid plan, portfolios or API keys.</p></details>
+    <details><summary>What does a screen marked Pro, Institutional or Enterprise do if I am on Free?</summary><p>It shows what it does and offers <b>Sign in</b> or <b>See plans</b>. Nothing is hidden behind a fake preview. Prices are on the <a href="/pricing/">pricing page</a>.</p></details>
+    <details><summary>The top bar says DEGRADED or RECONNECTING.</summary><p>DEGRADED means one public node is behind the others. It usually clears within a few ledgers. RECONNECTING means the link dropped, and nothing is shown as live until it is back. Press <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>R</kbd> to re-read.</p></details>
+    <details><summary>Where is my data kept?</summary><p>Verdicts, policies and settings stay on your device. The <b>Trust &amp; Security</b> screen lists exactly what is read and where anything goes.</p></details>
+    <details><summary>I am stuck.</summary><p>Open <b>NOSHX</b> and use the <b>Support</b> tab, or <a href="/contact/">contact us</a>. The <b>Learn</b> screen has hands-on labs for each part of the app.</p></details>
+  </section>
+
+  </div>
+</div>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/news/">Newsroom</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+
+</body>
+</html>
