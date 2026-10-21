@@ -99,6 +99,8 @@
     });
     var meter = document.getElementById("taskMeter");
     if (meter) meter.textContent = done + " of " + boxes.length + " complete";
+    var tbar = document.getElementById("taskBar");
+    if (tbar) tbar.style.width = (boxes.length ? (done / boxes.length) * 100 : 0) + "%";
     document.querySelectorAll("[data-scenario-tab]").forEach(function (tab) {
       tab.classList.toggle("done", !!progress["scenario-" + tab.getAttribute("data-scenario-tab")]);
     });
