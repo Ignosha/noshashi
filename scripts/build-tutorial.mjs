@@ -204,7 +204,7 @@ function shotFigure(manifest, name) {
 }
 
 function feature(manifest, [label, plan, answers, steps, shot, more]) {
-  return `<article class="tu-feature" id="${slug(label)}">
+  return `<article class="tu-feature" id="screen-${slug(label)}">
       <div class="tu-fhead"><h3>${esc(label)}</h3><span class="tu-plan ${PLAN_CLASS[plan]}">${plan}</span></div>
       <p class="tu-answers">${esc(answers)}</p>
       <ol class="tu-steps">${steps.map((s) => `<li>${s}</li>`).join("")}</ol>
