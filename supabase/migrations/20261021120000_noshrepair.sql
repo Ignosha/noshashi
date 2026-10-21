@@ -50,7 +50,7 @@ comment on function noshashi.is_repair_staff() is
 
 create table if not exists noshashi.support_access_grants (
   id          uuid primary key default gen_random_uuid(),
-  ticket_id   uuid not null references noshashi.support_tickets(id) on delete restrict,
+  ticket_id   uuid not null references noshashi.support_tickets(id) on delete cascade,
   account_id  uuid not null references noshashi.accounts(id) on delete cascade,
   scope       text not null default 'read' check (scope = 'read'),
   granted_at  timestamptz not null default now(),
@@ -63,7 +63,7 @@ create index if not exists support_access_grants_ticket_idx on noshashi.support_
 
 create table if not exists noshashi.support_diagnostics (
   id          bigint generated always as identity primary key,
-  ticket_id   uuid not null references noshashi.support_tickets(id) on delete restrict,
+  ticket_id   uuid not null references noshashi.support_tickets(id) on delete cascade,
   account_id  uuid not null references noshashi.accounts(id) on delete cascade,
   kind        text not null check (kind in ('self-repair', 'errors', 'environment', 'repair-result')),
   payload     jsonb not null check (octet_length(payload::text) <= 65536),
@@ -74,7 +74,7 @@ create index if not exists support_diagnostics_ticket_idx on noshashi.support_di
 
 create table if not exists noshashi.support_repair_actions (
   id            uuid primary key default gen_random_uuid(),
-  ticket_id     uuid not null references noshashi.support_tickets(id) on delete restrict,
+  ticket_id     uuid not null references noshashi.support_tickets(id) on delete cascade,
   account_id    uuid not null references noshashi.accounts(id) on delete cascade,
   action        text not null check (action in (
                   'run_self_repair', 'refresh_plan', 'reconnect_ledger',
@@ -92,7 +92,7 @@ create index if not exists support_repair_actions_ticket_idx on noshashi.support
 
 create table if not exists noshashi.support_access_log (
   id          bigint generated always as identity primary key,
-  ticket_id   uuid not null references noshashi.support_tickets(id) on delete restrict,
+  ticket_id   uuid not null references noshashi.support_tickets(id) on delete cascade,
   account_id  uuid not null references noshashi.accounts(id) on delete cascade,
   actor_id    uuid references noshashi.accounts(id) on delete set null,
   actor_role  text not null check (actor_role in ('customer', 'staff')),
@@ -107,7 +107,10 @@ create table if not exists noshashi.support_access_log (
 create index if not exists support_access_log_account_idx on noshashi.support_access_log (account_id, id desc);
 create index if not exists support_access_log_ticket_idx on noshashi.support_access_log (ticket_id, id desc);
 
--- Diagnostics and the access log are append-only for every role.
+-- Diagnostics and the access log cannot be edited by any role. Clients
+-- have no delete grant either. Only the owner, in SQL, can remove a
+-- ticket's rows (for example for an erasure request), and then they go
+-- with the ticket instead of blocking it.
 create or replace function noshashi.noshrepair_append_only()
 returns trigger
 language plpgsql
@@ -120,12 +123,12 @@ $$;
 
 drop trigger if exists support_diagnostics_append_only on noshashi.support_diagnostics;
 create trigger support_diagnostics_append_only
-  before update or delete on noshashi.support_diagnostics
+  before update on noshashi.support_diagnostics
   for each row execute function noshashi.noshrepair_append_only();
 
 drop trigger if exists support_access_log_append_only on noshashi.support_access_log;
 create trigger support_access_log_append_only
-  before update or delete on noshashi.support_access_log
+  before update on noshashi.support_access_log
   for each row execute function noshashi.noshrepair_append_only();
 
 -- ── 2. Reads ─────────────────────────────────────────────────────────

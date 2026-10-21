@@ -74,16 +74,19 @@ npm run noshrepair:tauri dev    # as the desktop app
 npm run noshrepair:tauri build  # installers in noshrepair/src-tauri/target/release/bundle
 ```
 
-Installers for macOS, Windows and Linux are built by the **NOSHREPAIR**
-workflow (Actions → NOSHREPAIR → Run workflow, from main) and attached to
-the run as artifacts.
+Installers for macOS (Apple silicon), Windows and Linux are built by the
+**NOSHREPAIR** workflow on every push that changes NOSHREPAIR, or by hand
+(Actions → NOSHREPAIR → Run workflow), and attached to the run as
+artifacts. They are unsigned: on macOS, right-click the app and choose
+Open the first time; on Windows, choose More info → Run anyway.
 
 ## Before first use
 
 The database side is `supabase/migrations/20261021120000_noshrepair.sql`.
-It must be applied to the production project by the owner; until then
-NOSHREPAIR's ticket screens show "not available" for account access and
-repairs, and the NOSHASHI app hides its access panel.
+The owner applies it once: Supabase → SQL Editor → New query, paste the
+whole file, Run. It only adds tables and functions. Until then the NOSHASHI
+app hides its access panel and NOSHREPAIR's sign-in reports the account is
+not on the support team.
 
 ## Accessibility
 

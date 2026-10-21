@@ -1,7 +1,9 @@
 # Builds NOSHREPAIR, the support staff console, for each desktop platform.
 #
-# Run by hand from main (Actions → NOSHREPAIR → Run workflow). The
-# installers are uploaded as workflow artifacts for staff to download; they
+# Runs by hand (Actions → NOSHREPAIR → Run workflow) and on any push that
+# changes NOSHREPAIR. The installers are uploaded as workflow artifacts
+# for staff to download, from any branch, so a change can be tried before
+# it merges; they
 # are not published as a public release, since NOSHREPAIR is a staff tool.
 # A copy is worthless without a support account, two-factor and a
 # customer's grant, but there is no reason to advertise it.
@@ -10,17 +12,16 @@ name: NOSHREPAIR
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "noshrepair/**"
+      - ".github/workflows/noshrepair.yml"
 
 permissions:
   contents: read
 
 jobs:
-  verify:
-    uses: ./.github/workflows/ci.yml
-
   build:
-    needs: verify
-    if: github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
