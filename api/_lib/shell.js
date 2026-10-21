@@ -34,51 +34,70 @@ export const ORIGIN = (process.env.PUBLIC_SITE_URL || "https://www.noshashi.app"
 // console and the app icon cannot drift apart.
 export { MARK };
 
+// Six destinations. Everything else on the site is one click below one
+// of them (see FOOTER_GROUPS), so a visitor never has to scan a dozen
+// links to find where to start.
 export const NAV = [
-  { href: "/#public", label: "Free tools", i18n: "nav.tools" },
-  { href: "/news/", label: "Newsroom", key: "news", i18n: "nav.news" },
-  { href: "/progress/", label: "Progress", key: "progress", i18n: "nav.progress" },
-  { href: "/status/", label: "Status", key: "status", i18n: "nav.status", optional: true },
-  { href: "/research/", label: "Findings", i18n: "nav.findings", optional: true },
-  { href: "/learn/", label: "Learn", i18n: "nav.learn", optional: true },
-  // `wide`: these two made the header 188px too wide from 1200 to 1480.
-  // They drop out first; the pricing section and footer still link both.
-  { href: "/enterprise/", label: "Enterprise", i18n: "nav.enterprise", optional: true, wide: true },
-  { href: "/strategic-infrastructure/", label: "Infrastructure", i18n: "nav.infrastructure", optional: true, wide: true },
-  { href: "/#download", label: "Download", i18n: "nav.download" },
+  { href: "/platform/", label: "Platform", key: "platform", i18n: "nav.platform" },
+  { href: "/solutions/", label: "Solutions", key: "solutions", i18n: "nav.solutions" },
+  { href: "/#public", label: "Free tools", i18n: "nav.tools", optional: true },
+  { href: "/resources/", label: "Resources", key: "resources", i18n: "nav.resources" },
   { href: "/pricing/", label: "Pricing", i18n: "nav.pricing" },
+  { href: "/about/", label: "About", key: "about", i18n: "nav.about", optional: true, wide: true },
 ];
 
-export const FOOTER_LINKS = [
-  { href: "/contact/", label: "Contact" },
-  { href: "/brief/", label: "Product brief" },
-  // Not in NAV deliberately. The primary nav already carries eight
-  // links and overflows its container below 900px; a ninth makes a
-  // known layout fault worse. The page is reached from the free-tools
-  // section on the landing page and from here.
-  { href: "/certificate/", label: "Authority certificate" },
-  { href: "/badge/", label: "Issuer badge" },
-  { href: "/alerts/", label: "Issuer alerts" },
-  { href: "/delivered/", label: "Delivered-amount export" },
-  { href: "/treasury/", label: "Treasury report" },
-  { href: "/book-health/", label: "Book health" },
-  { href: "/xapp/", label: "Check an address" },
-  { href: "/news/", label: "Newsroom" },
-  { href: "/progress/", label: "Progress" },
-  { href: "/status/", label: "Status" },
-  { href: "/research/", label: "Findings" },
-  { href: "/learn/", label: "Learn NOSHASHI (course)" },
-  { href: "/guide/", label: "Plain-language guide" },
-  { href: "/pricing/", label: "Pricing" },
-  { href: "/enterprise/", label: "Enterprise" },
-  { href: "/trust/", label: "Trust & security" },
-  { href: "/misread/", label: "The ledger can be misread" },
-  { href: "/strategic-infrastructure/", label: "Strategic infrastructure" },
-  { href: "/developers/", label: "Developers" },
-  { href: "/docs/", label: "Documentation" },
-  { href: "/legal/", label: "Legal & accessibility" },
-  { href: "https://github.com/Ignosha/noshashi", label: "GitHub" },
+// The footer is the full map of the site, grouped by the same six
+// destinations so a technical page is always findable without crowding
+// the header.
+export const FOOTER_GROUPS = [
+  { title: "Platform", links: [
+    { href: "/platform/", label: "Platform overview" },
+    { href: "/#public", label: "Free tools" },
+    { href: "/#download", label: "Download" },
+    { href: "/pricing/", label: "Pricing" },
+    { href: "/developers/", label: "Developers & API" },
+    { href: "/docs/", label: "Documentation" },
+  ] },
+  { title: "Solutions", links: [
+    { href: "/solutions/#exchanges", label: "Exchanges & payments" },
+    { href: "/solutions/#trading", label: "Trading & liquidity" },
+    { href: "/solutions/#issuers", label: "Issuers & treasury" },
+    { href: "/solutions/#compliance", label: "Compliance & risk" },
+    { href: "/enterprise/", label: "Enterprise" },
+    { href: "/strategic-infrastructure/", label: "Strategic infrastructure" },
+  ] },
+  { title: "Free tools", links: [
+    { href: "/xapp/", label: "Check an address" },
+    { href: "/certificate/", label: "Authority certificate" },
+    { href: "/badge/", label: "Issuer badge" },
+    { href: "/alerts/", label: "Issuer alerts" },
+    { href: "/delivered/", label: "Delivered-amount export" },
+    { href: "/treasury/", label: "Treasury report" },
+    { href: "/book-health/", label: "Book health" },
+  ] },
+  { title: "Resources", links: [
+    { href: "/resources/", label: "All resources" },
+    { href: "/research/", label: "Research findings" },
+    { href: "/misread/", label: "The ledger can be misread" },
+    { href: "/learn/", label: "Learn NOSHASHI (course)" },
+    { href: "/guide/", label: "Plain-language guide" },
+    { href: "/news/", label: "Newsroom" },
+    { href: "/progress/", label: "Progress & releases" },
+    { href: "/status/", label: "Status" },
+  ] },
+  { title: "Company", links: [
+    { href: "/about/", label: "About" },
+    { href: "/design-partners/", label: "Design partners" },
+    { href: "/contact/", label: "Contact" },
+    { href: "/brief/", label: "Product brief" },
+    { href: "/trust/", label: "Trust & security" },
+    { href: "/legal/", label: "Legal & accessibility" },
+    { href: "https://github.com/Ignosha/noshashi", label: "GitHub" },
+  ] },
 ];
+
+// Flat list, kept for anything that wants every footer destination.
+export const FOOTER_LINKS = FOOTER_GROUPS.flatMap((g) => g.links);
 
 /** The shared header. `current` marks the active page for a11y and style. */
 export function renderHeader(current = "") {
@@ -97,23 +116,25 @@ export function renderHeader(current = "") {
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
         <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
       </button>
-      <a class="btn ghost" href="/contact/"><span data-i18n="nav.contact">Contact</span></a>
-      <a class="btn" href="/#download"><span data-i18n="nav.downloadBeta">Download beta</span></a>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/#download"><span data-i18n="nav.download">Download</span></a>
     </nav>
   </div>
 </header>`;
 }
 
 export function renderFooter() {
-  const links = FOOTER_LINKS.map(
-    (l) => `<a href="${attrUrl(l.href)}">${esc(l.label)}</a>`
+  const groups = FOOTER_GROUPS.map(
+    (g) => `<div class="foot-group"><p class="foot-h">${esc(g.title)}</p>${g.links
+      .map((l) => `<a href="${attrUrl(l.href)}"${l.href.startsWith("http") ? ' rel="noopener"' : ""}>${esc(l.label)}</a>`)
+      .join("")}</div>`
   ).join("\n      ");
   return `<footer>
   <div class="shell foot">
-    <p class="mono">© ${new Date().getUTCFullYear()} NOSHASHI Labs · XRPL Mainnet · All builds BETA</p>
-    <div class="foot-links">
-      ${links}
-    </div>
+    <nav class="foot-map" aria-label="Site map">
+      ${groups}
+    </nav>
+    <p class="mono foot-legal">© ${new Date().getUTCFullYear()} NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
   </div>
 </footer>`;
 }

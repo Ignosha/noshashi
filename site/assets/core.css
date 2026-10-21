@@ -83,6 +83,10 @@ header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
 .btn:hover,.btn:focus-visible{filter:brightness(1.1);transform:translateY(-1px);
   box-shadow:0 6px 18px color-mix(in srgb,var(--brand) 22%,transparent)}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+/* A button inside the nav keeps its own text colour; `.nav-links a` is
+   more specific than `.btn` and was turning the primary label grey. */
+.nav-links a.btn{color:var(--on-brand)}
+.nav-links a.btn.ghost{color:var(--ink)}
 .btn.ghost:hover{border-color:var(--brand);filter:none}
 .btn[disabled]{opacity:.55;cursor:progress;transform:none;box-shadow:none}
 .brand-mark{flex:none;display:block;object-fit:contain}
@@ -116,6 +120,14 @@ footer{border-top:1px solid var(--rule);padding:36px 0;margin-top:24px}
 .foot-links{display:flex;gap:22px;flex-wrap:wrap}
 .foot-links a{font-size:12px;color:var(--muted);text-decoration:none}
 .foot-links a:hover{color:var(--ink)}
+.foot-map{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:28px;width:100%}
+.foot-group{display:flex;flex-direction:column;gap:9px;min-width:0}
+.foot-group .foot-h{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin:0 0 4px}
+.foot-group a{font-size:13px;color:var(--muted);text-decoration:none;line-height:1.4}
+.foot-group a:hover,.foot-group a:focus-visible{color:var(--ink)}
+.foot-legal{width:100%;border-top:1px solid var(--rule);padding-top:20px;margin-top:8px}
+@media (max-width:900px){.foot-map{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.foot-map{grid-template-columns:1fr}}
 
 /* 1180, from measurement. At 1100 the optional links were still shown
    between 1101 and 1180 and did not fit: /contact/ and /news/ overflowed
@@ -141,3 +153,40 @@ main code{overflow-wrap:anywhere}
    content, faint enough that text never has to compete with it. */
 .garden-page > .garden-field{opacity:.24}
 html[data-theme="light"] .garden-page > .garden-field{opacity:.2}
+
+/* ── Shared page components (platform, solutions, resources, about,
+      design partners). The homepage carries the same rules inline. ── */
+.sec-head{max-width:62ch;margin:0 0 22px}
+.sec-head h2{font-size:clamp(22px,2.6vw,30px);letter-spacing:-.02em;margin:6px 0 8px}
+.sec-head p{color:var(--muted);font-size:15px;line-height:1.6}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card-link{display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+.card-link:hover,.card-link:focus-visible{border-color:color-mix(in srgb,var(--brand) 55%,var(--rule));transform:translateY(-2px)}
+.card-link .go,.panel .go{margin-top:auto;padding-top:14px;font-size:13px;color:var(--brand);font-weight:500;text-decoration:none}
+.panel h3{margin:8px 0 6px;font-size:17px}
+.chip{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border-radius:999px;border:1px solid var(--rule);color:var(--muted);margin:0 6px 6px 0}
+.chip.ok{color:var(--brand);border-color:color-mix(in srgb,var(--brand) 45%,var(--rule))}
+.chip.soon{color:var(--hold,#e0b341);border-color:color-mix(in srgb,var(--hold,#e0b341) 45%,var(--rule))}
+.steps4{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.steps4 li{position:relative;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r,3px);padding:22px}
+.steps4 li:not(:last-child)::after{content:"";position:absolute;top:50%;right:-11px;width:8px;height:8px;border-top:1.5px solid var(--brand);border-right:1.5px solid var(--brand);transform:translateY(-50%) rotate(45deg);z-index:1}
+.steps4 p:not(.num){color:var(--muted);font-size:13.5px;line-height:1.6}
+.steps5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.ticks,.pilot{margin:10px 0 0;padding:0;display:grid;gap:10px;font-size:14px;line-height:1.55;color:var(--muted)}
+.ticks{list-style:none}
+.ticks li{position:relative;padding-left:22px}
+.ticks li::before{content:"✓";position:absolute;left:0;color:var(--brand);font-weight:700}
+.pilot{padding-left:20px}
+.pilot li::marker{color:var(--brand)}
+.where{margin-top:12px;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--faint)}
+.band{border:1px solid var(--rule);border-radius:var(--r,3px);background:var(--surface);padding:28px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.band h2{font-size:clamp(20px,2.2vw,26px);margin:0 0 6px}
+.band p{color:var(--muted);margin:0}
+@media (max-width:1000px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){
+  .steps4{grid-template-columns:1fr}
+  .steps4 li:not(:last-child)::after{top:auto;bottom:-11px;right:50%;transform:translateX(50%) rotate(135deg)}
+}
+@media (max-width:640px){.g4{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.card-link{transition:none}.card-link:hover{transform:none}}
