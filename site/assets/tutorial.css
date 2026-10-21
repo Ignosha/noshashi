@@ -27,7 +27,7 @@
 .tu-steps.big{font-size:17px}
 
 .tu-feature{border:1px solid var(--rule);border-radius:16px;background:var(--surface);padding:22px 22px 18px;margin-top:14px;scroll-margin-top:84px}
-.tu-feature header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tu-fhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .tu-feature h3{margin:0;font-size:20px;letter-spacing:-.01em}
 .tu-answers{margin:6px 0 0;color:var(--muted)}
 .tu-more{margin:12px 0 0;font-weight:600}

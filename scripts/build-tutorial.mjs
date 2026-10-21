@@ -64,10 +64,10 @@ const GROUPS = [
       "Read freeze, clawback and signing powers, and how concentrated the holdings are.",
       "Keep the digest: anyone can re-check the same reading later.",
     ]],
-    ["Security Center", FREE, "Protect an account and check who you are about to pay.", [
-      "On <b>Account check</b>, paste your own address and press <b>Check</b> to see how it could be taken over: keys, signers and recent changes.",
-      "Use <b>Safe send</b> to check an address before you pay it, and catch lookalikes.",
-      "If an account was drained, <b>Recover funds</b> walks you through what happened.",
+    ["Security Center", FREE, "Protect an account, check who you are paying, and recover from a theft.", [
+      "Pick a tool from the tabs along the top. Start with <b>Account check</b>: paste your own address and press <b>Check</b>.",
+      "Read the grade and each finding in plain English. Fixes come as unsigned transactions you copy and sign in your own wallet.",
+      "Before paying someone, use <b>Pre-sign check</b> or <b>Safe send</b>. If an account was drained, use <b>Recover funds</b> or <b>Incident response</b>. Tabs that need a paid plan say so.",
     ], "security"],
   ]],
   ["liquidity", "Liquidity", "Is there real depth to buy or sell?", [
@@ -161,7 +161,7 @@ const GROUPS = [
     ], "sync"],
     ["Learn", FREE, "Hands-on labs and short explainers.", [
       "Pick a lab. Each one walks you through a real screen with real mainnet data.",
-      "Come back for the short reviews it schedules, so it sticks.",
+      "Each right answer comes back for a short review after 1, 3, 7, 16 and 35 days, so it sticks.",
       "Watch the explainers for the ideas behind the checks.",
     ], "learn"],
   ]],
@@ -205,7 +205,7 @@ function shotFigure(manifest, name) {
 
 function feature(manifest, [label, plan, answers, steps, shot, more]) {
   return `<article class="tu-feature" id="${slug(label)}">
-      <header><h3>${esc(label)}</h3><span class="tu-plan ${PLAN_CLASS[plan]}">${plan}</span></header>
+      <div class="tu-fhead"><h3>${esc(label)}</h3><span class="tu-plan ${PLAN_CLASS[plan]}">${plan}</span></div>
       <p class="tu-answers">${esc(answers)}</p>
       <ol class="tu-steps">${steps.map((s) => `<li>${s}</li>`).join("")}</ol>
       ${more ? `<p class="tu-more"><a href="${more}">Full walkthrough &rarr;</a></p>` : ""}

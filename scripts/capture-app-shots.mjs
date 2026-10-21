@@ -54,7 +54,9 @@ async function go(label) {
   await page.waitForTimeout(1200);
 }
 function ledgerOf(body) {
-  const m = body.match(/ledger ([\d,]{9,})/i) || body.match(/LGR\s+([\d,]{9,})/);
+  // The status bar's LGR is the ledger on screen right now; a "ledger N"
+  // elsewhere can be an older one the screen is describing.
+  const m = body.match(/LGR\s+([\d,]{9,})/) || body.match(/ledger ([\d,]{9,})/i);
   return m ? Number(m[1].replace(/,/g, "")) : null;
 }
 
