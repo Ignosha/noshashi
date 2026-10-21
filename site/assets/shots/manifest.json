@@ -5,26 +5,26 @@
     {
       "name": "overview",
       "alt": "NOSHASHI desktop app overview, connected to XRPL mainnet, showing how much of the Bitstamp USD order book can actually fill.",
-      "ledger": 107796384,
-      "captured_at": "2026-10-21T02:35:16.580Z"
+      "ledger": 107796652,
+      "captured_at": "2026-10-21T02:52:22.075Z"
     },
     {
       "name": "verification",
       "alt": "Verification screen: a 1,000 XRP settlement to Bitstamp's account evaluated against a rule profile, with the verdict and its reasons.",
-      "ledger": 107796388,
-      "captured_at": "2026-10-21T02:35:25.661Z"
+      "ledger": 107796656,
+      "captured_at": "2026-10-21T02:52:31.334Z"
     },
     {
       "name": "audit",
       "alt": "Audit trail screen: an account's validated payment history with delivered amounts and counterparty screening.",
-      "ledger": 107796392,
-      "captured_at": "2026-10-21T02:35:32.377Z"
+      "ledger": 107796659,
+      "captured_at": "2026-10-21T02:52:38.186Z"
     },
     {
       "name": "address",
       "alt": "Address check: what an XRPL account is, who controls it and what it can do, read from the ledger.",
-      "ledger": 107796395,
-      "captured_at": "2026-10-21T02:35:43.406Z"
+      "ledger": 107796662,
+      "captured_at": "2026-10-21T02:52:49.329Z"
     }
   ]
 }
