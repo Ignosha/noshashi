@@ -1,0 +1,12 @@
+/* The footer site map, for pages that predate core.css (pricing). Mirrors core.css. */
+.foot{display:flex;flex-wrap:wrap;gap:20px}
+.foot-map{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:28px;width:100%}
+.foot-group{display:flex;flex-direction:column;gap:9px;min-width:0}
+.foot-group .foot-h{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin:0 0 4px}
+.foot-group a{font-size:13px;color:var(--muted);text-decoration:none;line-height:1.4}
+.foot-group a:hover,.foot-group a:focus-visible{color:var(--ink)}
+.foot-legal{width:100%;border-top:1px solid var(--rule);padding-top:20px;margin-top:8px}
+@media (max-width:900px){.foot-map{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.foot-map{grid-template-columns:1fr}}
+/* Primary nav button text: the page's `.nav-links a` colour is more specific than `.btn`. */
+.nav-links a.btn:not(.ghost){color:#08100B}

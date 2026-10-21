@@ -467,6 +467,32 @@
   .tier.focus .name{color:var(--brand)} .tier.institutional .name{color:var(--tele)}
   .tier .amt{font-size:34px;font-weight:700;margin:18px 0 2px;letter-spacing:-.02em}
   .tier .per{color:var(--faint);font-size:11px;font-family:"IBM Plex Mono",monospace}
+  .tier .for{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.5}
+
+  /* ── Redesign pieces ─────────────────────────────────────────────── */
+  .hi-trust{margin-top:18px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.04em;color:var(--muted);max-width:52ch;line-height:1.6}
+  .card-link{display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+  .card-link:hover,.card-link:focus-visible{border-color:color-mix(in srgb,var(--brand) 55%,var(--rule));transform:translateY(-2px)}
+  .card-link .go{margin-top:auto;padding-top:16px;font-size:13px;color:var(--brand);font-weight:500}
+  .steps4{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;counter-reset:s}
+  .steps4 li{position:relative;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:24px}
+  .steps4 li:not(:last-child)::after{content:"";position:absolute;top:50%;right:-11px;width:8px;height:8px;border-top:1.5px solid var(--brand);border-right:1.5px solid var(--brand);transform:translateY(-50%) rotate(45deg);z-index:1}
+  .steps4 h3{margin:8px 0 6px;font-size:17px}
+  .steps4 p:not(.num){color:var(--muted);font-size:13.5px;line-height:1.6}
+  .chip{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border-radius:999px;border:1px solid var(--rule);color:var(--muted)}
+  .chip.ok{color:var(--brand);border-color:color-mix(in srgb,var(--brand) 45%,var(--rule))}
+  .why h3{margin:12px 0 6px}
+  .ticks,.pilot{margin:10px 0 0;padding:0;display:grid;gap:10px;font-size:14px;line-height:1.55;color:var(--muted)}
+  .ticks{list-style:none}
+  .ticks li{position:relative;padding-left:22px}
+  .ticks li::before{content:"✓";position:absolute;left:0;color:var(--brand);font-weight:700}
+  .pilot{padding-left:20px}
+  .pilot li::marker{color:var(--brand);font-family:"IBM Plex Mono",monospace}
+  @media (max-width:900px){
+    .steps4{grid-template-columns:1fr}
+    .steps4 li:not(:last-child)::after{top:auto;bottom:-11px;right:50%;transform:translateX(50%) rotate(135deg)}
+  }
+  @media (prefers-reduced-motion:reduce){.card-link{transition:none}.card-link:hover{transform:none}}
   .tier .who{color:var(--faint);font-size:12px;margin-top:4px}
   .tier ul{list-style:none;margin-top:22px;flex:1;display:grid;gap:9px;align-content:start}
   .tier li{display:flex;gap:9px;font-size:13px;color:var(--muted);line-height:1.5}
@@ -500,6 +526,14 @@
   .foot-links{display:flex;gap:22px;flex-wrap:wrap}
   .foot-links a{font-size:12px;color:var(--muted);text-decoration:none}
   .foot-links a:hover{color:var(--ink)}
+  .foot-map{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:28px;width:100%}
+  .foot-group{display:flex;flex-direction:column;gap:9px;min-width:0}
+  .foot-group .foot-h{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin:0 0 4px}
+  .foot-group a{font-size:13px;color:var(--muted);text-decoration:none;line-height:1.4}
+  .foot-group a:hover,.foot-group a:focus-visible{color:var(--ink)}
+  .foot-legal{width:100%;border-top:1px solid var(--rule);padding-top:20px;margin-top:8px}
+  @media (max-width:900px){.foot-map{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:420px){.foot-map{grid-template-columns:1fr}}
 
   .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
   .reveal.in{opacity:1;transform:none}
@@ -703,11 +737,10 @@
     -webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);
             mask-image:linear-gradient(180deg,#000 55%,transparent)}
   html[data-theme="light"] .hero-instrument > .garden-field{opacity:.5}
-  /* NOSHASHI, set as the hero's title above the question: the brand
-     first, then what it answers. Plain page ink, no gradient or glow. */
-  .hi-title{margin:auto 0 14px;white-space:nowrap;color:var(--ink);
-    font:700 clamp(30px,9.2vw,104px)/.9 "Space Grotesk",system-ui,sans-serif;
-    letter-spacing:.14em;margin-right:-.14em;
+  /* The category line above the headline: a small eyebrow, not a
+     wordmark. The brand already sits in the header. */
+  .hi-title{margin:auto 0 18px;color:var(--brand);
+    font:500 12px/1.4 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.22em;
     animation:hiUp .9s cubic-bezier(.16,1,.3,1) both;animation-delay:.05s}
   .hero-instrument .hi-title + h1{margin-top:0}
   /* The bloom, the hero's centrepiece. Static: no loop, no frame cost.
@@ -957,25 +990,7 @@
 </div>
 <div class="layer">
 <a class="skip" href="#main">Skip to content</a>
-<header>
-  <div class="shell nav">
-    <a class="brand" href="/">
-      <!--SLOT:BRANDMARK-->
-      <span>NOSHASHI</span>
-    </a>
-    <nav class="nav-links" aria-label="Primary">
-      <a class="nav-link" href="#problem">Problem</a>
-      <a class="nav-link" href="#how">How it works</a>
-      <a class="nav-link" href="#public">Try it free</a>
-      <a class="nav-link" href="#who">Who it's for</a>
-      <a class="nav-link optional" href="#pricing">Pricing</a>
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
-        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
-      </button>
-      <a class="btn" href="#download">Download free</a>
-    </nav>
-  </div>
-</header>
+<!--SLOT:HEADER-->
 
 <main class="shell" id="main">
   <!--
@@ -1031,19 +1046,10 @@
       count) and tints its outer ring by the live assessment below.
       2D only: one image, three SVG rings, CSS.
     -->
-    <figure class="core" data-garden-origin aria-labelledby="coreCap">
-      <svg class="core-rings" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
-        <circle class="r1" cx="100" cy="100" r="58"/>
-        <circle class="r2" cx="100" cy="100" r="76"/>
-        <circle class="r3" cx="100" cy="100" r="95"/>
-        <path class="r-tick" d="M100 3v8M100 189v8M3 100h8M189 100h8"/>
-      </svg>
-      <img class="core-flower" src="/assets/flower.webp" width="960" height="946" alt="" decoding="async" fetchpriority="high">
-      <figcaption id="coreCap" class="core-cap mono">
-        <span>INTELLIGENCE CORE</span>
-        <span data-core-note>breathes with each validated ledger</span>
-      </figcaption>
-    </figure>
+    <!-- The flower is gone from the hero; this empty box keeps the point
+         the ASCII field's ripples start from (garden-field.js reads
+         [data-garden-origin]). -->
+    <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
 
     <div class="hi-face">
       <!--
@@ -1061,48 +1067,27 @@
         <div class="opt"><dt>Build</dt><dd translate="no"><!--SLOT:VERSION--></dd></div>
       </dl>
 
-      <p class="hi-title">NOSHASHI</p>
-      <h1><span class="h1-a">Check XRPL risk before you move money</span></h1>
-      <p class="hi-sub">Can this token be frozen? Can you actually sell it? Did that payment arrive in full? NOSHASHI checks the live ledger and gives you a clear answer, with a receipt.</p>
+      <p class="hi-title">XRPL ASSET INTELLIGENCE</p>
+      <h1><span class="h1-a">Know what you're holding. Know what can happen.</span></h1>
+      <p class="hi-sub">Analyze XRPL assets, verify payment outcomes, and understand issuer controls and real market liquidity using evidence from the ledger.</p>
       <!-- Filled by site/assets/garden-field.js from the live ledger stream; the text here is what shows without script. -->
       <p class="mono hi-caption" data-garden-caption translate="no">The pond answers each validated XRPL ledger as it closes.</p>
 
       <div class="hi-actions">
-        <a class="hi-cta" href="#public">Try it free</a>
-        <a class="hi-cta ghost" href="/contact/?topic=institutions">Book a call</a>
+        <a class="hi-cta" href="#public">Explore free tools</a>
+        <a class="hi-cta ghost" href="/contact/?topic=institutions">Request an institutional demo</a>
       </div>
+      <p class="hi-trust">Read-only by design. No custody. No private-key storage. No transaction signing.</p>
     </div>
   </section>
 
-  <section class="proof-strip" aria-label="NOSHASHI proof strip" data-i18n-aria-label="proof.aria" data-i18n-aria-label-en="NOSHASHI proof strip">
-    <div class="proof-stat">
-      <span class="label" data-i18n="proof.ledger.label">VALIDATED LEDGER</span>
-      <strong data-i18n="proof.ledger.value">XRPL mainnet</strong>
-      <small data-i18n="proof.ledger.note">same state going into every decision</small>
-    </div>
-    <div class="proof-stat">
-      <span class="label" data-i18n="proof.rules.label">RULES</span>
-      <strong data-i18n="proof.rules.value">GO · HOLD · NO-GO</strong>
-      <small data-i18n="proof.rules.note">deterministic, replayable policy checks</small>
-    </div>
-    <div class="proof-stat">
-      <span class="label" data-i18n="proof.receipt.label">RECEIPT</span>
-      <strong data-i18n="proof.receipt.value">SHA-256</strong>
-      <small data-i18n="proof.receipt.note">byte-stable evidence for review</small>
-    </div>
-    <div class="proof-stat">
-      <span class="label" data-i18n="proof.control.label">CONTROL</span>
-      <strong data-i18n="proof.control.value">Read-only</strong>
-      <small data-i18n="proof.control.note">no custody, no keys, no broadcast path</small>
-    </div>
-  </section>
 
   <!-- Live mainnet ticker: real data over the same public WebSocket the
        desktop app uses. If it cannot connect it says so. -->
   <div class="ticker" id="ticker" aria-live="polite" aria-label="Live XRP Ledger telemetry">
-    <span class="tk"><b id="tk-state">CONNECTING</b><i>LIVE LINK</i></span>
+    <span class="tk"><b id="tk-state">CONNECTING</b><i>LIVE LEDGER</i></span>
     <span class="tk"><b id="tk-xrp">—</b><i>XRP / RLUSD PRICE</i></span>
-    <span class="tk"><b id="tk-spread">—</b><i>SPREAD YOU CAN FILL</i></span>
+    <span class="tk"><b id="tk-spread">—</b><i>SPREAD THAT CAN FILL</i></span>
     <span class="tk"><b id="tk-ledger">—</b><i>LATEST LEDGER</i></span>
     <span class="tk"><b id="tk-tx">—</b><i>TRANSACTIONS</i></span>
     <span class="tk"><b id="tk-fee">—</b><i>FEE</i></span>
@@ -1112,27 +1097,31 @@
   <section id="problem" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">The problem</p>
-      <h2>What you see on the XRP Ledger is not always what you get</h2>
+      <h2>Public data. Hidden risks.</h2>
+      <p>The XRP Ledger is open, but the parts that cost money are easy to miss.</p>
     </div>
     <div class="grid g3">
-      <div class="panel">
-        <p class="num">FREEZE RISK</p>
-        <h3>Tokens can be frozen</h3>
-        <p>Most token issuers keep the right to freeze or claw back your balance. Few apps show it.</p>
-      </div>
-      <div class="panel">
-        <p class="num">FAKE DEPTH</p>
-        <h3>Order books overstate liquidity</h3>
-        <p>Offers stay listed after their owners spend the funds. The real exit is often much smaller.</p>
-      </div>
-      <div class="panel">
-        <p class="num">SHORT PAYMENTS</p>
-        <h3>"Successful" payments can deliver less</h3>
-        <p>A partial payment can succeed and deliver a fraction of the amount shown. Exchanges have lost money this way.</p>
-      </div>
+      <a class="panel card-link" href="/certificate/">
+        <p class="num">ISSUER RISK</p>
+        <h3>Who can freeze or claw back your asset?</h3>
+        <p>Understand which issuer controls may affect what you hold.</p>
+        <span class="go">Check an issuer &rarr;</span>
+      </a>
+      <a class="panel card-link" href="/delivered/">
+        <p class="num">PAYMENT VERIFICATION</p>
+        <h3>Did the payment arrive in full?</h3>
+        <p>A "successful" payment can deliver less. Check what it actually delivered.</p>
+        <span class="go">Verify a payment &rarr;</span>
+      </a>
+      <a class="panel card-link" href="/book-health/">
+        <p class="num">REAL LIQUIDITY</p>
+        <h3>Could you actually sell it?</h3>
+        <p>Measure what an order book could realistically execute, not what it advertises.</p>
+        <span class="go">Measure a book &rarr;</span>
+      </a>
     </div>
     <details class="traps" style="margin-top:18px">
-      <summary class="btn ghost">See 6 real examples from mainnet</summary>
+      <summary class="btn ghost">See real examples from mainnet</summary>
       <div style="margin-top:18px">
         <!--SLOT:MISREAD-->
         <p class="micro" style="margin-top:12px"><a href="/misread/">Each example, with the code behind it</a></p>
@@ -1143,33 +1132,21 @@
   <section id="how" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">How it works</p>
-      <h2>Read. Decide. Prove.</h2>
+      <h2>From ledger data to verifiable evidence.</h2>
     </div>
-    <div class="grid g3">
-      <div class="panel">
-        <p class="num">01 · READ</p>
-        <h3>Live ledger data</h3>
-        <p>Only from validated ledgers, checked against a second server.</p>
-      </div>
-      <div class="panel">
-        <p class="num">02 · DECIDE</p>
-        <h3>GO, HOLD or NO-GO</h3>
-        <p>Against your own written policy. Every rule shows its result and reason.</p>
-      </div>
-      <div class="panel">
-        <p class="num">03 · PROVE</p>
-        <h3>A receipt for every decision</h3>
-        <p>A SHA-256 receipt and audit log your auditor can re-check.</p>
-      </div>
-    </div>
-    <p class="micro" style="text-align:center;margin-top:18px">Read-only: NOSHASHI never holds keys, signs or moves funds.</p>
+    <ol class="steps4">
+      <li><p class="num">01 · READ</p><h3>Read the ledger</h3><p>Inspect the relevant XRPL data from validated ledgers.</p></li>
+      <li><p class="num">02 · ANALYZE</p><h3>Run the checks</h3><p>Issuer controls, delivered amounts, fillable depth and account settings.</p></li>
+      <li><p class="num">03 · VERIFY</p><h3>See the evidence</h3><p>The result, the rule behind it and the ledger it was read at.</p></li>
+      <li><p class="num">04 · EXPORT</p><h3>Keep the proof</h3><p>A SHA-256 receipt and exportable evidence for review.</p></li>
+    </ol>
   </section>
 
   <section id="public" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">Try it free</p>
-      <h2>Check an address, a payment or an order book now</h2>
-      <p>Runs in your browser on live XRP Ledger data. No account needed.</p>
+      <p class="eyebrow">The product, live</p>
+      <h2>See the evidence for yourself.</h2>
+      <p>These are the real tools, running in your browser on live XRP Ledger data. No account needed.</p>
     </div>
 
       <div class="tools">
@@ -1289,26 +1266,75 @@
   <section id="who" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">Who it's for</p>
-      <h2>Teams that move or hold value on the XRP Ledger</h2>
+      <h2>Built for people who need to know.</h2>
     </div>
     <div class="grid g2">
-      <div class="panel"><h3>Exchanges and custodians</h3><p>Screen deposits and withdrawals: fake tokens, phishing dust, lookalike addresses, sanctioned senders up to three hops back.</p></div>
-      <div class="panel"><h3>Token issuers</h3><p>Show holders exactly what powers you keep, and prove it from the ledger.</p></div>
-      <div class="panel"><h3>Funds and treasuries</h3><p>Know the real exit for a position before you size it.</p></div>
-      <div class="panel"><h3>Auditors</h3><p>Check a fair-value mark against depth that can actually fill, with the ledger it was read at.</p></div>
+      <div class="panel"><p class="num">EXCHANGES &amp; PAYMENT OPERATORS</p><p>Screen deposits and withdrawals for counterfeit tokens, phishing dust and lookalike addresses, and credit what a payment actually delivered.</p></div>
+      <div class="panel"><p class="num">TRADING &amp; LIQUIDITY TEAMS</p><p>See what an order book can really fill before you size or exit a position.</p></div>
+      <div class="panel"><p class="num">TOKEN ISSUERS &amp; TREASURY</p><p>Show holders exactly which controls you keep, proven from the ledger, and know your treasury's real exit.</p></div>
+      <div class="panel"><p class="num">COMPLIANCE &amp; RISK</p><p>Decide GO, HOLD or NO-GO against a written policy, with an audit log and a receipt for every decision.</p></div>
     </div>
+    <p class="cta" style="margin-top:22px"><a class="btn ghost" href="/solutions/">See solutions by team</a></p>
+  </section>
+
+  <section id="why" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">Why NOSHASHI</p>
+      <h2>Evidence over assumptions.</h2>
+      <p>Instead of combining explorers, spreadsheets and guesswork, every answer comes with what it was read from.</p>
+    </div>
+    <div class="grid g2 why">
+      <div class="panel"><span class="chip ok">Available now</span><h3>Reads the ledger directly</h3><p>Answers come from public, validated XRPL ledger data, not a third party's summary.</p></div>
+      <div class="panel"><span class="chip ok">Available now</span><h3>Delivered, not requested</h3><p>Separates what a payment asked for from what it actually delivered.</p></div>
+      <div class="panel"><span class="chip ok">Available now</span><h3>Liquidity that can execute</h3><p>Counts only offers whose owners can fund them, so the depth you see is depth you can use.</p></div>
+      <div class="panel"><span class="chip ok">Available now</span><h3>Traceable evidence</h3><p>Each decision carries a SHA-256 receipt and the ledger it was read at.</p></div>
+    </div>
+    <p class="micro" style="text-align:center">Work in progress is shown openly on the <a href="/progress/">progress page</a>, never marketed as finished.</p>
+  </section>
+
+  <section id="early" class="reveal">
+    <div class="kicker-block">
+      <p class="eyebrow">Early access</p>
+      <h2>Help shape the next generation of XRPL intelligence.</h2>
+      <p>Work directly with the NOSHASHI team to evaluate real workflows, identify operational gaps, and help prioritize the next stage of development.</p>
+    </div>
+    <div class="grid g2 early">
+      <div class="panel">
+        <p class="num">WHY START NOW</p>
+        <ul class="ticks">
+          <li>Issuer, payment and liquidity checks in one place instead of several tools.</li>
+          <li>Test it against a workflow you already run, before you commit budget.</li>
+          <li>A direct line to the people building it. Your feedback sets priorities.</li>
+          <li>Set up your workflow early, then scale it across your team.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <p class="num">HOW A PILOT WORKS</p>
+        <ol class="pilot">
+          <li>You name an operational problem.</li>
+          <li>We show the existing capability that addresses it.</li>
+          <li>We agree how success will be measured.</li>
+          <li>You test it against your current workflow.</li>
+          <li>The results decide a paid pilot, a contract or what we build next.</li>
+        </ol>
+      </div>
+    </div>
+    <p class="micro" style="text-align:center">Free tools stay free and public. Paid plans add saved decisions, alerts, the Compliance API and audit exports.</p>
+    <p class="cta" style="margin-top:18px"><a class="btn" href="/design-partners/">Become a design partner</a></p>
   </section>
 
   <section id="pricing" class="reveal">
     <div class="kicker-block">
       <p class="eyebrow">Pricing</p>
       <h2>Start free. Pay when your team needs more.</h2>
+      <p>Published prices. No sales call needed to start.</p>
     </div>
     <div class="price">
       <div class="tier">
         <span class="cap"></span>
         <p class="name">FREE</p>
         <p class="amt">$0</p><p class="per">forever</p>
+        <p class="for">For anyone checking a token, payment or order book.</p>
         <ul>
           <li>Desktop app and free web tools</li>
           <li>Unlimited GO / HOLD / NO-GO checks</li>
@@ -1320,6 +1346,7 @@
         <span class="cap"></span>
         <p class="name">PRO</p>
         <p class="amt">$749</p><p class="per">per seat / month</p>
+        <p class="for">For analysts, traders and small desks.</p>
         <ul>
           <li>Unlimited address checks</li>
           <li>Real exit liquidity and freeze analysis</li>
@@ -1334,6 +1361,7 @@
         <span class="cap"></span>
         <p class="name">INSTITUTIONAL</p>
         <p class="amt">$40,000</p><p class="per">per year</p>
+        <p class="for">For exchanges, issuers and compliance teams.</p>
         <ul>
           <li>Compliance API and webhooks</li>
           <li>Issuer surveillance: who holds your tokens</li>
@@ -1345,6 +1373,7 @@
         <span class="cap"></span>
         <p class="name">ENTERPRISE</p>
         <p class="amt">From $120,000</p><p class="per">per year</p>
+        <p class="for">For large operators that need scale and integration.</p>
         <ul>
           <li>Everything above, at scale</li>
           <li>High-volume API and event feeds</li>
@@ -1353,7 +1382,7 @@
         <a class="btn ghost block" href="/enterprise/" style="margin-top:22px">Learn more</a>
       </div>
     </div>
-    <p class="micro" style="margin-top:18px;text-align:center">API checks also sold in prepaid packs. <a href="/pricing/">Full pricing</a></p>
+    <p class="micro" style="margin-top:18px;text-align:center">API checks also sold in prepaid packs. <a href="/pricing/">Compare every plan and limit</a></p>
   </section>
 
   <section id="download" class="reveal">
@@ -1375,41 +1404,20 @@
 
   <section id="contact-cta" class="reveal">
     <div class="kicker-block">
-      <p class="eyebrow">Contact</p>
-      <h2>Talk to the founder</h2>
-      <p>Book a 30-minute call or send a question. You get a straight answer.</p>
+      <p class="eyebrow">Get started</p>
+      <h2>Understand the ledger before you act.</h2>
+      <p>Start with free XRPL analysis tools or discuss an institutional use case with our team.</p>
     </div>
     <div class="cta">
-      <a class="btn" href="/contact/?topic=institutions">Book a call</a>
-      <a class="btn ghost" href="mailto:support@noshashi.app">support@noshashi.app</a>
+      <a class="btn" href="#public">Explore free tools</a>
+      <a class="btn ghost" href="/contact/?topic=institutions">Contact NOSHASHI</a>
     </div>
-    <div style="margin-top:28px"><!--SLOT:SUBSCRIBE--></div>
+    <div style="margin-top:36px"><!--SLOT:SUBSCRIBE--></div>
     <p class="micro" style="margin-top:28px;text-align:center">Not legal, tax or investment advice. A GO means your rules passed; it does not make a transaction lawful. NOSHASHI sells software and never holds funds.</p>
   </section>
 </main>
 
-<footer>
-  <div class="shell foot">
-    <p class="mono">© 2026 <span data-i18n="foot.rights">NOSHASHI Labs · XRPL Mainnet · All builds BETA</span></p>
-    <nav class="foot-links" aria-label="Site">
-      <a href="#public">Free tools</a>
-      <a href="/brief/">Product brief</a>
-      <a href="#download">Download</a>
-      <a href="/enterprise/">Institutions</a>
-      <a href="/trust/">Security &amp; trust</a>
-      <a href="/contact/">Contact</a>
-      <a href="/news/">Newsroom</a>
-      <a href="/progress/">Progress</a>
-      <a href="/status/">Status</a>
-      <a href="/research/">Findings</a>
-      <a href="/learn/">Learn NOSHASHI (course)</a>
-      <a href="/guide/">Plain-language guide</a>
-      <a href="/pricing/">Pricing</a>
-      <a href="/legal/">Legal &amp; accessibility</a>
-      <a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a>
-    </nav>
-  </div>
-</footer>
+<!--SLOT:FOOTER-->
 </div>
 
 <script src="/assets/chart.js" defer></script>

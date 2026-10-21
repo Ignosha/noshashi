@@ -35,7 +35,7 @@ import { getNews } from "../api/_lib/news.js";
 import { getMarket } from "../api/_lib/market.js";
 import { getProjectFeed, deriveStatus } from "../api/_lib/project-feed.js";
 import { ENTRIES as KB } from "../api/_lib/kb.js";
-import { renderPage, breadcrumb, ORGANIZATION, ORIGIN, MARK } from "../api/_lib/shell.js";
+import { renderPage, renderHeader, renderFooter, NAV, breadcrumb, ORGANIZATION, ORIGIN } from "../api/_lib/shell.js";
 import { renderMisread } from "../api/_lib/misread.js";
 import { docsSections } from "../api/_lib/docs.js";
 import { esc, isoDate, ago } from "../api/_lib/html.js";
@@ -45,6 +45,7 @@ import {
   renderProgress, renderRail, renderMarket, renderMarketHead, renderMarketFoot, renderSubscribe,
 } from "../api/_lib/sections.js";
 import { jsonLd } from "../api/_lib/shell.js";
+import { buildRedesignPages, REDESIGN_PAGES } from "./build-pages.mjs";
 import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
@@ -75,7 +76,8 @@ async function buildHome({ news, market, feed, status, release }) {
 
   const slots = {
     ORIGIN: ORIGIN,
-    BRANDMARK: MARK,
+    HEADER: renderHeader("home"),
+    FOOTER: renderFooter(),
     VERSION: release ? esc(release.tag) : "beta",
     MARKETHEAD: renderMarketHead(market),
     MARKET: renderMarket(market),
@@ -1370,6 +1372,16 @@ async function buildPricingEnhancement() {
     html = html.replace('<script src="/assets/nav.js" defer></script>',
       '<script src="/assets/i18n.js" defer></script>\n<script src="/assets/nav.js" defer></script>');
   }
+  // Same six destinations and the same footer map as every other page.
+  // The page keeps its own header styles, so only the links are swapped.
+  const navLinks = NAV.map((item) =>
+    `<a href="${item.href}"${item.optional ? ' class="optional"' : ""}${item.href === "/pricing/" ? ' aria-current="page"' : ""}>${item.label}</a>`
+  ).join("\n        ");
+  html = html.replace(/<nav class="nav-links" aria-label="Primary">[\s\S]*?<\/nav>\n    <\/nav>/,
+    `<nav class="nav-links" aria-label="Primary">\n        ${navLinks}\n        <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>\n        <a class="btn" href="/#download">Download</a>\n      </nav>\n    </nav>`);
+  html = html.replace(/<footer>[\s\S]*?<\/footer>/, renderFooter());
+  const footStyle = '<link rel="stylesheet" href="/assets/core-footer.css">';
+  if (!html.includes(footStyle)) html = html.replace('<link rel="stylesheet" href="/assets/modules.css">', `<link rel="stylesheet" href="/assets/modules.css">\n${footStyle}`);
   await write("pricing/index.html", html);
 }
 
@@ -1571,6 +1583,7 @@ async function buildSitemap(docs = []) {
     ["/protection/", "weekly", "0.8"],
     ["/releases/1-0-14/", "monthly", "0.7"],
     ["/pricing/", "monthly", "0.9"],
+    ...REDESIGN_PAGES,
     ["/enterprise/", "monthly", "0.9"],
     ["/trust/", "monthly", "0.8"],
     ["/misread/", "monthly", "0.8"],
@@ -1666,6 +1679,7 @@ async function main() {
   await buildAuthConfirmed();
   await buildPricingEnhancement();
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
+  await buildRedesignPages(write);
   await buildTrust();
   await buildMisread();
   const docs = await buildDocs();
