@@ -74,7 +74,7 @@ npm run noshrepair:tauri dev    # as the desktop app
 npm run noshrepair:tauri build  # installers in noshrepair/src-tauri/target/release/bundle
 ```
 
-Installers for macOS (Apple silicon), Windows and Linux are built by the
+Installers for macOS (one universal DMG for Intel and Apple silicon, macOS 10.15 or later), Windows and Linux are built by the
 **NOSHREPAIR** workflow on every push that changes NOSHREPAIR, or by hand
 (Actions → NOSHREPAIR → Run workflow), and attached to the run as
 artifacts. They are unsigned: on macOS, right-click the app and choose
