@@ -2,6 +2,25 @@
 
 ## 1.0.21
 
+### Support
+
+- When NOSHASHI support asks to look at your account, the app asks you on
+  whatever screen you are on. You choose 4, 24 or 72 hours, and whether
+  support may apply fixes without asking each time. You can revoke it from
+  the ticket at any time.
+- Support can look at the app on one of your computers: version, ledger
+  connection, clock, sign-in, plan, settings health, updates and recent
+  errors. Never keys, addresses or what your settings contain.
+- Fixes support sends go to one computer and run only there: switch ledger
+  server, renew the sign-in, repair damaged settings, clear the error log,
+  install the latest signed update, restart the window, and the existing
+  self-check, reconnect, plan re-read and diagnostics. Each waits for your
+  Apply unless you allowed fixes, and every one is in the ticket's log.
+- Opening a ticket can share the app's recent errors (on by default,
+  scrubbed of secrets on your computer first) and allow support a 24-hour
+  look (off by default).
+- Every screen has a guide (press ?), and there is a guided tour of the app.
+
 ### Fixed
 
 - Issuer screens no longer fail on large issuers such as Bitstamp. The
