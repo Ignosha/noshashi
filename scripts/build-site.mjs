@@ -1220,7 +1220,7 @@ async function buildPricingEnhancement() {
     .tier-compare{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);overflow-x:auto;background:color-mix(in srgb,var(--surface) 55%,transparent)}
     .tier-compare table{min-width:1080px;width:100%;border-collapse:collapse;table-layout:fixed}
     .tier-compare th,.tier-compare td{padding:13px 12px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top;font-size:12px}
-    .tier-compare thead th{padding-top:17px;padding-bottom:15px;color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase}
+    .tier-compare thead th{padding-top:17px;padding-bottom:15px;color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
     .tier-compare thead th:not(:first-child){border-left:1px solid var(--rule)}
     .tier-compare thead th:first-child{width:23%;color:var(--faint)}
     .tier-compare thead th:nth-child(4){color:var(--tele)}
@@ -1228,17 +1228,17 @@ async function buildPricingEnhancement() {
     .tier-compare tbody th{color:var(--muted);font-weight:500}
     .tier-compare tbody td{color:var(--ink);border-left:1px solid var(--rule)}
     .tier-compare tbody tr:last-child th,.tier-compare tbody tr:last-child td{border-bottom:0}
-    .tier-compare .group th{padding:10px 12px 7px;color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:color-mix(in srgb,var(--ground) 70%,transparent);border-bottom:1px solid var(--rule)}
+    .tier-compare .group th{padding:10px 12px 7px;color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;background:color-mix(in srgb,var(--ground) 70%,transparent);border-bottom:1px solid var(--rule)}
     .tier-compare .group th:not(:first-child){border-left:0}
-    .tier-compare .yes{color:var(--go);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare .contracted{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare .optional{color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
+    .tier-compare .yes{color:var(--go);font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare .contracted{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare .optional{color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:12px}
     .tier-compare .no{color:var(--faint)}
-    .tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare caption{caption-side:bottom;padding:12px;color:var(--faint);text-align:left;font-size:11px}
+    .tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare caption{caption-side:bottom;padding:12px;color:var(--faint);text-align:left;font-size:12px}
     .tier-compare .tier-price{font-size:13px;font-weight:700;color:var(--ink)}
-    .tier-compare .tier-price small{display:block;margin-top:3px;color:var(--faint);font:10px "IBM Plex Mono",monospace;font-weight:400}
+    .tier-compare .tier-price small{display:block;margin-top:3px;color:var(--faint);font:11px "IBM Plex Mono",monospace;font-weight:400}
     .tier-compare .tier-link{display:inline-flex;margin-top:8px;color:inherit;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
     .tier-compare .tier-link:hover{color:var(--tele)}
     @media(max-width:900px){.price{grid-template-columns:1fr;overflow-x:visible}.price .tier{min-width:0}}
@@ -1246,7 +1246,7 @@ async function buildPricingEnhancement() {
   </style>`;
   if (!html.includes("id=\"noshashi-tier-comparison\"")) html = html.replace("</style>", `${css}</style>`);
   // Rules added after the committed page first received the block above.
-  const soonRule = '.tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}';
+  const soonRule = '.tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:12px}';
   if (!html.includes(".tier-compare .soon{")) html = html.replace(".tier-compare .no{color:var(--faint)}", `.tier-compare .no{color:var(--faint)}\n    ${soonRule}`);
   // The committed pricing page is also the input to this enhancement. Remove
   // prior generated copies so repeated site builds remain idempotent.

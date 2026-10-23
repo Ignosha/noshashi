@@ -63,7 +63,7 @@
 <section>
   <div class="rail">
     <div><span class="label">CURRENT BUILD</span><strong>—</strong><small>Beta channel, unsigned, built by CI.</small></div>
-    <div><span class="label">RELEASES SHIPPED</span><strong>3</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
+    <div><span class="label">RELEASES SHIPPED</span><strong>5</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
     <div><span class="label">TESTS PASSING</span><strong>1,200+</strong><small>Across the app, the API and the website. Run with npm test.</small></div>
     <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>No sign-up exists. Nothing is held server-side.</small></div>
   </div>
@@ -122,6 +122,24 @@
   </div>
   <div class="console"><div class="console-body">
     <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-10-23T13:50:00.000Z">2026-10-23</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>1.0.22: support can look at your app and fix it, only when you allow it</h3>
+      <p>When support asks to look, the app asks you on whatever screen you are on: 4, 24 or 72 hours, and whether fixes may run without asking. Support sees a read-only snapshot of one computer (version, ledger connection, clock, sign-in, plan, settings health, recent errors; never keys or addresses) and…</p>
+      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-10-20T15:50:00.000Z">2026-10-20</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>1.0.21: large issuers load, plainer screens</h3>
+      <p>Issuer screens no longer fail on large issuers such as Bitstamp: when a public server cannot return the total supply in time, the survey shows the holders it read and says so. The welcome screen and Overview open with three live cards, and the website homepage goes from 23 sections to 8.</p>
+      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
+    </article>
     <article class="log-entry" data-kind="milestone">
       <div class="log-meta">
         <time datetime="2026-10-20T01:00:00.000Z">2026-10-20</time>
@@ -175,24 +193,6 @@
       <h3>1.0.14: safer to hold XRP, easier to trust who holds it</h3>
       <p>An emergency kit for drained accounts, a reviewed scam registry and phishing check, withdrawal screening, and Customer Asset Protection: proof from the XRP Ledger that customer XRP is backed and yours is counted. Verification, not insurance.</p>
       <a class="log-link" href="/releases/1-0-14/">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="milestone">
-      <div class="log-meta">
-        <time datetime="2026-09-17T12:00:00.000Z">2026-09-17</time>
-        <span class="log-kind">MILESTONE</span>
-      </div>
-      <h3>Every download is now labelled BETA</h3>
-      <p>The desktop builds are pre-1.0 and unsigned while the release pipeline is hardened. The download section now says so on every artifact rather than only in the operator note underneath, so the channel is never read as stable by accident.</p>
-      <a class="log-link" href="/#download">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="note">
-      <div class="log-meta">
-        <time datetime="2026-09-17T11:30:00.000Z">2026-09-17</time>
-        <span class="log-kind">NOTE</span>
-      </div>
-      <h3>Public site rebuilt around live feeds</h3>
-      <p>The site now carries a live XRP newsroom, this mission log, a support console and a contact channel. Every page is rendered on the server before it is served, so the content is in the HTML a crawler receives rather than assembled afterwards in the browser.</p>
-      <a class="log-link" href="/status/">OPEN →</a>
     </article>
   </div>
   </div></div>

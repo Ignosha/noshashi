@@ -108,8 +108,17 @@ async function readBody(req) {
   return raw;
 }
 
+/** Fixed-path rewrites only, which is all vercel.json uses for /api. */
+function applyRewrite(url) {
+  const rule = (config.rewrites || []).find((r) => r.source === url.pathname);
+  if (!rule) return url;
+  const next = new URL(rule.destination, url);
+  for (const [k, v] of url.searchParams) if (!next.searchParams.has(k)) next.searchParams.set(k, v);
+  return next;
+}
+
 const server = createServer(async (req, res) => {
-  const url = new URL(req.url, `http://localhost:${PORT}`);
+  const url = applyRewrite(new URL(req.url, `http://localhost:${PORT}`));
   const pathname = decodeURIComponent(url.pathname);
   applyHeaders(res, pathname);
 
@@ -122,6 +131,7 @@ const server = createServer(async (req, res) => {
 
   if (pathname.startsWith("/api/")) {
     const name = pathname.slice(5).replace(/\/+$/, "");
+    decorate(req, res, url);
     // `_lib` is not routable on Vercel either — underscore-prefixed
     // files are excluded from the function build.
     if (!name || name.startsWith("_") || name.includes("..")) {
@@ -132,11 +142,11 @@ const server = createServer(async (req, res) => {
       const file = path.join(ROOT, "api", `${name}.js`);
       await stat(file);
       const mod = await import(pathToFileURL(file).href);
-      decorate(req, res, url);
       req.body = await readBody(req);
       await mod.default(req, res);
     } catch (error) {
       if (error?.code === "ENOENT") {
+        console.warn(`[dev] no handler at /api/${name}`);
         res.statusCode = 404;
         return res.json({ error: `No handler at /api/${name}` });
       }

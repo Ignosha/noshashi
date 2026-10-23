@@ -93,6 +93,10 @@ function mountPage(live: boolean) {
     zIndex: "-1",
     pointerEvents: "none",
     overflow: "hidden",
+    // Faint enough that text never competes with it. Set here rather than
+    // in a stylesheet so pages that load a different set of CSS (pricing,
+    // billing) do not show it at full strength over their copy.
+    opacity: "0.16",
   });
   document.body.appendChild(layer);
 

@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-10-23T13:50:00Z",
+    "kind": "release",
+    "title": "1.0.22: support can look at your app and fix it, only when you allow it",
+    "body": "When support asks to look, the app asks you on whatever screen you are on: 4, 24 or 72 hours, and whether fixes may run without asking. Support sees a read-only snapshot of one computer (version, ledger connection, clock, sign-in, plan, settings health, recent errors; never keys or addresses) and sends fixes from a fixed list to that computer only. Every request is in the ticket's log.",
+    "link": "/docs/release-notes/"
+  },
+  {
+    "date": "2026-10-20T15:50:00Z",
+    "kind": "release",
+    "title": "1.0.21: large issuers load, plainer screens",
+    "body": "Issuer screens no longer fail on large issuers such as Bitstamp: when a public server cannot return the total supply in time, the survey shows the holders it read and says so. The welcome screen and Overview open with three live cards, and the website homepage goes from 23 sections to 8.",
+    "link": "/docs/release-notes/"
+  },
+  {
     "date": "2026-10-20T01:00:00Z",
     "kind": "milestone",
     "title": "Book health: quoted versus funded depth on the main XRP books, live",

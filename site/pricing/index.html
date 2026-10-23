@@ -113,15 +113,15 @@
   .tier .body{padding:18px 16px 16px;display:flex;flex-direction:column;flex:1}
   .tier .name{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--muted)}
   .tier.focus .name{color:var(--brand)} .tier.inst .name{color:var(--tele)}
-  .tier .per{color:var(--faint);font-size:10.5px;font-family:"IBM Plex Mono",monospace;
+  .tier .per{color:var(--faint);font-size:11.5px;font-family:"IBM Plex Mono",monospace;
     letter-spacing:.06em;margin-top:6px}
   .tier .who{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.55}
   .tier .role{display:inline-block;margin-top:12px;font-family:"IBM Plex Mono",monospace;
-    font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
     border:1px solid var(--rule);border-radius:var(--ri);padding:4px 7px}
   .tier .spec{margin:16px 0 0;flex:1}
   .tier .act{margin-top:16px;display:grid;gap:7px}
-  .tier .terms{font-size:10.5px;color:var(--faint);line-height:1.55}
+  .tier .terms{font-size:12px;color:var(--faint);line-height:1.55}
   /* Seat count sits on the instrument, not in a rounded form field. */
   .seats{display:flex;align-items:center;justify-content:space-between;gap:12px;
     border:1px solid var(--rule);border-radius:var(--ri);padding:8px 11px;margin-bottom:7px}
@@ -195,7 +195,7 @@
     .tier-compare{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);overflow-x:auto;background:color-mix(in srgb,var(--surface) 55%,transparent)}
     .tier-compare table{min-width:1080px;width:100%;border-collapse:collapse;table-layout:fixed}
     .tier-compare th,.tier-compare td{padding:13px 12px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top;font-size:12px}
-    .tier-compare thead th{padding-top:17px;padding-bottom:15px;color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase}
+    .tier-compare thead th{padding-top:17px;padding-bottom:15px;color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
     .tier-compare thead th:not(:first-child){border-left:1px solid var(--rule)}
     .tier-compare thead th:first-child{width:23%;color:var(--faint)}
     .tier-compare thead th:nth-child(4){color:var(--tele)}
@@ -203,17 +203,17 @@
     .tier-compare tbody th{color:var(--muted);font-weight:500}
     .tier-compare tbody td{color:var(--ink);border-left:1px solid var(--rule)}
     .tier-compare tbody tr:last-child th,.tier-compare tbody tr:last-child td{border-bottom:0}
-    .tier-compare .group th{padding:10px 12px 7px;color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:color-mix(in srgb,var(--ground) 70%,transparent);border-bottom:1px solid var(--rule)}
+    .tier-compare .group th{padding:10px 12px 7px;color:var(--brand);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;background:color-mix(in srgb,var(--ground) 70%,transparent);border-bottom:1px solid var(--rule)}
     .tier-compare .group th:not(:first-child){border-left:0}
-    .tier-compare .yes{color:var(--go);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare .contracted{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare .optional{color:#9BE15D;font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
+    .tier-compare .yes{color:var(--go);font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare .contracted{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare .optional{color:#9BE15D;font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:12px}
     .tier-compare .no{color:var(--faint)}
-    .tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:10px}
-    .tier-compare caption{caption-side:bottom;padding:12px;color:var(--faint);text-align:left;font-size:11px}
+    .tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare caption{caption-side:bottom;padding:12px;color:var(--faint);text-align:left;font-size:12px}
     .tier-compare .tier-price{font-size:13px;font-weight:700;color:var(--ink)}
-    .tier-compare .tier-price small{display:block;margin-top:3px;color:var(--faint);font:10px "IBM Plex Mono",monospace;font-weight:400}
+    .tier-compare .tier-price small{display:block;margin-top:3px;color:var(--faint);font:11px "IBM Plex Mono",monospace;font-weight:400}
     .tier-compare .tier-link{display:inline-flex;margin-top:8px;color:inherit;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
     .tier-compare .tier-link:hover{color:var(--tele)}
     @media(max-width:760px){.tier-compare{margin-right:calc((100vw - var(--shell))/2 * -1);margin-left:calc((100vw - var(--shell))/2 * -1);padding-left:4vw;padding-right:4vw}.tier-compare th,.tier-compare td{padding:12px 10px}}
