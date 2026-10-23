@@ -140,11 +140,6 @@ main code{overflow-wrap:anywhere}
 @media (max-width:920px){ .nav-links a:not(.btn){display:none} }
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
 
-/* The page-wide ASCII pond (site/assets/garden-field.js): fixed behind all
-   content, faint enough that text never has to compete with it. */
-.garden-page > .garden-field{opacity:.24}
-html[data-theme="light"] .garden-page > .garden-field{opacity:.2}
-
 /* ── Shared page components (platform, solutions, resources, about,
       design partners). The homepage carries the same rules inline. ── */
 .sec-head{max-width:62ch;margin:0 0 22px}
