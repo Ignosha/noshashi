@@ -11,6 +11,7 @@ import {
   repairRequests,
   revokeSupportAccess,
 } from "@/lib/support/repair";
+import { deviceId } from "@/lib/support/device";
 import { ACCESS_EVENT_LABEL, repairAction, type AccessEvent, type AccessGrant, type RepairRequest } from "@/lib/support/repairCatalog";
 
 const POLL_MS = 20_000;
@@ -20,8 +21,9 @@ const POLL_MS = 20_000;
  *
  * Support can only ever see this account if the customer allows it here,
  * read-only and for a time they choose, and only ever change something on
- * this computer if the customer presses Apply on a repair. Every look and
- * every repair is listed in the access log below, which nobody can edit.
+ * this computer if the customer presses Apply on a repair, or allowed fixes
+ * to run while the grant lasts. Every look and every repair is listed in
+ * the access log below, which nobody can edit.
  */
 export function SupportAccess({ ticketId }: { ticketId: string }) {
   const { push } = useToast();
@@ -32,6 +34,8 @@ export function SupportAccess({ ticketId }: { ticketId: string }) {
   const [requests, setRequests] = useState<RepairRequest[]>([]);
   const [log, setLog] = useState<AccessEvent[]>([]);
   const [hours, setHours] = useState(24);
+  const [autoRepair, setAutoRepair] = useState(false);
+  const [myDevice, setMyDevice] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
 
@@ -47,6 +51,10 @@ export function SupportAccess({ ticketId }: { ticketId: string }) {
       setUnavailable(true);
     }
   }, [ticketId]);
+
+  useEffect(() => {
+    void deviceId().then(setMyDevice);
+  }, []);
 
   useEffect(() => {
     void load();
@@ -69,7 +77,8 @@ export function SupportAccess({ ticketId }: { ticketId: string }) {
 
   if (unavailable) return null;
 
-  const pending = requests.filter((r) => r.status === "pending");
+  const pending = requests.filter((r) => r.status === "pending" && (r.deviceId === null || r.deviceId === myDevice));
+  const elsewhere = requests.filter((r) => r.status === "pending" && r.deviceId !== null && r.deviceId !== myDevice);
   const done = requests.filter((r) => r.status !== "pending");
   const runtime = {
     refreshPlan,
@@ -88,7 +97,8 @@ export function SupportAccess({ ticketId }: { ticketId: string }) {
           <>
             <span className="text-foreground">
               Support can view this account, read-only, until{" "}
-              <time dateTime={grant.expiresAt}>{new Date(grant.expiresAt).toLocaleString()}</time>.
+              <time dateTime={grant.expiresAt}>{new Date(grant.expiresAt).toLocaleString()}</time>
+              {grant.autoRepair ? ", and apply fixes from NOSHASHI's fixed list without asking" : ""}.
             </span>
             <Button size="sm" variant="outline" disabled={busy !== null} onClick={() => void run("revoke", async () => { await revokeSupportAccess(ticketId); return "Support can no longer view this account."; }, "ACCESS NOT REVOKED")}>
               REVOKE NOW
@@ -109,15 +119,20 @@ export function SupportAccess({ ticketId }: { ticketId: string }) {
                 <option value={72}>for 72 hours</option>
               </select>
             </label>
-            <Button size="sm" variant="outline" disabled={busy !== null} onClick={() => void run("allow", async () => { await allowSupportAccess(ticketId, hours); return `Support can view this account for ${hours} hours. You can revoke it at any time.`; }, "ACCESS NOT ALLOWED")}>
-              ALLOW READ-ONLY ACCESS
+            <label className="flex items-center gap-1 text-muted-foreground">
+              <input type="checkbox" checked={autoRepair} onChange={(e) => setAutoRepair(e.target.checked)} />
+              <span>let support apply fixes without asking</span>
+            </label>
+            <Button size="sm" variant="outline" disabled={busy !== null} onClick={() => void run("allow", async () => { await allowSupportAccess(ticketId, hours, autoRepair); return `Support can view this account for ${hours} hours${autoRepair ? " and apply fixes" : ""}. You can revoke it at any time.`; }, "ACCESS NOT ALLOWED")}>
+              ALLOW ACCESS
             </Button>
           </>
         )}
       </div>
       <p className="text-[10.5px] leading-relaxed text-muted-foreground">
-        Read-only means support sees your plan, API key names (never the keys), and the diagnostics you shared. Support can never
-        see keys, move funds, or change anything without your Apply.
+        Support sees your plan, API key names (never the keys), the diagnostics you shared, and a read-only picture of this app when
+        it asks. Fixes come only from NOSHASHI's fixed list and run on the computer they are sent to, after your Apply or, if you
+        allowed it, by themselves. Support can never see keys or move funds.
       </p>
 
       {pending.length > 0 && (
@@ -143,6 +158,12 @@ export function SupportAccess({ ticketId }: { ticketId: string }) {
         </ul>
       )}
 
+      {elsewhere.length > 0 && (
+        <p className="text-[11px] text-muted-foreground">
+          {elsewhere.length} fix{elsewhere.length === 1 ? " is" : "es are"} waiting on another of your computers. Open NOSHASHI there to answer.
+        </p>
+      )}
+
       {(done.length > 0 || log.length > 0) && (
         <details className="text-[11px]">
           <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Access log and past repairs</summary>
@@ -153,6 +174,7 @@ export function SupportAccess({ ticketId }: { ticketId: string }) {
                   {r.status.toUpperCase()}
                 </span>{" "}
                 {repairAction(r.action)?.title ?? r.action}
+                {r.automatic ? " · ran by itself" : ""}
                 {r.decidedAt ? ` · ${new Date(r.decidedAt).toLocaleString()}` : ""}
               </li>
             ))}

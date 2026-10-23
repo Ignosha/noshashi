@@ -2,9 +2,11 @@ import { useCallback, useEffect, useId, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { PRIORITIES, STATUS_LABEL, ticketRef, type Ticket, type TicketMessage, type TicketPriority, type TicketStatus } from "@/lib/support/tickets";
 import { ACCESS_EVENT_LABEL, REPAIR_ACTIONS, repairAction, type AccessEvent, type AccessGrant, type RepairActionId, type RepairRequest } from "@/lib/support/repairCatalog";
+import { snapshotFindings, type Snapshot } from "@/lib/support/snapshotReport";
 import {
   accessLogFor,
   accountView,
+  devicesFrom,
   diagnostics,
   grantFor,
   messages,
@@ -15,6 +17,7 @@ import {
   setTicket,
   ticket as loadTicket,
   type AccountView,
+  type Device,
   type Diagnostic,
 } from "../api";
 import { Alert, Badge, LiveStatus, PageTitle, Section } from "../ui";
@@ -47,6 +50,8 @@ export function TicketView({ id, onBack }: { id: string; onBack: () => void }) {
   const [log, setLog] = useState<AccessEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
+  /** The computer requests go to; null means any of the customer's computers. */
+  const [device, setDevice] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -113,13 +118,29 @@ export function TicketView({ id, onBack }: { id: string; onBack: () => void }) {
           <ReplyForm onSend={(body) => act(() => reply(id, body), "Reply sent. The customer sees it in their app.")} />
         </div>
         <div className="space-y-4">
-          <AccountAccess ticketId={id} grant={grant} onRequest={(reason) => act(() => requestAccess(id, reason), "Request sent. The customer is asked in their app.")} />
+          <AccountAccess ticketId={id} grant={grant} onRequest={(reason) => act(() => requestAccess(id, reason), "Request sent. The customer's app asks them on whatever screen they are on.")} />
+          <LiveApp
+            grant={grant}
+            devices={devicesFrom(diags, grant)}
+            device={device}
+            onDevice={setDevice}
+            snapshots={diags.filter((d) => d.kind === "snapshot")}
+            repairs={repairs}
+            onLook={() => act(() => proposeRepair(id, "collect_snapshot", "", device), "Asked the app for a snapshot. It answers by itself within about 15 seconds while the app is open.")}
+          />
           <Repairs
             grant={grant}
+            devices={devicesFrom(diags, grant)}
+            device={device}
             repairs={repairs}
-            onPropose={(action, note) => act(() => proposeRepair(id, action, note), "Repair sent. It runs only when the customer presses Apply.")}
+            onPropose={(action, note) =>
+              act(
+                () => proposeRepair(id, action, note, device),
+                grant?.autoRepair ? "Fix sent. The customer allowed fixes, so their app runs it by itself." : "Fix sent. It runs when the customer presses Apply."
+              )
+            }
           />
-          <Diagnostics items={diags} />
+          <Diagnostics items={diags.filter((d) => d.kind !== "snapshot")} />
           <AccessLog events={log} />
         </div>
       </div>
@@ -342,7 +363,24 @@ function AccountDetails({ view }: { view: AccountView }) {
   );
 }
 
-function Repairs({ grant, repairs, onPropose }: { grant: AccessGrant | null; repairs: RepairRequest[]; onPropose: (action: RepairActionId, note: string) => Promise<void> }) {
+function deviceName(devices: Device[], id: string | null): string {
+  if (!id) return "any of their computers";
+  return devices.find((d) => d.id === id)?.label ?? `computer ${id.slice(0, 8)}`;
+}
+
+function Repairs({
+  grant,
+  devices,
+  device,
+  repairs,
+  onPropose,
+}: {
+  grant: AccessGrant | null;
+  devices: Device[];
+  device: string | null;
+  repairs: RepairRequest[];
+  onPropose: (action: RepairActionId, note: string) => Promise<void>;
+}) {
   const noteId = useId();
   const [action, setAction] = useState<RepairActionId>("run_self_repair");
   const [note, setNote] = useState("");
@@ -350,7 +388,11 @@ function Repairs({ grant, repairs, onPropose }: { grant: AccessGrant | null; rep
   return (
     <Section title="REPAIRS">
       <p className="mb-3 text-sm text-muted-foreground">
-        Pick a fix from the fixed list. The customer sees it in plain words and it runs on their machine only when they press Apply. Nothing else can be sent.
+        Pick a fix from the fixed list. It goes to <span className="text-foreground">{deviceName(devices, device)}</span> only.{" "}
+        {grant?.autoRepair
+          ? "The customer allowed fixes, so their app runs it by itself and reports back."
+          : "The customer sees it in plain words and it runs when they press Apply."}{" "}
+        Nothing outside this list can be sent.
       </p>
       {grant ? (
         <form
@@ -362,7 +404,7 @@ function Repairs({ grant, repairs, onPropose }: { grant: AccessGrant | null; rep
         >
           <fieldset className="space-y-1.5">
             <legend className="mb-1 font-[600]">Repair</legend>
-            {REPAIR_ACTIONS.map((a) => (
+            {REPAIR_ACTIONS.filter((a) => !a.readOnly).map((a) => (
               <label key={a.id} className="flex cursor-pointer items-start gap-2">
                 <input type="radio" name="repair" className="mt-1" value={a.id} checked={action === a.id} onChange={() => setAction(a.id)} />
                 <span>
@@ -398,13 +440,137 @@ function Repairs({ grant, repairs, onPropose }: { grant: AccessGrant | null; rep
             <li key={r.id} className="border-t border-border pt-2">
               <Badge tone={REPAIR_TONE[r.status]}>{r.status.toUpperCase()}</Badge> {repairAction(r.action)?.title ?? r.action}
               <span className="block text-xs text-muted-foreground">
-                Sent {when(r.requestedAt)}
-                {r.decidedAt ? ` · answered ${when(r.decidedAt)}` : ""}
+                For {deviceName(devices, r.deviceId)} · sent {when(r.requestedAt)}
+                {r.decidedAt ? ` · ${r.automatic ? "ran by itself" : "answered"} ${when(r.decidedAt)}` : ""}
               </span>
               {r.result && <p className="mt-1 whitespace-pre-wrap break-words text-xs">{r.result}</p>}
             </li>
           ))}
         </ul>
+      )}
+    </Section>
+  );
+}
+
+const SNAPSHOT_STALE_MS = 10 * 60_000;
+
+/**
+ * The customer's app, as it is right now on one of their computers: ask
+ * for a snapshot and read what it found. The app answers by itself while
+ * the grant is active; nothing here changes anything on their side.
+ */
+function LiveApp({
+  grant,
+  devices,
+  device,
+  onDevice,
+  snapshots,
+  repairs,
+  onLook,
+}: {
+  grant: AccessGrant | null;
+  devices: Device[];
+  device: string | null;
+  onDevice: (id: string | null) => void;
+  snapshots: Diagnostic[];
+  repairs: RepairRequest[];
+  onLook: () => Promise<void>;
+}) {
+  const groupId = useId();
+  const latest = snapshots.find((d) => device === null || d.deviceId === device) ?? null;
+  const snapshot = latest ? (latest.payload as unknown as Snapshot) : null;
+  const waiting = repairs.some((r) => r.action === "collect_snapshot" && r.status === "pending" && (device === null || r.deviceId === device));
+  const findings = snapshot ? snapshotFindings(snapshot) : [];
+  const stale = latest ? Date.now() - Date.parse(latest.createdAt) > SNAPSHOT_STALE_MS : false;
+
+  return (
+    <Section title="THE CUSTOMER'S APP">
+      {!grant ? (
+        <p className="text-sm text-muted-foreground">Ask for access first. Once the customer allows it, you can look at their app here.</p>
+      ) : (
+        <div className="space-y-3 text-sm">
+          <fieldset className="space-y-1.5">
+            <legend id={groupId} className="mb-1 font-[600]">
+              Which computer
+            </legend>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="device" checked={device === null} onChange={() => onDevice(null)} />
+              Any of their computers
+            </label>
+            {devices.map((d) => (
+              <label key={d.id} className="flex items-center gap-2">
+                <input type="radio" name="device" checked={device === d.id} onChange={() => onDevice(d.id)} />
+                <span>
+                  {d.label} <span className="text-xs text-muted-foreground">· seen {when(d.lastSeen)}</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button onClick={() => void onLook()} disabled={waiting}>
+              {waiting ? "Waiting for the app…" : "Look at the app now"}
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              {grant.autoRepair ? (
+                <Badge tone="go">FIXES RUN BY THEMSELVES</Badge>
+              ) : (
+                <Badge tone="hold">FIXES WAIT FOR APPLY</Badge>
+              )}
+            </span>
+          </div>
+          {waiting && <LiveStatus>The request is with the app. It answers within about 15 seconds while the app is open.</LiveStatus>}
+          {snapshot && (
+            <div className="space-y-2 border border-border bg-background p-3">
+              <p className="text-xs text-muted-foreground">
+                Snapshot from {snapshot.device?.label ?? "their app"} · <time dateTime={latest!.createdAt}>{when(latest!.createdAt)}</time>
+                {stale ? " · over 10 minutes old" : ""}
+              </p>
+              {findings.length ? (
+                <ul className="list-disc space-y-0.5 pl-5" aria-label="What the snapshot found">
+                  {findings.map((f) => (
+                    <li key={f} className="text-no-go">
+                      <span className="text-foreground">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-go">Nothing wrong found.</p>
+              )}
+              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-xs">
+                {(
+                  [
+                    ["Version", `${snapshot.device?.version} · ${snapshot.device?.platform} ${snapshot.device?.shell}`],
+                    ["Ledger", `${snapshot.ledger?.connected ? "connected" : "disconnected"} · ${snapshot.ledger?.server} · ${snapshot.ledger?.readMs ?? "–"} ms`],
+                    ["Validated ledger", snapshot.ledger?.validatedLedger?.toLocaleString("en-US") ?? "none"],
+                    ["Clock", snapshot.ledger?.clockSkewSeconds === null ? "unknown" : `${snapshot.ledger?.clockSkewSeconds} s from ledger time`],
+                    ["Sign-in", snapshot.session?.signedIn ? `signed in · ${snapshot.session.expiresInSeconds ?? "?"} s left · two-factor ${snapshot.session.twoFactor ? "yes" : "no"}` : "not signed in"],
+                    ["Plan in the app", snapshot.plan?.tier ?? "unknown"],
+                    ["Settings", `${snapshot.settings?.stored ?? 0} saved · ${snapshot.settings?.damaged?.length ?? 0} damaged${snapshot.settings?.writable === false ? " · cannot save" : ""}`],
+                    ["Updates", snapshot.update?.state === "available" ? `${snapshot.update.latest} available` : snapshot.update?.state ?? "unknown"],
+                    ["Language / time zone", `${snapshot.device?.language} · ${snapshot.device?.timeZone}`],
+                  ] as Array<[string, string]>
+                ).map(([k, v]) => (
+                  <div key={k} className="contents">
+                    <dt className="text-muted-foreground">{k}</dt>
+                    <dd className="break-words">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              {snapshot.errors?.length > 0 && (
+                <details>
+                  <summary className="cursor-pointer text-xs">Recent errors ({snapshot.errors.length})</summary>
+                  <ol className="mono-font mt-1 max-h-60 space-y-1 overflow-auto text-xs">
+                    {[...snapshot.errors].reverse().map((e, i) => (
+                      <li key={i} className="break-words">
+                        {e.at.slice(0, 19).replace("T", " ")} · {e.where ?? "app"} · {e.message}
+                      </li>
+                    ))}
+                  </ol>
+                </details>
+              )}
+            </div>
+          )}
+        </div>
       )}
     </Section>
   );

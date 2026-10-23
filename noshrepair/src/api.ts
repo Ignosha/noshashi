@@ -1,8 +1,11 @@
 import { db } from "./client";
 import { messageFromRow, ticketFromRow, type Ticket, type TicketMessage, type TicketPriority, type TicketStatus } from "@/lib/support/tickets";
 import {
+  GRANT_COLUMNS,
+  REPAIR_COLUMNS,
   RepairError,
   eventFromRow,
+  grantFromRow,
   requestFromRow,
   type AccessEvent,
   type AccessGrant,
@@ -70,25 +73,58 @@ export async function setTicket(ticketId: string, change: { status?: TicketStatu
   await call("update_support_ticket", { p_ticket: ticketId, p_status: change.status ?? null, p_priority: change.priority ?? null });
 }
 
-export type Diagnostic = { id: number; kind: string; payload: Record<string, unknown>; createdAt: string };
+export type Diagnostic = { id: number; kind: string; payload: Record<string, unknown>; createdAt: string; deviceId: string | null };
 
 export async function diagnostics(ticketId: string): Promise<Diagnostic[]> {
-  const { data, error } = await db().from("support_diagnostics").select("id, kind, payload, created_at").eq("ticket_id", ticketId).order("id", { ascending: false }).limit(50);
+  const { data, error } = await db()
+    .from("support_diagnostics")
+    .select("id, kind, payload, created_at, device_id")
+    .eq("ticket_id", ticketId)
+    .order("id", { ascending: false })
+    .limit(50);
   if (error) throw new Error(error.message);
-  return (data ?? []).map((r: { id: number; kind: string; payload: Record<string, unknown>; created_at: string }) => ({ id: r.id, kind: r.kind, payload: r.payload, createdAt: r.created_at }));
+  return (data ?? []).map((r: { id: number; kind: string; payload: Record<string, unknown>; created_at: string; device_id: string | null }) => ({
+    id: r.id,
+    kind: r.kind,
+    payload: r.payload,
+    createdAt: r.created_at,
+    deviceId: r.device_id,
+  }));
+}
+
+export type Device = { id: string; label: string; lastSeen: string };
+
+/**
+ * The customer's computers this ticket knows about: every install that
+ * granted access or sent diagnostics on it, newest first. A repair can be
+ * addressed to one of them so only that computer runs it.
+ */
+export function devicesFrom(diags: Diagnostic[], grant: AccessGrant | null): Device[] {
+  const seen = new Map<string, Device>();
+  const add = (id: string | null, label: string | null, at: string) => {
+    if (!id) return;
+    const prev = seen.get(id);
+    if (!prev || prev.lastSeen < at) seen.set(id, { id, label: label ?? prev?.label ?? `Computer ${id.slice(0, 8)}`, lastSeen: at });
+  };
+  if (grant) add(grant.deviceId, grant.deviceLabel, grant.grantedAt);
+  for (const d of diags) {
+    const device = d.payload?.device as { label?: string } | string | undefined;
+    add(d.deviceId, typeof device === "string" ? device : device?.label ?? null, d.createdAt);
+  }
+  return [...seen.values()].sort((a, b) => b.lastSeen.localeCompare(a.lastSeen));
 }
 
 export async function grantFor(ticketId: string): Promise<AccessGrant | null> {
   const { data } = await db()
     .from("support_access_grants")
-    .select("id, granted_at, expires_at, revoked_at")
+    .select(GRANT_COLUMNS)
     .eq("ticket_id", ticketId)
     .is("revoked_at", null)
     .gt("expires_at", new Date().toISOString())
     .order("expires_at", { ascending: false })
     .limit(1);
-  const row = (data ?? [])[0] as { id: string; granted_at: string; expires_at: string; revoked_at: string | null } | undefined;
-  return row ? { id: row.id, grantedAt: row.granted_at, expiresAt: row.expires_at, revokedAt: row.revoked_at } : null;
+  const row = (data ?? [])[0] as Parameters<typeof grantFromRow>[0] | undefined;
+  return row ? grantFromRow(row) : null;
 }
 
 export async function requestAccess(ticketId: string, reason: string): Promise<void> {
@@ -111,14 +147,15 @@ export async function accountView(ticketId: string): Promise<AccountView> {
   return (await call<AccountView & Record<string, unknown>>("support_account_view", { p_ticket: ticketId })) as AccountView;
 }
 
-export async function proposeRepair(ticketId: string, action: RepairActionId, note: string): Promise<void> {
-  await call("request_support_repair", { p_ticket: ticketId, p_action: action, p_note: note.trim() || null });
+/** Send a request to the customer's app: to one computer, or to any of theirs when device is null. */
+export async function proposeRepair(ticketId: string, action: RepairActionId, note: string, device: string | null): Promise<void> {
+  await call("request_support_repair", { p_ticket: ticketId, p_action: action, p_note: note.trim() || null, p_device: device });
 }
 
 export async function repairsFor(ticketId: string): Promise<RepairRequest[]> {
   const { data, error } = await db()
     .from("support_repair_actions")
-    .select("id, ticket_id, action, note, status, result, requested_at, decided_at")
+    .select(REPAIR_COLUMNS)
     .eq("ticket_id", ticketId)
     .order("requested_at", { ascending: false });
   if (error) throw new Error(error.message);

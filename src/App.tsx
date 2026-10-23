@@ -141,6 +141,7 @@ import { isMac, isTauri, isTrayView } from "@/lib/env";
 import { ToastProvider, useToast } from "@/lib/toast";
 import { AppearanceProvider, logicalWidth, useAppearance } from "@/lib/appearance";
 import { AuthProvider, useAuth } from "@/lib/auth/useAuth";
+import { SupportRequests } from "@/components/nova/SupportRequests";
 import { BillingProvider, useBilling } from "@/lib/billing/useEntitlements";
 import { SkipLink, Announcer } from "@/components/nova/A11y";
 import { AccessibilityWidget } from "@/components/nova/AccessibilityWidget";
@@ -1364,6 +1365,7 @@ function ConsoleApp() {
         />
 
         <GuideDialog scene={scene} open={guideOpen} onOpenChange={setGuideOpen} onStartTour={startTour} />
+        <SupportRequests signedIn={Boolean(user)} />
         {tourIndex !== null && (
           <TourCard stops={stops} index={tourIndex} onIndex={setTourIndex} onClose={() => setTourIndex(null)} />
         )}
