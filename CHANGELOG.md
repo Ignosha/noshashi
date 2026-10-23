@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.21
+## 1.0.22
 
 ### Support
 
@@ -20,6 +20,8 @@
   scrubbed of secrets on your computer first) and allow support a 24-hour
   look (off by default).
 - Every screen has a guide (press ?), and there is a guided tour of the app.
+
+## 1.0.21
 
 ### Fixed
 
