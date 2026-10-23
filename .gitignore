@@ -38,3 +38,4 @@ site/.env.*
 supabase/.temp/
 COMMERCIALIZATION_PLAN.txt
 SETUP.md
+.sqltest.err

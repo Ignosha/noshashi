@@ -77,6 +77,11 @@ class XrplLink {
     return this.connected;
   }
 
+  /** The public server this link uses now, or will try next. */
+  currentEndpoint(): string {
+    return ENDPOINTS[this.endpointIndex % ENDPOINTS.length];
+  }
+
   /**
    * Drop the current connection and open a fresh one on the next public
    * server. Used by self-repair when a socket is stuck open but silent.

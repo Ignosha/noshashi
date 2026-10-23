@@ -1,0 +1,22 @@
+/* NOSHASHI's own theme, so NOSHREPAIR looks and behaves like the app it repairs. */
+@import "../../src/index.css";
+@source "../../src";
+@source "./";
+
+/* Respect the system's reduced-motion setting (WCAG 2.3.3). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Screen headings take focus programmatically so screen readers announce
+   them; they are not controls, so they get no focus ring. */
+h1[tabindex="-1"]:focus,
+h1[tabindex="-1"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}

@@ -145,7 +145,6 @@ ${THEME_BOOT}
 ${jsonLd([ORGANIZATION])}
 </head>
 <body class="ws-body-root">
-<a class="skip" href="#ws-main">Skip to content</a>
 <div class="ws-app" data-tool="${esc(key)}">
 ${sidebar(key, version)}
 <div class="ws-col">

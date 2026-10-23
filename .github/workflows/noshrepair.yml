@@ -1,0 +1,86 @@
+# Builds NOSHREPAIR, the support staff console, for each desktop platform.
+#
+# Runs by hand (Actions → NOSHREPAIR → Run workflow) and on any push that
+# changes NOSHREPAIR. The installers are uploaded as workflow artifacts
+# for staff to download, from any branch, so a change can be tried before
+# it merges; they
+# are not published as a public release, since NOSHREPAIR is a staff tool.
+# A copy is worthless without a support account, two-factor and a
+# customer's grant, but there is no reason to advertise it.
+
+name: NOSHREPAIR
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "noshrepair/**"
+      - ".github/workflows/noshrepair.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # One universal DMG that runs on both Intel and Apple silicon Macs.
+          - platform: macos-latest
+            target: universal-apple-darwin
+            rust_targets: aarch64-apple-darwin,x86_64-apple-darwin
+            label: macos-universal
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            rust_targets: x86_64-unknown-linux-gnu
+            label: linux-x64
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            rust_targets: x86_64-pc-windows-msvc
+            label: windows-x64
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux webview dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev libgtk-3-dev patchelf build-essential file
+          pkg-config --modversion webkit2gtk-4.1
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_targets }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./noshrepair/src-tauri -> target"
+          key: noshrepair-${{ matrix.target }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Rust tests
+        run: cargo test --lib --manifest-path noshrepair/src-tauri/Cargo.toml
+
+      - name: Build
+        working-directory: noshrepair
+        run: npx tauri build --target ${{ matrix.target }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: noshrepair-${{ matrix.label }}
+          path: |
+            noshrepair/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.dmg
+            noshrepair/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.deb
+            noshrepair/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.AppImage
+            noshrepair/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.msi
+            noshrepair/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.exe
+          if-no-files-found: error
+          retention-days: 30
