@@ -5,7 +5,8 @@
  *
  *   BASE=http://127.0.0.1:4321 node scripts/record-demo.mjs
  *
- * Writes a WebM to ./out; convert it with ffmpeg (see docs/first-tester-campaign.md).
+ * Writes a WebM to ./out. .github/workflows/demo-video.yml runs it, encodes
+ * the MP4 and poster into site/assets/video and commits them.
  */
 import { chromium } from "playwright";
 
