@@ -37,12 +37,13 @@ import { fetchWithTimeout } from "./_lib/html.js";
 import { enquiryEmail } from "./_lib/email.js";
 
 const LIMITS = { name: 120, email: 200, org: 160, subject: 160, message: 4000 };
-const TOPICS = new Set(["support", "institutions", "security", "privacy", "other"]);
+const TOPICS = new Set(["support", "institutions", "security", "privacy", "feedback", "other"]);
 const ROUTE = {
   support: "support@noshashi.app",
   institutions: "institutions@noshashi.app",
   security: "security@noshashi.app",
   privacy: "privacy@noshashi.app",
+  feedback: "support@noshashi.app",
   other: "support@noshashi.app",
 };
 
@@ -79,7 +80,7 @@ async function deliverByEmail(enquiry) {
   const lines = [
     `Topic:   ${enquiry.topic}`,
     `Name:    ${enquiry.name}`,
-    `Email:   ${enquiry.email}`,
+    `Email:   ${enquiry.email || "(none given)"}`,
     enquiry.org ? `Org:     ${enquiry.org}` : null,
     `Sent:    ${enquiry.at}`,
     `Source:  ${enquiry.origin}`,
@@ -96,7 +97,8 @@ async function deliverByEmail(enquiry) {
       from,
       to,
       // Answering the forwarded mail replies to the sender directly.
-      reply_to: enquiry.email,
+      // Product feedback may be anonymous, and then there is no one to reply to.
+      ...(enquiry.email ? { reply_to: enquiry.email } : {}),
       subject: branded.subject,
       html: branded.html,
       text: lines.join("\n"),
@@ -115,7 +117,7 @@ async function deliverByWebhook(enquiry) {
     // `text` carries a readable rendering for webhooks that show one
     // field (Slack); the structured fields sit alongside it.
     body: JSON.stringify({
-      text: `NOSHASHI enquiry — ${enquiry.topic} — ${enquiry.subject}\nFrom ${enquiry.name} <${enquiry.email}>${enquiry.org ? ` (${enquiry.org})` : ""}\n\n${enquiry.message}`,
+      text: `NOSHASHI enquiry — ${enquiry.topic} — ${enquiry.subject}\nFrom ${enquiry.name}${enquiry.email ? ` <${enquiry.email}>` : ""}${enquiry.org ? ` (${enquiry.org})` : ""}\n\n${enquiry.message}`,
       ...enquiry,
     }),
   });
@@ -168,9 +170,21 @@ export default async function handler(req, res) {
     origin: process.env.PUBLIC_SITE_URL || `https://${req.headers.host}`,
   };
 
+  /*
+   * Product feedback is the one topic that can be anonymous: testers
+   * should not have to hand over an address to say what confused them.
+   * An address they do give must still look like one, and is only kept
+   * when they ticked consent to be contacted about it.
+   */
+  const anonymous = enquiry.topic === "feedback";
+  if (anonymous) {
+    enquiry.name = enquiry.name || "Tester";
+    if (enquiry.email && body.consent !== true) enquiry.email = "";
+  }
+
   const problems = [];
   if (!enquiry.name) problems.push("a name");
-  if (!EMAIL.test(enquiry.email)) problems.push("a valid email address");
+  if (anonymous ? enquiry.email && !EMAIL.test(enquiry.email) : !EMAIL.test(enquiry.email)) problems.push("a valid email address");
   if (enquiry.message.length < 12) problems.push("a message of at least a few words");
   if (problems.length) {
     return res.status(400).json({ error: `Please add ${problems.join(", ")}.` });
@@ -194,7 +208,9 @@ export default async function handler(req, res) {
       ok: true,
       delivered: delivered.join("+"),
       route: recipients(enquiry.topic)[0],
-      message: "Message sent. You will get a reply at the address you gave.",
+      message: enquiry.email
+        ? "Message sent. You will get a reply at the address you gave."
+        : "Message sent. You left no address, so no reply will come.",
     });
   }
 

@@ -110,19 +110,34 @@
     <div data-ctx-details><p class="ws-muted">Run an analysis to see its source, timestamps and method here.</p></div>
   </div>
   <div class="ws-ctx-view" data-ctx-view="feedback" hidden>
-    <p class="ws-muted">Wrong result, confusing wording, missing feature or a data discrepancy? Tell us. It goes privately to the founder; nothing is published.</p>
+    <p class="ws-muted">What was useful, confusing or missing? It goes privately to the founder; nothing is published. Only the first two fields are needed.</p>
     <form class="ws-form" id="wsFeedback" novalidate>
-      <label for="wsFbKind">Type</label>
-      <select id="wsFbKind" name="kind"><option>Incorrect result</option><option>Confusing explanation</option><option>Missing functionality</option><option>Data discrepancy</option><option>Feature request</option></select>
-      <label for="wsFbWhat">What happened</label>
-      <textarea id="wsFbWhat" name="what" maxlength="1500" rows="4" required></textarea>
-      <label for="wsFbEmail">Email for a reply</label>
-      <input id="wsFbEmail" name="email" type="email" autocomplete="email" maxlength="200" required>
+      <label for="wsFbKind">Category</label>
+      <select id="wsFbKind" name="kind"><option>Analysis accuracy or evidence</option><option>Missing issuer or token information</option><option>Confusing terminology</option><option>Usability or navigation</option><option>Performance or reliability</option><option>Feature request</option><option>Other</option></select>
+      <label for="wsFbWhat">Your experience, in a few sentences</label>
+      <textarea id="wsFbWhat" name="what" maxlength="1500" rows="4" required aria-describedby="wsFbWhatHint"></textarea>
+      <p class="ws-fine" id="wsFbWhatHint">At least a few words. Never paste a seed phrase, private key or confidential trading information.</p>
+      <details class="ws-more-fields">
+        <summary>Answer a few more questions (optional)</summary>
+        <label for="wsFbGoal">What were you trying to accomplish?</label>
+        <input id="wsFbGoal" name="goal" maxlength="300">
+        <label for="wsFbUseful">What was useful?</label>
+        <input id="wsFbUseful" name="useful" maxlength="300">
+        <label for="wsFbMissing">What was confusing or missing?</label>
+        <input id="wsFbMissing" name="missing" maxlength="300">
+        <label for="wsFbAgain">What would make you use NOSHASHI again?</label>
+        <input id="wsFbAgain" name="again" maxlength="300">
+        <label for="wsFbRole">Your role or type of organization</label>
+        <input id="wsFbRole" name="role" maxlength="120" placeholder="e.g. wallet developer, token issuer, researcher">
+      </details>
+      <label for="wsFbEmail">Email, if you would like a reply (optional)</label>
+      <input id="wsFbEmail" name="email" type="email" autocomplete="email" maxlength="200">
+      <label class="ws-check"><input type="checkbox" name="consent" id="wsFbConsent"> I agree to be contacted about this feedback. My address is used for nothing else.</label>
       <div class="form-trap" aria-hidden="true"><label for="wsFbTrap">Leave empty</label><input id="wsFbTrap" name="company_website" tabindex="-1" autocomplete="off"></div>
       <button class="ws-btn primary" type="submit">Send feedback</button>
       <p class="ws-status" role="status" aria-live="polite" data-fb-status></p>
     </form>
-    <p class="ws-fine">The page and the last input you analyzed are attached so we can reproduce it. Never send keys or seed phrases.</p>
+    <p class="ws-fine">The page and the last input you analyzed are attached so we can reproduce it.</p>
   </div>
   <div class="ws-ctx-view" data-ctx-view="settings" hidden>
     <p class="ws-ctx-label">Appearance</p>

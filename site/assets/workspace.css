@@ -221,3 +221,19 @@ html[data-ws-side="rail"] .ws-brand{flex-direction:column;gap:10px}
   .ws-side{transition:none}
   .ws-loading::before{animation:none}
 }
+
+/* First-use guide, tester card and feedback extras (tester campaign). */
+.ws-guide,.ws-tester{margin:16px 0;padding:16px 18px;border:1px solid var(--rule);border-radius:12px;background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.ws-tester{margin-top:28px}
+.ws-guide-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ws-guide-title{margin:0;font-size:15px;font-weight:600;color:var(--ink)}
+.ws-guide-steps{margin:10px 0 0;padding-left:20px;color:var(--muted);font-size:14px;line-height:1.6}
+.ws-guide-steps li{margin:2px 0}
+.ws-guide-steps b{color:var(--ink);font-weight:600}
+.ws-tester p{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
+.ws-tester .ws-actions{margin-top:14px}
+.ws-check{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.ws-check input{margin-top:2px}
+.ws-more-fields{display:grid;gap:8px;border:1px solid var(--rule);border-radius:8px;padding:8px 10px}
+.ws-more-fields[open]{padding-bottom:12px}
+.ws-more-fields summary{cursor:pointer;font-size:12.5px;color:var(--ink)}
