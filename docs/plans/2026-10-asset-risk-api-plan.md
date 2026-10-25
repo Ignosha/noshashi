@@ -75,7 +75,7 @@ Not on the list on purpose: more networks, new dashboards, more marketing pages.
 | `api/_lib/asset-risk.js` | New: `walkBook` (exit estimate on funded depth), `assemble` (report), `canonical` and `receiptFor` (SHA-256 over sorted-key JSON), `LIMITATIONS` |
 | `api/_lib/routes/asset-risk.js` | New: validation, per-caller limit (30/min), parallel reads that fail independently, stable error codes, 60 s edge cache |
 | `api/tools.js`, `vercel.json`, `tests/function-count.test.js` | Route registered |
-| `tests/asset-risk.test.js` | New: 18 tests (exit arithmetic, receipt stability, report assembly against the recorded Bitstamp certificate, every error code, the 429 path) |
+| `tests/asset-risk.test.js` | New: 19 tests (exit arithmetic, receipt stability, a production report re-hashed to its own receipt, report assembly against the recorded Bitstamp certificate, every error code, the 429 path) |
 | `docs/API.md`, `docs/api/COMPLIANCE_API.md`, `scripts/build-site.mjs` | Endpoint documented; real Compliance API URL replaces the placeholder; stale migration status corrected |
 
 ---
@@ -100,7 +100,7 @@ Schema `noshashi.asset-risk.v1`. Full table in `docs/API.md` §6a. Rules:
 | Unit | Report from the recorded production certificate (`tests/fixtures/authority-bitstamp-107585800.json`) | same |
 | Contract | Every 400 code, 405, 429 with `Retry-After`, rejected requests not counted | same |
 | Parity | Book and authority maths match the desktop app | existing tests |
-| Live | After deploy: one call each for Bitstamp USD, GateHub USD, RLUSD, and an issuer with no book; record one response as a fixture | manual, then `tests/fixtures/` |
+| Live | Done on the PR #124 preview, 2026-10-25, mainnet: Bitstamp USD `size=1000` (both reads at ledger 107,894,639; sell fills at −3.85% vs mid, buy at +5.73%), RLUSD 40-hex `size=50000` (−0.19% / +0.23%), GateHub issuer only (recorded as `tests/fixtures/asset-risk-gatehub-107894643.json`) | repeat on production after merge |
 
 ---
 
@@ -188,7 +188,7 @@ The current Pro tier ($749 per seat) prices the console, not the API. Keep it; a
 
 **Days 1–30: audit and validation**
 - [x] Audit (this document)
-- [x] Free Asset Risk API live with docs (this change; verify on production after merge)
+- [x] Free Asset Risk API built, documented and checked live on the preview deployment (repeat on production after merge)
 - [ ] Count free API usage (backlog 3)
 - [ ] Post the free endpoint in XRPL Developers Discord, GitHub README, one Show HN
 - [ ] 10 interviews from the profiles in §5, using the questions in §5

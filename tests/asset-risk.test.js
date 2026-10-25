@@ -54,6 +54,14 @@ describe("walkBook", () => {
 });
 
 describe("receipt", () => {
+  it("re-hashes a report served by production to the digest it carries", async () => {
+    // Captured from the PR #124 preview on 2026-10-25, live mainnet. Anyone
+    // holding a report can check its receipt this way.
+    const served = JSON.parse(readFileSync("tests/fixtures/asset-risk-gatehub-107894643.json", "utf8"));
+    const { receipt, ...report } = served;
+    expect(await receiptFor(report)).toBe(receipt.digest);
+  });
+
   it("does not depend on key order", async () => {
     expect(canonical({ b: 1, a: { d: 2, c: [3, { f: 4, e: 5 }] } })).toBe(canonical({ a: { c: [3, { e: 5, f: 4 }], d: 2 }, b: 1 }));
     expect(await receiptFor({ x: 1, y: 2 })).toBe(await receiptFor({ y: 2, x: 1 }));
