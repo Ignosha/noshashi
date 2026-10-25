@@ -221,28 +221,37 @@
   var fb = document.getElementById("wsFeedback");
   if (fb) {
     var opened = Date.now();
+    var sending = false;
+    var EMAIL_OK = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
     fb.addEventListener("submit", function (e) {
       e.preventDefault();
+      if (sending) return;
       var status = fb.querySelector("[data-fb-status]");
-      var what = fb.what.value.trim(), email = fb.email.value.trim();
-      if (!what || !email) { status.textContent = "Add what happened and an email for the reply."; status.setAttribute("data-tone", "bad"); return; }
+      function say(text, tone) { status.textContent = text; if (tone) status.setAttribute("data-tone", tone); else status.removeAttribute("data-tone"); }
+      var what = fb.what.value.trim(), email = fb.email.value.trim(), consent = fb.consent.checked;
+      if (what.length < 12) { say("Describe your experience in at least a few words.", "bad"); fb.what.focus(); return; }
+      if (email && !EMAIL_OK.test(email)) { say("That email address does not look right. Leave it empty to send without one.", "bad"); fb.email.focus(); return; }
+      if (email && !consent) { say("Tick the consent box to be contacted, or leave the email empty.", "bad"); fb.consent.focus(); return; }
+      var extra = [["Trying to", fb.goal], ["Useful", fb.useful], ["Confusing or missing", fb.missing], ["Would use again if", fb.again], ["Role", fb.role]]
+        .map(function (p) { var v = p[1].value.trim(); return v ? p[0] + ": " + v : ""; }).filter(Boolean);
       var send = fb.querySelector("button[type=submit]");
-      send.disabled = true; status.textContent = "Sending…"; status.removeAttribute("data-tone");
+      sending = true; send.disabled = true; say("Sending…");
       fetch("/api/contact", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          topic: "support", name: "Workspace user", email: email, org: "",
-          subject: "Workspace feedback · " + fb.kind.value,
-          message: "Type: " + fb.kind.value + "\nPage: " + location.pathname + "\nLast input: " + (lastInput || "—") + "\n\n" + what,
+          topic: "feedback", name: fb.role.value.trim() || "Tester", email: email, consent: consent, org: "",
+          subject: "Tester feedback · " + fb.kind.value,
+          message: "Category: " + fb.kind.value + "\nPage: " + location.pathname + "\nLast input: " + (lastInput || "—") +
+            "\n\n" + what + (extra.length ? "\n\n" + extra.join("\n") : ""),
           elapsed: Date.now() - opened, company_website: fb.company_website.value
         })
-      }).then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
+      }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { ok: r.ok, body: b }; }); })
         .then(function (res) {
-          if (res.ok) { fb.reset(); status.textContent = "Thank you. The founder reads every one."; status.setAttribute("data-tone", "good"); return; }
-          status.textContent = res.body.error || "That did not send. Email support@noshashi.app instead."; status.setAttribute("data-tone", "bad");
+          if (res.ok) { fb.reset(); say(email ? "Thank you. You will get a reply at the address you gave." : "Thank you. The founder reads every one.", "good"); return; }
+          say((res.body.error || "That did not send.") + " You can also email support@noshashi.app.", "bad");
         })
-        .catch(function () { status.textContent = "Could not reach the server. Email support@noshashi.app instead."; status.setAttribute("data-tone", "bad"); })
-        .then(function () { send.disabled = false; });
+        .catch(function () { say("Could not reach the server, so nothing was sent. Email support@noshashi.app instead.", "bad"); })
+        .then(function () { sending = false; send.disabled = false; });
     });
   }
 
@@ -346,6 +355,12 @@
         "</dl>" +
         '<div class="ws-block"><h3 class="ws-h2">What this means</h3><ul class="ws-notes">' + notes.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") +
         "<li>These are the issuer's powers, not a verdict. One passing check does not make a token safe.</li></ul></div>" +
+        '<div class="ws-block"><h3 class="ws-h2">Not shown by the ledger: verify yourself</h3><ul class="ws-notes">' +
+        "<li>" + (domain ? "Who runs this account. The domain " + esc(domain) + " is set by the account itself: confirm the issuer lists this address in that domain's xrp-ledger.toml and on its own website."
+          : "Who runs this account. No domain is set, so the ledger names no operator: find this address published by the issuer itself before trusting it.") + "</li>" +
+        "<li>Which token you hold. One issuer can issue several currency codes; check the exact code on your trust line.</li>" +
+        "<li>Whether the token is backed or redeemable. Reserves, attestations and redemption terms are off-ledger; ask the issuer for them.</li>" +
+        "<li>Whether these settings will stay. They are read at the ledger shown; the account's key holders can change most of them later (giving up freeze is permanent).</li></ul></div>" +
         '<div class="ws-block"><h3 class="ws-h2">Evidence</h3>' + table([
           row("Must approve each holder", f.requireAuthorization ? "Yes" : "No"),
           row("Master key", f.disableMasterKey ? "Disabled" : "Enabled"),
@@ -586,4 +601,20 @@
       submit();
     }
   }
+
+  /* ── first-use guide and tester card: dismissible, remembered here ── */
+  document.querySelectorAll("[data-dismiss-key]").forEach(function (box) {
+    var key = "noshashi:ws:dismissed:" + box.getAttribute("data-dismiss-key");
+    try { if (localStorage.getItem(key) === "1") { box.hidden = true; return; } } catch (e) {}
+    var x = box.querySelector("[data-dismiss]");
+    if (x) x.addEventListener("click", function () {
+      box.hidden = true;
+      try { localStorage.setItem(key, "1"); } catch (e) {}
+      if (input) input.focus();
+    });
+  });
+  document.querySelectorAll("[data-start-analyzing]").forEach(function (b) {
+    b.addEventListener("click", function () { if (input) { input.focus(); input.scrollIntoView({ block: "center" }); } });
+  });
+  if (new URLSearchParams(location.search).get("feedback") === "1") openCtx("feedback");
 })();

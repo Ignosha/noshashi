@@ -1,0 +1,67 @@
+name: Demo video
+
+# Records the homepage demo (scripts/record-demo.mjs) against the local
+# site, which reads XRPL mainnet live, and commits the video and poster to
+# the branch that ran it. A GitHub runner is used because it can reach
+# public XRPL nodes. The recorder waits for every result to render and
+# fails, committing nothing, if one does not. Run it by hand on a branch.
+
+on:
+  workflow_dispatch:
+  push:
+    # Never main: the recording commits, and main only takes reviewed
+    # changes. The video reaches main through the pull request.
+    branches-ignore: [main]
+    paths:
+      - scripts/record-demo.mjs
+      - .github/workflows/demo-video.yml
+
+concurrency:
+  group: demo-video-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Record on mainnet
+        run: |
+          node scripts/dev-site.mjs &
+          npx wait-on -t 30000 http://127.0.0.1:4321/ || sleep 5
+          mkdir -p /tmp/rec && cd /tmp/rec
+          node "$GITHUB_WORKSPACE/scripts/record-demo.mjs"
+
+      - name: Encode
+        run: |
+          W=$(ls /tmp/rec/out/*.webm | head -1)
+          mkdir -p site/assets/video
+          # Screen content at 12 fps compresses to well under a megabyte.
+          ffmpeg -y -loglevel error -i "$W" -vf fps=12 -c:v libx264 -preset veryslow -crf 34 \
+            -tune stillimage -pix_fmt yuv420p -movflags +faststart -an site/assets/video/noshashi-demo.mp4
+          ffmpeg -y -loglevel error -ss 26 -i "$W" -frames:v 1 -q:v 6 site/assets/video/noshashi-demo.jpg
+          ls -la site/assets/video
+
+      - name: Commit the video
+        if: github.ref != 'refs/heads/main'
+        run: |
+          git add site/assets/video
+          if git diff --cached --quiet; then echo "No change."; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Homepage demo video recorded on XRPL mainnet"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

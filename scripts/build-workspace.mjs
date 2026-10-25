@@ -90,19 +90,34 @@ function contextPanel(details) {
     <div data-ctx-details>${details || '<p class="ws-muted">Run an analysis to see its source, timestamps and method here.</p>'}</div>
   </div>
   <div class="ws-ctx-view" data-ctx-view="feedback" hidden>
-    <p class="ws-muted">Wrong result, confusing wording, missing feature or a data discrepancy? Tell us. It goes privately to the founder; nothing is published.</p>
+    <p class="ws-muted">What was useful, confusing or missing? It goes privately to the founder; nothing is published. Only the first two fields are needed.</p>
     <form class="ws-form" id="wsFeedback" novalidate>
-      <label for="wsFbKind">Type</label>
-      <select id="wsFbKind" name="kind"><option>Incorrect result</option><option>Confusing explanation</option><option>Missing functionality</option><option>Data discrepancy</option><option>Feature request</option></select>
-      <label for="wsFbWhat">What happened</label>
-      <textarea id="wsFbWhat" name="what" maxlength="1500" rows="4" required></textarea>
-      <label for="wsFbEmail">Email for a reply</label>
-      <input id="wsFbEmail" name="email" type="email" autocomplete="email" maxlength="200" required>
+      <label for="wsFbKind">Category</label>
+      <select id="wsFbKind" name="kind"><option>Analysis accuracy or evidence</option><option>Missing issuer or token information</option><option>Confusing terminology</option><option>Usability or navigation</option><option>Performance or reliability</option><option>Feature request</option><option>Other</option></select>
+      <label for="wsFbWhat">Your experience, in a few sentences</label>
+      <textarea id="wsFbWhat" name="what" maxlength="1500" rows="4" required aria-describedby="wsFbWhatHint"></textarea>
+      <p class="ws-fine" id="wsFbWhatHint">At least a few words. Never paste a seed phrase, private key or confidential trading information.</p>
+      <details class="ws-more-fields">
+        <summary>Answer a few more questions (optional)</summary>
+        <label for="wsFbGoal">What were you trying to accomplish?</label>
+        <input id="wsFbGoal" name="goal" maxlength="300">
+        <label for="wsFbUseful">What was useful?</label>
+        <input id="wsFbUseful" name="useful" maxlength="300">
+        <label for="wsFbMissing">What was confusing or missing?</label>
+        <input id="wsFbMissing" name="missing" maxlength="300">
+        <label for="wsFbAgain">What would make you use NOSHASHI again?</label>
+        <input id="wsFbAgain" name="again" maxlength="300">
+        <label for="wsFbRole">Your role or type of organization</label>
+        <input id="wsFbRole" name="role" maxlength="120" placeholder="e.g. wallet developer, token issuer, researcher">
+      </details>
+      <label for="wsFbEmail">Email, if you would like a reply (optional)</label>
+      <input id="wsFbEmail" name="email" type="email" autocomplete="email" maxlength="200">
+      <label class="ws-check"><input type="checkbox" name="consent" id="wsFbConsent"> I agree to be contacted about this feedback. My address is used for nothing else.</label>
       <div class="form-trap" aria-hidden="true"><label for="wsFbTrap">Leave empty</label><input id="wsFbTrap" name="company_website" tabindex="-1" autocomplete="off"></div>
       <button class="ws-btn primary" type="submit">Send feedback</button>
       <p class="ws-status" role="status" aria-live="polite" data-fb-status></p>
     </form>
-    <p class="ws-fine">The page and the last input you analyzed are attached so we can reproduce it. Never send keys or seed phrases.</p>
+    <p class="ws-fine">The page and the last input you analyzed are attached so we can reproduce it.</p>
   </div>
   <div class="ws-ctx-view" data-ctx-view="settings" hidden>
     <p class="ws-ctx-label">Appearance</p>
@@ -224,14 +239,45 @@ function overview(version) {
   });
 }
 
-function toolPage({ key, path, crumb, title, lede, description, form, examples, details, empty }) {
+function toolPage({ key, path, crumb, title, lede, description, form, examples, details, empty, intro = "", after = "" }) {
   return { key, path, title: crumb, crumb, description, details,
     main: `${head(title, lede)}
+${intro}
 ${form}
 ${examples ? `<p class="ws-examples">${examples}</p>` : ""}
 <div class="ws-empty" data-empty>${empty}</div>
-<section class="ws-result" data-result aria-live="polite" hidden></section>` };
+<section class="ws-result" data-result aria-live="polite" hidden></section>
+${after}` };
 }
+
+/* First-use guide for the issuer tool: three steps in the page's own
+   words, dismissible and remembered in this browser only. */
+const ISSUER_GUIDE = `<section class="ws-guide" data-dismiss-key="issuer-guide" aria-labelledby="wsGuideTitle">
+  <div class="ws-guide-head"><h2 class="ws-guide-title" id="wsGuideTitle">New here? Three steps</h2>
+  <button type="button" class="ws-icon-btn" data-dismiss aria-label="Hide these steps">${icon("close")}</button></div>
+  <ol class="ws-guide-steps">
+    <li><b>Paste an issuer address</b> below, or press one of the examples (Bitstamp, GateHub, Ripple).</li>
+    <li><b>Read the controls</b>: can it freeze holders, claw back balances, require approval, charge a transfer fee?</li>
+    <li><b>Check the evidence</b> and the ledger it was read at, then note what you still need to verify yourself.</li>
+  </ol>
+  <p class="ws-fine">NOSHASHI shows what the ledger records about an issuer. It does not say whether a token is safe, legitimate or a good investment.</p>
+</section>`;
+
+/* The first-tester invitation. Placed after the result area so it never
+   sits between someone and the tool they came to use. */
+const TESTER_CARD = `<aside class="ws-tester" data-dismiss-key="tester-card" aria-labelledby="wsTesterTitle">
+  <div class="ws-guide-head"><h2 class="ws-guide-title" id="wsTesterTitle">Help us improve NOSHASHI</h2>
+  <button type="button" class="ws-icon-btn" data-dismiss aria-label="Hide this card">${icon("close")}</button></div>
+  <p>Try a real XRPL token-analysis workflow and tell us what is useful, confusing, or missing.</p>
+  <ol class="ws-guide-steps">
+    <li>Choose an XRPL-issued token you know or want to investigate.</li>
+    <li>Review the issuer information and currently available findings.</li>
+    <li>Identify one finding that affects what you would investigate next.</li>
+    <li>Tell us what evidence or functionality is missing.</li>
+  </ol>
+  <div class="ws-actions"><button type="button" class="ws-btn primary" data-start-analyzing>Start analyzing</button>
+  <button type="button" class="ws-btn" data-ctx-open="feedback">Share feedback</button></div>
+</aside>`;
 
 const PAGES = [
   toolPage({
@@ -263,6 +309,8 @@ const PAGES = [
 </form>`,
     examples: 'Examples: <button type="button" class="sample" data-example="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B">Bitstamp (USD)</button> · <button type="button" class="sample" data-example="rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq">GateHub</button> · <button type="button" class="sample" data-example="rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">Ripple (RLUSD)</button>',
     empty: "<p><b>Paste an issuer address.</b> You will see whether it can freeze holders, claw back balances or require approval, and what it charges on transfers.</p>",
+    intro: ISSUER_GUIDE,
+    after: TESTER_CARD,
     details: method([
       "Source: <code>account_info</code> with signer lists at the latest validated ledger, via <code>/api/issuer-state</code>.",
       "Each control is read from the account's flags; nothing is inferred.",

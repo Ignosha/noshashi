@@ -259,7 +259,7 @@ export function enquiryEmail(enquiry) {
     <p style="margin:0 0 8px;font-family:${MONO};font-size:10px;letter-spacing:.14em;color:${T.faint};">MESSAGE</p>
     <p style="margin:0;font-family:${SANS};font-size:15px;color:${T.ink};line-height:1.7;white-space:pre-wrap;">${esc(enquiry.message)}</p>
     <p style="margin:24px 0 0;font-family:${SANS};font-size:12px;color:${T.faint};line-height:1.6;">
-      Replying to this email goes straight to ${esc(enquiry.email)}.</p>`;
+      ${enquiry.email ? `Replying to this email goes straight to ${esc(enquiry.email)}.` : "Sent without an email address, so there is no one to reply to."}</p>`;
 
   return {
     subject: `[${enquiry.topic}] ${enquiry.subject || "Website enquiry"}`,
