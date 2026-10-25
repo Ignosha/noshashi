@@ -142,6 +142,10 @@
     {
       "source": "/api/book-health",
       "destination": "/api/tools?tool=book-health"
+    },
+    {
+      "source": "/api/v1/asset-risk",
+      "destination": "/api/tools?tool=asset-risk"
     }
   ]
 }

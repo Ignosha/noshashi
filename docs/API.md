@@ -218,6 +218,49 @@ and published rate limits. Useful as a health check.
 
 ---
 
+## 6a. `GET /api/v1/asset-risk` — built, free, no key
+
+Answers, for one issued asset: **what can its issuer do to holders, and
+what could actually be sold or bought on its XRP order book right now?**
+The free, keyless entry point to the API, served from the website's own
+origin:
+
+```http
+GET https://www.noshashi.app/api/v1/asset-risk?issuer=r…&currency=USD&size=1000
+```
+
+| Parameter | Required | Meaning |
+|---|---|---|
+| `issuer` | yes | The issuing account (`r…`). |
+| `currency` | no | 3-character or 40-hex code. Without it, only issuer controls are read. |
+| `size` | no | Units of the asset. Adds an exit estimate: what a sale (walking the bids) and a purchase (walking the asks) of that size would fill at. Needs `currency`. |
+
+Response `200`, schema `noshashi.asset-risk.v1`:
+
+| Field | Meaning |
+|---|---|
+| `asset` | `issuer`, `currency`, `currency_label`. |
+| `evaluated_at` | ISO time of the read. |
+| `ledgers` | Validated ledger index of each read (`issuer_controls`, `liquidity`) and the `gap` between them. |
+| `issuer_controls` | The authority certificate's `authority_verdict` (`go`, `hold`, `no-go`, `insufficient-data`), `rules_version`, `certificate_digest` and every check with its detail. A verdict on the issuer's ledger controls, **not a rating of the asset**. |
+| `liquidity` | `reference` bid/ask/mid, `quoted` against `fillable` depth within `band` of mid, `fillable_ratio`, `levels_requested`, `units`, `disclosures`, and `exit.sell` / `exit.buy` when `size` is given: `filled`, `unfilled`, `fully_fillable`, `average_price`, `worst_price`, `impact_vs_mid_pct`, `levels_used`. `null` without `currency`. |
+| `unknowns` | Each source that could not be read, and why. Empty when everything was read. |
+| `limitations` | What the report never checks: off-ledger backing, identity, AMM pools, later changes. Always present. |
+| `evidence` | The free endpoints that return the raw ledger replies behind each figure. |
+| `receipt` | SHA-256 over the canonical JSON (keys sorted at every depth) of every other field. |
+
+Errors are `{ "error": "<code>", "message": "…" }`: `invalid_issuer`,
+`invalid_currency`, `invalid_size`, `size_needs_currency` (400),
+`method_not_allowed` (405), `rate_limited` (429, with `Retry-After`),
+`ledger_unreachable` (502). One unreadable source does not fail the call:
+it is named in `unknowns` and its section is `null`.
+
+Limits: 30 uncached requests a minute per caller (`X-RateLimit-Limit`,
+`X-RateLimit-Remaining`); answers are cached at the edge for 60 seconds.
+The limiter is per serverless instance, not global.
+
+---
+
 ## 6. `GET /v1/market/:pair` — `NOT BUILT`
 
 Answers: **what is this market actually worth, as distinct from what it
@@ -662,14 +705,15 @@ network. Do not call from a browser.
 |---|---|
 | `POST /noshashi-verify` — auth, entitlement, credit, audit | Deployed |
 | Base58 checksum validation of `subject` | Done |
-| Durable per-key, tier-aware rate limiting | Done — needs migration applied |
-| Idempotency-Key replay | Done — needs migration applied |
-| Credit refund on `502`/`503` | Done — needs migration applied |
-| Terminal key revocation, key expiry, key scopes | Done — needs migration applied |
+| Durable per-key, tier-aware rate limiting | Done — migration applied in production (verified 2026-10-25) |
+| Idempotency-Key replay | Done — migration applied in production (verified 2026-10-25) |
+| Credit refund on `502`/`503` | Done — migration applied in production (verified 2026-10-25) |
+| Terminal key revocation, key expiry, key scopes | Done — migration applied in production (verified 2026-10-25) |
 | Fail-closed audit write | Done |
 | Vanity `api.noshashi.app` origin | Not configured |
 | Path-style `/v1/compliance/:address` | Not built (body-style works) |
-| `GET /v1/market/:pair` | Not built |
+| `GET /api/v1/asset-risk` — issuer controls, fillable depth, exit estimate, receipt | Built (free, keyless, §6a) |
+| `GET /v1/market/:pair` | Not built (exit estimate available through §6a) |
 | `GET /v1/combined/:address` | Not built |
 | Webhook delivery, signing, retries | Not built |
 | OpenAPI 3.1 document | Not built |
