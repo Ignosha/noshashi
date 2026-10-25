@@ -66,6 +66,14 @@ records and what still needs checking.
 
 ## The 12-minute scenario: "Would you investigate this token further?"
 
+**Audience:** an XRPL builder, token researcher, digital-asset operator, or
+developer evaluating an unfamiliar issued token.
+
+**Task, read to the tester word for word:** "Inspect this XRPL-issued token
+and its issuer. Identify the observable issuer controls and other available
+signals that deserve further attention. Explain what you can conclude from
+the evidence and what remains unknown."
+
 Run it live on a call (screen shared by the tester) or send it as written
 instructions. Don't explain the product first; watching where people get
 stuck is the point.
