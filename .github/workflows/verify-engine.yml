@@ -7,7 +7,9 @@ name: Verification engine
 # server. No network.
 #
 # `live` reads XRPL mainnet: it verifies a recorded partial payment from two
-# endpoints run by different operators and checks the verdict. It is kept
+# endpoints run by different operators and checks the verdict, once with
+# the Rust engine and once with the hosted API's TypeScript port
+# (supabase/functions/noshashi-verify/payment.ts). It is kept
 # out of CI (which release.yml gates on) so a public node having a bad
 # minute cannot block a release; a failure here is still a real signal to
 # look at.
@@ -18,10 +20,16 @@ on:
     paths:
       - "src-tauri/**"
       - "tests/fixtures/account-tx-solo-107587061.json"
+      - "tests/fixtures/payment-verify-vectors.json"
+      - "supabase/functions/noshashi-verify/payment.ts"
+      - "src/lib/desk/__tests__/payment-hosted.test.ts"
       - ".github/workflows/verify-engine.yml"
   pull_request:
     paths:
       - "src-tauri/**"
+      - "tests/fixtures/payment-verify-vectors.json"
+      - "supabase/functions/noshashi-verify/payment.ts"
+      - "src/lib/desk/__tests__/payment-hosted.test.ts"
       - ".github/workflows/verify-engine.yml"
 
 permissions:
@@ -79,3 +87,16 @@ jobs:
 
       - name: Verify a real mainnet partial payment from two operators
         run: cargo test --locked --lib --manifest-path src-tauri/Cargo.toml verify -- --ignored --nocapture
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Hosted rules, shared vectors and the same payment live
+        env:
+          NOSHASHI_LIVE: "1"
+        run: npx vitest run src/lib/desk/__tests__/payment-hosted.test.ts

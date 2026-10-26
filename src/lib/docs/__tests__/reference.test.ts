@@ -51,6 +51,8 @@ describe("the documentation reference is the code's", () => {
       "analyze/issuer",
       "analyze/address",
       "analyze/transaction",
+      "payment/verify",
+      "payment/signing-key",
     ]);
     expect(reference.servers.length).toBeGreaterThan(1);
   });

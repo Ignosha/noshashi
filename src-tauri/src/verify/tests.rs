@@ -1029,3 +1029,77 @@ fn t35_digest_parity_vector() {
 }
 
 const PARITY_DIGEST: &str = "ACA86C389009899CF9FCCC15EA4E175A57571075388F5EEB4FFC98E5767A2766";
+
+/// Shared with the hosted API (supabase/functions/noshashi-verify/payment.ts):
+/// both sides run tests/fixtures/payment-verify-vectors.json and must reach
+/// the same status, reason, findings, decision key and evidence digest.
+/// With NOSHASHI_WRITE_VECTORS=1 this engine writes `expected` instead.
+#[test]
+fn t36_shared_vectors() {
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../tests/fixtures/payment-verify-vectors.json"
+    );
+    let mut file: Value = serde_json::from_str(&std::fs::read_to_string(path).expect("vectors"))
+        .expect("vectors parse");
+    let entries = real_entries();
+    let write = std::env::var("NOSHASHI_WRITE_VECTORS").is_ok();
+    let vectors = file["vectors"].as_array_mut().expect("vectors array");
+    assert!(vectors.len() >= 30);
+    for v in vectors.iter_mut() {
+        let name = v["name"].as_str().unwrap().to_string();
+        let reads: Vec<SourceRead> = v["reads"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| {
+                let source = r["source"].as_str().unwrap();
+                let at = r["observed_at"].as_str().unwrap();
+                if let Some(i) = r["fixture"].as_u64() {
+                    observe(source, at, &entries[i as usize])
+                } else if let Some(e) = r["failed"].as_str() {
+                    SourceRead::Failed {
+                        source: source.into(),
+                        observed_at: at.into(),
+                        error: e.into(),
+                    }
+                } else {
+                    observe(source, at, &r["result"])
+                }
+            })
+            .collect();
+        let invoice: Option<InvoicePolicy> = if v["invoice"].is_null() {
+            None
+        } else {
+            Some(serde_json::from_value(v["invoice"].clone()).expect("invoice"))
+        };
+        let network: Network = serde_json::from_value(v["network"].clone()).unwrap();
+        let report = verify(&VerifyInput {
+            requested_hash: v["hash"].as_str().unwrap(),
+            network,
+            reads: &reads,
+            invoice: invoice.as_ref(),
+            prior_invoice: v["prior_invoice"].as_str(),
+            evaluated_at: v["evaluated_at"].as_str().unwrap(),
+            rules_version: RULES_VERSION,
+        });
+        let got = json!({
+            "status": report.status,
+            "reason_code": report.reason_code,
+            "findings": report.findings.iter().map(|f| f.code).collect::<Vec<_>>(),
+            "amount_difference": report.amount_difference,
+            "decision_key": report.decision_key,
+            "evidence_digest": report.evidence_digest,
+        });
+        if write {
+            v["expected"] = got;
+        } else {
+            assert_eq!(v["expected"], got, "vector: {name}");
+        }
+    }
+    if write {
+        let mut text = serde_json::to_string_pretty(&file).unwrap();
+        text.push('\n');
+        std::fs::write(path, text).unwrap();
+    }
+}

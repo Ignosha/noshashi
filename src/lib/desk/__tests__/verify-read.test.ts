@@ -228,8 +228,8 @@ describe("the function wiring", () => {
 
   it("the API reference documents every verb the function serves", () => {
     const doc = readFileSync("docs/api/COMPLIANCE_API.md", "utf8");
-    const verbs = [...source.matchAll(/^  "([a-z/{}]+)":/gm)].map((m) => m[1]);
-    expect(verbs).toEqual(["authority/check", "receipts/{digest}", "analyze/issuer", "analyze/address", "analyze/transaction"]);
+    const verbs = [...source.matchAll(/^  "([a-z/{}-]+)":/gm)].map((m) => m[1]);
+    expect(verbs).toEqual(["authority/check", "receipts/{digest}", "analyze/issuer", "analyze/address", "analyze/transaction", "payment/verify", "payment/signing-key"]);
     for (const verb of verbs) expect(doc).toContain(`\`${verb}\``);
   });
 

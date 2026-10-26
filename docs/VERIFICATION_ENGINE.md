@@ -7,6 +7,8 @@ checks it with exact arithmetic, and returns `VERIFIED`, `HOLD` or
 SHA-256 digest over a canonical evidence record.
 
 The desktop app calls it through the Tauri command `verify_xrpl_payment`.
+The hosted Compliance API serves the same rules as `POST payment/verify`
+(`supabase/functions/noshashi-verify/payment.ts`, see "Hosted API" below).
 In the app it is the **Invoice check** panel on the Settlement screen
 (`src/components/scenes/InvoiceCheck.tsx`). The existing settlement read
 (`src/lib/desk/settlement.ts`) is unchanged: it describes what a
@@ -112,7 +114,7 @@ The record has the schema `noshashi.xrpl-payment-evidence/1`. It holds:
 
 What the digest proves, and what it doesn't:
 - **Content integrity:** yes. The record re-hashes to its digest only if not one byte changed.
-- **Authenticity:** no. Anyone can compute a SHA-256. Signed exports would need a key held server-side, never in the desktop app. Not implemented.
+- **Authenticity:** not from the digest alone, because anyone can compute a SHA-256. The hosted API can add an Ed25519 signature with a key held only in its secrets (see "Hosted API").
 - **Ledger truth:** no. It fixes what the sources said. Validation and agreement between independent sources are separate checks, recorded inside the record.
 
 `decision_key` is SHA-256 of `{network, hash, invoice, rules}`. The same transaction, invoice and rules always give the same key, so it can be used to deduplicate.
@@ -133,7 +135,7 @@ What the digest proves, and what it doesn't:
 
 ## Tests
 
-`cargo test --lib verify` (in `src-tauri`) runs 40 tests. `.github/workflows/verify-engine.yml` runs them on every change to `src-tauri`, then runs the live test:
+`cargo test --lib verify` (in `src-tauri`) runs 41 tests. `.github/workflows/verify-engine.yml` runs them on every change to `src-tauri`, then runs the live test:
 
 - **Real mainnet fixtures** (`tests/fixtures/account-tx-solo-107587061.json`):
   - a full payment;
@@ -149,7 +151,36 @@ What the digest proves, and what it doesn't:
   - tamper detection;
   - rules version changes the digest and the key.
 - **Properties:** 5,000 deterministic pseudo-random cases checking comparison, addition, subtraction and round-tripping against i128 arithmetic.
-- **Live** (`--ignored`, run in CI): verifies the real CSC partial payment from two operators on mainnet and expects `PARTIAL_NOT_PERMITTED`.
+- **Shared vectors** (`t36`): 38 cases in `tests/fixtures/payment-verify-vectors.json`, 16 of them built on the real mainnet entries. Each pins the status, reason, findings, difference, decision key and evidence digest. The hosted API's TypeScript port must reproduce every one (`src/lib/desk/__tests__/payment-hosted.test.ts`).
+- **Live** (`--ignored`, run in CI): verifies the real CSC partial payment from two operators on mainnet and expects `PARTIAL_NOT_PERMITTED`. It passed on 2026-10-26 (workflow runs 40345517702 and 40345580240).
+
+## Hosted API
+
+`POST payment/verify` on the `noshashi-verify` Edge Function serves these rules to integrations. `docs/api/COMPLIANCE_API.md` has the request and response. The hosted version adds what a desktop binary cannot:
+
+- **Keys, quotas and limits.** A `verify`-scoped key, the `compliance_api` entitlement and the durable per-key rate limit. One credit per call, not charged when no source answered.
+- **A persistent settlement book.** `noshashi.payment_settlements` has a unique constraint on (tenant, network, transaction hash). A transaction settles at most one invoice per organization, or per account for a personal key. Two requests that race for different invoices cannot both get `VERIFIED`: the loser is decided again against the winner's invoice and gets `ALREADY_APPLIED`.
+- **An audit trail.** `noshashi.payment_verifications` keeps every served report, as served, and is append-only (no UPDATE or DELETE grant for any role). The row is written before the response; if it cannot be written, nothing is served and the credit is returned.
+- **Idempotency.** `Idempotency-Key` replays the stored response. A key reused for a different question is refused, because the decision key is computed before any read.
+- **Signed exports.** These are optional and gated on configuration.
+  - With the function secret `PAYMENT_EVIDENCE_SIGNING_KEY` set (an Ed25519 key, base64 PKCS#8), each report carries an Ed25519 signature over a canonical statement. The statement covers the hash, network, invoice, status, reason, rules, decision key and evidence digest.
+  - The public key is served at `GET payment/signing-key`. `checkSignature` in `payment.ts` shows the check: verify the signature, then re-hash the evidence.
+  - The private key exists only in the function's secrets: never in this repository, the desktop app or a response.
+  - Without it, the API says signing is not configured and the digest proves integrity only.
+
+The hosted rules are a port, not a binding to the Rust crate, because the Edge runtime is Deno. Parity is enforced, not assumed: the shared vectors, the canonical-JSON parity vector (`t35`) and the same transport limits (allowlist, no redirects, 1 MiB cap, compressed bodies refused, three attempts) are tested on both sides.
+
+## Installer size
+
+Measured on 2026-10-26 with `npx tauri build --bundles deb,appimage` on Linux x86-64, version 1.0.22, with this engine included:
+
+| Artifact | Size |
+|---|---|
+| Release binary (`noshashi`) | 8,531,416 bytes (8.5 MB) |
+| `.deb` | 4,463,352 bytes (4.5 MB) |
+| AppImage (bundles WebKitGTK) | 80,386,552 bytes (80.4 MB) |
+
+The build then stopped at updater signing, because `TAURI_SIGNING_PRIVATE_KEY` is held only by the release workflow. That step comes after bundling and does not change the sizes. macOS and Windows installers were not measured here.
 
 ## Security notes
 
@@ -162,8 +193,8 @@ Implemented:
 - No telemetry: transaction data goes only to the allowlisted XRPL nodes.
 
 Remaining:
-- The settlement book is in memory and per session. A hosted service needs it in a database, with a unique constraint on the hash.
-- No signed exports yet.
+- In the desktop app the settlement book is in memory and per session. The hosted API's book is persistent and shared per tenant (above).
+- Signed exports exist only on the hosted API, and only once its signing key is configured. The desktop app never signs, by design.
 - Public nodes carry no SLA, and both mainnet operators are public endpoints. An institutional deployment should add its own node as a third source.
 - The free-tier limit of 10 verifications a month is **not** enforced in the desktop app. Client-side metering is not a security control, so metering belongs to the hosted API.
 - Sanctions screening and the Travel Rule are out of scope. An address check is not OFAC compliance.

@@ -844,6 +844,14 @@
     {
       "path": "analyze/transaction",
       "description": "POST { hash } — a transaction's type, parties, result and delivered amount, read live. read or verify scope, free."
+    },
+    {
+      "path": "payment/verify",
+      "description": "POST { hash, network?, invoice?, dual_source?, record? } — did this transaction pay this invoice? VERIFIED, HOLD or REJECTED with a reason code and evidence digest; a VERIFIED settlement is recorded once per transaction. verify scope, one credit."
+    },
+    {
+      "path": "payment/signing-key",
+      "description": "GET — the Ed25519 public key that signs payment evidence, when signing is configured. Free, unauthenticated."
     }
   ],
   "edgeFunctions": [

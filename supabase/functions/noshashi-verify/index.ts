@@ -35,6 +35,7 @@ import {
   summariseTransaction,
   type ReadVerb,
 } from "./read.ts";
+import * as payment from "./payment.ts";
 
 /**
  * The service-role client, and its type.
@@ -113,6 +114,9 @@ const VERBS: Record<string, string> = {
   "analyze/issuer": "POST { issuer } — an issuer's controls, read live from the validated ledger. read or verify scope, free.",
   "analyze/address": "POST { address } — balance, reserve, owner count and credentials, read live. read or verify scope, free.",
   "analyze/transaction": "POST { hash } — a transaction's type, parties, result and delivered amount, read live. read or verify scope, free.",
+  "payment/verify":
+    "POST { hash, network?, invoice?, dual_source?, record? } — did this transaction pay this invoice? VERIFIED, HOLD or REJECTED with a reason code and evidence digest; a VERIFIED settlement is recorded once per transaction. verify scope, one credit.",
+  "payment/signing-key": "GET — the Ed25519 public key that signs payment evidence, when signing is configured. Free, unauthenticated.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -829,6 +833,12 @@ async function handle(request: Request, requestId: string): Promise<Response> {
 
   if (verb === "authority/check") {
     return await checkAuthorityCertificate(request, requestId);
+  }
+  if (verb === "payment/verify") {
+    return await handlePaymentVerify(request, requestId);
+  }
+  if (verb === "payment/signing-key") {
+    return await paymentSigningKey(request, requestId);
   }
   const read = readVerbOf(verb);
   if (read === "bad_digest") {
@@ -1786,4 +1796,280 @@ async function checkAuthorityCertificate(
     },
     requestId
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Payment verification — did this transaction pay this invoice?       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The desktop engine's rules (src-tauri/src/verify), served. The checks
+ * are payment.ts, a port held to the Rust engine by shared vectors; this
+ * function adds what a desktop binary cannot: a key, a credit, an audit
+ * row, a settlement book shared by everyone on the tenant, and a
+ * signature when a signing key is configured.
+ *
+ * Order matters:
+ *   1. admit (key with verify scope, entitlement, rate limit) and parse;
+ *      a bad hash or invoice is a 400 and costs nothing;
+ *   2. replay an Idempotency-Key, refusing one reused for a different
+ *      question (the decision key is computable before any read);
+ *   3. take one credit, read the ledger, decide;
+ *   4. record a VERIFIED settlement BEFORE serving it. The unique
+ *      constraint decides races: a request that loses to a different
+ *      invoice is decided again with that invoice as the prior one, so it
+ *      comes back ALREADY_APPLIED instead of a second VERIFIED;
+ *   5. write the audit row, fail closed, then respond.
+ * A read where no source answered is served (HOLD, SOURCE_UNAVAILABLE)
+ * and not billed.
+ */
+
+let signingKeyCache: Promise<payment.SigningKey | null> | null = null;
+
+function signingKey(): Promise<payment.SigningKey | null> {
+  if (!signingKeyCache) {
+    const raw = Deno.env.get("PAYMENT_EVIDENCE_SIGNING_KEY");
+    signingKeyCache = raw
+      ? payment.importSigningKey(raw).catch((error) => {
+          // A malformed secret disables signing; it never reaches a caller.
+          console.error(JSON.stringify({ level: "error", event: "signing_key_unusable", message: error instanceof Error ? error.message : String(error) }));
+          return null;
+        })
+      : Promise.resolve(null);
+  }
+  return signingKeyCache;
+}
+
+async function paymentSigningKey(request: Request, requestId: string): Promise<Response> {
+  if (request.method.toUpperCase() !== "GET") {
+    return json(405, { error: "method_not_allowed", message: "Only GET is supported." }, requestId, { Allow: "GET" });
+  }
+  const key = await signingKey();
+  if (!key) {
+    return json(
+      404,
+      { error: "signing_not_configured", message: "Payment evidence is not signed by this deployment. Reports still carry their SHA-256 evidence digest." },
+      requestId
+    );
+  }
+  return json(
+    200,
+    {
+      alg: "Ed25519",
+      key_id: key.keyId,
+      public_key_jwk: key.publicJwk,
+      signature_schema: payment.SIGNATURE_SCHEMA,
+      how_to_check:
+        "Ed25519-verify `signature` (base64url) over the UTF-8 bytes of `payload` with this key, then check that payload.evidence_digest equals SHA-256 of the canonical JSON of the evidence (keys sorted by UTF-8 bytes, no whitespace).",
+    },
+    requestId
+  );
+}
+
+async function handlePaymentVerify(request: Request, requestId: string): Promise<Response> {
+  if (request.method.toUpperCase() !== "POST") {
+    return json(405, { error: "method_not_allowed", message: "Only POST is supported." }, requestId, { Allow: "POST" });
+  }
+  const started = performance.now();
+
+  /* 1. Key, entitlement, rate limit; then the body. ------------------ */
+  const admitted = await admit(request, requestId, "verify");
+  if (admitted instanceof Response) return admitted;
+  const { supabase, auth, features, expired, perSecond } = admitted;
+
+  if (!(request.headers.get("content-type") ?? "").toLowerCase().includes("application/json")) {
+    return json(415, { error: "unsupported_media_type", message: "Content-Type must be application/json." }, requestId);
+  }
+  const rawBody = await request.text();
+  if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    return json(413, { error: "payload_too_large", message: `Body must be under ${MAX_BODY_BYTES} bytes.` }, requestId);
+  }
+  let body: Record<string, unknown>;
+  try {
+    const parsed = JSON.parse(rawBody);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) throw new Error("not an object");
+    body = parsed as Record<string, unknown>;
+  } catch {
+    return json(400, { error: "invalid_json", message: "Request body must be a JSON object." }, requestId);
+  }
+
+  const hash = payment.normalizeHash(typeof body.hash === "string" ? body.hash : "");
+  if (!hash) {
+    return json(400, { error: "invalid_hash", message: "hash is a transaction hash: exactly 64 hexadecimal characters." }, requestId);
+  }
+  const network = body.network === undefined ? "mainnet" : body.network;
+  if (network !== "mainnet" && network !== "testnet") {
+    return json(400, { error: "invalid_network", message: 'network is "mainnet" or "testnet".' }, requestId);
+  }
+  let invoice: payment.InvoicePolicy | null = null;
+  if (body.invoice !== undefined && body.invoice !== null) {
+    const parsed = payment.parseInvoice(body.invoice);
+    if (typeof parsed === "string") return json(400, { error: "invalid_invoice", message: parsed }, requestId);
+    const problem = payment.policyProblem(parsed);
+    if (problem) return json(400, { error: "invalid_policy", reason_code: "INVALID_POLICY", message: problem }, requestId);
+    if (parsed.invoice_id.length > 255) return json(400, { error: "invalid_invoice", message: "invoice.invoice_id must be 255 characters or fewer." }, requestId);
+    invoice = parsed;
+  }
+  for (const flag of ["dual_source", "record"]) {
+    if (body[flag] !== undefined && typeof body[flag] !== "boolean") {
+      return json(400, { error: "invalid_json", message: `${flag} must be true or false.` }, requestId);
+    }
+  }
+  // Two operators by default: the API is what a business relies on.
+  const dualSource = body.dual_source !== false;
+  const record = body.record !== false;
+
+  if (!features.includes("compliance_api")) {
+    return json(403, { error: "feature_not_enabled", message: "The Compliance API requires the Institutional plan." }, requestId);
+  }
+  if (expired) {
+    return json(403, { error: "entitlement_expired", message: "Entitlement has expired. Renew to continue." }, requestId);
+  }
+
+  /* 2. Idempotent replay. -------------------------------------------- */
+  const decisionKey = await payment.digest({
+    network,
+    hash,
+    invoice: invoice ? payment.invoiceJson(invoice) : null,
+    rules: payment.RULES_VERSION,
+  });
+  const idempotencyKey = (request.headers.get("idempotency-key") ?? "").trim() || null;
+  if (idempotencyKey && idempotencyKey.length > 255) {
+    return json(400, { error: "invalid_idempotency_key", message: "Idempotency-Key must be 255 characters or fewer." }, requestId);
+  }
+  const replay = async (): Promise<Response | null> => {
+    if (!idempotencyKey) return null;
+    const { data, error } = await supabase
+      .schema("noshashi")
+      .from("payment_verifications")
+      .select("response, request_id, decision_key")
+      .eq("account_id", auth.accountId)
+      .eq("idempotency_key", idempotencyKey)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    if (data.decision_key !== decisionKey) {
+      return json(
+        422,
+        { error: "idempotency_key_reused", message: "This Idempotency-Key was used for a different transaction, network or invoice." },
+        requestId
+      );
+    }
+    return json(200, data.response as Record<string, unknown>, requestId, {
+      "X-Idempotent-Replay": "true",
+      "X-Original-Request-Id": String(data.request_id ?? ""),
+    });
+  };
+  const replayed = await replay();
+  if (replayed) return replayed;
+
+  /* 3. One credit, then the ledger. ---------------------------------- */
+  const { data: consumed, error: consumeError } = await supabase
+    .schema("noshashi")
+    .rpc("consume_verification_credit", { p_account: auth.accountId });
+  if (consumeError) throw consumeError;
+  if (consumed !== true) {
+    return json(402, { error: "quota_exhausted", message: "No verification credits remaining. Purchase a credit pack." }, requestId);
+  }
+  let billed = true;
+  const refund = async (reason: string) => {
+    if (!billed) return;
+    billed = false;
+    const { error } = await supabase.schema("noshashi").rpc("refund_verification_credit", { p_account: auth.accountId });
+    console.warn(JSON.stringify({ level: "warn", request_id: requestId, event: "credit_refunded", reason, refund_failed: error ? error.message : undefined }));
+  };
+
+  try {
+    const tenant = auth.organizationId ? { column: "organization_id", value: auth.organizationId } : { column: "account_id", value: auth.accountId };
+    const priorInvoice = async (): Promise<string | null> => {
+      let query = supabase
+        .schema("noshashi")
+        .from("payment_settlements")
+        .select("invoice_id")
+        .eq("network", network)
+        .eq("transaction_hash", hash)
+        .eq(tenant.column, tenant.value);
+      if (!auth.organizationId) query = query.is("organization_id", null);
+      const { data, error } = await query.maybeSingle();
+      if (error) throw error;
+      return data ? String(data.invoice_id) : null;
+    };
+
+    const { reads, stats } = await payment.readSources(hash, network, dualSource);
+    if (!reads.some((r) => r.status !== "failed")) await refund("no_source_answered");
+
+    const decideWith = (prior: string | null) =>
+      payment.verify({ requestedHash: hash, network, reads, invoice, priorInvoice: prior, evaluatedAt: new Date().toISOString() });
+    let report = await decideWith(await priorInvoice());
+
+    /* 4. Record the settlement before serving it. -------------------- */
+    let recorded = false;
+    if (record && report.status === "VERIFIED" && invoice) {
+      const { error } = await supabase.schema("noshashi").from("payment_settlements").insert({
+        account_id: auth.accountId,
+        organization_id: auth.organizationId,
+        network,
+        transaction_hash: hash,
+        invoice_id: invoice.invoice_id,
+        decision_key: report.decision_key,
+        evidence_digest: report.evidence_digest,
+        request_id: requestId,
+      });
+      if (!error) recorded = true;
+      else if (error.code === "23505") {
+        const winner = await priorInvoice();
+        if (winner === invoice.invoice_id) recorded = true;
+        else report = await decideWith(winner);
+      } else throw error;
+    }
+
+    /* 5. Sign, audit (fail closed), respond. ------------------------- */
+    const key = await signingKey();
+    const signature = key ? await payment.signReport(report, key, new Date().toISOString()) : null;
+    const responseBody = {
+      report,
+      signature,
+      signing: key ? `Ed25519, key ${key.keyId}; public key at payment/signing-key` : "not configured on this deployment: the evidence digest proves integrity, not origin",
+      recorded,
+      source_stats: stats,
+      billed,
+    };
+    const { error: auditError } = await supabase.schema("noshashi").from("payment_verifications").insert({
+      account_id: auth.accountId,
+      organization_id: auth.organizationId,
+      api_key_id: auth.keyId,
+      request_id: requestId,
+      idempotency_key: idempotencyKey,
+      network,
+      transaction_hash: hash,
+      invoice_id: invoice?.invoice_id ?? null,
+      status: report.status,
+      reason_code: report.reason_code,
+      rule_version: report.rule_version,
+      decision_key: report.decision_key,
+      evidence_digest: report.evidence_digest,
+      response: responseBody,
+      signed: signature !== null,
+      billed,
+      latency_ms: Math.max(1, Math.round(performance.now() - started)),
+    });
+    if (auditError) {
+      if (auditError.code === "23505" && idempotencyKey) {
+        await refund("idempotent_duplicate");
+        const again = await replay();
+        if (again) return again;
+      }
+      await refund("audit_write_failed");
+      console.error(JSON.stringify({ level: "error", request_id: requestId, event: "audit_write_failed", message: auditError.message }));
+      return json(
+        503,
+        { error: "report_not_recorded", message: "The report could not be written to the audit trail, so it was not served. No credit was charged. Retry." },
+        requestId
+      );
+    }
+    return json(200, responseBody, requestId, { "RateLimit-Limit": String(perSecond) });
+  } catch (error) {
+    await refund("internal_error");
+    throw error;
+  }
 }
