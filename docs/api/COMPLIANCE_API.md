@@ -3,7 +3,7 @@
 One Edge Function, `noshashi-verify`, serves every verb. Paths are relative to
 
 ```
-https://<project>.supabase.co/functions/v1/noshashi-verify
+https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify
 ```
 
 `GET` on the bare path (no key needed) lists every verb, the domain registry
@@ -109,6 +109,24 @@ Every response is JSON and carries a `request_id`. Every refusal is `{ "error": 
 | 413 / 415 | `payload_too_large`, `unsupported_media_type` | |
 | 429 | `rate_limited` | Comes with `Retry-After`. |
 | 502 | `ledger_unavailable` | Mainnet could not be read. Nothing was charged. |
+
+## Free: `GET /api/v1/asset-risk` (no key)
+
+Before you have a key, one call on the website's own origin answers the
+first question most integrations ask about an issued asset: what can its
+issuer do to holders, and what could actually be sold or bought on its XRP
+order book right now?
+
+```
+curl "https://www.noshashi.app/api/v1/asset-risk?issuer=rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B&currency=USD&size=1000"
+```
+
+- `issuer` (required), `currency` (optional; without it only issuer controls are read), `size` (optional, units of the asset; adds what a sale and a purchase of that size would fill at).
+- Response schema `noshashi.asset-risk.v1`: `issuer_controls` (the authority certificate's verdict, rules version, digest and every check), `liquidity` (quoted against fillable depth, reference mid, `exit.sell` and `exit.buy`), `ledgers` (the validated ledger of each read), `unknowns` (each source that could not be read), `limitations` (what is never checked), `evidence` (the raw-read endpoints) and `receipt` (SHA-256 over everything else, keys sorted).
+- Errors are `{ "error": "<code>", "message": "…" }`: `invalid_issuer`, `invalid_currency`, `invalid_size`, `size_needs_currency`, `rate_limited` (with `Retry-After`), `ledger_unreachable`. One unreadable source does not fail the call; it is listed in `unknowns`.
+- 30 uncached requests a minute per caller; answers are cached for 60 seconds.
+
+It is not a rating. A report without findings means the ledger showed none of the controls or thin books it checks for; it says nothing about backing, redemption or who the issuer is.
 
 ## Not served by the API yet
 
