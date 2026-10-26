@@ -1,0 +1,102 @@
+name: Verification engine
+
+# The Rust payment-verification engine (src-tauri/src/verify).
+#
+# `unit` runs the engine's tests: exact amounts, every verdict and reason
+# code, the evidence digest, and the transport limits against a local HTTP
+# server. No network.
+#
+# `live` reads XRPL mainnet: it verifies a recorded partial payment from two
+# endpoints run by different operators and checks the verdict, once with
+# the Rust engine and once with the hosted API's TypeScript port
+# (supabase/functions/noshashi-verify/payment.ts). It is kept
+# out of CI (which release.yml gates on) so a public node having a bad
+# minute cannot block a release; a failure here is still a real signal to
+# look at.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "src-tauri/**"
+      - "tests/fixtures/account-tx-solo-107587061.json"
+      - "tests/fixtures/payment-verify-vectors.json"
+      - "supabase/functions/noshashi-verify/payment.ts"
+      - "src/lib/desk/__tests__/payment-hosted.test.ts"
+      - ".github/workflows/verify-engine.yml"
+  pull_request:
+    paths:
+      - "src-tauri/**"
+      - "tests/fixtures/payment-verify-vectors.json"
+      - "supabase/functions/noshashi-verify/payment.ts"
+      - "src/lib/desk/__tests__/payment-hosted.test.ts"
+      - ".github/workflows/verify-engine.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-engine-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux webview dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev libgtk-3-dev build-essential
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+          key: verify-engine
+
+      # generate_context! embeds the built frontend; the tests do not use it.
+      - name: Placeholder frontend
+        run: mkdir -p dist && echo '<!doctype html>' > dist/index.html
+
+      - name: Engine tests
+        run: cargo test --locked --lib --manifest-path src-tauri/Cargo.toml verify
+
+  live:
+    runs-on: ubuntu-22.04
+    needs: unit
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux webview dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev libgtk-3-dev build-essential
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+          key: verify-engine
+
+      - name: Placeholder frontend
+        run: mkdir -p dist && echo '<!doctype html>' > dist/index.html
+
+      - name: Verify a real mainnet partial payment from two operators
+        run: cargo test --locked --lib --manifest-path src-tauri/Cargo.toml verify -- --ignored --nocapture
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Hosted rules, shared vectors and the same payment live
+        env:
+          NOSHASHI_LIVE: "1"
+        run: npx vitest run src/lib/desk/__tests__/payment-hosted.test.ts

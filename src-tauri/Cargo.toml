@@ -31,7 +31,7 @@ sha2 = "0.10"
 # builds, with its TLS choice: rustls over ring, no second crypto stack.
 reqwest = { version = "0.13", default-features = false, features = ["json", "stream", "rustls-no-provider", "http2", "system-proxy"] }
 rustls = { version = "0.23", default-features = false, features = ["ring"] }
-tokio = { version = "1", features = ["sync", "macros"] }
+tokio = { version = "1", features = ["sync", "macros", "time"] }
 futures-util = { version = "0.3", default-features = false }
 
 # Desktop only: the menu bar tray and its HUD, the global accelerator,
@@ -80,3 +80,7 @@ codegen-units = 1
 opt-level = "s"
 strip = true
 panic = "abort"
+
+[dev-dependencies]
+# The verifier's transport tests run a local HTTP server (src/verify/tests.rs).
+tokio = { version = "1", features = ["rt", "net", "io-util", "macros", "time"] }

@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { TraceButton } from "@/lib/nav/handoff";
 import { useClaimedSubject } from "@/lib/nav/handoff";
+import { InvoiceCheck } from "./InvoiceCheck";
 
 /**
  * SettlementScene — what a transaction actually moved.
@@ -173,6 +174,8 @@ export function SettlementBody() {
               does.
             </p>
           </Panel>
+
+          <InvoiceCheck hash={query} />
 
           {report && (
             <Panel label="RECORD" bodyClassName="p-0">

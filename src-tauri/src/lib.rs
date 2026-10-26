@@ -16,6 +16,7 @@ use std::fs;
 use std::io::Read;
 
 mod model_proxy;
+mod verify;
 
 use sha2::{Digest, Sha256};
 
@@ -529,6 +530,7 @@ pub fn run() {
             clear_provider_key,
             model_proxy::model_request,
             model_proxy::model_cancel,
+            verify::verify_xrpl_payment,
             updater_configured
         ]);
 

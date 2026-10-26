@@ -1,0 +1,1658 @@
+{
+  "about": "Shared vectors for the XRPL payment rules (xrpl-payment/1). Checked by cargo test (verify::tests::t36_shared_vectors) and by src/lib/desk/__tests__/payment-hosted.test.ts, so the desktop engine and the hosted API decide and digest identically. Entries with `fixture` are REAL mainnet account_tx entries, by index into tests/fixtures/account-tx-solo-107587061.json. Entries named `synthetic:` are SYNTHETIC rippled `tx` (API v2) replies built to cover cases no recorded transaction does; they are not ledger evidence. `expected` is written by the Rust engine (NOSHASHI_WRITE_VECTORS=1 cargo test ... t36) and then frozen.",
+  "fixture_file": "tests/fixtures/account-tx-solo-107587061.json",
+  "vectors": [
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "CE54A770E5C7500BE4CF1AA27DCF1986310591C3F44B816D59698C2339B2BEA2",
+        "evidence_digest": "B9E79084DDC13CFBC4E9600EF7EFADBC47C8D4500DD97E01ECAB3F4FCE12F7F9",
+        "findings": [
+          "SETTLED"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real full SOLO payment settles a SOLO invoice (40-hex code, other case)",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "705E4B77DE0A9D6CFDCF398701F04410EFADDEC427AC298DB862A15663F3E587",
+        "evidence_digest": "D1A3F6DE5C3E855CF8779F5FDCBB64741188BD6D14F7105074D42964FB710586",
+        "findings": [
+          "NO_INVOICE_POLICY"
+        ],
+        "reason_code": "NO_INVOICE_POLICY",
+        "status": "HOLD"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": null,
+      "name": "real payment without an invoice gives facts only",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "-1.538957443523",
+        "decision_key": "CDEE820045CA7EEAB9DB30ED1F56D3B7968DC08B441315AF3209430FBB45255A",
+        "evidence_digest": "3862344E7B7457CFD812230439F7F2766B9407BA7A80058BC0F5ED1BE5BE5508",
+        "findings": [
+          "PARTIAL_NOT_PERMITTED",
+          "PARTIAL_PAYMENT_FLAGGED"
+        ],
+        "reason_code": "PARTIAL_NOT_PERMITTED",
+        "status": "REJECTED"
+      },
+      "hash": "F3B8B18E6AEFDCEA3388D0B0932820C4F10F4849847E7989876FA9CD19687A70",
+      "invoice": {
+        "asset": {
+          "currency": "CSC",
+          "issuer": "rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr",
+          "kind": "issued"
+        },
+        "destination": "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6",
+        "expected_amount": "162.6994990013102",
+        "invoice_id": "INV-CSC-1"
+      },
+      "name": "real CSC partial payment, invoice refuses partial payments",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 2,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "97A8197ABE7390EBCC3E75C7F80E14734077B723AD6CEC24B85D42F4EEE24DCD",
+        "evidence_digest": "53A39DE10508E245CCCC60512AB74F7924A0DE60B860B1D708793A2A7A9D2A9F",
+        "findings": [
+          "SETTLED_PARTIAL_PERMITTED",
+          "PARTIAL_PAYMENT_FLAGGED"
+        ],
+        "reason_code": "SETTLED_PARTIAL_PERMITTED",
+        "status": "VERIFIED"
+      },
+      "hash": "F3B8B18E6AEFDCEA3388D0B0932820C4F10F4849847E7989876FA9CD19687A70",
+      "invoice": {
+        "allow_partial_payment": true,
+        "asset": {
+          "currency": "CSC",
+          "issuer": "rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr",
+          "kind": "issued"
+        },
+        "destination": "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6",
+        "expected_amount": "161.1605415577872",
+        "invoice_id": "INV-CSC-1"
+      },
+      "name": "real CSC partial payment, partial allowed and delivered meets invoice",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 2,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "-1.538957443523",
+        "decision_key": "75542A67AC75E96047ABE42FCC962899B3F7820D6FC5885869794826D670D5BA",
+        "evidence_digest": "247B5D56B9085F8B7F4723EB5B85DB0F385E01CFC3E8251481664BFC2B77A6A8",
+        "findings": [
+          "UNDERPAID",
+          "PARTIAL_PAYMENT_FLAGGED"
+        ],
+        "reason_code": "UNDERPAID",
+        "status": "REJECTED"
+      },
+      "hash": "F3B8B18E6AEFDCEA3388D0B0932820C4F10F4849847E7989876FA9CD19687A70",
+      "invoice": {
+        "allow_partial_payment": true,
+        "asset": {
+          "currency": "CSC",
+          "issuer": "rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr",
+          "kind": "issued"
+        },
+        "destination": "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6",
+        "expected_amount": "162.6994990013102",
+        "invoice_id": "INV-CSC-1"
+      },
+      "name": "real CSC partial payment, partial allowed but short of invoice",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 2,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "-0.000000000014687",
+        "decision_key": "75C48A2996369D3F22CD254530B79B15D61BE3061B083753D8B7EB2420B96D9B",
+        "evidence_digest": "DCCF22CB1DD6A7FDFB326ACC38253B10101B7DB8D5FC53011BA17701E78BDB85",
+        "findings": [
+          "UNDERPAID",
+          "PARTIAL_PAYMENT_FLAGGED"
+        ],
+        "reason_code": "UNDERPAID",
+        "status": "REJECTED"
+      },
+      "hash": "84B464CB48ED2CD982AF7E3D78CB6589ACDE5132FA6D049767C91A281A5D647C",
+      "invoice": {
+        "allow_partial_payment": true,
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6",
+        "expected_amount": "1.064341457878901",
+        "invoice_id": "INV-SOLO-1",
+        "underpayment_tolerance": "0.00000000001"
+      },
+      "name": "real SOLO partial short by 1.4687e-11, tolerance 1e-11",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 3,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "-0.000000000014687",
+        "decision_key": "3E1C01E5C94E0F0F6704E6755814E2FFDBDB64F323CA91D4A7B735FF58F664FD",
+        "evidence_digest": "0B39763E8BD440CCCA14AE9CC9B57BE9BB240251D297D5F41EFC6876E7011AB3",
+        "findings": [
+          "SETTLED_PARTIAL_PERMITTED",
+          "PARTIAL_PAYMENT_FLAGGED"
+        ],
+        "reason_code": "SETTLED_PARTIAL_PERMITTED",
+        "status": "VERIFIED"
+      },
+      "hash": "84B464CB48ED2CD982AF7E3D78CB6589ACDE5132FA6D049767C91A281A5D647C",
+      "invoice": {
+        "allow_partial_payment": true,
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6",
+        "expected_amount": "1.064341457878901",
+        "invoice_id": "INV-SOLO-1",
+        "underpayment_tolerance": "1e-10"
+      },
+      "name": "real SOLO partial short by 1.4687e-11, tolerance 1e-10",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 3,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "E7C290F1632095F647F320310CF5FDD7CB306D91B0BAF84EC080ECACDA89596D",
+        "evidence_digest": "4C4B529DCED52CB3ADC4B2628085CAF32D11C43E65C002087704839F24316A7B",
+        "findings": [
+          "NOT_PAYMENT"
+        ],
+        "reason_code": "NOT_PAYMENT",
+        "status": "REJECTED"
+      },
+      "hash": "505F8B0D4A49E13BED1B51A8F61922D0D68A03D56ABB69C7A961F33353230A9F",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "1",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real OfferCancel is not a payment",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 4,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "C4776C2F8EFED2FC9D45F5535389C1E9365425C40C35EF51AD37C5F1233A67AD",
+        "evidence_digest": "6B48645AE307148ED5133B11DAEFD781DC3EDF1DC328A6085068784803A4B6B4",
+        "findings": [
+          "ASSET_MISMATCH"
+        ],
+        "reason_code": "ASSET_MISMATCH",
+        "status": "REJECTED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real payment, same code from another issuer",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "5C4A3C1A32EA906912732962F44ED3E357BF3FC84ADB3B1CAFBB8AC85F309356",
+        "evidence_digest": "83B4D543446457E962F042ECFC205BCE2F3FDC4DB04C31204DF87919F00DD81E",
+        "findings": [
+          "DESTINATION_MISMATCH"
+        ],
+        "reason_code": "DESTINATION_MISMATCH",
+        "status": "REJECTED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6",
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real payment to another account",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "3E5A699D241B20B471A95F7902E9AE23FF28BC1639256651FB5B171158C0ED43",
+        "evidence_digest": "463FF6A2EA725CF4365F65E22473C0640FB6A62FE5C3D4A788729F3EB98EC2DC",
+        "findings": [
+          "DESTINATION_TAG_MISMATCH"
+        ],
+        "reason_code": "DESTINATION_TAG_MISMATCH",
+        "status": "REJECTED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "destination_tag": 7,
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real payment without the required tag",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "CE54A770E5C7500BE4CF1AA27DCF1986310591C3F44B816D59698C2339B2BEA2",
+        "evidence_digest": "D94B52B8550111B29BF25A1049517DC6AF39E2B8E9C29A4AB8388ADBCD99DBF1",
+        "findings": [
+          "ALREADY_APPLIED"
+        ],
+        "reason_code": "ALREADY_APPLIED",
+        "status": "REJECTED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real payment already applied to another invoice",
+      "network": "mainnet",
+      "prior_invoice": "INV-OTHER",
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "CE54A770E5C7500BE4CF1AA27DCF1986310591C3F44B816D59698C2339B2BEA2",
+        "evidence_digest": "A63FA1EB9CFC15F250DA3030EEA1BA2E0835E8BF5005B31CF84E3A81EE747310",
+        "findings": [
+          "SETTLED"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real payment, same invoice recorded before",
+      "network": "mainnet",
+      "prior_invoice": "INV-SOLO-1",
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "CE54A770E5C7500BE4CF1AA27DCF1986310591C3F44B816D59698C2339B2BEA2",
+        "evidence_digest": "6273C3D96592D1966EE39D3414BBE659E4A036681F0E784BC8A73A5563E026AA",
+        "findings": [
+          "SETTLED"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real payment, two operators agree",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        },
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.250Z",
+          "source": "s2.ripple.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "CE54A770E5C7500BE4CF1AA27DCF1986310591C3F44B816D59698C2339B2BEA2",
+        "evidence_digest": "E3B08DF2A774168982457129457ECE8E0ADC601CC7535CDED8EC8D113E508DFC",
+        "findings": [
+          "SETTLED",
+          "SOURCE_UNAVAILABLE"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real payment, second operator failed",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        },
+        {
+          "failed": "timed out",
+          "observed_at": "2026-10-26T12:00:00.250Z",
+          "source": "s2.ripple.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "CE54A770E5C7500BE4CF1AA27DCF1986310591C3F44B816D59698C2339B2BEA2",
+        "evidence_digest": "3112535547BE12F49B37365B128E3A92B505AB2E89E4B4578672725748D3699C",
+        "findings": [
+          "SETTLED",
+          "NOT_FOUND"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "real payment, second operator lagging",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "fixture": 0,
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        },
+        {
+          "observed_at": "2026-10-26T12:00:00.250Z",
+          "result": {
+            "error": "txnNotFound"
+          },
+          "source": "s2.ripple.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "1DD0C279C0C28824772E00BA7DBBF3D97EF1217082D78581E26A455F5FAF5A1A",
+        "evidence_digest": "DEF0224B34775C756B19095F377D117D6233D5485F62F1082561F32537A2FB1F",
+        "findings": [
+          "NOT_FOUND"
+        ],
+        "reason_code": "NOT_FOUND",
+        "status": "HOLD"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "1",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "no source has it",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "error": "txnNotFound"
+          },
+          "source": "xrplcluster.com"
+        },
+        {
+          "observed_at": "2026-10-26T12:00:00.250Z",
+          "result": {
+            "error": "txnNotFound"
+          },
+          "source": "s2.ripple.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "1DD0C279C0C28824772E00BA7DBBF3D97EF1217082D78581E26A455F5FAF5A1A",
+        "evidence_digest": "2019E14AA5E3D66579B137EF4676FB8EF2855C8F4DF9866DDE2464E75378271B",
+        "findings": [
+          "SOURCE_UNAVAILABLE",
+          "SOURCE_UNAVAILABLE",
+          "SOURCE_UNAVAILABLE"
+        ],
+        "reason_code": "SOURCE_UNAVAILABLE",
+        "status": "HOLD"
+      },
+      "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+      "invoice": {
+        "asset": {
+          "currency": "534f4c4f00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "kind": "issued"
+        },
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "1",
+        "invoice_id": "INV-SOLO-1"
+      },
+      "name": "every source failed",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "failed": "HTTP 403",
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "source": "xrplcluster.com"
+        },
+        {
+          "failed": "response exceeds the 1048576-byte limit; reading stopped",
+          "observed_at": "2026-10-26T12:00:00.250Z",
+          "source": "s2.ripple.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "E09B64BEAE868A54C17B28B36573ECF334642FA896EA2F64E57FFE2051EDDEAC",
+        "findings": [
+          "SETTLED"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.50",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: XRP invoice settled, amount written 125.50",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "4.5",
+        "decision_key": "2906733BF3E14580DA04EECFE51D560E24E0C6E0088BFB3C81B5E11B90ECB458",
+        "evidence_digest": "5EE0B8B73099B66D84BE00ADA5C656D5859DB21D961A116BCA373A2B23DE82FD",
+        "findings": [
+          "OVERPAID_REVIEW"
+        ],
+        "reason_code": "OVERPAID_REVIEW",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "hold_overpayment": true,
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: XRP overpaid, invoice holds overpayments",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "130000000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "130000000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "4.5",
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "9B50F122E34268FC0E1B89547432814A6932E1B0496182D5C77B2A214E56978A",
+        "findings": [
+          "SETTLED"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: XRP overpaid, accepted",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "130000000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "130000000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "-0.01",
+        "decision_key": "E1F04424C7B3767A99C997DA8EB5BEBBE98C755AB35BD9BE9C1B42C1092BE967",
+        "evidence_digest": "AAF70B10A15D20E7C952A008E9E7B613622F9813529CC5BE4CC3D5CA48958F03",
+        "findings": [
+          "SETTLED"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1",
+        "underpayment_tolerance": "0.01"
+      },
+      "name": "synthetic: XRP underpaid within tolerance",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125490000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125490000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "6510A215B101BA191AA873D274CCAF6AB13D1A6B65BF271D2F96A9AD527DE45F",
+        "findings": [
+          "DELIVERED_UNAVAILABLE"
+        ],
+        "reason_code": "DELIVERED_UNAVAILABLE",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: delivered_amount unavailable",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "unavailable"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "086448D65FDCC1E844C2A9978D03BA9694CE56197A890F8237D6E1210659E319",
+        "findings": [
+          "DELIVERED_MISSING"
+        ],
+        "reason_code": "DELIVERED_MISSING",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: delivered_amount missing",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "8E8BEBD7981651A1FB0F4237801BEFDD2B83FBA44BD09B1371491D0D58C4B042",
+        "findings": [
+          "NOT_VALIDATED"
+        ],
+        "reason_code": "NOT_VALIDATED",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: not validated",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": false
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "B94C2F07A9544ECD980F00D949E5E98E131E38BAA9471F6CB9A20BC5B10D2288",
+        "findings": [
+          "NOT_VALIDATED"
+        ],
+        "reason_code": "NOT_VALIDATED",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: validation not stated",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            }
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "94B277F4E5DAA4A20563CD3A698FF74755C4448115B7DDC887E16FE1E842D4B9",
+        "findings": [
+          "TRANSACTION_FAILED"
+        ],
+        "reason_code": "TRANSACTION_FAILED",
+        "status": "REJECTED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: validated failure tecPATH_DRY",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tecPATH_DRY"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "FA6560C831E53FD30FEBA4019A109233970E4D0D072238BB58B4C04E0F4872D8",
+        "findings": [
+          "MISSING_METADATA"
+        ],
+        "reason_code": "MISSING_METADATA",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: missing metadata",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "5DA36005EB2D9921A25F4D0A4A103AD900223FA3F1B7E886872CC2E26CD69068",
+        "findings": [
+          "HASH_MISMATCH"
+        ],
+        "reason_code": "HASH_MISMATCH",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: source answered another transaction",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "F0F31FB985438FD1463F283D8F0CA997A443033B8BDB85E4B372F542F54E7E79",
+        "findings": [
+          "UNSUPPORTED_ASSET"
+        ],
+        "reason_code": "UNSUPPORTED_ASSET",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: MPT delivered amount",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": {
+                "mpt_issuance_id": "0000012FFD9EE5DA93AC614B4DB94D7E0FCE415CA51BED47",
+                "value": "100"
+              }
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": {
+                "mpt_issuance_id": "0000012FFD9EE5DA93AC614B4DB94D7E0FCE415CA51BED47",
+                "value": "100"
+              },
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "00807BE15BF9D11DD3106D35F8ECDA31AB5EB4E6216AA4B0D25DEB987F9DCE95",
+        "findings": [
+          "MALFORMED_AMOUNT"
+        ],
+        "reason_code": "MALFORMED_AMOUNT",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: negative drops",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "-5"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "-5",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "A68404A3E6036DF7935FC6B090D807748DC8566D6BF3BF3BA99B44CB760531B0",
+        "evidence_digest": "AFD2F7EE65C430D88F29AB7E1BF275E42C526173DA78F04CF7E87E32245E7549",
+        "findings": [
+          "SOURCE_DISAGREEMENT"
+        ],
+        "reason_code": "SOURCE_DISAGREEMENT",
+        "status": "HOLD"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: two operators disagree",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        },
+        {
+          "observed_at": "2026-10-26T12:00:00.250Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125000000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "s2.ripple.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "3C7B209E13BF0C0B5617940C38EFC2A9102870BE20FA5AACD7CAEC2E42D2CE4F",
+        "evidence_digest": "C243BC2054BD491316F695F0F81F0717D1BEFAC8E64F70851A726C70EE746607",
+        "findings": [
+          "SETTLED_PARTIAL_PERMITTED",
+          "PARTIAL_PAYMENT_FLAGGED"
+        ],
+        "reason_code": "SETTLED_PARTIAL_PERMITTED",
+        "status": "VERIFIED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "allow_partial_payment": true,
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "synthetic: XRP partial payment flagged, delivered all",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 131072,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "4ECB03736D42D5A122AF71B79E7C335DA9E5763559AA61A53D6AE920BD98DE2E",
+        "evidence_digest": "9D382B3B5CFA2845225F6CA7FF1F70D58175E7FE3E3629828D936DAA3E485523",
+        "findings": [
+          "INVALID_POLICY"
+        ],
+        "reason_code": "INVALID_POLICY",
+        "status": "REJECTED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "0",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "invoice: zero amount",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "6E7ED61F4A07F83EC4DDC3272ECEA971F533B52090CA2DFB5B35FA70067FF729",
+        "evidence_digest": "D3E7D2A39CF931DE73653A2FF83EF643CF82E11B94A9BC1725722C926CBA4347",
+        "findings": [
+          "INVALID_POLICY"
+        ],
+        "reason_code": "INVALID_POLICY",
+        "status": "REJECTED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "0.0000001",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "invoice: XRP finer than a drop",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "CA5B8468A40A86446571B733E88A141A543CB4EA6D9DD7D1D75F79E9CA9F7F7E",
+        "evidence_digest": "912F1BEBD10E30A5FCE8E33FBD5A201C8C7D2AFD10604E437C4C20F7131DEDFA",
+        "findings": [
+          "INVALID_POLICY"
+        ],
+        "reason_code": "INVALID_POLICY",
+        "status": "REJECTED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "1",
+        "invoice_id": "INV-XRP-1",
+        "underpayment_tolerance": "1"
+      },
+      "name": "invoice: tolerance not below the amount",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "xrplcluster.com"
+        }
+      ]
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": null,
+        "decision_key": "6E5F26DAA94E31A3F9F65934A99839BC8C48700EA8CBBB327049BC565B180953",
+        "evidence_digest": "A2C332A77E6C5C5F60B6F7B09C4E1AA426E154B0D4527FD1D6A13F73D625A82C",
+        "findings": [
+          "INVALID_HASH"
+        ],
+        "reason_code": "INVALID_HASH",
+        "status": "REJECTED"
+      },
+      "hash": "XYZ",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "1",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "hash: not 64 hex characters",
+      "network": "mainnet",
+      "prior_invoice": null,
+      "reads": []
+    },
+    {
+      "evaluated_at": "2026-10-26T12:00:00.000Z",
+      "expected": {
+        "amount_difference": "0",
+        "decision_key": "5E32FFABA25D53FAC408C9E02CE188803A985C525AB7882BFAA50476D8D83857",
+        "evidence_digest": "AC0BCDA7272772F4B11739EB9DE417CEBB2789E37223834B7BE3381557DBEFD7",
+        "findings": [
+          "SETTLED"
+        ],
+        "reason_code": "SETTLED",
+        "status": "VERIFIED"
+      },
+      "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "invoice": {
+        "asset": {
+          "kind": "xrp"
+        },
+        "destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+        "destination_tag": 42,
+        "expected_amount": "125.5",
+        "invoice_id": "INV-XRP-1"
+      },
+      "name": "testnet network changes the decision key",
+      "network": "testnet",
+      "prior_invoice": null,
+      "reads": [
+        {
+          "observed_at": "2026-10-26T12:00:00.000Z",
+          "result": {
+            "hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "ledger_index": 99000000,
+            "meta": {
+              "AffectedNodes": [],
+              "TransactionResult": "tesSUCCESS",
+              "delivered_amount": "125500000"
+            },
+            "tx_json": {
+              "Account": "rSenderSyntheticxxxxxxxxxxxxxxxxx",
+              "DeliverMax": "125500000",
+              "Destination": "rMerchantSyntheticxxxxxxxxxxxxxx",
+              "DestinationTag": 42,
+              "Flags": 0,
+              "TransactionType": "Payment"
+            },
+            "validated": true
+          },
+          "source": "s.altnet.rippletest.net"
+        }
+      ]
+    }
+  ]
+}
