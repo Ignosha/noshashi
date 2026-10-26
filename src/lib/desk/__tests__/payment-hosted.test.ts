@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll } from "vitest";
 import { readFileSync } from "node:fs";
-import { createServer, type Server } from "node:http";
+import { createServer, type RequestListener, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import * as pay from "../../../../supabase/functions/noshashi-verify/payment";
 
@@ -135,12 +135,12 @@ describe("transport, against a local HTTP server", () => {
   let server: Server | null = null;
   let hits = 0;
 
-  async function serve(handler: Parameters<typeof createServer>[0]): Promise<pay.Endpoint> {
+  async function serve(handler: RequestListener): Promise<pay.Endpoint> {
     if (server) await new Promise((r) => server!.close(r));
     hits = 0;
     server = createServer((req, res) => {
       hits += 1;
-      handler!(req, res);
+      handler(req, res);
     });
     await new Promise<void>((r) => server!.listen(0, "127.0.0.1", r));
     return { name: "local", operator: "test", url: `http://127.0.0.1:${(server.address() as AddressInfo).port}/` };
