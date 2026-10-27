@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.0.23
+
+### Invoice check
+
+- On the Settlement screen, a new Invoice check panel answers one
+  question: did this transaction pay this invoice? Enter the invoice (the
+  receiving account, an optional destination tag, the asset and the
+  amount you expect) and it reads the transaction from the XRP Ledger.
+- The answer is VERIFIED, HOLD or REJECTED, with the reason in plain
+  words. Only VERIFIED is green.
+- It credits what was actually delivered, never the amount the sender
+  asked for. A partial payment that delivered less is rejected unless you
+  chose to accept partial payments, and then only if what arrived still
+  covers the invoice.
+- Amounts are compared exactly, to the last digit, and the same currency
+  code from a different issuer counts as a different asset.
+- By default it reads from two independent operators (XRPL Labs and
+  Ripple). If they disagree, or the transaction is not final yet, it holds
+  rather than guesses.
+- Within a session, one transaction cannot settle two different invoices.
+- Export evidence saves the record behind the answer as JSON, with a
+  SHA-256 fingerprint anyone can recompute.
+
 ## 1.0.22
 
 ### Support

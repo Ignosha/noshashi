@@ -64,8 +64,8 @@
 
 <section>
   <div class="clockbar" id="mission-clock" data-epoch="2026-08-29T00:00:00Z">
-    <div><span class="label">UTC</span><span class="value live" id="clock-utc">23:16:28</span></div>
-    <div><span class="label">MISSION ELAPSED</span><span class="value" id="clock-met">T+55d</span></div>
+    <div><span class="label">UTC</span><span class="value live" id="clock-utc">12:16:16</span></div>
+    <div><span class="label">MISSION ELAPSED</span><span class="value" id="clock-met">T+59d</span></div>
     <div><span class="label">SINCE FIRST RELEASE</span><span class="value">2026-08-29</span></div>
   </div>
   <div style="margin-top:14px">
@@ -100,6 +100,15 @@
   </div>
   <div class="console"><div class="console-body">
     <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-10-27T13:00:00.000Z">2026-10-27</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>1.0.23: did this transaction pay this invoice?</h3>
+      <p>A new Invoice check panel on the Settlement screen reads the transaction from the XRP Ledger and answers VERIFIED, HOLD or REJECTED, with the reason. It credits only what was delivered, so a partial payment that fell short is rejected; it compares amounts exactly and reads from two independent…</p>
+      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
+    </article>
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
         <time datetime="2026-10-23T13:50:00.000Z">2026-10-23</time>

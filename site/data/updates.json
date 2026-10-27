@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-10-27T13:00:00Z",
+    "kind": "release",
+    "title": "1.0.23: did this transaction pay this invoice?",
+    "body": "A new Invoice check panel on the Settlement screen reads the transaction from the XRP Ledger and answers VERIFIED, HOLD or REJECTED, with the reason. It credits only what was delivered, so a partial payment that fell short is rejected; it compares amounts exactly and reads from two independent operators by default. The same check is available to integrations through the Compliance API, with signed evidence.",
+    "link": "/docs/release-notes/"
+  },
+  {
     "date": "2026-10-23T13:50:00Z",
     "kind": "release",
     "title": "1.0.22: support can look at your app and fix it, only when you allow it",
