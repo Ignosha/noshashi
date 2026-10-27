@@ -178,7 +178,9 @@ jobs:
             letting it surprise you.
           releaseDraft: false
           prerelease: false
-          includeUpdaterJson: true
+          # Each job rewriting latest.json raced the others and v1.0.24
+          # shipped with Windows only; updater-manifest writes it once.
+          includeUpdaterJson: false
 
       # tauri-action attaches to the release, but a plain artefact makes the
       # binaries retrievable from a workflow_dispatch run with no tag.
@@ -193,6 +195,15 @@ jobs:
             src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe
             src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
             src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage
+
+  # latest.json, from every signed bundle once all of them are attached.
+  updater-manifest:
+    needs: build
+    permissions:
+      contents: write
+    uses: ./.github/workflows/updater-manifest.yml
+    with:
+      tag: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
 
   # The website's download section and release notes are rendered from the
   # GitHub releases API when the site is built. A release published after

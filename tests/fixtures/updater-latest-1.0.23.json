@@ -1,0 +1,51 @@
+{
+  "version": "1.0.23",
+  "notes": "Built from 2d62cde0a026590261d4b1e041a869b7827401df on macos-latest.\n\nVerify your download before running it:\n\n    shasum -a 256 <file>          # macOS / Linux\n    certutil -hashfile <file> SHA256   # Windows\n\nThe app also hashes its own running binary — Settings ›\nBinary integrity — so you can confirm nothing changed between\nthis page and execution.\n\nThese builds are **not code-signed or notarised**. macOS will\nwarn about an unidentified developer; Windows SmartScreen will\nwarn too. That is expected and worth saying plainly rather than\nletting it surprise you.",
+  "pub_date": "2026-10-27T12:40:14.318Z",
+  "platforms": {
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RmU5VVdHNUJtSnh4MEZhdjJxTEdQMC9iUW1SNTROTVVIMkxwUHY3M2E5ek5HOHdVQmYxV0tYeFZXQlM4QTdyZ1pnRlpvU3RxcFZraENNT28ySUtLTXdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0NjYzCWZpbGU6Tk9TSEFTSEkuYXBwLnRhci5negl2ZXJzaW9uOjEuMC4yMwpYMWplVkx0bW1CeUhCb2JKS3o4bzdVLzRvbHhLUjZlS3lMaVZ1bW83dGRaYmZvNHNMb2psNzdCUFZReU1sVlkwZFF3V3dIRTY2TStsTmxGYXlkc0VCdz09Cg==",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_x64.app.tar.gz"
+    },
+    "darwin-x86_64-app": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RmU5VVdHNUJtSnh4MEZhdjJxTEdQMC9iUW1SNTROTVVIMkxwUHY3M2E5ek5HOHdVQmYxV0tYeFZXQlM4QTdyZ1pnRlpvU3RxcFZraENNT28ySUtLTXdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0NjYzCWZpbGU6Tk9TSEFTSEkuYXBwLnRhci5negl2ZXJzaW9uOjEuMC4yMwpYMWplVkx0bW1CeUhCb2JKS3o4bzdVLzRvbHhLUjZlS3lMaVZ1bW83dGRaYmZvNHNMb2psNzdCUFZReU1sVlkwZFF3V3dIRTY2TStsTmxGYXlkc0VCdz09Cg==",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_x64.app.tar.gz"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RmJrYlQrYWhMQ3p4RVZDRFdGSURuQVhtSEZoUlZCVWw5YUk1TGFNK1lFakp1dkNoNzNwVWJCYlVYMkZCK2ZVSjZ1VVE5eU5LcWRkaG9zVCtMOFU0VXdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0NzE5CWZpbGU6Tk9TSEFTSElfMS4wLjIzX3g2NF9lbi1VUy5tc2kJdmVyc2lvbjoxLjAuMjMKR0VFdnRBanBhQVRHZEs0L09iQy92Vi9XUkVyNjBnaUQvTjFtUkFzWjZkb1Bsd05jbTM1WE55Q3gzOHJOenZ0aFpSTk9FYzlIRHFFSGtNT01WNUVSQ1E9PQo=",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_x64_en-US.msi"
+    },
+    "windows-x86_64-msi": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RmJrYlQrYWhMQ3p4RVZDRFdGSURuQVhtSEZoUlZCVWw5YUk1TGFNK1lFakp1dkNoNzNwVWJCYlVYMkZCK2ZVSjZ1VVE5eU5LcWRkaG9zVCtMOFU0VXdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0NzE5CWZpbGU6Tk9TSEFTSElfMS4wLjIzX3g2NF9lbi1VUy5tc2kJdmVyc2lvbjoxLjAuMjMKR0VFdnRBanBhQVRHZEs0L09iQy92Vi9XUkVyNjBnaUQvTjFtUkFzWjZkb1Bsd05jbTM1WE55Q3gzOHJOenZ0aFpSTk9FYzlIRHFFSGtNT01WNUVSQ1E9PQo=",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_x64_en-US.msi"
+    },
+    "windows-x86_64-nsis": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RmU0V25IQkJwcFlncFdwb0xRaDRGYUJMT0U5MmU4NGxHQXNqdTk1dXNUclhtb0JyM3p6MzZRNHhnNFZmTnBFbWpaNW5zWnRDc0R5MExMRVoxMUxoeGdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0NzE5CWZpbGU6Tk9TSEFTSElfMS4wLjIzX3g2NC1zZXR1cC5leGUJdmVyc2lvbjoxLjAuMjMKa3JwWW9wYWVGWmRWRjU1U1FxazFlSFFLOEVVbGJMcUxOVmVZc2N2RTQwVVJmZ2NJM1UxSzkyUVZKKzFjb2ZNbk5lOHZNVW53NVFMSWExUVMvNnJMRHc9PQo=",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_x64-setup.exe"
+    },
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RlZQREc3dThkR09MdG15cEVTa1lMQXpIK0phWkVuazFlZUtua1ZVVlpueGVEazBKa0tVMFBiL2tBTWhabUJEM2QxajlhUzVIOGo5VU5vS0ZNQUZQbWdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0Nzc2CWZpbGU6Tk9TSEFTSElfMS4wLjIzX2FtZDY0LkFwcEltYWdlCXZlcnNpb246MS4wLjIzCmpGZnMzeUFCVEtiNzhSSTlsNzFxK1hDYUtXcHYybXZiNzRBWDB6QmdZK0xKTXF2bnkrNS9UWFJyeDU3V3pnVzFUMFZ6Ukg2dXpMUmRxWWdFQm1sZ0J3PT0K",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_amd64.AppImage"
+    },
+    "linux-x86_64-appimage": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RlZQREc3dThkR09MdG15cEVTa1lMQXpIK0phWkVuazFlZUtua1ZVVlpueGVEazBKa0tVMFBiL2tBTWhabUJEM2QxajlhUzVIOGo5VU5vS0ZNQUZQbWdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0Nzc2CWZpbGU6Tk9TSEFTSElfMS4wLjIzX2FtZDY0LkFwcEltYWdlCXZlcnNpb246MS4wLjIzCmpGZnMzeUFCVEtiNzhSSTlsNzFxK1hDYUtXcHYybXZiNzRBWDB6QmdZK0xKTXF2bnkrNS9UWFJyeDU3V3pnVzFUMFZ6Ukg2dXpMUmRxWWdFQm1sZ0J3PT0K",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_amd64.AppImage"
+    },
+    "linux-x86_64-deb": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RloycFAzVnFlMnB4SVJDMVdLamliRUZCNE1pTXc2aXl2d3FTcFVnMWYwN205OVM2YjhVaUthaWl0QnNlRGNsUXhmNXNLWTZaZkNHaVJzTzhLRTl5dXdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0Nzc2CWZpbGU6Tk9TSEFTSElfMS4wLjIzX2FtZDY0LmRlYgl2ZXJzaW9uOjEuMC4yMwp1WC85VzVCZW1IeWxsVjhnL2ZxMGhTYlFQRm53cFA5MjJVeVBCZDhZektSVEtaQjRnYTlmZUFXWTFGMUc4aldQTnIzcHl0cnFvM21Fc0ZFVnhpczVCQT09Cg==",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_amd64.deb"
+    },
+    "linux-x86_64-rpm": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RlZ5SEZMcnZRSEVBU0ZFeVdsSi9STzBBL3pRTERvTHh0cVRIT2xkMzZiMWtob3YrVk9jdWpWdVJ5bmRPUU91czJoZE80RjhuRmxFeVR2LzZsaisxZHdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0Nzc2CWZpbGU6Tk9TSEFTSEktMS4wLjIzLTEueDg2XzY0LnJwbQl2ZXJzaW9uOjEuMC4yMwpLeWJKTUVIeitUakJza2M2WVp0RVBJM2ZWTlZidDhwK0hYRXJoVnoxNjdac1dzRlVlalRVaHo2cmdDR0owa1JST25YVEhuWjF1NTNpejhvd3h6NHlCUT09Cg==",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI-1.0.23-1.x86_64.rpm"
+    },
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RmVlUmFZMm0vUVRFSWVaYmRMYWp3MXIra3hkUUVSR0NCRElabVJ0NUhvUlJtQWdOTis2Q2V1L2hSV2pLbTZUKzRUNXRuaG1DQTYvOElwVW5ESEExYmdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0ODEwCWZpbGU6Tk9TSEFTSEkuYXBwLnRhci5negl2ZXJzaW9uOjEuMC4yMwpkdlVvUm9XM0VEdWpubzJmZVNrbzF5ZTVQZ29xY2J1aTVvbHJrSFhQUkJFc0ExYWlNdU05dmUxSEVhbnk4WEE4NjdSb1VLRFhIbnFLN2ZWUWtlUDJDZz09Cg==",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_aarch64.app.tar.gz"
+    },
+    "darwin-aarch64-app": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSZHhlV0hYMW54RmVlUmFZMm0vUVRFSWVaYmRMYWp3MXIra3hkUUVSR0NCRElabVJ0NUhvUlJtQWdOTis2Q2V1L2hSV2pLbTZUKzRUNXRuaG1DQTYvOElwVW5ESEExYmdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTA0ODEwCWZpbGU6Tk9TSEFTSEkuYXBwLnRhci5negl2ZXJzaW9uOjEuMC4yMwpkdlVvUm9XM0VEdWpubzJmZVNrbzF5ZTVQZ29xY2J1aTVvbHJrSFhQUkJFc0ExYWlNdU05dmUxSEVhbnk4WEE4NjdSb1VLRFhIbnFLN2ZWUWtlUDJDZz09Cg==",
+      "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_aarch64.app.tar.gz"
+    }
+  }
+}
