@@ -1,6 +1,6 @@
 [package]
 name = "noshashi"
-version = "1.0.23"
+version = "1.0.24"
 description = "NOSHASHI — autonomous compliance layer mission control"
 edition = "2021"
 rust-version = "1.77"

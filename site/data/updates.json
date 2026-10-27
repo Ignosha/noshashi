@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-10-27T13:40:00Z",
+    "kind": "release",
+    "title": "1.0.24: addresses you paste into the invoice check just work",
+    "body": "The receiving account and issuer fields ignore the spaces and invisible characters copying can add, and no longer get capitalised or autocorrected. A mistyped address is caught by its checksum before the ledger is read, with a plain message instead of a destination mismatch. X-addresses are accepted and split into the account and its tag.",
+    "link": "/docs/release-notes/"
+  },
+  {
     "date": "2026-10-27T13:00:00Z",
     "kind": "release",
     "title": "1.0.23: did this transaction pay this invoice?",

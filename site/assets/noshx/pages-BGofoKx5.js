@@ -206,7 +206,10 @@ A receipt digest shows the receipt was not altered. It is not a signature and do
 authority/check | POST — re-derive an authority certificate's digest from its own body. Free, unauthenticated, reads nothing. |
 receipts/{digest} | GET — a receipt this account or its organization recorded, as it was served. read or verify scope, free. |
 See the API reference for request and response shapes.
-Generated from src/lib/policy.ts · supabase/functions/noshashi-verify/index.ts` }, { title: "Release notes · NOSHASHI docs › 1.0.23", source: "https://www.noshashi.app/docs/release-notes/", text: `Invoice check
+Generated from src/lib/policy.ts · supabase/functions/noshashi-verify/index.ts` }, { title: "Release notes · NOSHASHI docs › 1.0.24", source: "https://www.noshashi.app/docs/release-notes/", text: `Invoice check
+The receiving account and issuer fields now ignore the spaces, line breaks and invisible characters that copying an address can add, and no longer let the system capitalise or autocorrect what you type.
+An address is checked against its checksum before the ledger is read, so a mistyped character gets a plain message (a capital R, a 0, O, I or l, the wrong length, or a failed checksum) instead of a REJECTED destination mismatch.
+An X-address is accepted and split into the account and its destination tag.`, weight: 0.45 }, { title: "Release notes · NOSHASHI docs › 1.0.23", source: "https://www.noshashi.app/docs/release-notes/", text: `Invoice check
 On the Settlement screen, a new Invoice check panel answers one question: did this transaction pay this invoice? Enter the invoice (the receiving account, an optional destination tag, the asset and the amount you expect) and it reads the transaction from the XRP Ledger.
 The answer is VERIFIED, HOLD or REJECTED, with the reason in plain words. Only VERIFIED is green.
 It credits what was actually delivered, never the amount the sender asked for. A partial payment that delivered less is rejected unless you chose to accept partial payments, and then only if what arrived still covers the invoice.
