@@ -64,7 +64,7 @@
 
 <section>
   <div class="clockbar" id="mission-clock" data-epoch="2026-08-29T00:00:00Z">
-    <div><span class="label">UTC</span><span class="value live" id="clock-utc">12:16:16</span></div>
+    <div><span class="label">UTC</span><span class="value live" id="clock-utc">13:25:34</span></div>
     <div><span class="label">MISSION ELAPSED</span><span class="value" id="clock-met">T+59d</span></div>
     <div><span class="label">SINCE FIRST RELEASE</span><span class="value">2026-08-29</span></div>
   </div>
@@ -100,6 +100,15 @@
   </div>
   <div class="console"><div class="console-body">
     <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-10-27T13:40:00.000Z">2026-10-27</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>1.0.24: addresses you paste into the invoice check just work</h3>
+      <p>The receiving account and issuer fields ignore the spaces and invisible characters copying can add, and no longer get capitalised or autocorrected. A mistyped address is caught by its checksum before the ledger is read, with a plain message instead of a destination mismatch. X-addresses are…</p>
+      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
+    </article>
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
         <time datetime="2026-10-27T13:00:00.000Z">2026-10-27</time>

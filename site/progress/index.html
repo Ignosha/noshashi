@@ -63,7 +63,7 @@
 <section>
   <div class="rail">
     <div><span class="label">CURRENT BUILD</span><strong>—</strong><small>Beta channel, unsigned, built by CI.</small></div>
-    <div><span class="label">RELEASES SHIPPED</span><strong>6</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
+    <div><span class="label">RELEASES SHIPPED</span><strong>7</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
     <div><span class="label">TESTS PASSING</span><strong>1,200+</strong><small>Across the app, the API and the website. Run with npm test.</small></div>
     <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>No sign-up exists. Nothing is held server-side.</small></div>
   </div>
@@ -122,6 +122,15 @@
   </div>
   <div class="console"><div class="console-body">
     <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-10-27T13:40:00.000Z">2026-10-27</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>1.0.24: addresses you paste into the invoice check just work</h3>
+      <p>The receiving account and issuer fields ignore the spaces and invisible characters copying can add, and no longer get capitalised or autocorrected. A mistyped address is caught by its checksum before the ledger is read, with a plain message instead of a destination mismatch. X-addresses are…</p>
+      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
+    </article>
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
         <time datetime="2026-10-27T13:00:00.000Z">2026-10-27</time>
@@ -183,15 +192,6 @@
       </div>
       <h3>1.0.20: annual prices, coming-soon items marked, a stricter website</h3>
       <p>Enterprise and Strategic are priced by the year; the uptime SLA, single sign-on and dedicated environments are marked coming soon. The website runs no inline script. An internal security assessment ran on 30 September, and SOC 2 readiness documents and contract templates were added.</p>
-      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-09-29T03:00:00.000Z">2026-09-29</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>1.0.15: real domain and credential registry, audit evidence, readable at any size</h3>
-      <p>Every permissioned domain and credential on mainnet, read by a sweep of the ledger; admission checks with SHA-256 records; audit trails screened against OFAC and the scam registry with a signed manifest. Text is larger, scaling fills the window, and 2FA sign-in is fixed.</p>
       <a class="log-link" href="/docs/release-notes/">OPEN →</a>
     </article>
   </div>
