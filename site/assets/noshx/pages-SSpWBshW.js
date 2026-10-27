@@ -206,7 +206,14 @@ A receipt digest shows the receipt was not altered. It is not a signature and do
 authority/check | POST — re-derive an authority certificate's digest from its own body. Free, unauthenticated, reads nothing. |
 receipts/{digest} | GET — a receipt this account or its organization recorded, as it was served. read or verify scope, free. |
 See the API reference for request and response shapes.
-Generated from src/lib/policy.ts · supabase/functions/noshashi-verify/index.ts` }, { title: "Release notes · NOSHASHI docs › 1.0.22", source: "https://www.noshashi.app/docs/release-notes/", text: `Support
+Generated from src/lib/policy.ts · supabase/functions/noshashi-verify/index.ts` }, { title: "Release notes · NOSHASHI docs › 1.0.23", source: "https://www.noshashi.app/docs/release-notes/", text: `Invoice check
+On the Settlement screen, a new Invoice check panel answers one question: did this transaction pay this invoice? Enter the invoice (the receiving account, an optional destination tag, the asset and the amount you expect) and it reads the transaction from the XRP Ledger.
+The answer is VERIFIED, HOLD or REJECTED, with the reason in plain words. Only VERIFIED is green.
+It credits what was actually delivered, never the amount the sender asked for. A partial payment that delivered less is rejected unless you chose to accept partial payments, and then only if what arrived still covers the invoice.
+Amounts are compared exactly, to the last digit, and the same currency code from a different issuer counts as a different asset.
+By default it reads from two independent operators (XRPL Labs and Ripple). If they disagree, or the transaction is not final yet, it holds rather than guesses.
+Within a session, one transaction cannot settle two different invoices.
+Export evidence saves the record behind the answer as JSON, with a SHA-256 fingerprint anyone can recompute.`, weight: 0.45 }, { title: "Release notes · NOSHASHI docs › 1.0.22", source: "https://www.noshashi.app/docs/release-notes/", text: `Support
 When NOSHASHI support asks to look at your account, the app asks you on whatever screen you are on. You choose 4, 24 or 72 hours, and whether support may apply fixes without asking each time. You can revoke it from the ticket at any time.
 Support can look at the app on one of your computers: version, ledger connection, clock, sign-in, plan, settings health, updates and recent errors. Never keys, addresses or what your settings contain.
 Fixes support sends go to one computer and run only there: switch ledger server, renew the sign-in, repair damaged settings, clear the error log, install the latest signed update, restart the window, and the existing self-check, reconnect, plan re-read and diagnostics. Each waits for your Apply unless you allowed fixes, and every one is in the ticket's log.

@@ -63,7 +63,7 @@
 <section>
   <div class="rail">
     <div><span class="label">CURRENT BUILD</span><strong>—</strong><small>Beta channel, unsigned, built by CI.</small></div>
-    <div><span class="label">RELEASES SHIPPED</span><strong>5</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
+    <div><span class="label">RELEASES SHIPPED</span><strong>6</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
     <div><span class="label">TESTS PASSING</span><strong>1,200+</strong><small>Across the app, the API and the website. Run with npm test.</small></div>
     <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>No sign-up exists. Nothing is held server-side.</small></div>
   </div>
@@ -122,6 +122,15 @@
   </div>
   <div class="console"><div class="console-body">
     <div class="log" id="mission-log">
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-10-27T13:00:00.000Z">2026-10-27</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3>1.0.23: did this transaction pay this invoice?</h3>
+      <p>A new Invoice check panel on the Settlement screen reads the transaction from the XRP Ledger and answers VERIFIED, HOLD or REJECTED, with the reason. It credits only what was delivered, so a partial payment that fell short is rejected; it compares amounts exactly and reads from two independent…</p>
+      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
+    </article>
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
         <time datetime="2026-10-23T13:50:00.000Z">2026-10-23</time>
@@ -184,15 +193,6 @@
       <h3>1.0.15: real domain and credential registry, audit evidence, readable at any size</h3>
       <p>Every permissioned domain and credential on mainnet, read by a sweep of the ledger; admission checks with SHA-256 records; audit trails screened against OFAC and the scam registry with a signed manifest. Text is larger, scaling fills the window, and 2FA sign-in is fixed.</p>
       <a class="log-link" href="/docs/release-notes/">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-09-28T18:00:00.000Z">2026-09-28</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>1.0.14: safer to hold XRP, easier to trust who holds it</h3>
-      <p>An emergency kit for drained accounts, a reviewed scam registry and phishing check, withdrawal screening, and Customer Asset Protection: proof from the XRP Ledger that customer XRP is backed and yours is counted. Verification, not insurance.</p>
-      <a class="log-link" href="/releases/1-0-14/">OPEN →</a>
     </article>
   </div>
   </div></div>
