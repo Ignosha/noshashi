@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
+import { classicAddressToXAddress } from "ripple-address-codec";
 import { describe, expect, it } from "vitest";
-import { buildInvoice, canonicalJson, EMPTY_INVOICE, evidenceFile, formatAmountView, type VerificationReport } from "../verifyPayment";
+import { addressProblem, buildInvoice, canonicalJson, cleanAddress, EMPTY_INVOICE, evidenceFile, formatAmountView, type VerificationReport } from "../verifyPayment";
 
 /**
  * The web side of invoice verification. The decision itself is made and
@@ -53,6 +54,11 @@ describe("buildInvoice", () => {
     [{ destinationTag: "-1" }, /destination tag/],
     [{ assetKind: "issued" as const, currency: "XRP", issuer: "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6" }, /issued currency/],
     [{ assetKind: "issued" as const, currency: "USD", issuer: "nope" }, /issuer/],
+    // One character changed (the last 6 → 7): right shape, wrong checksum.
+    [{ destination: "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF7" }, /checksum/],
+    [{ destination: "Rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6" }, /capital R/],
+    [{ destination: "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF0" }, /0, O, I or l/],
+    [{ destination: "" }, /Enter the receiving account/],
   ])("rejects %j", (patch, message) => {
     expect(buildInvoice({ ...valid, ...patch })).toMatch(message);
   });
@@ -74,5 +80,35 @@ describe("display and export", () => {
     const file = evidenceFile(report);
     expect(file.filename).toBe("noshashi-payment-evidence-F3B8B18E6AEF.json");
     expect(JSON.parse(file.contents)).toMatchObject({ evidence_digest: "AB", evidence: { x: 1 } });
+  });
+});
+
+describe("receiving account as pasted", () => {
+  const address = "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6";
+
+  it("strips spaces, line breaks and invisible characters copying adds", () => {
+    const pasted = `\u200B ${address.slice(0, 10)}\u00AD${address.slice(10)}\n\uFEFF`;
+    expect(cleanAddress(pasted)).toBe(address);
+    const p = buildInvoice({ ...valid, destination: pasted });
+    expect(typeof p === "object" && p.destination).toBe(address);
+  });
+
+  it("accepts a valid classic address", () => {
+    expect(addressProblem(address, "receiving account")).toBeNull();
+  });
+
+  it("splits an X-address into the account and its tag", () => {
+    const p = buildInvoice({ ...valid, destination: classicAddressToXAddress(address, 42, false) });
+    expect(typeof p === "object" && p.destination).toBe(address);
+    expect(typeof p === "object" && p.destination_tag).toBe(42);
+  });
+
+  it("refuses an X-address whose tag disagrees with the tag field", () => {
+    expect(buildInvoice({ ...valid, destination: classicAddressToXAddress(address, 42, false), destinationTag: "7" })).toMatch(/tag 42/);
+  });
+
+  it("checks the issuer the same way", () => {
+    const p = buildInvoice({ ...valid, assetKind: "issued", currency: "CSC", issuer: " rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr\u200B" });
+    expect(typeof p === "object" && p.asset).toEqual({ kind: "issued", currency: "CSC", issuer: "rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr" });
   });
 });

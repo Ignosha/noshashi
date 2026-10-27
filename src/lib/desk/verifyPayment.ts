@@ -1,3 +1,4 @@
+import { isValidClassicAddress, isValidXAddress, xAddressToClassicAddress } from "ripple-address-codec";
 import { isTauri } from "@/lib/env";
 
 /**
@@ -90,14 +91,46 @@ export const EMPTY_INVOICE: InvoiceForm = {
 };
 
 const DECIMAL = /^\d+(\.\d+)?$/;
-const ADDRESS = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+
+/**
+ * An address as pasted, without the characters copying adds: spaces, line
+ * breaks, and invisible ones (zero-width space, joiners, BOM, soft hyphen)
+ * that String.trim leaves in and that make a correct address fail.
+ */
+export function cleanAddress(value: string): string {
+  return value.replace(/[\s\u00AD\u200B-\u200D\u2060\uFEFF]/g, "");
+}
+
+/**
+ * Why an address is not a classic XRPL address, or null when it is. The
+ * base58 checksum is checked here, so a single mistyped character is caught
+ * before the ledger is read instead of coming back as a destination mismatch.
+ */
+export function addressProblem(address: string, role: string): string | null {
+  if (!address) return `Enter the ${role}.`;
+  if (/^R/.test(address)) return `The ${role} starts with a capital R. XRPL addresses start with a lower-case r.`;
+  if (!address.startsWith("r")) return `The ${role} is an XRPL address beginning with r.`;
+  if (/[0OIl]/.test(address)) return `The ${role} contains 0, O, I or l, which XRPL addresses never use. Check for a mistyped character.`;
+  if (address.length < 25 || address.length > 35) return `The ${role} is ${address.length} characters; XRPL addresses are 25 to 35.`;
+  if (!isValidClassicAddress(address)) return `The ${role} fails its checksum, so a character is probably mistyped. Paste it from the wallet or explorer.`;
+  return null;
+}
 
 /** The form as an invoice policy, or the first thing missing from it. */
 export function buildInvoice(form: InvoiceForm): InvoicePolicy | string {
   const id = form.invoiceId.trim();
   if (!id) return "Give the invoice an identifier.";
-  const destination = form.destination.trim();
-  if (!ADDRESS.test(destination)) return "The receiving account is an XRPL address beginning with r.";
+  let destination = cleanAddress(form.destination);
+  // An X-address carries the account and its tag together; the ledger
+  // records them apart, so it is split here.
+  let xTag: number | undefined;
+  if (isValidXAddress(destination)) {
+    const x = xAddressToClassicAddress(destination);
+    destination = x.classicAddress;
+    if (x.tag !== false) xTag = x.tag;
+  }
+  const destinationProblem = addressProblem(destination, "receiving account");
+  if (destinationProblem) return destinationProblem;
   const amount = form.expectedAmount.trim();
   if (!DECIMAL.test(amount) || /^0+(\.0+)?$/.test(amount)) return "The expected amount is a positive decimal number, like 125 or 0.5.";
   let tag: number | undefined;
@@ -106,16 +139,21 @@ export function buildInvoice(form: InvoiceForm): InvoicePolicy | string {
     if (!Number.isInteger(n) || n < 0 || n > 4294967295) return "A destination tag is a whole number up to 4294967295.";
     tag = n;
   }
+  if (xTag !== undefined) {
+    if (tag !== undefined && tag !== xTag) return `The receiving account's X-address carries tag ${xTag}, but the destination tag says ${tag}.`;
+    tag = xTag;
+  }
   const tolerance = form.tolerance.trim();
   if (tolerance && !DECIMAL.test(tolerance)) return "The tolerance is a decimal number, or empty for none.";
   let asset: Asset = { kind: "xrp" };
   if (form.assetKind === "issued") {
     const currency = form.currency.trim();
-    const issuer = form.issuer.trim();
+    const issuer = cleanAddress(form.issuer);
     if (!/^([A-Za-z0-9?!@#$%^&*<>(){}[\]|]{3}|[0-9A-Fa-f]{40})$/.test(currency) || currency.toUpperCase() === "XRP") {
       return "An issued currency is a 3-character code or a 40-hex code.";
     }
-    if (!ADDRESS.test(issuer)) return "The issuer is an XRPL address beginning with r.";
+    const issuerProblem = addressProblem(issuer, "issuer");
+    if (issuerProblem) return issuerProblem;
     asset = { kind: "issued", currency, issuer };
   }
   return {

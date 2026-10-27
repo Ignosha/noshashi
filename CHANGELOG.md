@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Invoice check
+
+- The receiving account and issuer fields now ignore the spaces, line
+  breaks and invisible characters that copying an address can add, and
+  no longer let the system capitalise or autocorrect what you type.
+- An address is checked against its checksum before the ledger is read,
+  so a mistyped character gets a plain message (a capital R, a 0, O, I
+  or l, the wrong length, or a failed checksum) instead of a REJECTED
+  destination mismatch.
+- An X-address is accepted and split into the account and its
+  destination tag.
+
 ## 1.0.23
 
 ### Invoice check
