@@ -168,6 +168,18 @@ What the digest proves, and what it doesn't:
   - The private key exists only in the function's secrets: never in this repository, the desktop app or a response.
   - Without it, the API says signing is not configured and the digest proves integrity only.
 
+**In production since 2026-10-27** (`noshashi-verify` version 17; tables from migration `20261026150000`). A request with a real, scoped key went end to end:
+- **Request:** the real CSC partial payment, against an invoice for the full requested amount.
+- **Reads:** one attempt each from XRPL Labs (1,339 ms) and Ripple (288 ms).
+- **Verdict:** `REJECTED` / `PARTIAL_NOT_PERMITTED` at ledger 107,587,014, with 161.1605415577872 delivered. That is the verdict the Rust engine and the shared vectors give.
+- **Billing and audit:** one credit was charged and the audit row was written.
+- **The key:** it was generated inside the database, so it never appeared in a log or a transcript. It expired after 15 minutes and was then revoked.
+
+**Signing enabled 2026-10-27.** The `PAYMENT_EVIDENCE_SIGNING_KEY` secret was set by the owner; the private key was never in this repository or a transcript.
+- `GET payment/signing-key` returns key `2F6500CAC968AF37`, public key `vEyJxmswsxo9jROtz_dOs7DCrGwMPkUXpe4N0Cw2JmE` (Ed25519, base64url `x`).
+- A second production request, with the same payment and a full-amount invoice, came back `REJECTED` / `PARTIAL_NOT_PERMITTED`, signed by that key.
+- Its signature was checked independently with WebCrypto against the published public key. It verifies, the statement names the report's evidence digest, and changing the status in the statement makes it fail.
+
 The hosted rules are a port, not a binding to the Rust crate, because the Edge runtime is Deno. Parity is enforced, not assumed: the shared vectors, the canonical-JSON parity vector (`t35`) and the same transport limits (allowlist, no redirects, 1 MiB cap, compressed bodies refused, three attempts) are tested on both sides.
 
 ## Installer size
@@ -180,7 +192,21 @@ Measured on 2026-10-26 with `npx tauri build --bundles deb,appimage` on Linux x8
 | `.deb` | 4,463,352 bytes (4.5 MB) |
 | AppImage (bundles WebKitGTK) | 80,386,552 bytes (80.4 MB) |
 
-The build then stopped at updater signing, because `TAURI_SIGNING_PRIVATE_KEY` is held only by the release workflow. That step comes after bundling and does not change the sizes. macOS and Windows installers were not measured here.
+The build then stopped at updater signing, because `TAURI_SIGNING_PRIVATE_KEY` is held only by the release workflow. That step comes after bundling and does not change the sizes.
+
+For every platform, the published v1.0.22 release has these sizes, as reported by GitHub for the release assets built by `release.yml` on 2026-10-23. That release was cut before this engine was merged:
+
+| Installer | Size |
+|---|---|
+| macOS, Apple silicon (`.dmg`) | 6,178,468 bytes (6.2 MB) |
+| macOS, Intel (`.dmg`) | 6,360,423 bytes (6.4 MB) |
+| Windows (`-setup.exe`) | 3,203,968 bytes (3.2 MB) |
+| Windows (`.msi`) | 3,985,408 bytes (4.0 MB) |
+| Linux (`.deb`) | 4,400,352 bytes (4.4 MB) |
+| Linux (`.rpm`) | 4,401,554 bytes (4.4 MB) |
+| Linux (AppImage) | 82,831,864 bytes (82.8 MB) |
+
+The like-for-like comparison is the `.deb`: 4,400,352 bytes without the engine, 4,463,352 with it. The engine adds about 63 KB. The next release will give the measured sizes for the other platforms.
 
 ## Security notes
 
