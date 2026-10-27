@@ -1,0 +1,142 @@
+{
+  "_about": "Real XRPL Testnet transactions made by scripts/academy/testnet-scenario.mjs and judged with the app's payment rules from two testnet operators. Testnet XRP has no value. Testnet is reset from time to time; re-run the script after a reset.",
+  "network": "testnet",
+  "recorded_at": "2026-10-27T16:15:40.579Z",
+  "rules_version": "xrpl-payment/1",
+  "token": "TST",
+  "accounts": {
+    "merchant": "rD9dgnbRAdwnzdUijnVUMVV65BSrFWccYn",
+    "customer": "rEMZveYc4kK1ntuXrAtszujng6pkTmamCB",
+    "issuer": "r4dRZZ3gP5CXcz7LDPVfAVRnmERJBcofSD"
+  },
+  "cases": [
+    {
+      "id": "paid",
+      "title": "Paid in full, right tag",
+      "hash": "3E44E1F454F5179A19703E4A194383012E6A093264C7B88202BA057655298253",
+      "ledger_index": 21867541,
+      "destination_tag": 1042,
+      "requested": "5 XRP",
+      "delivered": "5 XRP",
+      "partial_payment": false,
+      "invoice": {
+        "invoice_id": "TEST-1042",
+        "destination": "rD9dgnbRAdwnzdUijnVUMVV65BSrFWccYn",
+        "destination_tag": 1042,
+        "asset": {
+          "kind": "xrp"
+        },
+        "expected_amount": "5"
+      },
+      "status": "VERIFIED",
+      "reason_code": "SETTLED",
+      "sources": [
+        "s.altnet.rippletest.net",
+        "testnet.xrpl-labs.com"
+      ]
+    },
+    {
+      "id": "wrong-tag",
+      "title": "Right amount, wrong destination tag",
+      "hash": "C5B33E0DAFE4E305D10B1299C39AC04EA37468BD8FEFDB4D4EC227ABD3ACA52C",
+      "ledger_index": 21867543,
+      "destination_tag": 2001,
+      "requested": "5 XRP",
+      "delivered": "5 XRP",
+      "partial_payment": false,
+      "invoice": {
+        "invoice_id": "TEST-1042B",
+        "destination": "rD9dgnbRAdwnzdUijnVUMVV65BSrFWccYn",
+        "destination_tag": 1042,
+        "asset": {
+          "kind": "xrp"
+        },
+        "expected_amount": "5"
+      },
+      "status": "REJECTED",
+      "reason_code": "DESTINATION_TAG_MISMATCH",
+      "sources": [
+        "s.altnet.rippletest.net",
+        "testnet.xrpl-labs.com"
+      ]
+    },
+    {
+      "id": "underpaid",
+      "title": "Paid 4 XRP on a 5 XRP invoice",
+      "hash": "6C1EA5EF6A643164BECB0578CB57EAB6A6B6ED2918375A270AD5AA09C31758AF",
+      "ledger_index": 21867545,
+      "destination_tag": 1043,
+      "requested": "4 XRP",
+      "delivered": "4 XRP",
+      "partial_payment": false,
+      "invoice": {
+        "invoice_id": "TEST-1043",
+        "destination": "rD9dgnbRAdwnzdUijnVUMVV65BSrFWccYn",
+        "destination_tag": 1043,
+        "asset": {
+          "kind": "xrp"
+        },
+        "expected_amount": "5"
+      },
+      "status": "REJECTED",
+      "reason_code": "UNDERPAID",
+      "sources": [
+        "s.altnet.rippletest.net",
+        "testnet.xrpl-labs.com"
+      ]
+    },
+    {
+      "id": "overpaid",
+      "title": "Paid 6 XRP on a 5 XRP invoice",
+      "hash": "B4725555E5A031778A6A81D48E64C5162EBC564CEF5364AF26DE12E874E52837",
+      "ledger_index": 21867547,
+      "destination_tag": 1044,
+      "requested": "6 XRP",
+      "delivered": "6 XRP",
+      "partial_payment": false,
+      "invoice": {
+        "invoice_id": "TEST-1044",
+        "destination": "rD9dgnbRAdwnzdUijnVUMVV65BSrFWccYn",
+        "destination_tag": 1044,
+        "asset": {
+          "kind": "xrp"
+        },
+        "expected_amount": "5",
+        "hold_overpayment": true
+      },
+      "status": "HOLD",
+      "reason_code": "OVERPAID_REVIEW",
+      "sources": [
+        "s.altnet.rippletest.net",
+        "testnet.xrpl-labs.com"
+      ]
+    },
+    {
+      "id": "partial",
+      "title": "A partial payment: 80 TST asked, at most 50 sent",
+      "hash": "A6B6630A6206A6B4C6E7BF71BAB9E33507667DEC658FDF2AE88BAD6AE3121E3D",
+      "ledger_index": 21867549,
+      "destination_tag": 1045,
+      "requested": "80 TST",
+      "delivered": "50 TST",
+      "partial_payment": true,
+      "invoice": {
+        "invoice_id": "TEST-1045",
+        "destination": "rD9dgnbRAdwnzdUijnVUMVV65BSrFWccYn",
+        "destination_tag": 1045,
+        "asset": {
+          "kind": "issued",
+          "currency": "TST",
+          "issuer": "r4dRZZ3gP5CXcz7LDPVfAVRnmERJBcofSD"
+        },
+        "expected_amount": "80"
+      },
+      "status": "REJECTED",
+      "reason_code": "PARTIAL_NOT_PERMITTED",
+      "sources": [
+        "s.altnet.rippletest.net",
+        "testnet.xrpl-labs.com"
+      ]
+    }
+  ]
+}
