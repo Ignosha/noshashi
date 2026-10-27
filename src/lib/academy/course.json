@@ -716,7 +716,7 @@
       ],
       "words": ["delivered_amount", "Partial payment", "Destination tag", "Digest (SHA-256)", "Mainnet"],
       "keyIdea": "An invoice is paid only by what was delivered, to the right account and tag, in a validated ledger.",
-      "labs": ["invoice", "invoice-testnet"],
+      "labs": ["invoice"],
       "quiz": [
         {
           "question": "Which answer means the invoice was paid?",

@@ -9,10 +9,10 @@
  * kept identical to the Rust engine by the shared vectors), reading two
  * independent testnet operators:
  *
- *   paid        25 XRP to tag 1042, invoice 25 XRP tag 1042   → VERIFIED
- *   wrong-tag   25 XRP to tag 2001, invoice tag 1042           → REJECTED
- *   underpaid   20 XRP to tag 1043, invoice 25 XRP             → REJECTED
- *   overpaid    30 XRP to tag 1044, invoice 25 XRP, hold over  → HOLD
+ *   paid        5 XRP to tag 1042, invoice 5 XRP tag 1042   → VERIFIED
+ *   wrong-tag   5 XRP to tag 2001, invoice tag 1042         → REJECTED
+ *   underpaid   4 XRP to tag 1043, invoice 5 XRP            → REJECTED
+ *   overpaid    6 XRP to tag 1044, invoice 5 XRP, hold over → HOLD
  *   partial     partial payment of a testnet token, 80 asked, 50 sent → REJECTED
  *
  * It writes src/lib/academy/testnet-cases.json: the accounts' public
@@ -49,6 +49,7 @@ async function submit(tx, wallet) {
 }
 
 const fund = async () => (await client.fundWallet()).wallet;
+// The faucet's grant is small, so the amounts below are a few XRP each.
 const merchant = await fund();
 const customer = await fund();
 const issuer = await fund();
@@ -86,34 +87,34 @@ const CASES = [
   {
     id: "paid",
     title: "Paid in full, right tag",
-    tx: xrpPay("25", 1042),
-    invoice: { invoice_id: "TEST-1042", destination: merchant.classicAddress, destination_tag: 1042, asset: { kind: "xrp" }, expected_amount: "25" },
+    tx: xrpPay("5", 1042),
+    invoice: { invoice_id: "TEST-1042", destination: merchant.classicAddress, destination_tag: 1042, asset: { kind: "xrp" }, expected_amount: "5" },
     expect: "VERIFIED",
   },
   {
     id: "wrong-tag",
     title: "Right amount, wrong destination tag",
-    tx: xrpPay("25", 2001),
-    invoice: { invoice_id: "TEST-1042B", destination: merchant.classicAddress, destination_tag: 1042, asset: { kind: "xrp" }, expected_amount: "25" },
+    tx: xrpPay("5", 2001),
+    invoice: { invoice_id: "TEST-1042B", destination: merchant.classicAddress, destination_tag: 1042, asset: { kind: "xrp" }, expected_amount: "5" },
     expect: "REJECTED",
   },
   {
     id: "underpaid",
-    title: "Paid 20 XRP on a 25 XRP invoice",
-    tx: xrpPay("20", 1043),
-    invoice: { invoice_id: "TEST-1043", destination: merchant.classicAddress, destination_tag: 1043, asset: { kind: "xrp" }, expected_amount: "25" },
+    title: "Paid 4 XRP on a 5 XRP invoice",
+    tx: xrpPay("4", 1043),
+    invoice: { invoice_id: "TEST-1043", destination: merchant.classicAddress, destination_tag: 1043, asset: { kind: "xrp" }, expected_amount: "5" },
     expect: "REJECTED",
   },
   {
     id: "overpaid",
-    title: "Paid 30 XRP on a 25 XRP invoice",
-    tx: xrpPay("30", 1044),
+    title: "Paid 6 XRP on a 5 XRP invoice",
+    tx: xrpPay("6", 1044),
     invoice: {
       invoice_id: "TEST-1044",
       destination: merchant.classicAddress,
       destination_tag: 1044,
       asset: { kind: "xrp" },
-      expected_amount: "25",
+      expected_amount: "5",
       hold_overpayment: true,
     },
     expect: "HOLD",
