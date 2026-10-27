@@ -175,6 +175,11 @@ What the digest proves, and what it doesn't:
 - **Billing and audit:** one credit was charged and the audit row was written.
 - **The key:** it was generated inside the database, so it never appeared in a log or a transcript. It expired after 15 minutes and was then revoked.
 
+**Signing enabled 2026-10-27.** The `PAYMENT_EVIDENCE_SIGNING_KEY` secret was set by the owner; the private key was never in this repository or a transcript.
+- `GET payment/signing-key` returns key `2F6500CAC968AF37`, public key `vEyJxmswsxo9jROtz_dOs7DCrGwMPkUXpe4N0Cw2JmE` (Ed25519, base64url `x`).
+- A second production request, with the same payment and a full-amount invoice, came back `REJECTED` / `PARTIAL_NOT_PERMITTED`, signed by that key.
+- Its signature was checked independently with WebCrypto against the published public key. It verifies, the statement names the report's evidence digest, and changing the status in the statement makes it fail.
+
 The hosted rules are a port, not a binding to the Rust crate, because the Edge runtime is Deno. Parity is enforced, not assumed: the shared vectors, the canonical-JSON parity vector (`t35`) and the same transport limits (allowlist, no redirects, 1 MiB cap, compressed bodies refused, three attempts) are tested on both sides.
 
 ## Installer size
