@@ -14,7 +14,7 @@
 |---|---|---|
 | Revenue to date | **$0** | Production database: 1 account; its only subscription is cancelled |
 | Paying customers | **0** | Same |
-| Hosted API verifications served | **0** | `noshashi.verification_events` row count |
+| Hosted API verifications served to anyone other than the founder | **0** | `noshashi.verification_events` (0 rows) and `noshashi.payment_verifications` (1 row: the founder's own production test, 2026-10-27) |
 | Institutions emailed | 23, from 162 researched | `outreach/contacts.csv` (`status = contacted`) |
 | Replies from them | 0 (1 bounce) | Hourly inbox checks since the sends |
 | Tester interviews logged | 0 | `docs/first-tester-campaign.md` log |
