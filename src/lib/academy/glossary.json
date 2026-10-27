@@ -1,0 +1,510 @@
+[
+ {
+  "term": "Account",
+  "meaning": "A place on the ledger that holds XRP and tokens, identified by an address starting with r."
+ },
+ {
+  "term": "AccountSet",
+  "meaning": "The transaction that changes an account's settings and flags."
+ },
+ {
+  "term": "Address",
+  "meaning": "An account's public identifier, 25 to 35 characters starting with r."
+ },
+ {
+  "term": "Adjudication",
+  "meaning": "NOSHASHI's process of checking something against rules and returning a verdict."
+ },
+ {
+  "term": "Amendment",
+  "meaning": "A change to the XRPL's rules, enabled after 80% of validators support it for two weeks."
+ },
+ {
+  "term": "Amendment blocked",
+  "meaning": "A server that has not upgraded when an amendment activates, and stops following the ledger."
+ },
+ {
+  "term": "AML",
+  "meaning": "Anti-Money-Laundering: rules to stop criminal money moving."
+ },
+ {
+  "term": "AMM",
+  "meaning": "Automated market maker: a pool of two assets that trades automatically (XLS-30)."
+ },
+ {
+  "term": "Auction slot",
+  "meaning": "A seat in an AMM pool that gives its holder discounted trading for a time."
+ },
+ {
+  "term": "Auto-bridging",
+  "meaning": "Routing a token-to-token trade through XRP when that gives a better price."
+ },
+ {
+  "term": "Blackholed",
+  "meaning": "An account nobody can sign for again: master key disabled, regular key unusable, no signer list."
+ },
+ {
+  "term": "Blocking check",
+  "meaning": "A check whose failure gives NO-GO."
+ },
+ {
+  "term": "book_offers",
+  "meaning": "The server call that returns an order book's offers."
+ },
+ {
+  "term": "CASP / VASP",
+  "meaning": "A crypto (or virtual) asset service provider: a regulated business handling digital assets."
+ },
+ {
+  "term": "Check (payment)",
+  "meaning": "A deferred payment the receiver cashes when they choose."
+ },
+ {
+  "term": "Clawback",
+  "meaning": "An issuer power to take tokens back from a holder. Must be enabled before any trust lines exist (XLS-39)."
+ },
+ {
+  "term": "Closed ledger",
+  "meaning": "A ledger that has stopped taking transactions but is not yet validated."
+ },
+ {
+  "term": "Compliance",
+  "meaning": "Following the laws and rules that apply to moving money."
+ },
+ {
+  "term": "Compliance API",
+  "meaning": "NOSHASHI's read-only interface for verdicts and readings."
+ },
+ {
+  "term": "Concentration",
+  "meaning": "How much of an asset or activity sits with a few parties; measured with the HHI."
+ },
+ {
+  "term": "Consensus",
+  "meaning": "How validators agree on the next ledger without mining."
+ },
+ {
+  "term": "Counterparty",
+  "meaning": "Whoever is on the other side of a transaction."
+ },
+ {
+  "term": "Credential",
+  "meaning": "An on-ledger proof that an account passed a check (XLS-70)."
+ },
+ {
+  "term": "Currency code",
+  "meaning": "A token's name, 3 characters or 40 hex. Anyone can use any code, so it proves nothing alone."
+ },
+ {
+  "term": "Deep freeze",
+  "meaning": "A freeze where the holder can neither send nor receive the token (XLS-77)."
+ },
+ {
+  "term": "delivered_amount",
+  "meaning": "The amount a payment actually delivered, in its metadata. The figure to credit."
+ },
+ {
+  "term": "Depth",
+  "meaning": "How much is on offer in an order book."
+ },
+ {
+  "term": "Destination tag",
+  "meaning": "A number telling a shared account which customer a payment is for."
+ },
+ {
+  "term": "Domain verification",
+  "meaning": "Proof that an account belongs to a website: the site lists the account in its /.well-known/xrp-ledger.toml."
+ },
+ {
+  "term": "DEX",
+  "meaning": "The decentralised exchange built into the XRPL."
+ },
+ {
+  "term": "Digest (SHA-256)",
+  "meaning": "A fixed-length fingerprint of data. Change anything and the digest changes completely."
+ },
+ {
+  "term": "Domain",
+  "meaning": "A web domain an account claims, verifiable against a file on that domain."
+ },
+ {
+  "term": "Drops",
+  "meaning": "The smallest unit of XRP: 1 XRP = 1,000,000 drops."
+ },
+ {
+  "term": "Escrow",
+  "meaning": "Funds locked until a time passes or a condition is met."
+ },
+ {
+  "term": "EscrowFinish",
+  "meaning": "The transaction that releases a matured escrow. Nothing pays out until someone submits it."
+ },
+ {
+  "term": "Exception",
+  "meaning": "An approved, recorded override of a NO-GO for a stated reason."
+ },
+ {
+  "term": "Fee pressure",
+  "meaning": "How high transaction costs are running because the network is busy."
+ },
+ {
+  "term": "Flag",
+  "meaning": "An on/off setting on an account or trust line."
+ },
+ {
+  "term": "Four-eyes",
+  "meaning": "A control where a second person must approve a change."
+ },
+ {
+  "term": "Freeze",
+  "meaning": "An issuer power to stop a holder sending its token on."
+ },
+ {
+  "term": "Funded depth",
+  "meaning": "Depth backed by owners who can actually deliver."
+ },
+ {
+  "term": "gateway_balances",
+  "meaning": "The server call that returns an issuer's obligations."
+ },
+ {
+  "term": "Global freeze",
+  "meaning": "An issuer freezing every holder of its tokens at once."
+ },
+ {
+  "term": "GO",
+  "meaning": "A verdict meaning every check passed."
+ },
+ {
+  "term": "Hash",
+  "meaning": "A transaction's or object's 64-character hexadecimal identifier."
+ },
+ {
+  "term": "Hash-chained log",
+  "meaning": "A log where each entry includes the fingerprint of the previous one, so edits show."
+ },
+ {
+  "term": "HHI",
+  "meaning": "Herfindahl-Hirschman Index: the sum of squared percentage shares; 10,000 is total concentration."
+ },
+ {
+  "term": "HOLD",
+  "meaning": "A verdict meaning a person should review before moving."
+ },
+ {
+  "term": "HUD",
+  "meaning": "NOSHASHI's small live panel in the macOS menu bar."
+ },
+ {
+  "term": "INSUFFICIENT_DATA",
+  "meaning": "A check state meaning the ledger did not give enough to decide. Never a pass."
+ },
+ {
+  "term": "Investigation",
+  "meaning": "A case in NOSHASHI collecting verdicts, readings and notes, with a hash-chained log."
+ },
+ {
+  "term": "IOU",
+  "meaning": "Another name for an issued token: a promise from its issuer."
+ },
+ {
+  "term": "Issuer",
+  "meaning": "The account that creates a token and sets its rules."
+ },
+ {
+  "term": "KYC",
+  "meaning": "Know Your Customer: verifying who a customer is."
+ },
+ {
+  "term": "Ledger",
+  "meaning": "One numbered snapshot of the whole XRPL, produced every 3 to 5 seconds."
+ },
+ {
+  "term": "Ledger index",
+  "meaning": "A ledger's number. Fixes a reading to a moment anyone can re-check."
+ },
+ {
+  "term": "Limit",
+  "meaning": "The most of a token you are willing to hold on a trust line."
+ },
+ {
+  "term": "Listed depth",
+  "meaning": "All the depth shown on a book, including offers nobody can fill."
+ },
+ {
+  "term": "LP token",
+  "meaning": "A token received for adding assets to an AMM pool; carries a fee vote."
+ },
+ {
+  "term": "Mainnet",
+  "meaning": "The real, live XRP Ledger, as opposed to test networks."
+ },
+ {
+  "term": "Master key",
+  "meaning": "An account's original key pair. It can be disabled."
+ },
+ {
+  "term": "Metadata",
+  "meaning": "The record of what a transaction actually did, attached once it is validated."
+ },
+ {
+  "term": "MiCA",
+  "meaning": "The EU's regulation for crypto-assets, including stablecoin issuers."
+ },
+ {
+  "term": "Mid price",
+  "meaning": "The average of the best bid and best ask."
+ },
+ {
+  "term": "Multi-signature",
+  "meaning": "Several keys signing together, set with a signer list."
+ },
+ {
+  "term": "NFT",
+  "meaning": "A unique token (XLS-20). Its ID encodes the rights its issuer kept."
+ },
+ {
+  "term": "NFTokenID",
+  "meaning": "The 64-character identifier of an NFT, which encodes its flags."
+ },
+ {
+  "term": "No Freeze",
+  "meaning": "A permanent promise by an issuer never to freeze."
+ },
+ {
+  "term": "NO-GO",
+  "meaning": "A verdict meaning a blocking check failed."
+ },
+ {
+  "term": "NOT_APPLICABLE",
+  "meaning": "A check state meaning the check does not apply."
+ },
+ {
+  "term": "Obligations",
+  "meaning": "The total of an issuer's tokens held by others: its real circulating supply."
+ },
+ {
+  "term": "Observer",
+  "meaning": "NOSHASHI's agent mode that watches for changes and opens investigations."
+ },
+ {
+  "term": "Offer",
+  "meaning": "An order posted on the DEX to trade one asset for another."
+ },
+ {
+  "term": "Order book",
+  "meaning": "All the offers for one trading pair."
+ },
+ {
+  "term": "Owner reserve",
+  "meaning": "XRP locked for each object an account owns, such as a trust line or offer."
+ },
+ {
+  "term": "Partial payment",
+  "meaning": "A payment whose Amount is only a maximum; it can deliver less and still succeed."
+ },
+ {
+  "term": "Passport",
+  "meaning": "NOSHASHI's signed, portable record of an asset's posture."
+ },
+ {
+  "term": "Path",
+  "meaning": "A route that lets a payment convert currencies on the way."
+ },
+ {
+  "term": "Payment channel",
+  "meaning": "Many small off-ledger payments settled later in one transaction."
+ },
+ {
+  "term": "Permissioned domain",
+  "meaning": "An area where only accounts with the right credentials may take part (XLS-80)."
+ },
+ {
+  "term": "Policy",
+  "meaning": "An organisation's own thresholds and rules applied to verdicts."
+ },
+ {
+  "term": "Provenance",
+  "meaning": "Where an account came from: its age and first funder."
+ },
+ {
+  "term": "Quorum",
+  "meaning": "The minimum total signing weight needed to act for an account."
+ },
+ {
+  "term": "Receipt",
+  "meaning": "NOSHASHI's record of a verdict: ledger index, rules version, checks and digest."
+ },
+ {
+  "term": "Regular key",
+  "meaning": "A second key an account nominates to sign for it."
+ },
+ {
+  "term": "Require Auth",
+  "meaning": "An issuer setting: you need its approval to hold its token."
+ },
+ {
+  "term": "Reserve",
+  "meaning": "XRP an account must keep locked: a base reserve plus an owner reserve per object."
+ },
+ {
+  "term": "Pre-sign check",
+  "meaning": "Decoding a transaction before signing it, to see what it really does. Most thefts start with a signature the owner did not understand."
+ },
+ {
+  "term": "REVIEW",
+  "meaning": "A check state meaning a human decision is needed."
+ },
+ {
+  "term": "Selective disclosure",
+  "meaning": "Proving a credential exists without revealing the personal data behind it."
+ },
+ {
+  "term": "Sequence",
+  "meaning": "An account's transaction counter, starting at its creation ledger index."
+ },
+ {
+  "term": "Signer list",
+  "meaning": "The keys and weights used for multi-signature."
+ },
+ {
+  "term": "Spread",
+  "meaning": "The gap between the best bid and the best ask."
+ },
+ {
+  "term": "Stablecoin",
+  "meaning": "A token meant to hold a steady value, such as one US dollar."
+ },
+ {
+  "term": "taker_gets_funded",
+  "meaning": "The field book_offers adds when an owner cannot cover an offer."
+ },
+ {
+  "term": "tec",
+  "meaning": "A result prefix: failed, but recorded and the fee charged."
+ },
+ {
+  "term": "tesSUCCESS",
+  "meaning": "The success result. It does not mean the full Amount arrived."
+ },
+ {
+  "term": "Token",
+  "meaning": "An asset on the XRPL other than XRP, created by an issuer."
+ },
+ {
+  "term": "Transaction",
+  "meaning": "A signed instruction that changes the ledger."
+ },
+ {
+  "term": "Transaction cost",
+  "meaning": "The small XRP fee each transaction pays, which is destroyed."
+ },
+ {
+  "term": "Transfer fee",
+  "meaning": "A percentage (0% to 100%) an issuer charges when holders send its token to each other."
+ },
+ {
+  "term": "Travel Rule",
+  "meaning": "FATF Recommendation 16: sender and receiver details travel with transfers above a threshold."
+ },
+ {
+  "term": "Trust line",
+  "meaning": "The link you open to an issuer to hold its token."
+ },
+ {
+  "term": "UNL",
+  "meaning": "Unique Node List: the validators a server trusts not to collude."
+ },
+ {
+  "term": "Unfunded offer",
+  "meaning": "An offer still listed although its owner cannot fill it."
+ },
+ {
+  "term": "Validated ledger",
+  "meaning": "A ledger at least 80% of trusted validators agreed on. It is final."
+ },
+ {
+  "term": "Validator",
+  "meaning": "A server that votes on which ledger is the true next one."
+ },
+ {
+  "term": "Warning check",
+  "meaning": "A check whose failure gives HOLD rather than NO-GO."
+ },
+ {
+  "term": "Webhook",
+  "meaning": "A signed notification NOSHASHI sends to your own system when an event happens."
+ },
+ {
+  "term": "X-address",
+  "meaning": "An address format that packs an address and destination tag together."
+ },
+ {
+  "term": "XLS",
+  "meaning": "A numbered proposal for a new XRPL standard, such as XLS-30 for AMMs."
+ },
+ {
+  "term": "XRP",
+  "meaning": "The XRP Ledger's own currency."
+ },
+ {
+  "term": "XRPL",
+  "meaning": "The XRP Ledger."
+ },
+ {
+  "term": "Address poisoning",
+  "meaning": "Sending someone a tiny payment from a lookalike address, matching the start and end of one they use, so they copy it from their history by mistake."
+ },
+ {
+  "term": "AccountDelete",
+  "meaning": "The transaction that deletes an account and sends its remaining XRP to another; thieves use it to sweep throwaway accounts."
+ },
+ {
+  "term": "Proof of reserves",
+  "meaning": "Showing, from the ledger, the XRP an institution holds in the accounts it names for its customers."
+ },
+ {
+  "term": "Merkle sum tree",
+  "meaning": "A tree of hashes and sums over customer balances whose root proves the total without revealing any balance."
+ },
+ {
+  "term": "Inclusion proof",
+  "meaning": "The path from one customer's leaf to the published root, which proves their balance is counted."
+ },
+ {
+  "term": "Coverage ratio",
+  "meaning": "Reserves divided by published customer liabilities; 100% or more means fully backed."
+ },
+ {
+  "term": "Protection fund",
+  "meaning": "XRP set aside to make customers whole up to a per-customer limit, secured only if no single key can move it."
+ },
+ {
+  "term": "Withdrawal screening",
+  "meaning": "Checking an outbound payment before it is signed: will it bounce, and is the destination new, a lookalike, sanctioned or reported."
+ },
+ {
+  "term": "Scam registry",
+  "meaning": "Addresses reported by institutions with transaction evidence and confirmed by an independent reviewer."
+ },
+ {
+  "term": "Quote churn",
+  "meaning": "Orders placed and replaced again and again without filling; it makes an order book look deeper than it is."
+ },
+ {
+  "term": "Hardening plan",
+  "meaning": "NOSHASHI's list of unsigned transactions that make an account harder to take over, for the owner to sign in their own wallet."
+ },
+ {
+  "term": "Incident dossier",
+  "meaning": "NOSHASHI's plain-text record of a theft trail and recovery paths, with a SHA-256 fingerprint anyone can re-check."
+ },
+ {
+  "term": "Seed",
+  "meaning": "The secret an account's keys are derived from. Whoever has it controls the account; no legitimate service ever asks for it."
+ },
+ {
+  "term": "Security Guardian",
+  "meaning": "NOSHASHI's Strategic alert: a signed security_alert webhook when a watched account's keys change or it is deleted."
+ }
+]

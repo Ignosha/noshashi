@@ -1,0 +1,47 @@
+name: Academy testnet cases
+
+# Makes the Academy invoice lab's payments on the real XRPL Testnet
+# (scripts/academy/testnet-scenario.mjs), checks each with the app's payment
+# rules from two testnet operators, and commits the recording to the branch
+# that ran it. A GitHub runner is used because it can reach the testnet.
+# Faucet secrets stay in the runner's memory; only public addresses and
+# transaction hashes are written. Run it again after a testnet reset.
+
+on:
+  workflow_dispatch:
+  push:
+    # Never main: the recording commits, and main only takes reviewed changes.
+    branches-ignore: [main]
+    paths:
+      - scripts/academy/testnet-scenario.mjs
+      - .github/workflows/academy-testnet.yml
+
+concurrency:
+  group: academy-testnet-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: |
+          npm ci --no-audit --no-fund
+          npm i --no-save --no-audit --no-fund xrpl@4.0.0
+      - name: Make and judge the testnet payments
+        run: node --experimental-strip-types scripts/academy/testnet-scenario.mjs
+      - name: Commit the recording
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/academy/testnet-cases.json
+          if git diff --cached --quiet; then echo "No change."; exit 0; fi
+          git commit -m "Academy: record the testnet invoice cases"
+          git push

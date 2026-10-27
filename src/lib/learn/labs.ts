@@ -40,6 +40,12 @@ export type LabStep = {
   subjectLabel?: string;
   /** The tab of the scene that reads the subject, when the scene has several. */
   view?: string;
+  /**
+   * Values to type on a screen that does not take a handed-over value, or
+   * extra fields for one that does (an invoice's account and amount). Each
+   * is shown with a COPY button.
+   */
+  copy?: Array<{ label: string; value: string }>;
   /** What to look for once there. */
   lookFor: string;
   check: Checkpoint;
@@ -78,6 +84,16 @@ export const LAB_SUBJECTS = {
   nftTrader: "rP4pHjuJyaZ9RNVg48mMVRvGSwi7byj4BZ",
   /** XRP Toolkit's donations account: its Domain names xrptoolkit.com, whose xrp-ledger.toml lists it. */
   toolkit: "rTooLkitCksh5mQa67eaa2JaWHDBnHkpy",
+  /** An AMM pool's account (it carries an AMMID), recorded at ledger 107,194,965. */
+  ammPool: "rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am",
+  /** A partial payment that asked for 100,000 XRP and delivered 0.077162 XRP, validated in ledger 107,194,530. */
+  partialXrp: "307662378F518778F01116DBB93A43B882015FFB5EAB6899962741DF46FF19AA",
+  /** A partial CSC payment: asked 162.6994990013102, delivered 161.1605415577872, ledger 107,587,014. */
+  cscPayment: "F3B8B18E6AEFDCEA3388D0B0932820C4F10F4849847E7989876FA9CD19687A70",
+  /** Where the CSC payment was sent. */
+  cscDestination: "rogue5HnPRSszD9CWGSUz8UGHMVwSSKF6",
+  /** The CSC issuer. */
+  cscIssuer: "rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr",
 } as const;
 
 const S = LAB_SUBJECTS;
@@ -550,6 +566,338 @@ export const LABS: Lab[] = [
           ],
           answer: 0,
           why: "Validated transactions are final. Paid 'recovery' offers are the second half of the scam. INCIDENT RESPONSE follows the value and lists the paths that really exist, with the evidence each needs.",
+        },
+      },
+    ],
+  },
+  {
+    id: "authority",
+    title: "Certify what an issuer can still do",
+    outcome: "Run an Authority certificate on a real issuer and read each of its checks without mistaking a fact for an accusation.",
+    minutes: 4,
+    requires: "authority_certificate",
+    steps: [
+      {
+        id: "certify",
+        task: "Open AUTHORITY, paste Bitstamp's USD issuing account into ISSUER, and press CERTIFY AUTHORITY.",
+        scene: "authority",
+        copy: [{ label: "Bitstamp's USD issuer", value: S.bitstamp }],
+        lookFor: "A VERDICT, the ledger it was read at, the checks one by one, and a digest you can copy with COPY DIGEST.",
+        check: {
+          question: "Which kind of check, if it fails, makes the whole verdict NO-GO?",
+          options: [
+            "A blocking check, such as \"No single key controls the issuer\"",
+            "Any warning check, such as the transfer fee",
+            "None: the verdict is always GO for a well-known issuer",
+          ],
+          answer: 0,
+          why: "A failed blocking check gives NO-GO. Failed warnings give HOLD. That is how every NOSHASHI verdict is decided.",
+        },
+      },
+      {
+        id: "single-key",
+        task: "Find the check \"No single key controls the issuer\".",
+        scene: "authority",
+        copy: [{ label: "Bitstamp's USD issuer", value: S.bitstamp }],
+        lookFor:
+          "At ledger 107,193,471 (24 September 2026) Bitstamp's master key was disabled and one regular key, rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ, could sign for the account.",
+        check: {
+          question: "Why does one regular key fail this check even though the master key is disabled?",
+          options: [
+            "Whoever holds that one regular key can still sign for the issuer alone",
+            "Regular keys are not allowed on issuers",
+            "The check only looks at the master key",
+          ],
+          answer: 0,
+          why: "Disabling the master key only matters if signing then needs several people. One regular key is still one key.",
+        },
+      },
+      {
+        id: "freeze",
+        task: "Find the check \"Freeze permanently surrendered\".",
+        scene: "authority",
+        lookFor: "At ledger 107,193,471 Bitstamp had not set lsfNoFreeze, so this warning check did not pass.",
+        check: {
+          question: "Bitstamp keeps the right to freeze. How should a compliance officer read that?",
+          options: [
+            "As a fact to weigh: regulated issuers often must keep freeze rights",
+            "As proof Bitstamp intends to freeze holders",
+            "As a reason to report Bitstamp",
+          ],
+          answer: 0,
+          why: "The certificate states what the issuer can still do so a holder decides knowingly. It is not an accusation.",
+        },
+      },
+    ],
+  },
+  {
+    id: "book",
+    title: "Measure what a book can really fill",
+    outcome: "Read an order book's listed and funded depth, and say how much of it you could actually trade into.",
+    minutes: 3,
+    requires: "portfolios",
+    steps: [
+      {
+        id: "read",
+        task: "Open ORDER BOOK with Bitstamp's USD issuer filled in. The currency is already USD.",
+        scene: "book",
+        subject: S.bitstamp,
+        subjectLabel: "Bitstamp's USD issuer",
+        lookFor: "FILLABLE — BIDS and FILLABLE — ASKS beside what is listed, and OFFERS THAT CANNOT FILL.",
+        check: {
+          question: "What does \"fillable\" count that \"listed\" does not?",
+          options: [
+            "Only what each offer's owner actually holds and can deliver",
+            "Offers from verified companies only",
+            "Offers placed in the last hour",
+          ],
+          answer: 0,
+          why: "An offer stays listed after its owner runs out of funds. The ledger reports the real amount as taker_gets_funded.",
+        },
+      },
+      {
+        id: "worked",
+        task: "Look at OFFERS THAT CANNOT FILL.",
+        scene: "book",
+        subject: S.bitstamp,
+        subjectLabel: "Bitstamp's USD issuer",
+        lookFor: "Each offer listed there is on the book but its owner cannot cover it.",
+        check: {
+          question: "Three offers list 10,000 each; their owners hold 10,000, 500 and 0. How much could you sell into them?",
+          options: ["10,500", "30,000", "20,000"],
+          answer: 0,
+          why: "Only funded amounts trade: 10,000 + 500 + 0. Adding the listed amounts overstates the market by almost three times.",
+        },
+      },
+    ],
+  },
+  {
+    id: "amm",
+    title: "Find out who governs a pool",
+    outcome: "Read an AMM pool's trading fee, its fee votes and its auction slot, and say who really sets the price of using it.",
+    minutes: 3,
+    requires: "portfolios",
+    steps: [
+      {
+        id: "read",
+        task: "Open POOL GOVERNANCE, paste the pool account below, and press READ POOL GOVERNANCE.",
+        scene: "amm",
+        copy: [{ label: "AMM pool account", value: S.ammPool }],
+        lookFor:
+          "TRADING FEE, FEE VOTES with the LARGEST VOTER, and the AUCTION SLOT. The account is an AMM's own account: it carried an AMMID at ledger 107,194,965.",
+        check: {
+          question: "Whose votes decide the pool's trading fee?",
+          options: [
+            "LP token holders, weighted by how many LP tokens each holds",
+            "The account that created the pool, forever",
+            "Validators",
+          ],
+          answer: 0,
+          why: "Voting power follows LP tokens, which is why the screen shows what share the largest voter carries.",
+        },
+      },
+      {
+        id: "slot",
+        task: "Look at the AUCTION SLOT.",
+        scene: "amm",
+        lookFor: "Who holds the slot, if anyone, and whether it has EXPIRED.",
+        check: {
+          question: "What does holding the auction slot give an account?",
+          options: [
+            "A heavily discounted trading fee for a while",
+            "Ownership of the pool's assets",
+            "The right to freeze the pool",
+          ],
+          answer: 0,
+          why: "The slot rewards active traders who keep the pool's price in line with the market.",
+        },
+      },
+    ],
+  },
+  {
+    id: "settlement",
+    title: "See what a payment really delivered",
+    outcome: "Read a real partial payment and credit what arrived, not what was asked for.",
+    minutes: 3,
+    requires: "portfolios",
+    steps: [
+      {
+        id: "partial",
+        task: "Open SETTLEMENT with the transaction below filled in.",
+        scene: "settlement",
+        subject: S.partialXrp,
+        subjectLabel: "A real partial payment",
+        lookFor:
+          "REQUESTED and DELIVERED side by side, and PARTIAL FLAG. Validated in ledger 107,194,530, it asked for 100,000 XRP and delivered 0.077162 XRP, with RESULT tesSUCCESS.",
+        check: {
+          question: "How much should a business credit for this payment?",
+          options: ["0.077162 XRP, the delivered amount", "100,000 XRP, the Amount", "Nothing, because it failed"],
+          answer: 0,
+          why: "It succeeded, but the partial-payment flag made Amount only a maximum. delivered_amount is what arrived.",
+        },
+      },
+      {
+        id: "flag",
+        task: "Find PARTIAL FLAG in the RECORD.",
+        scene: "settlement",
+        subject: S.partialXrp,
+        subjectLabel: "A real partial payment",
+        lookFor: "The flag is set: Flags 131072 is tfPartialPayment.",
+        check: {
+          question: "What does the partial-payment flag change?",
+          options: [
+            "Amount becomes a maximum; the payment may deliver less and still succeed",
+            "The payment is split across several ledgers",
+            "The fee is waived",
+          ],
+          answer: 0,
+          why: "That is exactly how exchanges that credited Amount were drained.",
+        },
+      },
+    ],
+  },
+  {
+    id: "invoice",
+    title: "Check a payment against an invoice",
+    outcome: "Run the Invoice check on a real mainnet payment and get REJECTED and VERIFIED for the right reasons.",
+    minutes: 5,
+    requires: "portfolios",
+    steps: [
+      {
+        id: "rejected",
+        task: "Open SETTLEMENT with the CSC payment filled in. In INVOICE CHECK enter the values below, choose ISSUED TOKEN, leave partial payments off, and press CHECK AGAINST INVOICE.",
+        scene: "settlement",
+        subject: S.cscPayment,
+        subjectLabel: "A real CSC payment",
+        copy: [
+          { label: "INVOICE ID", value: "INV-CSC-1" },
+          { label: "RECEIVING ACCOUNT", value: S.cscDestination },
+          { label: "CURRENCY CODE", value: "CSC" },
+          { label: "ISSUER", value: S.cscIssuer },
+          { label: "EXPECTED AMOUNT", value: "162.6994990013102" },
+        ],
+        lookFor:
+          "REJECTED with reason PARTIAL_NOT_PERMITTED. REQUESTED 162.6994990013102, DELIVERED 161.1605415577872, ledger 107,587,014.",
+        check: {
+          question: "Why is it REJECTED when the result was tesSUCCESS?",
+          options: [
+            "It was a partial payment, and this invoice does not accept partial payments",
+            "The receiving account is wrong",
+            "CSC is not a real token",
+          ],
+          answer: 0,
+          why: "It delivered 1.538957443523 CSC less than asked, using the partial-payment flag, and the invoice did not allow that.",
+        },
+      },
+      {
+        id: "verified",
+        task: "Change EXPECTED AMOUNT to the delivered figure below, switch on \"Accept partial payments that still meet the invoice\", and check again.",
+        scene: "settlement",
+        subject: S.cscPayment,
+        subjectLabel: "A real CSC payment",
+        copy: [{ label: "EXPECTED AMOUNT", value: "161.1605415577872" }],
+        lookFor: "VERIFIED with reason SETTLED_PARTIAL_PERMITTED, and DIFFERENCE 0.",
+        check: {
+          question: "Partial payments are now allowed, but you set the amount back to 162.6994990013102. What happens?",
+          options: [
+            "REJECTED, underpaid: allowing partial payments does not lower the amount owed",
+            "VERIFIED, because partial payments are allowed",
+            "HOLD, because the amounts are close",
+          ],
+          answer: 0,
+          why: "The check compares exact amounts. Accepting a partial payment means accepting one that still meets the invoice, not one that falls short.",
+        },
+      },
+    ],
+  },
+  {
+    id: "provenance",
+    title: "Find where a counterparty came from",
+    outcome: "Trace an account's real age and first funder before you deal with it.",
+    minutes: 2,
+    requires: "portfolios",
+    steps: [
+      {
+        id: "trace",
+        task: "Open PROVENANCE with Bitstamp's USD issuer filled in.",
+        scene: "provenance",
+        subject: S.bitstamp,
+        subjectLabel: "Bitstamp's USD issuer",
+        lookFor: "FUNDED BY, the FUNDING CHAIN, and how long ago the account was created.",
+        check: {
+          question: "Which counterparty deserves more questions?",
+          options: [
+            "A days-old account funded by an unknown source",
+            "A years-old account funded by a known exchange",
+            "They deserve exactly the same questions",
+          ],
+          answer: 0,
+          why: "Most stolen withdrawals go to fresh accounts, and an unknown funder is a gap in the story.",
+        },
+      },
+    ],
+  },
+  {
+    id: "workstation",
+    title: "Keep a record an auditor can check",
+    outcome: "Find your verdict history, try a policy change safely, and export a file an auditor can verify.",
+    minutes: 3,
+    requires: "portfolios",
+    steps: [
+      {
+        id: "policy",
+        task: "Open LEDGER & POLICY and look at the Policy and Simulate tabs.",
+        scene: "workstation",
+        lookFor: "A draft policy can be simulated against past verdicts before anyone approves it.",
+        check: {
+          question: "Why simulate a policy change before it goes live?",
+          options: [
+            "To see which past verdicts it would have changed",
+            "To make it take effect faster",
+            "Because simulation skips approval",
+          ],
+          answer: 0,
+          why: "A change is judged by what it would have done to real past decisions, and still needs a second person to approve it.",
+        },
+      },
+      {
+        id: "export",
+        task: "Open the Export tab.",
+        scene: "workstation",
+        lookFor: "An export carries a SHA-256 chain-of-custody signature, and the screen explains how the recipient verifies it.",
+        check: {
+          question: "An auditor gets your export and someone changed one line in transit. What happens?",
+          options: [
+            "The fingerprint no longer matches, so the change shows",
+            "Nothing: the change is invisible",
+            "The file deletes itself",
+          ],
+          answer: 0,
+          why: "Change one character and a SHA-256 digest changes completely.",
+        },
+      },
+    ],
+  },
+  {
+    id: "credentials",
+    title: "See how credentials work on the ledger",
+    outcome: "Read the credential registry and explain how a credential proves something without revealing personal data.",
+    minutes: 2,
+    steps: [
+      {
+        id: "how",
+        task: "Open CREDENTIALS and read HOW CREDENTIALS WORK.",
+        scene: "credentials",
+        lookFor: "HELD CREDENTIALS, each with its ISSUER, SUBJECT, whether it is ACCEPTED, and when it EXPIRES.",
+        check: {
+          question: "A credential sits on an account but was never ACCEPTED. What does it prove?",
+          options: [
+            "Nothing yet: the subject has not accepted it",
+            "Everything, as soon as it is issued",
+            "That the account is frozen",
+          ],
+          answer: 0,
+          why: "Under XLS-70 a credential counts only once the subject accepts it, and only until it expires.",
         },
       },
     ],
