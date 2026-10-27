@@ -37,7 +37,7 @@ function Field({ id, label, value, onChange, placeholder }: { id: string; label:
       <Label htmlFor={id} className="text-[10.5px] tracking-wide">
         {label}
       </Label>
-      <Input id={id} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} spellCheck={false} className="mt-1 font-mono text-[11px]" />
+      <Input id={id} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} spellCheck={false} autoCapitalize="off" autoCorrect="off" autoComplete="off" className="mt-1 font-mono text-[11px]" />
     </div>
   );
 }
