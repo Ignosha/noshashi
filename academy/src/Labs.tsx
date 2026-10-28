@@ -7,7 +7,7 @@ import { testnetInvoice, testnetRecorded } from "@/lib/academy/testnetLab";
 import { useOnline } from "./useOnline";
 import { LAB_SUBJECTS } from "@/lib/learn/labs";
 import { BENCHES, runInvoice, type BenchResult, type InvoiceRun } from "./benches";
-import { ALL_LABS, labById } from "./labs";
+import { ALL_LABS, labById } from "./labCatalog";
 import { useLocal } from "./useLocal";
 
 /**

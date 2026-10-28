@@ -7,7 +7,7 @@ import { useLocal } from "./useLocal";
 import { isTauri } from "@/lib/env";
 import { saveTextFile } from "@/lib/export";
 import { cn } from "@/lib/utils";
-import { ALL_LABS as LABS, labById } from "./labs";
+import { ALL_LABS as LABS, labById } from "./labCatalog";
 import { labStatus, sanitizeProgress } from "@/lib/learn/labProgress";
 import {
   EMPTY_PROGRESS,
