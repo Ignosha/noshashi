@@ -95,6 +95,7 @@ async function workstationLab(page, title, report) {
     if (!entry.ok) entry.screen = ((await frame.locator("main").innerText().catch(() => "")) || "").replace(/\s+/g, " ").slice(0, 400);
     report.push(entry);
     console.log(`${entry.ok ? "LIVE" : "FAIL"}  ${title} · step ${n}: ${o.map((x) => `${x.met ? "✓" : "○"} ${x.label}`).join(" · ")}${pressed ? ` (pressed ${pressed})` : ""}`);
+    if (!entry.ok) console.log(`      ${entry.blocked ? `refused: ${entry.blocked} · ` : ""}screen: ${entry.screen}`);
   }
   await page.getByRole("button", { name: "EXIT LAB" }).click();
 }

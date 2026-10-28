@@ -19,35 +19,36 @@ function post(event: Payload): void {
  * showing and what was read, so the lab can tick off what the trainee did.
  * Rendered only in the training edition.
  */
-export function TrainingBridge({ scene, onNavigate }: { scene: SceneId; onNavigate: (scene: string) => void }) {
+export function TrainingBridge({
+  scene,
+  onNavigate,
+  onReopen,
+}: {
+  scene: SceneId;
+  onNavigate: (scene: string) => void;
+  /** Mount the screen showing afresh, so it claims a newly handed-over value. */
+  onReopen: () => void;
+}) {
   const handOff = useHandoff();
   const showing = useRef(scene);
   showing.current = scene;
 
   useEffect(() => {
-    let reopen = 0;
     const onMessage = (event: MessageEvent) => {
       if (event.source !== window.parent || event.origin !== window.location.origin) return;
       if (!isOpenScreen(event.data)) return;
       const { scene: target, value, as, view } = event.data;
-      window.clearTimeout(reopen);
-      if (!value) onNavigate(target);
-      else if (target !== showing.current) handOff({ scene: target as SceneId, value, as, view });
-      else {
-        // A screen takes a handed-over value when it opens (useClaimedSubject),
-        // and the next lab step often names the screen already showing. Step
-        // off it and open it afresh, as moving between screens in NOSHASHI does.
-        onNavigate("home");
-        reopen = window.setTimeout(() => handOff({ scene: target as SceneId, value, as, view }), 150);
-      }
+      if (!value) return onNavigate(target);
+      handOff({ scene: target as SceneId, value, as, view });
+      // A screen takes a handed-over value when it mounts (useClaimedSubject),
+      // and the next lab step often names the screen already showing: mount
+      // it afresh, as moving between screens in NOSHASHI does.
+      if (target === showing.current) onReopen();
     };
     window.addEventListener("message", onMessage);
     post({ type: "ready" });
-    return () => {
-      window.clearTimeout(reopen);
-      window.removeEventListener("message", onMessage);
-    };
-  }, [handOff, onNavigate]);
+    return () => window.removeEventListener("message", onMessage);
+  }, [handOff, onNavigate, onReopen]);
 
   useEffect(() => {
     post({ type: "scene", scene });

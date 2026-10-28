@@ -743,6 +743,11 @@ function ConsoleApp() {
     };
   }, [push]);
 
+  // The training copy reopens the screen showing when a lab hands it a new
+  // value: a screen takes a handed-over value when it mounts.
+  const [reopened, setReopened] = useState(0);
+  const reopenScene = useCallback(() => setReopened((n) => n + 1), []);
+
   const goTo = useCallback((next: string) => {
     if (!SCENE_BY_ID.has(next as SceneId)) return;
     setScene(next as SceneId);
@@ -975,7 +980,7 @@ function ConsoleApp() {
   return (
     <TooltipProvider delayDuration={220}>
       <HandoffProvider onNavigate={goTo} currentScene={scene}>
-      {isTraining && <TrainingBridge scene={scene} onNavigate={goTo} />}
+      {isTraining && <TrainingBridge scene={scene} onNavigate={goTo} onReopen={reopenScene} />}
       <ObserverRunner />
       <StressScheduleRunner />
       <PersonalGuardianRunner />
@@ -1222,7 +1227,7 @@ function ConsoleApp() {
             >
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={scene}
+                  key={isTraining ? `${scene}:${reopened}` : scene}
                   variants={sceneVariants}
                   /*
                    * Only mount hidden when there is something to animate.
