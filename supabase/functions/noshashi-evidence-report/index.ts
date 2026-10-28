@@ -39,7 +39,7 @@ import {
   reportModel,
   requestsFor,
 } from "../_shared/evidenceReport.ts";
-import { renderPdf } from "../_shared/evidencePdf.ts";
+import { type PdfAssets, renderPdf } from "../_shared/evidencePdf.ts";
 
 const MAX_ATTEMPTS = 4;
 /** Each tick stays well inside the function's wall-clock limit. */
@@ -108,6 +108,38 @@ async function gather(scope: { issuers: string[]; wallets: string[]; books: stri
   );
 }
 
+/**
+ * noshashi.app's fonts and mark, for the PDF. Loaded from the site once per
+ * instance; anything that does not load is left out and the PDF falls back
+ * to standard fonts rather than holding the report back.
+ */
+const BRAND_ASSETS: Record<keyof PdfAssets, string> = {
+  sans: "/fonts/space-grotesk-500-latin.ttf",
+  sansBold: "/fonts/space-grotesk-600-latin.ttf",
+  mono: "/fonts/ibm-plex-mono-400-latin.ttf",
+  monoBold: "/fonts/ibm-plex-mono-500-latin.ttf",
+  mark: "/assets/flower-mark-128.png",
+};
+let brand: Promise<PdfAssets> | null = null;
+function brandAssets(): Promise<PdfAssets> {
+  brand ??= Promise.all(
+    Object.entries(BRAND_ASSETS).map(async ([key, path]) => {
+      try {
+        const response = await fetch(SITE + path, { signal: AbortSignal.timeout(15_000) });
+        return response.ok ? [key, new Uint8Array(await response.arrayBuffer())] : [key, undefined];
+      } catch {
+        return [key, undefined];
+      }
+    }),
+  ).then((entries) => {
+    const loaded = Object.fromEntries(entries.filter(([, v]) => v)) as PdfAssets;
+    // A partial set is retried next time rather than cached.
+    if (Object.keys(loaded).length < Object.keys(BRAND_ASSETS).length) brand = null;
+    return loaded;
+  });
+  return brand;
+}
+
 async function sendEmail(message: Json): Promise<{ ok: boolean; status: number; detail?: string }> {
   const apiKey = Deno.env.get("RESEND_API_KEY");
   if (!apiKey) return { ok: false, status: 0, detail: "RESEND_API_KEY is not set" };
@@ -162,7 +194,7 @@ async function deliver(db: Db, delivery: Delivery): Promise<string> {
   const evidence = evidenceOf(sources);
   const digest = await sha256(evidence);
   const input = { reference, tier: order.tier, organization: order.organization, scope: order, periodEnd: delivery.period_end, generatedAt, sources, digest };
-  const pdf = await renderPdf(reportModel(input));
+  const pdf = await renderPdf(reportModel(input), await brandAssets());
   const letter = { reference, organization: order.organization, periodEnd: delivery.period_end, digest, findings: findings(sources), tier: order.tier };
   const file = `NOSHASHI-Ledger-Evidence-Report-${reference}`;
 
