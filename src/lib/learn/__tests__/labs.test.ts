@@ -63,10 +63,21 @@ describe("lab content is well formed", () => {
     expect(LAB_SUBJECTS.nftMutable).toMatch(/^[0-9A-F]{64}$/);
   });
 
-  it("marks the treasury lab as needing the plan its screen needs", () => {
-    const treasury = LABS.find((l) => l.id === "treasury")!;
-    expect(treasury.requires).toBe("portfolios");
-    expect(LABS.filter((l) => l.id !== "treasury").every((l) => !l.requires)).toBe(true);
+  it("marks each lab as needing the plan its screens need", () => {
+    // The scene table in App.tsx: each scene id and, when gated, the plan feature it needs.
+    const app = readFileSync("src/App.tsx", "utf8");
+    const table = app.slice(app.indexOf("const SCENES"), app.indexOf("];", app.indexOf("const SCENES")));
+    const needs = new Map<string, string | undefined>();
+    for (const block of table.split(/\n  \{/).slice(1)) {
+      const id = /id: "([a-z]+)"/.exec(block)?.[1];
+      if (id) needs.set(id, /requires: "([a-z_]+)"/.exec(block)?.[1]);
+    }
+    for (const lab of LABS) {
+      expect(needs.size, "scene table parsed").toBeGreaterThan(20);
+      const required = [...new Set(lab.steps.map((s) => needs.get(s.scene)).filter(Boolean))];
+      expect(required.length, lab.id).toBeLessThanOrEqual(1);
+      expect(lab.requires, lab.id).toBe(required[0]);
+    }
   });
 });
 

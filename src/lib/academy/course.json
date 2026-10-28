@@ -1,0 +1,1274 @@
+{
+  "version": "academy/1",
+  "title": "NOSHASHI Academy",
+  "levels": [
+    {
+      "id": "L1",
+      "n": 1,
+      "title": "Ledger basics",
+      "blurb": "What the XRP Ledger is, how it agrees, and what accounts, transactions and tokens are."
+    },
+    {
+      "id": "L2",
+      "n": 2,
+      "title": "Who is in control",
+      "blurb": "What issuers can still do, who can sign for an account, NFT rights, and how the rules change."
+    },
+    {
+      "id": "L3",
+      "n": 3,
+      "title": "Markets and payments",
+      "blurb": "Order books, AMM pools, partial payments, and checking that an invoice was really paid."
+    },
+    {
+      "id": "L4",
+      "n": 4,
+      "title": "NOSHASHI at work",
+      "blurb": "Compliance words, how the app reads the ledger, verdicts and receipts, every screen, and teams."
+    },
+    {
+      "id": "L5",
+      "n": 5,
+      "title": "Keeping people safe",
+      "blurb": "Protecting an account, what to do after a theft, getting stuck XRP back, and protecting customers."
+    }
+  ],
+  "lessons": [
+    {
+      "id": "a1",
+      "level": "L1",
+      "title": "One shared record",
+      "minutes": 5,
+      "source": "/learn/#l1",
+      "video": "02-xrpl-basics",
+      "goals": [
+        "I can say what the XRP Ledger is in one sentence.",
+        "I can explain what makes a ledger validated, and why that matters."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "A public record of who owns what",
+          "text": "The XRP Ledger (XRPL) is a public database that has run since 2012. Thousands of servers keep identical copies. Anyone can read it. Nobody, not even the people who built it, can quietly change it."
+        },
+        {
+          "kind": "idea",
+          "title": "A new page every few seconds",
+          "text": "Every 3 to 5 seconds the network makes a new ledger: a snapshot of every account and balance. Each ledger gets a number called its ledger index. The number only goes up. It is now past 107 million."
+        },
+        {
+          "kind": "analogy",
+          "title": "Think of it like",
+          "text": "A notebook that thousands of accountants keep at the same time. Every few seconds they compare their newest page. When 80% of the ones you trust wrote the same page, it is glued into the book forever."
+        },
+        {
+          "kind": "idea",
+          "title": "Validated means final",
+          "text": "Special servers called validators vote. When at least 80% of the validators a server trusts agree, the ledger is validated. After that it can never be reversed or edited. NOSHASHI only reads validated ledgers."
+        },
+        {
+          "kind": "example",
+          "title": "Why NOSHASHI shows a ledger number",
+          "text": "Every NOSHASHI result says which ledger it was read at, for example \"ledger 107,207,971\". Because that ledger can never change, anyone can ask any server for the same ledger later and check the reading."
+        }
+      ],
+      "words": ["Ledger", "Ledger index", "Validator", "Consensus", "Validated ledger", "UNL"],
+      "keyIdea": "Validated means final. A ledger index is a timestamp nobody can argue with.",
+      "labs": ["network"],
+      "quiz": [
+        {
+          "question": "How often does the XRP Ledger make a new ledger?",
+          "options": ["Every 3 to 5 seconds", "Every 10 minutes", "Once a day"],
+          "answer": 0,
+          "why": "A new ledger closes every 3 to 5 seconds, each with a higher ledger index."
+        },
+        {
+          "question": "What makes a ledger validated?",
+          "options": [
+            "At least 80% of the validators a server trusts agreed on it",
+            "NOSHASHI approved it",
+            "It is more than one day old"
+          ],
+          "answer": 0,
+          "why": "Validators vote. Once 80% of a server's trusted list agree, the ledger is validated and final."
+        },
+        {
+          "question": "Why does every NOSHASHI result carry a ledger index?",
+          "options": [
+            "So anyone can re-check the reading against the same, unchangeable ledger",
+            "Because it is the price of the reading",
+            "It is the account's password"
+          ],
+          "answer": 0,
+          "why": "A validated ledger never changes, so the same ledger index always gives the same facts."
+        }
+      ]
+    },
+    {
+      "id": "a2",
+      "level": "L1",
+      "title": "Accounts, keys and reserves",
+      "minutes": 5,
+      "source": "/learn/#l2",
+      "video": "02-xrpl-basics",
+      "goals": [
+        "I can recognise an XRPL address.",
+        "I can explain why the secret key matters and why some XRP cannot be spent."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "An address starts with r",
+          "text": "An account holds XRP and tokens. Its address starts with a lower-case r and is 25 to 35 characters long. Example: Bitstamp's USD issuer, rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B. Addresses never contain 0, O, I or l."
+        },
+        {
+          "kind": "warning",
+          "title": "Whoever holds the secret owns the account",
+          "text": "A secret (often starting with s) controls the account. Anyone who has it can move everything. Never share it, never type it into a website. NOSHASHI never asks for it: it only reads public data."
+        },
+        {
+          "kind": "idea",
+          "title": "The reserve",
+          "text": "Every account keeps some XRP locked so the shared ledger does not fill with junk: 1 XRP to exist, plus 0.2 XRP for each thing it owns, like a trust line or an offer. Locked XRP cannot be spent."
+        },
+        {
+          "kind": "example",
+          "title": "Balance is not the same as spendable",
+          "text": "An account with 10 XRP that owns 5 objects has 1 + 5 × 0.2 = 2 XRP locked. Only 8 XRP can move. NOSHASHI shows both numbers so you never mistake one for the other."
+        },
+        {
+          "kind": "warning",
+          "title": "A common mistake",
+          "text": "An account's Sequence number is not how many transactions it made. It starts near the ledger index when the account was created, so a big number can mean a young account."
+        }
+      ],
+      "words": ["Address", "Account", "Seed", "Reserve", "Owner reserve", "Drops", "Sequence", "X-address"],
+      "keyIdea": "Whoever holds the key owns the account. Balance minus reserve is what can actually move.",
+      "labs": ["address"],
+      "quiz": [
+        {
+          "question": "Which of these is an XRPL address?",
+          "options": ["rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B", "107587014", "F3B8B18E6AEFDCEA3388D0B0932820C4F10F4849847E7989876FA9CD19687A70"],
+          "answer": 0,
+          "why": "Addresses start with r. The second is a ledger index, and the third is a 64-character transaction hash. All three are real, from lessons in this course."
+        },
+        {
+          "question": "An account has 10 XRP and owns 5 objects. About how much can it spend?",
+          "options": ["8 XRP", "10 XRP", "5 XRP"],
+          "answer": 0,
+          "why": "1 XRP base reserve plus 5 × 0.2 XRP owner reserve locks 2 XRP, leaving 8."
+        },
+        {
+          "question": "Does NOSHASHI ever need your secret key?",
+          "options": ["No, it only reads public data", "Yes, to check your balance", "Only once, to sign in"],
+          "answer": 0,
+          "why": "NOSHASHI never asks for a secret, never signs and never moves money."
+        }
+      ]
+    },
+    {
+      "id": "a3",
+      "level": "L1",
+      "title": "Transactions and what results mean",
+      "minutes": 4,
+      "source": "/learn/#l3",
+      "video": "08-transactions",
+      "goals": [
+        "I can name a few transaction types.",
+        "I can read a result code and know whether it is final."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Every change is a transaction",
+          "text": "A transaction is a signed instruction. Payment sends value. OfferCreate places a trade. TrustSet opens a trust line. AccountSet changes a setting. Each one pays a tiny fee in XRP that is destroyed, not paid to anyone."
+        },
+        {
+          "kind": "idea",
+          "title": "Only validated results count",
+          "text": "When a transaction is first submitted, the server gives a tentative result. It becomes final only when it is in a validated ledger. The final result is stored in the transaction's metadata."
+        },
+        {
+          "kind": "idea",
+          "title": "Reading the result code",
+          "text": "tesSUCCESS: it worked. tec…: it failed but was recorded, and the fee was charged. tef, tel, tem or ter: it was not applied at all, and no fee was charged."
+        },
+        {
+          "kind": "warning",
+          "title": "Success does not mean all of it arrived",
+          "text": "A payment can say tesSUCCESS and deliver a tiny part of its stated amount. Level 3 shows how, and what to check instead."
+        }
+      ],
+      "words": ["Transaction", "Transaction cost", "tesSUCCESS", "tec", "Metadata", "Fee pressure"],
+      "keyIdea": "Only a result in a validated ledger is final. Read the metadata, not the request.",
+      "labs": ["gate"],
+      "quiz": [
+        {
+          "question": "A result starts with tec. What happened?",
+          "options": ["It failed but was recorded, and the fee was charged", "It succeeded", "It was never sent"],
+          "answer": 0,
+          "why": "tec codes are recorded failures: nothing moved except the fee."
+        },
+        {
+          "question": "Where is a transaction's final result stored?",
+          "options": ["In its metadata, in a validated ledger", "In the sender's email", "In the Amount field"],
+          "answer": 0,
+          "why": "Metadata records what actually happened once the ledger is validated."
+        },
+        {
+          "question": "What happens to the small XRP fee every transaction pays?",
+          "options": ["It is destroyed", "It goes to validators", "It goes to NOSHASHI"],
+          "answer": 0,
+          "why": "The transaction cost is burned. That protects the network from spam without paying anyone."
+        }
+      ]
+    },
+    {
+      "id": "a4",
+      "level": "L1",
+      "title": "Tokens, issuers and trust lines",
+      "minutes": 5,
+      "source": "/learn/#l4",
+      "video": "02-xrpl-basics",
+      "goals": [
+        "I can explain what a token and its issuer are.",
+        "I can say why a token's name proves nothing."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Tokens are promises",
+          "text": "Besides XRP, the ledger carries tokens: digital dollars, euros, gold, shares. Every token is created by an issuer, an account that promises the token is backed by something. RLUSD, BBRL and AUDD are stablecoins issued this way."
+        },
+        {
+          "kind": "idea",
+          "title": "Trust lines",
+          "text": "To hold a token you open a trust line to its issuer. The trust line records the most you are willing to hold (the limit) and how much you hold now. Each trust line adds 0.2 XRP to your reserve."
+        },
+        {
+          "kind": "analogy",
+          "title": "Think of it like",
+          "text": "A gift card. It is only worth something because the shop that issued it promises to honour it. A card with the same name from a different shop is a different card."
+        },
+        {
+          "kind": "warning",
+          "title": "The name proves nothing",
+          "text": "A token is identified by its currency code AND its issuer address. Anyone can issue a token called USD. Scammers send look-alike tokens to people's accounts. Always ask: who issued this?"
+        }
+      ],
+      "words": ["Token", "Issuer", "Trust line", "Limit", "Currency code", "Obligations", "Stablecoin", "IOU"],
+      "keyIdea": "Ask \"who issued this?\" before \"what is it called?\". The issuer address is the token's identity.",
+      "labs": ["claims"],
+      "quiz": [
+        {
+          "question": "What identifies a token on the XRPL?",
+          "options": ["Its currency code and its issuer address together", "Its currency code alone", "Its price"],
+          "answer": 0,
+          "why": "Anyone can use the code USD. The issuer address is what makes it a specific token."
+        },
+        {
+          "question": "What must you open before you can hold a token?",
+          "options": ["A trust line to its issuer", "A bank account", "A payment channel"],
+          "answer": 0,
+          "why": "A TrustSet transaction opens the trust line that records your limit and balance."
+        },
+        {
+          "question": "A stranger sends you 1,000 \"USD\" from an issuer you have never heard of. What should you think?",
+          "options": ["It may be a look-alike token; check the issuer", "I just received 1,000 dollars", "Ripple sent it"],
+          "answer": 0,
+          "why": "A familiar code from an unknown issuer is a classic impersonation. NOSHASHI's Inbox flags these."
+        }
+      ]
+    },
+    {
+      "id": "a5",
+      "level": "L2",
+      "title": "What an issuer can still do",
+      "minutes": 7,
+      "source": "/learn/#l5",
+      "video": "03-issuer-powers",
+      "goals": [
+        "I can name the issuer powers: freeze, clawback, Require Auth and transfer fee.",
+        "I can read an Authority verdict without treating it as an accusation."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Powers live on the issuer's account",
+          "text": "Issuers can switch on powers stored as flags on their account. They are public, but almost no wallet shows them. They decide whether a token is really yours. This is the most important lesson in the course."
+        },
+        {
+          "kind": "idea",
+          "title": "Freeze",
+          "text": "An issuer can freeze one holder, or everyone at once (global freeze). A frozen holder can only send the token back to the issuer. An issuer that sets No Freeze gives up freezing forever."
+        },
+        {
+          "kind": "idea",
+          "title": "Clawback and Require Auth",
+          "text": "Clawback lets the issuer take tokens back out of your account. It can only be switched on before the issuer has any trust lines. Require Auth means you need the issuer's approval before you can hold the token."
+        },
+        {
+          "kind": "idea",
+          "title": "Transfer fee",
+          "text": "An issuer can charge a percentage every time holders send its token to each other, from 0% to 100%. The issuer can change it later."
+        },
+        {
+          "kind": "example",
+          "title": "Real readings, 24 September 2026",
+          "text": "Bitstamp: freeze rights kept, one key can sign, 0.15% fee → NO-GO. Sologenic: No Freeze set, blackholed, 0.01% fee → HOLD. A NO-GO is not an accusation. Regulated issuers often must keep freeze rights. It tells you what they can still do."
+        }
+      ],
+      "words": ["Freeze", "Global freeze", "No Freeze", "Deep freeze", "Clawback", "Require Auth", "Transfer fee", "Flag"],
+      "keyIdea": "A token can be yours on paper and still be frozen or taken back. Read the issuer's powers before you hold it.",
+      "labs": ["authority", "address"],
+      "quiz": [
+        {
+          "question": "What does clawback let an issuer do?",
+          "options": ["Take its tokens back out of a holder's account", "Change the price of XRP", "Read your secret key"],
+          "answer": 0,
+          "why": "Clawback lets the issuer recover tokens. It can only be enabled before any trust lines exist."
+        },
+        {
+          "question": "An issuer has set No Freeze. What does that mean?",
+          "options": ["It has given up freezing, permanently", "It is frozen right now", "It can freeze, but only on weekends"],
+          "answer": 0,
+          "why": "No Freeze can never be switched back off."
+        },
+        {
+          "question": "A well-known regulated issuer gets NO-GO. What is the best way to read that?",
+          "options": [
+            "A fact about what the issuer can still do, not an accusation",
+            "Proof the issuer is a scam",
+            "A bug in NOSHASHI"
+          ],
+          "answer": 0,
+          "why": "NO-GO usually means one key can sign or freeze rights are kept. Many regulated issuers must keep them."
+        }
+      ]
+    },
+    {
+      "id": "a6",
+      "level": "L2",
+      "title": "Who really controls an account",
+      "minutes": 5,
+      "source": "/learn/#l6",
+      "video": "09-who-controls",
+      "goals": [
+        "I can name the three ways to sign for an account.",
+        "I can count a multi-signature quorum using weights, not headcount."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Three ways to sign",
+          "text": "Master key: the original key. Regular key: a second key the account picks, handy for keeping the master offline. Signer list: up to 32 people, each with a weight. More than one can be active at once."
+        },
+        {
+          "kind": "example",
+          "title": "Count weights, not people",
+          "text": "Alice 3, Bob 2, Carol 2, Dan 1, Eve 1. Quorum 5. Alice and Bob together have 3 + 2 = 5, so only two people are needed, not \"three of five\". NOSHASHI's Control Surface works this out for you."
+        },
+        {
+          "kind": "warning",
+          "title": "The master key can skip the list",
+          "text": "If the master key is still switched on, one person holding it can bypass the whole signer list. NOSHASHI flags this as a master-key bypass."
+        },
+        {
+          "kind": "idea",
+          "title": "Blackholed",
+          "text": "An account with its master key disabled, its regular key set to an address nobody can sign for, and no signer list is blackholed. Nobody can ever sign for it again. Its settings are frozen in time."
+        }
+      ],
+      "words": ["Master key", "Regular key", "Signer list", "Multi-signature", "Quorum", "Blackholed"],
+      "keyIdea": "Count weights, not people, and check whether a master key can skip the whole process.",
+      "labs": ["treasury"],
+      "quiz": [
+        {
+          "question": "Weights: Alice 3, Bob 2, Carol 2. Quorum 5. What is the fewest people who can sign?",
+          "options": ["2", "3", "1"],
+          "answer": 0,
+          "why": "Alice (3) plus Bob or Carol (2) reaches 5."
+        },
+        {
+          "question": "A treasury has a signer list, but its master key is still enabled. What is the risk?",
+          "options": ["One person with the master key can bypass the list", "None, the list always wins", "The account is blackholed"],
+          "answer": 0,
+          "why": "An enabled master key can sign alone, skipping the signer list."
+        },
+        {
+          "question": "What does blackholed mean?",
+          "options": ["Nobody can ever sign for the account again", "The account was deleted", "The account is frozen by Ripple"],
+          "answer": 0,
+          "why": "With no usable key and no signer list, nothing can change its settings or supply."
+        }
+      ]
+    },
+    {
+      "id": "a7",
+      "level": "L2",
+      "title": "NFTs and the rights issuers keep",
+      "minutes": 4,
+      "source": "/learn/#l10",
+      "video": "10-nfts",
+      "goals": [
+        "I can say what an NFTokenID tells me.",
+        "I can name the rights an NFT issuer can keep."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Unique tokens",
+          "text": "An NFT is a one-of-a-kind token: art, a ticket, a deed, a membership. Each has a 64-character NFTokenID. The ID itself holds the rules the issuer set when it was made."
+        },
+        {
+          "kind": "idea",
+          "title": "Rights an issuer can keep",
+          "text": "Burnable: the issuer can destroy it, even while you own it. Not transferable: you can only sell it back to the issuer. Mutable: the issuer can change what it points to. Transfer fee: up to 50% of every resale."
+        },
+        {
+          "kind": "example",
+          "title": "No ledger call needed",
+          "text": "Because the rules are inside the ID, NOSHASHI's Token Rights screen can decode them straight from the 64 characters, without asking the ledger."
+        }
+      ],
+      "words": ["NFT", "NFTokenID", "Transfer fee"],
+      "keyIdea": "Owning an NFT does not mean the issuer is done with it. Its ID tells you what they kept.",
+      "labs": ["nft"],
+      "quiz": [
+        {
+          "question": "Where are an NFT's rules stored?",
+          "options": ["Inside its NFTokenID", "In a PDF from the seller", "Nowhere, they are secret"],
+          "answer": 0,
+          "why": "The ID encodes the flags and the transfer fee the issuer set at minting."
+        },
+        {
+          "question": "What does mutable mean for an NFT?",
+          "options": ["The issuer can change what it points to after you buy it", "It can be split into pieces", "It is free"],
+          "answer": 0,
+          "why": "A mutable NFT's URI can change, so the picture or document can change."
+        },
+        {
+          "question": "What is the highest transfer fee an NFT issuer can set?",
+          "options": ["50% of every resale", "1%", "100%"],
+          "answer": 0,
+          "why": "NFT transfer fees go up to 50%."
+        }
+      ]
+    },
+    {
+      "id": "a8",
+      "level": "L2",
+      "title": "How the rules change",
+      "minutes": 3,
+      "source": "/learn/#l11",
+      "video": "11-amendments",
+      "goals": [
+        "I can explain how an amendment is switched on."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Amendments",
+          "text": "The XRPL's rules change through amendments. A new feature is written into the server software, then validators vote. It switches on only after it keeps at least 80% support for two weeks in a row."
+        },
+        {
+          "kind": "warning",
+          "title": "Servers that fall behind",
+          "text": "A server that has not upgraded when an amendment switches on becomes amendment blocked. It stops following the ledger until it is upgraded."
+        },
+        {
+          "kind": "example",
+          "title": "Features that arrived this way",
+          "text": "AMM pools (XLS-30), Clawback (XLS-39), NFTs (XLS-20), Credentials (XLS-70), Permissioned Domains (XLS-80) and Deep Freeze (XLS-77). An XLS number is the public proposal behind a feature."
+        }
+      ],
+      "words": ["Amendment", "Amendment blocked", "XLS"],
+      "keyIdea": "New rules need a supermajority for two weeks. What is enabled today is readable from the ledger.",
+      "labs": ["network"],
+      "quiz": [
+        {
+          "question": "How does an amendment switch on?",
+          "options": ["80% of validators support it for two weeks in a row", "Ripple decides", "The first person to vote wins"],
+          "answer": 0,
+          "why": "It needs a supermajority that holds for two weeks."
+        },
+        {
+          "question": "What is an XLS number?",
+          "options": ["The public proposal behind a feature", "A ledger index", "A type of fee"],
+          "answer": 0,
+          "why": "For example, XLS-30 is the proposal for AMM pools."
+        },
+        {
+          "question": "What happens to a server that did not upgrade in time?",
+          "options": ["It becomes amendment blocked", "It earns a reward", "Nothing"],
+          "answer": 0,
+          "why": "It stops following the ledger until it is upgraded."
+        }
+      ]
+    },
+    {
+      "id": "a9",
+      "level": "L3",
+      "title": "Order books: listed versus funded",
+      "minutes": 6,
+      "source": "/learn/#l7",
+      "video": "04-funded-depth",
+      "goals": [
+        "I can explain what an order book is.",
+        "I can tell listed depth from funded depth."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "A built-in exchange",
+          "text": "The XRPL has had its own exchange, the DEX, since 2012. Anyone can post an offer, like \"sell 100 USD for 190 XRP\". All offers for one pair make an order book. The gap between the best buy and best sell is the spread."
+        },
+        {
+          "kind": "warning",
+          "title": "Some offers cannot trade",
+          "text": "An offer stays on the book even after its owner no longer has the money to fill it. It is still listed, but it cannot trade. These are unfunded offers."
+        },
+        {
+          "kind": "example",
+          "title": "Worked example",
+          "text": "Three offers each list 10,000. Their owners hold 10,000, 500 and 0. Listed depth: 30,000. Funded depth: 10,500. Try to sell 20,000 and most of it will not fill."
+        },
+        {
+          "kind": "example",
+          "title": "A real measurement, 8 September 2026",
+          "text": "USD from Bitstamp: listed and funded almost the same (1.0×). SOLO from Sologenic: listed 2,545 times what was funded. Deep stablecoin books are close to honest; the gap is in long-tail tokens. Re-measure before quoting: books change every few seconds."
+        }
+      ],
+      "words": ["DEX", "Offer", "Order book", "Spread", "Mid price", "Listed depth", "Funded depth", "Unfunded offer", "taker_gets_funded"],
+      "keyIdea": "Listed depth is an advert. Funded depth is what you can actually get out at.",
+      "labs": ["book"],
+      "quiz": [
+        {
+          "question": "Three offers list 10,000 each. Owners hold 10,000, 500 and 0. What is the funded depth?",
+          "options": ["10,500", "30,000", "0"],
+          "answer": 0,
+          "why": "Only what owners can actually deliver counts: 10,000 + 500 + 0."
+        },
+        {
+          "question": "What is an unfunded offer?",
+          "options": ["An offer still listed whose owner cannot fill it", "An offer with no fee", "An offer for XRP only"],
+          "answer": 0,
+          "why": "It shows on the book but cannot trade."
+        },
+        {
+          "question": "Where is the gap between listed and funded depth usually largest?",
+          "options": ["Long-tail tokens", "Major stablecoins", "There is never a gap"],
+          "answer": 0,
+          "why": "In the September 2026 sample, stablecoin books were close to honest while SOLO and BTC were thousands of times overstated."
+        }
+      ]
+    },
+    {
+      "id": "a10",
+      "level": "L3",
+      "title": "AMM pools",
+      "minutes": 4,
+      "source": "/learn/#l8",
+      "video": "12-amm",
+      "goals": [
+        "I can explain what an AMM pool is and who governs its fee."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "A pool of two assets",
+          "text": "An automated market maker (AMM) is a pool holding two assets, for example XRP and a stablecoin. It trades with anyone at a price set by the ratio of the two balances. The DEX routes trades through books and pools, whichever is better."
+        },
+        {
+          "kind": "idea",
+          "title": "LP tokens",
+          "text": "People who deposit both assets get LP tokens: their share of the pool. Every swap pays a fee of up to 1% into the pool."
+        },
+        {
+          "kind": "idea",
+          "title": "Who sets the fee",
+          "text": "LP token holders vote on the fee, weighted by how many LP tokens they hold. Anyone can bid for the auction slot, which gives its holder much cheaper trades for a while."
+        },
+        {
+          "kind": "example",
+          "title": "In NOSHASHI",
+          "text": "The Pool Governance screen shows who votes the fee, what share of LP tokens those votes carry, and who holds the auction slot. A pool whose fee is set by one big holder behaves differently from one with many voters."
+        }
+      ],
+      "words": ["AMM", "LP token", "Auction slot"],
+      "keyIdea": "A pool's fee and discounts are governed by whoever holds the most LP tokens. Check who that is.",
+      "labs": ["amm"],
+      "quiz": [
+        {
+          "question": "What sets an AMM pool's price?",
+          "options": ["The ratio of the two balances in the pool", "Ripple", "The last trade on another blockchain"],
+          "answer": 0,
+          "why": "The pool prices trades from the ratio of what it holds."
+        },
+        {
+          "question": "Who votes on a pool's trading fee?",
+          "options": ["LP token holders, weighted by their LP tokens", "Validators", "The first depositor only"],
+          "answer": 0,
+          "why": "Voting power follows LP token holdings."
+        },
+        {
+          "question": "What does the auction slot give its holder?",
+          "options": ["Much cheaper trades for a while", "Ownership of the pool", "The right to freeze the pool"],
+          "answer": 0,
+          "why": "The slot holder trades at a heavily discounted fee."
+        }
+      ]
+    },
+    {
+      "id": "a11",
+      "level": "L3",
+      "title": "Payments: credit what arrived",
+      "minutes": 6,
+      "source": "/learn/#l9",
+      "video": "05-payments",
+      "goals": [
+        "I can explain a partial payment.",
+        "I can say which figure to credit: delivered_amount."
+      ],
+      "cards": [
+        {
+          "kind": "warning",
+          "title": "The Amount can lie",
+          "text": "A Payment's Amount says how much should arrive. If the sender sets the partial payment flag, the Amount is only a maximum. The payment can deliver far less and still say tesSUCCESS."
+        },
+        {
+          "kind": "idea",
+          "title": "Credit delivered_amount",
+          "text": "The true figure is delivered_amount, in the transaction's metadata. The XRPL's own documentation says to credit that. Exchanges that credited Amount instead have been drained."
+        },
+        {
+          "kind": "example",
+          "title": "A real case, 28 August 2026",
+          "text": "Amount: 999,332.87 LRC. Delivered: 3,958.64 LRC, about 0.4%. Result: tesSUCCESS. A system crediting the Amount would have over-credited by about 250 times."
+        },
+        {
+          "kind": "idea",
+          "title": "Destination tags",
+          "text": "A destination tag is a number that tells a shared account, like an exchange, which customer a payment is for. A missing tag is a common reason a deposit seems lost."
+        }
+      ],
+      "words": ["Partial payment", "delivered_amount", "Destination tag", "Path", "Escrow", "Check (payment)", "Payment channel"],
+      "keyIdea": "Credit what was delivered, never what was asked for.",
+      "labs": ["settlement"],
+      "quiz": [
+        {
+          "question": "Which figure should you credit for a payment?",
+          "options": ["delivered_amount in the metadata", "The Amount field", "Whatever the sender says in an email"],
+          "answer": 0,
+          "why": "delivered_amount is what actually arrived."
+        },
+        {
+          "question": "Can a partial payment say tesSUCCESS and still deliver almost nothing?",
+          "options": ["Yes", "No, success means everything arrived"],
+          "answer": 0,
+          "why": "In the real LRC case, about 0.4% arrived and the result was tesSUCCESS."
+        },
+        {
+          "question": "What is a destination tag for?",
+          "options": ["Telling a shared account which customer a payment is for", "Paying the fee", "Freezing a token"],
+          "answer": 0,
+          "why": "Exchanges and custodians use the tag to credit the right customer."
+        }
+      ]
+    },
+    {
+      "id": "a12",
+      "level": "L3",
+      "title": "Did this payment pay this invoice?",
+      "minutes": 6,
+      "source": "/docs/",
+      "video": "13-invoice-check",
+      "goals": [
+        "I can run an Invoice check and read VERIFIED, HOLD or REJECTED.",
+        "I can explain why the check compares exact amounts and reads two servers."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "The question a business really has",
+          "text": "Settlement tells you what a transaction moved. The Invoice check asks the next question: did this transaction pay this invoice? You enter the receiving account, an optional destination tag, the asset and the amount you expect."
+        },
+        {
+          "kind": "idea",
+          "title": "Three answers",
+          "text": "VERIFIED: it paid the invoice. HOLD: something needs a person to look, for example the ledger is not validated yet. REJECTED: it did not pay, with the reason in plain words. Only VERIFIED is green."
+        },
+        {
+          "kind": "idea",
+          "title": "Exact, and checked twice",
+          "text": "Amounts are compared exactly, digit by digit, never rounded. By default the check reads two independent node operators, XRPL Labs and Ripple, and says so if they disagree. Every answer comes with an evidence fingerprint (SHA-256)."
+        },
+        {
+          "kind": "example",
+          "title": "A real case on mainnet",
+          "text": "A CSC payment asked for 162.6994990013102 and delivered 161.1605415577872 (ledger 107,587,014). Expecting the full amount → REJECTED, partial not permitted. Expecting 161.1605415577872 with partial payments allowed → VERIFIED."
+        },
+        {
+          "kind": "try",
+          "title": "Practise for free on testnet",
+          "text": "Testnet is a practice copy of the XRP Ledger where XRP has no value. The Invoice check has a TESTNET switch, and the testnet lab gives you real testnet payments to check."
+        }
+      ],
+      "words": ["delivered_amount", "Partial payment", "Destination tag", "Digest (SHA-256)", "Mainnet"],
+      "keyIdea": "An invoice is paid only by what was delivered, to the right account and tag, in a validated ledger.",
+      "labs": ["invoice", "invoice-testnet"],
+      "quiz": [
+        {
+          "question": "Which answer means the invoice was paid?",
+          "options": ["VERIFIED", "HOLD", "REJECTED"],
+          "answer": 0,
+          "why": "Only VERIFIED is green. HOLD needs a person to look; REJECTED did not pay."
+        },
+        {
+          "question": "A payment delivered slightly less than the invoice, and partial payments are not allowed. What will the check say?",
+          "options": ["REJECTED", "VERIFIED", "It rounds up and says VERIFIED"],
+          "answer": 0,
+          "why": "Amounts are exact. The real CSC case was REJECTED for exactly this reason."
+        },
+        {
+          "question": "What is testnet?",
+          "options": ["A practice copy of the XRP Ledger where XRP has no value", "A faster mainnet", "A NOSHASHI server"],
+          "answer": 0,
+          "why": "Testnet lets you practise with real transactions that cost nothing."
+        }
+      ]
+    },
+    {
+      "id": "a13",
+      "level": "L4",
+      "title": "Compliance words, made simple",
+      "minutes": 6,
+      "source": "/learn/#l12",
+      "video": "14-compliance-words",
+      "goals": [
+        "I can explain KYC, AML, sanctions screening and the Travel Rule in my own words.",
+        "I can say what behaviour screening cannot see."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Two questions",
+          "text": "Compliance means following the laws for moving money. On the XRPL it comes down to two questions. Am I allowed to move this? Could I actually get out of it? The first is law and policy. The second is market reality."
+        },
+        {
+          "kind": "idea",
+          "title": "The words",
+          "text": "KYC: checking who a customer is. AML: rules to stop criminal money. Sanctions screening: checking no one is on a government blocklist. Travel Rule: sender and receiver details travel with larger transfers between regulated firms."
+        },
+        {
+          "kind": "example",
+          "title": "Travel Rule thresholds",
+          "text": "FATF suggests 1,000 USD or EUR. The US uses 3,000 USD. The EU applies it with no minimum. NOSHASHI lets you set your jurisdiction and tells you when a transfer is in scope."
+        },
+        {
+          "kind": "warning",
+          "title": "What screening misses",
+          "text": "Behaviour screening asks whether a person is risky. It cannot see what a token's issuer can do. A clean holder can hold a token that can be frozen or clawed back. NOSHASHI reads both sides."
+        },
+        {
+          "kind": "idea",
+          "title": "Compliance built into the ledger",
+          "text": "Credentials (XLS-70) let a trusted issuer, like a KYC provider, vouch for an account without revealing personal data. Permissioned domains (XLS-80) admit only accounts holding the right credentials."
+        }
+      ],
+      "words": ["Compliance", "KYC", "AML", "Travel Rule", "CASP / VASP", "MiCA", "Credential", "Selective disclosure", "Permissioned domain", "HHI"],
+      "keyIdea": "Know who you deal with, know what the asset allows, and keep evidence you can show later.",
+      "labs": ["credentials"],
+      "quiz": [
+        {
+          "question": "What does KYC mean?",
+          "options": ["Know Your Customer: checking who a customer is", "Keep Your Coins", "A type of token"],
+          "answer": 0,
+          "why": "KYC is identity verification."
+        },
+        {
+          "question": "What can behaviour screening NOT see?",
+          "options": ["What a token's issuer can still do", "Who sent a payment", "Sanctions lists"],
+          "answer": 0,
+          "why": "Issuer powers are a property of the asset, stored in the issuer's flags."
+        },
+        {
+          "question": "What does a credential (XLS-70) let an issuer do?",
+          "options": ["Vouch for an account without revealing personal data", "Freeze any account", "Change the fee"],
+          "answer": 0,
+          "why": "That is selective disclosure: proof without the underlying data."
+        }
+      ]
+    },
+    {
+      "id": "a14",
+      "level": "L4",
+      "title": "What NOSHASHI is, and how it reads",
+      "minutes": 5,
+      "source": "/learn/#l13",
+      "video": "01-what-noshashi-does",
+      "goals": [
+        "I can describe NOSHASHI's two questions.",
+        "I can list how NOSHASHI keeps its readings honest."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Both questions, one reading",
+          "text": "NOSHASHI is a desktop app for macOS, Windows and Linux. It answers both compliance questions about any account, token, pool or payment: am I allowed to move this, and could I get out of it? It reads both from the same ledger reading."
+        },
+        {
+          "kind": "idea",
+          "title": "How it stays honest",
+          "text": "It reads validated ledgers only. It compares several public servers and shows any disagreement. When it cannot tell, it says so instead of showing zero. It never asks for keys, never signs and never moves money."
+        },
+        {
+          "kind": "idea",
+          "title": "Stamped and fingerprinted",
+          "text": "Every result carries the ledger index it was read at and a SHA-256 digest: a fingerprint of the exact result. Change one character and the fingerprint changes completely."
+        },
+        {
+          "kind": "idea",
+          "title": "Who uses it",
+          "text": "Compliance officers, trading desks, treasury teams, token issuers and auditors. And anyone checking an address before paying it, for free."
+        }
+      ],
+      "words": ["Digest (SHA-256)", "Hash", "Mainnet", "Counterparty", "Adjudication"],
+      "keyIdea": "Validated only, compared across servers, honest about unknowns, and never holding keys.",
+      "labs": ["network"],
+      "quiz": [
+        {
+          "question": "What are NOSHASHI's two questions?",
+          "options": ["Am I allowed to move this? Could I actually get out of it?", "What is the price? Should I buy?", "Who is the CEO? Where is the office?"],
+          "answer": 0,
+          "why": "Law and policy on one side, market reality on the other."
+        },
+        {
+          "question": "What does NOSHASHI do when the ledger does not give enough to decide?",
+          "options": ["Says so, instead of guessing or showing zero", "Shows zero", "Guesses"],
+          "answer": 0,
+          "why": "It withholds the figure and explains why."
+        },
+        {
+          "question": "What is a SHA-256 digest?",
+          "options": ["A fingerprint of the exact result", "A password", "A transaction fee"],
+          "answer": 0,
+          "why": "Change one character of the result and the digest changes completely."
+        }
+      ]
+    },
+    {
+      "id": "a15",
+      "level": "L4",
+      "title": "Verdicts, checks and receipts",
+      "minutes": 5,
+      "source": "/learn/#l16",
+      "video": "01-what-noshashi-does",
+      "goals": [
+        "I can explain GO, HOLD and NO-GO.",
+        "I can name the five states a check can report."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Three verdicts",
+          "text": "GO: every check passed. HOLD: a warning-level check did not pass, or something needs review; a person should look before moving. NO-GO: a blocking check failed; do not move until it is resolved or formally excepted."
+        },
+        {
+          "kind": "idea",
+          "title": "Five check states",
+          "text": "PASS: run and satisfied. FAIL: run and not satisfied. REVIEW: needs a human decision. INSUFFICIENT_DATA: not enough to decide, never counted as a pass. NOT_APPLICABLE: the check does not apply."
+        },
+        {
+          "kind": "idea",
+          "title": "The receipt",
+          "text": "Every verdict makes a receipt: what was checked, the ledger index, the rules version, each check's result and a SHA-256 digest over all of it. Anyone who recomputes the digest over the same contents gets the same value."
+        },
+        {
+          "kind": "idea",
+          "title": "Your policy",
+          "text": "Your organisation can tune checks with its own thresholds and required credentials. A verdict says when a policy was applied, or that it shows raw ledger facts only."
+        }
+      ],
+      "words": ["GO", "HOLD", "NO-GO", "Blocking check", "Warning check", "REVIEW", "INSUFFICIENT_DATA", "NOT_APPLICABLE", "Receipt", "Policy"],
+      "keyIdea": "Read the verdict, then open the checks: every result names the exact rule that decided it.",
+      "labs": ["gate"],
+      "quiz": [
+        {
+          "question": "A blocking check failed. What is the verdict?",
+          "options": ["NO-GO", "HOLD", "GO"],
+          "answer": 0,
+          "why": "Any failed blocking check gives NO-GO."
+        },
+        {
+          "question": "Is INSUFFICIENT_DATA a pass?",
+          "options": ["No, it is an abstention", "Yes"],
+          "answer": 0,
+          "why": "Not enough data never counts as passing."
+        },
+        {
+          "question": "What lets someone check later that a receipt was not altered?",
+          "options": ["Recomputing its SHA-256 digest", "Asking NOSHASHI support", "Looking at the colour"],
+          "answer": 0,
+          "why": "The same contents always give the same digest; any change gives a different one."
+        }
+      ]
+    },
+    {
+      "id": "a16",
+      "level": "L4",
+      "title": "A tour of the app",
+      "minutes": 8,
+      "source": "/learn/#l17",
+      "video": "07-app-tour",
+      "goals": [
+        "I can find any screen in the sidebar and say what it is for.",
+        "I can start with Mission Control and Check an Address."
+      ],
+      "cards": [
+        {
+          "kind": "try",
+          "title": "Start here",
+          "text": "Open Mission Control first. If the ledger number climbs every few seconds, you are connected and current. If it stops, readings will be stale until it resumes."
+        },
+        {
+          "kind": "idea",
+          "title": "Am I allowed to move this?",
+          "text": "Verification runs a settlement through the gate. Provenance shows how old a counterparty is and who funded it. Credentials and Domain Grid show who vouched for an account and where it is admitted."
+        },
+        {
+          "kind": "idea",
+          "title": "Could I get out of it?",
+          "text": "Order Book shows funded depth. Pool Governance shows who controls an AMM. Exposure Analysis puts a position's risks together. Portfolio & Radar watches many wallets at once."
+        },
+        {
+          "kind": "idea",
+          "title": "Treasury, issuance and records",
+          "text": "Control Surface shows who can move a treasury. Issuance, Authority and Passport describe a token from the issuer's side. Audit Trail and Settlement read history and payments. Ledger & Policy keeps your verdicts and exports."
+        },
+        {
+          "kind": "idea",
+          "title": "Free tools",
+          "text": "Check an Address (10 a month), Inbox (claims sent to you), Token Rights (NFTs), Ledger Sync (what four servers say) and the Security Center's free tools work without a paid plan."
+        }
+      ],
+      "words": ["HUD", "Provenance", "Passport", "Concentration"],
+      "keyIdea": "Mission Control first, then the screen that answers your question. Buttons say READING… while they work.",
+      "labs": ["address", "provenance", "workstation"],
+      "quiz": [
+        {
+          "question": "Which screen should you glance at first to confirm you are connected?",
+          "options": ["Mission Control", "Pricing", "Settings"],
+          "answer": 0,
+          "why": "A climbing ledger number means a live, current connection."
+        },
+        {
+          "question": "Which screen tells you how old a counterparty is and who funded it?",
+          "options": ["Provenance", "Order Book", "Token Rights"],
+          "answer": 0,
+          "why": "Provenance traces an account's real age and first funder."
+        },
+        {
+          "question": "Which screen shows who can move a treasury?",
+          "options": ["Control Surface", "Inbox", "Ledger Sync"],
+          "answer": 0,
+          "why": "Control Surface reads the master key, signer list and minimum signers."
+        }
+      ]
+    },
+    {
+      "id": "a17",
+      "level": "L4",
+      "title": "Teams, policies and the Agent",
+      "minutes": 5,
+      "source": "/learn/#l18",
+      "video": "06-for-institutions",
+      "goals": [
+        "I can explain four-eyes approval and why investigations are hash-chained.",
+        "I can say what the Agent is for, and what it is not."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Four-eyes policy",
+          "text": "An organisation shares one policy. A change starts as a draft, can be simulated against past verdicts, and needs a second person to approve it before it is active. Every step is logged."
+        },
+        {
+          "kind": "idea",
+          "title": "Exceptions and investigations",
+          "text": "A NO-GO can be overridden only through an exception a reviewer approves, possibly after asking for evidence. An investigation (a case) collects readings and notes. Its log is hash-chained, so entries cannot be quietly edited."
+        },
+        {
+          "kind": "idea",
+          "title": "The Agent",
+          "text": "The Agent is an AI assistant in the app. By default it runs on your own computer, so nothing leaves it. It explains readings, helps with the app, and the Observer watches issuers and wallets for changes."
+        },
+        {
+          "kind": "warning",
+          "title": "Use it wisely",
+          "text": "The Agent explains; the ledger decides. Always confirm important points against the readings and receipts themselves."
+        }
+      ],
+      "words": ["Four-eyes", "Exception", "Investigation", "Hash-chained log", "Observer", "Webhook", "Compliance API"],
+      "keyIdea": "Two people approve rule changes, every decision is logged, and the ledger, not the AI, decides.",
+      "labs": ["noshx", "workstation"],
+      "quiz": [
+        {
+          "question": "What is four-eyes approval?",
+          "options": ["A second person must approve a policy change", "Two screens at once", "A type of freeze"],
+          "answer": 0,
+          "why": "One person drafts, another approves; both are logged."
+        },
+        {
+          "question": "Why is an investigation's log hash-chained?",
+          "options": ["So entries cannot be quietly edited or removed", "To make it faster", "To hide it from auditors"],
+          "answer": 0,
+          "why": "Each entry includes the fingerprint of the one before."
+        },
+        {
+          "question": "The Agent and a ledger reading disagree. Which do you trust?",
+          "options": ["The ledger reading", "The Agent", "Whichever is longer"],
+          "answer": 0,
+          "why": "The Agent explains; the ledger decides."
+        }
+      ]
+    },
+    {
+      "id": "a18",
+      "level": "L5",
+      "title": "Making an account hard to take over",
+      "minutes": 6,
+      "source": "/learn/#l20",
+      "video": "15-account-security",
+      "goals": [
+        "I can list the four defences for an account.",
+        "I can explain address poisoning and how to avoid it."
+      ],
+      "cards": [
+        {
+          "kind": "warning",
+          "title": "How accounts get emptied",
+          "text": "Nobody can reset an XRPL account or undo a payment. Most accounts are emptied because the secret was exposed: typed into a fake site, saved in a cloud note or screenshot, or read by malware. The ledger itself is not broken into."
+        },
+        {
+          "kind": "idea",
+          "title": "Four defences",
+          "text": "1. Keep the master seed offline, on paper or steel. 2. Sign day to day with a regular key in a hardware wallet. 3. Require several signers for a treasury, then disable the master key. 4. Close doors strangers use, like unsolicited offers and checks."
+        },
+        {
+          "kind": "example",
+          "title": "Address poisoning, a real example",
+          "text": "The account rfWPjcbY5QT2shRFY2SSQHFKPYSMzxaMaN sent 1-drop payments with a fake \"free XRP\" link, then deleted itself into the next account. Each account was made to end in \"xaman\", the name of a real wallet."
+        },
+        {
+          "kind": "try",
+          "title": "The habit that beats poisoning",
+          "text": "Take addresses from your own saved records, never from your transaction history. The Security Center's free SAFE SEND names any look-alike of an address you have paid before."
+        }
+      ],
+      "words": ["Seed", "Regular key", "Signer list", "Address poisoning", "Hardening plan", "Security Guardian"],
+      "keyIdea": "Your account is exactly as safe as the least protected key that can sign for it.",
+      "labs": ["security"],
+      "quiz": [
+        {
+          "question": "How are most XRPL accounts emptied?",
+          "options": ["The secret was exposed", "The ledger was hacked", "A validator stole it"],
+          "answer": 0,
+          "why": "Fake sites, cloud notes, screenshots and malware expose secrets."
+        },
+        {
+          "question": "What is address poisoning?",
+          "options": [
+            "Sending you a tiny payment from a look-alike address so you copy it later",
+            "A virus in the ledger",
+            "A freeze by the issuer"
+          ],
+          "answer": 0,
+          "why": "The fake sits next to the real address in your history."
+        },
+        {
+          "question": "Where should you copy a payee's address from?",
+          "options": ["Your own saved records", "Your transaction history", "A message from a stranger"],
+          "answer": 0,
+          "why": "History is exactly where poisoned look-alikes appear."
+        }
+      ]
+    },
+    {
+      "id": "a19",
+      "level": "L5",
+      "title": "When an account is emptied",
+      "minutes": 6,
+      "source": "/learn/#l21",
+      "video": "16-after-a-theft",
+      "goals": [
+        "I can list what to do in the first hour after a theft.",
+        "I can spot a fake recovery service."
+      ],
+      "cards": [
+        {
+          "kind": "warning",
+          "title": "The hard truth first",
+          "text": "A validated XRPL payment is final. Nobody can reverse it: not validators, not Ripple, not wallet makers, not NOSHASHI. Anyone offering to recover stolen XRP for a fee is running the second half of the scam."
+        },
+        {
+          "kind": "idea",
+          "title": "The first hour",
+          "text": "Move anything left to a brand-new account made on a clean device. Check whether the thief added their own keys. Follow where the value went. Report it to the police with transaction hashes, amounts and times; in the US that is ic3.gov."
+        },
+        {
+          "kind": "idea",
+          "title": "Paths that can work",
+          "text": "An exchange can freeze a deposit if reached quickly, usually with a police reference. A token's issuer can freeze, or claw back, stolen tokens unless it gave that up. Authorities can act when a trail reaches a sanctioned address."
+        },
+        {
+          "kind": "example",
+          "title": "In NOSHASHI",
+          "text": "Incident Response follows the value hop by hop, past dust and deleted accounts, says where it is now, rates each recovery path honestly, and writes a fingerprinted dossier for police, exchanges and issuers."
+        }
+      ],
+      "words": ["AccountDelete", "Incident dossier", "Freeze", "Clawback"],
+      "keyIdea": "Nothing reverses a validated payment. Speed, evidence and the right request to the right party are what recover funds, when anything can.",
+      "labs": ["security"],
+      "quiz": [
+        {
+          "question": "Someone offers to reverse your stolen XRP for a fee. What is it?",
+          "options": ["A scam", "A real service", "Ripple support"],
+          "answer": 0,
+          "why": "Validated payments cannot be reversed by anyone."
+        },
+        {
+          "question": "What should you do first?",
+          "options": ["Move what is left to a new account made on a clean device", "Wait a week", "Post your seed online for help"],
+          "answer": 0,
+          "why": "Whoever has the old key can take the rest at any moment."
+        },
+        {
+          "question": "Who can sometimes freeze stolen funds?",
+          "options": ["An exchange that received them, or the token's issuer", "Nobody, ever", "Any validator"],
+          "answer": 0,
+          "why": "Custodians and issuers with freeze rights are the realistic paths."
+        }
+      ]
+    },
+    {
+      "id": "a20",
+      "level": "L5",
+      "title": "Getting XRP back, and signing safely",
+      "minutes": 6,
+      "source": "/learn/#l22",
+      "video": "17-getting-xrp-back",
+      "goals": [
+        "I can name kinds of stuck XRP that can be recovered.",
+        "I can name the signatures that empty accounts."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "XRP you can get back",
+          "text": "A matured escrow waits for someone to finish it. A check written to you pays nothing until you cash it. Every object you own locks 0.2 XRP; removing ones you no longer need frees it."
+        },
+        {
+          "kind": "example",
+          "title": "Real examples from mainnet",
+          "text": "Ripple's escrow wallet #03 (rB3WNZc45gxzW31zxfXdkx8HusAhoqscPn) holds ten escrows to itself, waiting to be finished. An NFT trader had four expired buy offers: 0.8 XRP of reserve returns when they are cancelled."
+        },
+        {
+          "kind": "warning",
+          "title": "Read before you sign",
+          "text": "A phishing site does not need your seed if you will sign for it. Dangerous signatures: SetRegularKey or SignerListSet (hand over control), AccountDelete (sends everything away), and an NFT offer for zero."
+        },
+        {
+          "kind": "idea",
+          "title": "Is this account who it says?",
+          "text": "Anyone can write a domain on an account. It is proven only when that website lists the account in its xrp-ledger.toml file. The Security Center's free DOMAIN CHECK tests this."
+        }
+      ],
+      "words": ["Escrow", "EscrowFinish", "Check (payment)", "Owner reserve", "Pre-sign check", "Domain verification"],
+      "keyIdea": "Nobody can reverse a theft, but you can finish, cancel, cash and clean up what is yours, and refuse to sign what you have not read.",
+      "labs": ["recovery"],
+      "quiz": [
+        {
+          "question": "An escrow has matured. Does the XRP move by itself?",
+          "options": ["No, someone must submit EscrowFinish", "Yes, automatically"],
+          "answer": 0,
+          "why": "Escrows wait for a finishing transaction."
+        },
+        {
+          "question": "Which signature can hand control of your account to someone else?",
+          "options": ["SetRegularKey", "Payment of 1 XRP to a friend", "TrustSet"],
+          "answer": 0,
+          "why": "SetRegularKey and SignerListSet give signing power away."
+        },
+        {
+          "question": "An account's Domain says bitstamp.net. Is it proven?",
+          "options": ["Only if bitstamp.net lists it in its xrp-ledger.toml", "Yes, always", "Yes, if the account is old"],
+          "answer": 0,
+          "why": "Anyone can write a domain; the website must list the account back."
+        }
+      ]
+    },
+    {
+      "id": "a21",
+      "level": "L5",
+      "title": "Protecting customers' XRP",
+      "minutes": 6,
+      "source": "/learn/#l23",
+      "video": "18-protecting-customers",
+      "goals": [
+        "I can explain proof of reserves and why liabilities matter too.",
+        "I can tell a real protection fund from one that counts for nothing."
+      ],
+      "cards": [
+        {
+          "kind": "idea",
+          "title": "Reserves AND liabilities",
+          "text": "A big balance proves little if the business owes more. A Merkle sum tree proves what a business owes all customers without showing anyone's balance. Each customer can check they are counted."
+        },
+        {
+          "kind": "example",
+          "title": "A real tree",
+          "text": "Built over the 138 holders of a real token (USDB), the tree totals exactly what the ledger says the issuer owes: 33,733,671.32 USDB. Understate one holder and their path no longer reaches the root."
+        },
+        {
+          "kind": "idea",
+          "title": "A fund no single key can move",
+          "text": "Locked in escrow until a date: strong. Under a signer list with the master key disabled: strong. Behind one key: whoever holds it can take it, so it counts for nothing."
+        },
+        {
+          "kind": "warning",
+          "title": "Verification, not insurance",
+          "text": "NOSHASHI shows what is really set aside. It pays no claims, and no government scheme stands behind it."
+        }
+      ],
+      "words": ["Proof of reserves", "Merkle sum tree", "Inclusion proof", "Coverage ratio", "Protection fund", "Withdrawal screening", "Scam registry"],
+      "keyIdea": "A promise about customers' XRP is worth what the ledger can show.",
+      "labs": [],
+      "quiz": [
+        {
+          "question": "Why are reserves alone not enough?",
+          "options": ["The business might owe customers more than it holds", "Reserves are always fake", "The ledger hides them"],
+          "answer": 0,
+          "why": "You need liabilities too, to work out coverage."
+        },
+        {
+          "question": "A protection fund sits behind one key. How much does it count for?",
+          "options": ["Nothing, whoever holds the key can take it", "Everything", "Half"],
+          "answer": 0,
+          "why": "Only escrow or a real signer list makes a fund hard to take."
+        },
+        {
+          "question": "Is NOSHASHI's protection view insurance?",
+          "options": ["No, it is verification", "Yes, it pays claims"],
+          "answer": 0,
+          "why": "It shows what is set aside; it does not pay claims."
+        }
+      ]
+    }
+  ],
+  "exam": {
+    "questions": 25,
+    "passPercent": 80,
+    "lessonPassCorrect": 2
+  }
+}

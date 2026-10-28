@@ -1,0 +1,53 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:05.622
+Customers of a business that holds X R P for them have no deposit insurance.
+
+2
+00:00:05.622 --> 00:00:09.703
+The ledger cannot insure anyone, but it can prove a great deal.
+
+3
+00:00:11.403 --> 00:00:15.699
+A large balance proves little if the business owes its customers more.
+
+4
+00:00:15.699 --> 00:00:20.363
+A Merkle sum tree proves the total owed, without revealing anyone's balance.
+
+5
+00:00:20.813 --> 00:00:26.786
+Each customer receives a path from their own balance to the published total, and can check that they are counted.
+
+6
+00:00:28.486 --> 00:00:36.294
+Built over the one hundred thirty-eight holders of a real token, the tree totals exactly what the ledger itself says the issuer owes.
+
+7
+00:00:36.744 --> 00:00:41.192
+Understate one holder's balance, and their path no longer reaches the root.
+
+8
+00:00:41.192 --> 00:00:42.141
+The cheat shows.
+
+9
+00:00:43.841 --> 00:00:50.305
+A protection fund locked in escrow, or held under a signer list with the master key disabled, is real.
+
+10
+00:00:50.755 --> 00:00:55.214
+A fund behind one key counts for nothing: whoever holds that key can take it.
+
+11
+00:00:55.664 --> 00:00:59.012
+And remember, this is verification, not insurance.
+
+12
+00:00:59.012 --> 00:01:01.691
+NOSHASHI shows what is really set aside.
+
+13
+00:01:01.691 --> 00:01:02.896
+It pays no claims.

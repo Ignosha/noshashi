@@ -1,0 +1,49 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:07.271
+An N F T on the XRP Ledger is a one-of-a-kind token: art, a ticket, a deed or a membership.
+
+2
+00:00:07.271 --> 00:00:11.025
+Owning one does not mean its issuer is done with it.
+
+3
+00:00:12.725 --> 00:00:20.118
+Each N F T has a sixty-four character ID, and the rules its issuer set at minting are written inside that ID.
+
+4
+00:00:20.118 --> 00:00:25.205
+NOSHASHI's Token Rights screen decodes them without even asking the ledger.
+
+5
+00:00:26.905 --> 00:00:30.916
+Burnable means the issuer can destroy the token, even while you own it.
+
+6
+00:00:31.366 --> 00:00:35.057
+If it is not transferable, you can only sell it back to the issuer.
+
+7
+00:00:35.507 --> 00:00:41.800
+Mutable means the issuer can change what it points to, so the picture or document can change after you buy it.
+
+8
+00:00:42.250 --> 00:00:46.218
+And the transfer fee lets the issuer take up to half of every resale.
+
+9
+00:00:47.918 --> 00:00:51.869
+Here are two real tokens from mainnet, decoded from their IDs.
+
+10
+00:00:51.869 --> 00:00:57.795
+The first can be resold, cannot be changed, and pays its issuer five percent of every resale.
+
+11
+00:00:58.245 --> 00:01:04.994
+The second is mutable: its issuer can change what it points to, and it takes ten percent of every resale.
+
+12
+00:01:04.994 --> 00:01:08.272
+Both labs in the Academy use these same two tokens.

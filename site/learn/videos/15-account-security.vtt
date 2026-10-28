@@ -1,0 +1,65 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:04.683
+An X R P Ledger account belongs to whoever can sign for it.
+
+2
+00:00:04.683 --> 00:00:09.072
+Nobody at a help desk can reset it, and no payment can be undone.
+
+3
+00:00:09.072 --> 00:00:12.177
+So security comes down to protecting the keys.
+
+4
+00:00:13.877 --> 00:00:17.930
+Most accounts are emptied the same way: the secret is exposed.
+
+5
+00:00:17.930 --> 00:00:23.683
+It is typed into a fake site, saved in a cloud note or a screenshot, or read by malware.
+
+6
+00:00:23.683 --> 00:00:26.101
+The ledger itself is not broken into.
+
+7
+00:00:27.801 --> 00:00:31.460
+One: keep the master seed offline, on paper or steel.
+
+8
+00:00:31.460 --> 00:00:35.119
+Nobody legitimate, including NOSHASHI, ever needs it.
+
+9
+00:00:35.569 --> 00:00:39.302
+Two: sign day to day with a regular key held in a hardware wallet.
+
+10
+00:00:39.752 --> 00:00:46.195
+Three: require several signers for a treasury, and then disable the master key, or the list can be bypassed.
+
+11
+00:00:46.645 --> 00:00:53.279
+Four: close the doors strangers use, such as unsolicited N F T offers, checks and payment channels.
+
+12
+00:00:54.979 --> 00:00:56.500
+Here is a real account.
+
+13
+00:00:56.500 --> 00:01:01.593
+It sent payments of one drop, with a memo pointing to a fake free X R P site.
+
+14
+00:01:02.043 --> 00:01:05.935
+Then it deleted itself into the next account, which did the same.
+
+15
+00:01:05.935 --> 00:01:13.840
+Every account in the series was made to end in xaman, the name of a real wallet, so a hurried copy from history picks the wrong one.
+
+16
+00:01:14.290 --> 00:01:20.306
+The habit that beats it: take addresses from your own saved records, never from your transaction history.

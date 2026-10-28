@@ -48,6 +48,10 @@ jobs:
       - name: Typecheck NOSHREPAIR
         run: npx tsc -p noshrepair --noEmit
 
+      # NOSHASHI Academy, the separate learning app, has its own tsconfig.
+      - name: Typecheck Academy
+        run: npx tsc -p academy --noEmit
+
       # The Edge Functions are Deno, and nothing else in this pipeline
       # looks at them. tsconfig.json includes only `src`, so `npx tsc
       # --noEmit` above walks straight past supabase/functions — which
@@ -109,6 +113,11 @@ jobs:
       # console; the site deploys without packages, so the build is committed.
       - name: Website NOSHX is rebuilt
         run: npm run check:noshx-web
+
+      # site/academy/app/ is the Academy built for the browser; committed for
+      # the same reason.
+      - name: Website Academy is rebuilt
+        run: npm run check:academy-web
 
       - name: Tests
         run: npm test

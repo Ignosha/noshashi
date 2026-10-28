@@ -1,0 +1,890 @@
+[
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "What makes a ledger 'validated'?",
+  "options": [
+   "It is older than a day",
+   "At least 80% of trusted validators agreed on it, so it is final",
+   "NOSHASHI approved it",
+   "It contains only XRP payments"
+  ],
+  "answer": 1,
+  "why": "Validators vote; when 80% of a server's trusted list agree, the ledger is validated and can never change."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "Roughly how often does the XRPL produce a new ledger?",
+  "options": [
+   "Every 10 minutes",
+   "Every 3 to 5 seconds",
+   "Once a day",
+   "Only when someone pays"
+  ],
+  "answer": 1,
+  "why": "A new ledger closes every 3 to 5 seconds, each with a higher ledger index."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "What happens to the XRP paid as a transaction cost?",
+  "options": [
+   "It goes to validators",
+   "It is destroyed",
+   "It goes to Ripple",
+   "It returns to the sender"
+  ],
+  "answer": 1,
+  "why": "The cost is burned, which protects the network from spam without paying anyone."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "Why can't all of an account's XRP always be spent?",
+  "options": [
+   "Because of the reserve",
+   "Because XRP expires",
+   "Because of the transfer fee",
+   "Because of consensus"
+  ],
+  "answer": 0,
+  "why": "Every account locks a base reserve plus an owner reserve per object it owns."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "An account's Sequence number is 91,000,000. What does that tell you?",
+  "options": [
+   "It made 91 million transactions",
+   "Its counter started near the ledger index when it was created",
+   "It is blackholed",
+   "Nothing at all"
+  ],
+  "answer": 1,
+  "why": "Sequence starts at the creation ledger index, not zero, so it hints at age, not activity."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "A transaction result starts with tec. What does that mean?",
+  "options": [
+   "Success",
+   "It failed but was recorded and the fee was charged",
+   "It was never submitted",
+   "It is still pending"
+  ],
+  "answer": 1,
+  "why": "tec means claimed cost only: the transaction failed but is in the ledger and the fee is gone."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "Two tokens are both called USD. What tells them apart?",
+  "options": [
+   "Their price",
+   "The issuer address",
+   "The colour in your wallet",
+   "Nothing, they are the same"
+  ],
+  "answer": 1,
+  "why": "Anyone can use the code USD. The issuer address is the token's identity."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "What must you open before you can hold an issued token?",
+  "options": [
+   "An escrow",
+   "A trust line to the issuer",
+   "An AMM pool",
+   "A signer list"
+  ],
+  "answer": 1,
+  "why": "A trust line records your limit and balance with that issuer."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "What does an issuer's gateway_balances show?",
+  "options": [
+   "Its XRP balance",
+   "Its obligations: how much of each token others hold",
+   "Its fees",
+   "Its validators"
+  ],
+  "answer": 1,
+  "why": "It is the real circulating supply of each token the issuer has issued."
+ },
+ {
+  "round": "ROUND 1 · THE XRP LEDGER",
+  "question": "Which amendment rule is correct?",
+  "options": [
+   "51% for a day",
+   "80% of validators for two weeks",
+   "Any validator can switch it on",
+   "Ripple decides alone"
+  ],
+  "answer": 1,
+  "why": "An amendment needs at least 80% support held for two weeks."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "An issuer has set No Freeze. What does that mean?",
+  "options": [
+   "It can freeze whenever it likes",
+   "It has permanently given up freezing",
+   "The token is frozen now",
+   "Only XRP can be frozen"
+  ],
+  "answer": 1,
+  "why": "No Freeze is permanent and cannot be switched back off."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "Which power lets an issuer take tokens back from your account?",
+  "options": [
+   "Transfer fee",
+   "Require Auth",
+   "Clawback",
+   "Destination tag"
+  ],
+  "answer": 2,
+  "why": "Clawback, which can only be enabled before the issuer has any trust lines."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "What does a deep freeze add to a normal freeze?",
+  "options": [
+   "Nothing",
+   "The holder can neither send nor receive the token",
+   "It freezes XRP too",
+   "It is temporary"
+  ],
+  "answer": 1,
+  "why": "Deep freeze (XLS-77) blocks receiving as well as sending."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "A signer list has weights 3, 2, 2, 1, 1 and a quorum of 5. What is the fewest number of signers needed?",
+  "options": [
+   "Five",
+   "Three",
+   "Two",
+   "One"
+  ],
+  "answer": 2,
+  "why": "The weight-3 and a weight-2 signer reach 5 together. Count weights, not people."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "What makes an issuer blackholed?",
+  "options": [
+   "It was hacked",
+   "Master key disabled, regular key set to an address nobody controls, no signer list",
+   "It has no holders",
+   "It charges no fee"
+  ],
+  "answer": 1,
+  "why": "Nobody can ever sign for it again."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "What is an unfunded offer?",
+  "options": [
+   "An offer with no price",
+   "An offer still listed although its owner cannot fill it",
+   "An offer in XRP",
+   "A cancelled offer"
+  ],
+  "answer": 1,
+  "why": "Offers stay listed after owners stop holding the funds."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "Three offers list 10,000 each; owners hold 10,000, 500 and 0. What is the funded depth?",
+  "options": [
+   "30,000",
+   "10,500",
+   "10,000",
+   "500"
+  ],
+  "answer": 1,
+  "why": "10,000 + 500 + 0 = 10,500. Listed depth would say 30,000."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "Which field does book_offers add when an owner cannot cover an offer?",
+  "options": [
+   "delivered_amount",
+   "taker_gets_funded",
+   "TransferRate",
+   "Sequence"
+  ],
+  "answer": 1,
+  "why": "taker_gets_funded shows what the owner can actually deliver."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "Who votes on an AMM pool's trading fee?",
+  "options": [
+   "Validators",
+   "LP token holders, weighted by holdings",
+   "The issuer",
+   "Nobody, it is fixed"
+  ],
+  "answer": 1,
+  "why": "Votes are weighted by LP tokens, so large holders carry more weight."
+ },
+ {
+  "round": "ROUND 2 · ISSUERS, MARKETS AND PAYMENTS",
+  "question": "A payment shows tesSUCCESS with the partial-payment flag. What should you credit?",
+  "options": [
+   "The Amount field",
+   "delivered_amount",
+   "The fee",
+   "Nothing"
+  ],
+  "answer": 1,
+  "why": "With the flag, Amount is only a maximum. delivered_amount is what arrived."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "What does the Travel Rule require?",
+  "options": [
+   "Slow payments",
+   "Sender and receiver details travel with transfers above a threshold",
+   "Freezing all tokens",
+   "Only domestic payments"
+  ],
+  "answer": 1,
+  "why": "FATF Recommendation 16. Thresholds vary: USD/EUR 1,000 suggested, USD 3,000 in the US, none in the EU."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "Why can't behaviour screening alone catch issuer risk?",
+  "options": [
+   "It is too slow",
+   "Issuer powers are a property of the asset, not of the person holding it",
+   "Issuers are always safe",
+   "Screening reads flags already"
+  ],
+  "answer": 1,
+  "why": "A clean holder can hold a clawback-enabled token. Only the issuer's flags reveal that."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "An HHI of 10,000 means what?",
+  "options": [
+   "Perfectly spread out",
+   "One party has everything",
+   "Ten thousand holders",
+   "The fee is 100%"
+  ],
+  "answer": 1,
+  "why": "HHI sums squared percentage shares; 100² = 10,000 is total concentration."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "What are the two questions NOSHASHI answers?",
+  "options": [
+   "Price and volume",
+   "Am I allowed to move this, and could I actually get out of it?",
+   "Who owns XRP, and when to buy",
+   "Which wallet is fastest"
+  ],
+  "answer": 1,
+  "why": "Compliance and exit liquidity, from the same ledger reading."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "A check shows INSUFFICIENT_DATA. How should you treat it?",
+  "options": [
+   "As a pass",
+   "As a fail",
+   "As an abstention: the ledger did not give enough to decide",
+   "As a bug"
+  ],
+  "answer": 2,
+  "why": "It is never a pass. NOSHASHI would rather say it cannot tell than guess."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "An issuer fails 'no single key controls the issuer'. Which verdict follows?",
+  "options": [
+   "GO",
+   "HOLD",
+   "NO-GO",
+   "NOT_APPLICABLE"
+  ],
+  "answer": 2,
+  "why": "That check is blocking, so a failure gives NO-GO."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "Which screen tells you who can really move a treasury?",
+  "options": [
+   "Order Book",
+   "Control Surface",
+   "Inbox",
+   "Ledger Sync"
+  ],
+  "answer": 1,
+  "why": "Control Surface derives minimum signers from weights and flags a master-key bypass."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "You need to check a payment really arrived. Which screen and button?",
+  "options": [
+   "Settlement · READ SETTLEMENT",
+   "Passport · GENERATE PASSPORT",
+   "Authority · CERTIFY AUTHORITY",
+   "Ledger Watch"
+  ],
+  "answer": 0,
+  "why": "Settlement compares requested with delivered."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "Why does every reading carry a ledger index and a SHA-256 digest?",
+  "options": [
+   "Decoration",
+   "So anyone can re-check the same moment and prove the record was not changed",
+   "To make files bigger",
+   "It is required by the Travel Rule"
+  ],
+  "answer": 1,
+  "why": "The index fixes the moment; the digest proves the contents are unchanged."
+ },
+ {
+  "round": "ROUND 3 · COMPLIANCE AND THE APP",
+  "question": "What does four-eyes approval mean for a policy change?",
+  "options": [
+   "It needs four approvers",
+   "A second person must approve before it goes live",
+   "It is reviewed by four validators",
+   "It lasts four days"
+  ],
+  "answer": 1,
+  "why": "One person drafts and submits; a different person approves."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What is a drop?",
+  "options": [
+   "A token removed by clawback",
+   "The smallest unit of XRP: 1 XRP = 1,000,000 drops",
+   "A ledger that failed consensus",
+   "The fee an issuer charges"
+  ],
+  "answer": 1,
+  "why": "Balances and fees are recorded in drops. A reserve of 1 XRP is 1,000,000 drops."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What is the UNL (Unique Node List)?",
+  "options": [
+   "The validators a server trusts not to collude",
+   "A list of banned addresses",
+   "Every unfunded offer on the DEX",
+   "The tokens NOSHASHI has approved"
+  ],
+  "answer": 0,
+  "why": "A ledger is validated when 80% of the validators on a server's UNL agree."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What are an issuer's obligations?",
+  "options": [
+   "Its legal duties under MiCA",
+   "The XRP it keeps in reserve",
+   "The total of its tokens held by others: its real circulating supply",
+   "Offers it is forced to fill"
+  ],
+  "answer": 2,
+  "why": "gateway_balances reports them per currency. It is the figure concentration is measured against."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What is a regular key?",
+  "options": [
+   "The first key an account ever had",
+   "A validator's signing key",
+   "The key that opens a permissioned domain",
+   "A second key an account nominates to sign for it"
+  ],
+  "answer": 3,
+  "why": "If a regular key is set, it can sign even when the master key is disabled. That is why blackholing needs both handled."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What does Require Auth mean?",
+  "options": [
+   "You need the issuer's approval to hold its token",
+   "Every payment needs two signatures",
+   "The token can only be sold for XRP",
+   "The issuer must approve every trade"
+  ],
+  "answer": 0,
+  "why": "It is an issuer setting. It is one of the six authority checks, a warning when it is on."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What is a transaction's metadata?",
+  "options": [
+   "The memo the sender typed",
+   "Its price in US dollars",
+   "The record of what it actually did, attached once it is validated",
+   "The list of validators that voted"
+  ],
+  "answer": 2,
+  "why": "Metadata is where delivered_amount lives, which is why NOSHASHI reads it rather than the Amount field."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "In NOSHASHI, what is provenance?",
+  "options": [
+   "Where an account came from: its age and first funder",
+   "The country an issuer is based in",
+   "The price history of a token",
+   "Who wrote the rules version"
+  ],
+  "answer": 0,
+  "why": "The Provenance screen traces it with TRACE PROVENANCE, useful before paying a new counterparty."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What is a destination tag?",
+  "options": [
+   "A label for NFTs",
+   "A number telling a shared account which customer a payment is for",
+   "A tag that freezes a payment",
+   "The name of a trust line"
+  ],
+  "answer": 1,
+  "why": "Exchanges hold many customers in one address. Without the right tag, a payment arrives but nobody knows whose it is."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What is a credential (XLS-70)?",
+  "options": [
+   "A password for the app",
+   "A paid NOSHASHI plan",
+   "A validator's licence",
+   "An on-ledger proof that an account passed a check"
+  ],
+  "answer": 3,
+  "why": "An issuer of credentials (for example a KYC provider) records the proof on the ledger. Permissioned domains (XLS-80) can require it."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What does selective disclosure mean?",
+  "options": [
+   "Publishing every customer's data",
+   "Proving a credential exists without revealing the personal data behind it",
+   "Only disclosing profits",
+   "Hiding transactions from validators"
+  ],
+  "answer": 1,
+  "why": "It lets a counterparty confirm a check was passed without receiving the documents."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "What is the spread?",
+  "options": [
+   "The gap between the best bid and the best ask",
+   "How many holders a token has",
+   "The AMM trading fee",
+   "The time between ledgers"
+  ],
+  "answer": 0,
+  "why": "A wide spread means trading costs more. It says nothing about how much can be filled; funded depth does."
+ },
+ {
+  "round": "ROUND 4 · VOCABULARY",
+  "question": "In NOSHASHI, what is an exception?",
+  "options": [
+   "A crash report",
+   "A check that was skipped",
+   "An approved, recorded override of a NO-GO for a stated reason",
+   "A payment that bounced"
+  ],
+  "answer": 2,
+  "why": "It never erases the NO-GO. The override, its reason and its reviewer are kept alongside it."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "A listed company holds XRP in its treasury. Its auditor asks whether the year-end value is defensible. How does NOSHASHI help?",
+  "options": [
+   "It sets the price itself",
+   "It measures how much could really be sold in the market at a stated ledger index, so the auditor can re-check the figure",
+   "It guarantees the auditor signs off",
+   "It moves the XRP into cold storage"
+  ],
+  "answer": 1,
+  "why": "Auditors need evidence of the principal market. Funded depth stamped with a ledger index is evidence anyone can reproduce."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "A compliance officer is asked to approve holding a new stablecoin. Which reading answers 'could the issuer freeze or claw back what we hold?'",
+  "options": [
+   "Learn",
+   "Ledger Sync",
+   "Authority: CERTIFY AUTHORITY reads the issuer's flags and returns GO, HOLD or NO-GO",
+   "The HUD"
+  ],
+  "answer": 2,
+  "why": "Freeze, clawback, Require Auth, key control, transfer fee and concentration are properties of the asset. Screening the people involved cannot see them."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "An examiner asks a bank to show why a transfer was allowed eight months ago. What does NOSHASHI give it?",
+  "options": [
+   "A screenshot",
+   "The receipt: ledger index, rules version, checks and digest, so the decision can be reproduced exactly",
+   "A phone number for support",
+   "Nothing; the ledger has changed since"
+  ],
+  "answer": 1,
+  "why": "The ledger index fixes the moment. The digest proves the record was not edited afterwards."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "Why does four-eyes approval matter to an enterprise?",
+  "options": [
+   "It makes changes faster",
+   "No single employee can quietly change the rules that decide what the firm may do",
+   "It is needed to install the app",
+   "It lowers the price"
+  ],
+  "answer": 1,
+  "why": "Segregation of duties is a basic control auditors and regulators expect. Drafts can be simulated before anyone approves them."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "A trading desk is about to take a large position in an XRPL token. What risk does NOSHASHI check that a price chart hides?",
+  "options": [
+   "Whether the logo is official",
+   "Whether the listed depth includes unfunded offers, so the way out is far thinner than it looks",
+   "The token's age in days",
+   "The colour of the chart"
+  ],
+  "answer": 1,
+  "why": "In the 8 September sample, listed depth was a median 4.4 times funded depth within the band."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "A payments company receives XRPL payments on behalf of customers. Which two details stop it crediting the wrong amount or the wrong customer?",
+  "options": [
+   "delivered_amount and the destination tag",
+   "Sequence and the fee",
+   "The currency code and the spread",
+   "The UNL and the ledger index"
+  ],
+  "answer": 0,
+  "why": "Credit delivered_amount, never the Amount field of a partial payment, and match the destination tag to the customer."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "An enterprise already runs its own case management and alerting. How does NOSHASHI fit in?",
+  "options": [
+   "It replaces them",
+   "It does not; it is desktop only",
+   "Signed webhooks push events to your systems, and the Compliance API gives read access to verdicts and readings",
+   "It emails a spreadsheet each week"
+  ],
+  "answer": 2,
+  "why": "Webhooks are signed so your systems can prove they came from NOSHASHI."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "Why is a hash-chained investigation log valuable to a regulated firm?",
+  "options": [
+   "It saves disk space",
+   "Entries cannot be quietly edited or removed, so the record of what the team knew, and when, holds up under review",
+   "It hides the log from auditors",
+   "It is faster to search"
+  ],
+  "answer": 1,
+  "why": "Each entry carries the fingerprint of the one before. Changing any entry breaks every link after it."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "A NO-GO blocks a trade the business has a legitimate reason to make. What is the controlled way forward?",
+  "options": [
+   "Turn NOSHASHI off",
+   "Edit the receipt",
+   "Request an exception; a reviewer approves, rejects or asks for more evidence, and the decision stays with the verdict",
+   "Ask the issuer to change its flags"
+  ],
+  "answer": 2,
+  "why": "Overrides happen in the open, with a reason and a second person, which is what an examiner looks for."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "A token issuer wants to show institutional buyers exactly what they would be exposed to. What can it share?",
+  "options": [
+   "Its marketing deck",
+   "A link to the free authority certificate for its issuer address, which anyone can re-check",
+   "Its private keys",
+   "Its bank statements"
+  ],
+  "answer": 1,
+  "why": "The certificate page at /certificate/ runs the same six checks with the ledger index and digest, free and without an account."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "Which plan is built for regulated teams that need organisation features and unlimited seats?",
+  "options": [
+   "Free",
+   "Pro",
+   "Institutional",
+   "None; each seat is separate"
+  ],
+  "answer": 2,
+  "why": "Institutional is $4,000 a month. Enterprise and Strategic, from $120,000 a year, are for larger organisations and infrastructure partners."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "What does answering both questions from one ledger reading save a compliance team?",
+  "options": [
+   "Nothing",
+   "Reconciling a screening tool and a market terminal that looked at the ledger at different moments",
+   "Hiring an auditor",
+   "Paying transaction costs"
+  ],
+  "answer": 1,
+  "why": "When compliance and liquidity come from the same WebSocket in the same second, the file tells one consistent story."
+ },
+ {
+  "round": "ROUND 5 · HOW IT HELPS INSTITUTIONS AND ENTERPRISES",
+  "question": "NOSHASHI is in beta. What should an institution take from that today?",
+  "options": [
+   "The readings are invented",
+   "It provides information, not financial or legal advice; re-measure a reading before relying on it for a decision",
+   "It cannot be installed",
+   "Beta means free forever"
+  ],
+  "answer": 1,
+  "why": "Every build is labelled beta. Every reading is real and stamped with its ledger, so re-checking it is straightforward."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "How are most XRP Ledger accounts actually emptied?",
+  "options": [
+   "The ledger is hacked",
+   "The secret seed is exposed: a fake wallet site, a cloud backup, a screenshot or malware",
+   "Validators take the funds",
+   "Another account guesses the address"
+  ],
+  "answer": 1,
+  "why": "The ledger is not broken into. Whoever holds a key that can sign owns the account, so protecting the seed is the whole game."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "What does a regular key held in a hardware wallet give you?",
+  "options": [
+   "A second copy of your balance",
+   "Day-to-day signing without the master seed, and a key you can replace in one transaction if it leaks",
+   "Faster payments",
+   "Protection from fees"
+  ],
+  "answer": 1,
+  "why": "The master seed stays offline; if the regular key is ever exposed, the master key sets a new one."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "A treasury has a 2-of-3 signer list but its master key is still enabled. What is the risk?",
+  "options": [
+   "None",
+   "One stolen master seed skips the whole approval",
+   "The signers cannot sign",
+   "The account is blackholed"
+  ],
+  "answer": 1,
+  "why": "Disable the master key once the signers are confirmed, or the quorum is optional."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "What is address poisoning?",
+  "options": [
+   "A virus in your wallet",
+   "A lookalike address, matching the start and end of one you use, sent to you so you copy it from history",
+   "A frozen trust line",
+   "A fake token"
+  ],
+  "answer": 1,
+  "why": "Always take destinations from your own records. NOSHASHI's SAFE SEND checks a pasted address against your book."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "Your XRP was stolen an hour ago. What can reverse the payment?",
+  "options": [
+   "Validators, if asked quickly",
+   "A recovery service, for a fee",
+   "Nothing: validated transactions are final; recovery happens off-ledger",
+   "Deleting your account"
+  ],
+  "answer": 2,
+  "why": "Paid 'recovery' offers are the second half of the scam. Exchanges freezing tagged deposits and issuers freezing their own tokens are the real paths."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "Stolen XRP reached an account that requires destination tags. Who can help?",
+  "options": [
+   "Nobody",
+   "The exchange or service behind it, which can freeze the customer behind that tag if reached quickly",
+   "The first validator",
+   "NOSHASHI, by reversing it"
+  ],
+  "answer": 1,
+  "why": "Send the transaction hash, amount, time and tag, ideally with a police reference."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "Why do thieves send hundreds of 1-drop payments after a theft?",
+  "options": [
+   "To pay fees",
+   "To bury the real transfers in noise and spread phishing links",
+   "To close the account",
+   "To vote on amendments"
+  ],
+  "answer": 1,
+  "why": "A trace that ignores the dust and follows AccountDelete sweeps sees through it."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "What does NOSHASHI's hardening plan contain?",
+  "options": [
+   "Your secret key",
+   "Unsigned transactions for you to review and sign in your own wallet",
+   "A password reset",
+   "Nothing, it only scores"
+  ],
+  "answer": 1,
+  "why": "NOSHASHI reads the ledger and never signs or asks for a key."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "An escrow to you matured last week. Why has the XRP not arrived?",
+  "options": [
+   "It was stolen",
+   "An escrow never pays out by itself: someone must submit EscrowFinish",
+   "Escrows take a month to settle",
+   "The issuer froze it"
+  ],
+  "answer": 1,
+  "why": "RECOVER FUNDS lists matured escrows with the EscrowFinish to sign."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "A site asks you to sign a SetRegularKey naming an address you do not recognise. What happens if you sign?",
+  "options": [
+   "Nothing, it only reads",
+   "Whoever holds that key can move everything in your account from then on",
+   "Your fees go down",
+   "The account is deleted"
+  ],
+  "answer": 1,
+  "why": "PRE-SIGN CHECK answers DO NOT SIGN for exactly this: it is the quickest way to take over an account."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "Your exchange deposit failed with tecDST_TAG_NEEDED. Where is the XRP?",
+  "options": [
+   "At the exchange, unassigned",
+   "Still in your account: only the fee was spent",
+   "Burned",
+   "In escrow"
+  ],
+  "answer": 1,
+  "why": "A tec result means the payment did nothing but charge its fee. Send again with the tag."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "An account's Domain field says bitstamp.net. What proves it really belongs to Bitstamp?",
+  "options": [
+   "Nothing more is needed",
+   "bitstamp.net listing the account in its /.well-known/xrp-ledger.toml",
+   "A large balance",
+   "An old account age"
+  ],
+  "answer": 1,
+  "why": "Anyone can write any domain. DOMAIN CHECK reads the site's file and says VERIFIED only when the account is listed."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "What is the XRP Ledger equivalent of revoking a token approval?",
+  "options": [
+   "There is nothing to revoke",
+   "Cancelling what you left open: checks you wrote, NFT sell offers, payment channels, old orders, keys and signers",
+   "Deleting your trust lines",
+   "Changing your password"
+  ],
+  "answer": 1,
+  "why": "EXPOSURE AUDIT lists each open permission with the one transaction that revokes it."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "An exchange shows a large XRP balance. Why is that not proof customers are safe?",
+  "options": [
+   "It always is",
+   "It says nothing about what the exchange owes; proof needs liabilities too",
+   "Balances cannot be read",
+   "Only validators can check"
+  ],
+  "answer": 1,
+  "why": "Reserves divided by published liabilities is the coverage ratio. Reserves alone can hide larger debts."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "What does a customer's inclusion proof let them check?",
+  "options": [
+   "Everyone else's balance",
+   "That their own balance is counted in the published total, without seeing anyone else's",
+   "The exchange's password",
+   "Their seed"
+  ],
+  "answer": 1,
+  "why": "The path from their leaf to the published root reproduces it only if their balance is in it."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "A protection fund sits in an account controlled by one key. How much of it is secured?",
+  "options": [
+   "All of it",
+   "None: whoever holds that key can move it",
+   "Half",
+   "It depends on the balance"
+  ],
+  "answer": 1,
+  "why": "Only XRP locked in escrow, or under a signer list with the master key disabled, is counted as secured."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "Is NOSHASHI's Customer Asset Protection insurance?",
+  "options": [
+   "Yes, it pays claims",
+   "No: it verifies and publishes what is set aside; nobody pays claims and no government scheme stands behind it",
+   "Yes, backed by a government",
+   "Only on Strategic"
+  ],
+  "answer": 1,
+  "why": "It gives customers facts they can check, not a guarantee."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "A customer asks to withdraw to an address created an hour ago. Why screen it?",
+  "options": [
+   "Old addresses are slower",
+   "Most stolen withdrawals go to freshly created accounts",
+   "New accounts pay more fees",
+   "It is illegal"
+  ],
+  "answer": 1,
+  "why": "WITHDRAWALS flags destinations hours old, and lookalikes of past destinations."
+ },
+ {
+  "round": "ROUND 6 · ACCOUNT SECURITY AND INCIDENT RESPONSE",
+  "question": "An account placed 171 orders on a token in minutes, replaced or cancelled all of them, and none filled. What does that show?",
+  "options": [
+   "Proven fraud",
+   "Depth that is constantly re-quoted and never trades: the book looks deeper than it is",
+   "A broken ledger",
+   "Nothing at all"
+  ],
+  "answer": 1,
+  "why": "It is an indicator, not a verdict: an ordinary market maker re-quoting looks the same."
+ }
+]

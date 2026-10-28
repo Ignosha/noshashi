@@ -1,0 +1,69 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:05.008
+Before you trust a treasury or an issuer, ask who can actually sign for it.
+
+2
+00:00:05.008 --> 00:00:07.420
+This video shows how to count it properly.
+
+3
+00:00:09.120 --> 00:00:11.686
+There are three ways to sign for an account.
+
+4
+00:00:11.686 --> 00:00:14.603
+The master key is the account's original key pair.
+
+5
+00:00:15.053 --> 00:00:20.642
+A regular key is a second key the account nominates, which lets the master key stay offline.
+
+6
+00:00:21.092 --> 00:00:25.024
+And a signer list names up to thirty-two signers, each with a weight.
+
+7
+00:00:25.024 --> 00:00:29.924
+A transaction is valid when the weights of the people who signed add up to the quorum.
+
+8
+00:00:31.624 --> 00:00:34.038
+Here is a treasury with five signers.
+
+9
+00:00:34.038 --> 00:00:38.214
+Alice has weight three, Bob two, Carol two, Dan one and Eve one.
+
+10
+00:00:38.214 --> 00:00:39.453
+The quorum is five.
+
+11
+00:00:39.903 --> 00:00:46.680
+Alice and Bob together reach five, so only two people are needed, not three of five as the headcount suggests.
+
+12
+00:00:46.680 --> 00:00:50.314
+NOSHASHI's Control Surface works this out from the weights.
+
+13
+00:00:52.014 --> 00:00:58.743
+And if the master key is still enabled, one person holding it can sign alone and skip the whole signer list.
+
+14
+00:00:58.743 --> 00:01:01.422
+NOSHASHI flags that as a master-key bypass.
+
+15
+00:01:03.122 --> 00:01:11.954
+An account whose master key is disabled, whose regular key points at an address nobody can sign for, and which has no signer list, is blackholed.
+
+16
+00:01:12.404 --> 00:01:14.580
+Nobody can ever sign for it again.
+
+17
+00:01:14.580 --> 00:01:19.252
+Its settings and its supply are frozen in time, for better and for worse.

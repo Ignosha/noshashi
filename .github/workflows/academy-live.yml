@@ -1,0 +1,44 @@
+name: Academy live readings
+
+# Opens the Academy (the committed web build, site/academy/app/) in a real
+# browser and presses RUN IT HERE on every lab step against the live XRP
+# Ledger, mainnet and testnet, from a runner that can reach the public
+# nodes. Fails if any step could not read the ledger. Kept out of CI so a
+# public node having a bad minute never blocks a merge; run by hand before
+# an Academy release, and on changes to the labs.
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
+    paths:
+      - academy/src/**
+      - src/lib/academy/**
+      - src/lib/learn/labs.ts
+      - scripts/academy/live-labs.cjs
+      - .github/workflows/academy-live.yml
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve the site
+        run: |
+          (cd site && python3 -m http.server 4180 >/tmp/site.log 2>&1 &)
+          sleep 2
+      - name: Every lab step, live
+        run: node scripts/academy/live-labs.cjs http://localhost:4180/academy/app/ live-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: academy-live-report
+          path: live-report.json

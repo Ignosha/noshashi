@@ -41,6 +41,11 @@ type View = { kind: "list" } | { kind: "lab"; id: string; step: number } | { kin
 
 let remembered: View = { kind: "list" };
 
+/** Open a lab the next time this panel appears: how a course lesson sends a learner to its lab. */
+export function openLabNext(id: string) {
+  if (labById(id)) remembered = { kind: "lab", id, step: 0 };
+}
+
 const SCREEN: Partial<Record<SceneId, string>> = {
   safeshop: "CHECK AN ADDRESS",
   nft: "TOKEN RIGHTS",
@@ -49,6 +54,14 @@ const SCREEN: Partial<Record<SceneId, string>> = {
   network: "LEDGER SYNC",
   agent: "NOSHX",
   treasury: "CONTROL SURFACE",
+  authority: "AUTHORITY",
+  book: "ORDER BOOK",
+  amm: "POOL GOVERNANCE",
+  settlement: "SETTLEMENT",
+  provenance: "PROVENANCE",
+  workstation: "LEDGER & POLICY",
+  credentials: "CREDENTIALS",
+  security: "SECURITY CENTER",
 };
 
 const screenName = (scene: SceneId) => SCREEN[scene] ?? scene.toUpperCase();
@@ -293,31 +306,39 @@ function LabRun({
 
 function GoThere({ step, onNavigate }: { step: LabStep; onNavigate?: (scene: SceneId) => void }) {
   const handOff = useHandoff();
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
   const go = () => (step.subject ? handOff({ scene: step.scene, value: step.subject, from: "learn", as: step.subjectLabel, view: step.view }) : onNavigate?.(step.scene));
-  const copy = async () => {
-    if (!step.subject) return;
+  const copy = async (value: string) => {
     try {
-      await navigator.clipboard.writeText(step.subject);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      await navigator.clipboard.writeText(value);
+      setCopied(value);
+      window.setTimeout(() => setCopied(null), 1500);
     } catch {
       // Clipboard refused (permissions); the value is on screen to select by hand.
     }
   };
+  const values = [
+    ...(step.subject ? [{ label: step.subjectLabel ?? "VALUE", value: step.subject }] : []),
+    ...(step.copy ?? []),
+  ];
   return (
     <div className="flex flex-col gap-2">
-      {step.subject && (
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="shrink-0 font-mono text-[10.5px] tracking-[0.1em] text-faint">{(step.subjectLabel ?? "VALUE").toUpperCase()}</span>
-          <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-telemetry" title={step.subject}>
-            {step.subject}
+      {values.map(({ label, value }) => (
+        <div key={`${label}:${value}`} className="flex min-w-0 items-center gap-2">
+          <span className="shrink-0 font-mono text-[10.5px] tracking-[0.1em] text-faint">{label.toUpperCase()}</span>
+          <code className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-telemetry" title={value}>
+            {value}
           </code>
-          <button onClick={() => void copy()} className="shrink-0 font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground hover:text-brand">
-            {copied ? "COPIED" : "COPY"}
+          <button
+            type="button"
+            onClick={() => void copy(value)}
+            aria-label={`Copy ${label}`}
+            className="shrink-0 font-mono text-[10.5px] tracking-[0.1em] text-muted-foreground hover:text-brand"
+          >
+            {copied === value ? "COPIED" : "COPY"}
           </button>
         </div>
-      )}
+      ))}
       <div>
         <Button size="sm" variant="outline" onClick={go}>
           TAKE ME TO {screenName(step.scene)} →

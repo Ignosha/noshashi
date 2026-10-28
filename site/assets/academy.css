@@ -1,0 +1,27 @@
+/* /academy/: NOSHASHI Academy on the website. */
+.ac-wrap{max-width:900px;margin:0 auto}
+.ac-hero{text-align:center;max-width:740px;margin:0 auto 48px}
+.ac-hero h1{font-size:clamp(32px,5vw,54px);line-height:1.06;letter-spacing:-.03em;margin:10px 0 0;text-wrap:balance}
+.ac-hero > p:not(.eyebrow):not(.cta){color:var(--muted);font-size:clamp(16px,1.6vw,19px);line-height:1.55;margin:16px auto 0;max-width:56ch}
+.ac-hero .cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin-top:24px}
+.ac-soon{color:var(--muted);font-size:14px;max-width:34ch;text-align:left}
+.ac-fine{color:var(--faint);font-size:13px;line-height:1.55;margin-top:18px}
+.ac-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 48px}
+.ac-grid > div{border:1px solid var(--rule);border-radius:14px;background:var(--surface);padding:18px 20px}
+.ac-grid h2{font-size:18px;margin:0}
+.ac-grid p{color:var(--muted);margin:8px 0 0;line-height:1.55}
+.ac-course > h2{font-size:clamp(24px,3vw,32px);letter-spacing:-.02em;margin:0 0 6px}
+.ac-level{border-top:1px solid var(--rule);padding-top:18px;margin-top:18px}
+.ac-level h3{margin:0;font-size:18px}
+.ac-level > p{color:var(--muted);margin:6px 0 0}
+.ac-level ol{margin:10px 0 0;padding-left:22px;line-height:1.5}
+.ac-level li{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px dashed color-mix(in srgb,var(--rule) 60%,transparent)}
+.ac-level li::marker{color:var(--brand)}
+.ac-meta{color:var(--faint);font:500 12px/1.6 "IBM Plex Mono",ui-monospace,monospace;white-space:nowrap}
+.ac-result{border:1px solid var(--rule);border-radius:14px;background:var(--surface);padding:22px 24px;max-width:640px;margin:0 auto}
+.ac-result.ok{border-color:color-mix(in srgb,var(--go) 55%,transparent)}
+.ac-result.bad{border-color:color-mix(in srgb,var(--no-go) 55%,transparent)}
+.ac-result dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:14px 0 0}
+.ac-result dt{color:var(--faint);font:500 12px/1.6 "IBM Plex Mono",ui-monospace,monospace}
+.ac-result dd{margin:0;word-break:break-all}
+@media (max-width:640px){.ac-grid{grid-template-columns:1fr}.ac-level li{flex-direction:column;gap:0}}

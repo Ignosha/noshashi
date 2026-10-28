@@ -47,5 +47,82 @@
     "blurb": "Every section of the desktop app, what it is for and which button to press.",
     "lesson": "l17",
     "secs": 202
+  },
+  {
+    "id": "08-transactions",
+    "title": "Transactions and what results mean",
+    "blurb": "Every change is a signed transaction, only validated results are final, and success does not mean all of it arrived.",
+    "lesson": "l3",
+    "secs": 95
+  },
+  {
+    "id": "09-who-controls",
+    "title": "Who really controls an account",
+    "blurb": "Master key, regular key and signer lists; counting a quorum by weight; the master-key bypass; blackholed accounts.",
+    "lesson": "l6",
+    "secs": 80
+  },
+  {
+    "id": "10-nfts",
+    "title": "NFTs and the rights issuers keep",
+    "blurb": "What an NFTokenID encodes: burnable, transferable, mutable and the resale fee, with two real tokens.",
+    "lesson": "l10",
+    "secs": 69
+  },
+  {
+    "id": "11-amendments",
+    "title": "How the rules change",
+    "blurb": "Amendments need 80% of validators for two weeks; servers that fall behind become amendment blocked.",
+    "lesson": "l11",
+    "secs": 50
+  },
+  {
+    "id": "12-amm",
+    "title": "AMM pools and who governs them",
+    "blurb": "Pools of two assets, LP tokens, fee votes weighted by LP tokens, and the auction slot.",
+    "lesson": "l8",
+    "secs": 64
+  },
+  {
+    "id": "13-invoice-check",
+    "title": "Did this payment pay this invoice?",
+    "blurb": "VERIFIED, HOLD or REJECTED, exact amounts, two node operators, and a real CSC partial payment.",
+    "lesson": "l9",
+    "secs": 80
+  },
+  {
+    "id": "14-compliance-words",
+    "title": "Compliance words, made simple",
+    "blurb": "KYC, AML, sanctions screening, the Travel Rule, what screening misses, and compliance built into the ledger.",
+    "lesson": "l12",
+    "secs": 81
+  },
+  {
+    "id": "15-account-security",
+    "title": "Making an account hard to take over",
+    "blurb": "How accounts are emptied, the four defences, and a real address-poisoning series from mainnet.",
+    "lesson": "l20",
+    "secs": 81
+  },
+  {
+    "id": "16-after-a-theft",
+    "title": "When an account is emptied",
+    "blurb": "Why nothing reverses a validated payment, the first hour, and the recovery paths that really exist.",
+    "lesson": "l21",
+    "secs": 76
+  },
+  {
+    "id": "17-getting-xrp-back",
+    "title": "Getting XRP back, and signing safely",
+    "blurb": "Stuck XRP you can recover, the signatures that empty accounts, and how to prove a domain claim.",
+    "lesson": "l22",
+    "secs": 80
+  },
+  {
+    "id": "18-protecting-customers",
+    "title": "Protecting customers' XRP",
+    "blurb": "Proof of reserves and liabilities with a Merkle sum tree, protection funds no single key can move, and what NOSHASHI is not.",
+    "lesson": "l23",
+    "secs": 64
   }
 ]

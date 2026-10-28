@@ -39,3 +39,6 @@ supabase/.temp/
 COMMERCIALIZATION_PLAN.txt
 SETUP.md
 .sqltest.err
+academy/dist/
+academy/src-tauri/target/
+academy/src-tauri/gen/

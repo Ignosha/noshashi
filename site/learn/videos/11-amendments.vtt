@@ -1,0 +1,37 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:04.188
+The XRP Ledger's rules do change, but never quietly.
+
+2
+00:00:04.188 --> 00:00:08.615
+New features arrive as amendments, and this is how they switch on.
+
+3
+00:00:10.315 --> 00:00:14.952
+A new feature is written into the server software, and then validators vote on it.
+
+4
+00:00:14.952 --> 00:00:20.043
+It switches on only after it keeps at least eighty percent support for two weeks in a row.
+
+5
+00:00:21.743 --> 00:00:27.015
+A server that has not upgraded when an amendment switches on becomes amendment blocked.
+
+6
+00:00:27.015 --> 00:00:30.105
+It stops following the ledger until it is upgraded.
+
+7
+00:00:31.805 --> 00:00:40.206
+Many features in this course arrived this way: pools, clawback, N F Ts, credentials, permissioned domains and deep freeze.
+
+8
+00:00:40.206 --> 00:00:44.200
+Each X L S number is the public proposal behind a feature.
+
+9
+00:00:44.650 --> 00:00:48.597
+And what is enabled today can always be read from the ledger itself.
