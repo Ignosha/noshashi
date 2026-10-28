@@ -307,7 +307,7 @@ describe("the Ledger Evidence Report", () => {
     expect(res.statusCode).toBe(200);
   });
 
-  it("holds the Issuer check to one issuer and charges $750", async () => {
+  it("holds the Issuer check to one issuer and charges $950", async () => {
     let res = mockRes();
     await handler(report({ tier: "issuer", issuers: [ISSUER, "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq"].join(",") }), res);
     expect(res.statusCode).toBe(400);
@@ -315,7 +315,7 @@ describe("the Ledger Evidence Report", () => {
     res = mockRes();
     await handler(report({ tier: "issuer", issuers: ISSUER, wallets: WALLET }), res);
     expect(res.statusCode).toBe(200);
-    expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("75000");
+    expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("95000");
     expect(stripeForm().allow_promotion_codes).toBe("false");
   });
 

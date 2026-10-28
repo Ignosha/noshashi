@@ -11,7 +11,7 @@
 export const EVIDENCE_TIERS = {
   issuer: {
     name: "Issuer check",
-    cents: 75_000,
+    cents: 95_000,
     cadence: "once",
     limits: { issuers: 1, wallets: 3, books: 1 },
     summary: "One report on a single token issuer: its controls, up to three team or treasury wallets, and its order book.",
