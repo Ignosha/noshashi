@@ -69,4 +69,6 @@ jobs:
           git add site/learn/videos
           if git diff --cached --quiet; then echo "No change."; exit 0; fi
           git commit -m "Learn videos: build the narrated course videos"
+          # The branch may have moved on while this ran; put the recording on top.
+          git pull --rebase origin "$GITHUB_REF_NAME"
           git push

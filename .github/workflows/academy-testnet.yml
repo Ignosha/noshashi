@@ -44,4 +44,6 @@ jobs:
           git add src/lib/academy/testnet-cases.json
           if git diff --cached --quiet; then echo "No change."; exit 0; fi
           git commit -m "Academy: record the testnet invoice cases"
+          # The branch may have moved on while this ran; put the recording on top.
+          git pull --rebase origin "$GITHUB_REF_NAME"
           git push
