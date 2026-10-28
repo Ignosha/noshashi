@@ -1,9 +1,10 @@
 name: Academy live readings
 
 # Opens the Academy (the committed web build, site/academy/app/) in a real
-# browser and presses RUN IT HERE on every lab step against the live XRP
-# Ledger, mainnet and testnet, from a runner that can reach the public
-# nodes. Fails if any step could not read the ledger. Kept out of CI so a
+# browser and does every lab step against the live XRP Ledger, from a runner
+# that can reach the public nodes: NOSHASHI labs in the lab workstation (the
+# training copy of NOSHASHI inside the Academy), the testnet lab on its
+# practice bench. Fails if any step could not be done. Kept out of CI so a
 # public node having a bad minute never blocks a merge; run by hand before
 # an Academy release, and on changes to the labs.
 
@@ -13,6 +14,8 @@ on:
     branches-ignore: [main]
     paths:
       - academy/src/**
+      - site/academy/app/**
+      - src/lib/training/**
       - src/lib/academy/**
       - src/lib/learn/labs.ts
       - scripts/academy/live-labs.cjs

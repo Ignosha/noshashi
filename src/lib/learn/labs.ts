@@ -64,6 +64,27 @@ export type Lab = {
   steps: LabStep[];
 };
 
+/** What each screen a lab uses is called in NOSHASHI's own navigation. */
+export const LAB_SCREENS: Partial<Record<SceneId, string>> = {
+  safeshop: "CHECK AN ADDRESS",
+  nft: "TOKEN RIGHTS",
+  claims: "INBOX",
+  verify: "VERIFICATION",
+  network: "LEDGER SYNC",
+  agent: "NOSHX",
+  treasury: "CONTROL SURFACE",
+  authority: "AUTHORITY",
+  book: "ORDER BOOK",
+  amm: "POOL GOVERNANCE",
+  settlement: "SETTLEMENT",
+  provenance: "PROVENANCE",
+  workstation: "LEDGER & POLICY",
+  credentials: "CREDENTIALS",
+  security: "SECURITY CENTER",
+};
+
+export const screenName = (scene: SceneId) => LAB_SCREENS[scene] ?? scene.toUpperCase();
+
 /** Real mainnet subjects, named once so tests can check them against the recordings. */
 export const LAB_SUBJECTS = {
   /** Bitstamp's USD issuing account. account_info recorded at ledger 107,193,471. */

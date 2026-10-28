@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useBilling } from "@/lib/billing/useEntitlements";
 import { useHandoff } from "@/lib/nav/handoff";
 import { useSetting } from "@/lib/store";
-import { LABS, allSteps, labById, type Lab, type LabStep } from "@/lib/learn/labs";
+import { LABS, allSteps, labById, screenName, type Lab, type LabStep } from "@/lib/learn/labs";
 import {
   EMPTY_PROGRESS,
   completeStep,
@@ -46,25 +46,6 @@ export function openLabNext(id: string) {
   if (labById(id)) remembered = { kind: "lab", id, step: 0 };
 }
 
-const SCREEN: Partial<Record<SceneId, string>> = {
-  safeshop: "CHECK AN ADDRESS",
-  nft: "TOKEN RIGHTS",
-  claims: "INBOX",
-  verify: "VERIFICATION",
-  network: "LEDGER SYNC",
-  agent: "NOSHX",
-  treasury: "CONTROL SURFACE",
-  authority: "AUTHORITY",
-  book: "ORDER BOOK",
-  amm: "POOL GOVERNANCE",
-  settlement: "SETTLEMENT",
-  provenance: "PROVENANCE",
-  workstation: "LEDGER & POLICY",
-  credentials: "CREDENTIALS",
-  security: "SECURITY CENTER",
-};
-
-const screenName = (scene: SceneId) => SCREEN[scene] ?? scene.toUpperCase();
 const KNOWN = new Set(allSteps().map((s) => s.key));
 
 export function useLabProgress() {

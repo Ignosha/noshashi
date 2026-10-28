@@ -35,7 +35,7 @@ export function NoshashiMark({
   if (tone === "color") {
     return (
       <img
-        src="/brand/flower-mark-128.png"
+        src={`${import.meta.env.BASE_URL}brand/flower-mark-128.png`}
         width={size}
         height={size}
         alt={title ?? ""}

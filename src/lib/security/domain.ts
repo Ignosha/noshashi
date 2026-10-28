@@ -1,4 +1,6 @@
 import { FUNCTIONS_URL } from "@/lib/supabase/project";
+import { isTraining } from "@/lib/edition";
+import { trainingGuard } from "@/lib/training/guard";
 import type { DomainCheck } from "../../../supabase/functions/_shared/xrplEvents.ts";
 
 export type { DomainCheck };
@@ -19,5 +21,8 @@ export async function verifyDomain(query: { address: string } | { domain: string
   const response = await fetch(`${FUNCTIONS_URL}/noshashi-xrpl-watch/domain-verify?${q}`, { signal: AbortSignal.timeout(20_000) });
   const body = (await response.json().catch(() => ({}))) as { check?: DomainCheck; accounts?: DomainAccount[]; message?: string };
   if (!response.ok || !body.check) throw new Error(body.message ?? `The domain check failed (HTTP ${response.status}).`);
+  // The ledger is read server-side here, so NOSHASHI Academy's workstation
+  // counts the answer as the lab's reading of that account.
+  if (isTraining && "address" in query) trainingGuard().answered("domain-verify", { account: query.address }, {});
   return { check: body.check, accounts: body.accounts };
 }

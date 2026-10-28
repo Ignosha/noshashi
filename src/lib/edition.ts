@@ -20,7 +20,7 @@
  * about the product and contradicts everything this one claims.
  */
 
-export type Edition = "full" | "demo";
+export type Edition = "full" | "demo" | "training";
 
 /*
  * Written without optional chaining on purpose.
@@ -32,9 +32,36 @@ export type Edition = "full" | "demo";
  * both code paths, and the separation stops being a build-time one.
  */
 export const EDITION: Edition =
-  import.meta.env.VITE_NOSHASHI_EDITION === "demo" ? "demo" : "full";
+  import.meta.env.VITE_NOSHASHI_EDITION === "demo"
+    ? "demo"
+    : import.meta.env.VITE_NOSHASHI_EDITION === "training"
+      ? "training"
+      : "full";
 
 export const isDemo: boolean = EDITION === "demo";
+
+/**
+ * The training copy runs inside NOSHASHI Academy as the lab workstation
+ * (academy/vite.workstation.config.mts). Every screen opens, so a lab can
+ * be done without NOSHASHI installed, but a paid screen reads only the
+ * labs' own addresses and what the ledger links to them
+ * (src/lib/training/guard.ts): the copy teaches the product, it is not a
+ * free Pro plan. Billing and sign-in are inert, as in the demo.
+ */
+export const isTraining: boolean = EDITION === "training";
+
+/** Capabilities the training copy keeps closed: they need NOSHASHI's servers or a customer's own systems. */
+export const TRAINING_CLOSED: ReadonlySet<string> = new Set([
+  "compliance_api",
+  "webhooks",
+  "regulator_seats",
+  "white_label",
+  "sla",
+  "sso",
+  "dedicated_environment",
+  "embedded_delivery",
+  "event_feeds",
+]);
 
 /** Capabilities the demo closes off, with the reason shown to the user. */
 export const DEMO_LOCKED: Record<string, string> = {

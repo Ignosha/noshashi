@@ -1,4 +1,4 @@
-import { isDemo, DEMO_LOCKED, DEMO_UPGRADE_URL } from "@/lib/edition";
+import { isDemo, isTraining, DEMO_LOCKED, DEMO_UPGRADE_URL, TRAINING_CLOSED } from "@/lib/edition";
 import {
   createContext,
   useCallback,
@@ -150,6 +150,9 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
       // second path a demo could slip past — and it is a *narrowing*, so
       // the demo can never grant something the entitlement did not.
       if (isDemo && feature in DEMO_LOCKED) return false;
+      // The training copy opens every screen a lab uses; what a paid screen
+      // may read is narrowed instead, in src/lib/training/guard.ts.
+      if (isTraining) return !TRAINING_CLOSED.has(feature);
       return entitlement.features.includes(feature);
     },
     [entitlement.features]
@@ -157,7 +160,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
 
   const startCheckout = useCallback(async (priceId: string, seats = 1) => {
     // A demo that takes a payment is worse than one that does not exist.
-    if (isDemo) {
+    if (isDemo || isTraining) {
       await openExternal(DEMO_UPGRADE_URL);
       return;
     }

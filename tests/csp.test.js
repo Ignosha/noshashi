@@ -28,6 +28,18 @@ describe("the website's Content-Security-Policy", () => {
   });
 });
 
+describe("the Academy lab workstation's policy", () => {
+  it("is the site's policy, except that the Academy may frame it", () => {
+    const rules = JSON.parse(readFileSync("vercel.json", "utf8")).headers;
+    const workstation = rules
+      .find((h) => h.source === "/academy/app/workstation/(.*)")
+      .headers.find((h) => h.key === "Content-Security-Policy").value;
+    expect(workstation).toBe(csp.replace("frame-ancestors 'none'", "frame-ancestors 'self'"));
+    // Vercel applies matching rules in order, so the override must come after the catch-all.
+    expect(rules.findIndex((h) => h.source === "/academy/app/workstation/(.*)")).toBeGreaterThan(rules.findIndex((h) => h.source === "/(.*)"));
+  });
+});
+
 describe("moving inline scripts out", () => {
   it("replaces an inline script with a same-origin file of the same content, in place", () => {
     const { html, files } = externalizeInlineScripts('<p>a</p><script>var x=1;</script><p>b</p>');
