@@ -15,7 +15,7 @@
 export type Tier = "issuer" | "standard" | "quarterly" | "audit" | "test";
 
 export const TIERS: Record<Tier, { name: string; cents: number; cadence: "once" | "quarterly" | "monthly"; limits: { issuers: number; wallets: number; books: number } }> = {
-  issuer: { name: "Issuer check", cents: 75_000, cadence: "once", limits: { issuers: 1, wallets: 3, books: 1 } },
+  issuer: { name: "Issuer check", cents: 95_000, cadence: "once", limits: { issuers: 1, wallets: 3, books: 1 } },
   standard: { name: "Standard", cents: 250_000, cadence: "once", limits: { issuers: 3, wallets: 10, books: 3 } },
   quarterly: { name: "Quarterly", cents: 750_000, cadence: "quarterly", limits: { issuers: 3, wallets: 10, books: 3 } },
   audit: { name: "Audit support", cents: 1_000_000, cadence: "monthly", limits: { issuers: 6, wallets: 10, books: 6 } },
