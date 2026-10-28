@@ -138,6 +138,8 @@ import { TrayScene } from "@/components/scenes/TrayScene";
 import { useXRPL } from "@/lib/xrpl/useXRPL";
 import { useSetting } from "@/lib/store";
 import { isMac, isTauri, isTrayView } from "@/lib/env";
+import { isTraining } from "@/lib/edition";
+import { TrainingBridge } from "@/lib/training/bridge";
 import { ToastProvider, useToast } from "@/lib/toast";
 import { AppearanceProvider, logicalWidth, useAppearance } from "@/lib/appearance";
 import { AuthProvider, useAuth } from "@/lib/auth/useAuth";
@@ -597,7 +599,9 @@ function ConsoleApp() {
    * boot → the launch sequence, landing → the mission brief,
    * console → the instrument. Returning operators skip the brief.
    */
-  const [stage, setStage] = useState<"boot" | "landing" | "console">("boot");
+  // The Academy's lab workstation opens straight on the console: a lab
+  // step names the screen, so the launch sequence and brief are skipped.
+  const [stage, setStage] = useState<"boot" | "landing" | "console">(isTraining ? "console" : "boot");
   // The board's sidebar is open by default; collapsing is an escape hatch
   // for narrow windows, not the resting state.
   const [railOpen, setRailOpen] = useState(
@@ -613,7 +617,9 @@ function ConsoleApp() {
   // Executive mode shows the scenes that answer the three questions; Analyst
   // shows every tool. New installs start in Executive (progressive
   // disclosure); the choice persists.
-  const [consoleMode, setConsoleMode] = useSetting<"executive" | "analyst">("console.mode", "executive");
+  const [storedMode, setConsoleMode] = useSetting<"executive" | "analyst">("console.mode", "executive");
+  // Labs use every tool, so the training copy always shows Analyst.
+  const consoleMode = isTraining ? "analyst" : storedMode;
   // Whether the operator has picked a view, rather than inheriting the default
   // (the first step of the getting-started guide on Home).
   const [modeChosen, setModeChosen] = useSetting(MODE_CHOSEN_KEY, false);
@@ -969,6 +975,7 @@ function ConsoleApp() {
   return (
     <TooltipProvider delayDuration={220}>
       <HandoffProvider onNavigate={goTo} currentScene={scene}>
+      {isTraining && <TrainingBridge scene={scene} onNavigate={goTo} />}
       <ObserverRunner />
       <StressScheduleRunner />
       <PersonalGuardianRunner />

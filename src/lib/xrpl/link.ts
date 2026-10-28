@@ -15,6 +15,8 @@ const ENDPOINTS = [
 ];
 
 import { RequestPacer } from "./pacer";
+import { isTraining } from "@/lib/edition";
+import { trainingGuard } from "@/lib/training/guard";
 
 const REQUEST_TIMEOUT_MS = 12_000;
 /**
@@ -253,6 +255,18 @@ class XrplLink {
 
   /** Issue a rippled command and await its response, paced. */
   request(command: string, params: Record<string, unknown> = {}): Promise<Record<string, any>> {
+    if (isTraining) {
+      // NOSHASHI Academy's workstation: paid screens read only the labs.
+      try {
+        trainingGuard().admit(command, params);
+      } catch (error) {
+        return Promise.reject(error);
+      }
+      return this.pacer.run(() => this.send(command, params)).then((result) => {
+        trainingGuard().answered(command, params, result);
+        return result;
+      });
+    }
     return this.pacer.run(() => this.send(command, params));
   }
 

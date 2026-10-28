@@ -7,6 +7,23 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { FEATURE_CATALOG, planFor } from "@/lib/billing/catalog";
 import { SPRING } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { useLayoutEffect } from "react";
+import { isTraining } from "@/lib/edition";
+import { trainingGuard } from "@/lib/training/guard";
+
+/**
+ * NOSHASHI Academy's training copy: while a paid surface is on screen,
+ * reads are narrowed to the labs (src/lib/training/guard.ts). A layout
+ * effect, so the narrowing is in place before the surface's own effects
+ * make their first read.
+ */
+function PaidScope({ children }: { children: React.ReactNode }) {
+  useLayoutEffect(() => {
+    trainingGuard().paid(1);
+    return () => trainingGuard().paid(-1);
+  }, []);
+  return <>{children}</>;
+}
 
 /**
  * Gated — the single place a paid capability is checked.
@@ -45,7 +62,7 @@ export function Gated({
     );
   }
 
-  if (has(feature)) return <>{children}</>;
+  if (has(feature)) return isTraining ? <PaidScope>{children}</PaidScope> : <>{children}</>;
 
   return (
     <motion.div

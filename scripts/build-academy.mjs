@@ -51,7 +51,7 @@ export async function buildAcademy(write) {
 <section class="ac-hero">
   <p class="eyebrow">NOSHASHI ACADEMY · FREE</p>
   <h1>Learn NOSHASHI and the XRP Ledger, one small step at a time.</h1>
-  <p>${COURSE.lessons.length} short lessons in ${COURSE.levels.length} levels, about ${minutes} minutes in all. Videos with captions, every card read aloud if you like, a three-question check after each lesson, hands-on labs on the real ledger, and a certificate of completion.</p>
+  <p>${COURSE.lessons.length} short lessons in ${COURSE.levels.length} levels, about ${minutes} minutes in all. Videos with captions, every card read aloud if you like, a three-question check after each lesson, hands-on labs in a lab workstation running the real NOSHASHI console, and a certificate of completion.</p>
   <p class="cta"><a class="btn" href="/academy/app/">Start in your browser</a> ${download}</p>
   <p class="ac-fine">No account, no sign-in, no keys. Your progress stays on your own computer. Works offline: the desktop app carries everything, videos included; in the browser the course keeps working offline after your first visit, and only the videos need a connection. Offline, labs show their recorded ledger readings.</p>
 </section>
@@ -60,7 +60,7 @@ export async function buildAcademy(write) {
   <div><h2>Learn the way you learn</h2><p>Choose watch, listen, read or do. Each lesson starts with that, and nothing is hidden for any style.</p></div>
   <div><h2>Short enough to finish</h2><p>One idea per card, one question at a time, a progress line that always shows how close the end is, and no timers.</p></div>
   <div><h2>Built for everyone</h2><p>Larger text, more spacing, Atkinson Hyperlegible letters for low vision, high contrast, no movement, read-aloud, captions and transcripts, full keyboard use, and break reminders.</p></div>
-  <div><h2>Practise on the real ledger</h2><p>${LABS} labs, one for every NOSHASHI feature, use real mainnet addresses, plus ${TESTNET.cases.length} real testnet payments to check against invoices. Many run right inside the Academy using NOSHASHI's own code.</p></div>
+  <div><h2>A lab workstation, like Packet Tracer</h2><p>${LABS} labs, one for every NOSHASHI feature, run in the lab workstation: the real NOSHASHI console inside the Academy, beside each step's instructions, with objectives that tick off as you do them and CHECK RESULTS to score them. Real mainnet addresses, plus ${TESTNET.cases.length} real testnet payments to check against invoices. No NOSHASHI install needed.</p></div>
 </section>
 
 <section class="ac-course">

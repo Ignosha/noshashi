@@ -2,7 +2,7 @@
 
 interface ImportMetaEnv {
   /** "demo" produces the limited early-release artefact. See src/lib/edition.ts. */
-  readonly VITE_NOSHASHI_EDITION?: "full" | "demo";
+  readonly VITE_NOSHASHI_EDITION?: "full" | "demo" | "training";
 
   /**
    * Supabase origin. Optional: src/lib/supabase/client.ts falls back to the

@@ -858,8 +858,8 @@ function LessonLabs({ lesson, labProgress, onOpenLab }: { lesson: Lesson; labPro
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[12px] text-muted-foreground">
-        Labs use the real app with real XRP Ledger addresses filled in for you. Each step tells you where to go and what to look for, then asks one
-        question.
+        Labs open the lab workstation: the real NOSHASHI console inside the Academy, with real XRP Ledger addresses filled in for you. Each step says
+        what to do and ticks off each objective as you do it, then asks one question.
       </p>
       {lesson.labs.map((id) => {
         const lab = labById(id);

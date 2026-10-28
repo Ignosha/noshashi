@@ -9,15 +9,18 @@ import { LAB_SUBJECTS } from "@/lib/learn/labs";
 import { BENCHES, runInvoice, type BenchResult, type InvoiceRun } from "./benches";
 import { ALL_LABS, labById } from "./labCatalog";
 import { useLocal } from "./useLocal";
+import { WorkstationLab } from "./Workstation";
+import { TESTNET_LAB } from "@/lib/academy/testnetLab";
 
 /**
  * Labs — practising every NOSHASHI feature on the real XRP Ledger.
  *
- * Each step says what to do in NOSHASHI, in its own words and button names,
- * so a trainee who has the app can follow it there. Where the reading needs
- * only the public ledger, a practice bench makes the same reading here with
- * NOSHASHI's own code, on the step's real address, so a trainee without the
- * app still sees live results. Then one question, explained right or wrong.
+ * Every NOSHASHI lab runs in the lab workstation (Workstation.tsx): the real
+ * NOSHASHI console inside the Academy, beside the step's instructions and
+ * objectives, so nothing needs NOSHASHI installed. The testnet invoice lab
+ * reads the XRPL testnet, which the console does not, so it keeps its
+ * practice bench: the same reading made here with NOSHASHI's own code.
+ * Each step ends with one question, explained right or wrong.
  */
 
 /** Invoice checks the mainnet invoice lab runs, exactly as recorded in the shared vectors. */
@@ -66,8 +69,10 @@ export function Labs({ openId, onClose }: { openId: string | null; onClose: () =
     return (
       <div className="flex flex-col gap-3">
         <p className="max-w-[70ch] text-[12.5px] text-muted-foreground">
-          {ALL_LABS.length} labs, one for every NOSHASHI feature. Each uses real XRP Ledger addresses and transactions. Where a lab can read the ledger
-          here, press RUN IT HERE to see live results; if you have NOSHASHI, follow the same steps there.
+          {ALL_LABS.length} labs, one for every NOSHASHI feature, on real XRP Ledger addresses and transactions. Each opens the lab workstation: the real
+          NOSHASHI console inside the Academy, with the instructions beside it and CHECK RESULTS to see what you have done. You do not need NOSHASHI
+          installed. Like NOSHASHI, the workstation reads the public XRP Ledger and NOSHASHI's public sanctions and phishing lists; nothing about you
+          is sent.
         </p>
         <ul className="flex flex-col gap-1.5">
           {ALL_LABS.map((l) => {
@@ -96,6 +101,15 @@ export function Labs({ openId, onClose }: { openId: string | null; onClose: () =
         </ul>
       </div>
     );
+  }
+
+  const done = (key: string) => setProgress(completeStep(progress, key, Date.now()));
+  const back = () => {
+    setLabId(null);
+    onClose();
+  };
+  if (lab.id !== TESTNET_LAB.id) {
+    return <WorkstationLab key={lab.id} lab={lab} progress={progress} onDone={done} onBack={back} />;
   }
 
   return (
@@ -136,7 +150,6 @@ function LabRun({
         <h2 className="text-[16px] font-semibold text-foreground">{lab.title}</h2>
         <p className="text-[12px] text-muted-foreground">{lab.outcome}</p>
         {lab.note && <p className="mt-1 text-[11px] text-faint">{lab.note}</p>}
-        {lab.requires && <p className="mt-1 text-[11px] text-faint">In NOSHASHI this screen needs a paid plan. The practice bench here is free.</p>}
       </div>
       <p className="font-mono text-[10.5px] tracking-[0.1em] text-faint">
         STEP {at + 1} OF {lab.steps.length}
@@ -164,7 +177,7 @@ function LabRun({
   );
 }
 
-function Values({ step }: { step: LabStep }) {
+export function Values({ step }: { step: LabStep }) {
   const [copied, setCopied] = useState<string | null>(null);
   const values = [...(step.subject ? [{ label: step.subjectLabel ?? "VALUE", value: step.subject }] : []), ...(step.copy ?? [])];
   if (!values.length) return null;
@@ -198,7 +211,7 @@ function Values({ step }: { step: LabStep }) {
   );
 }
 
-function Bench({ lab, step }: { lab: Lab; step: LabStep }) {
+export function Bench({ lab, step }: { lab: Lab; step: LabStep }) {
   const invoice = invoiceRunFor(lab, step);
   const bench = invoice ? { label: "CHECK AGAINST INVOICE", run: () => runInvoice(invoice) } : BENCHES[step.scene];
   const subject = subjectOf(step);
@@ -280,7 +293,7 @@ function Bench({ lab, step }: { lab: Lab; step: LabStep }) {
   );
 }
 
-function Checkpoint({ step, seed, done, onRight }: { step: LabStep; seed: string; done: boolean; onRight: () => void }) {
+export function Checkpoint({ step, seed, done, onRight }: { step: LabStep; seed: string; done: boolean; onRight: () => void }) {
   const q = shuffled(step.check.options, step.check.answer, seed);
   const [picked, setPicked] = useState<number | null>(null);
   return (
