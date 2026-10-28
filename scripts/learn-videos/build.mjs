@@ -217,7 +217,10 @@ const server = http.createServer((q, r) => {
   fs.createReadStream(f).pipe(r);
 }).listen(0);
 const port = server.address().port;
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || "/opt/pw-browsers/chromium" });
+// A preinstalled Chromium (CHROMIUM, or /opt/pw-browsers in some sandboxes)
+// if there is one; otherwise the one `npx playwright install` put in place.
+const preinstalled = [process.env.CHROMIUM, "/opt/pw-browsers/chromium"].find((p) => p && fs.existsSync(p));
+const browser = await chromium.launch(preinstalled ? { executablePath: preinstalled } : {});
 
 for (const video of videos) {
   const tl = timeline(video);
