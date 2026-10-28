@@ -13,6 +13,10 @@
  *                            issued, to whom and when, so an auditor holding
  *                            one can confirm it came from NOSHASHI unaltered.
  *
+ * Email goes through Resend (RESEND_API_KEY; REPORT_FROM overrides the
+ * sender, which must be on a domain verified in Resend). Until the key is
+ * set, nothing is claimed and orders simply wait.
+ *
  * A report whose readings could not all be taken is not sent: it is
  * retried on the next tick, and after MAX_ATTEMPTS the order is handed to
  * the support inbox instead, so a buyer never receives a report with a
@@ -107,7 +111,7 @@ async function sendEmail(message: Json): Promise<{ ok: boolean; status: number; 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: Deno.env.get("REPORT_FROM") || Deno.env.get("SUPPORT_FROM") || "NOSHASHI <support@noshashi.app>", ...message }),
+    body: JSON.stringify({ from: Deno.env.get("REPORT_FROM") || "NOSHASHI Reports <reports@mail.noshashi.app>", ...message }),
   }).catch((error) => ({ ok: false, status: 0, text: async () => String(error) }) as unknown as Response);
   return { ok: response.ok, status: response.status, detail: response.ok ? undefined : (await response.text().catch(() => "")).slice(0, 300) };
 }
@@ -202,6 +206,9 @@ async function deliver(db: Db, delivery: Delivery): Promise<string> {
 }
 
 async function tick(db: Db): Promise<Json> {
+  // Without a way to send, claiming would only spend attempts. Orders wait,
+  // due, and the hourly tick picks them up once the key is set.
+  if (!Deno.env.get("RESEND_API_KEY")) return { processed: 0, waiting: "RESEND_API_KEY is not set" };
   const { data: due, error } = await db.rpc("evidence_reports_claim", { p_limit: PER_TICK });
   if (error) throw error;
   const results: Json[] = [];
