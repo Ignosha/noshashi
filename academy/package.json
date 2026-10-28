@@ -1,0 +1,10 @@
+{
+  "name": "noshashi-academy-app",
+  "private": true,
+  "description": "NOSHASHI Academy's app shell. Dependencies live in the repository root; this file exists so `npm run tauri` run from the Xcode project (academy/src-tauri/gen/apple) and from academy/ drives the Academy, not NOSHASHI. The Academy's own scripts forward to the root.",
+  "scripts": {
+    "tauri": "tauri",
+    "academy:dev": "npm --prefix .. run academy:dev",
+    "academy:build": "npm --prefix .. run academy:build"
+  }
+}
