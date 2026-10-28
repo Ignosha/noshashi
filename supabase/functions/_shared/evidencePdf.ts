@@ -1,7 +1,7 @@
 /**
  * Draws a Ledger Evidence Report (the ReportModel built in
  * ./evidenceReport.ts) as a PDF in noshashi.app's own look: the dark
- * green ground, the lime brand rule, Space Grotesk for text, IBM Plex
+ * green ground (or, for print, the light theme on white), the lime brand rule, Space Grotesk for text, IBM Plex
  * Mono for labels and figures, and the flower mark. US Letter, numbered
  * sections, tables on raised panels, and a footer with the report
  * reference and page numbers on every page.
@@ -24,21 +24,13 @@ const INNER = W - 2 * M;
 const BOTTOM = 70;
 
 const hex = (h: string) => rgb(parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255);
-/* The site's tokens (site/assets/core.css, dark theme). */
-const GROUND = hex("#08100B");
-const SURFACE = hex("#0E1911");
-const ELEVATED = hex("#15251A");
-const INK = hex("#E9F5E7");
-const MUTED = hex("#A7B8A8");
-const FAINT = hex("#718473");
-const RULE = hex("#263B2A");
-const BRAND = hex("#9BE15D");
-const TONES: Record<Exclude<Tone, null>, ReturnType<typeof rgb>> = {
-  good: BRAND,
-  warn: hex("#E7C766"),
-  bad: hex("#FF7B7B"),
-  muted: FAINT,
+/* The site's tokens (site/assets/core.css). "light" is the site's light
+   theme on a white ground, for printing. */
+const PALETTES = {
+  dark: { ground: "#08100B", surface: "#0E1911", elevated: "#15251A", ink: "#E9F5E7", muted: "#A7B8A8", faint: "#718473", rule: "#263B2A", brand: "#9BE15D", hold: "#E7C766", nogo: "#FF7B7B" },
+  light: { ground: "#FFFFFF", surface: "#F2F8F0", elevated: "#E5F0E2", ink: "#0B160D", muted: "#3F5843", faint: "#55705A", rule: "#C4D7C5", brand: "#247A3B", hold: "#8B6500", nogo: "#B42332" },
 };
+export type PdfTheme = keyof typeof PALETTES;
 
 type Fonts = { sans: PDFFont; bold: PDFFont; mono: PDFFont; monoBold: PDFFont; custom: boolean };
 
@@ -100,7 +92,10 @@ async function loadFonts(doc: PDFDocument, a: PdfAssets): Promise<Fonts> {
   };
 }
 
-export async function renderPdf(model: ReportModel, assets: PdfAssets = {}): Promise<Uint8Array> {
+export async function renderPdf(model: ReportModel, assets: PdfAssets = {}, theme: PdfTheme = "dark"): Promise<Uint8Array> {
+  const p = PALETTES[theme];
+  const [GROUND, SURFACE, ELEVATED, INK, MUTED, FAINT, RULE, BRAND] = [p.ground, p.surface, p.elevated, p.ink, p.muted, p.faint, p.rule, p.brand].map(hex);
+  const TONES: Record<Exclude<Tone, null>, ReturnType<typeof rgb>> = { good: BRAND, warn: hex(p.hold), bad: hex(p.nogo), muted: FAINT };
   const doc = await PDFDocument.create();
   doc.setTitle(`${model.title} ${model.meta[0]?.[1] ?? ""}`.trim());
   doc.setAuthor("NOSHASHI");
@@ -299,13 +294,13 @@ export async function renderPdf(model: ReportModel, assets: PdfAssets = {}): Pro
 
   // ── Footer on every page ──
   const pages = doc.getPages();
-  pages.forEach((p, i) => {
-    page = p;
-    p.drawLine({ start: { x: M, y: 46 }, end: { x: W - M, y: 46 }, thickness: 0.6, color: RULE });
+  pages.forEach((pg, i) => {
+    page = pg;
+    pg.drawLine({ start: { x: M, y: 46 }, end: { x: W - M, y: 46 }, thickness: 0.6, color: RULE });
     const label = wrap(c(model.footer), f.sans, 7.5, INNER - 80)[0];
-    p.drawText(label, { x: M, y: 30, size: 7.5, font: f.sans, color: FAINT });
+    pg.drawText(label, { x: M, y: 30, size: 7.5, font: f.sans, color: FAINT });
     const n = `${String(i + 1).padStart(2, "0")} / ${String(pages.length).padStart(2, "0")}`;
-    p.drawText(n, { x: W - M - f.mono.widthOfTextAtSize(n, 7.5), y: 30, size: 7.5, font: f.mono, color: FAINT });
+    pg.drawText(n, { x: W - M - f.mono.widthOfTextAtSize(n, 7.5), y: 30, size: 7.5, font: f.mono, color: FAINT });
   });
 
   return await doc.save();

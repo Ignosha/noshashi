@@ -410,12 +410,12 @@ export function emailText(e: EmailInput): string {
   return [
     "Hello,",
     "",
-    `Your Ledger Evidence Report${e.organization ? ` for ${e.organization}` : ""} is attached as a PDF${e.periodEnd ? `, with treasury holdings as at ${fmtDate(`${e.periodEnd}T12:00:00Z`)}` : ""}.`,
+    `Your Ledger Evidence Report${e.organization ? ` for ${e.organization}` : ""} is attached as a PDF${e.periodEnd ? `, with treasury holdings as at ${fmtDate(`${e.periodEnd}T12:00:00Z`)}` : ""}. A light copy for printing is attached too.`,
     "",
     "What stood out:",
     ...e.findings.map((f) => `  • ${f}`),
     "",
-    "The second attachment is the evidence file: every reply the XRP Ledger gave us, exactly as received. Your auditor can confirm the report is genuine and unchanged by entering its fingerprint at noshashi.app/evidence-report/verify:",
+    "The last attachment is the evidence file: every reply the XRP Ledger gave us, exactly as received. Your auditor can confirm the report is genuine and unchanged by entering its fingerprint at noshashi.app/evidence-report/verify:",
     `  ${e.digest}`,
     "",
     "If anything in the report raises a question, just reply to this email.",
@@ -455,7 +455,7 @@ export function emailHtml(e: EmailInput): string {
 <div style="${label};margin:0 0 8px">Ledger Evidence Report</div>
 <div style="font-family:${sans};font-size:24px;font-weight:600;line-height:1.2;letter-spacing:-0.4px;color:#E9F5E7;margin:0 0 22px">${e.organization ? `Prepared for ${escHtml(e.organization)}` : "Your report is ready"}</div>
 <p style="margin:0 0 14px;color:#E9F5E7">Hello,</p>
-<p style="margin:0 0 20px;color:#A7B8A8">Your Ledger Evidence Report is attached as a PDF${e.periodEnd ? `, with treasury holdings as at ${escHtml(fmtDate(`${e.periodEnd}T12:00:00Z`))}` : ""}. Every statement in it was read directly from the XRP Ledger and is stamped with the ledger it came from.</p>
+<p style="margin:0 0 20px;color:#A7B8A8">Your Ledger Evidence Report is attached as a PDF${e.periodEnd ? `, with treasury holdings as at ${escHtml(fmtDate(`${e.periodEnd}T12:00:00Z`))}` : ""}, with a light copy for printing. Every statement in it was read directly from the XRP Ledger and is stamped with the ledger it came from.</p>
 <div style="${label};margin:0 0 10px">What stood out</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 22px">${e.findings
     .map(
@@ -463,7 +463,7 @@ export function emailHtml(e: EmailInput): string {
         `<tr><td valign="top" style="width:18px;padding:7px 0 0;background:#0E1911"><div style="width:6px;height:6px;background:#9BE15D;font-size:0;line-height:0">&nbsp;</div></td><td style="padding:0 0 10px;font-family:${sans};font-size:14.5px;line-height:1.6;color:#E9F5E7;background:#0E1911">${escHtml(f)}</td></tr>`,
     )
     .join("")}</table>
-<p style="margin:0 0 20px;color:#A7B8A8">The second attachment is the evidence file: every reply the XRP Ledger gave us, exactly as received. Anyone, your auditor included, can confirm the report is genuine and unchanged from its fingerprint.</p>
+<p style="margin:0 0 20px;color:#A7B8A8">The last attachment is the evidence file: every reply the XRP Ledger gave us, exactly as received. Anyone, your auditor included, can confirm the report is genuine and unchanged from its fingerprint.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 26px"><tr><td style="background:#9BE15D;border-radius:10px">
 <a href="${escHtml(verify)}" style="display:inline-block;padding:12px 22px;font-family:${sans};font-size:14px;font-weight:600;color:#08100B;text-decoration:none">Verify this report</a></td></tr></table>
 <p style="margin:0 0 14px;color:#A7B8A8">If anything in the report raises a question, just reply to this email.</p>

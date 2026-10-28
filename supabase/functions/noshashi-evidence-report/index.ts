@@ -194,7 +194,10 @@ async function deliver(db: Db, delivery: Delivery): Promise<string> {
   const evidence = evidenceOf(sources);
   const digest = await sha256(evidence);
   const input = { reference, tier: order.tier, organization: order.organization, scope: order, periodEnd: delivery.period_end, generatedAt, sources, digest };
-  const pdf = await renderPdf(reportModel(input), await brandAssets());
+  const model = reportModel(input);
+  const assets = await brandAssets();
+  const pdf = await renderPdf(model, assets);
+  const printPdf = await renderPdf(model, assets, "light");
   const letter = { reference, organization: order.organization, periodEnd: delivery.period_end, digest, findings: findings(sources), tier: order.tier };
   const file = `NOSHASHI-Ledger-Evidence-Report-${reference}`;
 
@@ -207,6 +210,7 @@ async function deliver(db: Db, delivery: Delivery): Promise<string> {
     text: emailText(letter),
     attachments: [
       { filename: `${file}.pdf`, content: base64(pdf) },
+      { filename: `${file}-print.pdf`, content: base64(printPdf) },
       { filename: `${file}-evidence.json`, content: base64(evidence) },
     ],
   });
