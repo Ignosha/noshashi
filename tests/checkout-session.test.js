@@ -307,6 +307,18 @@ describe("the Ledger Evidence Report", () => {
     expect(res.statusCode).toBe(200);
   });
 
+  it("holds the Issuer check to one issuer and charges $750", async () => {
+    let res = mockRes();
+    await handler(report({ tier: "issuer", issuers: [ISSUER, "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq"].join(",") }), res);
+    expect(res.statusCode).toBe(400);
+    expect(sent).toBeUndefined();
+    res = mockRes();
+    await handler(report({ tier: "issuer", issuers: ISSUER, wallets: WALLET }), res);
+    expect(res.statusCode).toBe(200);
+    expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("75000");
+    expect(stripeForm().allow_promotion_codes).toBe("false");
+  });
+
   it("refuses a malformed order book or period end", async () => {
     for (const fields of [{ wallets: WALLET, books: "XRP." + ISSUER }, { wallets: WALLET, books: "USD" }, { wallets: WALLET, period_end: "30/09/2026" }]) {
       const res = mockRes();

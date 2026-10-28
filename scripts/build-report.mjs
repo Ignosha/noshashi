@@ -1,5 +1,5 @@
 /*
- * The Ledger Evidence Report, in three tiers (api/_lib/evidence-tiers.js),
+ * The Ledger Evidence Report, in four tiers (api/_lib/evidence-tiers.js),
  * built and emailed automatically once Stripe confirms the payment.
  *
  *   /evidence-report/          the tiers, what it is and is not, and the order form
@@ -24,7 +24,7 @@ import { EVIDENCE_TIERS, DEFAULT_TIER } from "../api/_lib/evidence-tiers.js";
 
 const FUNCTIONS = "https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1";
 const usd = (cents) => `$${(cents / 100).toLocaleString("en-US")}`;
-const FROM = usd(EVIDENCE_TIERS.standard.cents);
+const FROM = usd(Math.min(...Object.values(EVIDENCE_TIERS).filter((t) => !t.hidden).map((t) => t.cents)));
 /** The builder previews the largest scope any tier allows. */
 const REPORT_LIMITS = Object.values(EVIDENCE_TIERS).reduce(
   (m, t) => ({ issuers: Math.max(m.issuers, t.limits.issuers), wallets: Math.max(m.wallets, t.limits.wallets), books: Math.max(m.books, t.limits.books) }),
@@ -60,6 +60,7 @@ const COMMON_JS = `
 `;
 
 const TIER_COPY = {
+  issuer: "One report on a single token issuer, for a project to show holders, exchanges and partners. 1 issuer, up to 3 team or treasury wallets and its order book.",
   standard: "One report, at your period end or today. Up to 3 issuers, 10 wallets and 3 order books.",
   quarterly: "A report now, then one the day after each of the next four quarter-ends. Same scope as Standard.",
   audit: "A report now, then one the day after each of the next twelve month-ends. Up to 6 issuers, 10 wallets and 6 order books.",
