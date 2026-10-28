@@ -39,7 +39,7 @@ function clean(text: string, custom: boolean): string {
   const t = text.replace(/→/g, "->").replace(/≤/g, "<=").replace(/≥/g, ">=");
   return custom
     ? t
-    : t.replace(/[^\x09\x0A\x0D\x20-\x7E -ÿ–—‘’“”•…€™]/g, "?");
+    : t.replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF\u2013\u2014\u2018\u2019\u201C\u201D\u2022\u2026\u20AC\u2122]/g, "?");
 }
 
 function wrap(text: string, font: PDFFont, size: number, width: number): string[] {
