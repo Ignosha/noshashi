@@ -33,6 +33,21 @@ async function waitFor(page, test, ms) {
   return false;
 }
 
+/** Press the screen's own action button (the first enabled one), as a trainee would. Returns its label. */
+async function pressAction(frame) {
+  const buttons = frame.locator("main button:visible");
+  const count = await buttons.count();
+  for (let i = 0; i < count; i += 1) {
+    const b = buttons.nth(i);
+    const text = ((await b.innerText().catch(() => "")) || "").trim();
+    if (ACTION.test(text) && (await b.isEnabled().catch(() => false))) {
+      await b.click().catch(() => undefined);
+      return text;
+    }
+  }
+  return null;
+}
+
 async function workstationLab(page, title, report) {
   const frame = page.frameLocator('iframe[title^="NOSHASHI lab workstation"]');
   const steps = await page.locator('nav[aria-label="Steps"] button').count();
@@ -70,17 +85,13 @@ async function workstationLab(page, title, report) {
           }
         }
       }
-      const buttons = frame.locator("main button:visible");
-      const count = await buttons.count();
-      for (let i = 0; i < count && !pressed; i += 1) {
-        const b = buttons.nth(i);
-        const text = ((await b.innerText().catch(() => "")) || "").trim();
-        if (ACTION.test(text) && (await b.isEnabled().catch(() => false))) {
-          await b.click().catch(() => undefined);
-          pressed = text;
-        }
-      }
+      pressed = await pressAction(frame);
       done = await waitFor(page, met, 90000);
+      // A public node that times out is answered the way a trainee would: press again.
+      if (!done && /Timed out/i.test((await frame.locator("main").innerText().catch(() => "")) || "")) {
+        pressed = (await pressAction(frame)) ?? pressed;
+        done = await waitFor(page, met, 90000);
+      }
     }
     const o = await objectives(page);
     const blocked = await page.getByRole("alert").innerText().catch(() => "");
