@@ -94,3 +94,21 @@ export const testnetInvoice = (stepId: string) => {
   const c = byId(stepId);
   return c ? { network: "testnet" as const, hash: c.hash, invoice: c.invoice as Record<string, unknown> } : null;
 };
+
+/** What the recording says a testnet step's check decided, for showing offline. */
+export const testnetRecorded = (stepId: string) => {
+  const c = byId(stepId);
+  return c
+    ? {
+        headline: `${c.status} · ${c.reason_code}`,
+        rows: [
+          ["Network", "testnet"],
+          ["Ledger", c.ledger_index.toLocaleString("en-US")],
+          ["Requested", c.requested],
+          ["Delivered", c.delivered ?? "—"],
+          ["Read from", c.sources.join(" and ")],
+          ["Recorded", recording.recorded_at.slice(0, 10)],
+        ] as Array<[string, string]>,
+      }
+    : null;
+};

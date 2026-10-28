@@ -27,7 +27,7 @@
     "noshrepair:build": "tsc -p noshrepair --noEmit && vite build --config noshrepair/vite.config.mts",
     "noshrepair:tauri": "cd noshrepair && tauri",
     "academy:dev": "vite --config academy/vite.config.mts",
-    "academy:build": "tsc -p academy --noEmit && vite build --config academy/vite.config.mts",
+    "academy:build": "tsc -p academy --noEmit && vite build --config academy/vite.config.mts && node scripts/academy-videos.mjs",
     "academy:tauri": "cd academy && tauri",
     "site:academy": "vite build --config academy/vite.web.config.mts",
     "test": "vitest run",

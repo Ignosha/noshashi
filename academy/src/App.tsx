@@ -2,6 +2,8 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { AcademyPanel } from "./AcademyPanel";
 import { Labs } from "./Labs";
+import { useOnline } from "./useOnline";
+import { isTauri } from "@/lib/env";
 
 /**
  * NOSHASHI Academy — a separate desktop app for learning NOSHASHI and the
@@ -15,6 +17,7 @@ type Tab = "course" | "labs";
 export default function App() {
   const [tab, setTab] = useState<Tab>("course");
   const [openLab, setOpenLab] = useState<string | null>(null);
+  const online = useOnline();
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <a href="#main" className="skip-link rounded bg-brand px-3 py-1.5 text-primary-foreground">
@@ -48,8 +51,15 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <p className="ml-auto hidden text-[11px] text-faint sm:block">Free · no account · your progress stays on this computer</p>
+        <p className="ml-auto hidden text-[11px] text-faint sm:block">Free · works offline · your progress stays on this computer</p>
       </header>
+      {!online && (
+        <p role="status" className="border-b border-hold/40 bg-hold/10 px-5 py-2 text-[12px] text-foreground">
+          {isTauri
+            ? "You are offline. Lessons, videos, read-aloud, checks, the final check and your certificate all work. Lab readings show what was recorded until you reconnect."
+            : "You are offline. Lessons, read-aloud, checks, the final check and your certificate all work. Videos need a connection here (the desktop app has them built in), and lab readings show what was recorded."}
+        </p>
+      )}
       <main id="main" className="mx-auto w-full max-w-[1000px] flex-1 px-5 py-5">
         {tab === "course" ? (
           <AcademyPanel

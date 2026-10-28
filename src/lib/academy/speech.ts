@@ -19,6 +19,10 @@ export function speak(text: string, rate = 1, onEnd?: () => void): void {
   const u = new SpeechSynthesisUtterance(spoken(text));
   u.rate = Math.min(1.4, Math.max(0.6, rate));
   u.lang = "en-US";
+  // Prefer a voice installed on this computer: it works offline and sends
+  // nothing anywhere. Some browsers default to an online voice otherwise.
+  const local = window.speechSynthesis.getVoices().find((v) => v.localService && v.lang.toLowerCase().startsWith("en"));
+  if (local) u.voice = local;
   u.onend = () => onEnd?.();
   u.onerror = () => onEnd?.();
   window.speechSynthesis.speak(u);

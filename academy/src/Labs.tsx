@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Lab, LabStep } from "@/lib/learn/labs";
 import { completeStep, labStatus, sanitizeProgress, shuffled, stepKey } from "@/lib/learn/labProgress";
-import { testnetInvoice } from "@/lib/academy/testnetLab";
+import { testnetInvoice, testnetRecorded } from "@/lib/academy/testnetLab";
+import { useOnline } from "./useOnline";
 import { LAB_SUBJECTS } from "@/lib/learn/labs";
 import { BENCHES, runInvoice, type BenchResult, type InvoiceRun } from "./benches";
 import { ALL_LABS, labById } from "./labs";
@@ -23,6 +24,11 @@ import { useLocal } from "./useLocal";
 const CSC = {
   destination: LAB_SUBJECTS.cscDestination,
   asset: { kind: "issued", currency: "CSC", issuer: LAB_SUBJECTS.cscIssuer },
+};
+/** What the mainnet invoice runs decided when recorded (tests/fixtures/payment-verify-vectors.json). */
+const INVOICE_RECORDED: Record<string, string> = {
+  "invoice/rejected": "REJECTED · PARTIAL_NOT_PERMITTED",
+  "invoice/verified": "VERIFIED · SETTLED_PARTIAL_PERMITTED",
 };
 const INVOICE_RUNS: Record<string, InvoiceRun> = {
   "invoice/rejected": {
@@ -196,20 +202,40 @@ function Bench({ lab, step }: { lab: Lab; step: LabStep }) {
   const invoice = invoiceRunFor(lab, step);
   const bench = invoice ? { label: "CHECK AGAINST INVOICE", run: () => runInvoice(invoice) } : BENCHES[step.scene];
   const subject = subjectOf(step);
+  const online = useOnline();
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<BenchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   if (!bench || (!invoice && !subject && step.scene !== "network")) {
     return <p className="text-[11px] text-faint">This step happens in NOSHASHI itself; read what to look for, then answer the question below.</p>;
   }
+  // Offline, or the ledger did not answer: show what was recorded instead.
+  // Every lab step already states its recorded reading and the ledger it
+  // was read at; invoice steps also carry the verdict they were recorded with.
+  const recorded = (): BenchResult => {
+    const key = stepKey(lab.id, step.id);
+    const t = lab.id === "invoice-testnet" ? testnetRecorded(step.id) : null;
+    if (t) return { headline: `Recorded: ${t.headline}`, rows: t.rows, findings: [] };
+    return {
+      headline: INVOICE_RECORDED[key] ? `Recorded: ${INVOICE_RECORDED[key]}` : "Recorded reading",
+      rows: [],
+      findings: [{ id: "recorded", severity: "info", title: "As recorded", detail: step.lookFor }],
+    };
+  };
   const run = async () => {
     setBusy(true);
     setError(null);
+    if (!online) {
+      setResult(recorded());
+      setError("You are offline, so this is the reading recorded when the lab was written. Connect and run it again for a live reading.");
+      setBusy(false);
+      return;
+    }
     try {
       setResult(await bench.run(subject ?? ""));
-    } catch (e) {
-      setResult(null);
-      setError(e instanceof Error ? e.message : "The ledger could not be read just now. Try again in a moment.");
+    } catch {
+      setResult(recorded());
+      setError("The ledger could not be reached, so this is the recorded reading. Try again when you are connected for a live one.");
     } finally {
       setBusy(false);
     }
@@ -218,12 +244,16 @@ function Bench({ lab, step }: { lab: Lab; step: LabStep }) {
     <div className="flex flex-col gap-2 rounded-[4px] bg-brand/5 px-3 py-2.5">
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" onClick={() => void run()} disabled={busy}>
-          {busy ? "READING THE LEDGER…" : `RUN IT HERE: ${bench.label}`}
+          {busy ? "READING THE LEDGER…" : online ? `RUN IT HERE: ${bench.label}` : "SHOW THE RECORDED READING"}
         </Button>
-        <span className="text-[11px] text-faint">Live from the XRP Ledger{invoice?.network === "testnet" ? " testnet" : ""}, using NOSHASHI's own code.</span>
+        <span className="text-[11px] text-faint">
+          {online
+            ? `Live from the XRP Ledger${invoice?.network === "testnet" ? " testnet" : ""}, using NOSHASHI's own code.`
+            : "Offline: shows the real reading recorded for this step."}
+        </span>
       </div>
       <div aria-live="polite">
-        {error && <p className="text-[12px] text-no-go">{error}</p>}
+        {error && <p className="text-[12px] text-hold">{error}</p>}
         {result && (
           <div className="flex flex-col gap-1.5">
             <p className="text-[13px] font-semibold text-foreground">{result.headline}</p>

@@ -4,7 +4,7 @@ import "@fontsource/atkinson-hyperlegible/latin-700.css";
 import { Panel } from "@/components/nova/Panel";
 import { Button } from "@/components/ui/button";
 import { useLocal } from "./useLocal";
-import { openExternal } from "@/lib/external";
+import { isTauri } from "@/lib/env";
 import { saveTextFile } from "@/lib/export";
 import { cn } from "@/lib/utils";
 import { ALL_LABS as LABS, labById } from "./labs";
@@ -64,7 +64,6 @@ import videos from "../../site/learn/videos/videos.json";
  * hands real mainnet values to the real screens.
  */
 
-const SITE = "https://www.noshashi.app";
 const VIDEO = new Map(videos.map((v) => [v.id, v]));
 // Captions ship inside the app, a few kilobytes each, so they work without
 // asking the website for anything but the video itself.
@@ -636,11 +635,42 @@ function Cards({ lesson, access, onSeen, onDone }: { lesson: Lesson; access: Acc
   );
 }
 
+/**
+ * Where a video comes from. The desktop app carries the videos inside it
+ * (scripts/academy-videos.mjs copies them in at build time), so they play
+ * with no connection. They are read into a blob first because some desktop
+ * webviews only play video served with byte ranges, which the app's own
+ * asset server does not offer. On the website they are same-origin files.
+ */
+function useVideoSource(id: string) {
+  const [src, setSrc] = useState<string | null>(isTauri ? null : `/learn/videos/${id}.mp4`);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (!isTauri) return;
+    let url: string | null = null;
+    let cancelled = false;
+    fetch(`/videos/${id}.mp4`)
+      .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+      .then((b) => {
+        if (cancelled) return;
+        url = URL.createObjectURL(b);
+        setSrc(url);
+      })
+      .catch(() => !cancelled && setFailed(true));
+    return () => {
+      cancelled = true;
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [id]);
+  return { src, failed, poster: isTauri ? `/videos/${id}.jpg` : `/learn/videos/${id}.jpg` };
+}
+
 function LessonVideo({ id }: { id: string }) {
   const meta = VIDEO.get(id)!;
   const vtt = captionsFor(id);
   const track = useMemo(() => (vtt ? URL.createObjectURL(new Blob([vtt], { type: "text/vtt" })) : null), [vtt]);
   useEffect(() => () => (track ? URL.revokeObjectURL(track) : undefined), [track]);
+  const { src, failed, poster } = useVideoSource(id);
   const [showText, setShowText] = useState(false);
   const transcript = useMemo(
     () =>
@@ -655,19 +685,18 @@ function LessonVideo({ id }: { id: string }) {
       <p className="text-[12px] text-muted-foreground">
         {meta.title} · {Math.floor(meta.secs / 60)}:{String(meta.secs % 60).padStart(2, "0")} · captions on. {meta.blurb}
       </p>
-      <video controls preload="metadata" poster={`${SITE}/learn/videos/${id}.jpg`} className="w-full max-w-[720px] rounded-[4px] border border-border/60 bg-black" aria-label={meta.title}>
-        <source src={`${SITE}/learn/videos/${id}.mp4`} type="video/mp4" />
-        {track && <track kind="captions" src={track} srcLang="en" label="English" default />}
-      </video>
-      <p className="text-[11px] text-faint">
-        The video plays from noshashi.app, so it needs an internet connection. The words are below if it will not play.
-      </p>
+      {src ? (
+        <video controls preload="metadata" poster={poster} className="w-full max-w-[720px] rounded-[4px] border border-border/60 bg-black" aria-label={meta.title}>
+          <source src={src} type="video/mp4" />
+          {track && <track kind="captions" src={track} srcLang="en" label="English" default />}
+        </video>
+      ) : (
+        <p className="text-[12px] text-muted-foreground">{failed ? "This video could not be loaded. The words are below." : "Loading the video…"}</p>
+      )}
+      <p className="text-[11px] text-faint">The words of the video are below too, for reading at your own pace.</p>
       <div>
         <Button variant="outline" size="sm" onClick={() => setShowText(!showText)} aria-expanded={showText}>
           {showText ? "HIDE THE WORDS" : "READ THE WORDS INSTEAD"}
-        </Button>
-        <Button variant="link" size="sm" onClick={() => void openExternal(`${SITE}/learn/videos/${id}.mp4`)}>
-          Open in browser
         </Button>
       </div>
       {showText && (
