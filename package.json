@@ -26,6 +26,10 @@
     "noshrepair:dev": "vite --config noshrepair/vite.config.mts",
     "noshrepair:build": "tsc -p noshrepair --noEmit && vite build --config noshrepair/vite.config.mts",
     "noshrepair:tauri": "cd noshrepair && tauri",
+    "academy:dev": "vite --config academy/vite.config.mts",
+    "academy:build": "tsc -p academy --noEmit && vite build --config academy/vite.config.mts",
+    "academy:tauri": "cd academy && tauri",
+    "site:academy": "vite build --config academy/vite.web.config.mts",
     "test": "vitest run",
     "test:sql": "scripts/test-sql.sh",
     "test:watch": "vitest",
@@ -34,9 +38,11 @@
     "check:garden": "node scripts/build-garden-field.mjs --check",
     "check:intelligence": "node scripts/build-intelligence.mjs --check",
     "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg",
-    "check:noshx-web": "npm run -s site:noshx && git diff --exit-code --stat site/assets/noshx && test -z \"$(git status --porcelain site/assets/noshx)\""
+    "check:noshx-web": "npm run -s site:noshx && git diff --exit-code --stat site/assets/noshx && test -z \"$(git status --porcelain site/assets/noshx)\"",
+    "check:academy-web": "npm run -s site:academy && git diff --exit-code --stat site/academy/app && test -z \"$(git status --porcelain site/academy/app)\""
   },
   "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "^5.2.6",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.1.6",
     "@radix-ui/react-label": "^2.1.2",

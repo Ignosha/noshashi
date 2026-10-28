@@ -378,3 +378,41 @@ export function recordFromLink(fragment: string): CertificateRecord | null {
     return null;
   }
 }
+
+const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+/**
+ * The certificate as a standalone page: opens in any browser, prints to
+ * one landscape page, and carries the link that re-checks its code.
+ */
+export function certificateHtml(record: CertificateRecord, code: string): string {
+  const e = escapeHtml;
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Certificate of Completion · ${e(record.name)}</title>
+<style>
+@page{size:landscape;margin:12mm}
+body{margin:0;font-family:Georgia,"Times New Roman",serif;background:#f7f5ef;color:#14161a}
+main{max-width:900px;margin:24px auto;padding:48px 56px;border:3px double #1c6b5a;background:#fff;text-align:center}
+.k{font:600 12px/1.4 system-ui,sans-serif;letter-spacing:.22em;color:#1c6b5a}
+h1{font-size:34px;margin:14px 0 4px}.name{font-size:36px;margin:8px 0 6px;font-weight:600}
+p{font-size:16px;line-height:1.6;margin:8px auto;max-width:62ch}
+.code{font:600 18px/1.4 ui-monospace,monospace;letter-spacing:.14em;margin-top:22px}
+.hash{font:11px/1.4 ui-monospace,monospace;color:#555;word-break:break-all}
+.fine{font:12px/1.5 system-ui,sans-serif;color:#555;margin-top:22px}
+a{color:#1c6b5a}
+</style></head>
+<body><main>
+<div class="k">NOSHASHI ACADEMY</div>
+<h1>Certificate of Completion</h1>
+<p>This certifies that</p>
+<div class="name">${e(record.name)}</div>
+<p>completed the NOSHASHI course on the XRP Ledger and the NOSHASHI app: ${record.lessons_passed} of ${record.lessons_total} lessons passed, final check ${record.exam_percent}%, ${record.labs_completed} of ${record.labs_total} hands-on labs completed.</p>
+<p>Completed on ${e(record.completed_on)} · course ${e(record.course)}</p>
+<div class="code">CODE ${shortCode(code)}</div>
+<div class="hash">SHA-256 ${code}</div>
+<p class="fine">A record of a completed self-paced course. It is not a professional licence, an accreditation, a regulatory qualification or an offer of employment.<br>
+Check it: <a href="${verifyLink(record)}">${e(verifyLink(record).slice(0, 60))}…</a> recomputes the code from what this certificate states.</p>
+</main></body></html>
+`;
+}

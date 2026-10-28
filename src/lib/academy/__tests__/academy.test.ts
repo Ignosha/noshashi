@@ -24,6 +24,7 @@ import {
   verifyLink,
 } from "../academy";
 import { LABS } from "@/lib/learn/labs";
+import { TESTNET_LAB } from "../testnetLab";
 import videos from "../../../../site/learn/videos/videos.json";
 
 /** The website's knowledge check, read from the script the page runs. */
@@ -72,7 +73,7 @@ describe("course content", () => {
   });
 
   it("links only to labs and videos that exist", () => {
-    const labIds = new Set(LABS.map((l) => l.id));
+    const labIds = new Set([...LABS, TESTNET_LAB].map((l) => l.id));
     const videoIds = new Set(videos.map((v) => v.id));
     for (const l of LESSONS) {
       for (const lab of l.labs) expect(labIds.has(lab), `${l.id} → ${lab}`).toBe(true);
@@ -229,5 +230,28 @@ describe("certificate of completion", () => {
     expect(back).toEqual(record);
     expect(canonical(back)).toBe(canonical(record));
     expect(recordFromLink("#garbage")).toBeNull();
+  });
+});
+
+describe("the testnet lab", () => {
+  it("has one well-formed step per recorded testnet payment", () => {
+    expect(TESTNET_LAB.steps.length).toBeGreaterThanOrEqual(5);
+    for (const step of TESTNET_LAB.steps) {
+      expect(new Set(step.check.options).size, step.id).toBe(step.check.options.length);
+      expect(step.copy?.[0].value, step.id).toMatch(/^[0-9A-F]{64}$/);
+    }
+  });
+
+  it("states exactly what the recording says each check decided", async () => {
+    const { TESTNET } = await import("../testnetLab");
+    expect(TESTNET.network).toBe("testnet");
+    for (const c of TESTNET.cases) {
+      const step = TESTNET_LAB.steps.find((s) => s.id === c.id)!;
+      expect(step.lookFor).toContain(c.status);
+      expect(step.lookFor).toContain(c.reason_code);
+      expect(c.sources.length, c.id).toBe(2);
+    }
+    const status = Object.fromEntries(TESTNET.cases.map((c) => [c.id, c.status]));
+    expect(status).toMatchObject({ paid: "VERIFIED", "wrong-tag": "REJECTED", underpaid: "REJECTED", overpaid: "HOLD", partial: "REJECTED" });
   });
 });

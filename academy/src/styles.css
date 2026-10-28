@@ -1,0 +1,32 @@
+/* NOSHASHI's own theme, so the Academy looks like the app it teaches. */
+@import "../../src/index.css";
+@source "../../src";
+@source "./";
+
+/* Respect the system's reduced-motion setting (WCAG 2.3.3). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Reading comfort settings chosen in the Academy. */
+.academy-contrast :is(p, span, li, dd, label, legend) { color: hsl(var(--foreground)) !important; }
+.academy-contrast :is(button, input, select, article, dl > div) { border-color: hsl(var(--foreground) / 0.75) !important; }
+.academy-still *, .academy-still *::before, .academy-still *::after { transition: none !important; animation: none !important; }
+
+/* Headings that take focus for screen readers get no ring; they are not controls. */
+:is(h1, h2, h3)[tabindex="-1"]:focus { outline: none; box-shadow: none; }
+
+/* A visible skip link for keyboard users. */
+.skip-link { position: absolute; left: -9999px; top: 8px; }
+.skip-link:focus { left: 8px; z-index: 50; }
+
+@media print {
+  body:has(.academy-certificate) * { visibility: hidden; }
+  .academy-certificate, .academy-certificate * { visibility: visible; }
+  .academy-certificate { position: absolute; inset: 0 0 auto 0; background: #fff; color: #000; }
+}

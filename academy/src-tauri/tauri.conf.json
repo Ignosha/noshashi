@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "NOSHASHI Academy",
+  "version": "0.1.0",
+  "identifier": "app.noshashi.academy",
+  "build": {
+    "beforeDevCommand": "npm run academy:dev",
+    "devUrl": "http://localhost:1440",
+    "beforeBuildCommand": "npm run academy:build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https://www.noshashi.app; connect-src 'self' ipc: http://ipc.localhost wss://xrplcluster.com wss://s1.ripple.com wss://s2.ripple.com wss://xrpl.ws wss://s.altnet.rippletest.net:51233 wss://testnet.xrpl-labs.com; media-src https://www.noshashi.app blob:; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; worker-src 'none'",
+      "dangerousDisableAssetCspModification": false,
+      "freezePrototype": true
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Education",
+    "shortDescription": "Learn NOSHASHI and the XRP Ledger",
+    "longDescription": "A self-paced course with videos, read-aloud, checks, hands-on labs on the live XRP Ledger, and a certificate of completion.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  }
+}
