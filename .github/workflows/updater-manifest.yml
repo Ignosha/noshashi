@@ -46,3 +46,9 @@ jobs:
           gh release download "$TAG" --pattern '*.sig' --dir "$work/sigs"
           node scripts/updater-manifest.mjs "$work/release.json" "$work/sigs" "$work/latest.json"
           gh release upload "$TAG" "$work/latest.json" --clobber
+          # Installed copies fetch releases/latest/download/latest.json, so the
+          # current NOSHASHI release must be the repo's latest (an Academy
+          # release published after it would otherwise take that place).
+          if [ "$TAG" = "v$(node -p "require('./src-tauri/tauri.conf.json').version")" ]; then
+            gh release edit "$TAG" --latest
+          fi

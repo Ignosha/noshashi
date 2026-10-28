@@ -117,6 +117,8 @@ jobs:
           mapfile -t FILES < <(find upload -type f | sort)
           printf '%s\n' "${FILES[@]}"
           test "${#FILES[@]}" -ge 3
-          gh release create "$TAG" --target "$GITHUB_SHA" --title "NOSHASHI Academy $VERSION" \
+          # --latest=false: NOSHASHI's updater reads releases/latest/latest.json,
+          # so the repo's latest release must stay the NOSHASHI one.
+          gh release create "$TAG" --target "$GITHUB_SHA" --title "NOSHASHI Academy $VERSION" --latest=false \
             --notes "NOSHASHI Academy, the free course for NOSHASHI and the XRP Ledger. These builds are not code-signed: macOS and Windows will warn about an unidentified developer." \
             "${FILES[@]}"
