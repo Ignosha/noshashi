@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Verify a Ledger Evidence Report</title>
+<meta name="description" content="Confirm a NOSHASHI Ledger Evidence Report by the SHA-256 it states: whether it was issued, to whom and when.">
+<link rel="canonical" href="https://www.noshashi.app/evidence-report/verify/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/evidence-report/verify/">
+<meta property="og:title" content="Verify a Ledger Evidence Report">
+<meta property="og:description" content="Confirm a NOSHASHI Ledger Evidence Report by the SHA-256 it states: whether it was issued, to whom and when.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Verify a Ledger Evidence Report">
+<meta name="twitter:description" content="Confirm a NOSHASHI Ledger Evidence Report by the SHA-256 it states: whether it was issued, to whom and when.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]}</script>
+<style>
+.er-form{display:grid;gap:14px;max-width:680px}
+.er-form textarea{min-height:64px;font:12px "IBM Plex Mono",monospace}
+.er-list{margin:8px 0 0;padding-left:18px;line-height:1.7}
+.er-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
+.er-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn-quiet{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.er-tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0}
+.er-tier{display:block;border:1px solid var(--rule);border-radius:var(--r);padding:16px 18px;cursor:pointer}
+.er-tier:has(input:checked){border-color:var(--ink)}
+.er-tier input{margin-right:8px}
+.er-tier .num{margin:0 0 4px}
+.er-tier strong{display:block;font:600 26px/1.15 "Space Grotesk",sans-serif;margin:4px 0 8px}
+.er-tier p{margin:0;font-size:13px;line-height:1.55}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
+      <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/"><span data-i18n="nav.demo2">Demo</span></a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/resources/"><span data-i18n="nav.resources">Resources</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme">
+        <span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head">
+  <p class="eyebrow">Ledger Evidence Report · verification</p>
+  <h1>Confirm a report is authentic</h1>
+  <p>Every Ledger Evidence Report states a SHA-256 over the raw evidence it was built from. Enter it here to see
+     whether NOSHASHI issued a report with that digest, to whom and when. To check the report was not altered, compute the
+     SHA-256 of the evidence file sent with it (for example <code>shasum -a 256 file.json</code>) and compare.</p>
+</div>
+<section>
+  <form class="er-form" id="vf-form" novalidate>
+    <div class="form-field"><label for="vf-digest">SHA-256 stated on the report</label>
+      <input id="vf-digest" type="text" spellcheck="false" autocomplete="off" maxlength="64" placeholder="64 hexadecimal characters"></div>
+    <div class="er-actions"><button class="btn" type="submit">Verify</button></div>
+    <p class="form-status" id="vf-status" role="status" aria-live="polite"></p>
+  </form>
+  <div id="vf-out"></div>
+</section>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/news/">Newsroom</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/inline/8168419a6958aca47351.js"></script>
+</body>
+</html>

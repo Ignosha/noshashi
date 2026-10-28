@@ -51,6 +51,7 @@ import { buildTutorial, TUTORIAL_PAGES } from "./build-tutorial.mjs";
 import { buildAcademy, ACADEMY_PAGES } from "./build-academy.mjs";
 import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
+import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -1606,6 +1607,7 @@ async function buildSitemap(docs = []) {
     // somebody who will never install anything.
     ["/certificate/", "weekly", "0.9"],
     ...TOOL_PAGES,
+    ...REPORT_PAGES,
     ...BRIEF_PAGES,
     ["/protection/", "weekly", "0.8"],
     ["/releases/1-0-14/", "monthly", "0.7"],
@@ -1703,6 +1705,7 @@ async function main() {
   await buildContact();
   await buildCertificate();
   await buildTools(write);
+  await buildReport(write);
   await buildBrief(write);
   await buildProtection();
   await buildRelease1014();
