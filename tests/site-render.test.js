@@ -16,9 +16,9 @@ import { describe, it, expect } from "vitest";
 
 import { esc, attrUrl, decodeEntities, stripTags, clamp, ago, megabytes } from "../api/_lib/html.js";
 import { parseFeed } from "../api/_lib/news.js";
-import { deriveStatus } from "../api/_lib/project-feed.js";
+import { deriveStatus, isAcademyRelease } from "../api/_lib/project-feed.js";
 import { answer, search, CONFIDENT, ENTRIES } from "../api/_lib/kb.js";
-import { renderNews, renderLog, renderDownloads, renderBoard } from "../api/_lib/sections.js";
+import { renderNews, renderLog, renderDownloads, renderAcademyDownload, renderBoard } from "../api/_lib/sections.js";
 import { ungroundedFigures } from "../api/support-chat.js";
 
 describe("escaping", () => {
@@ -338,5 +338,43 @@ describe("support console figure guard", () => {
 
   it("ignores prose with no figures in it", () => {
     expect(ungroundedFigures("It reads validated ledger state and returns a verdict.")).toEqual([]);
+  });
+});
+
+describe("NOSHASHI Academy download", () => {
+  // Asset names and sizes as published on academy-v0.1.0 (2026-10-28).
+  const base = "https://github.com/Ignosha/noshashi/releases/download/academy-v0.1.0/";
+  const academy = {
+    tag: "academy-v0.1.0",
+    url: "https://github.com/Ignosha/noshashi/releases/tag/academy-v0.1.0",
+    assets: [
+      ["NOSHASHI-Academy_0.1.0_universal.dmg", 71800000],
+      ["NOSHASHI-Academy_0.1.0_x64-setup.exe", 34500000],
+      ["NOSHASHI-Academy_0.1.0_x64_en-US.msi", 34800000],
+      ["NOSHASHI-Academy_0.1.0_amd64.deb", 34600000],
+      ["NOSHASHI-Academy_0.1.0_amd64.AppImage", 113000000],
+    ].map(([name, size]) => ({ name, size, url: base + name, sha256: "" })),
+  };
+
+  it("tells Academy releases apart from NOSHASHI releases", () => {
+    expect(isAcademyRelease({ tag: "academy-v0.1.0" })).toBe(true);
+    expect(isAcademyRelease({ tag: "v1.0.24" })).toBe(false);
+    expect(isAcademyRelease(null)).toBe(false);
+  });
+
+  it("links each platform's installer and the release", () => {
+    const html = renderAcademyDownload(academy);
+    for (const name of ["universal.dmg", "x64-setup.exe", "amd64.deb", "amd64.AppImage"]) {
+      expect(html).toContain(base + "NOSHASHI-Academy_0.1.0_" + name);
+    }
+    expect(html).toContain('href="https://github.com/Ignosha/noshashi/releases/tag/academy-v0.1.0"');
+    expect(html).toContain("v0.1.0");
+    expect(html).toContain('href="/academy/app/"');
+  });
+
+  it("falls back to the Academy page without release data", () => {
+    const html = renderAcademyDownload(null);
+    expect(html).toContain('href="/academy/"');
+    expect(html).not.toContain("releases/download");
   });
 });

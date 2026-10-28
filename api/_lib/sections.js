@@ -317,6 +317,39 @@ export function renderDownloads(release) {
     </div>`;
 }
 
+/**
+ * NOSHASHI Academy, the free course, under the app's own downloads. Links
+ * the installers of the newest academy-v* release; without release data it
+ * links the Academy page, which links them too.
+ */
+export function renderAcademyDownload(release) {
+  const ACADEMY_FILES = [
+    ["macOS", /_universal\.dmg$/],
+    ["Windows", /_x64-setup\.exe$/],
+    ["Linux .deb", /_amd64\.deb$/],
+    ["Linux AppImage", /_amd64\.AppImage$/],
+  ];
+  const links = (release?.assets || []).length
+    ? ACADEMY_FILES.map(([label, pattern]) => {
+        const asset = release.assets.find((a) => pattern.test(a.name));
+        return asset ? `<a href="${attrUrl(asset.url)}">${esc(label)}</a> <span class="mono">${esc(megabytes(asset.size))}</span>` : "";
+      }).filter(Boolean)
+    : [];
+  const version = release ? ` · ${esc(release.tag.replace(/^academy-/, ""))}` : "";
+  return `<div class="academy-dl">
+      <div>
+        <p class="eyebrow">NOSHASHI ACADEMY · FREE COURSE${version}</p>
+        <h3>Learn NOSHASHI and the XRP Ledger</h3>
+        <p>21 short lessons with narrated videos, read-aloud, labs on the real ledger and a certificate of completion. Works offline. A separate app; it reads the public ledger and never touches keys.</p>
+      </div>
+      <div class="academy-actions">
+        <a class="btn" href="/academy/app/">Start in your browser</a>
+        <a class="btn ghost" href="${release ? attrUrl(release.url) : "/academy/"}"${release ? ' rel="noopener"' : ""}>${DOWNLOAD_ICON}<span>Download the Academy app</span></a>
+        ${links.length ? `<p class="phash">${links.join(" · ")}. Not code-signed yet.</p>` : ""}
+      </div>
+    </div>`;
+}
+
 /** The two commands that check a download, naming the real files. */
 export function renderVerifyCommand(release) {
   const dmg = release?.assets?.find((a) => /_aarch64\.dmg$/.test(a.name))?.name || "NOSHASHI.dmg";

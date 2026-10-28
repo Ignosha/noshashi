@@ -92,6 +92,9 @@ function summariseNotes(body) {
   return clamp(paragraph || text, 320);
 }
 
+/** NOSHASHI Academy is released from the same repository, tagged academy-v<version>. */
+export const isAcademyRelease = (release) => /^academy-v/.test(release?.tag || "");
+
 /** Shipped releases, newest first. Returns [] rather than throwing. */
 export async function getReleases({ limit = 10, timeout = 6000 } = {}) {
   const headers = {
@@ -155,7 +158,8 @@ export async function getProjectFeed({ limit = 12, root, origin } = {}) {
 
   for (const release of releaseResult.releases) {
     entries.push({
-      kind: "release",
+      // Academy releases are news, not NOSHASHI releases.
+      kind: isAcademyRelease(release) ? "milestone" : "release",
       title: release.name || release.tag,
       body: release.notes || `Release ${release.tag} published from CI.`,
       url: release.url,
@@ -169,7 +173,10 @@ export async function getProjectFeed({ limit = 12, root, origin } = {}) {
 
   return {
     entries: entries.slice(0, limit),
-    latestRelease: releaseResult.releases[0] || null,
+    // The repository also publishes NOSHASHI Academy (academy-v<version>);
+    // the newest release is not necessarily the app's.
+    latestRelease: releaseResult.releases.find((r) => !isAcademyRelease(r)) || null,
+    latestAcademyRelease: releaseResult.releases.find(isAcademyRelease) || null,
     partial: !releaseResult.ok,
     fetchedAt: new Date().toISOString(),
   };
