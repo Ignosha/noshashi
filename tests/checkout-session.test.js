@@ -283,7 +283,8 @@ describe("the Ledger Evidence Report", () => {
       res = mockRes();
       await handler(report({ tier: "test", wallets: WALLET }), res);
       expect(res.statusCode).toBe(200);
-      expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("50");
+      expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("100");
+      expect(stripeForm().allow_promotion_codes).toBe("true");
       expect(stripeForm().customer_email).toBe("owner@example.com");
     } finally {
       delete process.env.EVIDENCE_TEST_EMAIL;
@@ -295,6 +296,8 @@ describe("the Ledger Evidence Report", () => {
     await handler(report({ wallets: WALLET }), res);
     expect(stripeForm()["custom_text[submit][message]"]).toContain("noshashi.app/legal/report-terms");
     expect(stripeForm().customer_email).toBeUndefined();
+    // Promotion codes stay off for every tier that is sold.
+    expect(stripeForm().allow_promotion_codes).toBe("false");
   });
 
   it("gives Audit support its larger scope", async () => {

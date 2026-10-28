@@ -146,14 +146,14 @@ async function buildSales(write) {
      Buying is subject to the <a href="/legal/report-terms/">Terms of Sale</a>.</p>
 </section>`;
 
-  const prices = Object.fromEntries(Object.entries(EVIDENCE_TIERS).map(([k, t]) => [k, usd(t.cents)]));
+  const prices = Object.fromEntries(Object.entries(EVIDENCE_TIERS).map(([k, t]) => [k, usd(t.listCents ?? t.cents)]));
   const limits = Object.fromEntries(Object.entries(EVIDENCE_TIERS).map(([k, t]) => [k, t.limits]));
   const script = `<script>
 (function(){${COMMON_JS}
   var form=document.getElementById("er-form"); if(!form)return;
   var status=document.getElementById("er-status"), pay=document.getElementById("er-pay"), preview=document.getElementById("er-preview");
   var PRICES=${JSON.stringify(prices)}, LIMITS=${JSON.stringify(limits)};
-  // ?tier=test starts the unlisted $0.50 test purchase; the server decides
+  // ?tier=test starts the unlisted $1.00 test purchase (promotion codes allowed); the server decides
   // whether it is offered and where its report goes.
   var forced=null; try{if(new URLSearchParams(location.search).get("tier")==="test")forced="test";}catch(e){}
   function tier(){if(forced)return forced;var t=form.querySelector('input[name="tier"]:checked');return t?t.value:"${DEFAULT_TIER}";}

@@ -171,7 +171,7 @@ export function reportForm(scope, origin) {
     mode: "payment",
     "line_items[0][quantity]": "1",
     "line_items[0][price_data][currency]": "usd",
-    "line_items[0][price_data][unit_amount]": String(tier.cents),
+    "line_items[0][price_data][unit_amount]": String(tier.listCents ?? tier.cents),
     "line_items[0][price_data][product_data][name]": `NOSHASHI Ledger Evidence Report: ${tier.name}`,
     "line_items[0][price_data][product_data][description]":
       `${tier.summary} Read from validated XRP Ledger mainnet: issuer controls, who can move each wallet, and quoted versus funded order-book depth. Ledger-stamped, with the raw evidence, emailed automatically.`,
@@ -182,7 +182,7 @@ export function reportForm(scope, origin) {
     billing_address_collection: "required",
     "tax_id_collection[enabled]": "true",
     "invoice_creation[enabled]": "true",
-    allow_promotion_codes: process.env.STRIPE_ALLOW_PROMOTION_CODES === "true" ? "true" : "false",
+    allow_promotion_codes: tier.promotionCodes || process.env.STRIPE_ALLOW_PROMOTION_CODES === "true" ? "true" : "false",
     "payment_intent_data[description]": `Ledger Evidence Report (${tier.name})${scope.organization ? ` for ${scope.organization}` : ""}`,
     "custom_text[submit][message]":
       "By paying you agree to NOSHASHI's Terms of Sale for the Ledger Evidence Report (noshashi.app/legal/report-terms). The report is a record of public XRP Ledger facts, not an audit opinion, valuation or legal advice.",
