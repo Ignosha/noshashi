@@ -25,7 +25,7 @@ const LABS = (readFileSync(new URL("../src/lib/learn/labs.ts", import.meta.url),
  * browser version and says the installers are coming, rather than linking
  * to a release that does not exist.
  */
-const DESKTOP_RELEASED = false;
+const DESKTOP_RELEASED = true;
 const RELEASE_URL = `https://github.com/Ignosha/noshashi/releases/tag/academy-v${VERSION}`;
 
 export async function buildAcademy(write) {

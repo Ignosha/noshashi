@@ -172,7 +172,7 @@
       "title": "Transactions and what results mean",
       "minutes": 4,
       "source": "/learn/#l3",
-      "video": null,
+      "video": "08-transactions",
       "goals": [
         "I can name a few transaction types.",
         "I can read a result code and know whether it is final."
@@ -352,7 +352,7 @@
       "title": "Who really controls an account",
       "minutes": 5,
       "source": "/learn/#l6",
-      "video": null,
+      "video": "09-who-controls",
       "goals": [
         "I can name the three ways to sign for an account.",
         "I can count a multi-signature quorum using weights, not headcount."
@@ -409,7 +409,7 @@
       "title": "NFTs and the rights issuers keep",
       "minutes": 4,
       "source": "/learn/#l10",
-      "video": null,
+      "video": "10-nfts",
       "goals": [
         "I can say what an NFTokenID tells me.",
         "I can name the rights an NFT issuer can keep."
@@ -461,7 +461,7 @@
       "title": "How the rules change",
       "minutes": 3,
       "source": "/learn/#l11",
-      "video": null,
+      "video": "11-amendments",
       "goals": [
         "I can explain how an amendment is switched on."
       ],
@@ -569,7 +569,7 @@
       "title": "AMM pools",
       "minutes": 4,
       "source": "/learn/#l8",
-      "video": null,
+      "video": "12-amm",
       "goals": [
         "I can explain what an AMM pool is and who governs its fee."
       ],
@@ -682,7 +682,7 @@
       "title": "Did this payment pay this invoice?",
       "minutes": 6,
       "source": "/docs/",
-      "video": null,
+      "video": "13-invoice-check",
       "goals": [
         "I can run an Invoice check and read VERIFIED, HOLD or REJECTED.",
         "I can explain why the check compares exact amounts and reads two servers."
@@ -744,7 +744,7 @@
       "title": "Compliance words, made simple",
       "minutes": 6,
       "source": "/learn/#l12",
-      "video": null,
+      "video": "14-compliance-words",
       "goals": [
         "I can explain KYC, AML, sanctions screening and the Travel Rule in my own words.",
         "I can say what behaviour screening cannot see."
@@ -1039,7 +1039,7 @@
       "title": "Making an account hard to take over",
       "minutes": 6,
       "source": "/learn/#l20",
-      "video": null,
+      "video": "15-account-security",
       "goals": [
         "I can list the four defences for an account.",
         "I can explain address poisoning and how to avoid it."
@@ -1100,7 +1100,7 @@
       "title": "When an account is emptied",
       "minutes": 6,
       "source": "/learn/#l21",
-      "video": null,
+      "video": "16-after-a-theft",
       "goals": [
         "I can list what to do in the first hour after a theft.",
         "I can spot a fake recovery service."
@@ -1157,7 +1157,7 @@
       "title": "Getting XRP back, and signing safely",
       "minutes": 6,
       "source": "/learn/#l22",
-      "video": null,
+      "video": "17-getting-xrp-back",
       "goals": [
         "I can name kinds of stuck XRP that can be recovered.",
         "I can name the signatures that empty accounts."
@@ -1214,7 +1214,7 @@
       "title": "Protecting customers' XRP",
       "minutes": 6,
       "source": "/learn/#l23",
-      "video": null,
+      "video": "18-protecting-customers",
       "goals": [
         "I can explain proof of reserves and why liabilities matter too.",
         "I can tell a real protection fund from one that counts for nothing."
