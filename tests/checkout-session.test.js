@@ -272,6 +272,31 @@ describe("the Ledger Evidence Report", () => {
     expect(sent).toBeUndefined();
   });
 
+  it("offers the test tier only when the owner's address is configured, and locks the receipt to it", async () => {
+    let res = mockRes();
+    await handler(report({ tier: "test", wallets: WALLET }), res);
+    expect(res.statusCode).toBe(400);
+    expect(sent).toBeUndefined();
+
+    process.env.EVIDENCE_TEST_EMAIL = "owner@example.com";
+    try {
+      res = mockRes();
+      await handler(report({ tier: "test", wallets: WALLET }), res);
+      expect(res.statusCode).toBe(200);
+      expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("50");
+      expect(stripeForm().customer_email).toBe("owner@example.com");
+    } finally {
+      delete process.env.EVIDENCE_TEST_EMAIL;
+    }
+  });
+
+  it("states the terms of sale at the point of payment", async () => {
+    const res = mockRes();
+    await handler(report({ wallets: WALLET }), res);
+    expect(stripeForm()["custom_text[submit][message]"]).toContain("noshashi.app/legal/report-terms");
+    expect(stripeForm().customer_email).toBeUndefined();
+  });
+
   it("gives Audit support its larger scope", async () => {
     const six = ["rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq", "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz", ISSUER, WALLET].join(",");
     const res = mockRes();

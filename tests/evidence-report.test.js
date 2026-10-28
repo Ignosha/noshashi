@@ -8,7 +8,9 @@ import {
   currencyLabel,
   requestsFor,
   findings,
-  renderReport,
+  reportModel,
+  emailHtml,
+  emailText,
   evidenceOf,
 } from "../supabase/functions/_shared/evidenceReport.ts";
 
@@ -125,20 +127,21 @@ const bookReply = {
 };
 
 describe("findings", () => {
-  it("states each retained power and thin book with its ledger index", () => {
+  it("says each retained power and thin book in plain English, with its ledger", () => {
     const f = findings([
-      { kind: "issuer", subject: ISSUER, request: "/api/authority", reply: issuerReply },
+      { kind: "issuer", subject: ISSUER, request: "/api/authority", reply: { ...issuerReply, checks: issuerReply.checks.map((c, i) => ({ ...c, id: ["FREEZE_SURRENDERED", "NOT_GLOBALLY_FROZEN", "SUPPLY_CONCENTRATION"][i] })) } },
       { kind: "book", subject: `USD.${WALLET}`, request: "/api/book", reply: bookReply },
     ]);
-    expect(f[0]).toContain("Freeze permanently surrendered");
+    expect(f[0]).toContain("can still freeze any holder's balance");
     expect(f[0]).toContain("107,960,396");
-    expect(f.some((x) => x.includes("Supply concentration"))).toBe(false);
+    expect(f.some((x) => x.toLowerCase().includes("supply"))).toBe(false);
     expect(f[1]).toContain("1.6%");
+    expect(f.join(" ")).not.toMatch(/https?:\/\//);
   });
 
   it("says a failed reading failed, never that it passed", () => {
     const f = findings([{ kind: "issuer", subject: ISSUER, request: "/api/authority", error: "timeout" }]);
-    expect(f[0]).toContain("could not be read");
+    expect(f[0]).toContain("could not read");
   });
 });
 
@@ -147,34 +150,57 @@ describe("the report document", () => {
     { kind: "issuer", subject: ISSUER, request: `/api/authority?issuer=${ISSUER}&walk=1`, reply: issuerReply },
     { kind: "book", subject: `USD.${WALLET}`, request: `/api/book?currency=USD&issuer=${WALLET}`, reply: bookReply },
   ];
-  const html = renderReport({
+  const input = {
     reference: "NER-20261028-ABCDEF-01",
     tier: "quarterly",
-    organization: "Acme <Treasury>",
+    organization: "Acme Treasury",
     scope: { issuers: [ISSUER], wallets: [], books: [`USD.${WALLET}`] },
     periodEnd: null,
     generatedAt: "2026-10-28T15:00:00.000Z",
     sources,
     digest: "A".repeat(64),
+  };
+  const model = reportModel(input);
+  const words = JSON.stringify(model);
+
+  it("opens with a summary and carries the fingerprint and reference", () => {
+    expect(model.blocks[0]).toEqual({ type: "heading", text: "1. Summary" });
+    expect(words).toContain("A".repeat(64));
+    expect(model.meta).toContainEqual(["Plan", "Quarterly"]);
+    expect(model.subtitle).toBe("Prepared for Acme Treasury");
   });
 
-  it("is a complete document carrying the digest and the verification link", () => {
-    expect(html.startsWith("<!doctype html>")).toBe(true);
-    expect(html).toContain("A".repeat(64));
-    expect(html).toContain(`/evidence-report/verify/?digest=${"A".repeat(64)}`);
-    expect(html).toContain("QUARTERLY");
-  });
-
-  it("escapes what the buyer typed", () => {
-    expect(html).toContain("Acme &lt;Treasury&gt;");
-    expect(html).not.toContain("<Treasury>");
+  it("is written for people, not as a list of links", () => {
+    expect(words).not.toMatch(/https?:\/\//);
+    expect(words).not.toContain("/api/");
   });
 
   it("shows an abstention as not measured, not as a pass", () => {
-    expect(html).toContain("Not measured");
+    const table = model.blocks.find((b) => b.type === "table");
+    const supply = table.rows.find((r) => r.cells[0] === "Supply concentration");
+    expect(supply.cells[1]).toBe("Not measured");
+    expect(supply.tones[1]).toBe("muted");
   });
 
   it("hashes exactly the replies it was built from", () => {
     expect(JSON.parse(evidenceOf(sources))).toEqual(sources);
+  });
+});
+
+describe("the delivery email", () => {
+  const letter = { reference: "NER-1-01", organization: "Acme <Treasury>", periodEnd: "2026-09-30", digest: "B".repeat(64), findings: ["One finding."], tier: "standard" };
+
+  it("is a short letter with one link: the verification button", () => {
+    const html = emailHtml(letter);
+    expect(html.match(/href=/g)).toHaveLength(1);
+    expect(html).toContain(`/evidence-report/verify/?digest=${"B".repeat(64)}`);
+    expect(html).toContain("Acme &lt;Treasury&gt;");
+    expect(html).toContain("September 30, 2026");
+  });
+
+  it("has a plain-text version with no raw URLs", () => {
+    const text = emailText(letter);
+    expect(text).toContain("One finding.");
+    expect(text).not.toMatch(/https?:\/\//);
   });
 });

@@ -7,8 +7,11 @@
 
   var form=document.getElementById("er-form"); if(!form)return;
   var status=document.getElementById("er-status"), pay=document.getElementById("er-pay"), preview=document.getElementById("er-preview");
-  var PRICES={"standard":"$2,500","quarterly":"$7,500","audit":"$10,000"}, LIMITS={"standard":{"issuers":3,"wallets":10,"books":3},"quarterly":{"issuers":3,"wallets":10,"books":3},"audit":{"issuers":6,"wallets":10,"books":6}};
-  function tier(){var t=form.querySelector('input[name="tier"]:checked');return t?t.value:"standard";}
+  var PRICES={"standard":"$2,500","quarterly":"$7,500","audit":"$10,000","test":"$0.5"}, LIMITS={"standard":{"issuers":3,"wallets":10,"books":3},"quarterly":{"issuers":3,"wallets":10,"books":3},"audit":{"issuers":6,"wallets":10,"books":6},"test":{"issuers":3,"wallets":10,"books":3}};
+  // ?tier=test starts the unlisted $0.50 test purchase; the server decides
+  // whether it is offered and where its report goes.
+  var forced=null; try{if(new URLSearchParams(location.search).get("tier")==="test")forced="test";}catch(e){}
+  function tier(){if(forced)return forced;var t=form.querySelector('input[name="tier"]:checked');return t?t.value:"standard";}
   function scope(){
     return {tier:tier(),organization:form.organization.value.trim(),issuers:items(form.issuers.value),wallets:items(form.wallets.value),
             books:items(form.books.value),period_end:form.period_end.value};
@@ -23,6 +26,7 @@
   function sync(){pay.textContent="Pay "+PRICES[tier()]+" by card";preview.href=previewUrl();}
   try{var q=new URLSearchParams(location.search).get("tier");var r=q&&form.querySelector('input[name="tier"][value="'+q.replace(/[^a-z]/g,"")+'"]');if(r)r.checked=true;}catch(e){}
   sync();
+  if(forced)say(status,"Test purchase: "+PRICES.test+", one Standard report, sent to the owner's address.","");
   form.addEventListener("input",sync); form.addEventListener("change",sync);
   form.addEventListener("submit",function(e){
     e.preventDefault();

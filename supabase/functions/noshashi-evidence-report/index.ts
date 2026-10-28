@@ -33,10 +33,13 @@ import {
   type Source,
   type Tier,
   evidenceOf,
+  emailHtml,
+  emailText,
   findings,
-  renderReport,
+  reportModel,
   requestsFor,
 } from "../_shared/evidenceReport.ts";
+import { renderPdf } from "../_shared/evidencePdf.ts";
 
 const MAX_ATTEMPTS = 4;
 /** Each tick stays well inside the function's wall-clock limit. */
@@ -72,8 +75,8 @@ async function sha256(text: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
 }
 
-function base64(text: string): string {
-  const bytes = new TextEncoder().encode(text);
+function base64(data: string | Uint8Array): string {
+  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
   let binary = "";
   for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   return btoa(binary);
@@ -158,32 +161,21 @@ async function deliver(db: Db, delivery: Delivery): Promise<string> {
   const generatedAt = new Date().toISOString();
   const evidence = evidenceOf(sources);
   const digest = await sha256(evidence);
-  const html = renderReport({ reference, tier: order.tier, organization: order.organization, scope: order, periodEnd: delivery.period_end, generatedAt, sources, digest });
-  const verify = `${SITE}/evidence-report/verify/?digest=${digest}`;
-  const file = `noshashi-evidence-report-${reference}`;
+  const input = { reference, tier: order.tier, organization: order.organization, scope: order, periodEnd: delivery.period_end, generatedAt, sources, digest };
+  const pdf = await renderPdf(reportModel(input));
+  const letter = { reference, organization: order.organization, periodEnd: delivery.period_end, digest, findings: findings(sources), tier: order.tier };
+  const file = `NOSHASHI-Ledger-Evidence-Report-${reference}`;
 
   const sent = await sendEmail({
     to: [order.email],
     bcc: [inbox],
     reply_to: inbox,
-    subject: `Your NOSHASHI Ledger Evidence Report ${reference}${delivery.period_end ? ` (period end ${delivery.period_end})` : ""}`,
-    text: [
-      `Your Ledger Evidence Report ${reference} is attached${order.organization ? ` for ${order.organization}` : ""}.`,
-      "",
-      "Findings in brief:",
-      ...findings(sources).map((f) => `- ${f}`),
-      "",
-      `Open ${file}.html in any browser to read it, and print it to save it as a PDF. ${file}.json holds every ledger reply the report was built from; its SHA-256 is ${digest}.`,
-      `Anyone, your auditor included, can confirm this report came from NOSHASHI unaltered: ${verify}`,
-      "",
-      "It is a record of public ledger facts at the stated ledger indexes, not an audit opinion, a valuation or a legal finding.",
-      "Questions: reply to this email.",
-      "",
-      "NOSHASHI · https://www.noshashi.app",
-    ].join("\n"),
+    subject: `Your Ledger Evidence Report${order.organization ? ` for ${order.organization}` : ""}${delivery.period_end ? `, period end ${delivery.period_end}` : ""}`,
+    html: emailHtml(letter),
+    text: emailText(letter),
     attachments: [
-      { filename: `${file}.html`, content: base64(html) },
-      { filename: `${file}.json`, content: base64(evidence) },
+      { filename: `${file}.pdf`, content: base64(pdf) },
+      { filename: `${file}-evidence.json`, content: base64(evidence) },
     ],
   });
 

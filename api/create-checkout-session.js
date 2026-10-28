@@ -126,6 +126,8 @@ function list(value) {
 export function readReportScope(body) {
   const tier = tierOf(body.tier ?? DEFAULT_TIER);
   if (!tier) return { error: "Choose Standard, Quarterly or Audit support." };
+  const testEmail = String(process.env.EVIDENCE_TEST_EMAIL ?? "").trim();
+  if (tier === "test" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail)) return { error: "Choose Standard, Quarterly or Audit support." };
   const limits = EVIDENCE_TIERS[tier].limits;
   const issuers = list(body.issuers);
   const wallets = list(body.wallets);
@@ -150,7 +152,7 @@ export function readReportScope(body) {
     if (!DATE.test(periodEnd) || Number.isNaN(day.getTime())) return { error: "Write the period end as YYYY-MM-DD." };
     if (day.getTime() < Date.parse("2013-01-01")) return { error: "The period end must be after the XRP Ledger's history begins." };
   }
-  return { tier, issuers, wallets, books, periodEnd, organization };
+  return { tier, issuers, wallets, books, periodEnd, organization, ...(tier === "test" ? { lockedEmail: testEmail } : {}) };
 }
 
 export function reportForm(scope, origin) {
@@ -182,7 +184,12 @@ export function reportForm(scope, origin) {
     "invoice_creation[enabled]": "true",
     allow_promotion_codes: process.env.STRIPE_ALLOW_PROMOTION_CODES === "true" ? "true" : "false",
     "payment_intent_data[description]": `Ledger Evidence Report (${tier.name})${scope.organization ? ` for ${scope.organization}` : ""}`,
+    "custom_text[submit][message]":
+      "By paying you agree to NOSHASHI's Terms of Sale for the Ledger Evidence Report (noshashi.app/legal/report-terms). The report is a record of public XRP Ledger facts, not an audit opinion, valuation or legal advice.",
   });
+  // The test tier's report can only ever go to the owner: Stripe shows a
+  // prefilled customer_email as fixed, and the webhook delivers to it.
+  if (scope.lockedEmail) form.set("customer_email", scope.lockedEmail);
   for (const [key, value] of Object.entries(metadata)) {
     if (!value) continue;
     // On the session for the webhook and the dashboard, on the payment

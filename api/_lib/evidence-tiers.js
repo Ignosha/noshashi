@@ -30,6 +30,18 @@ export const EVIDENCE_TIERS = {
     limits: { issuers: 6, wallets: 10, books: 6 },
     summary: "A report now, then one at each of the next twelve month-ends, with a larger scope.",
   },
+  // Not sold. A Standard report at Stripe's minimum charge, for testing a
+  // real card payment end to end. The checkout offers it only when
+  // EVIDENCE_TEST_EMAIL is set, and the report always goes to that address,
+  // so the URL is worth nothing to anyone else.
+  test: {
+    name: "Test",
+    cents: 50,
+    cadence: "once",
+    limits: { issuers: 3, wallets: 10, books: 3 },
+    summary: "A test of the full purchase and delivery, sent to the owner.",
+    hidden: true,
+  },
 };
 
 export const DEFAULT_TIER = "standard";

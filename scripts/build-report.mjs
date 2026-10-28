@@ -68,6 +68,7 @@ const TIER_COPY = {
 /* ── /evidence-report/ ────────────────────────────────────────────── */
 async function buildSales(write) {
   const tiers = Object.entries(EVIDENCE_TIERS)
+    .filter(([, t]) => !t.hidden)
     .map(([key, t]) => `<label class="er-tier"><p class="num"><input type="radio" name="tier" value="${key}"${key === DEFAULT_TIER ? " checked" : ""}>${t.name.toUpperCase()}</p>
       <strong>${usd(t.cents)}</strong><p>${TIER_COPY[key]}</p></label>`)
     .join("\n      ");
@@ -141,7 +142,8 @@ async function buildSales(write) {
   </form>
   <p class="er-note" style="margin-top:14px">Paying by bank transfer, against a purchase order, or after a vendor form? Email
      <a href="mailto:support@noshashi.app?subject=Ledger%20Evidence%20Report">support@noshashi.app</a> and an invoice will be
-     sent instead. Received a report? <a href="/evidence-report/verify/">Confirm it is authentic</a>.</p>
+     sent instead. Received a report? <a href="/evidence-report/verify/">Confirm it is authentic</a>.
+     Buying is subject to the <a href="/legal/report-terms/">Terms of Sale</a>.</p>
 </section>`;
 
   const prices = Object.fromEntries(Object.entries(EVIDENCE_TIERS).map(([k, t]) => [k, usd(t.cents)]));
@@ -151,7 +153,10 @@ async function buildSales(write) {
   var form=document.getElementById("er-form"); if(!form)return;
   var status=document.getElementById("er-status"), pay=document.getElementById("er-pay"), preview=document.getElementById("er-preview");
   var PRICES=${JSON.stringify(prices)}, LIMITS=${JSON.stringify(limits)};
-  function tier(){var t=form.querySelector('input[name="tier"]:checked');return t?t.value:"${DEFAULT_TIER}";}
+  // ?tier=test starts the unlisted $0.50 test purchase; the server decides
+  // whether it is offered and where its report goes.
+  var forced=null; try{if(new URLSearchParams(location.search).get("tier")==="test")forced="test";}catch(e){}
+  function tier(){if(forced)return forced;var t=form.querySelector('input[name="tier"]:checked');return t?t.value:"${DEFAULT_TIER}";}
   function scope(){
     return {tier:tier(),organization:form.organization.value.trim(),issuers:items(form.issuers.value),wallets:items(form.wallets.value),
             books:items(form.books.value),period_end:form.period_end.value};
@@ -166,6 +171,7 @@ async function buildSales(write) {
   function sync(){pay.textContent="Pay "+PRICES[tier()]+" by card";preview.href=previewUrl();}
   try{var q=new URLSearchParams(location.search).get("tier");var r=q&&form.querySelector('input[name="tier"][value="'+q.replace(/[^a-z]/g,"")+'"]');if(r)r.checked=true;}catch(e){}
   sync();
+  if(forced)say(status,"Test purchase: "+PRICES.test+", one Standard report, sent to the owner's address.","");
   form.addEventListener("input",sync); form.addEventListener("change",sync);
   form.addEventListener("submit",function(e){
     e.preventDefault();
@@ -274,6 +280,49 @@ async function buildVerify(write) {
     head: CSS,
     body,
     scripts: script,
+  }));
+}
+
+/* ── /legal/report-terms/ ─────────────────────────────────────────── */
+async function buildTerms(write) {
+  const updated = "October 28, 2026";
+  const section = (title, ...paras) => `<h2 style="margin-top:28px">${title}</h2>${paras.map((p) => `<p>${p}</p>`).join("")}`;
+  const body = `<div class="page-head">
+  <p class="eyebrow">Legal · last updated ${updated}</p>
+  <h1>Terms of Sale: Ledger Evidence Report</h1>
+  <p>These terms apply when you buy a Ledger Evidence Report from NOSHASHI. They are written to be read, not skimmed past.
+     If anything here is unclear, write to <a href="mailto:support@noshashi.app">support@noshashi.app</a> before you buy.</p>
+</div>
+<section class="er-note" style="max-width:76ch;font-size:14px;color:var(--ink)">
+  ${section("1. Who you are buying from",
+    "NOSHASHI, operated by Joshua Edmond, 2445 Dunn Ave, Apt 1119, Jacksonville, FL 32218, United States. Payment is taken by Stripe; NOSHASHI never receives or stores your card details.")}
+  ${section("2. What you are buying",
+    "A report of public facts read from the XRP Ledger for the addresses and order books you name when you order: Standard (one report), Quarterly (a report at purchase and at each of the next four quarter-ends) or Audit support (a report at purchase and at each of the next twelve month-ends). The scope is fixed at purchase. Each report is a PDF with an evidence file and a fingerprint (SHA-256) that anyone can check on our verification page.")}
+  ${section("3. What the report is not",
+    "The report records ledger facts at the ledger numbers it states. It is not an audit opinion, an attestation or assurance engagement, a valuation, fair-value guidance under any accounting standard, investment, legal or tax advice, or a determination that any asset, issuer or person is or is not compliant with any law. It should not be the only basis for a financial, legal or investment decision.",
+    "You may share the report with your auditors, advisers, board and regulators. NOSHASHI accepts no duty of care to anyone other than you, the buyer, by reason of that sharing.")}
+  ${section("4. How the report is made",
+    "Reports are generated automatically from validated XRP Ledger mainnet through public ledger servers, using the methods stated in each report: for example, order-book depth counts offers within 10% of the market price and at most 100 offers on each side, and AMM pools are shown separately. A figure is accurate to the ledger at the stated ledger number; the ledger changes continuously afterwards. A reading that cannot be taken is never shown as a pass.")}
+  ${section("5. Delivery",
+    "Reports are emailed to the address you pay with, usually within minutes of payment, and scheduled reports the day after each period end. If a report cannot be built because the ledger cannot be read for your scope, we retry, and if it still cannot be built we tell you and refund that report.")}
+  ${section("6. Refunds and cancellation",
+    "If a report is not delivered, or materially fails to match this description, tell us within 14 days of delivery and we will correct it or refund it. You may cancel Quarterly or Audit support at any time; we refund the reports not yet delivered, pro rata to the price paid. Delivered reports are otherwise non-refundable, because they are digital records produced for you.")}
+  ${section("7. Liability",
+    "To the extent the law allows, NOSHASHI's total liability arising from an order is limited to the amount you paid for that order, and NOSHASHI is not liable for indirect, consequential or lost-profit losses. Nothing in these terms limits liability that cannot be limited by law.")}
+  ${section("8. Your information",
+    "To deliver and verify reports we keep the order's scope (the public addresses you named), the organization name you gave, your email address and each report's fingerprint. Anyone holding a report's fingerprint can see, on the verification page, the report reference, organization name, plan and dates. We do not sell this information. Payment data is handled by Stripe under its own terms.")}
+  ${section("9. Prices and taxes",
+    "Prices are in US dollars. Where sales tax, VAT or similar applies, it is added at checkout or invoiced as required. Stripe issues an invoice for every payment.")}
+  ${section("10. Law",
+    "These terms are governed by the laws of the State of Florida, USA. Questions or complaints: <a href='mailto:support@noshashi.app'>support@noshashi.app</a>.")}
+</section>`;
+
+  await write("legal/report-terms/index.html", renderPage({
+    title: "Terms of Sale — Ledger Evidence Report",
+    description: "The terms that apply when you buy a NOSHASHI Ledger Evidence Report: what it is and is not, delivery, refunds, liability and your information.",
+    path: "/legal/report-terms/",
+    body,
+    structured: [breadcrumb("Terms of Sale: Ledger Evidence Report", "/legal/report-terms/")],
   }));
 }
 
@@ -524,6 +573,7 @@ export async function buildReport(write) {
   await buildSales(write);
   await buildOrdered(write);
   await buildVerify(write);
+  await buildTerms(write);
   await buildBuilder(write);
 }
 
@@ -531,4 +581,5 @@ export async function buildReport(write) {
 export const REPORT_PAGES = [
   ["/evidence-report/", "monthly", "0.8"],
   ["/evidence-report/verify/", "monthly", "0.5"],
+  ["/legal/report-terms/", "yearly", "0.3"],
 ];
