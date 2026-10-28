@@ -21,6 +21,12 @@
 /* Headings that take focus for screen readers get no ring; they are not controls. */
 :is(h1, h2, h3)[tabindex="-1"]:focus { outline: none; box-shadow: none; }
 
+/* Clear of the notch, the status bar and the home indicator on iPhone and
+   iPad (viewport-fit=cover); zero everywhere else. */
+.safe-area {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
 /* A visible skip link for keyboard users. */
 .skip-link { position: absolute; left: -9999px; top: 8px; }
 .skip-link:focus { left: 8px; z-index: 50; }

@@ -1,0 +1,65 @@
+name: Academy iOS build
+
+# Builds NOSHASHI Academy for iPhone and iPad on a Mac runner, so a change
+# that breaks the iOS app is caught on the pull request rather than at a
+# desk with Xcode. It compiles the Rust shell for an iPhone and for the
+# simulator, then generates the Xcode project and builds the whole app for
+# the simulator, unsigned. Installing on a real phone needs an Apple ID in
+# Xcode on a Mac, which docs/ACADEMY-IOS.md walks through; that is free.
+
+on:
+  pull_request:
+    paths:
+      - "academy/**"
+      - ".github/workflows/academy-ios.yml"
+  workflow_dispatch:
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,aarch64-apple-ios-sim
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./academy/src-tauri -> target"
+          key: academy-ios
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      # The app embeds the Academy, its lab workstation and its videos.
+      - run: npm run academy:build
+
+      - name: Compile for iPhone
+        working-directory: academy/src-tauri
+        run: cargo build --locked --lib --target aarch64-apple-ios
+
+      - name: Compile for the iPhone simulator
+        working-directory: academy/src-tauri
+        run: cargo build --locked --lib --target aarch64-apple-ios-sim
+
+      - name: Generate the Xcode project
+        working-directory: academy
+        run: |
+          npx tauri ios init --ci
+          npx tauri icon src-tauri/icons/icon.png
+
+      - name: Build the app for the simulator (unsigned)
+        working-directory: academy
+        run: npx tauri ios build --target aarch64-sim --debug --ci
+
+      - name: Show the built app's Info.plist
+        working-directory: academy
+        run: |
+          app=$(find src-tauri/gen/apple -name '*.app' -type d | head -1)
+          echo "Built: $app"
+          plutil -p "$app/Info.plist" | grep -E 'CFBundleShortVersionString|CFBundleIdentifier|UIFileSharingEnabled|LSSupportsOpeningDocumentsInPlace|MinimumOSVersion'

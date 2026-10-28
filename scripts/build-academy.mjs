@@ -53,6 +53,7 @@ export async function buildAcademy(write) {
   <h1>Learn NOSHASHI and the XRP Ledger, one small step at a time.</h1>
   <p>${COURSE.lessons.length} short lessons in ${COURSE.levels.length} levels, about ${minutes} minutes in all. Videos with captions, every card read aloud if you like, a three-question check after each lesson, hands-on labs in a lab workstation running the real NOSHASHI console, and a certificate of completion.</p>
   <p class="cta"><a class="btn" href="/academy/app/">Start in your browser</a> ${download}</p>
+  <p class="ac-fine"><strong>On iPhone or iPad:</strong> open <a href="/academy/app/">the Academy</a> in Safari, tap Share, then Add to Home Screen. It gets its own icon and opens full screen, like an app.</p>
   <p class="ac-fine">No account, no sign-in, no keys. Your progress stays on your own computer. Works offline: the desktop app carries everything, videos included; in the browser the course keeps working offline after your first visit, and only the videos need a connection. Offline, labs show their recorded ledger readings.</p>
 </section>
 
