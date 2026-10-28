@@ -644,6 +644,588 @@ export const VIDEOS = [
       },
     ],
   },
+  {
+    id: "08-transactions",
+    title: "Transactions and what results mean",
+    blurb: "Every change is a signed transaction, only validated results are final, and success does not mean all of it arrived.",
+    lesson: "l3",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 8",
+        title: "Transactions and what results mean",
+        body: `<p class="sub" data-at="0">Every change to the ledger is a signed instruction.</p>`,
+        say: ["Everything that changes on the XRP Ledger happens through a transaction: a signed instruction from an account. This video shows how to read what happened to one."],
+      },
+      {
+        kick: "TYPES",
+        title: "A few you will meet",
+        body: `
+          <div class="grid2">
+            <div class="c" data-at="0"><b>Payment</b><span>Sends XRP or a token</span></div>
+            <div class="c" data-at="0"><b>OfferCreate</b><span>Places a trade on the exchange</span></div>
+            <div class="c" data-at="1"><b>TrustSet</b><span>Opens a trust line to hold a token</span></div>
+            <div class="c" data-at="1"><b>AccountSet</b><span>Changes an account's settings</span></div>
+          </div>
+          <p class="note" data-at="2">Each one pays a tiny fee in XRP that is <b>destroyed</b>, not paid to anyone.</p>`,
+        say: [
+          "A Payment sends XRP or a token. OfferCreate places a trade on the built-in exchange.",
+          "TrustSet opens a trust line so an account can hold a token, and AccountSet changes an account's settings.",
+          "Every transaction pays a tiny fee in XRP. The fee is destroyed, not paid to anyone, which protects the network from spam.",
+        ],
+      },
+      {
+        kick: "FINAL OR NOT",
+        title: "Only a validated result counts",
+        body: `
+          <div class="flowrow" data-at="0"><span>Signed and submitted</span><i>→</i><span>Tentative result</span><i>→</i><span class="ok">In a validated ledger</span><i>→</i><span class="hi">Final, in the metadata</span></div>
+          <p class="note" data-at="1">A tentative result can still change. Read the result from a <b>validated</b> ledger.</p>`,
+        say: [
+          "When a transaction is first submitted, the server gives a tentative result. It becomes final only when the transaction is in a validated ledger, and the final result is stored in its metadata.",
+          "So never treat the first answer as the last. NOSHASHI reads validated ledgers only.",
+        ],
+      },
+      {
+        kick: "RESULT CODES",
+        title: "Reading the code",
+        body: `
+          <div class="verdicts">
+            <div class="v go" data-at="0"><b>tes…</b><span>tesSUCCESS: it did what it said.</span></div>
+            <div class="v hold" data-at="1"><b>tec…</b><span>Failed but recorded. The fee was charged.</span></div>
+            <div class="v nogo" data-at="2"><b>tef tel tem ter</b><span>Not applied at all. No fee.</span></div>
+          </div>`,
+        say: [
+          "A result starting with t e s means success: the transaction did what it said.",
+          "A result starting with t e c means it failed but was still recorded in the ledger, and the fee was charged. Nothing else moved.",
+          "Results starting with t e f, t e l, t e m or t e r mean the transaction was not applied at all, and no fee was charged.",
+        ],
+      },
+      {
+        kick: "WATCH OUT",
+        title: "Success does not mean all of it arrived",
+        body: `<p class="big" data-at="0">A payment can say <b class="go">tesSUCCESS</b> and deliver a <b class="nogo">tiny part</b> of its stated amount.</p>
+          <p class="note" data-at="1">Credit <b>delivered_amount</b>. Video 5 shows a real case.</p>`,
+        say: [
+          "One warning. A payment can say success and still deliver only a tiny part of the amount it states.",
+          "That is a partial payment. The figure to trust is delivered amount, in the metadata. Video five shows a real case on mainnet.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "09-who-controls",
+    title: "Who really controls an account",
+    blurb: "Master key, regular key and signer lists; counting a quorum by weight; the master-key bypass; blackholed accounts.",
+    lesson: "l6",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 9",
+        title: "Who really controls an account",
+        body: `<p class="sub" data-at="0">Count weights, not people.</p>`,
+        say: ["Before you trust a treasury or an issuer, ask who can actually sign for it. This video shows how to count it properly."],
+      },
+      {
+        kick: "THREE WAYS TO SIGN",
+        title: "More than one can be active at once",
+        body: `
+          <div class="grid3">
+            <div class="c" data-at="0"><b>Master key</b><span>The account's original key pair</span></div>
+            <div class="c" data-at="1"><b>Regular key</b><span>A second key the account chooses, so the master can stay offline</span></div>
+            <div class="c" data-at="2"><b>Signer list</b><span>Up to 32 signers, each with a weight, and a quorum to reach</span></div>
+          </div>`,
+        say: [
+          "There are three ways to sign for an account. The master key is the account's original key pair.",
+          "A regular key is a second key the account nominates, which lets the master key stay offline.",
+          "And a signer list names up to thirty-two signers, each with a weight. A transaction is valid when the weights of the people who signed add up to the quorum.",
+        ],
+      },
+      {
+        kick: "WORKED EXAMPLE",
+        title: "Quorum 5",
+        body: `
+          <div class="weights" data-at="0"><span class="w on">3</span><span class="w on">2</span><span class="w">2</span><span class="w">1</span><span class="w">1</span><b>Alice 3 + Bob 2 = 5</b></div>
+          <p class="big" data-at="1">Two people are enough, not "three of five".</p>`,
+        say: [
+          "Here is a treasury with five signers. Alice has weight three, Bob two, Carol two, Dan one and Eve one. The quorum is five.",
+          "Alice and Bob together reach five, so only two people are needed, not three of five as the headcount suggests. NOSHASHI's Control Surface works this out from the weights.",
+        ],
+      },
+      {
+        kick: "WATCH OUT",
+        title: "The master key can skip the list",
+        body: `<p class="note" data-at="0">If the master key is still enabled, <b>one person</b> holding it can sign alone and bypass the whole signer list.</p>`,
+        say: ["And if the master key is still enabled, one person holding it can sign alone and skip the whole signer list. NOSHASHI flags that as a master-key bypass."],
+      },
+      {
+        kick: "BLACKHOLED",
+        title: "Nobody can ever sign again",
+        body: `
+          <ul class="list">
+            <li data-at="0">Master key disabled</li>
+            <li data-at="0">Regular key set to an address nobody can sign for</li>
+            <li data-at="0">No signer list</li>
+          </ul>
+          <p class="note" data-at="1">Its settings and supply are frozen in time, for better and worse.</p>`,
+        say: [
+          "An account whose master key is disabled, whose regular key points at an address nobody can sign for, and which has no signer list, is blackholed.",
+          "Nobody can ever sign for it again. Its settings and its supply are frozen in time, for better and for worse.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "10-nfts",
+    title: "NFTs and the rights issuers keep",
+    blurb: "What an NFTokenID encodes: burnable, transferable, mutable and the resale fee, with two real tokens.",
+    lesson: "l10",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 10",
+        title: "NFTs and the rights issuers keep",
+        body: `<p class="sub" data-at="0">Owning an NFT does not mean the issuer is done with it.</p>`,
+        say: ["An N F T on the XRP Ledger is a one-of-a-kind token: art, a ticket, a deed or a membership. Owning one does not mean its issuer is done with it."],
+      },
+      {
+        kick: "THE ID HOLDS THE RULES",
+        title: "64 characters, read without the ledger",
+        body: `<p class="note" data-at="0">Each NFT has a 64-character <b>NFTokenID</b>. The rules the issuer set when minting are inside it.</p>`,
+        say: ["Each N F T has a sixty-four character ID, and the rules its issuer set at minting are written inside that ID. NOSHASHI's Token Rights screen decodes them without even asking the ledger."],
+      },
+      {
+        kick: "RIGHTS AN ISSUER CAN KEEP",
+        title: "Four things to check",
+        body: `
+          <div class="grid2">
+            <div class="c" data-at="0"><b>Burnable</b><span>The issuer can destroy it, even while you own it</span></div>
+            <div class="c" data-at="1"><b>Not transferable</b><span>You can only sell it back to the issuer</span></div>
+            <div class="c" data-at="2"><b>Mutable</b><span>The issuer can change what it points to</span></div>
+            <div class="c" data-at="3"><b>Transfer fee</b><span>Up to 50% of every resale</span></div>
+          </div>`,
+        say: [
+          "Burnable means the issuer can destroy the token, even while you own it.",
+          "If it is not transferable, you can only sell it back to the issuer.",
+          "Mutable means the issuer can change what it points to, so the picture or document can change after you buy it.",
+          "And the transfer fee lets the issuer take up to half of every resale.",
+        ],
+      },
+      {
+        kick: "TWO REAL TOKENS",
+        title: "Decoded from their IDs",
+        body: `
+          <table class="t">
+            <tr><th>TOKEN</th><th>TRANSFERABLE</th><th>MUTABLE</th><th>RESALE FEE</th></tr>
+            ${row(0, ["Issued by r4qHM7…mui7B", "yes", "no", "5%"])}
+            ${row(1, ["Issued by rKDFM3…2dK74", "yes", '<span class="hold">yes</span>', "10%"])}
+          </table>`,
+        say: [
+          "Here are two real tokens from mainnet, decoded from their IDs. The first can be resold, cannot be changed, and pays its issuer five percent of every resale.",
+          "The second is mutable: its issuer can change what it points to, and it takes ten percent of every resale. Both labs in the Academy use these same two tokens.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "11-amendments",
+    title: "How the rules change",
+    blurb: "Amendments need 80% of validators for two weeks; servers that fall behind become amendment blocked.",
+    lesson: "l11",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 11",
+        title: "How the rules change",
+        body: `<p class="sub" data-at="0">New features arrive as amendments.</p>`,
+        say: ["The XRP Ledger's rules do change, but never quietly. New features arrive as amendments, and this is how they switch on."],
+      },
+      {
+        kick: "THE VOTE",
+        title: "80% for two weeks in a row",
+        body: `
+          <div class="flowrow" data-at="0"><span>Written into the server software</span><i>→</i><span>Validators vote</span><i>→</i><span class="hi">80% support, held for two weeks</span><i>→</i><span class="ok">Enabled</span></div>`,
+        say: ["A new feature is written into the server software, and then validators vote on it. It switches on only after it keeps at least eighty percent support for two weeks in a row."],
+      },
+      {
+        kick: "FALLING BEHIND",
+        title: "Amendment blocked",
+        body: `<p class="note" data-at="0">A server that has not upgraded when an amendment switches on becomes <b>amendment blocked</b> and stops following the ledger.</p>`,
+        say: ["A server that has not upgraded when an amendment switches on becomes amendment blocked. It stops following the ledger until it is upgraded."],
+      },
+      {
+        kick: "FEATURES THAT ARRIVED THIS WAY",
+        title: "Each one has a public proposal",
+        body: `
+          <p class="chips" data-at="0"><em>AMM · XLS-30</em><em>Clawback · XLS-39</em><em>NFTs · XLS-20</em><em>Credentials · XLS-70</em><em>Permissioned Domains · XLS-80</em><em>Deep Freeze · XLS-77</em></p>
+          <p class="note" data-at="1">What is enabled today can be read from the ledger itself.</p>`,
+        say: [
+          "Many features in this course arrived this way: pools, clawback, N F Ts, credentials, permissioned domains and deep freeze. Each X L S number is the public proposal behind a feature.",
+          "And what is enabled today can always be read from the ledger itself.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "12-amm",
+    title: "AMM pools and who governs them",
+    blurb: "Pools of two assets, LP tokens, fee votes weighted by LP tokens, and the auction slot.",
+    lesson: "l8",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 12",
+        title: "AMM pools and who governs them",
+        body: `<p class="sub" data-at="0">A pool's fee is set by whoever holds the most LP tokens.</p>`,
+        say: ["Besides order books, the XRP Ledger has automated market makers: pools that trade with anyone. Here is how they work, and who sets their fee."],
+      },
+      {
+        kick: "THE POOL",
+        title: "Two assets, priced by their ratio",
+        body: `<p class="note" data-at="0">A pool holds two assets, for example XRP and a stablecoin, and prices every trade from the <b>ratio</b> of what it holds.</p>
+          <p class="note" data-at="1">The exchange routes a trade through books and pools, whichever is better.</p>`,
+        say: [
+          "A pool holds two assets, for example X R P and a stablecoin, and prices every trade from the ratio of the two balances.",
+          "When you trade, the ledger routes through order books and pools, whichever gives the better price.",
+        ],
+      },
+      {
+        kick: "LP TOKENS AND THE FEE",
+        title: "Votes are weighted by LP tokens",
+        body: `
+          <div class="grid2">
+            <div class="c" data-at="0"><b>LP tokens</b><span>Your share of the pool, for depositing both assets</span></div>
+            <div class="c" data-at="1"><b>Trading fee</b><span>Up to 1% per swap, voted by LP token holders</span></div>
+          </div>`,
+        say: [
+          "People who deposit both assets receive L P tokens: their share of the pool.",
+          "Every swap pays a fee of up to one percent into the pool, and L P token holders vote on that fee, weighted by how many L P tokens each one holds.",
+        ],
+      },
+      {
+        kick: "THE AUCTION SLOT",
+        title: "Cheaper trades for a while",
+        body: `<p class="note" data-at="0">Anyone can bid LP tokens for the <b>auction slot</b>. Its holder trades at a heavily discounted fee for a period.</p>
+          <p class="note" data-at="1">Pool Governance shows the fee, the largest voter and who holds the slot.</p>`,
+        say: [
+          "Anyone can bid L P tokens for the auction slot, which lets its holder trade at a heavily discounted fee for a period.",
+          "NOSHASHI's Pool Governance screen shows the fee, who votes it and with what share, and who holds the slot. A pool whose fee is set by one large holder behaves differently from one with many voters.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "13-invoice-check",
+    title: "Did this payment pay this invoice?",
+    blurb: "VERIFIED, HOLD or REJECTED, exact amounts, two node operators, and a real CSC partial payment.",
+    lesson: "l9",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 13",
+        title: "Did this payment pay this invoice?",
+        body: `<p class="sub" data-at="0">The question a business really has.</p>`,
+        say: ["Settlement tells you what a transaction moved. The Invoice check answers the question a business really has: did this transaction pay this invoice?"],
+      },
+      {
+        kick: "THREE ANSWERS",
+        title: "Only VERIFIED is green",
+        body: `
+          <div class="verdicts">
+            <div class="v go" data-at="0"><b>VERIFIED</b><span>It paid the invoice.</span></div>
+            <div class="v hold" data-at="1"><b>HOLD</b><span>A person should look first.</span></div>
+            <div class="v nogo" data-at="2"><b>REJECTED</b><span>It did not pay, with the reason in plain words.</span></div>
+          </div>`,
+        say: [
+          "You enter the receiving account, an optional destination tag, the asset and the amount you expect. Verified means it paid the invoice.",
+          "Hold means a person should look first, for example when a payment is larger than the invoice.",
+          "Rejected means it did not pay, and the reason is given in plain words. Only verified is green.",
+        ],
+      },
+      {
+        kick: "HOW IT DECIDES",
+        title: "Exact, and read twice",
+        body: `
+          <ul class="list">
+            <li data-at="0">Credits only what was <b>delivered</b>, never the stated amount</li>
+            <li data-at="1">Compares amounts exactly, digit by digit</li>
+            <li data-at="2">Reads two independent operators: XRPL Labs and Ripple</li>
+          </ul>`,
+        say: [
+          "It credits only what was delivered, never the amount the payment states.",
+          "It compares amounts exactly, digit by digit, and never rounds.",
+          "And by default it reads the transaction from two independent node operators, X R P L Labs and Ripple, and says so if they disagree.",
+        ],
+      },
+      {
+        kick: "A REAL CASE · LEDGER 107,587,014",
+        title: "A partial CSC payment",
+        body: `
+          <table class="t num">
+            <tr><th>INVOICE</th><th>EXPECTED</th><th>PARTIAL ALLOWED</th><th>RESULT</th></tr>
+            ${row(0, ["Full amount", "162.6994990013102", "no", '<span class="nogo">REJECTED</span>'])}
+            ${row(1, ["Delivered amount", "161.1605415577872", "yes", '<span class="ok">VERIFIED</span>'])}
+          </table>`,
+        say: [
+          "Here is a real payment on mainnet. It asked for one hundred sixty-two point six nine nine C S C and delivered one hundred sixty-one point one six. Checked against the full amount, with partial payments not allowed, it is rejected.",
+          "Checked against the amount actually delivered, with partial payments allowed, it is verified. The Academy's labs let you run both, and five more real cases on testnet.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "14-compliance-words",
+    title: "Compliance words, made simple",
+    blurb: "KYC, AML, sanctions screening, the Travel Rule, what screening misses, and compliance built into the ledger.",
+    lesson: "l12",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 14",
+        title: "Compliance words, made simple",
+        body: `<p class="sub" data-at="0">Am I allowed to move this? Could I get out of it?</p>`,
+        say: ["Compliance means following the laws for moving money. On the X R P Ledger it comes down to two questions: am I allowed to move this, and could I actually get out of it?"],
+      },
+      {
+        kick: "THE WORDS",
+        title: "Four you will hear every day",
+        body: `
+          <div class="grid2">
+            <div class="c" data-at="0"><b>KYC</b><span>Know Your Customer: checking who a customer is</span></div>
+            <div class="c" data-at="1"><b>AML</b><span>Rules and monitoring to stop criminal money</span></div>
+            <div class="c" data-at="2"><b>Sanctions screening</b><span>Checking nobody is on a government blocklist</span></div>
+            <div class="c" data-at="3"><b>Travel Rule</b><span>Sender and receiver details travel with larger transfers</span></div>
+          </div>`,
+        say: [
+          "K Y C, know your customer, means checking who a customer is.",
+          "A M L, anti-money-laundering, means the rules and monitoring that stop criminal money.",
+          "Sanctions screening checks that nobody involved is on a government blocklist.",
+          "And the Travel Rule means that for larger transfers between regulated firms, the sender's and receiver's details travel with the payment. The threshold depends on where you are: about one thousand dollars or euros suggested by the F A T F, three thousand in the United States, and no minimum in the European Union.",
+        ],
+      },
+      {
+        kick: "WHAT SCREENING MISSES",
+        title: "The asset, not the person",
+        body: `<p class="note" data-at="0">Screening asks whether a person is risky. It cannot see what a token's <b>issuer</b> can still do: freeze it or claw it back.</p>`,
+        say: ["Behaviour screening asks whether a counterparty is risky. It cannot see what a token's issuer can still do. A perfectly clean holder can hold a token that can be frozen or clawed back. NOSHASHI reads both sides."],
+      },
+      {
+        kick: "BUILT INTO THE LEDGER",
+        title: "Credentials and permissioned domains",
+        body: `
+          <div class="grid2">
+            <div class="c" data-at="0"><b>Credentials · XLS-70</b><span>A trusted issuer vouches for an account without revealing the personal data</span></div>
+            <div class="c" data-at="1"><b>Permissioned domains · XLS-80</b><span>Only accounts holding the right credentials can take part</span></div>
+          </div>`,
+        say: [
+          "The ledger now has compliance built in. With credentials, a trusted issuer such as a K Y C provider can vouch for an account without revealing the personal data behind it.",
+          "And permissioned domains admit only accounts that hold the right credentials.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "15-account-security",
+    title: "Making an account hard to take over",
+    blurb: "How accounts are emptied, the four defences, and a real address-poisoning series from mainnet.",
+    lesson: "l20",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 15",
+        title: "Making an account hard to take over",
+        body: `<p class="sub" data-at="0">Nobody can reset an account, and nothing can be undone.</p>`,
+        say: ["An X R P Ledger account belongs to whoever can sign for it. Nobody at a help desk can reset it, and no payment can be undone. So security comes down to protecting the keys."],
+      },
+      {
+        kick: "HOW ACCOUNTS ARE EMPTIED",
+        title: "The secret gets exposed",
+        body: `
+          <ul class="list two">
+            <li data-at="0">Typed into a fake wallet or "airdrop" site</li>
+            <li data-at="0">Saved in a cloud note or screenshot</li>
+            <li data-at="0">Read off the clipboard by malware</li>
+            <li data-at="0">The ledger itself is not broken into</li>
+          </ul>`,
+        say: ["Most accounts are emptied the same way: the secret is exposed. It is typed into a fake site, saved in a cloud note or a screenshot, or read by malware. The ledger itself is not broken into."],
+      },
+      {
+        kick: "FOUR DEFENCES",
+        title: "From simplest to strongest",
+        body: `
+          <ul class="list">
+            <li data-at="0"><em>1</em>Keep the master seed offline, on paper or steel</li>
+            <li data-at="1"><em>2</em>Sign day to day with a regular key in a hardware wallet</li>
+            <li data-at="2"><em>3</em>Require several signers for a treasury, then disable the master key</li>
+            <li data-at="3"><em>4</em>Close the doors strangers use: unsolicited offers, checks and channels</li>
+          </ul>`,
+        say: [
+          "One: keep the master seed offline, on paper or steel. Nobody legitimate, including NOSHASHI, ever needs it.",
+          "Two: sign day to day with a regular key held in a hardware wallet.",
+          "Three: require several signers for a treasury, and then disable the master key, or the list can be bypassed.",
+          "Four: close the doors strangers use, such as unsolicited N F T offers, checks and payment channels.",
+        ],
+      },
+      {
+        kick: "A REAL EXAMPLE FROM MAINNET",
+        title: "Address poisoning",
+        body: `
+          <p class="addr mono" data-at="0">rfWPjcbY5QT2shRFY2SSQHFKPYSMzxaMaN<small>SENT 1-DROP PAYMENTS WITH A FAKE "FREE XRP" LINK</small></p>
+          <p class="note" data-at="1">Then it deleted itself into the next account. Each one was made to end in <b>"xaman"</b>, the name of a real wallet.</p>
+          <p class="big" data-at="2">Copy addresses from your <b>own records</b>, never from history.</p>`,
+        say: [
+          "Here is a real account. It sent payments of one drop, with a memo pointing to a fake free X R P site.",
+          "Then it deleted itself into the next account, which did the same. Every account in the series was made to end in xaman, the name of a real wallet, so a hurried copy from history picks the wrong one.",
+          "The habit that beats it: take addresses from your own saved records, never from your transaction history.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "16-after-a-theft",
+    title: "When an account is emptied",
+    blurb: "Why nothing reverses a validated payment, the first hour, and the recovery paths that really exist.",
+    lesson: "l21",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 16",
+        title: "When an account is emptied",
+        body: `<p class="sub" data-at="0">What can and cannot be done.</p>`,
+        say: ["If an account has been emptied, here is what can and cannot be done, starting with the hard truth."],
+      },
+      {
+        kick: "THE HARD TRUTH",
+        title: "A validated payment is final",
+        body: `<p class="note" data-at="0">Validators, Ripple, wallet makers and NOSHASHI <b>cannot reverse it</b>. Anyone offering to recover stolen XRP for a fee is running the second half of the scam.</p>`,
+        say: ["A validated payment is final. Validators, Ripple, wallet makers and NOSHASHI cannot reverse it. Anyone offering to recover stolen X R P for a fee is running the second half of the scam."],
+      },
+      {
+        kick: "THE FIRST HOUR",
+        title: "Four things to do now",
+        body: `
+          <ul class="list">
+            <li data-at="0"><em>1</em>Move anything left to a new account made on a clean device</li>
+            <li data-at="1"><em>2</em>Check whether the thief added their own keys</li>
+            <li data-at="2"><em>3</em>Follow where the value went</li>
+            <li data-at="3"><em>4</em>Report it with hashes, amounts and times</li>
+          </ul>`,
+        say: [
+          "First, move anything left to a brand-new account created on a device that never held the old seed.",
+          "Second, check whether the thief added their own regular key or signer list, so they can keep signing.",
+          "Third, follow where the value went. Every movement is public.",
+          "Fourth, report it to the police with the evidence: transaction hashes, amounts and times. In the United States that is I C 3 dot gov.",
+        ],
+      },
+      {
+        kick: "PATHS THAT CAN WORK",
+        title: "The right request to the right party",
+        body: `
+          <div class="grid3">
+            <div class="c" data-at="0"><b>An exchange</b><span>Can freeze a deposit if reached quickly</span></div>
+            <div class="c" data-at="1"><b>A token's issuer</b><span>Can freeze, or claw back, stolen tokens</span></div>
+            <div class="c" data-at="2"><b>Authorities</b><span>Can act when a trail reaches a sanctioned address</span></div>
+          </div>`,
+        say: [
+          "If stolen value reached an exchange, the exchange can identify and freeze the deposit if reached quickly, usually with a police reference.",
+          "A token's issuer can freeze stolen tokens, or claw them back, unless it has given that right up.",
+          "And authorities can act when a trail reaches a sanctioned address. NOSHASHI's Incident Response follows the value hop by hop and writes a fingerprinted dossier for all three.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "17-getting-xrp-back",
+    title: "Getting XRP back, and signing safely",
+    blurb: "Stuck XRP you can recover, the signatures that empty accounts, and how to prove a domain claim.",
+    lesson: "l22",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 17",
+        title: "Getting XRP back, and signing safely",
+        body: `<p class="sub" data-at="0">Some XRP is just waiting for one signature.</p>`,
+        say: ["Stolen X R P cannot be pulled back, but a lot of X R P is simply stuck, waiting for its owner to sign one transaction. And most thefts start with one signature the owner did not understand."],
+      },
+      {
+        kick: "XRP YOU CAN GET BACK",
+        title: "Finish, cancel, cash, clean up",
+        body: `
+          <div class="grid3">
+            <div class="c" data-at="0"><b>Matured escrows</b><span>Wait for an EscrowFinish</span></div>
+            <div class="c" data-at="1"><b>Uncashed checks</b><span>Pay nothing until cashed</span></div>
+            <div class="c" data-at="2"><b>Owner reserve</b><span>0.2 XRP back for each object removed</span></div>
+          </div>
+          <p class="note" data-at="3">Ripple's escrow wallet #03 holds ten escrows to itself, each waiting to be finished.</p>`,
+        say: [
+          "A matured escrow does not pay out on its own. Someone must finish it.",
+          "A check written to you pays nothing until you cash it.",
+          "And every object an account owns locks zero point two X R P. Removing ones you no longer need frees it.",
+          "A real example: Ripple's escrow wallet number three holds ten escrows to itself, each waiting for a finishing transaction.",
+        ],
+      },
+      {
+        kick: "READ BEFORE YOU SIGN",
+        title: "Signatures that empty accounts",
+        body: `
+          <ul class="list">
+            <li data-at="0"><em>SetRegularKey · SignerListSet</em>Hand signing power to someone else</li>
+            <li data-at="1"><em>AccountDelete</em>Sends everything to its destination</li>
+            <li data-at="2"><em>NFTokenCreateOffer</em>Selling an NFT for nothing</li>
+          </ul>`,
+        say: [
+          "A phishing site does not need your seed if you will sign for it. Set regular key and signer list set hand signing power to someone else.",
+          "Account delete sends everything to its destination.",
+          "And an N F T sell offer for zero gives the token away. Decode every request before signing it. The Security Center's free Pre-sign check does this.",
+        ],
+      },
+      {
+        kick: "IS THIS ACCOUNT WHO IT SAYS?",
+        title: "A domain is proven only both ways",
+        body: `<p class="note" data-at="0">Anyone can write a domain on an account. It is proven only when that website lists the account back in its <b>xrp-ledger.toml</b>.</p>`,
+        say: ["Anyone can write a website name on an account. The claim is proven only when that website lists the account back in its x r p ledger dot toml file. X R P Toolkit's donations account does both, so it is verified. The free Domain check tests this."],
+      },
+    ],
+  },
+  {
+    id: "18-protecting-customers",
+    title: "Protecting customers' XRP",
+    blurb: "Proof of reserves and liabilities with a Merkle sum tree, protection funds no single key can move, and what NOSHASHI is not.",
+    lesson: "l23",
+    scenes: [
+      {
+        kick: "NOSHASHI ACADEMY · VIDEO 18",
+        title: "Protecting customers' XRP",
+        body: `<p class="sub" data-at="0">A promise is worth what the ledger can show.</p>`,
+        say: ["Customers of a business that holds X R P for them have no deposit insurance. The ledger cannot insure anyone, but it can prove a great deal."],
+      },
+      {
+        kick: "RESERVES AND LIABILITIES",
+        title: "Both halves of the picture",
+        body: `<p class="note" data-at="0">A big balance proves little if the business owes more. A <b>Merkle sum tree</b> proves what it owes all customers without showing anyone's balance.</p>
+          <p class="note" data-at="1">Each customer can check that their own balance is counted.</p>`,
+        say: [
+          "A large balance proves little if the business owes its customers more. A Merkle sum tree proves the total owed, without revealing anyone's balance.",
+          "Each customer receives a path from their own balance to the published total, and can check that they are counted.",
+        ],
+      },
+      {
+        kick: "A REAL TREE",
+        title: "138 holders of a real token",
+        body: `<p class="big" data-at="0">Total: <b>33,733,671.32 USDB</b>, exactly what the ledger says the issuer owes.</p>
+          <p class="note" data-at="1">Understate one holder and their path no longer reaches the root.</p>`,
+        say: [
+          "Built over the one hundred thirty-eight holders of a real token, the tree totals exactly what the ledger itself says the issuer owes.",
+          "Understate one holder's balance, and their path no longer reaches the root. The cheat shows.",
+        ],
+      },
+      {
+        kick: "PROTECTION FUNDS",
+        title: "A fund no single key can move",
+        body: `
+          <div class="verdicts">
+            <div class="v go" data-at="0"><b>STRONG</b><span>Locked in escrow until a date</span></div>
+            <div class="v go" data-at="0"><b>STRONG</b><span>Under a signer list, master key disabled</span></div>
+            <div class="v nogo" data-at="1"><b>NOTHING</b><span>Behind one key: whoever holds it can take it</span></div>
+          </div>
+          <p class="note" data-at="2">This is verification, not insurance. NOSHASHI pays no claims.</p>`,
+        say: [
+          "A protection fund locked in escrow, or held under a signer list with the master key disabled, is real.",
+          "A fund behind one key counts for nothing: whoever holds that key can take it.",
+          "And remember, this is verification, not insurance. NOSHASHI shows what is really set aside. It pays no claims.",
+        ],
+      },
+    ],
+  },
 ];
 
 // Spoken forms. Captions keep the written text; the voice reads these.
@@ -657,4 +1239,6 @@ export const SPOKEN = [
   [/\bCSV\b/g, "C S V"],
   [/\bAPI\b/g, "A P I"],
   [/\bL R C\b/g, "L R C"],
+  [/\bNFTs\b/g, "N F Ts"],
+  [/\bNFT\b/g, "N F T"],
 ];
