@@ -442,6 +442,15 @@
     color:var(--muted);font-size:12px;line-height:1.6}
   .download-note .signal{width:7px;height:7px;flex:none;margin-top:6px;border-radius:50%;
     background:var(--tele);box-shadow:0 0 0 4px color-mix(in srgb,var(--tele) 12%,transparent)}
+  .academy-dl{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:center;
+    margin-top:28px;padding:22px 24px;border:1px solid var(--rule);border-radius:var(--r);
+    background:var(--surface)}
+  .academy-dl h3{margin:6px 0 8px;font-size:20px}
+  .academy-dl p{color:var(--muted);font-size:14px;line-height:1.6;margin:0}
+  .academy-dl .eyebrow{color:var(--faint);font-size:10px}
+  .academy-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .academy-actions .phash{flex-basis:100%;margin-top:4px;word-break:normal}
+  @media (max-width:900px){ .academy-dl{grid-template-columns:1fr} }
   @media (max-width:900px){ .release-rail{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:560px){ .release-rail{grid-template-columns:1fr} }
 
@@ -1373,6 +1382,7 @@
       <p>Not code-signed yet: on a Mac, right-click the app and choose Open the first time. New to it? <a href="/tutorial/">The 10-minute tutorial</a> walks through every screen.</p>
     </div>
     <!--SLOT:DOWNLOADS-->
+    <!--SLOT:ACADEMY-->
   </section>
 
   <section id="questions" class="reveal">

@@ -41,7 +41,7 @@ import { docsSections } from "../api/_lib/docs.js";
 import { esc, isoDate, ago } from "../api/_lib/html.js";
 import {
   renderNews, renderNewsHead, renderLog, renderBoard, renderClock,
-  renderDownloads, renderVerifyCommand, renderFaq, faqStructuredData,
+  renderDownloads, renderAcademyDownload, renderVerifyCommand, renderFaq, faqStructuredData,
   renderProgress, renderRail, renderMarket, renderMarketHead, renderMarketFoot, renderSubscribe,
 } from "../api/_lib/sections.js";
 import { jsonLd } from "../api/_lib/shell.js";
@@ -104,6 +104,7 @@ async function buildHome({ news, market, feed, status, release }) {
     NEWSHEAD: renderNewsHead(news),
     NEWS: renderNews(news, { limit: 8 }).replace('class="feed"', 'class="feed bare"'),
     DOWNLOADS: renderDownloads(release),
+    ACADEMY: renderAcademyDownload(feed.latestAcademyRelease),
     VERIFYCMD: renderVerifyCommand(release),
     CLOCK: renderClock(),
     BOARD: renderBoard(status),
