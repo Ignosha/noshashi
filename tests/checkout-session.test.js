@@ -257,6 +257,28 @@ describe("the Ledger Evidence Report", () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it("charges each tier its own price, and refuses a tier that does not exist", async () => {
+    for (const [tier, cents] of [["standard", "250000"], ["quarterly", "750000"], ["audit", "1000000"]]) {
+      const res = mockRes();
+      await handler(report({ tier, wallets: WALLET }), res);
+      expect(res.statusCode).toBe(200);
+      expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe(cents);
+      expect(stripeForm()["metadata[tier]"]).toBe(tier);
+    }
+    sent = undefined;
+    const res = mockRes();
+    await handler(report({ tier: "platinum", wallets: WALLET }), res);
+    expect(res.statusCode).toBe(400);
+    expect(sent).toBeUndefined();
+  });
+
+  it("gives Audit support its larger scope", async () => {
+    const six = ["rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq", "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz", ISSUER, WALLET].join(",");
+    const res = mockRes();
+    await handler(report({ tier: "audit", issuers: six }), res);
+    expect(res.statusCode).toBe(200);
+  });
+
   it("refuses a malformed order book or period end", async () => {
     for (const fields of [{ wallets: WALLET, books: "XRP." + ISSUER }, { wallets: WALLET, books: "USD" }, { wallets: WALLET, period_end: "30/09/2026" }]) {
       const res = mockRes();

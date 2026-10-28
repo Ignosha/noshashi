@@ -1,6 +1,6 @@
 /*
  * POST /api/create-checkout-session — start a Pro subscription, or, with
- * product=evidence-report, pay for a one-off Ledger Evidence Report.
+ * product=evidence-report, pay for a Ledger Evidence Report (by tier).
  *
  * What was wrong with this before, in the order it bites:
  *
@@ -47,6 +47,7 @@
  */
 
 import { clientKey, take } from "./_lib/rate-limit.js";
+import { EVIDENCE_TIERS, DEFAULT_TIER, tierOf } from "./_lib/evidence-tiers.js";
 
 /**
  * Pro, by billing period. Both are overridable by environment because a
@@ -101,14 +102,12 @@ function readCadence(body) {
 }
 
 /**
- * The Ledger Evidence Report: a one-off, fixed-price report, prepared by
- * hand from the same public reads as /certificate/, /treasury/ and
- * /api/book. Its price is set here, not by the page, so a posted form
- * cannot name its own.
+ * The Ledger Evidence Report, in three tiers (api/_lib/evidence-tiers.js).
+ * The report is built and emailed automatically once Stripe confirms the
+ * payment (supabase/functions/noshashi-evidence-report). Its price comes
+ * from the tier table here, never from the form, so a posted form cannot
+ * name its own.
  */
-export const REPORT_PRICE_CENTS = 250_000;
-export const REPORT_LIMITS = { issuers: 3, wallets: 10, books: 3 };
-
 const ADDRESS = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 /** A 3-character code, a longer code the report converts to hex, or 40 hex. */
 const CURRENCY = /^([A-Za-z0-9]{3,20}|[0-9A-Fa-f]{40})$/;
@@ -120,11 +119,14 @@ function list(value) {
 
 /**
  * What the buyer wants covered, checked here because it ends up in
- * Stripe metadata (500 characters a value) and in the report's scope. A
- * report needs at least one issuer or one wallet: a book alone is what
- * /book-health/ already gives away.
+ * Stripe metadata (500 characters a value) and drives the automated
+ * report. A report needs at least one issuer or one wallet: a book alone
+ * is what /book-health/ already gives away.
  */
 export function readReportScope(body) {
+  const tier = tierOf(body.tier ?? DEFAULT_TIER);
+  if (!tier) return { error: "Choose Standard, Quarterly or Audit support." };
+  const limits = EVIDENCE_TIERS[tier].limits;
   const issuers = list(body.issuers);
   const wallets = list(body.wallets);
   const books = list(body.books);
@@ -132,9 +134,9 @@ export function readReportScope(body) {
   const organization = String(body.organization ?? "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 120);
 
   if (!issuers.length && !wallets.length) return { error: "Name at least one issuing account or one wallet for the report to cover." };
-  if (issuers.length > REPORT_LIMITS.issuers) return { error: `At most ${REPORT_LIMITS.issuers} issuing accounts per report.` };
-  if (wallets.length > REPORT_LIMITS.wallets) return { error: `At most ${REPORT_LIMITS.wallets} wallets per report.` };
-  if (books.length > REPORT_LIMITS.books) return { error: `At most ${REPORT_LIMITS.books} order books per report.` };
+  if (issuers.length > limits.issuers) return { error: `At most ${limits.issuers} issuing accounts on ${EVIDENCE_TIERS[tier].name}.` };
+  if (wallets.length > limits.wallets) return { error: `At most ${limits.wallets} wallets per report.` };
+  if (books.length > limits.books) return { error: `At most ${limits.books} order books on ${EVIDENCE_TIERS[tier].name}.` };
   const badAddress = [...issuers, ...wallets].find((a) => !ADDRESS.test(a));
   if (badAddress) return { error: `${badAddress.slice(0, 40)} is not an XRP Ledger classic address. They begin with r.` };
   for (const book of books) {
@@ -146,13 +148,16 @@ export function readReportScope(body) {
   if (periodEnd) {
     const day = new Date(`${periodEnd}T23:59:59Z`);
     if (!DATE.test(periodEnd) || Number.isNaN(day.getTime())) return { error: "Write the period end as YYYY-MM-DD." };
+    if (day.getTime() < Date.parse("2013-01-01")) return { error: "The period end must be after the XRP Ledger's history begins." };
   }
-  return { issuers, wallets, books, periodEnd, organization };
+  return { tier, issuers, wallets, books, periodEnd, organization };
 }
 
 export function reportForm(scope, origin) {
+  const tier = EVIDENCE_TIERS[scope.tier];
   const metadata = {
     product: "evidence_report",
+    tier: scope.tier,
     issuers: scope.issuers.join(","),
     wallets: scope.wallets.join(","),
     books: scope.books.join(","),
@@ -164,10 +169,10 @@ export function reportForm(scope, origin) {
     mode: "payment",
     "line_items[0][quantity]": "1",
     "line_items[0][price_data][currency]": "usd",
-    "line_items[0][price_data][unit_amount]": String(REPORT_PRICE_CENTS),
-    "line_items[0][price_data][product_data][name]": "NOSHASHI Ledger Evidence Report",
+    "line_items[0][price_data][unit_amount]": String(tier.cents),
+    "line_items[0][price_data][product_data][name]": `NOSHASHI Ledger Evidence Report: ${tier.name}`,
     "line_items[0][price_data][product_data][description]":
-      "One-off report read from validated XRP Ledger mainnet: issuer controls, who can move each wallet, and quoted versus funded order-book depth. Ledger-stamped, with the raw evidence and a 30-minute walkthrough.",
+      `${tier.summary} Read from validated XRP Ledger mainnet: issuer controls, who can move each wallet, and quoted versus funded order-book depth. Ledger-stamped, with the raw evidence, emailed automatically.`,
     success_url: `${origin}/evidence-report/ordered/?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/evidence-report/`,
     // Institutions pay against an invoice and file it: Stripe issues one
@@ -176,7 +181,7 @@ export function reportForm(scope, origin) {
     "tax_id_collection[enabled]": "true",
     "invoice_creation[enabled]": "true",
     allow_promotion_codes: process.env.STRIPE_ALLOW_PROMOTION_CODES === "true" ? "true" : "false",
-    "payment_intent_data[description]": `Ledger Evidence Report${scope.organization ? ` for ${scope.organization}` : ""}`,
+    "payment_intent_data[description]": `Ledger Evidence Report (${tier.name})${scope.organization ? ` for ${scope.organization}` : ""}`,
   });
   for (const [key, value] of Object.entries(metadata)) {
     if (!value) continue;

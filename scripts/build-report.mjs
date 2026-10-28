@@ -1,17 +1,18 @@
 /*
- * The Ledger Evidence Report: a one-off, fixed-price report for a
- * company holding or issuing on the XRP Ledger.
+ * The Ledger Evidence Report, in three tiers (api/_lib/evidence-tiers.js),
+ * built and emailed automatically once Stripe confirms the payment.
  *
- *   /evidence-report/          what it is, what it is not, and the order form
+ *   /evidence-report/          the tiers, what it is and is not, and the order form
  *   /evidence-report/ordered/  where Stripe returns a buyer after paying
- *   /evidence-report/build/    the report itself, assembled in the browser
+ *   /evidence-report/build/    the same report assembled in the browser (preview)
+ *   /evidence-report/verify/   confirm a report by its SHA-256
  *
  * Every figure in the report is read live from the same free endpoints
  * the public tools use (/api/authority, /api/treasury, /api/book), at the
- * ledger index each one states, and the raw replies are offered for
- * download with a SHA-256 digest over them. The buyer pays for the report
- * being prepared, checked, explained and filed, not for data that is
- * otherwise hidden; the page says so.
+ * ledger index each one states. Delivery is
+ * supabase/functions/noshashi-evidence-report; the buyer pays for the
+ * report being prepared, delivered on schedule and verifiable, not for
+ * data that is otherwise hidden, and the page says so.
  *
  * Copy rules the whole site keeps: no score, no legal or accounting
  * finding, an unreadable fact is never shown as a pass, and nothing here
@@ -19,9 +20,16 @@
  */
 
 import { renderPage, breadcrumb } from "../api/_lib/shell.js";
-import { REPORT_PRICE_CENTS, REPORT_LIMITS } from "../api/create-checkout-session.js";
+import { EVIDENCE_TIERS, DEFAULT_TIER } from "../api/_lib/evidence-tiers.js";
 
-const PRICE = `$${(REPORT_PRICE_CENTS / 100).toLocaleString("en-US")}`;
+const FUNCTIONS = "https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1";
+const usd = (cents) => `$${(cents / 100).toLocaleString("en-US")}`;
+const FROM = usd(EVIDENCE_TIERS.standard.cents);
+/** The builder previews the largest scope any tier allows. */
+const REPORT_LIMITS = Object.values(EVIDENCE_TIERS).reduce(
+  (m, t) => ({ issuers: Math.max(m.issuers, t.limits.issuers), wallets: Math.max(m.wallets, t.limits.wallets), books: Math.max(m.books, t.limits.books) }),
+  { issuers: 0, wallets: 0, books: 0 }
+);
 const NOINDEX = `<meta name="robots" content="noindex">`;
 
 /** A real, public scope: Ripple's RLUSD issuer and the Bitstamp USD book. */
@@ -31,11 +39,17 @@ const SAMPLE =
 const CSS = `<style>
 .er-form{display:grid;gap:14px;max-width:680px}
 .er-form textarea{min-height:64px;font:12px "IBM Plex Mono",monospace}
-.er-price{font:600 32px/1.1 "Space Grotesk",sans-serif;margin:0}
 .er-list{margin:8px 0 0;padding-left:18px;line-height:1.7}
 .er-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
 .er-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .btn-quiet{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.er-tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0}
+.er-tier{display:block;border:1px solid var(--rule);border-radius:var(--r);padding:16px 18px;cursor:pointer}
+.er-tier:has(input:checked){border-color:var(--ink)}
+.er-tier input{margin-right:8px}
+.er-tier .num{margin:0 0 4px}
+.er-tier strong{display:block;font:600 26px/1.15 "Space Grotesk",sans-serif;margin:4px 0 8px}
+.er-tier p{margin:0;font-size:13px;line-height:1.55}
 </style>`;
 
 const COMMON_JS = `
@@ -45,14 +59,24 @@ const COMMON_JS = `
   function items(v){return String(v||"").split(/[\\s,]+/).map(function(s){return s.trim();}).filter(Boolean);}
 `;
 
+const TIER_COPY = {
+  standard: "One report, at your period end or today. Up to 3 issuers, 10 wallets and 3 order books.",
+  quarterly: "A report now, then one the day after each of the next four quarter-ends. Same scope as Standard.",
+  audit: "A report now, then one the day after each of the next twelve month-ends. Up to 6 issuers, 10 wallets and 6 order books.",
+};
+
 /* ── /evidence-report/ ────────────────────────────────────────────── */
 async function buildSales(write) {
+  const tiers = Object.entries(EVIDENCE_TIERS)
+    .map(([key, t]) => `<label class="er-tier"><p class="num"><input type="radio" name="tier" value="${key}"${key === DEFAULT_TIER ? " checked" : ""}>${t.name.toUpperCase()}</p>
+      <strong>${usd(t.cents)}</strong><p>${TIER_COPY[key]}</p></label>`)
+    .join("\n      ");
   const body = `<div class="page-head">
-  <p class="eyebrow">One-off report · ${PRICE}</p>
+  <p class="eyebrow">Report · from ${FROM}</p>
   <h1>Ledger Evidence Report</h1>
   <p>For a company that holds XRP or issues on the XRP Ledger, and has to show an auditor, a board or a
-     counterparty what the ledger says. We read your accounts from validated XRP Ledger mainnet, write the
-     facts up with the ledger index each one was read at, and walk your team through them.</p>
+     counterparty what the ledger says. Name your accounts and pay; the report is read from validated XRP
+     Ledger mainnet and emailed to you, with every fact stamped with the ledger index it was read at.</p>
 </div>
 <section>
   <div class="grid g2">
@@ -68,60 +92,68 @@ async function buildSales(write) {
       <p>Quoted against funded depth within 10% of mid on the books you name, plus how much of the XRP
          held could be sold into the main books. AMM pools are shown separately, not added.</p></div>
     <div class="panel"><p class="num">EVIDENCE ANYONE CAN RE-CHECK</p>
-      <p>Each section states its ledger index and digest. The raw ledger replies come with the report, with
-         a SHA-256 digest over all of them, so an auditor can re-read every figure without trusting us.</p></div>
+      <p>Each report carries its findings in plain language, every ledger reply it was built from, and a
+         SHA-256 over them. Your auditor can confirm the report on this site by that digest, and re-read every
+         figure without trusting us.</p></div>
   </div>
 
-  <h2 style="margin-top:32px">What you get for ${PRICE}</h2>
+  <h2 style="margin-top:32px">How it is delivered</h2>
   <ul class="er-list">
-    <li>The report as a PDF, and the raw evidence file it was built from.</li>
-    <li>A 30-minute walkthrough with the founder, by video or phone.</li>
-    <li>One re-run of the same scope at a later date of your choosing, within 90 days, for a second period end.</li>
+    <li>Emailed to the address you pay with, usually within minutes of payment: the report (open it in a browser, print to PDF) and the raw evidence file.</li>
+    <li>Quarterly and Audit support reports arrive by email the day after each period end, read at the last ledger of that day.</li>
     <li>An invoice from Stripe with your billing address and tax ID.</li>
+    <li>If a reading cannot be taken, the report is not sent with a gap: it is retried, and if it still cannot be read you hear from us and are refunded for that report.</li>
   </ul>
-  <p class="er-note" style="margin-top:10px">Delivered within 5 business days of payment. If the ledger cannot be read for the scope you name,
-     you are refunded in full.</p>
 
   <h2 style="margin-top:32px">What it is not</h2>
-  <p class="er-note">A record of ledger facts at a stated ledger index. It is not an audit opinion, an attestation, a valuation,
-     fair-value guidance under any accounting standard, or a legal or compliance determination about any asset
-     or person. NOSHASHI never asks for keys, seeds, balances or customer data: everything in the report is public
-     ledger state for the addresses you name.</p>
+  <p class="er-note">A record of ledger facts at a stated ledger index, generated automatically. It is not an audit opinion, an
+     attestation, a valuation, fair-value guidance under any accounting standard, or a legal or compliance determination
+     about any asset or person. NOSHASHI never asks for keys, seeds, balances or customer data: everything in the report
+     is public ledger state for the addresses you name.</p>
   <p class="er-note">Every figure comes from NOSHASHI's free public tools (<a href="/certificate/">certificate</a>,
      <a href="/treasury/">treasury report</a>, <a href="/book-health/">book health</a>), and you can run them yourself.
-     The report is for teams who want it prepared, checked, explained and filed. <a href="${SAMPLE}">See a live sample</a>
-     built from public accounts.</p>
+     The report is for teams who want it assembled, delivered on schedule and verifiable for the file.
+     <a href="${SAMPLE}">See a live sample</a> built from public accounts.</p>
 
   <h2 style="margin-top:32px" id="order">Order</h2>
   <form class="er-form" id="er-form" novalidate>
+    <fieldset style="border:0;padding:0;margin:0"><legend class="num">CHOOSE A TIER</legend>
+      <div class="er-tiers">
+      ${tiers}
+      </div>
+    </fieldset>
     <div class="form-field"><label for="er-org">Organization</label>
       <input id="er-org" name="organization" type="text" maxlength="120" autocomplete="organization" placeholder="Company name, as it should appear on the report"></div>
-    <div class="form-field"><label for="er-issuers">Issuing accounts (up to ${REPORT_LIMITS.issuers})</label>
+    <div class="form-field"><label for="er-issuers">Issuing accounts</label>
       <textarea id="er-issuers" name="issuers" spellcheck="false" placeholder="r…, one per line"></textarea></div>
-    <div class="form-field"><label for="er-wallets">Treasury wallets (up to ${REPORT_LIMITS.wallets})</label>
+    <div class="form-field"><label for="er-wallets">Treasury wallets (up to 10)</label>
       <textarea id="er-wallets" name="wallets" spellcheck="false" placeholder="r…, one per line"></textarea></div>
-    <div class="form-field"><label for="er-books">Order books (up to ${REPORT_LIMITS.books}, optional)</label>
+    <div class="form-field"><label for="er-books">Order books (optional)</label>
       <textarea id="er-books" name="books" spellcheck="false" placeholder="CURRENCY.issuer, for example USD.rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"></textarea></div>
-    <div class="form-field" style="max-width:220px"><label for="er-at">Period end (optional, UTC)</label>
+    <div class="form-field" style="max-width:220px"><label for="er-at">Period end for the first report (optional, UTC)</label>
       <input id="er-at" name="period_end" type="date"></div>
-    <p class="er-note">Name at least one issuing account or one wallet. Addresses only: never send keys or seeds.</p>
+    <p class="er-note">Name at least one issuing account or one wallet. Addresses only: never send keys or seeds. The report goes to the email you enter at checkout.</p>
     <div class="er-actions">
-      <button class="btn" type="submit" id="er-pay">Pay ${PRICE} by card</button>
+      <button class="btn" type="submit" id="er-pay">Pay ${FROM} by card</button>
       <a class="btn btn-quiet" id="er-preview" href="/evidence-report/build/">Preview this scope free</a>
     </div>
     <p class="form-status" id="er-status" role="status" aria-live="polite"></p>
   </form>
   <p class="er-note" style="margin-top:14px">Paying by bank transfer, against a purchase order, or after a vendor form? Email
      <a href="mailto:support@noshashi.app?subject=Ledger%20Evidence%20Report">support@noshashi.app</a> and an invoice will be
-     sent instead.</p>
+     sent instead. Received a report? <a href="/evidence-report/verify/">Confirm it is authentic</a>.</p>
 </section>`;
 
+  const prices = Object.fromEntries(Object.entries(EVIDENCE_TIERS).map(([k, t]) => [k, usd(t.cents)]));
+  const limits = Object.fromEntries(Object.entries(EVIDENCE_TIERS).map(([k, t]) => [k, t.limits]));
   const script = `<script>
 (function(){${COMMON_JS}
   var form=document.getElementById("er-form"); if(!form)return;
   var status=document.getElementById("er-status"), pay=document.getElementById("er-pay"), preview=document.getElementById("er-preview");
+  var PRICES=${JSON.stringify(prices)}, LIMITS=${JSON.stringify(limits)};
+  function tier(){var t=form.querySelector('input[name="tier"]:checked');return t?t.value:"${DEFAULT_TIER}";}
   function scope(){
-    return {organization:form.organization.value.trim(),issuers:items(form.issuers.value),wallets:items(form.wallets.value),
+    return {tier:tier(),organization:form.organization.value.trim(),issuers:items(form.issuers.value),wallets:items(form.wallets.value),
             books:items(form.books.value),period_end:form.period_end.value};
   }
   function previewUrl(){
@@ -131,14 +163,19 @@ async function buildSales(write) {
     if(s.period_end)p.set("at",s.period_end);
     return "/evidence-report/build/?"+p.toString();
   }
-  form.addEventListener("input",function(){preview.href=previewUrl();});
+  function sync(){pay.textContent="Pay "+PRICES[tier()]+" by card";preview.href=previewUrl();}
+  try{var q=new URLSearchParams(location.search).get("tier");var r=q&&form.querySelector('input[name="tier"][value="'+q.replace(/[^a-z]/g,"")+'"]');if(r)r.checked=true;}catch(e){}
+  sync();
+  form.addEventListener("input",sync); form.addEventListener("change",sync);
   form.addEventListener("submit",function(e){
     e.preventDefault();
-    var s=scope();
+    var s=scope(), lim=LIMITS[s.tier];
     if(!s.issuers.length&&!s.wallets.length){say(status,"Name at least one issuing account or one wallet.","bad");return;}
+    if(s.issuers.length>lim.issuers||s.wallets.length>lim.wallets||s.books.length>lim.books){
+      say(status,"This tier covers up to "+lim.issuers+" issuers, "+lim.wallets+" wallets and "+lim.books+" order books.","bad");return;}
     pay.disabled=true; say(status,"Opening secure checkout…","");
     fetch("/api/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
-      body:JSON.stringify({product:"evidence-report",organization:s.organization,issuers:s.issuers.join(","),
+      body:JSON.stringify({product:"evidence-report",tier:s.tier,organization:s.organization,issuers:s.issuers.join(","),
         wallets:s.wallets.join(","),books:s.books.join(","),period_end:s.period_end})})
       .then(function(r){return r.json().then(function(b){if(!r.ok||!b.url)throw new Error(b.error||"Checkout could not start.");return b;});})
       .then(function(b){location.href=b.url;})
@@ -148,8 +185,8 @@ async function buildSales(write) {
 </script>`;
 
   await write("evidence-report/index.html", renderPage({
-    title: `Ledger Evidence Report — XRP Ledger facts your auditor can re-check (${PRICE})`,
-    description: `One-off ${PRICE} report for companies holding XRP or issuing on the XRP Ledger: issuer controls, who can move each wallet, and quoted versus funded depth, read from validated mainnet, ledger-stamped, with the raw evidence and a walkthrough.`,
+    title: `Ledger Evidence Report — XRP Ledger facts your auditor can re-check (from ${FROM})`,
+    description: `Report for companies holding XRP or issuing on the XRP Ledger, from ${FROM}: issuer controls, who can move each wallet, and quoted versus funded depth, read from validated mainnet, ledger-stamped, emailed automatically, one-off, quarterly or monthly.`,
     path: "/evidence-report/",
     head: CSS,
     body,
@@ -162,19 +199,20 @@ async function buildSales(write) {
 async function buildOrdered(write) {
   const body = `<div class="page-head">
   <p class="eyebrow">Payment received</p>
-  <h1>Thank you. Your Ledger Evidence Report is under way.</h1>
-  <p>Stripe is emailing your receipt and invoice now. Within one business day you will hear from Joshua Edmond,
-     NOSHASHI's founder, to confirm the scope and book the 30-minute walkthrough. The report follows within
-     5 business days of payment.</p>
+  <h1>Thank you. Your Ledger Evidence Report is on its way.</h1>
+  <p>Stripe is emailing your receipt and invoice now. The report is being read from the XRP Ledger and will
+     arrive at the email you paid with, usually within minutes. Quarterly and Audit support reports follow by
+     email the day after each period end.</p>
 </div>
 <section>
   <div class="grid g2">
-    <div class="panel"><p class="num">IN THE MEANTIME</p>
-      <p>The free tools the report draws on are open to your team now: the <a href="/certificate/">issuer certificate</a>,
-         the <a href="/treasury/">treasury report</a> and <a href="/book-health/">book health</a>.</p></div>
-    <div class="panel"><p class="num">A CHANGE TO THE SCOPE?</p>
-      <p>Reply to the receipt or write to <a href="mailto:support@noshashi.app?subject=Ledger%20Evidence%20Report%20scope">support@noshashi.app</a>.
-         Addresses only: never send keys or seeds.</p></div>
+    <div class="panel"><p class="num">NOT ARRIVED WITHIN THE HOUR?</p>
+      <p>Check your spam folder for mail from noshashi.app, then write to
+         <a href="mailto:support@noshashi.app?subject=Ledger%20Evidence%20Report">support@noshashi.app</a>.
+         A report whose readings could not all be taken is retried rather than sent with a gap.</p></div>
+    <div class="panel"><p class="num">FOR YOUR AUDITOR</p>
+      <p>Every report states a SHA-256. Anyone can confirm it was issued by NOSHASHI, unaltered, on the
+         <a href="/evidence-report/verify/">verification page</a>.</p></div>
   </div>
 </section>`;
 
@@ -184,6 +222,58 @@ async function buildOrdered(write) {
     path: "/evidence-report/ordered/",
     head: NOINDEX,
     body,
+  }));
+}
+
+/* ── /evidence-report/verify/ ─────────────────────────────────────── */
+async function buildVerify(write) {
+  const body = `<div class="page-head">
+  <p class="eyebrow">Ledger Evidence Report · verification</p>
+  <h1>Confirm a report is authentic</h1>
+  <p>Every Ledger Evidence Report states a SHA-256 over the raw evidence it was built from. Enter it here to see
+     whether NOSHASHI issued a report with that digest, to whom and when. To check the report was not altered, compute the
+     SHA-256 of the evidence file sent with it (for example <code>shasum -a 256 file.json</code>) and compare.</p>
+</div>
+<section>
+  <form class="er-form" id="vf-form" novalidate>
+    <div class="form-field"><label for="vf-digest">SHA-256 stated on the report</label>
+      <input id="vf-digest" type="text" spellcheck="false" autocomplete="off" maxlength="64" placeholder="64 hexadecimal characters"></div>
+    <div class="er-actions"><button class="btn" type="submit">Verify</button></div>
+    <p class="form-status" id="vf-status" role="status" aria-live="polite"></p>
+  </form>
+  <div id="vf-out"></div>
+</section>`;
+
+  const script = `<script>
+(function(){${COMMON_JS}
+  var form=document.getElementById("vf-form"); if(!form)return;
+  var input=document.getElementById("vf-digest"), status=document.getElementById("vf-status"), out=document.getElementById("vf-out");
+  function run(){
+    var d=(input.value||"").trim();
+    if(!/^[0-9A-Fa-f]{64}$/.test(d)){say(status,"A SHA-256 is 64 hexadecimal characters.","bad");return;}
+    say(status,"Checking…",""); out.innerHTML="";
+    fetch("${FUNCTIONS}/noshashi-evidence-report/verify?digest="+d).then(function(r){return r.json();}).then(function(b){
+      if(!b.found){say(status,"No report with this digest was issued by NOSHASHI.","bad");return;}
+      say(status,"Issued by NOSHASHI.","");
+      var rows=[["Report",b.reference],["Prepared for",b.organization||"—"],["Tier",b.tier],["Period end",b.period_end||"None (latest ledger)"],["Generated",b.generated_at],["Sent",b.sent_at]];
+      var h='<table class="tool-table" style="width:100%;max-width:680px;border-collapse:collapse;font-size:13px"><tbody>';
+      rows.forEach(function(r){h+='<tr><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--rule)">'+esc(r[0])+'</th><td style="padding:6px 8px;border-bottom:1px solid var(--rule)">'+esc(r[1])+'</td></tr>';});
+      Object.keys(b.ledger_indexes||{}).forEach(function(k){h+='<tr><th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--rule)">Ledger</th><td style="padding:6px 8px;border-bottom:1px solid var(--rule);font:11px IBM Plex Mono,monospace;word-break:break-all">'+esc(b.ledger_indexes[k])+' · '+esc(k)+'</td></tr>';});
+      out.innerHTML=h+'</tbody></table>';
+    }).catch(function(){say(status,"Verification could not be reached. Try again shortly.","bad");});
+  }
+  form.addEventListener("submit",function(e){e.preventDefault();run();});
+  var q=new URLSearchParams(location.search).get("digest"); if(q){input.value=q;run();}
+})();
+</script>`;
+
+  await write("evidence-report/verify/index.html", renderPage({
+    title: "Verify a Ledger Evidence Report",
+    description: "Confirm a NOSHASHI Ledger Evidence Report by the SHA-256 it states: whether it was issued, to whom and when.",
+    path: "/evidence-report/verify/",
+    head: CSS,
+    body,
+    scripts: script,
   }));
 }
 
@@ -433,8 +523,12 @@ async function buildBuilder(write) {
 export async function buildReport(write) {
   await buildSales(write);
   await buildOrdered(write);
+  await buildVerify(write);
   await buildBuilder(write);
 }
 
-/** Only the sales page is listed; the builder and the receipt are noindex. */
-export const REPORT_PAGES = [["/evidence-report/", "monthly", "0.8"]];
+/** The builder and the receipt are noindex and left out. */
+export const REPORT_PAGES = [
+  ["/evidence-report/", "monthly", "0.8"],
+  ["/evidence-report/verify/", "monthly", "0.5"],
+];

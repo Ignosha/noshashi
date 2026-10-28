@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { TIERS, type Tier, schedule } from "../_shared/evidenceReport.ts";
 
 /**
  * noshashi-stripe-webhook — Stripe is the source of truth for billing;
@@ -264,14 +265,76 @@ Deno.serve(async (request: Request) => {
     );
   };
 
+  /**
+   * A paid Ledger Evidence Report: the order, the deliveries its tier buys,
+   * and a kick so the first report goes out now rather than on the hour.
+   * Idempotent on the session id, since Stripe retries webhooks.
+   */
+  // deno-lint-ignore no-explicit-any
+  const recordEvidenceOrder = async (session: any) => {
+    const meta = session.metadata ?? {};
+    const tier = String(meta.tier ?? "standard") as Tier;
+    const email = String(session.customer_details?.email ?? "").trim();
+    if (!(tier in TIERS) || session.payment_status !== "paid" || !email) {
+      console.error("EVIDENCE REPORT NOT RECORDED", { session: session.id, tier, payment_status: session.payment_status, hasEmail: Boolean(email) });
+      return;
+    }
+    if (Number(session.amount_total) < TIERS[tier].cents) {
+      console.error("EVIDENCE REPORT UNDERPAID", { session: session.id, tier, amount_total: session.amount_total });
+      return;
+    }
+    const split = (v: unknown) => String(v ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+    const periodEnd = /^\d{4}-\d{2}-\d{2}$/.test(String(meta.period_end ?? "")) ? String(meta.period_end) : null;
+    const created = new Date(Number(session.created) * 1000 || Date.now());
+    const reference = `NER-${created.toISOString().slice(0, 10).replaceAll("-", "")}-${String(session.id).slice(-6).toUpperCase()}`;
+    const { data: order, error } = await db
+      .from("evidence_report_orders")
+      .upsert(
+        {
+          reference,
+          stripe_session_id: session.id,
+          tier,
+          email,
+          organization: String(meta.organization ?? "").trim() || null,
+          issuers: split(meta.issuers),
+          wallets: split(meta.wallets),
+          books: split(meta.books),
+          period_end: periodEnd,
+          amount_cents: Number(session.amount_total),
+          currency: String(session.currency ?? "usd"),
+        },
+        { onConflict: "stripe_session_id", ignoreDuplicates: true },
+      )
+      .select("id")
+      .maybeSingle();
+    if (error) throw error;
+    // A retried event finds the order already there; its schedule is
+    // written again below and the duplicates are ignored, so a retry
+    // after a half-finished first attempt still completes it.
+    const orderId =
+      order?.id ??
+      (await db.from("evidence_report_orders").select("id").eq("stripe_session_id", session.id).maybeSingle()).data?.id;
+    if (!orderId) throw new Error(`evidence report order for ${session.id} was not written`);
+    const rows = schedule(tier, created, periodEnd).map((d, i) => ({ order_id: orderId, seq: i + 1, period_end: d.period_end, due_on: d.due_on }));
+    const { error: scheduleError } = await db
+      .from("evidence_report_deliveries")
+      .upsert(rows, { onConflict: "order_id,seq", ignoreDuplicates: true });
+    if (scheduleError) throw scheduleError;
+    await db.rpc("evidence_reports_kick");
+  };
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
-        // A Ledger Evidence Report is prepared by hand and grants nothing
-        // in the app. Resolving its buyer below would invite them into an
-        // account they never asked for, so it stops here.
-        if (session.metadata?.product === "evidence_report") break;
+        // A Ledger Evidence Report grants nothing in the app: it is built
+        // and emailed by noshashi-evidence-report. Resolving its buyer
+        // below would invite them into an account they never asked for,
+        // so it is recorded here and stops.
+        if (session.metadata?.product === "evidence_report") {
+          await recordEvidenceOrder(session);
+          break;
+        }
         let accountId = session.metadata?.account_id ?? session.client_reference_id;
 
         // A purchase made from the marketing site carries an email and

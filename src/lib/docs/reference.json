@@ -856,6 +856,7 @@
   ],
   "edgeFunctions": [
     "noshashi-checkout",
+    "noshashi-evidence-report",
     "noshashi-exception-decide",
     "noshashi-issuer-alerts",
     "noshashi-ledger-registry",
