@@ -1,5 +1,6 @@
 /*
- * POST /api/create-checkout-session — start a Pro subscription.
+ * POST /api/create-checkout-session — start a Pro subscription, or, with
+ * product=evidence-report, pay for a one-off Ledger Evidence Report.
  *
  * What was wrong with this before, in the order it bites:
  *
@@ -99,6 +100,95 @@ function readCadence(body) {
   return String(body.cadence ?? "monthly") === "annual" ? "annual" : "monthly";
 }
 
+/**
+ * The Ledger Evidence Report: a one-off, fixed-price report, prepared by
+ * hand from the same public reads as /certificate/, /treasury/ and
+ * /api/book. Its price is set here, not by the page, so a posted form
+ * cannot name its own.
+ */
+export const REPORT_PRICE_CENTS = 250_000;
+export const REPORT_LIMITS = { issuers: 3, wallets: 10, books: 3 };
+
+const ADDRESS = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+/** A 3-character code, a longer code the report converts to hex, or 40 hex. */
+const CURRENCY = /^([A-Za-z0-9]{3,20}|[0-9A-Fa-f]{40})$/;
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+function list(value) {
+  return [...new Set(String(value ?? "").split(/[\s,]+/).map((v) => v.trim()).filter(Boolean))];
+}
+
+/**
+ * What the buyer wants covered, checked here because it ends up in
+ * Stripe metadata (500 characters a value) and in the report's scope. A
+ * report needs at least one issuer or one wallet: a book alone is what
+ * /book-health/ already gives away.
+ */
+export function readReportScope(body) {
+  const issuers = list(body.issuers);
+  const wallets = list(body.wallets);
+  const books = list(body.books);
+  const periodEnd = String(body.period_end ?? "").trim();
+  const organization = String(body.organization ?? "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 120);
+
+  if (!issuers.length && !wallets.length) return { error: "Name at least one issuing account or one wallet for the report to cover." };
+  if (issuers.length > REPORT_LIMITS.issuers) return { error: `At most ${REPORT_LIMITS.issuers} issuing accounts per report.` };
+  if (wallets.length > REPORT_LIMITS.wallets) return { error: `At most ${REPORT_LIMITS.wallets} wallets per report.` };
+  if (books.length > REPORT_LIMITS.books) return { error: `At most ${REPORT_LIMITS.books} order books per report.` };
+  const badAddress = [...issuers, ...wallets].find((a) => !ADDRESS.test(a));
+  if (badAddress) return { error: `${badAddress.slice(0, 40)} is not an XRP Ledger classic address. They begin with r.` };
+  for (const book of books) {
+    const [currency, issuer, extra] = book.split(".");
+    if (extra !== undefined || !CURRENCY.test(currency ?? "") || !ADDRESS.test(issuer ?? "") || currency.toUpperCase() === "XRP") {
+      return { error: `Write each order book as CURRENCY.issuer, for example USD.rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B.` };
+    }
+  }
+  if (periodEnd) {
+    const day = new Date(`${periodEnd}T23:59:59Z`);
+    if (!DATE.test(periodEnd) || Number.isNaN(day.getTime())) return { error: "Write the period end as YYYY-MM-DD." };
+  }
+  return { issuers, wallets, books, periodEnd, organization };
+}
+
+export function reportForm(scope, origin) {
+  const metadata = {
+    product: "evidence_report",
+    issuers: scope.issuers.join(","),
+    wallets: scope.wallets.join(","),
+    books: scope.books.join(","),
+    period_end: scope.periodEnd,
+    organization: scope.organization,
+    source: "noshashi.app",
+  };
+  const form = new URLSearchParams({
+    mode: "payment",
+    "line_items[0][quantity]": "1",
+    "line_items[0][price_data][currency]": "usd",
+    "line_items[0][price_data][unit_amount]": String(REPORT_PRICE_CENTS),
+    "line_items[0][price_data][product_data][name]": "NOSHASHI Ledger Evidence Report",
+    "line_items[0][price_data][product_data][description]":
+      "One-off report read from validated XRP Ledger mainnet: issuer controls, who can move each wallet, and quoted versus funded order-book depth. Ledger-stamped, with the raw evidence and a 30-minute walkthrough.",
+    success_url: `${origin}/evidence-report/ordered/?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/evidence-report/`,
+    // Institutions pay against an invoice and file it: Stripe issues one
+    // for the payment, with the buyer's billing address and tax id on it.
+    billing_address_collection: "required",
+    "tax_id_collection[enabled]": "true",
+    "invoice_creation[enabled]": "true",
+    allow_promotion_codes: process.env.STRIPE_ALLOW_PROMOTION_CODES === "true" ? "true" : "false",
+    "payment_intent_data[description]": `Ledger Evidence Report${scope.organization ? ` for ${scope.organization}` : ""}`,
+  });
+  for (const [key, value] of Object.entries(metadata)) {
+    if (!value) continue;
+    // On the session for the webhook and the dashboard, on the payment
+    // and the invoice so the scope travels with the money.
+    form.set(`metadata[${key}]`, value);
+    form.set(`payment_intent_data[metadata][${key}]`, value);
+    form.set(`invoice_creation[invoice_data][metadata][${key}]`, value);
+  }
+  return form;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -136,6 +226,14 @@ export default async function handler(req, res) {
   }
 
   const body = readBody(req);
+  const origin = process.env.PUBLIC_SITE_URL || `https://${req.headers.host}`;
+
+  if (String(body.product ?? "") === "evidence-report") {
+    const scope = readReportScope(body);
+    if (scope.error) return fail(400, scope.error, { reason: "bad_scope" });
+    return startCheckout(reportForm(scope, origin), { product: "evidence-report" });
+  }
+
   const cadence = readCadence(body);
   const seats = readSeats(body);
 
@@ -143,8 +241,6 @@ export default async function handler(req, res) {
     cadence === "annual"
       ? process.env.STRIPE_PRO_ANNUAL_PRICE_ID || DEFAULT_PRICE_IDS.annual
       : process.env.STRIPE_PRO_PRICE_ID || DEFAULT_PRICE_IDS.monthly;
-
-  const origin = process.env.PUBLIC_SITE_URL || `https://${req.headers.host}`;
 
   const form = new URLSearchParams({
     mode: "subscription",
@@ -171,50 +267,53 @@ export default async function handler(req, res) {
     "metadata[cadence]": cadence,
   });
 
-  try {
-    const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${secretKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-        // Stripe replays a retried request rather than double-charging.
-        "Idempotency-Key": `noshashi-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-      },
-      body: form,
-    });
+  return startCheckout(form, { priceId, cadence, seats });
 
-    const session = await response.json().catch(() => ({}));
-
-    if (!response.ok || !session.url) {
-      const stripeError = session.error || {};
-      // The whole point of this rewrite: the real reason goes to the
-      // logs, where the operator can actually read it.
-      console.error("[stripe] checkout session failed", {
-        status: response.status,
-        type: stripeError.type,
-        code: stripeError.code,
-        param: stripeError.param,
-        message: stripeError.message,
-        priceId,
-        cadence,
-        seats,
+  /** One Stripe call for every product this page sells. */
+  async function startCheckout(form, context) {
+    try {
+      const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${secretKey}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+          // Stripe replays a retried request rather than double-charging.
+          "Idempotency-Key": `noshashi-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+        },
+        body: form,
       });
 
-      const readable =
-        stripeError.code === "resource_missing"
-          ? "The configured Pro price does not exist on this Stripe account — most often a live key paired with a test-mode price ID. Set STRIPE_PRO_PRICE_ID (and STRIPE_PRO_ANNUAL_PRICE_ID) to prices from the same mode as STRIPE_SECRET_KEY."
-          : stripeError.message ||
-            "Stripe declined the checkout request. The error has been logged.";
+      const session = await response.json().catch(() => ({}));
 
-      return fail(502, readable, { reason: stripeError.code || "stripe_error" });
+      if (!response.ok || !session.url) {
+        const stripeError = session.error || {};
+        // The whole point of this rewrite: the real reason goes to the
+        // logs, where the operator can actually read it.
+        console.error("[stripe] checkout session failed", {
+          status: response.status,
+          type: stripeError.type,
+          code: stripeError.code,
+          param: stripeError.param,
+          message: stripeError.message,
+          ...context,
+        });
+
+        const readable =
+          stripeError.code === "resource_missing" && context.priceId
+            ? "The configured Pro price does not exist on this Stripe account — most often a live key paired with a test-mode price ID. Set STRIPE_PRO_PRICE_ID (and STRIPE_PRO_ANNUAL_PRICE_ID) to prices from the same mode as STRIPE_SECRET_KEY."
+            : stripeError.message ||
+              "Stripe declined the checkout request. The error has been logged.";
+
+        return fail(502, readable, { reason: stripeError.code || "stripe_error" });
+      }
+
+      if (wantsJson) return res.status(200).json({ url: session.url });
+      return res.redirect(303, session.url);
+    } catch (error) {
+      console.error("[stripe] checkout request threw", error);
+      return fail(504, "Stripe did not respond. Try again, or email support@noshashi.app.", {
+        reason: "stripe_unreachable",
+      });
     }
-
-    if (wantsJson) return res.status(200).json({ url: session.url });
-    return res.redirect(303, session.url);
-  } catch (error) {
-    console.error("[stripe] checkout request threw", error);
-    return fail(504, "Stripe did not respond. Try again, or email support@noshashi.app.", {
-      reason: "stripe_unreachable",
-    });
   }
 }

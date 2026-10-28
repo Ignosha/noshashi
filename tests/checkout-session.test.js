@@ -206,3 +206,63 @@ describe("the no-script form still works", () => {
     expect(res.statusCode).toBe(303);
   });
 });
+
+describe("the Ledger Evidence Report", () => {
+  const ISSUER = "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De";
+  const WALLET = "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B";
+  const report = (fields) => post({ product: "evidence-report", ...fields });
+
+  it("charges the fixed price once, whatever the form says", async () => {
+    const res = mockRes();
+    await handler(report({ issuers: ISSUER, seats: 40, unit_amount: 1, price: "price_x" }), res);
+    expect(res.statusCode).toBe(200);
+    const form = stripeForm();
+    expect(form.mode).toBe("payment");
+    expect(form["line_items[0][price_data][unit_amount]"]).toBe("250000");
+    expect(form["line_items[0][price_data][currency]"]).toBe("usd");
+    expect(form["line_items[0][quantity]"]).toBe("1");
+    expect(form["line_items[0][price]"]).toBeUndefined();
+  });
+
+  it("carries the scope to the session, the payment and the invoice", async () => {
+    const res = mockRes();
+    await handler(report({ organization: "Acme Treasury", issuers: ISSUER, wallets: `${WALLET}\n${ISSUER}`, books: `USD.${WALLET}`, period_end: "2026-09-30" }), res);
+    const form = stripeForm();
+    expect(form["metadata[product]"]).toBe("evidence_report");
+    expect(form["metadata[wallets]"]).toBe(`${WALLET},${ISSUER}`);
+    expect(form["payment_intent_data[metadata][books]"]).toBe(`USD.${WALLET}`);
+    expect(form["invoice_creation[invoice_data][metadata][period_end]"]).toBe("2026-09-30");
+    expect(form["invoice_creation[enabled]"]).toBe("true");
+    expect(form.success_url).toContain("/evidence-report/ordered/");
+    expect(form["subscription_data[metadata][tier]"]).toBeUndefined();
+  });
+
+  it("refuses a report with nothing to cover", async () => {
+    const res = mockRes();
+    await handler(report({ books: `USD.${WALLET}` }), res);
+    expect(res.statusCode).toBe(400);
+    expect(sent).toBeUndefined();
+  });
+
+  it("refuses something that is not an address", async () => {
+    const res = mockRes();
+    await handler(report({ wallets: "not-an-address" }), res);
+    expect(res.statusCode).toBe(400);
+    expect(sent).toBeUndefined();
+  });
+
+  it("refuses a scope larger than one report", async () => {
+    const res = mockRes();
+    await handler(report({ issuers: [ISSUER, WALLET, "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq", "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"].join(",") }), res);
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("refuses a malformed order book or period end", async () => {
+    for (const fields of [{ wallets: WALLET, books: "XRP." + ISSUER }, { wallets: WALLET, books: "USD" }, { wallets: WALLET, period_end: "30/09/2026" }]) {
+      const res = mockRes();
+      await handler(report(fields), res);
+      expect(res.statusCode).toBe(400);
+    }
+    expect(sent).toBeUndefined();
+  });
+});

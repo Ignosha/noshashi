@@ -268,6 +268,10 @@ Deno.serve(async (request: Request) => {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
+        // A Ledger Evidence Report is prepared by hand and grants nothing
+        // in the app. Resolving its buyer below would invite them into an
+        // account they never asked for, so it stops here.
+        if (session.metadata?.product === "evidence_report") break;
         let accountId = session.metadata?.account_id ?? session.client_reference_id;
 
         // A purchase made from the marketing site carries an email and

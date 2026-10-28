@@ -328,6 +328,7 @@ async function buildTreasury(write) {
      and how much of the XRP could have been sold into <strong>funded</strong> dollar offers. That
      is the depth a mark can actually lean on. Quoted depth is often much larger. Print it or save
      it as a PDF for the file.</p>
+  <p>Want it prepared, explained and invoiced for the audit file? See the <a href="/evidence-report/">Ledger Evidence Report</a>.</p>
 </div>
 <section>
   <form class="tool-form" id="tr-form" novalidate>
