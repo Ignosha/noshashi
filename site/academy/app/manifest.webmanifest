@@ -1,0 +1,19 @@
+{
+  "name": "NOSHASHI Academy",
+  "short_name": "Academy",
+  "description": "Learn NOSHASHI and the XRP Ledger: short lessons, videos, read-aloud, labs in the real NOSHASHI console, and a certificate.",
+  "id": "/academy/app/",
+  "start_url": "/academy/app/",
+  "scope": "/academy/app/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0d0a",
+  "theme_color": "#0a0d0a",
+  "categories": ["education"],
+  "icons": [
+    { "src": "/academy/app/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/academy/app/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/academy/app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/academy/app/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

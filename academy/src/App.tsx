@@ -4,6 +4,7 @@ import { AcademyPanel } from "./AcademyPanel";
 import { Labs } from "./Labs";
 import { useOnline } from "./useOnline";
 import { isTauri } from "@/lib/env";
+import { InstallHint } from "./InstallHint";
 
 /**
  * NOSHASHI Academy — a separate desktop app for learning NOSHASHI and the
@@ -19,7 +20,7 @@ export default function App() {
   const [openLab, setOpenLab] = useState<string | null>(null);
   const online = useOnline();
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="safe-area flex min-h-screen flex-col bg-background text-foreground">
       <a href="#main" className="skip-link rounded bg-brand px-3 py-1.5 text-primary-foreground">
         Skip to the lesson
       </a>
@@ -53,6 +54,7 @@ export default function App() {
         </nav>
         <p className="ml-auto hidden text-[11px] text-faint sm:block">Free · works offline · your progress stays on this computer</p>
       </header>
+      <InstallHint />
       {!online && (
         <p role="status" className="border-b border-hold/40 bg-hold/10 px-5 py-2 text-[12px] text-foreground">
           {isTauri

@@ -1,12 +1,13 @@
-//! NOSHASHI Academy's native shell.
+//! NOSHASHI Academy's native shell, for the desktop and for iPhone and iPad.
 //!
 //! It does as little as possible. The window shows only the Academy's own
 //! bundled pages; any navigation elsewhere is refused. Two commands: open a
 //! noshashi.app page in the browser (and nothing else), and save a
-//! certificate of completion into Downloads (an .html file, nothing else).
+//! certificate of completion (an .html file, nothing else): into Downloads
+//! on the desktop, and into the app's Documents folder on iOS, which the
+//! Files app shows under On My iPhone › NOSHASHI Academy.
 
 use std::path::PathBuf;
-use std::process::Command;
 use tauri::{WebviewUrl, WebviewWindowBuilder};
 use url::Url;
 
@@ -30,8 +31,14 @@ fn is_noshashi_page(raw: &str) -> Option<Url> {
 #[tauri::command]
 fn open_external(url: String) -> Result<(), String> {
     let url = is_noshashi_page(&url).ok_or("The Academy only opens pages on noshashi.app.")?;
-    // Launched directly, never through a shell (on Windows, `cmd /C start`
-    // would re-parse `&` in the query as a command separator).
+    open_in_browser(&url)
+}
+
+/// Launched directly, never through a shell (on Windows, `cmd /C start`
+/// would re-parse `&` in the query as a command separator).
+#[cfg(desktop)]
+fn open_in_browser(url: &Url) -> Result<(), String> {
+    use std::process::Command;
     #[cfg(target_os = "macos")]
     let result = Command::new("/usr/bin/open").arg(url.as_str()).spawn();
     #[cfg(target_os = "windows")]
@@ -41,6 +48,12 @@ fn open_external(url: String) -> Result<(), String> {
     result.map(|_| ()).map_err(|e| e.to_string())
 }
 
+/// An iOS app cannot start another program; the page names the link instead.
+#[cfg(mobile)]
+fn open_in_browser(url: &Url) -> Result<(), String> {
+    Err(format!("Open {url} in Safari."))
+}
+
 /// A certificate's file name: letters, digits and dashes, ending .html, nothing that could climb out of Downloads.
 fn safe_certificate_name(name: &str) -> Option<String> {
     let stem = name.strip_suffix(".html")?;
@@ -48,9 +61,16 @@ fn safe_certificate_name(name: &str) -> Option<String> {
     ok.then(|| name.to_string())
 }
 
-fn downloads_dir() -> Option<PathBuf> {
-    let home = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE"))?;
-    let dir = PathBuf::from(home).join("Downloads");
+/// Where certificates are saved: Downloads on the desktop; on iOS the app's
+/// own Documents folder (the app's home is its sandbox there).
+fn certificates_dir() -> Option<PathBuf> {
+    let home = PathBuf::from(std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE"))?);
+    if cfg!(target_os = "ios") {
+        let dir = home.join("Documents");
+        std::fs::create_dir_all(&dir).ok()?;
+        return Some(dir);
+    }
+    let dir = home.join("Downloads");
     dir.is_dir().then_some(dir)
 }
 
@@ -62,9 +82,12 @@ fn export_text_file(filename: String, contents: String) -> Result<String, String
     if contents.len() > 200_000 || !contents.starts_with("<!doctype html>") {
         return Err("That is not a certificate.".into());
     }
-    let dir = downloads_dir().ok_or("No Downloads folder was found.")?;
-    let path = dir.join(name);
+    let dir = certificates_dir().ok_or("No Downloads folder was found.")?;
+    let path = dir.join(&name);
     std::fs::write(&path, contents).map_err(|e| e.to_string())?;
+    if cfg!(target_os = "ios") {
+        return Ok(format!("the Files app, On My iPhone › NOSHASHI Academy › {name}"));
+    }
     Ok(path.display().to_string())
 }
 
@@ -73,13 +96,11 @@ pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![open_external, export_text_file])
         .setup(|app| {
-            WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
-                .title("NOSHASHI Academy")
-                .inner_size(1180.0, 820.0)
-                .min_inner_size(640.0, 520.0)
-                .center()
-                .on_navigation(|url| allowed_navigation(url))
-                .build()?;
+            let window = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into())).on_navigation(|url| allowed_navigation(url));
+            // Sizing and a title belong to desktop windows; on iOS the app fills the screen.
+            #[cfg(desktop)]
+            let window = window.title("NOSHASHI Academy").inner_size(1180.0, 820.0).min_inner_size(640.0, 520.0).center();
+            window.build()?;
             Ok(())
         })
         .run(tauri::generate_context!())
