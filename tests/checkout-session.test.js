@@ -283,7 +283,8 @@ describe("the Ledger Evidence Report", () => {
       res = mockRes();
       await handler(report({ tier: "test", wallets: WALLET }), res);
       expect(res.statusCode).toBe(200);
-      expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("50");
+      expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("100");
+      expect(stripeForm().allow_promotion_codes).toBe("true");
       expect(stripeForm().customer_email).toBe("owner@example.com");
     } finally {
       delete process.env.EVIDENCE_TEST_EMAIL;
@@ -295,6 +296,8 @@ describe("the Ledger Evidence Report", () => {
     await handler(report({ wallets: WALLET }), res);
     expect(stripeForm()["custom_text[submit][message]"]).toContain("noshashi.app/legal/report-terms");
     expect(stripeForm().customer_email).toBeUndefined();
+    // Promotion codes stay off for every tier that is sold.
+    expect(stripeForm().allow_promotion_codes).toBe("false");
   });
 
   it("gives Audit support its larger scope", async () => {
@@ -302,6 +305,18 @@ describe("the Ledger Evidence Report", () => {
     const res = mockRes();
     await handler(report({ tier: "audit", issuers: six }), res);
     expect(res.statusCode).toBe(200);
+  });
+
+  it("holds the Issuer check to one issuer and charges $750", async () => {
+    let res = mockRes();
+    await handler(report({ tier: "issuer", issuers: [ISSUER, "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq"].join(",") }), res);
+    expect(res.statusCode).toBe(400);
+    expect(sent).toBeUndefined();
+    res = mockRes();
+    await handler(report({ tier: "issuer", issuers: ISSUER, wallets: WALLET }), res);
+    expect(res.statusCode).toBe(200);
+    expect(stripeForm()["line_items[0][price_data][unit_amount]"]).toBe("75000");
+    expect(stripeForm().allow_promotion_codes).toBe("false");
   });
 
   it("refuses a malformed order book or period end", async () => {

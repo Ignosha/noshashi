@@ -146,6 +146,13 @@ plan, phase by phase, with what is done and what remains.
 Deployment state, database notes, the website, email and house rules:
 [`docs/OPERATIONS.md`](docs/OPERATIONS.md) and [`HANDOFF.md`](HANDOFF.md).
 
+## Sponsor
+
+NOSHASHI's free tools and public source are built by one person. If they
+save you time, you can support the work through
+[GitHub Sponsors](https://github.com/sponsors/Ignosha). Sponsorship buys no
+access, features or influence over what a reading says.
+
 ## Contributing
 
 Open a pull request against `main`. CI runs the type check, the tests, the
