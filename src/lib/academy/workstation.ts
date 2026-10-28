@@ -36,7 +36,10 @@ export function stepIdentifiers(step: LabStep): string[] {
 }
 
 export function objectivesFor(step: LabStep): Objective[] {
-  const ids = stepIdentifiers(step);
+  // NOSHX reads the ledger only through the model the trainee has set up
+  // (on-device or their own key), which the workstation cannot assume. Its
+  // steps are scored on opening it and answering.
+  const ids = step.scene === "agent" ? [] : stepIdentifiers(step);
   const what = step.subjectLabel ?? step.copy?.find((c) => ID.test(c.value))?.label ?? "the lab's value";
   return [
     { id: "open", label: `Open ${screenName(step.scene)}` },

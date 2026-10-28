@@ -262,10 +262,18 @@ class XrplLink {
       } catch (error) {
         return Promise.reject(error);
       }
-      return this.pacer.run(() => this.send(command, params)).then((result) => {
-        trainingGuard().answered(command, params, result);
-        return result;
-      });
+      return this.pacer.run(() => this.send(command, params)).then(
+        (result) => {
+          trainingGuard().answered(command, params, result);
+          return result;
+        },
+        (error: unknown) => {
+          // "actNotFound" and the like are the ledger's answer too: a lab
+          // that reads a deleted or never-funded account has read it.
+          if (error instanceof XrplError && error.code && error.code !== "disconnected") trainingGuard().answered(command, params, {});
+          throw error;
+        }
+      );
     }
     return this.pacer.run(() => this.send(command, params));
   }

@@ -13,7 +13,7 @@ describe("lab workstation objectives", () => {
         const ids = objectivesFor(step).map((o) => o.id);
         expect(ids[0]).toBe("open");
         expect(ids[ids.length - 1]).toBe("answer");
-        expect(ids.includes("read")).toBe(stepIdentifiers(step).length > 0);
+        expect(ids.includes("read")).toBe(step.scene !== "agent" && stepIdentifiers(step).length > 0);
       }
     }
   });
