@@ -1,0 +1,57 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:03.936
+Compliance means following the laws for moving money.
+
+2
+00:00:03.936 --> 00:00:10.897
+On the X R P Ledger it comes down to two questions: am I allowed to move this, and could I actually get out of it?
+
+3
+00:00:12.597 --> 00:00:16.331
+K Y C, know your customer, means checking who a customer is.
+
+4
+00:00:16.781 --> 00:00:22.050
+A M L, anti-money-laundering, means the rules and monitoring that stop criminal money.
+
+5
+00:00:22.500 --> 00:00:27.001
+Sanctions screening checks that nobody involved is on a government blocklist.
+
+6
+00:00:27.451 --> 00:00:36.005
+And the Travel Rule means that for larger transfers between regulated firms, the sender's and receiver's details travel with the payment.
+
+7
+00:00:36.005 --> 00:00:46.993
+The threshold depends on where you are: about one thousand dollars or euros suggested by the F A T F, three thousand in the United States, and no minimum in the European Union.
+
+8
+00:00:48.693 --> 00:00:52.387
+Behaviour screening asks whether a counterparty is risky.
+
+9
+00:00:52.387 --> 00:00:55.564
+It cannot see what a token's issuer can still do.
+
+10
+00:00:55.564 --> 00:01:00.490
+A perfectly clean holder can hold a token that can be frozen or clawed back.
+
+11
+00:01:00.490 --> 00:01:02.175
+NOSHASHI reads both sides.
+
+12
+00:01:03.875 --> 00:01:06.357
+The ledger now has compliance built in.
+
+13
+00:01:06.357 --> 00:01:14.691
+With credentials, a trusted issuer such as a K Y C provider can vouch for an account without revealing the personal data behind it.
+
+14
+00:01:15.141 --> 00:01:19.515
+And permissioned domains admit only accounts that hold the right credentials.

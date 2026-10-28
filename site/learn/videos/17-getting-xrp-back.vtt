@@ -1,0 +1,73 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:08.721
+Stolen X R P cannot be pulled back, but a lot of X R P is simply stuck, waiting for its owner to sign one transaction.
+
+2
+00:00:08.721 --> 00:00:13.479
+And most thefts start with one signature the owner did not understand.
+
+3
+00:00:15.179 --> 00:00:17.805
+A matured escrow does not pay out on its own.
+
+4
+00:00:17.805 --> 00:00:19.147
+Someone must finish it.
+
+5
+00:00:19.597 --> 00:00:22.434
+A check written to you pays nothing until you cash it.
+
+6
+00:00:22.884 --> 00:00:27.126
+And every object an account owns locks zero point two X R P.
+
+7
+00:00:27.126 --> 00:00:30.095
+Removing ones you no longer need frees it.
+
+8
+00:00:30.545 --> 00:00:38.267
+A real example: Ripple's escrow wallet number three holds ten escrows to itself, each waiting for a finishing transaction.
+
+9
+00:00:39.967 --> 00:00:43.548
+A phishing site does not need your seed if you will sign for it.
+
+10
+00:00:43.548 --> 00:00:47.519
+Set regular key and signer list set hand signing power to someone else.
+
+11
+00:00:47.969 --> 00:00:50.743
+Account delete sends everything to its destination.
+
+12
+00:00:51.193 --> 00:00:54.776
+And an N F T sell offer for zero gives the token away.
+
+13
+00:00:54.776 --> 00:00:57.364
+Decode every request before signing it.
+
+14
+00:00:57.364 --> 00:01:00.814
+The Security Center's free Pre-sign check does this.
+
+15
+00:01:02.514 --> 00:01:05.661
+Anyone can write a website name on an account.
+
+16
+00:01:05.661 --> 00:01:12.502
+The claim is proven only when that website lists the account back in its x r p ledger dot toml file.
+
+17
+00:01:12.502 --> 00:01:16.811
+X R P Toolkit's donations account does both, so it is verified.
+
+18
+00:01:16.811 --> 00:01:19.069
+The free Domain check tests this.

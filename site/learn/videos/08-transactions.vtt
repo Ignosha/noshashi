@@ -1,0 +1,81 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:07.608
+Everything that changes on the XRP Ledger happens through a transaction: a signed instruction from an account.
+
+2
+00:00:07.608 --> 00:00:10.748
+This video shows how to read what happened to one.
+
+3
+00:00:12.448 --> 00:00:14.743
+A Payment sends XRP or a token.
+
+4
+00:00:14.743 --> 00:00:18.592
+OfferCreate places a trade on the built-in exchange.
+
+5
+00:00:19.042 --> 00:00:25.570
+TrustSet opens a trust line so an account can hold a token, and AccountSet changes an account's settings.
+
+6
+00:00:26.020 --> 00:00:28.950
+Every transaction pays a tiny fee in XRP.
+
+7
+00:00:28.950 --> 00:00:34.596
+The fee is destroyed, not paid to anyone, which protects the network from spam.
+
+8
+00:00:36.296 --> 00:00:40.962
+When a transaction is first submitted, the server gives a tentative result.
+
+9
+00:00:40.962 --> 00:00:48.179
+It becomes final only when the transaction is in a validated ledger, and the final result is stored in its metadata.
+
+10
+00:00:48.629 --> 00:00:51.399
+So never treat the first answer as the last.
+
+11
+00:00:51.399 --> 00:00:53.791
+NOSHASHI reads validated ledgers only.
+
+12
+00:00:55.491 --> 00:01:00.163
+A result starting with t e s means success: the transaction did what it said.
+
+13
+00:01:00.613 --> 00:01:07.316
+A result starting with t e c means it failed but was still recorded in the ledger, and the fee was charged.
+
+14
+00:01:07.316 --> 00:01:08.507
+Nothing else moved.
+
+15
+00:01:08.957 --> 00:01:17.661
+Results starting with t e f, t e l, t e m or t e r mean the transaction was not applied at all, and no fee was charged.
+
+16
+00:01:19.361 --> 00:01:20.126
+One warning.
+
+17
+00:01:20.126 --> 00:01:25.547
+A payment can say success and still deliver only a tiny part of the amount it states.
+
+18
+00:01:25.997 --> 00:01:27.684
+That is a partial payment.
+
+19
+00:01:27.684 --> 00:01:31.381
+The figure to trust is delivered amount, in the metadata.
+
+20
+00:01:31.381 --> 00:01:33.976
+Video five shows a real case on mainnet.

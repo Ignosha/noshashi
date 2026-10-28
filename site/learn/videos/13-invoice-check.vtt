@@ -1,0 +1,61 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:03.543
+Settlement tells you what a transaction moved.
+
+2
+00:00:03.543 --> 00:00:09.724
+The Invoice check answers the question a business really has: did this transaction pay this invoice?
+
+3
+00:00:11.424 --> 00:00:17.555
+You enter the receiving account, an optional destination tag, the asset and the amount you expect.
+
+4
+00:00:17.555 --> 00:00:19.744
+Verified means it paid the invoice.
+
+5
+00:00:20.194 --> 00:00:25.293
+Hold means a person should look first, for example when a payment is larger than the invoice.
+
+6
+00:00:25.743 --> 00:00:30.287
+Rejected means it did not pay, and the reason is given in plain words.
+
+7
+00:00:30.287 --> 00:00:31.780
+Only verified is green.
+
+8
+00:00:33.480 --> 00:00:37.491
+It credits only what was delivered, never the amount the payment states.
+
+9
+00:00:37.941 --> 00:00:41.887
+It compares amounts exactly, digit by digit, and never rounds.
+
+10
+00:00:42.337 --> 00:00:51.212
+And by default it reads the transaction from two independent node operators, X R P L Labs and Ripple, and says so if they disagree.
+
+11
+00:00:52.912 --> 00:00:55.152
+Here is a real payment on mainnet.
+
+12
+00:00:55.152 --> 00:01:02.463
+It asked for one hundred sixty-two point six nine nine C S C and delivered one hundred sixty-one point one six.
+
+13
+00:01:02.463 --> 00:01:07.931
+Checked against the full amount, with partial payments not allowed, it is rejected.
+
+14
+00:01:08.381 --> 00:01:14.213
+Checked against the amount actually delivered, with partial payments allowed, it is verified.
+
+15
+00:01:14.213 --> 00:01:18.791
+The Academy's labs let you run both, and five more real cases on testnet.

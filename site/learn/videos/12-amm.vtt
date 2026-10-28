@@ -1,0 +1,37 @@
+WEBVTT
+
+1
+00:00:00.700 --> 00:00:06.659
+Besides order books, the XRP Ledger has automated market makers: pools that trade with anyone.
+
+2
+00:00:06.659 --> 00:00:09.575
+Here is how they work, and who sets their fee.
+
+3
+00:00:11.275 --> 00:00:19.424
+A pool holds two assets, for example X R P and a stablecoin, and prices every trade from the ratio of the two balances.
+
+4
+00:00:19.874 --> 00:00:24.951
+When you trade, the ledger routes through order books and pools, whichever gives the better price.
+
+5
+00:00:26.651 --> 00:00:31.473
+People who deposit both assets receive L P tokens: their share of the pool.
+
+6
+00:00:31.923 --> 00:00:40.925
+Every swap pays a fee of up to one percent into the pool, and L P token holders vote on that fee, weighted by how many L P tokens each one holds.
+
+7
+00:00:42.625 --> 00:00:50.156
+Anyone can bid L P tokens for the auction slot, which lets its holder trade at a heavily discounted fee for a period.
+
+8
+00:00:50.606 --> 00:00:57.298
+NOSHASHI's Pool Governance screen shows the fee, who votes it and with what share, and who holds the slot.
+
+9
+00:00:57.298 --> 00:01:02.979
+A pool whose fee is set by one large holder behaves differently from one with many voters.
