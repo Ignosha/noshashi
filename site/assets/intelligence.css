@@ -56,7 +56,7 @@
   .core{right:-6%;top:6%;width:min(62vw,300px);transform:none;opacity:.42;animation:none}
   .core-cap{display:none}
 }
-html[data-theme="light"] .core-flower{filter:drop-shadow(0 0 10px rgb(36 122 59 / .25)) saturate(1.1) brightness(.92)}
+html[data-theme="light"] .core-flower{filter:drop-shadow(0 0 10px rgb(29 95 214 / .25)) saturate(1.1) brightness(.92)}
 
 /* ── Hero: system strip, copy, actions ───────────────────────────────── */
 .sys{display:flex;flex-wrap:wrap;gap:10px 26px;margin:0;

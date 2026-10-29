@@ -8,9 +8,9 @@
   @font-face { font-family: "Grotesk"; src: url("../../public/fonts/space-grotesk-500-latin.woff2") format("woff2"); font-weight: 500; }
   @font-face { font-family: "Plex"; src: url("../../public/fonts/ibm-plex-mono-500-latin.woff2") format("woff2"); font-weight: 500; }
   :root {
-    --ink: #08100b;      /* the app's dark ground */
+    --ink: #070B14;      /* the app's dark ground */
     --deep: #0d1a12;
-    --matcha: #9fe463;   /* the site's CTA green */
+    --matcha: #4C8DFF;   /* the site's CTA green */
     --leaf: #1d6630;
     --paper: #e6f2e4;
     --amber: #f2b33d;
@@ -252,7 +252,7 @@ function seek(t) {
       c.node.style.transform = `translate(-50%,-50%) translate(${x}px, ${y}px) scale(${sc})`;
     }
   }
-  swirl(t, 3.0, 0.5, "#9fe463");
+  swirl(t, 3.0, 0.5, "#4C8DFF");
 
   // SPACE ────────────────────────────────────
   const in3 = t >= 5.9 && t < 9.7;
@@ -280,7 +280,7 @@ function seek(t) {
     s3Top.style.opacity = easeOut(prog(t, 6.2, 6.6)) * (1 - prog(t, 9.3, 9.6));
     s3Cap.style.transform = `translateY(${(1 - easeOut(prog(t, 6.6, 7.0))) * 80}px)`;
   }
-  swirl(t, 6.0, 0.6, "#9fe463");
+  swirl(t, 6.0, 0.6, "#4C8DFF");
 
   // TIME ─────────────────────────────────────
   const in4 = t >= 9.4 && t < 12.7;
@@ -320,7 +320,7 @@ function seek(t) {
     cta.style.opacity = easeOut(prog(t, 13.8, 14.2));
     cta.style.transform = `translateY(${(1 - easeOut(prog(t, 13.8, 14.2))) * 30}px)`;
   }
-  swirl(t, 12.5, 0.5, "#9fe463");
+  swirl(t, 12.5, 0.5, "#4C8DFF");
 
   // A small, honest source line under the real-payment scene.
   foot.textContent = in4 && t > 10 ? "Recorded from XRPL mainnet · ledger 107,193,471" : "";

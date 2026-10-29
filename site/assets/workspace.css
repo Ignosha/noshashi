@@ -3,7 +3,7 @@
  * main workspace, and a context panel that opens only on demand.
  *
  * Every colour and font comes from the site's own tokens in core.css
- * (and accent.css for the blue theme), so the workspace is the same brand
+ * (navy and electric blue), so the workspace is the same brand
  * in a calmer, denser arrangement. No new palette is introduced here.
  */
 .ws-body-root{background:var(--ground);min-height:100vh}
@@ -237,3 +237,27 @@ html[data-ws-side="rail"] .ws-brand{flex-direction:column;gap:10px}
 .ws-more-fields{display:grid;gap:8px;border:1px solid var(--rule);border-radius:8px;padding:8px 10px}
 .ws-more-fields[open]{padding-bottom:12px}
 .ws-more-fields summary{cursor:pointer;font-size:12.5px;color:var(--ink)}
+
+/* ── Glass panels ─────────────────────────────────────────────────
+   Translucent surfaces with a fine blue edge, after the brand banner.
+   Only the containers a reader scans get the treatment; rows inside
+   them stay flat so nothing glows that does not need attention. When
+   the browser cannot blur, the panel falls back to the plain surface. */
+.ws-result,.ws-tool,.ws-details,.ws-history,.ws-tester,.ws-table-wrap,.ws-metrics{
+  border-color:color-mix(in srgb,var(--brand) 18%,var(--rule));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 86%,transparent),color-mix(in srgb,var(--surface) 64%,transparent));
+  box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 5%,transparent) inset,0 18px 40px -30px rgb(0 0 0 / .6);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.ws-metrics{background:color-mix(in srgb,var(--brand) 14%,var(--rule))}
+.ws-tool{transition:border-color .16s,transform .16s,box-shadow .16s}
+.ws-tool:hover,.ws-tool:focus-visible{border-color:color-mix(in srgb,var(--brand) 45%,var(--rule));
+  box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 6%,transparent) inset,0 0 0 1px color-mix(in srgb,var(--brand) 18%,transparent),0 18px 40px -26px color-mix(in srgb,var(--brand) 45%,transparent)}
+@media (prefers-reduced-motion:no-preference){.ws-tool:hover{transform:translateY(-1px)}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .ws-result,.ws-tool,.ws-details,.ws-history,.ws-tester,.ws-table-wrap{background:var(--surface)}
+}
+html[data-theme="light"] .ws-result,html[data-theme="light"] .ws-tool,html[data-theme="light"] .ws-details,
+html[data-theme="light"] .ws-history,html[data-theme="light"] .ws-tester,html[data-theme="light"] .ws-table-wrap{
+  background:var(--surface);box-shadow:0 1px 2px rgb(11 20 36 / .06)}
+/* A faint brand glow behind the workspace, so the glass has something to sit on. */
+.ws-col{background:radial-gradient(900px 420px at 85% -10%,color-mix(in srgb,var(--brand) 9%,transparent),transparent 70%)}

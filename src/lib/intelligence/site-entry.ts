@@ -389,10 +389,10 @@ class Network {
     const { ctx } = this;
     ctx.clearRect(0, 0, this.w, this.h);
     if (!this.points.size) return;
-    const brand = css("--brand") || "#9BE15D";
-    const tele = css("--tele") || "#55D98A";
+    const brand = css("--brand") || "#4C8DFF";
+    const tele = css("--tele") || "#5CD6F2";
     const hold = css("--hold") || "#E7C766";
-    const muted = css("--faint") || "#718473";
+    const muted = css("--faint") || "#7A89A6";
 
     // Relationships: soft curves, bowed a little so the field branches rather than meshes.
     for (const l of this.links) {

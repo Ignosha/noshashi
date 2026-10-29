@@ -13,18 +13,18 @@
    the landing page, which cannot link this file.
    ───────────────────────────────────────────────────────────────── */
  :root{
-  --ground:#08100B; --surface:#0E1911; --elevated:#15251A;
-  --ink:#E9F5E7; --muted:#A7B8A8; --faint:#718473; --rule:#263B2A;
-  --brand:#9BE15D; --tele:#55D98A; --on-brand:#08100B;
-  --go:#9BE15D; --hold:#E7C766; --nogo:#FF7B7B;
+  --ground:#070B14; --surface:#0D1424; --elevated:#142036;
+  --ink:#E8EEF8; --muted:#A6B2C8; --faint:#7A89A6; --rule:#22304A;
+  --brand:#4C8DFF; --tele:#5CD6F2; --on-brand:#070B14;
+  --go:#3DD68C; --hold:#E7C766; --nogo:#FF7B7B;
   --shell:min(1180px, 92vw);
   --r:10px;
 }
 html[data-theme="light"]{
-  --ground:#F2F8F0; --surface:#FFFFFF; --elevated:#E5F0E2;
-  --ink:#0B160D; --muted:#3F5843; --faint:#55705A; --rule:#C4D7C5;
-  --brand:#247A3B; --tele:#117549; --on-brand:#FFFFFF;
-  --go:#247A3B; --hold:#8B6500; --nogo:#B42332;
+  --ground:#F3F6FB; --surface:#FFFFFF; --elevated:#E6ECF6;
+  --ink:#0B1424; --muted:#3E4D66; --faint:#55637C; --rule:#C6D1E3;
+  --brand:#1D5FD6; --tele:#0B6E8C; --on-brand:#FFFFFF;
+  --go:#1E7A45; --hold:#8B6500; --nogo:#B42332;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}

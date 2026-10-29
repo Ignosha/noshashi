@@ -9,7 +9,7 @@
 @media (max-width:900px){.foot-map{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:420px){.foot-map{grid-template-columns:1fr}}
 /* Primary nav button text: the page's `.nav-links a` colour is more specific than `.btn`. */
-.nav-links a.btn:not(.ghost){color:#08100B}
+.nav-links a.btn:not(.ghost){color:#070B14}
 /* The GREEN / BLUE switch, styled like the shared theme toggle. */
 .accent-toggle{display:inline-flex;align-items:center;gap:7px;background:transparent;
   color:var(--muted);border:1px solid var(--rule);border-radius:var(--r);padding:8px 11px;

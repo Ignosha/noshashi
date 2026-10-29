@@ -29,10 +29,10 @@
      stylesheet, so these are duplicated deliberately; the tokens are the
      contract, and they must not drift. */
   :root{
-    --ground:#08100B; --surface:#0E1911; --elevated:#15251A;
-    --ink:#E9F5E7; --muted:#A7B8A8; --faint:#718473; --rule:#263B2A;
-    --brand:#9BE15D; --tele:#55D98A;
-    --go:#9BE15D; --hold:#F5B942; --nogo:#FF5F6D;
+    --ground:#070B14; --surface:#0D1424; --elevated:#142036;
+    --ink:#E8EEF8; --muted:#A6B2C8; --faint:#7A89A6; --rule:#22304A;
+    --brand:#4C8DFF; --tele:#5CD6F2;
+    --go:#3DD68C; --hold:#F5B942; --nogo:#FF5F6D;
     --shell:min(1180px, 92vw);
     --r:2px;
   }
@@ -199,7 +199,7 @@
     .tier-compare thead th:not(:first-child){border-left:1px solid var(--rule)}
     .tier-compare thead th:first-child{width:23%;color:var(--faint)}
     .tier-compare thead th:nth-child(4){color:var(--tele)}
-    .tier-compare thead th:nth-child(5){color:#9BE15D}
+    .tier-compare thead th:nth-child(5){color:#4C8DFF}
     .tier-compare tbody th{color:var(--muted);font-weight:500}
     .tier-compare tbody td{color:var(--ink);border-left:1px solid var(--rule)}
     .tier-compare tbody tr:last-child th,.tier-compare tbody tr:last-child td{border-bottom:0}
@@ -207,7 +207,7 @@
     .tier-compare .group th:not(:first-child){border-left:0}
     .tier-compare .yes{color:var(--go);font-family:"IBM Plex Mono",monospace;font-size:12px}
     .tier-compare .contracted{color:var(--tele);font-family:"IBM Plex Mono",monospace;font-size:12px}
-    .tier-compare .optional{color:#9BE15D;font-family:"IBM Plex Mono",monospace;font-size:12px}
+    .tier-compare .optional{color:#4C8DFF;font-family:"IBM Plex Mono",monospace;font-size:12px}
     .tier-compare .limited{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:12px}
     .tier-compare .no{color:var(--faint)}
     .tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:12px}
@@ -225,10 +225,7 @@
   <div class="shell">
     <nav class="nav">
       <a class="brand" href="/">
-        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="10.2" fill="none" stroke="#9BE15D" stroke-width="1.4"/>
-          <circle cx="12" cy="12" r="3.1" fill="#9BE15D"/>
-        </svg>
+        <img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async">
         <span>NOSHASHI</span>
       </a>
       <nav class="nav-links" aria-label="Primary">
@@ -239,7 +236,6 @@
         <a href="/resources/">Resources</a>
         <a href="/pricing/" aria-current="page">Pricing</a>
         <a href="/about/" class="optional">About</a>
-        <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme"><span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span></button>
         <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>
         <a class="btn" href="/app/">Open workspace</a>
       </nav>

@@ -1,21 +1,21 @@
 ---
 name: Noshashi Instrument
-source: noshashi-brand-reference.png
+source: brand/flower-source.png (the translucent blue lotus, 2026-10-29)
 description: Aerospace instrumentation for financial adjudication. Navy ground, a single blue accent for the brand and one telemetry cyan for live signal. Status colour is spent only on GO/HOLD/NO-GO. Soft corners, thin rules, tabular numerals, static orbital geometry behind the data.
 mode: operate
 colors:
-  ground: "#0B0F14"
-  surface: "#11161D"
-  elevated: "#1C2330"
-  text-primary: "#E6E8EB"
-  text-secondary: "#A3A8B3"
-  text-faint: "#747C8B"
-  border: "#2A313C"
-  accent: "#3A82F6"
-  telemetry: "#00E0C6"
-  go: "#35D49A"
+  ground: "#070B14"
+  surface: "#0D1424"
+  elevated: "#142036"
+  text-primary: "#E8EEF8"
+  text-secondary: "#A6B2C8"
+  text-faint: "#7A89A6"
+  border: "#22304A"
+  accent: "#4C8DFF"
+  telemetry: "#5CD6F2"
+  go: "#3DD68C"
   hold: "#F5B942"
-  no-go: "#FF5F6D"
+  no-go: "#FF6B78"
 fonts:
   display: "Space Grotesk"
   mono: "IBM Plex Mono"
@@ -23,6 +23,17 @@ radius: "0.5rem"
 ---
 
 # NOSHASHI — Design System
+
+## 2026-10 refresh: navy, electric blue, glass
+
+The site's interim green "garden" palette is retired. Every surface now uses
+the navy ground, an electric-blue brand (#4C8DFF), cyan for live signal
+(#5CD6F2) and green only for GO. Panels that a reader scans (the hero's
+live readings, workspace results and tools) are translucent glass with a
+fine blue edge; they fall back to the plain surface where the browser
+cannot blur. The logo is the translucent blue lotus in
+brand/flower-source.png; the previous green flower is kept as
+brand/flower-source-v1-green.png.
 
 Register: **Operate.** The visitor completes a task. Scanability, consistency
 and the real usage scene outrank expression. Brand lives in precise details,

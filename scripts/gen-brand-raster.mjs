@@ -3,7 +3,11 @@
  * Raster brand files, rendered with the bundled Chromium.
  *
  *   app-icon-master.png        1024px app icon: the owner's flower artwork
- *                              (brand/flower-source.png) on the garden ground.
+ *                              (brand/flower-source.png) on the navy ground.
+ *                              The previous green artwork is kept as
+ *                              brand/flower-source-v1-green.png; copy it back
+ *                              over flower-source.png and set ART below to
+ *                              ART_V1 to restore the old logo.
  *                              Source for `npm run icon` (tauri icon).
  *   src-tauri/icons/tray.png   macOS menu-bar template images from the
  *   src-tauri/icons/tray@2x.png  single-colour vector (brand/flower-mono.svg).
@@ -42,14 +46,18 @@ async function render(html, px, out) {
   console.log(`wrote ${out}`);
 }
 
-// The artwork's core sits at (628, 578) of 1263x1245; offset it so the
-// core, not the image box, lands on the icon's centre.
+// Where the artwork sits in its source image: the point the marks centre
+// on, the source width, and the half-size of the square that holds every
+// petal tip. ART_V1 is the previous green flower (1263x1245).
+const ART_V1 = { cx: 628, cy: 578, w: 1263, half: 600, ground: ["#17301D", "#0C1710", "#060B07"] };
+const ART = { cx: 954, cy: 568, w: 1920, half: 920, ground: ["#13213D", "#0A1224", "#050912"] };
+// Offset the artwork so its centre, not the image box, lands on the icon's centre.
 const flower = dataUrl("brand/flower-source.png", "image/png");
 await render(
   `<div style="width:1024px;height:1024px;position:relative;overflow:hidden;
-     background:radial-gradient(circle at 50% 50%,#17301D 0%,#0C1710 52%,#060B07 100%)">
+     background:radial-gradient(circle at 50% 50%,${ART.ground[0]} 0%,${ART.ground[1]} 52%,${ART.ground[2]} 100%)">
      <img src="${flower}" style="position:absolute;width:880px;
-       left:${512 - 628 * (880 / 1263)}px;top:${512 - 578 * (880 / 1263)}px">
+       left:${512 - ART.cx * (880 / ART.w)}px;top:${512 - ART.cy * (880 / ART.w)}px">
    </div>`,
   1024,
   "app-icon-master.png"
@@ -97,22 +105,21 @@ for (const [px, pad, out] of [
   const page = await browser.newPage();
   const sizes = [64, 128, 180];
   const pngs = await page.evaluate(
-    async ({ src, sizes }) => {
+    async ({ src, sizes, art }) => {
       const img = new Image();
       img.src = src;
       await img.decode();
-      // Core at (628, 578); every petal tip lies within 600px of it.
-      const half = 600;
+      const { cx, cy, half } = art;
       return sizes.map((px) => {
         const c = document.createElement("canvas");
         c.width = c.height = px;
         const g = c.getContext("2d");
         g.imageSmoothingQuality = "high";
-        g.drawImage(img, 628 - half, 578 - half, half * 2, half * 2, 0, 0, px, px);
+        g.drawImage(img, cx - half, cy - half, half * 2, half * 2, 0, 0, px, px);
         return c.toDataURL("image/png").split(",")[1];
       });
     },
-    { src: flower, sizes }
+    { src: flower, sizes, art: ART }
   );
   const outs = {
     64: ["site/assets/flower-mark-64.png"],

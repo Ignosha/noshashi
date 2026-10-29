@@ -39,18 +39,18 @@
 <style>
   :root{
     /* Brand board, section 05 */
-    --ground:#08100B; --surface:#0E1911; --elevated:#15251A;
-    --ink:#E9F5E7; --muted:#A7B8A8; --faint:#718473; --rule:#263B2A;
-    --brand:#9BE15D; --tele:#55D98A; --on-brand:#08100B;
-    --go:#9BE15D; --hold:#E7C766; --nogo:#FF7B7B;
+    --ground:#070B14; --surface:#0D1424; --elevated:#142036;
+    --ink:#E8EEF8; --muted:#A6B2C8; --faint:#7A89A6; --rule:#22304A;
+    --brand:#4C8DFF; --tele:#5CD6F2; --on-brand:#070B14;
+    --go:#3DD68C; --hold:#E7C766; --nogo:#FF7B7B;
     --shell:min(1180px, 92vw);
     --r:3px;
   }
   html[data-theme="light"]{
-    --ground:#F2F8F0; --surface:#FFFFFF; --elevated:#E5F0E2;
-    --ink:#0B160D; --muted:#3F5843; --faint:#55705A; --rule:#C4D7C5;
-    --brand:#247A3B; --tele:#117549; --on-brand:#FFFFFF;
-    --go:#247A3B; --hold:#8B6500; --nogo:#B42332;
+    --ground:#F3F6FB; --surface:#FFFFFF; --elevated:#E6ECF6;
+    --ink:#0B1424; --muted:#3E4D66; --faint:#55637C; --rule:#C6D1E3;
+    --brand:#1D5FD6; --tele:#0B6E8C; --on-brand:#FFFFFF;
+    --go:#1E7A45; --hold:#8B6500; --nogo:#B42332;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -470,10 +470,10 @@
   .tier.enterprise{border-color:color-mix(in srgb,var(--tele) 55%,var(--rule))}
   .tier.enterprise .cap{background:var(--tele)}
   .tier.enterprise .name{color:var(--tele)}
-  .tier.strategic{border-color:color-mix(in srgb,#b69cff 55%,var(--rule))}
-  .tier.strategic .cap{background:#b69cff}
-  .tier.strategic .name{color:#b69cff}
-  html[data-theme="light"] .tier.strategic .name{color:#5B3FB8}
+  .tier.strategic{border-color:color-mix(in srgb,var(--tele) 55%,var(--rule))}
+  .tier.strategic .cap{background:var(--tele)}
+  .tier.strategic .name{color:var(--tele)}
+  html[data-theme="light"] .tier.strategic .name{color:var(--tele)}
   .tier .name{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--muted)}
   .tier.focus .name{color:var(--brand)} .tier.institutional .name{color:var(--tele)}
   .tier .amt{font-size:34px;font-weight:700;margin:18px 0 2px;letter-spacing:-.02em}
@@ -759,11 +759,11 @@
      at 1. */
   .hi-bloom{position:absolute;top:2%;bottom:4%;left:26%;right:0;
     width:auto;height:96%;z-index:1;pointer-events:none;
-    color:rgb(155 225 93 / .9);
+    color:rgb(76 141 255 / .9);
     animation:hiFade 1.4s cubic-bezier(.16,1,.3,1) both;animation-delay:.35s}
   /* On the pale ground a translucent pale petal is invisible, so the
      light theme gets the brand hue at a lower weight instead. */
-  html[data-theme="light"] .hi-bloom{color:rgb(36 122 59 / .58)}
+  html[data-theme="light"] .hi-bloom{color:rgb(29 95 214 / .58)}
   /* Text that crosses the petals keeps a halo of the page ground, so the
      labels and the headline stay legible over the bloom in both themes. */
   .hi-label .t,.hi-label p,.hero-instrument h1{
@@ -774,8 +774,8 @@
      on it keeps the form from letterboxing to nothing in a narrow box. */
   @media(max-width:1023px){
     .hi-bloom{left:0;right:0;top:0;bottom:0;width:100%;height:100%;
-      color:rgb(155 225 93 / .52)}
-    html[data-theme="light"] .hi-bloom{color:rgb(36 122 59 / .38)}
+      color:rgb(76 141 255 / .52)}
+    html[data-theme="light"] .hi-bloom{color:rgb(29 95 214 / .38)}
     .hero-instrument > .garden-field{opacity:.45}
   }
 
@@ -1000,6 +1000,61 @@
     background:radial-gradient(60% 60% at 50% 40%,color-mix(in srgb,var(--brand) 38%,transparent),transparent 70%);
     filter:blur(40px)}
 
+  /* ── Banner hero: the copy on the left, the lotus and two glass
+     panels of live readings on the right. The panels mirror the ticker
+     below, so every figure comes from the same validated-ledger stream. */
+  .bx-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(24px,4vw,56px);
+    align-items:center;text-align:left}
+  .bx-hero .cx-hero-text{margin:0;max-width:600px}
+  .bx-hero h1{margin:0;max-width:14ch}
+  .bx-hero .cx-sub{margin-left:0;max-width:44ch}
+  .bx-hero .cx-actions{justify-content:flex-start}
+  .bx-hero .cx-btn{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+  .bx-hero .cx-btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+  .bx-hero .cx-btn.ghost:hover{border-color:var(--brand)}
+  .bx-tags{display:flex;flex-wrap:wrap;gap:6px 18px;margin:28px 0 0;
+    font:500 11px/1.6 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .bx-tags span+span::before{content:"/";margin-right:18px;color:var(--rule)}
+  .bx-stage{position:relative;display:grid;gap:16px;justify-items:end;align-content:center}
+  .bx-glass{position:relative;border:1px solid color-mix(in srgb,var(--brand) 26%,var(--rule));border-radius:14px;
+    background:color-mix(in srgb,var(--surface) 78%,transparent);padding:16px 18px;
+    box-shadow:0 1px 0 rgb(255 255 255 / .05) inset,0 24px 60px -28px rgb(0 0 0 / .7),0 0 0 1px rgb(255 255 255 / .02);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .bx-glass{background:var(--surface)}
+  }
+  .bx-live{width:min(360px,100%)}
+  .bx-reads{width:min(360px,100%);margin-right:48px}
+  .bx-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 10px;
+    font:500 11px/1.4 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .bx-state{padding:2px 8px;border-radius:999px;border:1px solid var(--rule);color:var(--hold);letter-spacing:.06em}
+  .bx-state[data-state="live"]{color:var(--go);border-color:color-mix(in srgb,var(--go) 40%,var(--rule))}
+  .bx-state[data-state="down"]{color:var(--nogo)}
+  .bx-rows{margin:0;display:grid;gap:7px}
+  .bx-rows div{display:flex;justify-content:space-between;gap:12px;font-size:13px}
+  .bx-rows dt{color:var(--muted)}
+  .bx-rows dd{margin:0;color:var(--ink);font:500 13px/1.4 "IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  .bx-spark{display:block;width:100%;height:48px;margin-top:12px;border-top:1px solid var(--rule);padding-top:8px;overflow:visible}
+  .bx-spark path{fill:none;stroke:var(--brand);stroke-width:1.6;vector-effect:non-scaling-stroke}
+  .bx-note{margin:6px 0 0;font-size:11px;line-height:1.4;color:var(--faint)}
+  .bx-reads ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+  .bx-reads a{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-size:14px}
+  .bx-reads a::before{content:"";width:7px;height:7px;border-radius:50%;border:1.5px solid var(--brand);flex:0 0 auto}
+  .bx-reads a:hover,.bx-reads a:focus-visible{color:var(--brand)}
+  @media (max-width:900px){
+    .bx-hero{grid-template-columns:1fr;text-align:center}
+    .bx-hero .cx-hero-text{margin:0 auto}
+    .bx-hero h1,.bx-hero .cx-sub{margin-left:auto;margin-right:auto}
+    .bx-hero .cx-actions,.bx-tags{justify-content:center}
+    .bx-stage{justify-items:stretch;max-width:420px;margin:0 auto;width:100%}
+    .bx-glass{width:auto;margin-right:0;text-align:left}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .bx-glass{animation:bx-rise .6s cubic-bezier(.2,.7,.2,1) both}
+    .bx-reads{animation-delay:.12s}
+    @keyframes bx-rise{from{opacity:.001;transform:translateY(8px)}}
+  }
+
   .cx-head{text-align:center;max-width:680px;margin:0 auto 48px}
   .cx-head h2{margin:0;font-size:clamp(30px,4vw,46px);line-height:1.08;letter-spacing:-.03em;font-weight:600;text-wrap:balance}
   .cx-head p{margin:14px 0 0;color:var(--muted);font-size:17px}
@@ -1066,15 +1121,40 @@
   -->
   <section class="cx-hero" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
-    <div class="cx-hero-text">
-      <p class="cx-pill"><i class="dot" aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span><span class="sep" aria-hidden="true">·</span>XRPL mainnet<span class="sep" aria-hidden="true">·</span><span data-sys-ledger translate="no">waiting</span></p>
-      <h1>Know what you hold before you act.</h1>
-      <p class="cx-sub">Issuer controls, delivered amounts and real liquidity, read straight from the XRP Ledger.</p>
-      <div class="cx-actions">
-        <a class="cx-btn" href="#download">Download the app</a>
-        <a class="cx-btn ghost" href="/app/">Open workspace</a>
+    <div class="bx-hero">
+      <div class="cx-hero-text">
+        <p class="cx-pill"><i class="dot" aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span><span class="sep" aria-hidden="true">·</span>XRPL mainnet<span class="sep" aria-hidden="true">·</span><span data-sys-ledger translate="no">waiting</span></p>
+        <h1>Know what you hold before you act.</h1>
+        <p class="cx-sub">Token and issuer risk, delivered amounts and real liquidity, read straight from validated XRP Ledger data, with the evidence attached.</p>
+        <div class="cx-actions">
+          <a class="cx-btn" href="/app/">Explore XRPL intelligence</a>
+          <a class="cx-btn ghost" href="/docs/">View documentation</a>
+        </div>
+        <p class="bx-tags"><span>XRPL intelligence</span><span>Token &amp; issuer risk</span><span>Ledger verification</span><span>Developer infrastructure</span></p>
+        <p class="cx-trust">Free · Read-only · No wallet, no keys</p>
       </div>
-      <p class="cx-trust">Free · Read-only · No wallet, no keys</p>
+      <div class="bx-stage" aria-label="Live XRP Ledger readings">
+        <div class="bx-glass bx-live">
+          <p class="bx-head"><span>XRPL mainnet</span><span class="bx-state" data-bx-state>Connecting</span></p>
+          <dl class="bx-rows">
+            <div><dt>Latest ledger</dt><dd data-bx-mirror="tk-ledger" translate="no">—</dd></div>
+            <div><dt>XRP / RLUSD</dt><dd data-bx-mirror="tk-xrp" translate="no">—</dd></div>
+            <div><dt>Spread that can fill</dt><dd data-bx-mirror="tk-spread" translate="no">—</dd></div>
+            <div><dt>Transactions</dt><dd data-bx-mirror="tk-tx" translate="no">—</dd></div>
+          </dl>
+          <svg class="bx-spark" viewBox="0 0 240 48" preserveAspectRatio="none" aria-hidden="true"><path data-bx-spark d=""/></svg>
+          <p class="bx-note" data-bx-note>XRP / RLUSD, each validated ledger since this page opened</p>
+        </div>
+        <div class="bx-glass bx-reads">
+          <p class="bx-head"><span>What it reads</span></p>
+          <ul>
+            <li><a href="/app/asset/">Token analysis</a></li>
+            <li><a href="/app/issuer/">Issuer risk</a></li>
+            <li><a href="/app/payment/">Payment verification</a></li>
+            <li><a href="/app/liquidity/">Liquidity &amp; order books</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
     <!--SLOT:SHOTHERO-->
   </section>
@@ -1418,6 +1498,7 @@
 <script src="/assets/support.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>
 <script src="/assets/intelligence.js" defer></script>
+<script src="/assets/hero-live.js" defer></script>
 <!--SLOT:JSONLD-->
 <script>
 (function () {

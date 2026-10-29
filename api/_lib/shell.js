@@ -120,9 +120,6 @@ export function renderHeader(current = "") {
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
         <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
       </button>
-      <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme">
-        <span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span>
-      </button>
       <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
       <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
     </nav>

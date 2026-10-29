@@ -27,8 +27,8 @@ const hex = (h: string) => rgb(parseInt(h.slice(1, 3), 16) / 255, parseInt(h.sli
 /* The site's tokens (site/assets/core.css). "light" is the site's light
    theme on a white ground, for printing. */
 const PALETTES = {
-  dark: { ground: "#08100B", surface: "#0E1911", elevated: "#15251A", ink: "#E9F5E7", muted: "#A7B8A8", faint: "#718473", rule: "#263B2A", brand: "#9BE15D", hold: "#E7C766", nogo: "#FF7B7B" },
-  light: { ground: "#FFFFFF", surface: "#F2F8F0", elevated: "#E5F0E2", ink: "#0B160D", muted: "#3F5843", faint: "#55705A", rule: "#C4D7C5", brand: "#247A3B", hold: "#8B6500", nogo: "#B42332" },
+  dark: { ground: "#070B14", surface: "#0D1424", elevated: "#142036", ink: "#E8EEF8", muted: "#A6B2C8", faint: "#7A89A6", rule: "#22304A", brand: "#4C8DFF", hold: "#E7C766", nogo: "#FF7B7B" },
+  light: { ground: "#FFFFFF", surface: "#F3F6FB", elevated: "#E6ECF6", ink: "#0B1424", muted: "#3E4D66", faint: "#55637C", rule: "#C6D1E3", brand: "#1D5FD6", hold: "#8B6500", nogo: "#B42332" },
 };
 export type PdfTheme = keyof typeof PALETTES;
 

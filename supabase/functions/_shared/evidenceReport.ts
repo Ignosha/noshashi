@@ -440,40 +440,40 @@ export function emailHtml(e: EmailInput): string {
   const verify = `${SITE}/evidence-report/verify/?digest=${e.digest}`;
   const sans = "'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
   const mono = "'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace";
-  const body = `font-family:${sans};color:#E9F5E7;font-size:15px;line-height:1.65`;
-  const label = `font-family:${mono};font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:#718473`;
+  const body = `font-family:${sans};color:#E8EEF8;font-size:15px;line-height:1.65`;
+  const label = `font-family:${mono};font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:#7A89A6`;
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark"><title>Your Ledger Evidence Report</title></head>
-<body style="margin:0;padding:0;background:#08100B">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#08100B"><tr><td align="center" style="padding:32px 12px;background:#08100B">
+<body style="margin:0;padding:0;background:#070B14">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#070B14"><tr><td align="center" style="padding:32px 12px;background:#070B14">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
-<tr><td style="padding:0 4px 22px;background:#08100B">
+<tr><td style="padding:0 4px 22px;background:#070B14">
 <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-<td style="padding-right:10px;background:#08100B"><img src="${SITE}/assets/flower-mark-64.png" width="26" height="26" alt="" style="display:block;border:0"></td>
-<td style="font-family:${sans};font-size:14px;font-weight:600;letter-spacing:3px;color:#E9F5E7;background:#08100B">NOSHASHI</td>
+<td style="padding-right:10px;background:#070B14"><img src="${SITE}/assets/flower-mark-64.png" width="26" height="26" alt="" style="display:block;border:0"></td>
+<td style="font-family:${sans};font-size:14px;font-weight:600;letter-spacing:3px;color:#E8EEF8;background:#070B14">NOSHASHI</td>
 </tr></table></td></tr>
-<tr><td style="background:#0E1911;border:1px solid #263B2A;border-radius:10px;padding:34px 32px 30px;${body}">
-<div style="width:40px;height:2px;background:#9BE15D;margin:0 0 18px;font-size:0;line-height:0">&nbsp;</div>
+<tr><td style="background:#0D1424;border:1px solid #22304A;border-radius:10px;padding:34px 32px 30px;${body}">
+<div style="width:40px;height:2px;background:#4C8DFF;margin:0 0 18px;font-size:0;line-height:0">&nbsp;</div>
 <div style="${label};margin:0 0 8px">Ledger Evidence Report</div>
-<div style="font-family:${sans};font-size:24px;font-weight:600;line-height:1.2;letter-spacing:-0.4px;color:#E9F5E7;margin:0 0 22px">${e.organization ? `Prepared for ${escHtml(e.organization)}` : "Your report is ready"}</div>
-<p style="margin:0 0 14px;color:#E9F5E7">Hello,</p>
-<p style="margin:0 0 20px;color:#A7B8A8">Your Ledger Evidence Report is attached as a PDF${e.periodEnd ? `, with treasury holdings as at ${escHtml(fmtDate(`${e.periodEnd}T12:00:00Z`))}` : ""}, with a light copy for printing. Every statement in it was read directly from the XRP Ledger and is stamped with the ledger it came from.</p>
+<div style="font-family:${sans};font-size:24px;font-weight:600;line-height:1.2;letter-spacing:-0.4px;color:#E8EEF8;margin:0 0 22px">${e.organization ? `Prepared for ${escHtml(e.organization)}` : "Your report is ready"}</div>
+<p style="margin:0 0 14px;color:#E8EEF8">Hello,</p>
+<p style="margin:0 0 20px;color:#A6B2C8">Your Ledger Evidence Report is attached as a PDF${e.periodEnd ? `, with treasury holdings as at ${escHtml(fmtDate(`${e.periodEnd}T12:00:00Z`))}` : ""}, with a light copy for printing. Every statement in it was read directly from the XRP Ledger and is stamped with the ledger it came from.</p>
 <div style="${label};margin:0 0 10px">What stood out</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 22px">${e.findings
     .map(
       (f) =>
-        `<tr><td valign="top" style="width:18px;padding:7px 0 0;background:#0E1911"><div style="width:6px;height:6px;background:#9BE15D;font-size:0;line-height:0">&nbsp;</div></td><td style="padding:0 0 10px;font-family:${sans};font-size:14.5px;line-height:1.6;color:#E9F5E7;background:#0E1911">${escHtml(f)}</td></tr>`,
+        `<tr><td valign="top" style="width:18px;padding:7px 0 0;background:#0D1424"><div style="width:6px;height:6px;background:#4C8DFF;font-size:0;line-height:0">&nbsp;</div></td><td style="padding:0 0 10px;font-family:${sans};font-size:14.5px;line-height:1.6;color:#E8EEF8;background:#0D1424">${escHtml(f)}</td></tr>`,
     )
     .join("")}</table>
-<p style="margin:0 0 20px;color:#A7B8A8">The last attachment is the evidence file: every reply the XRP Ledger gave us, exactly as received. Anyone, your auditor included, can confirm the report is genuine and unchanged from its fingerprint.</p>
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 26px"><tr><td style="background:#9BE15D;border-radius:10px">
-<a href="${escHtml(verify)}" style="display:inline-block;padding:12px 22px;font-family:${sans};font-size:14px;font-weight:600;color:#08100B;text-decoration:none">Verify this report</a></td></tr></table>
-<p style="margin:0 0 14px;color:#A7B8A8">If anything in the report raises a question, just reply to this email.</p>
-<p style="margin:0;color:#E9F5E7">Kind regards,<br>Joshua Edmond<br><span style="color:#718473">Founder, NOSHASHI</span></p>
+<p style="margin:0 0 20px;color:#A6B2C8">The last attachment is the evidence file: every reply the XRP Ledger gave us, exactly as received. Anyone, your auditor included, can confirm the report is genuine and unchanged from its fingerprint.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 26px"><tr><td style="background:#4C8DFF;border-radius:10px">
+<a href="${escHtml(verify)}" style="display:inline-block;padding:12px 22px;font-family:${sans};font-size:14px;font-weight:600;color:#070B14;text-decoration:none">Verify this report</a></td></tr></table>
+<p style="margin:0 0 14px;color:#A6B2C8">If anything in the report raises a question, just reply to this email.</p>
+<p style="margin:0;color:#E8EEF8">Kind regards,<br>Joshua Edmond<br><span style="color:#7A89A6">Founder, NOSHASHI</span></p>
 </td></tr>
-<tr><td style="padding:20px 6px 0;background:#08100B">
+<tr><td style="padding:20px 6px 0;background:#070B14">
 <div style="${label};font-size:9.5px;margin:0 0 6px">Report ${escHtml(e.reference)} · ${escHtml(TIERS[e.tier].name)} plan</div>
-<div style="font-family:${mono};font-size:10.5px;color:#718473;word-break:break-all;margin:0 0 10px">${escHtml(e.digest)}</div>
-<div style="font-family:${sans};font-size:11.5px;line-height:1.6;color:#718473">A record of public XRP Ledger facts at the ledger numbers stated. Not an audit opinion, valuation, investment advice or legal finding. NOSHASHI · Read-only XRPL intelligence · No custody, no keys, no signing.</div>
+<div style="font-family:${mono};font-size:10.5px;color:#7A89A6;word-break:break-all;margin:0 0 10px">${escHtml(e.digest)}</div>
+<div style="font-family:${sans};font-size:11.5px;line-height:1.6;color:#7A89A6">A record of public XRP Ledger facts at the ledger numbers stated. Not an audit opinion, valuation, investment advice or legal finding. NOSHASHI · Read-only XRPL intelligence · No custody, no keys, no signing.</div>
 </td></tr>
 </table></td></tr></table></body></html>`;
 }
