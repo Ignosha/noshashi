@@ -50,7 +50,7 @@ async function render(html, px, out) {
 // on, the source width, and the half-size of the square that holds every
 // petal tip. ART_V1 is the previous green flower (1263x1245).
 const ART_V1 = { cx: 628, cy: 578, w: 1263, half: 600, ground: ["#17301D", "#0C1710", "#060B07"] };
-const ART = { cx: 636, cy: 438, w: 1280, half: 610, ground: ["#13213D", "#0A1224", "#050912"] };
+const ART = { cx: 954, cy: 568, w: 1920, half: 920, ground: ["#13213D", "#0A1224", "#050912"] };
 // Offset the artwork so its centre, not the image box, lands on the icon's centre.
 const flower = dataUrl("brand/flower-source.png", "image/png");
 await render(

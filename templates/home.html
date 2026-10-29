@@ -1015,19 +1015,16 @@
   .bx-tags{display:flex;flex-wrap:wrap;gap:6px 18px;margin:28px 0 0;
     font:500 11px/1.6 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   .bx-tags span+span::before{content:"/";margin-right:18px;color:var(--rule)}
-  .bx-stage{position:relative;min-height:480px}
-  .bx-flower{position:absolute;left:-22%;top:50%;width:min(640px,96%);height:auto;transform:translateY(-50%);
-    filter:drop-shadow(0 0 40px color-mix(in srgb,var(--brand) 35%,transparent));pointer-events:none}
-  html[data-theme="light"] .bx-flower{filter:drop-shadow(0 6px 24px rgb(29 95 214 / .25))}
-  .bx-glass{position:absolute;border:1px solid color-mix(in srgb,var(--brand) 26%,var(--rule));border-radius:14px;
+  .bx-stage{position:relative;display:grid;gap:16px;justify-items:end;align-content:center}
+  .bx-glass{position:relative;border:1px solid color-mix(in srgb,var(--brand) 26%,var(--rule));border-radius:14px;
     background:color-mix(in srgb,var(--surface) 78%,transparent);padding:16px 18px;
     box-shadow:0 1px 0 rgb(255 255 255 / .05) inset,0 24px 60px -28px rgb(0 0 0 / .7),0 0 0 1px rgb(255 255 255 / .02);
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
     .bx-glass{background:var(--surface)}
   }
-  .bx-live{right:0;top:0;width:min(300px,62%)}
-  .bx-reads{right:16%;bottom:-9%;width:min(232px,50%)}
+  .bx-live{width:min(360px,100%)}
+  .bx-reads{width:min(360px,100%);margin-right:48px}
   .bx-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 10px;
     font:500 11px/1.4 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .bx-state{padding:2px 8px;border-radius:999px;border:1px solid var(--rule);color:var(--hold);letter-spacing:.06em}
@@ -1049,9 +1046,8 @@
     .bx-hero .cx-hero-text{margin:0 auto}
     .bx-hero h1,.bx-hero .cx-sub{margin-left:auto;margin-right:auto}
     .bx-hero .cx-actions,.bx-tags{justify-content:center}
-    .bx-stage{min-height:0;display:grid;gap:14px;padding-top:150px;max-width:420px;margin:0 auto;width:100%}
-    .bx-flower{left:50%;top:0;width:min(420px,100%);transform:translateX(-50%)}
-    .bx-glass{position:relative;inset:auto;width:auto;text-align:left}
+    .bx-stage{justify-items:stretch;max-width:420px;margin:0 auto;width:100%}
+    .bx-glass{width:auto;margin-right:0;text-align:left}
   }
   @media (prefers-reduced-motion:no-preference){
     .bx-glass{animation:bx-rise .6s cubic-bezier(.2,.7,.2,1) both}
@@ -1138,7 +1134,6 @@
         <p class="cx-trust">Free · Read-only · No wallet, no keys</p>
       </div>
       <div class="bx-stage" aria-label="Live XRP Ledger readings">
-        <img class="bx-flower" src="/assets/flower.webp" alt="" aria-hidden="true" width="960" height="608" decoding="async" fetchpriority="high">
         <div class="bx-glass bx-live">
           <p class="bx-head"><span>XRPL mainnet</span><span class="bx-state" data-bx-state>Connecting</span></p>
           <dl class="bx-rows">
