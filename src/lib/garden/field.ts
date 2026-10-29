@@ -128,13 +128,13 @@ export function xrpInk(lx: number, ly: number): number {
 /** Resolve any CSS colour string to #rrggbb, which is what the engine accepts. */
 export function toHex(css: string): string {
   const probe = document.createElement("canvas").getContext("2d");
-  if (!probe) return "#9be15d";
-  probe.fillStyle = "#9be15d";
-  probe.fillStyle = css.trim() || "#9be15d";
+  if (!probe) return "#4C8DFF";
+  probe.fillStyle = "#4C8DFF";
+  probe.fillStyle = css.trim() || "#4C8DFF";
   const out = String(probe.fillStyle);
   if (out.startsWith("#")) return out;
   const m = out.match(/\d+(\.\d+)?/g);
-  if (!m) return "#9be15d";
+  if (!m) return "#4C8DFF";
   return "#" + m.slice(0, 3).map((n) => Math.round(Number(n)).toString(16).padStart(2, "0")).join("");
 }
 

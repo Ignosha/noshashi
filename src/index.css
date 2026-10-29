@@ -17,8 +17,8 @@
    ------------------------------------------------------------ */
 /* ============================================================
    NOSHASHI · NOVA THEME
-   Matcha garden aesthetic — soft greens, organic shapes,
-   garden-like atmosphere. Mission colors: GO / HOLD / NO-GO.
+   Navy ground, electric-blue brand, cyan for live signal.
+   Mission colors: GO / HOLD / NO-GO.
    ============================================================ */
 
 :root {
@@ -28,7 +28,7 @@
   --card-foreground: 0 0% 0%;
   --popover: 0 0% 98%;
   --popover-foreground: 0 0% 0%;
-  --primary: 138 63% 31%;            /* #1D6630 — matcha, deepened for AA on white text */
+  --primary: 219 76% 48%;          /* #1D5FD6 */
   --primary-foreground: 0 0% 100%;
   --secondary: 0 0% 94%;
   --secondary-foreground: 0 0% 0%;
@@ -40,23 +40,20 @@
   --destructive-foreground: 0 0% 100%;
   --border: 0 0% 88%;
   --input: 0 0% 88%;
-  --ring: 0 0% 0%;
-  /* The brand board renders panels with a soft corner and a pill-shaped
-     command field. Zero-radius was the earlier NOVA direction; the board
-     supersedes it. */
+  --ring: 219 76% 48%;          /* #1D5FD6 */
   --radius: 0.5rem;
 
   --faint: 210 11% 38%;
 
   /* Light mode matches the website's light theme */
-  --brand: 138 55% 31%;              /* #247A3B - matcha green, as the website; 4.9:1 on white */
-  --telemetry: 148 70% 30%;          /* #168A55 - darker garden green */
+  --brand: 219 76% 48%;          /* #1D5FD6 */
+  --telemetry: 194 85% 30%;          /* #0B6E8C */
 
   /* Status colours are also text (GO / HOLD / NO-GO, DEGRADED, NONE
      ACTIVE), so on the light ground they are deepened to WCAG AA: at least
      4.5:1 on white, the card and their own dim tint. The previous values
      measured 3.2, 2.3 and 4.5 — amber HOLD was unreadable. */
-  --status-go: 138 63% 30%;          /* #1C7C39 — 5.2:1 on white */
+  --status-go: 145 61% 30%;          /* #1E7A45 */
   --status-hold: 38 95% 30%;         /* #955F03 — 5.3:1 on white */
   --status-no-go: 355 85% 44%;       /* #CF1020 — 5.6:1 on white */
   --status-go-dim: 138 55% 93%;
@@ -73,45 +70,44 @@
 
 .dark {
   /* ------------------------------------------------------------------
-     Palette matching the website's green-black brand palette (section 05):
-       ground   #08100B   surface  #0E1911   elevated #15251A
-       brand    #9BE15D   tele     #55D98A
-       neutrals #E9F5E7 #A7B8A8 #718473 #263B2A
-     Matcha garden aesthetic: soft greens, organic feel.
+     Palette matching the website's navy brand palette:
+       ground   #070B14   surface  #0D1424   elevated #142036
+       brand    #4C8DFF   tele     #5CD6F2
+       neutrals #E8EEF8 #A6B2C8 #7A89A6 #22304A
      ------------------------------------------------------------------ */
-  --background: 120 18% 5%;          /* #08100B */
-  --foreground: 135 20% 90%;         /* #E9F5E7 */
-  --card: 130 15% 8%;                /* #0E1911 */
-  --card-foreground: 135 20% 90%;
-  --popover: 125 18% 12%;            /* #15251A */
-  --popover-foreground: 135 20% 90%;
-  --primary: 108 70% 62%;            /* #9FE463 — matcha, the site's CTA green */
-  --primary-foreground: 120 18% 5%;
-  --secondary: 125 18% 12%;
-  --secondary-foreground: 135 20% 90%;
-  --muted: 125 15% 16%;              /* #263B2A */
-  --muted-foreground: 130 12% 74%;   /* raised for legibility on the dark ground */
-  --faint: 130 10% 62%;              /* AA on --background at 11px */
-  --accent: 125 18% 12%;
-  --accent-foreground: 135 20% 90%;
+  --background: 222 48% 5%;          /* #070B14 */
+  --foreground: 218 53% 94%;          /* #E8EEF8 */
+  --card: 222 47% 10%;          /* #0D1424 */
+  --card-foreground: 218 53% 94%;          /* #E8EEF8 */
+  --popover: 219 46% 15%;          /* #142036 */
+  --popover-foreground: 218 53% 94%;          /* #E8EEF8 */
+  --primary: 218 100% 65%;          /* #4C8DFF */
+  --primary-foreground: 220 60% 5%;          /* #050A14 */
+  --secondary: 219 46% 15%;          /* #142036 */
+  --secondary-foreground: 218 53% 94%;          /* #E8EEF8 */
+  --muted: 219 37% 21%;          /* #22304A */
+  --muted-foreground: 219 24% 72%;          /* #A6B2C8 */
+  --faint: 220 20% 56%;          /* #7A89A6 */
+  --accent: 219 46% 15%;          /* #142036 */
+  --accent-foreground: 218 53% 94%;          /* #E8EEF8 */
   --destructive: 355 85% 50%;
-  --destructive-foreground: 120 18% 5%;
-  --border: 125 15% 16%;             /* #263B2A */
-  --input: 125 15% 16%;
-  --ring: 138 63% 60%;               /* brand */
+  --destructive-foreground: 220 60% 5%;          /* #050A14 */
+  --border: 219 37% 21%;          /* #22304A */
+  --input: 219 37% 21%;          /* #22304A */
+  --ring: 218 100% 65%;          /* #4C8DFF */
 
-  --brand: 108 70% 60%;              /* #9BE15D - bright matcha */
-  --telemetry: 148 70% 60%;          /* #55D98A - fresh green */
+  --brand: 218 100% 65%;          /* #4C8DFF */
+  --telemetry: 191 85% 65%;          /* #5CD6F2 */
 
-  --status-go: 108 70% 60%;          /* #9BE15D */
-  --status-hold: 42 95% 64%;         /* #E7C766 */
-  --status-no-go: 355 85% 70%;       /* #FF7B7B */
-  --status-go-dim: 108 45% 12%;
+  --status-go: 151 65% 54%;          /* #3DD68C */
+  --status-hold: 40 90% 61%;          /* #F5B942 */
+  --status-no-go: 355 100% 71%;          /* #FF6B78 */
+  --status-go-dim: 151 45% 12%;
   --status-hold-dim: 42 60% 12%;
   --status-no-go-dim: 355 55% 13%;
 
-  --spectral: 135 20% 90%;
-  --line: 135 15% 20%;                  /* #263B2A — rule colour on dark ground */
+  --spectral: 218 53% 94%;          /* #E8EEF8 */
+  --line: 219 37% 21%;          /* #22304A */
 }
 
 @font-face {

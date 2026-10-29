@@ -48,7 +48,7 @@ function page(res, status, title, text) {
 <title>${title} · NOSHASHI</title>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#07130d;color:#e6efe9;
 font:16px/1.6 system-ui,sans-serif;padding:16px}main{max-width:440px;text-align:center}
-a{color:#9be15d}</style></head><body><main><h1>${title}</h1><p>${text}</p>
+a{color:#4C8DFF}</style></head><body><main><h1>${title}</h1><p>${text}</p>
 <p><a href="${SITE}/">Back to noshashi.app</a></p></main></body></html>`);
 }
 

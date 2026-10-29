@@ -98,7 +98,7 @@ ${flowerMono({ id: "nm", fill: "#000" })}
 // site's ground colour, with gaps cut by painting the ground colour, and
 // a radial glow standing in for the artwork's light. Mail clients crop it
 // to a circle, hence the scale that keeps every petal tip inside it.
-const BIMI_GROUND = "#08100B"; // --ground in site/assets/core.css
+const BIMI_GROUND = "#070B14"; // --ground in site/assets/core.css
 function bimiLayer(paths, gradient, gap) {
   return paths
     .map((d) =>
@@ -113,7 +113,7 @@ const bimi = `<?xml version="1.0" encoding="UTF-8"?>
 <defs>
 <radialGradient id="d" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="50"><stop offset="0" stop-color="#6FCB4F"/><stop offset="1" stop-color="#0E3F18"/></radialGradient>
 <radialGradient id="c" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="50"><stop offset="0" stop-color="#C6F58A"/><stop offset="0.45" stop-color="#3DA244"/><stop offset="1" stop-color="#145C22"/></radialGradient>
-<radialGradient id="i" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="30"><stop offset="0" stop-color="#F4FFE0"/><stop offset="0.5" stop-color="#9BE15D"/><stop offset="1" stop-color="#3DA244"/></radialGradient>
+<radialGradient id="i" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="30"><stop offset="0" stop-color="#F4FFE0"/><stop offset="0.5" stop-color="#4C8DFF"/><stop offset="1" stop-color="#3DA244"/></radialGradient>
 <radialGradient id="g" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="12"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C6F58A"/></radialGradient>
 </defs>
 <rect width="100" height="100" fill="${BIMI_GROUND}"/>

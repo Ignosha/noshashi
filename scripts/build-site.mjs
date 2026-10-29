@@ -1199,20 +1199,20 @@ async function buildPricingEnhancement() {
   // adding the comparison. Keeping this here makes the generated page safe
   // even while the legacy committed page remains the enhancement input.
   html = html
-    .replaceAll("#3A82F6", "#9BE15D")
-    .replaceAll("#00E0C6", "#55D98A")
-    .replaceAll("#35D49A", "#9BE15D")
-    .replaceAll("#0B0F14", "#08100B")
-    .replaceAll("#11161D", "#0E1911")
-    .replaceAll("#1C2330", "#15251A")
-    .replaceAll("#E6E8EB", "#E9F5E7")
-    .replaceAll("#A3A8B3", "#A7B8A8")
-    .replaceAll("#747C8B", "#718473")
-    .replaceAll("#2A313C", "#263B2A")
-    .replaceAll("#b69cff", "#9BE15D")
+    .replaceAll("#3A82F6", "#4C8DFF")
+    .replaceAll("#00E0C6", "#5CD6F2")
+    .replaceAll("#35D49A", "#4C8DFF")
+    .replaceAll("#0B0F14", "#070B14")
+    .replaceAll("#11161D", "#0D1424")
+    .replaceAll("#1C2330", "#142036")
+    .replaceAll("#E6E8EB", "#E8EEF8")
+    .replaceAll("#A3A8B3", "#A6B2C8")
+    .replaceAll("#747C8B", "#7A89A6")
+    .replaceAll("#2A313C", "#22304A")
+    .replaceAll("#b69cff", "#4C8DFF")
     .replace('content="dark"', 'content="dark light"');
   const css = `<style id="noshashi-tier-comparison">
-    html[data-theme="light"]{--ground:#F2F8F0;--surface:#FFF;--elevated:#E5F0E2;--ink:#0B160D;--muted:#3F5843;--faint:#55705A;--rule:#C4D7C5;--brand:#247A3B;--tele:#117549;--on-brand:#FFFFFF;--go:#247A3B}
+    html[data-theme="light"]{--ground:#F3F6FB;--surface:#FFF;--elevated:#E6ECF6;--ink:#0B1424;--muted:#3E4D66;--faint:#55637C;--rule:#C6D1E3;--brand:#1D5FD6;--tele:#0B6E8C;--on-brand:#FFFFFF;--go:#1E7A45}
     .hero::before{content:"";position:absolute;inset:24px -8vw auto auto;width:220px;height:150px;opacity:.28;pointer-events:none;background:radial-gradient(ellipse at 68% 36%,color-mix(in srgb,var(--brand) 42%,transparent) 0 18%,transparent 19%),radial-gradient(ellipse at 42% 65%,color-mix(in srgb,var(--tele) 30%,transparent) 0 15%,transparent 16%),radial-gradient(ellipse at 78% 76%,color-mix(in srgb,var(--brand) 24%,transparent) 0 12%,transparent 13%);border:1px solid color-mix(in srgb,var(--brand) 32%,transparent);border-radius:58% 42% 64% 36%;transform:rotate(-12deg)}
     .price{grid-template-columns:repeat(5,minmax(220px,1fr));overflow-x:auto;padding-bottom:8px}
     .price .tier{min-width:220px}
@@ -1404,7 +1404,7 @@ async function buildPricingEnhancement() {
     `<a href="${item.href}"${item.optional ? ' class="optional"' : ""}${item.href === "/pricing/" ? ' aria-current="page"' : ""}>${item.label}</a>`
   ).join("\n        ");
   html = html.replace(/<nav class="nav-links" aria-label="Primary">[\s\S]*?<\/nav>\n    <\/nav>/,
-    `<nav class="nav-links" aria-label="Primary">\n        ${navLinks}\n        <button class="theme-toggle accent-toggle" type="button" data-accent-toggle aria-label="Switch to the blue theme"><span class="swatch" aria-hidden="true"></span><span data-accent-label>BLUE</span></button>\n        <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>\n        <a class="btn" href="/app/">Open workspace</a>\n      </nav>\n    </nav>`);
+    `<nav class="nav-links" aria-label="Primary">\n        ${navLinks}\n        <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>\n        <a class="btn" href="/app/">Open workspace</a>\n      </nav>\n    </nav>`);
   html = html.replace(/<footer>[\s\S]*?<\/footer>/, renderFooter());
   const footStyle = '<link rel="stylesheet" href="/assets/core-footer.css">';
   if (!html.includes(footStyle)) html = html.replace('<link rel="stylesheet" href="/assets/modules.css">', `<link rel="stylesheet" href="/assets/modules.css">\n${footStyle}`);
