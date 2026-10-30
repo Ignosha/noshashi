@@ -9,7 +9,6 @@
   <url><loc>https://www.noshashi.app/treasury/</loc><lastmod>2026-10-30</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.noshashi.app/book-health/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.noshashi.app/xapp/</loc><lastmod>2026-10-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-<<<<<<< HEAD
   <url><loc>https://www.noshashi.app/tokens/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
   <url><loc>https://www.noshashi.app/tokens/rlusd-ripple/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.noshashi.app/tokens/usdc-circle/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
@@ -62,8 +61,6 @@
   <url><loc>https://www.noshashi.app/tokens/seal/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.noshashi.app/tokens/box-bitcoin-on-xrp/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.noshashi.app/tokens/plx-pollux/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-=======
->>>>>>> origin/claude/feature-pricing-recommendation-dp8xke
   <url><loc>https://www.noshashi.app/evidence-report/</loc><lastmod>2026-10-30</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.noshashi.app/evidence-report/verify/</loc><lastmod>2026-10-30</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://www.noshashi.app/legal/report-terms/</loc><lastmod>2026-10-30</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
