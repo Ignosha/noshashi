@@ -9,6 +9,58 @@
   <url><loc>https://www.noshashi.app/treasury/</loc><lastmod>2026-10-30</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.noshashi.app/book-health/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.noshashi.app/xapp/</loc><lastmod>2026-10-30</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/rlusd-ripple/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/usdc-circle/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/solo-sologenic/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/csc-casinocoin/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/vgb-vagabond/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/btc-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/phnix-phoenix/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/eth-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/army/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/usd-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/eur-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/xpm-xpmarket/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/bear/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/xrps/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/fuzzy-fuzzybear/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/cny-ripplefox/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/drop/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/atm-all-the-money/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/589/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/sgb-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/mag-magnetic-x/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/usd-bitstamp/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/xah-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/flr-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/666-666-xrp-meme-coin/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/plr-pillars/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/scrap-scrappy/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/real-realfi/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/btc-bitstamp/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/sigma/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/nxs-nexus-water/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/opulence-opulencex/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/bert-bert-the-bird/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/britto/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/xho/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/evr-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/lht-luckyhash/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/usdc-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/bchamp-bear-champ/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/xlm-ripplefox/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/cbird-common-bird/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/usdt-gatehub/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/xrt-xrpturbo/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/xmen-xrp-men/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/uga-ugabuga/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/lions-xrp-lions/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/tazz-tasmanian-tiger/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/xox-xrp-on-xrp/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/seal/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/box-bitcoin-on-xrp/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.noshashi.app/tokens/plx-pollux/</loc><lastmod>2026-10-30</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.noshashi.app/evidence-report/</loc><lastmod>2026-10-30</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.noshashi.app/evidence-report/verify/</loc><lastmod>2026-10-30</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://www.noshashi.app/legal/report-terms/</loc><lastmod>2026-10-30</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>

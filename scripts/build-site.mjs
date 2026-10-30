@@ -53,6 +53,7 @@ import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
 import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
+import { buildTokens, TOKEN_INDEX_PAGES } from "./build-tokens.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
@@ -1598,7 +1599,7 @@ async function buildDocs() {
 }
 
 /* ── sitemap ──────────────────────────────────────────────────────── */
-async function buildSitemap(docs = []) {
+async function buildSitemap(docs = [], tokenPages = []) {
   const pages = [
     ["/", "daily", "1.0"],
     ["/news/", "hourly", "0.9"],
@@ -1607,6 +1608,8 @@ async function buildSitemap(docs = []) {
     // somebody who will never install anything.
     ["/certificate/", "weekly", "0.9"],
     ...TOOL_PAGES,
+    ...TOKEN_INDEX_PAGES,
+    ...tokenPages,
     ...REPORT_PAGES,
     ...BRIEF_PAGES,
     ["/protection/", "weekly", "0.8"],
@@ -1705,6 +1708,7 @@ async function main() {
   await buildContact();
   await buildCertificate();
   await buildTools(write);
+  const tokenPages = await buildTokens(write);
   await buildReport(write);
   await buildBrief(write);
   await buildProtection();
@@ -1719,7 +1723,7 @@ async function main() {
   await buildTrust();
   await buildMisread();
   const docs = await buildDocs();
-  await buildSitemap(docs);
+  await buildSitemap(docs, tokenPages);
   await buildRobots();
   // Last: every page, generated or committed, loses its inline scripts so
   // the CSP can be script-src 'self' (scripts/inline-scripts.mjs).

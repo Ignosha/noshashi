@@ -187,6 +187,7 @@ async function buildAlerts(write) {
   var form=document.getElementById("alert-form"); if(!form)return;
   var issuer=document.getElementById("alert-issuer"), hook=document.getElementById("alert-webhook");
   var status=document.getElementById("alert-status"), go=document.getElementById("alert-go");
+  try{var pre=new URLSearchParams(location.search).get("issuer");if(pre&&ADDRESS.test(pre))issuer.value=pre;}catch(e){}
   var HOOK=/^https:\\/\\/(discord\\.com|discordapp\\.com|ptb\\.discord\\.com|canary\\.discord\\.com)\\/api\\/webhooks\\/\\d{15,22}\\/[A-Za-z0-9_-]{30,100}$/;
   form.addEventListener("submit",function(e){
     e.preventDefault();

@@ -71,6 +71,7 @@ export const FOOTER_GROUPS = [
     { href: "/strategic-infrastructure/", label: "Strategic infrastructure" },
   ] },
   { title: "Free tools", links: [
+    { href: "/tokens/", label: "XRPL token directory" },
     { href: "/xapp/", label: "Check an address" },
     { href: "/certificate/", label: "Authority certificate" },
     { href: "/badge/", label: "Issuer badge" },

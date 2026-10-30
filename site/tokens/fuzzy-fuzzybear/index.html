@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>FUZZY (Fuzzybear) on the XRP Ledger: freeze, clawback and issuer keys, live</title>
+<meta name="description" content="Can the FUZZY issuer (Fuzzybear) freeze holders or claw back tokens? Read live from the XRP Ledger: issuer flags, signing keys and real order-book depth for rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62.">
+<link rel="canonical" href="https://www.noshashi.app/tokens/fuzzy-fuzzybear/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/tokens/fuzzy-fuzzybear/">
+<meta property="og:title" content="FUZZY (Fuzzybear) on the XRP Ledger: freeze, clawback and issuer keys, live">
+<meta property="og:description" content="Can the FUZZY issuer (Fuzzybear) freeze holders or claw back tokens? Read live from the XRP Ledger: issuer flags, signing keys and real order-book depth for rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FUZZY (Fuzzybear) on the XRP Ledger: freeze, clawback and issuer keys, live">
+<meta name="twitter:description" content="Can the FUZZY issuer (Fuzzybear) freeze holders or claw back tokens? Read live from the XRP Ledger: issuer flags, signing keys and real order-book depth for rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Tokens","item":"https://www.noshashi.app/tokens/"},{"@type":"ListItem","position":3,"name":"FUZZY (Fuzzybear)","item":"https://www.noshashi.app/tokens/fuzzy-fuzzybear/"}]}]}</script>
+<style>
+.tk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:18px 0}
+.tk-card{display:block;border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;text-decoration:none;color:inherit}
+.tk-card:hover,.tk-card:focus-visible{border-color:var(--accent,currentColor)}
+.tk-card b{display:block;font-size:16px}
+.tk-card span{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.tk-card code{display:block;font:11px "IBM Plex Mono",monospace;color:var(--muted);margin-top:8px;word-break:break-all}
+.tk-filter{max-width:420px;margin:8px 0 4px}
+.tk-facts{display:grid;gap:0;margin:8px 0;max-width:760px}
+.tk-facts div{display:grid;grid-template-columns:minmax(150px,240px) 1fr;gap:14px;border-bottom:1px solid var(--rule);padding:10px 0;font-size:13.5px}
+.tk-facts b{font:12px "IBM Plex Mono",monospace;letter-spacing:.04em}
+.tk-facts p{margin:4px 0 0;color:var(--muted);font-size:12.5px;line-height:1.55}
+.tk-id{font:12px "IBM Plex Mono",monospace;word-break:break-all;color:var(--muted)}
+.tk-badge{margin:14px 0 6px;max-width:100%;height:auto}
+.tk-cta{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.tk-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
+.t-go{color:var(--go)} .t-hold{color:var(--hold)} .t-nogo{color:var(--nogo)} .t-unknown{color:var(--muted)}
+@media (max-width:560px){.tk-facts div{grid-template-columns:1fr;gap:4px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
+      <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/"><span data-i18n="nav.demo2">Demo</span></a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/resources/"><span data-i18n="nav.resources">Resources</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head">
+  <p class="eyebrow"><a href="/tokens/">Tokens</a> · XRP Ledger</p>
+  <h1>FUZZY (Fuzzybear): what the issuer can still do</h1>
+  <p>Read live from validated XRP Ledger state each time this page opens: whether the issuer of
+     <span translate="no">FUZZY</span> can freeze holders or claw tokens back, whether holding needs its permission,
+     who can sign for it, and how much of its order book can really fill.</p>
+  <p class="tk-id" translate="no">Issuer rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62 · currency 46555A5A59000000000000000000000000000000 · claims fuzzyxrp.com</p>
+</div>
+<section id="tk-live" data-issuer="rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62" data-currency="46555A5A59000000000000000000000000000000">
+  <img class="tk-badge" src="/api/badge?issuer=rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62&amp;style=card" alt="Live issuer badge for FUZZY" width="360" height="120" loading="lazy">
+  <h2>Issuer controls</h2>
+  <p class="form-status" id="tk-status" role="status" aria-live="polite">Reading the ledger…</p>
+  <div class="tk-facts" id="tk-facts"><noscript><p>This page reads the ledger in your browser. Open the
+    <a href="/certificate/?issuer=rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62">certificate</a> for the same reading.</p></noscript></div>
+  <h2>Order book against XRP</h2>
+  <p class="tk-note" id="tk-depth">Reading the order book…</p>
+  <div class="tk-cta">
+    <a class="btn" href="/evidence-report/?tier=issuer">Get the Issuer check · $950</a>
+    <a class="btn ghost" href="/certificate/?issuer=rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62">Full certificate, free</a>
+    <a class="btn ghost" href="/badge/?issuer=rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62">Put this badge on a site</a>
+    <a class="btn ghost" href="/alerts/?issuer=rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62">Alert me if it changes</a>
+  </div>
+  <p class="tk-note">These are ledger facts, not a rating, an audit or advice. A power the issuer has kept
+     is not a sign it will use it, and one it gave up cannot come back. The domain is what the
+     token list names for it; check that the domain's own xrp-ledger.toml lists this issuer before you rely on it. Supply
+     concentration is on the full certificate, because measuring it walks every holder line.</p>
+</section>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/tokens/">XRPL token directory</a><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/news/">Newsroom</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/inline/7e0177e03dbcd6df204e.js"></script>
+</body>
+</html>
