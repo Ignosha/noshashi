@@ -16,7 +16,7 @@ import {
   type IssuanceReport,
 } from "@/lib/desk/issuance";
 import { cn } from "@/lib/utils";
-import { TraceButton } from "@/lib/nav/handoff";
+import { TraceButton, useClaimedSubject } from "@/lib/nav/handoff";
 
 /**
  * IssuanceScene — surveillance from the issuer's side of the trust line.
@@ -61,13 +61,14 @@ function IssuanceBody() {
   const [walked, setWalked] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const run = async () => {
-    const address = query.trim();
+  const run = async (value?: string) => {
+    const address = (value ?? query).trim();
     if (!address || busy) return;
     if (!isValidAddress(address)) {
       setError("That is not a valid XRPL address.");
       return;
     }
+    setQuery(address);
     setBusy(true);
     setError(null);
     setWalked(0);
@@ -79,6 +80,12 @@ function IssuanceBody() {
       setBusy(false);
     }
   };
+
+  // An address handed over from another scene, or picked from the
+  // palette's test addresses, is read straight away.
+  useClaimedSubject("issuance", (subject) => {
+    void run(subject.value);
+  });
 
   const findings = report ? issuanceFindings(report) : [];
 
