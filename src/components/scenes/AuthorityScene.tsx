@@ -20,7 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { checkState, type CheckState } from "@/lib/policy";
 import { InvestigateIssuerButton } from "@/components/nova/InvestigateIssuerButton";
-import { TraceButton } from "@/lib/nav/handoff";
+import { TraceButton, useClaimedSubject } from "@/lib/nav/handoff";
 
 /**
  * AuthorityScene — what authority the issuer has kept.
@@ -100,13 +100,14 @@ function AuthorityBody() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const run = async () => {
-    const issuer = query.trim();
+  const run = async (value?: string) => {
+    const issuer = (value ?? query).trim();
     if (!issuer || busy) return;
     if (!isValidAddress(issuer)) {
       setError("That is not a valid XRPL address.");
       return;
     }
+    setQuery(issuer);
     setBusy(true);
     setError(null);
     setCopied(false);
@@ -118,6 +119,12 @@ function AuthorityBody() {
       setBusy(false);
     }
   };
+
+  // An address handed over from another scene, or picked from the
+  // palette's test addresses, is read straight away.
+  useClaimedSubject("authority", (subject) => {
+    void run(subject.value);
+  });
 
   const copyDigest = async () => {
     if (!certificate) return;

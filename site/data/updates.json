@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-10-30T14:00:00Z",
+    "kind": "release",
+    "title": "1.0.25: test addresses one keystroke away",
+    "body": "Press ⌘K (Ctrl+K on Windows and Linux) and type “test” for twelve real XRP Ledger accounts to try the app with: well-known issuers, a multi-signature account, an escrow wallet, an AMM pool, an unfunded address and a Testnet account. Picking one opens the screen where it shows something, already filled in. The app also takes on the new blue lotus mark and palette.",
+    "link": "/docs/release-notes/"
+  },
+  {
     "date": "2026-10-27T13:40:00Z",
     "kind": "release",
     "title": "1.0.24: addresses you paste into the invoice check just work",

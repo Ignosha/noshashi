@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.0.25
+
+### Test addresses
+
+- The command palette (⌘K, or Ctrl+K on Windows and Linux) has a new
+  TEST ADDRESSES group: twelve real accounts to try the console with,
+  among them the Bitstamp USD, RLUSD, SOLO and CSC issuers, a
+  multi-signature account, a Ripple escrow wallet, an AMM pool, an
+  address that was never funded and a Testnet account. Type "test" to
+  find them.
+- Picking one copies the address and opens the screen where it shows
+  something, already filled in and read. Each was read from the ledger
+  before it was added.
+- Authority, Issuance and Pool governance now accept an address handed
+  over from another screen, as Provenance and Control surface already
+  did.
+
+### Look
+
+- The new blue lotus mark and the navy and electric-blue palette from
+  the website are in the app.
+
 ## 1.0.24
 
 ### Invoice check

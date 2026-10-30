@@ -154,7 +154,8 @@ import { checkOnStartup } from "@/lib/updates";
 import { cn } from "@/lib/utils";
 import type { Status } from "@/lib/xrpl/types";
 import { DOMAIN_REGISTRY, evaluatePolicy } from "@/lib/policy";
-import { HandoffProvider } from "@/lib/nav/handoff";
+import { HandoffProvider, useHandoff } from "@/lib/nav/handoff";
+import { SAMPLE_ADDRESSES } from "@/lib/samples";
 import { ObserverRunner } from "@/lib/agent/useObserver";
 import { StressScheduleRunner } from "@/lib/desk/stressSchedule";
 import { PersonalGuardianRunner } from "@/lib/security/guardian";
@@ -1370,10 +1371,11 @@ function ConsoleApp() {
           )}
         </AnimatePresence>
 
-        <CommandPalette
+        <ConsolePalette
           open={paletteOpen}
           onOpenChange={setPaletteOpen}
           commands={commands}
+          onNavigate={goTo}
         />
 
         <GuideDialog scene={scene} open={guideOpen} onOpenChange={setGuideOpen} onStartTour={startTour} />
@@ -1388,6 +1390,59 @@ function ConsoleApp() {
 }
 
 /** Held for the moment a split chunk is in flight. */
+/**
+ * The palette, plus one entry per test address.
+ *
+ * Someone trying the console for the first time should not have to go and
+ * find an issuer to look at. Each test address copies itself to the
+ * clipboard and opens the screen where it shows something, already filled
+ * in and read. It sits inside the handoff provider so it can send the
+ * address the same way one scene sends a subject to another.
+ */
+function ConsolePalette({
+  open,
+  onOpenChange,
+  commands,
+  onNavigate,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  commands: Command[];
+  onNavigate: (scene: SceneId) => void;
+}) {
+  const handOff = useHandoff();
+  const { push } = useToast();
+  const all = useMemo<Command[]>(
+    () => [
+      ...commands,
+      ...SAMPLE_ADDRESSES.map((sample) => ({
+        id: `sample-${sample.address}`,
+        label: `Test address: ${sample.label}`,
+        group: "TEST ADDRESSES",
+        hint: `${sample.shows} · opens ${SCENE_BY_ID.get(sample.scene)?.label ?? sample.scene}`,
+        icon: <NovaCredit size={15} />,
+        run: () => {
+          void navigator.clipboard?.writeText(sample.address).catch(() => undefined);
+          // A Testnet account means nothing to the mainnet reads, so it is
+          // only copied; the screen it opens has the Testnet switch.
+          if (sample.network === "mainnet") {
+            handOff({ scene: sample.scene, value: sample.address, as: "test address" });
+          } else {
+            onNavigate(sample.scene);
+          }
+          push({
+            title: "TEST ADDRESS COPIED",
+            body: `${sample.label} · ${sample.address}`,
+            tone: "info",
+          });
+        },
+      })),
+    ],
+    [commands, handOff, onNavigate, push]
+  );
+  return <CommandPalette open={open} onOpenChange={onOpenChange} commands={all} />;
+}
+
 function SceneLoading() {
   return (
     <div className="flex h-full items-center justify-center">

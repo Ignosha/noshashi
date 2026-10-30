@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { shortAddress, isValidAddress } from "@/lib/xrpl/client";
 import { readAmm, ammFindings, type AmmReport } from "@/lib/desk/amm";
 import { cn } from "@/lib/utils";
-import { TraceButton } from "@/lib/nav/handoff";
+import { TraceButton, useClaimedSubject } from "@/lib/nav/handoff";
 
 /**
  * AmmScene — who sets the price of trading against a pool.
@@ -58,13 +58,14 @@ function AmmBody() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const run = async () => {
-    const account = query.trim();
+  const run = async (value?: string) => {
+    const account = (value ?? query).trim();
     if (!account || busy) return;
     if (!isValidAddress(account)) {
       setError("That is not a valid XRPL address.");
       return;
     }
+    setQuery(account);
     setBusy(true);
     setError(null);
     try {
@@ -76,6 +77,12 @@ function AmmBody() {
       setBusy(false);
     }
   };
+
+  // An address handed over from another scene, or picked from the
+  // palette's test addresses, is read straight away.
+  useClaimedSubject("amm", (subject) => {
+    void run(subject.value);
+  });
 
   const findings = report ? ammFindings(report) : [];
 
