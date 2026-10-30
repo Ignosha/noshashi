@@ -12,9 +12,22 @@
  *   POST /unsubscribe        { token }  Public. The token is in every alert.
  *
  *   POST /telegram           The Telegram bot's webhook. Commands:
- *                            /watch r…, /unwatch r…, /list, /start.
+ *                            /check r…, /watch r…, /unwatch r…, /list, /start.
+ *                            /check reads an issuer once and replies; it
+ *                            subscribes nothing, so it has no limit beyond
+ *                            Telegram's own.
  *                            Auth: Telegram's X-Telegram-Bot-Api-Secret-Token
  *                            header must equal TELEGRAM_WEBHOOK_SECRET.
+ *
+ *   POST /discord            Discord's interactions endpoint for the /check
+ *                            slash command. Auth: Discord's Ed25519
+ *                            signature over timestamp + body, checked
+ *                            against DISCORD_PUBLIC_KEY. Replies are
+ *                            deferred, because a ledger read can outlast
+ *                            Discord's three-second window, then filled in
+ *                            through the interaction's own webhook.
+ *                            scripts/register-discord-command.mjs registers
+ *                            the command once.
  *
  *   POST /tick               Every five minutes from pg_cron
  *                            (noshashi.issuer_alerts_kick), only while a
@@ -31,7 +44,8 @@
  *
  * Secrets: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (always present),
  * TELEGRAM_BOT_TOKEN and TELEGRAM_WEBHOOK_SECRET (only for Telegram; the
- * Discord path works without them).
+ * Discord webhook alerts work without them), DISCORD_PUBLIC_KEY and
+ * DISCORD_APPLICATION_ID (only for the Discord /check command).
  *
  * Deploy: supabase functions deploy noshashi-issuer-alerts --no-verify-jwt
  */
@@ -185,6 +199,30 @@ async function subscribe(db: Db, issuer: string, channel: "discord" | "telegram"
   return { ok: true, token: data.unsubscribe_token as string, powers, ledgerIndex: read.ledgerIndex };
 }
 
+/** One live reading for /check: nothing is stored, nothing is subscribed. */
+async function checkText(issuer: string): Promise<string> {
+  if (!ADDRESS_RE.test(issuer)) return "Send /check followed by an XRPL classic address. They begin with r.";
+  let read;
+  try {
+    read = await accountInfo(issuer);
+  } catch {
+    return "The ledger could not be read just now. Nothing here is a pass. Try again shortly.";
+  }
+  if (!read) return "No account with that address exists on the ledger.";
+  const powers = powersFrom(read.info);
+  if (!powers) return "The issuer could not be read. Try again shortly.";
+  return [
+    "NOSHASHI · issuer check",
+    `${issuer}${read.ledgerIndex ? ` (ledger ${read.ledgerIndex})` : ""}`,
+    "",
+    describePowers(powers),
+    "",
+    "Ledger facts, not a rating or advice.",
+    `Full reading: ${SITE}/certificate/?issuer=${issuer}`,
+    `Alert this chat if it changes: /watch ${issuer}`,
+  ].join("\n");
+}
+
 function receiptText(issuer: string, ledgerIndex: number | null, powers: Powers, token: string): string {
   return [
     "NOSHASHI · watching issuer",
@@ -249,7 +287,9 @@ async function handleTelegram(db: Db, request: Request): Promise<Response> {
   const name = command.split("@")[0].toLowerCase();
   const reply = (body: string) => sendTelegram(chatId, body);
 
-  if (name === "/watch") {
+  if (name === "/check") {
+    await reply(await checkText(argument));
+  } else if (name === "/watch") {
     const result = await subscribe(db, argument, "telegram", chatId);
     await reply(result.ok ? receiptText(argument, result.ledgerIndex, result.powers, result.token) : result.message);
   } else if (name === "/unwatch") {
@@ -266,6 +306,7 @@ async function handleTelegram(db: Db, request: Request): Promise<Response> {
     await reply([
       "NOSHASHI issuer alerts. Read-only: this bot never asks for keys or seeds, and never will.",
       "",
+      "/check r…    what an XRPL issuer can do right now, read from the ledger",
       "/watch r…    alert this chat when an XRPL issuer's powers change",
       "/unwatch r…  stop",
       "/list        what this chat watches",
@@ -274,6 +315,50 @@ async function handleTelegram(db: Db, request: Request): Promise<Response> {
     ].join("\n"));
   }
   return json(200, { ok: true });
+}
+
+// ── Discord /check ───────────────────────────────────────────────────
+
+const hexBytes = (hex: string) => new Uint8Array((hex.match(/../g) ?? []).map((b) => parseInt(b, 16)));
+
+/** Discord signs timestamp + raw body with the application's Ed25519 key. */
+async function discordSignatureOk(request: Request, body: string): Promise<boolean> {
+  const publicKey = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
+  const signature = request.headers.get("x-signature-ed25519") ?? "";
+  const timestamp = request.headers.get("x-signature-timestamp") ?? "";
+  if (!/^[0-9a-f]{64}$/i.test(publicKey) || !/^[0-9a-f]{128}$/i.test(signature) || !timestamp) return false;
+  try {
+    const key = await crypto.subtle.importKey("raw", hexBytes(publicKey), { name: "Ed25519" }, false, ["verify"]);
+    return await crypto.subtle.verify("Ed25519", key, hexBytes(signature), new TextEncoder().encode(timestamp + body));
+  } catch {
+    return false;
+  }
+}
+
+async function handleDiscord(request: Request): Promise<Response> {
+  const body = await request.text();
+  if (!(await discordSignatureOk(request, body))) return json(401, { error: "invalid request signature" });
+  const interaction: Json = JSON.parse(body);
+  if (interaction?.type === 1) return json(200, { type: 1 }); // PING
+
+  const appId = Deno.env.get("DISCORD_APPLICATION_ID") ?? String(interaction?.application_id ?? "");
+  const token = String(interaction?.token ?? "");
+  if (interaction?.type !== 2 || interaction?.data?.name !== "check" || !/^\d{15,22}$/.test(appId) || !token) {
+    return json(200, { type: 4, data: { content: "Use /check with an XRPL issuer address.", flags: 64 } });
+  }
+  const issuer = String((interaction.data.options ?? []).find((o: Json) => o?.name === "issuer")?.value ?? "").trim();
+  const followUp = (async () => {
+    const content = (await checkText(issuer)).replace(/\/watch r\S*$/m, `${SITE}/alerts/`);
+    await fetch(`https://discord.com/api/v10/webhooks/${appId}/${token}/messages/@original`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: content.slice(0, 1990), allowed_mentions: { parse: [] } }),
+      signal: AbortSignal.timeout(8_000),
+    }).catch(() => undefined);
+  })();
+  // deno-lint-ignore no-explicit-any
+  (globalThis as any).EdgeRuntime?.waitUntil?.(followUp);
+  return json(200, { type: 5 }); // "thinking…", replaced by the follow-up
 }
 
 // ── The tick ─────────────────────────────────────────────────────────
@@ -354,6 +439,7 @@ Deno.serve(async (request: Request): Promise<Response> => {
     if (route === "subscribe" && request.method === "POST") return await handleSubscribe(db, request, origin);
     if (route === "unsubscribe" && request.method === "POST") return await handleUnsubscribe(db, request, origin);
     if (route === "telegram" && request.method === "POST") return await handleTelegram(db, request);
+    if (route === "discord" && request.method === "POST") return await handleDiscord(request);
 
     if (route === "tick" && request.method === "POST") {
       const auth = request.headers.get("authorization") ?? "";
@@ -364,7 +450,7 @@ Deno.serve(async (request: Request): Promise<Response> => {
       if (data !== true) return json(401, { error: "unauthorized" });
       return json(200, await tick(db));
     }
-    return json(404, { error: "not_found", routes: ["GET /powers?issuer=", "POST /subscribe", "POST /unsubscribe", "POST /telegram", "POST /tick"] }, origin);
+    return json(404, { error: "not_found", routes: ["GET /powers?issuer=", "POST /subscribe", "POST /unsubscribe", "POST /telegram", "POST /discord", "POST /tick"] }, origin);
   } catch (error) {
     console.error(JSON.stringify({ level: "error", where: "issuer-alerts", message: error instanceof Error ? error.message : String(error) }));
     return json(500, { error: "internal" }, origin);
