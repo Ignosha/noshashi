@@ -1449,10 +1449,10 @@
   .pv-mark::before,.pv-mark::after{content:"";position:absolute;inset:3px;border-radius:50%;border:1px solid var(--brass)}
   .pv-mark::after{inset:5.5px;background:var(--brass);border:0}
 
-  .pv-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:center;gap:clamp(32px,5vw,80px);
+  .pv-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);align-items:center;gap:clamp(32px,5vw,72px);
     padding:clamp(56px,9vw,120px) 0 clamp(40px,6vw,72px);border-bottom:1px solid var(--rule)}
   .pv-kicker{display:flex;align-items:center;gap:12px;margin:0 0 28px;font-size:11.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}
-  .pv-h1{margin:0;max-width:15ch;font-size:clamp(46px,6.4vw,92px);line-height:1;letter-spacing:-.02em;font-weight:400;color:var(--ink)}
+  .pv-h1{margin:0;max-width:14ch;font-size:clamp(42px,5.2vw,76px);line-height:1.02;letter-spacing:-.02em;font-weight:400;color:var(--ink)}
   .pv-h1 em{font-style:italic;color:var(--brass)}
   .pv-lede{margin:30px 0 0;max-width:52ch;font-size:clamp(16px,1.3vw,18px);line-height:1.7;color:var(--muted)}
   .pv-actions{display:flex;align-items:center;flex-wrap:wrap;gap:14px 28px;margin-top:38px}
@@ -1547,6 +1547,112 @@
   .pv-close p{margin:16px auto 0;max-width:54ch;font-size:16px;line-height:1.7;color:var(--muted)}
   .pv-close .pv-actions{justify-content:center}
 
+
+  /* ── Private desk, as a product (v2) ─────────────────────────────── */
+  .pv-btn.ghost{background:transparent;color:var(--ink)}
+  .pv-btn.ghost:hover,.pv-btn.ghost:focus-visible{background:var(--ink);color:var(--ground)}
+  .pv-meta{margin:20px 0 0;font-size:13px;color:var(--faint)}
+
+  .pv-app{min-width:0;border:1px solid var(--rule);border-radius:6px;background:var(--surface);overflow:hidden;
+    box-shadow:0 1px 0 rgb(15 27 45 / .04),0 40px 80px -40px rgb(15 27 45 / .35)}
+  .pv-app-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 16px;background:#0F1B2D;color:#EEE8DC}
+  .pv-app-brand{font:500 12px var(--serif);letter-spacing:.22em}
+  .pv-app-brand i{font-style:italic;letter-spacing:0;font-size:13px;color:#C9A66B;margin-left:6px}
+  .pv-app-live{display:flex;align-items:center;gap:6px;font:500 10px var(--sans);letter-spacing:.12em;color:#B3B0A8}
+  .pv-app-live > i{width:6px;height:6px;border-radius:50%;background:#7FBF97}
+  .pv-app-body{display:grid;grid-template-columns:138px minmax(0,1fr);min-height:360px}
+  .pv-app-nav{display:flex;flex-direction:column;gap:2px;padding:16px 10px;background:var(--elevated);border-right:1px solid var(--rule);font-size:12.5px;color:var(--muted)}
+  .pv-app-nav b{margin:0 8px 8px;font:500 10px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  .pv-app-nav span{padding:7px 8px;border-radius:3px}
+  .pv-app-nav .on{background:var(--surface);color:var(--ink);box-shadow:inset 2px 0 0 var(--brass)}
+  .pv-app-main{padding:18px 20px 16px;min-width:0}
+  .pv-app-k{margin:0;font:500 10px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+  .pv-app-asset{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 12px;margin:8px 0 12px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+  .pv-app-asset b{font:500 24px var(--serif)}
+  .pv-app-asset span{font:11px "IBM Plex Mono",monospace;color:var(--faint);overflow-wrap:anywhere}
+  .pv-pill{margin-left:auto;padding:3px 9px;border:1px solid var(--rule);border-radius:999px;font:500 10px var(--sans);letter-spacing:.12em;text-transform:uppercase;font-style:normal;color:var(--muted)}
+  .pv-pill[data-tone="kept"]{border-color:color-mix(in srgb,var(--hold) 45%,transparent);color:var(--hold)}
+  .pv-pill[data-tone="clear"]{border-color:color-mix(in srgb,var(--go) 45%,transparent);color:var(--go)}
+  .pv-checks{list-style:none;margin:0;padding:0}
+  .pv-checks li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--rule);font-size:13px;color:var(--ink)}
+  .pv-checks li.wait{color:var(--faint);font-style:italic;border:0}
+  .pv-checks li em{font-style:normal;font-size:10.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+  .pv-checks li em.kept{color:var(--hold)}.pv-checks li em.clear{color:var(--go)}
+  .pv-checks li{opacity:0;transform:translateY(4px);animation:pv-row .5s ease forwards;animation-delay:calc(var(--n,0) * 90ms)}
+  .pv-checks li.wait{opacity:1;transform:none;animation:none}
+  @keyframes pv-row{to{opacity:1;transform:none}}
+  .pv-app-depth{margin-top:14px}
+  .pv-app-depth p{display:flex;justify-content:space-between;gap:10px;margin:0 0 7px;font-size:12px;color:var(--muted)}
+  .pv-app-depth b{font:500 15px var(--serif);color:var(--ink)}
+  .pv-app-bar2{height:6px;background:var(--elevated);border-radius:3px;overflow:hidden}
+  .pv-app-bar2 i{display:block;height:100%;width:0;background:var(--ink);transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
+  .pv-app-receipt{margin:14px 0 0;font:10.5px "IBM Plex Mono",monospace;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pv-app-receipt span{color:var(--muted)}
+
+  .pv-for{display:flex;align-items:center;flex-wrap:wrap;gap:10px 28px;padding:22px 0;border-bottom:1px solid var(--rule)}
+  .pv-for > span{font:500 11px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  .pv-for ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px 30px;margin:0;padding:0}
+  .pv-for li{font:500 20px var(--serif);color:var(--muted)}
+
+  /* The private desk: one deep-navy band, the same in both themes. */
+  .pv-desk{--ground:#0B1320;--surface:#101A2A;--elevated:#162236;--ink:#EEE8DC;--muted:#B3B0A8;--faint:#8E8D89;--rule:#26324B;--brass:#C9A66B;--go:#7FBF97;
+    margin:clamp(64px,9vw,112px) calc(50% - 50vw) 0;padding:clamp(56px,8vw,104px) calc(50vw - 50%);background:var(--ground);color:var(--ink)}
+  .pv-desk-in{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,96px);align-items:center}
+  .pv-desk .pv-kicker{margin-bottom:16px}
+  .pv-desk .pv-kicker .pv-num{font-size:18px}
+  .pv-desk h2{margin:0;font-size:clamp(32px,3.6vw,48px);font-weight:400}
+  .pv-desk-text > p:not(.pv-kicker):not(.pv-foot){margin:14px 0 26px;max-width:56ch;color:var(--muted);line-height:1.7}
+  .pv-desk .pv-stage.bx-stage{margin:0}
+  .pv-desk .pv-seal{width:min(420px,100%)}
+
+  .pv-api{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);align-items:start}
+  .pv-api-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+  .pv-api-list li{padding:18px 0;border-bottom:1px solid var(--rule)}
+  .pv-api-list b{display:block;font:500 21px var(--serif)}
+  .pv-api-list span{display:block;margin-top:6px;font-size:14.5px;line-height:1.6;color:var(--muted)}
+  .pv-code{margin:0;border-radius:6px;background:#0F1B2D;color:#EEE8DC;overflow:hidden}
+  .pv-code figcaption{display:flex;justify-content:space-between;gap:10px;padding:12px 18px;border-bottom:1px solid #26324B;font:500 10.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#8E8D89}
+  .pv-code figcaption a{color:#C9A66B;text-decoration:none;letter-spacing:.06em}
+  .pv-code pre{margin:0;padding:16px 18px 18px;overflow:auto;font:12.5px/1.65 "IBM Plex Mono",ui-monospace,monospace;color:#EEE8DC;background:none;border:0}
+  .pv-code pre + figcaption{border-top:1px solid #26324B}
+  #pv-code-out{color:#C9C3B6}
+  #pv-code-out .k{color:#C9A66B}
+
+  .pv-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--ink)}
+  .pv-grid li{padding:24px 26px 26px 0;border-bottom:1px solid var(--rule)}
+  .pv-grid li:not(:nth-child(3n+1)){padding-left:26px;border-left:1px solid var(--rule)}
+  .pv-grid b{display:block;font:500 21px var(--serif)}
+  .pv-grid span{display:block;margin-top:8px;font-size:14.5px;line-height:1.6;color:var(--muted)}
+  .pv-grid a{color:var(--ink)}
+
+  .pv-plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink)}
+  .pv-plans a{display:flex;flex-direction:column;padding:26px 24px 24px 0;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule);transition:background .3s ease}
+  .pv-plans a+a{padding-left:24px;border-left:1px solid var(--rule)}
+  .pv-plans a:hover{background:var(--surface)}
+  .pv-plan-hi{box-shadow:inset 0 3px 0 var(--brass)}
+  .pv-plan-n{font:500 11px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+  .pv-plans b{margin-top:16px;font:400 40px/1 var(--serif);font-variant-numeric:lining-nums}
+  .pv-plans em{margin-top:6px;font-style:normal;font-size:13px;color:var(--faint)}
+  .pv-plan-d{margin-top:16px;font-size:14.5px;line-height:1.6;color:var(--muted);flex:1}
+  .pv-plan-c{margin-top:20px;font-size:13.5px;font-weight:500}
+  .pv-sec details.pv-cases{margin-top:26px}
+  .pv-fees{width:100%}
+
+  @media (max-width:980px){
+    .pv-desk-in,.pv-api{grid-template-columns:1fr}
+    .pv-desk .pv-seal{width:min(320px,100%)}
+    .pv-grid,.pv-plans{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .pv-grid li,.pv-grid li:not(:nth-child(3n+1)){padding:22px 20px 22px 0;border-left:0}
+    .pv-grid li:nth-child(2n){padding-left:20px;border-left:1px solid var(--rule)}
+    .pv-plans a,.pv-plans a+a{padding:22px 20px 22px 0;border-left:0}
+    .pv-plans a:nth-child(2n){padding-left:20px;border-left:1px solid var(--rule)}
+  }
+  @media (max-width:640px){
+    .pv-app-body{grid-template-columns:1fr}
+    .pv-app-nav{display:none}
+    .pv-grid,.pv-plans{grid-template-columns:1fr}
+    .pv-grid li:nth-child(2n),.pv-plans a:nth-child(2n){padding-left:0;border-left:0}
+  }
   [data-reveal].will-reveal{opacity:0;transform:translateY(14px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
   [data-reveal].will-reveal.is-in{opacity:1;transform:none}
   /* The live ticker still feeds the statement (XRP / RLUSD); it is read
@@ -1615,29 +1721,67 @@
   <section class="pv-hero" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
     <div class="pv-hero-text">
-      <p class="pv-kicker"><i class="pv-mark" aria-hidden="true"></i>Ledger intelligence for institutions</p>
-      <h1 class="pv-h1">Know what a token <em>can do</em> before you hold it.</h1>
-      <p class="pv-lede">NOSHASHI reads the XRP Ledger the way a bank reads a counterparty: who controls an issuer, what a payment truly delivered, and how much of an order book can actually fill. Every reading names the ledger it came from and carries a receipt. We never hold keys.</p>
+      <p class="pv-kicker"><i class="pv-mark" aria-hidden="true"></i>Ledger intelligence for digital-asset banking</p>
+      <h1 class="pv-h1">Due diligence on digital assets, <em>read from the ledger.</em></h1>
+      <p class="pv-lede">NOSHASHI is the read-only risk and compliance workspace for banks, custodians and token issuers on the XRP Ledger. Issuer controls, delivered amounts, fillable liquidity and counterparty screening, each answer recorded with the ledger it came from and a receipt.</p>
       <div class="pv-actions">
-        <a class="pv-btn" href="/contact/?topic=institutions">Arrange a briefing</a>
-        <a class="pv-link" href="/app/">Open the workspace <span aria-hidden="true">→</span></a>
+        <a class="pv-btn" href="/app/">Start free</a>
+        <a class="pv-btn ghost" href="/contact/?topic=institutions">Book a demo</a>
+      </div>
+      <p class="pv-meta">Free plan, no card · Never holds keys · macOS, Windows, Linux and the browser</p>
+    </div>
+
+    <div class="pv-app" aria-label="The NOSHASHI workspace, reviewing the RLUSD issuer on live mainnet">
+      <div class="pv-app-bar"><span class="pv-app-brand">NOSHASHI <i>Workspace</i></span><span class="pv-app-live"><i aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span> · <span data-sys-ledger translate="no">—</span></span></div>
+      <div class="pv-app-body">
+        <nav class="pv-app-nav" aria-hidden="true"><b>Desk</b><span>Overview</span><span class="on">Issuer review</span><span>Payments</span><span>Liquidity</span><span>Screening</span><span>Evidence</span></nav>
+        <div class="pv-app-main">
+          <p class="pv-app-k">Issuer review</p>
+          <div class="pv-app-asset"><b>RLUSD</b><span translate="no">rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De</span><em id="pv-app-verdict" class="pv-pill">Reading</em></div>
+          <ul class="pv-checks" id="pv-app-checks"><li class="wait">Reading the issuer account from mainnet…</li></ul>
+          <div class="pv-app-depth"><p><span>Order book, within 10% of mid</span><b id="pv-app-fill">—</b></p><div class="pv-app-bar2"><i id="pv-app-fillbar"></i></div></div>
+          <p class="pv-app-receipt">Receipt <span id="pv-app-receipt" translate="no">pending</span></p>
+        </div>
       </div>
     </div>
-    <figure class="pv-seal">
-      <svg id="pv-seal" viewBox="0 0 400 400" role="img" aria-label="An engraved seal. A ring ripples outward from its centre each time the XRP Ledger validates a new ledger.">
-        <defs><path id="pv-ring-path" d="M200 200 m-176 0 a176 176 0 1 1 352 0 a176 176 0 1 1 -352 0"/></defs>
-        <g class="pv-ripples" id="pv-ripples"></g>
-        <g class="pv-guilloche" id="pv-guilloche"></g>
-        <circle class="pv-hair" cx="200" cy="200" r="188"/>
-        <circle class="pv-hair" cx="200" cy="200" r="164"/>
-        <text class="pv-ring-t"><textPath href="#pv-ring-path" startOffset="0">READ FROM VALIDATED LEDGERS · NO KEYS HELD · EVERY ANSWER RECEIPTED · NOSHASHI ·</textPath></text>
-        <circle class="pv-core" cx="200" cy="200" r="62"/>
-        <text class="pv-core-k" x="200" y="186" text-anchor="middle">LEDGER №</text>
-        <text class="pv-core-n" x="200" y="214" text-anchor="middle" id="pv-seal-n">—</text>
-        <text class="pv-core-s" x="200" y="234" text-anchor="middle" data-sys-field data-state="connecting">CONNECTING</text>
-      </svg>
-      <figcaption>Each ring is a ledger validated while this page has been open.</figcaption>
-    </figure>
+  </section>
+
+  <div class="pv-for" aria-label="Who uses NOSHASHI"><span>Built for</span><ul><li>Banks</li><li>Custodians</li><li>Exchanges</li><li>Token issuers</li><li>Auditors</li><li>Funds</li></ul></div>
+
+  <section class="pv-desk" data-reveal aria-labelledby="pv-s1">
+    <div class="pv-desk-in">
+      <figure class="pv-seal">
+        <svg id="pv-seal" viewBox="0 0 400 400" role="img" aria-label="An engraved seal. A ring ripples outward from its centre each time the XRP Ledger validates a new ledger.">
+          <defs><path id="pv-ring-path" d="M200 200 m-176 0 a176 176 0 1 1 352 0 a176 176 0 1 1 -352 0"/></defs>
+          <g class="pv-ripples" id="pv-ripples"></g>
+          <g class="pv-guilloche" id="pv-guilloche"></g>
+          <circle class="pv-hair" cx="200" cy="200" r="188"/>
+          <circle class="pv-hair" cx="200" cy="200" r="164"/>
+          <text class="pv-ring-t"><textPath href="#pv-ring-path" startOffset="0">READ FROM VALIDATED LEDGERS · NO KEYS HELD · EVERY ANSWER RECEIPTED · NOSHASHI ·</textPath></text>
+          <circle class="pv-core" cx="200" cy="200" r="62"/>
+          <text class="pv-core-k" x="200" y="186" text-anchor="middle">LEDGER №</text>
+          <text class="pv-core-n" x="200" y="214" text-anchor="middle" id="pv-seal-n">—</text>
+          <text class="pv-core-s" x="200" y="234" text-anchor="middle">VALIDATED</text>
+        </svg>
+        <figcaption>Each ring is a ledger validated while this page has been open.</figcaption>
+      </figure>
+      <div class="pv-desk-text">
+        <p class="pv-kicker"><span class="pv-num">I.</span>The private desk</p>
+        <h2 id="pv-s1">The ledger, as of this page</h2>
+        <p>A short statement read from the XRP Ledger while you were reading. Nothing here is sample data; a line that could not be read says so.</p>
+        <div class="pv-stage bx-stage"><table class="pv-table">
+          <tbody>
+            <tr><th scope="row">Latest validated ledger</th><td id="pv-ledger" translate="no">Waiting for the next close</td></tr>
+            <tr><th scope="row">Transactions in that ledger</th><td id="pv-tx">—</td></tr>
+            <tr><th scope="row">Average interval between closes</th><td id="pv-close">—</td></tr>
+            <tr><th scope="row">XRP against RLUSD <span class="pv-state" data-bx-state>Connecting</span></th><td><span data-bx-mirror="tk-xrp" translate="no">—</span></td></tr>
+            <tr><th scope="row">RLUSD issuer: powers retained</th><td id="pv-kept">Reading…</td></tr>
+            <tr><th scope="row">RLUSD book: depth that can fill</th><td id="pv-fill">Reading…</td></tr>
+          </tbody>
+        </table></div>
+        <p class="pv-foot" id="pv-foot">Sources: the public XRPL WebSocket for closes; NOSHASHI's own reads of the RLUSD issuer account and its DEX order book (AMM pools excluded).</p>
+      </div>
+    </div>
   </section>
 
   <dl class="pv-facts" aria-label="How NOSHASHI works">
@@ -1647,25 +1791,9 @@
     <div><dt>51 tokens</dt><dd>Covered today, each with a live issuer page.</dd></div>
   </dl>
 
-  <section class="pv-sec" data-reveal aria-labelledby="pv-s1">
-    <header class="pv-sec-h"><span class="pv-num">I.</span><h2 id="pv-s1">The ledger, as of this page</h2>
-      <p>A short statement read from the XRP Ledger while you were reading. Nothing here is sample data; a line that could not be read says so.</p></header>
-    <div class="pv-stage bx-stage"><table class="pv-table">
-      <tbody>
-        <tr><th scope="row">Latest validated ledger</th><td id="pv-ledger" translate="no">Waiting for the next close</td></tr>
-        <tr><th scope="row">Transactions in that ledger</th><td id="pv-tx">—</td></tr>
-        <tr><th scope="row">Average interval between closes</th><td id="pv-close">—</td></tr>
-        <tr><th scope="row">XRP against RLUSD <span class="pv-state" data-bx-state>Connecting</span></th><td><span data-bx-mirror="tk-xrp" translate="no">—</span></td></tr>
-        <tr><th scope="row">RLUSD issuer: powers retained over holders</th><td id="pv-kept">Reading…</td></tr>
-        <tr><th scope="row">RLUSD order book: depth that can fill, within 10% of mid</th><td id="pv-fill">Reading…</td></tr>
-      </tbody>
-    </table></div>
-    <p class="pv-foot" id="pv-foot">Sources: the public XRPL WebSocket for closes; NOSHASHI's own reads of the RLUSD issuer account and its DEX order book (AMM pools excluded).</p>
-  </section>
-
   <section class="pv-sec" data-reveal aria-labelledby="pv-s2">
-    <header class="pv-sec-h"><span class="pv-num">II.</span><h2 id="pv-s2">What we read</h2>
-      <p>Five questions a risk or treasury team asks before an asset moves. Each has a free tool on this site and a place in the desktop app.</p></header>
+    <header class="pv-sec-h"><span class="pv-num">II.</span><h2 id="pv-s2">One workspace, five instruments</h2>
+      <p>The questions a risk or treasury team asks before an asset moves. Each is in the workspace and the desktop app, and each has a free version on this site.</p></header>
     <ol class="pv-list">
       <li><a href="/certificate/"><span class="pv-ix">i</span><b>Issuer powers</b><span>Whether an issuer can freeze, claw back, gate who holds its token, or sign alone.</span><i aria-hidden="true">→</i></a></li>
       <li><a href="/delivered/"><span class="pv-ix">ii</span><b>Delivered amounts</b><span>What a payment actually delivered, which is not always what it asked for.</span><i aria-hidden="true">→</i></a></li>
@@ -1738,7 +1866,66 @@
   </section>
 
   <section class="pv-sec" data-reveal aria-labelledby="pv-s3">
-    <header class="pv-sec-h"><span class="pv-num">III.</span><h2 id="pv-s3">Who it is for</h2></header>
+    <header class="pv-sec-h"><span class="pv-num">III.</span><h2 id="pv-s3">Into your own systems</h2>
+      <p>The same readings the workspace uses, as an API your onboarding, treasury or monitoring systems can call.</p></header>
+    <div class="pv-api">
+      <ul class="pv-api-list">
+        <li><b>Asset Risk API</b><span>One call for an issued asset: issuer controls, fillable depth, an exit estimate and a receipt. Free to try, no key.</span></li>
+        <li><b>Compliance API</b><span>Every verb the desktop app runs, with keys, scopes and rate limits.</span></li>
+        <li><b>Issuer alerts</b><span>Telegram or Discord, the moment an issuer's powers change.</span></li>
+        <li><b>Evidence files</b><span>PDF, print copy and a JSON record with its SHA-256 fingerprint.</span></li>
+      </ul>
+      <figure class="pv-code">
+        <figcaption><span>Request</span><a href="/docs/api/">API reference →</a></figcaption>
+<pre><code>curl "https://www.noshashi.app/api/v1/asset-risk\
+  ?issuer=rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De\
+  &amp;currency=524C555344000000000000000000000000000000"</code></pre>
+        <figcaption><span>Response, read live from this page</span></figcaption>
+<pre><code id="pv-code-out">{ "schema": "noshashi.asset-risk.v1", … }</code></pre>
+      </figure>
+    </div>
+  </section>
+
+  <section class="pv-sec" data-reveal aria-labelledby="pv-s4">
+    <header class="pv-sec-h"><span class="pv-num">IV.</span><h2 id="pv-s4">Security and controls</h2>
+      <p>Built for the people who sign off on it: compliance, risk and audit.</p></header>
+    <ul class="pv-grid">
+      <li><b>Read-only by design</b><span>NOSHASHI never holds keys and never signs. There is nothing to connect and nothing to move.</span></li>
+      <li><b>Validated state only</b><span>Every reading comes from a validated ledger and names its index.</span></li>
+      <li><b>Receipts</b><span>A SHA-256 digest over every answer, so anyone can confirm what was read.</span></li>
+      <li><b>Versioned policy</b><span>GO, HOLD or NO-GO against a policy your team versions and reviews.</span></li>
+      <li><b>Audit log</b><span>Who checked what, when, and what the ledger said at the time.</span></li>
+      <li><b>Open source</b><span>The code is public on <a href="https://github.com/Ignosha/noshashi">GitHub</a>, for your own review.</span></li>
+    </ul>
+  </section>
+
+  <section class="pv-sec" data-reveal aria-labelledby="pv-s5">
+    <header class="pv-sec-h"><span class="pv-num">V.</span><h2 id="pv-s5">Plans</h2>
+      <p>Start free on your own addresses. Pay when your team needs seats, scale or an audit trail.</p></header>
+    <div class="pv-plans">
+      <a href="/pricing/"><span class="pv-plan-n">Free</span><b>$0</b><em>forever</em><span class="pv-plan-d">For trying NOSHASHI on your own addresses.</span><span class="pv-plan-c">Start free →</span></a>
+      <a href="/pricing/"><span class="pv-plan-n">Pro</span><b>$749</b><em>per seat, per month</em><span class="pv-plan-d">For trading desks and funds holding XRPL tokens.</span><span class="pv-plan-c">Choose Pro →</span></a>
+      <a href="/pricing/" class="pv-plan-hi"><span class="pv-plan-n">Institutional</span><b>$4,000</b><em>per month, unlimited seats</em><span class="pv-plan-d">For exchanges, custodians and token issuers who answer to auditors.</span><span class="pv-plan-c">Choose Institutional →</span></a>
+      <a href="/contact/?topic=institutions"><span class="pv-plan-n">Enterprise</span><b>$120,000</b><em>per year</em><span class="pv-plan-d">For banks and large operations. Strategic from $250,000 a year.</span><span class="pv-plan-c">Talk to us →</span></a>
+    </div>
+    <details class="pv-cases">
+      <summary>Ledger Evidence Report: one-off engagements from $950</summary>
+      <div>
+        <table class="pv-table pv-fees">
+          <thead><tr><th scope="col">Engagement</th><th scope="col">Scope</th><th scope="col">Fee</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><a href="/evidence-report/?tier=issuer">Issuer check</a></th><td>One token issuer, up to three team wallets and its order book</td><td>$950</td></tr>
+            <tr><th scope="row"><a href="/evidence-report/?tier=standard">Standard</a></th><td>One report, read now</td><td>$2,500</td></tr>
+            <tr><th scope="row"><a href="/evidence-report/?tier=quarterly">Quarterly</a></th><td>Now, and at each of the next four quarter-ends</td><td>$7,500</td></tr>
+            <tr><th scope="row"><a href="/evidence-report/?tier=audit">Audit support</a></th><td>Now, and at each of the next twelve month-ends</td><td>$15,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <section class="pv-sec" data-reveal aria-labelledby="pv-s6">
+    <header class="pv-sec-h"><span class="pv-num">VI.</span><h2 id="pv-s6">Who it is for</h2></header>
     <div class="pv-cols">
       <div><h3>Banks and custodians</h3><p>Screen XRP and RLUSD deposits before they are credited, and keep a record of why each one was accepted or held.</p><a class="pv-link" href="/solutions/">Solutions <span aria-hidden="true">→</span></a></div>
       <div><h3>Token issuers</h3><p>Show holders, exchanges and partners exactly which powers your issuer account keeps, read from the ledger rather than claimed.</p><a class="pv-link" href="/tokens/">Token directory <span aria-hidden="true">→</span></a></div>
@@ -1746,23 +1933,8 @@
     </div>
   </section>
 
-  <section class="pv-sec" data-reveal aria-labelledby="pv-s4">
-    <header class="pv-sec-h"><span class="pv-num">IV.</span><h2 id="pv-s4">Ledger Evidence Report: schedule of fees</h2>
-      <p>Issuer controls, holdings and who can move them, and real against advertised depth, for the addresses you name. A record of ledger facts, not an opinion.</p></header>
-    <table class="pv-table pv-fees">
-      <thead><tr><th scope="col">Engagement</th><th scope="col">Scope</th><th scope="col">Fee</th></tr></thead>
-      <tbody>
-        <tr><th scope="row"><a href="/evidence-report/?tier=issuer">Issuer check</a></th><td>One token issuer, up to three team wallets and its order book</td><td>$950</td></tr>
-        <tr><th scope="row"><a href="/evidence-report/?tier=standard">Standard</a></th><td>One report, read now</td><td>$2,500</td></tr>
-        <tr><th scope="row"><a href="/evidence-report/?tier=quarterly">Quarterly</a></th><td>Now, and at each of the next four quarter-ends</td><td>$7,500</td></tr>
-        <tr><th scope="row"><a href="/evidence-report/?tier=audit">Audit support</a></th><td>Now, and at each of the next twelve month-ends</td><td>$15,000</td></tr>
-      </tbody>
-    </table>
-    <p class="pv-foot">Invoice or bank transfer on request. Software subscriptions are on the <a href="/pricing/">pricing page</a>.</p>
-  </section>
-
-  <section class="pv-sec pv-letter" data-reveal aria-labelledby="pv-s5">
-    <header class="pv-sec-h"><span class="pv-num">V.</span><h2 id="pv-s5">A note from the founder</h2></header>
+  <section class="pv-sec pv-letter" data-reveal aria-labelledby="pv-s7">
+    <header class="pv-sec-h"><span class="pv-num">VII.</span><h2 id="pv-s7">A note from the founder</h2></header>
     <blockquote>
       <p>Institutions looking at the XRP Ledger are asked to take a great deal on trust: that an issuer will not freeze a balance, that a quoted book is really there, that a payment delivered what it said. The ledger already holds the answers. NOSHASHI reads them, names the ledger they came from, and keeps the receipt.</p>
       <p>We are a young company and we say so plainly. There are no borrowed logos here, only readings you can check for yourself.</p>
@@ -1773,8 +1945,8 @@
   <section class="pv-close" data-reveal>
     <i class="pv-mark" aria-hidden="true"></i>
     <h2>Arrange a private briefing</h2>
-    <p>Thirty minutes, remote, on your own addresses if you wish. Or begin with the free tools: read-only, on live mainnet, no account needed.</p>
-    <div class="pv-actions"><a class="pv-btn" href="/contact/?topic=institutions">Arrange a briefing</a><a class="pv-link" href="/#public">Use the free tools <span aria-hidden="true">→</span></a></div>
+    <p>Thirty minutes, remote, on your own addresses if you wish. Or start on the free plan today: read-only, on live mainnet, no card.</p>
+    <div class="pv-actions"><a class="pv-btn" href="/contact/?topic=institutions">Book a demo</a><a class="pv-btn ghost" href="/app/">Start free</a></div>
   </section>
 
   <!-- Live mainnet ticker: real data over the same public WebSocket the

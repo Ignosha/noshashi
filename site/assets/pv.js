@@ -101,50 +101,78 @@
     closes.push(tx);
   });
 
-  /* ── Issuer powers and book depth, read once when the table is near ── */
+  /* ── One live read: the public Asset Risk API for RLUSD ──────────
+     Fills the product window in the hero, two lines of the statement and
+     the response under the code sample, from the same reply. */
   var LABELS = {
-    FREEZE_SURRENDERED: "freeze",
-    NOT_GLOBALLY_FROZEN: "a global freeze in force",
-    OPEN_HOLDING: "authorisation of holders",
-    NO_UNILATERAL_SIGNER: "signing with one key",
-    NO_TRANSFER_FEE: "a transfer fee",
+    FREEZE_SURRENDERED: "Freeze",
+    NOT_GLOBALLY_FROZEN: "Global freeze in force",
+    OPEN_HOLDING: "Authorisation of holders",
+    NO_UNILATERAL_SIGNER: "Signing with one key",
+    NO_TRANSFER_FEE: "Transfer fee",
   };
-  var notes = [];
-  function foot() {
-    var f = $("pv-foot");
-    if (f && notes.length) f.textContent = "Sources: the public XRPL WebSocket for closes; " + notes.join("; ") + ".";
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function failAll() {
+    set("pv-kept", "Not read just now", true);
+    set("pv-fill", "Not read just now", true);
+    var list = $("pv-app-checks");
+    if (list) list.innerHTML = '<li class="wait">The ledger could not be read just now. Try again in a moment.</li>';
+    var v = $("pv-app-verdict"); if (v) v.textContent = "Not read";
   }
-  function readIssuer() {
-    fetch("/api/authority?issuer=" + RLUSD.issuer).then(function (r) { return r.json(); }).then(function (c) {
-      var checks = ((c && c.checks) || []).filter(function (k) { return LABELS[k.id]; });
-      if (!checks.length) throw new Error("no checks");
-      var kept = checks.filter(function (k) { return !k.passed; });
-      set("pv-kept", kept.length
-        ? kept.length + " of " + checks.length + ": " + kept.map(function (k) { return LABELS[k.id]; }).join(", ")
-        : "None of " + checks.length);
-      notes.push("the RLUSD issuer account read at ledger " + fmt(c.ledgerIndex));
-      foot();
-    }).catch(function () { set("pv-kept", "Not read just now", true); });
+  function readAssetRisk() {
+    fetch("/api/v1/asset-risk?issuer=" + RLUSD.issuer + "&currency=" + RLUSD.currency)
+      .then(function (r) { return r.json(); })
+      .then(function (a) {
+        if (!a || !a.schema) throw new Error("no report");
+        var ctl = a.issuer_controls, liq = a.liquidity, notes = [];
+        if (ctl && ctl.checks) {
+          var checks = ctl.checks.filter(function (k) { return LABELS[k.id]; });
+          var kept = checks.filter(function (k) { return !k.passed; });
+          set("pv-kept", kept.length
+            ? kept.length + " of " + checks.length + ": " + kept.map(function (k) { return LABELS[k.id].toLowerCase(); }).join(", ")
+            : "None of " + checks.length);
+          var list = $("pv-app-checks");
+          if (list) list.innerHTML = checks.map(function (k, n) {
+            return '<li style="--n:' + n + '"><span>' + esc(k.label) + '</span><em class="' + (k.passed ? "clear" : "kept") + '">' +
+              (k.passed ? "Yes" : "No") + "</em></li>";
+          }).join("");
+          var v = $("pv-app-verdict");
+          if (v) {
+            var verdict = String(ctl.authority_verdict || "").replace(/-/g, " ").toUpperCase();
+            v.textContent = verdict + (kept.length ? " · " + kept.length + " retained" : "");
+            v.setAttribute("data-tone", ctl.authority_verdict === "go" ? "clear" : "kept");
+          }
+          notes.push("the RLUSD issuer account read at ledger " + fmt(a.ledgers && a.ledgers.issuer_controls));
+        } else { set("pv-kept", "Not read just now", true); }
+        if (liq && liq.quoted) {
+          var quoted = (liq.quoted.bid || 0) + (liq.quoted.ask || 0);
+          var fill = (liq.fillable.bid || 0) + (liq.fillable.ask || 0);
+          if (quoted > 0) {
+            var pct = Math.round((fill / quoted) * 100);
+            set("pv-fill", pct + "% · " + compact(fill) + " of " + compact(quoted) + " RLUSD");
+            var fb = $("pv-app-fill"); if (fb) fb.textContent = pct + "% can fill";
+            var bar = $("pv-app-fillbar"); if (bar) requestAnimationFrame(function () { bar.style.width = Math.max(pct, 1) + "%"; });
+            notes.push("its DEX order book at ledger " + fmt(liq.ledger_index) + " (AMM pools excluded)");
+          }
+        } else { set("pv-fill", "Not read just now", true); }
+        var rc = $("pv-app-receipt");
+        if (rc && a.receipt) rc.textContent = "SHA-256 " + a.receipt.digest;
+        var f = $("pv-foot");
+        if (f && notes.length) f.textContent = "Sources: the public XRPL WebSocket for closes; " + notes.join("; ") + ".";
+        var out = $("pv-code-out");
+        if (out) {
+          var brief = {
+            schema: a.schema,
+            asset: a.asset,
+            ledgers: a.ledgers,
+            issuer_controls: ctl ? { authority_verdict: ctl.authority_verdict, checks: (ctl.checks || []).length + " checks" } : null,
+            liquidity: liq ? { fillable_ratio: liq.fillable_ratio } : null,
+            receipt: a.receipt ? { algorithm: a.receipt.algorithm, digest: a.receipt.digest } : null,
+          };
+          out.innerHTML = esc(JSON.stringify(brief, null, 2)).replace(/&quot;([a-z_]+)&quot;:/g, '<span class="k">"$1"</span>:');
+        }
+      })
+      .catch(failAll);
   }
-  function readBook() {
-    fetch("/api/book?currency=" + RLUSD.currency + "&issuer=" + RLUSD.issuer).then(function (r) { return r.json(); }).then(function (b) {
-      if (!b || !b.quoted) throw new Error("no book");
-      var quoted = (b.quoted.bid || 0) + (b.quoted.ask || 0);
-      var fill = (b.fillable.bid || 0) + (b.fillable.ask || 0);
-      if (!(quoted > 0)) throw new Error("empty book");
-      set("pv-fill", Math.round((fill / quoted) * 100) + "% · " + compact(fill) + " of " + compact(quoted) + " RLUSD");
-      notes.push("its DEX order book at ledger " + fmt(b.ledger_index) + " (AMM pools excluded)");
-      foot();
-    }).catch(function () { set("pv-fill", "Not read just now", true); });
-  }
-  var table = $("pv-kept");
-  if (table) {
-    if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (es) {
-        if (!es[0].isIntersecting) return;
-        io.disconnect(); readIssuer(); readBook();
-      }, { rootMargin: "300px" });
-      io.observe(table);
-    } else { readIssuer(); readBook(); }
-  }
+  readAssetRisk();
 })();
