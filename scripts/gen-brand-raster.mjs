@@ -135,4 +135,15 @@ for (const [px, pad, out] of [
   await page.close();
 }
 
+// The website touch icons: the ledger mark (site/assets/ledger-mark.svg)
+// full-bleed, since iOS rounds its own corners.
+const ledger = dataUrl("site/assets/ledger-mark.svg", "image/svg+xml");
+for (const [px, out] of [[180, "site/assets/ledger-mark-180.png"], [512, "site/assets/ledger-mark-512.png"]]) {
+  await render(
+    `<div style="width:${px}px;height:${px}px;background:#0B0B0C;overflow:hidden"><img src="${ledger}" style="display:block;width:${px * 1.08}px;height:${px * 1.08}px;margin:${-px * 0.04}px"></div>`,
+    px,
+    out
+  );
+}
+
 await browser.close();

@@ -27,6 +27,7 @@
  * wagging the dog.
  */
 
+import { MARK } from "../api/_lib/brand-mark.js";
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -1759,6 +1760,12 @@ async function accentLast(dir) {
       // Dark monochrome is the default palette: every page's <html> opens
       // dark until the visitor's saved choice says otherwise.
       html = html.replace(/<html lang="en"(?: data-theme="light")?>/, '<html lang="en" data-theme="dark">');
+      // Older static pages still name the flower; the website mark is the
+      // ledger mark (scripts/gen-brand.mjs).
+      html = html
+        .replaceAll('href="/assets/flower-mark-180.png"', 'href="/assets/ledger-mark-180.png"')
+        .replace(/<img class="brand-mark" src="\/assets\/flower-mark-128\.png" width="(\d+)" height="\d+"[^>]*>/g,
+          (_, w) => MARK.replace('width="26" height="26"', `width="${w}" height="${w}"`));
       if (/--ground:\s*#/.test(html) && !html.includes("data-skin-last")) html = html.replace("</head>", `${LINK}\n</head>`);
       if (html !== before) await writeFile(full, html);
     }

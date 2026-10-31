@@ -196,7 +196,7 @@ export const ORGANIZATION = {
   "@type": "Organization",
   name: "NOSHASHI Labs",
   url: `${ORIGIN}/`,
-  logo: `${ORIGIN}/favicon.svg`,
+  logo: `${ORIGIN}/assets/ledger-mark-512.png`,
   description:
     "Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.",
   sameAs: ["https://github.com/Ignosha/noshashi"],
@@ -253,7 +253,7 @@ export function renderPage({
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">
