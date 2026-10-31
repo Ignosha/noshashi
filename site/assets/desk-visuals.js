@@ -214,6 +214,17 @@
     ctx.fillText(text, x, y);
   }
 
+  /* ── The title emblem: a ring for every validated ledger ───────── */
+  var emW = [document.getElementById("rh-em-w1"), document.getElementById("rh-em-w2")];
+  if (emW[0] && emW[1] && !REDUCE) {
+    window.addEventListener("noshashi:ledger", function () {
+      emW.forEach(function (w, i) {
+        var c = i ? "go2" : "go";
+        w.classList.remove(c); void w.getBoundingClientRect(); w.classList.add(c);
+      });
+    });
+  }
+
   /* ── Figure 1: validated ledgers as blocks ─────────────────────── */
   // An oblique projection: each block's front face is a true rectangle, so
   // heights can be read against the scale on the back wall; depth runs up

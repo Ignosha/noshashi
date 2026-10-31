@@ -1609,6 +1609,41 @@
     .rh-problems li{grid-template-columns:40px minmax(0,1fr)}
   }
 
+
+  /* ── Title plate: the name, what it is, two ways in, and the emblem ── */
+  .rh-title{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:center;gap:clamp(24px,4vw,64px);
+    padding:clamp(44px,6vw,92px) 0 clamp(36px,4.5vw,64px);border-bottom:1px solid var(--rule)}
+  .rh-title-k{margin:0 0 18px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .rh-wordmark{margin:0;font-family:"Instrument Serif",Georgia,"Times New Roman",serif;font-weight:400;color:var(--ink);
+    font-size:clamp(68px,11vw,172px);line-height:.88;letter-spacing:-.02em}
+  .rh-wordmark .sub{display:block;margin-top:clamp(12px,1.4vw,20px);font-size:clamp(26px,3vw,44px);line-height:1.1;letter-spacing:-.01em;color:var(--muted)}
+  .rh-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .rh-title-dek{max-width:54ch;margin:24px 0 28px;font-size:16.5px;line-height:1.7;color:var(--muted)}
+  .rh-title-cta{display:flex;flex-wrap:wrap;gap:10px}
+  .rh-btn.lg{min-height:48px;padding:0 22px;font-size:15px;gap:10px}
+  .rh-btn.lg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .rh-title-fine{margin:16px 0 0;font-size:13px;color:var(--faint)}
+  .rh-emblem{margin:0;position:relative}
+  .rh-emblem svg{display:block;width:100%;max-width:480px;margin:0 auto;overflow:visible}
+  .rh-emblem .em-shadow{fill:#000;opacity:.55}
+  html[data-theme="light"] .rh-emblem .em-shadow{opacity:.2}
+  .rh-emblem .em-edge0{stop-color:color-mix(in srgb,var(--ink) 30%,var(--ground))}
+  .rh-emblem .em-edge1{stop-color:color-mix(in srgb,var(--ink) 6%,var(--ground))}
+  .rh-emblem .em-top0{stop-color:color-mix(in srgb,var(--ink) 16%,var(--ground))}
+  .rh-emblem .em-top1{stop-color:color-mix(in srgb,var(--ink) 3%,var(--ground))}
+  .rh-emblem .em-drop0{stop-color:var(--ink)}
+  .rh-emblem .em-drop1{stop-color:color-mix(in srgb,var(--ink) 35%,var(--ground))}
+  .rh-emblem .em-rim{fill:none;stroke:var(--ink);stroke-opacity:.5;stroke-width:1}
+  .rh-emblem .em-ring{fill:none;stroke:var(--ink);stroke-width:1.2}
+  .rh-emblem .em-wave{fill:none;stroke:var(--ink);stroke-width:1.6;opacity:0;transform-box:fill-box;transform-origin:center}
+  .rh-emblem .em-dropg{animation:em-bob 6s ease-in-out infinite}
+  .rh-emblem .em-wave.go{animation:em-wave 2.4s cubic-bezier(.2,.7,.3,1) forwards}
+  .rh-emblem .em-wave.go2{animation:em-wave 2.4s .35s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes em-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes em-wave{0%{opacity:.85;transform:scale(.18)}100%{opacity:0;transform:scale(1)}}
+  .rh-emblem figcaption{margin-top:6px;text-align:center;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+  @media (prefers-reduced-motion:reduce){.rh-emblem .em-dropg,.rh-emblem .em-wave.go,.rh-emblem .em-wave.go2{animation:none}}
+  @media (max-width:900px){.rh-title{grid-template-columns:1fr}.rh-emblem svg{max-width:340px}}
   /* ── Live figures (desk-visuals.js) ──────────────────────────────── */
   .rh-canvas{display:block;width:100%;touch-action:pan-y}
   .rh-band{margin:0;padding:clamp(18px,2.5vw,28px) 0 0;border-bottom:1px solid var(--rule)}
@@ -1667,10 +1702,51 @@
       <span class="rh-mast-r">Ledger <b data-sys-ledger translate="no">—</b> · <span id="rh-date">—</span></span>
     </div>
 
+    <div class="rh-title">
+      <div class="rh-title-text">
+        <p class="rh-title-k">Read-only intelligence for the XRP Ledger</p>
+        <h1 class="rh-wordmark">NOSHASHI<span class="rh-vh">: </span><span class="sub">an XRPL intelligence tool</span></h1>
+        <p class="rh-title-dek">Who can freeze a token, whether its order book can really fill, what a payment actually delivered, and who sits three hops behind a counterparty. Answered from validated ledgers, each with a receipt.</p>
+        <p class="rh-title-cta">
+          <a class="rh-btn lg" href="#download"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download</a>
+          <a class="rh-btn lg ghost" href="/app/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16M9 9v10"/></svg>Open workspace</a>
+        </p>
+        <p class="rh-title-fine">Free plan, no card. Never holds keys, never signs.</p>
+      </div>
+      <figure class="rh-emblem" aria-labelledby="rh-em-c">
+        <svg viewBox="0 0 440 380" role="img" aria-labelledby="rh-em-t">
+          <title id="rh-em-t">The NOSHASHI emblem: a drop falling onto a ledger disc and spreading in rings</title>
+          <defs>
+            <linearGradient id="em-edge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" class="em-edge1"/><stop offset=".55" class="em-edge0"/><stop offset="1" class="em-edge1"/></linearGradient>
+            <radialGradient id="em-top" cx=".42" cy=".38" r=".75"><stop offset="0" class="em-top0"/><stop offset="1" class="em-top1"/></radialGradient>
+            <linearGradient id="em-drop" x1=".25" y1="0" x2=".8" y2="1"><stop offset="0" class="em-drop0"/><stop offset="1" class="em-drop1"/></linearGradient>
+            <filter id="em-blur" x="-30%" y="-200%" width="160%" height="500%"><feGaussianBlur stdDeviation="14"/></filter>
+            <filter id="em-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+          </defs>
+          <ellipse class="em-shadow" cx="226" cy="336" rx="168" ry="24" filter="url(#em-blur)"/>
+          <path d="M40 236 A180 62 0 0 0 400 236 L400 260 A180 62 0 0 1 40 260 Z" fill="url(#em-edge)"/>
+          <ellipse cx="220" cy="236" rx="180" ry="62" fill="url(#em-top)"/>
+          <ellipse class="em-rim" cx="220" cy="236" rx="180" ry="62"/>
+          <ellipse class="em-ring" cx="220" cy="236" rx="148" ry="51" stroke-opacity=".22"/>
+          <ellipse class="em-ring" cx="220" cy="236" rx="112" ry="38.5" stroke-opacity=".34"/>
+          <ellipse class="em-ring" cx="220" cy="236" rx="76" ry="26" stroke-opacity=".5"/>
+          <ellipse class="em-ring" cx="220" cy="236" rx="40" ry="13.8" stroke-opacity=".7"/>
+          <ellipse class="em-wave" id="rh-em-w1" cx="220" cy="236" rx="170" ry="58.5"/>
+          <ellipse class="em-wave" id="rh-em-w2" cx="220" cy="236" rx="170" ry="58.5"/>
+          <ellipse cx="226" cy="240" rx="26" ry="8" fill="#000" opacity=".45" filter="url(#em-soft)"/>
+          <g class="em-dropg">
+            <path d="M220 42 C220 42 262 104 262 134 A42 42 0 0 1 178 134 C178 104 220 42 220 42 Z" fill="url(#em-drop)"/>
+            <path d="M200 112 C204 96 212 82 218 72" fill="none" stroke="var(--ground)" stroke-opacity=".45" stroke-width="4" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <figcaption id="rh-em-c">Each validated ledger sends a ring across the disc.</figcaption>
+      </figure>
+    </div>
+
     <div class="rh-lead">
       <article class="rh-story">
         <p class="rh-kicker">Issuer controls · RLUSD</p>
-        <h1 class="rh-h1" id="rh-headline">What the XRP Ledger says about the tokens you hold</h1>
+        <h2 class="rh-h1" id="rh-headline">What the XRP Ledger says about the tokens you hold</h2>
         <p class="rh-dek" id="rh-dek">Before a bank holds an asset, it asks who can freeze it, who controls it, and whether the market for it is real. On the XRP Ledger those answers are public. NOSHASHI reads them from validated ledgers and keeps the receipt.</p>
         <p class="rh-by" id="rh-by">Read by NOSHASHI from validated ledger state</p>
       </article>
