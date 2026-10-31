@@ -1,65 +1,73 @@
 /* ─────────────────────────────────────────────────────────────────────
-   NOSHASHI · Private (2026-10-31)
+   NOSHASHI · Green (2026-10-31)
    ─────────────────────────────────────────────────────────────────────
-   The site-wide skin, in the register of a private bank rather than a
-   start-up: warm ivory paper, deep ink, one antique-brass accent used for
-   rules and numerals, EB Garamond for headlines and figures, IBM Plex Sans
-   for text, hairline rules instead of boxes, square edges, no shadows.
-   Light by default; a deep-navy evening mode behind the toggle.
+   The site-wide skin of a calm compliance SaaS: white and deep green by
+   day, black and green by night. One typeface (Inter), soft rounded
+   panels, pill buttons, and the theme switch on the left edge of the
+   screen rather than in the header.
 
    It lives here because every server-rendered page already links this
    file last, so its tokens win without touching each page. The landing
    page sets the same tokens in its own inline style.
    ───────────────────────────────────────────────────────────────── */
 :root,html[data-theme="light"]{
-  --ground:#F4F0E8; --surface:#FBF9F4; --elevated:#ECE6DA;
-  --ink:#0F1B2D; --muted:#4A5262; --faint:#6E7280; --rule:#D8D0C0;
-  --brand:#0F1B2D; --tele:#8A6A3B; --on-brand:#F4F0E8; --brass:#8A6A3B;
-  --go:#2E6B47; --hold:#8A6A1F; --nogo:#9B2C2C;
-  --r:2px;
-  --serif:"EB Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;
-  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --ground:#FFFFFF; --surface:#F5F8F4; --elevated:#ECF2EA;
+  --ink:#0B1A10; --muted:#4E5F53; --faint:#6B7A6F; --rule:#E2E9E0;
+  --brand:#1F6B3A; --tele:#2F8A4C; --on-brand:#FFFFFF; --soft:#DDF3D9;
+  --go:#1F7A43; --hold:#8B6500; --nogo:#B42332;
+  --g1:#0F3A22; --g2:#1F5A35; --g3:#3E7D4F;
+  --r:14px;
 }
 html[data-theme="dark"]{
-  --ground:#0B1320; --surface:#101A2A; --elevated:#162236;
-  --ink:#EEE8DC; --muted:#B3B0A8; --faint:#8E8D89; --rule:#243049;
-  --brand:#EEE8DC; --tele:#C9A66B; --on-brand:#0B1320; --brass:#C9A66B;
-  --go:#7FBF97; --hold:#D9B86A; --nogo:#E59A9A;
+  --ground:#050806; --surface:#0C120E; --elevated:#121A15;
+  --ink:#F1F6F0; --muted:#A5B2A8; --faint:#7F8C82; --rule:#1C2620;
+  --brand:#5BD27F; --tele:#7FE29C; --on-brand:#04140A; --soft:#14301E;
+  --go:#6BD58C; --hold:#E3C77A; --nogo:#F08F8F;
+  --g1:#071C10; --g2:#0F3A22; --g3:#1F5A35;
 }
 body{background:var(--ground);color:var(--ink)}
-body,button,input,select,textarea{font-family:var(--sans)}
-
-/* Headlines in the serif, set quietly: regular weight, sentence case. */
-h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.01em}
-.page-head h1{font-size:clamp(38px,5vw,64px);line-height:1.04;letter-spacing:-.015em;font-weight:500}
-.page-head p{font-size:17px;line-height:1.65;color:var(--muted)}
+body,button,input,select,textarea{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-feature-settings:"cv11","ss01"}
+h1,h2,h3{font-family:"Inter",sans-serif;font-weight:500;letter-spacing:-.03em}
+.page-head h1{font-size:clamp(34px,4.6vw,56px);line-height:1.06;letter-spacing:-.035em;font-weight:500}
+.page-head p{font-size:17px;line-height:1.6;color:var(--muted)}
 .page-head::before,.section-head::before{display:none}
-.eyebrow{font-family:var(--sans);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:500;color:var(--brass)}
+.eyebrow{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--brand)}
 
-/* Header: ivory bar, one hairline, the wordmark in spaced serif capitals. */
-header{background:var(--ground);border-bottom:1px solid var(--rule);backdrop-filter:none;-webkit-backdrop-filter:none}
-.brand span{font-family:var(--serif);font-weight:500;letter-spacing:.24em;font-size:15px}
+/* Header: white bar, a pill of links, one pill button. */
+header{background:var(--ground);border-bottom:1px solid var(--rule);backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+.brand span{font-weight:600;letter-spacing:.14em}
 .nav-links a{font-size:13.5px}
-.nav-links a:not(.btn){border:0;padding:8px 10px;color:var(--muted)}
+.nav-links a:not(.btn){border:0;padding:8px 11px;color:var(--muted);border-radius:999px}
 .nav-links a:not(.btn)::before{display:none}
-.nav-links a:not(.btn):hover,.nav-links a:not(.btn):focus-visible{background:transparent;color:var(--ink);transform:none}
-.nav-links a[aria-current="page"]{color:var(--ink)}
-.theme-toggle{border:0;color:var(--muted)}
+.nav-links a:not(.btn):hover,.nav-links a:not(.btn):focus-visible{background:var(--surface);color:var(--ink);transform:none}
+.nav-links a[aria-current="page"]{color:var(--ink);background:var(--surface)}
 
-/* Buttons: square, spaced capitals, ink on ivory. */
-.btn{border-radius:var(--r);background:var(--ink);border:1px solid var(--ink);color:var(--ground);
-  font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:11px 20px;box-shadow:none}
-.nav-links a.btn:not(.ghost),a.btn:not(.ghost){color:var(--ground) !important;background:var(--ink) !important;border-color:var(--ink) !important}
-.btn:hover,.btn:focus-visible{filter:none;transform:none;background:color-mix(in srgb,var(--ink) 88%,var(--brass));box-shadow:none}
-.btn.ghost,.nav-links a.btn.ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
-.btn.ghost:hover{background:var(--ink);color:var(--ground)}
+/* Buttons: pills. Primary deep green, secondary outlined. */
+.btn{border-radius:999px;background:var(--brand);border:1px solid var(--brand);color:var(--on-brand);
+  font-size:13.5px;font-weight:500;letter-spacing:0;text-transform:none;padding:10px 20px;box-shadow:none}
+.nav-links a.btn:not(.ghost),a.btn:not(.ghost){color:var(--on-brand) !important;background:var(--brand) !important;border-color:var(--brand) !important}
+.btn:hover,.btn:focus-visible{filter:brightness(1.08);transform:none;box-shadow:none}
+.btn.ghost,.nav-links a.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--ink)}
 
-/* Panels: paper on paper, a hairline, no shadow. */
+/* Panels: soft, rounded, no shadow. */
 .panel,.card-link,.tool-out,.tk-card{border-radius:var(--r);box-shadow:none;background:var(--surface);border:1px solid var(--rule)}
-.card-link:hover,.card-link:focus-visible{border-color:var(--ink)}
-.panel .num,.panel p.num{font-family:var(--serif);letter-spacing:0;font-size:15px;font-style:italic;font-weight:500;color:var(--brass)}
-input,select,textarea{border-radius:var(--r)}
-code,pre,kbd,samp{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.card-link:hover,.card-link:focus-visible{border-color:var(--brand)}
+.panel .num,.panel p.num{font-family:"Inter",sans-serif;letter-spacing:.06em;font-size:12px;font-weight:500;color:var(--brand)}
+input,select,textarea{border-radius:10px}
+
+/* The theme switch: a tab fixed to the left edge, on every page. */
+.theme-toggle{position:fixed !important;left:0;top:50%;z-index:60;transform:translateY(-50%);
+  display:flex !important;flex-direction:column;align-items:center;gap:8px;padding:14px 9px !important;
+  border:1px solid var(--rule) !important;border-left:0 !important;border-radius:0 12px 12px 0 !important;
+  background:var(--ground) !important;color:var(--muted) !important;cursor:pointer;
+  box-shadow:0 6px 24px -12px rgb(0 0 0 / .25)}
+.theme-toggle::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--brand);
+  box-shadow:inset -5px -3px 0 0 var(--ground);transition:box-shadow .3s ease}
+html[data-theme="dark"] .theme-toggle::before{box-shadow:inset 0 0 0 4px var(--ground)}
+.theme-toggle > [aria-hidden="true"]{display:none !important}
+.theme-toggle > *{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10.5px !important;letter-spacing:.14em}
+.theme-toggle:hover,.theme-toggle:focus-visible{color:var(--ink) !important;border-color:var(--brand) !important}
 
 /* The ASCII ledger field, off for now. Delete this block to bring it back. */
 .garden-field,.garden-page,.garden-bg{display:none !important}

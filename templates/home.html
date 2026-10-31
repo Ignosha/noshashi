@@ -1422,266 +1422,163 @@
     .sc-card,.sc-card.wide{grid-column:1/-1}
     .mn-features{grid-template-columns:1fr}
   }
-  /* ── Private (2026-10-31) ──────────────────────────────────────────
-     The register of a private bank: ivory paper, deep ink, one antique
-     brass, EB Garamond over IBM Plex Sans, hairline rules instead of
-     boxes, numbered sections like an annual report. The one ornament is
-     an engraved seal whose rings ripple out once per validated ledger. */
+  /* ── Green (2026-10-31) ────────────────────────────────────────────
+     A calm compliance-SaaS page: white and deep green by day, black and
+     green by night. The hero is one rounded green card whose picture is
+     ASCII water: rings of characters spreading from the centre, one ring
+     for each ledger the XRP Ledger validates while the page is open. */
   :root,html[data-theme="light"]{
-    --ground:#F4F0E8; --surface:#FBF9F4; --elevated:#ECE6DA;
-    --ink:#0F1B2D; --muted:#4A5262; --faint:#6E7280; --rule:#D8D0C0;
-    --brand:#0F1B2D; --tele:#8A6A3B; --on-brand:#F4F0E8; --brass:#8A6A3B;
-    --go:#2E6B47; --hold:#8A6A1F; --nogo:#9B2C2C;
-    --serif:"EB Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;
-    --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --ground:#FFFFFF; --surface:#F5F8F4; --elevated:#ECF2EA;
+    --ink:#0B1A10; --muted:#4E5F53; --faint:#6B7A6F; --rule:#E2E9E0;
+    --brand:#1F6B3A; --tele:#2F8A4C; --on-brand:#FFFFFF; --soft:#DDF3D9;
+    --go:#1F7A43; --hold:#8B6500; --nogo:#B42332;
+    --g1:#0F3A22; --g2:#1F5A35; --g3:#3E7D4F;
   }
   html[data-theme="dark"]{
-    --ground:#0B1320; --surface:#101A2A; --elevated:#162236;
-    --ink:#EEE8DC; --muted:#B3B0A8; --faint:#8E8D89; --rule:#243049;
-    --brand:#EEE8DC; --tele:#C9A66B; --on-brand:#0B1320; --brass:#C9A66B;
-    --go:#7FBF97; --hold:#D9B86A; --nogo:#E59A9A;
+    --ground:#050806; --surface:#0C120E; --elevated:#121A15;
+    --ink:#F1F6F0; --muted:#A5B2A8; --faint:#7F8C82; --rule:#1C2620;
+    --brand:#5BD27F; --tele:#7FE29C; --on-brand:#04140A; --soft:#14301E;
+    --go:#6BD58C; --hold:#E3C77A; --nogo:#F08F8F;
+    --g1:#071C10; --g2:#0F3A22; --g3:#1F5A35;
   }
-  body{background:var(--ground);color:var(--ink);font-family:var(--sans)}
+  body{background:var(--ground);color:var(--ink);font-family:"Inter",sans-serif}
   body::after{content:none}
-  h1,h2,h3{font-family:var(--serif);font-weight:500}
+  h1,h2,h3{font-family:"Inter",sans-serif;font-weight:500}
 
-  .pv-mark{display:inline-block;position:relative;width:14px;height:14px;border-radius:50%;border:1px solid var(--brass);flex:none}
-  .pv-mark::before,.pv-mark::after{content:"";position:absolute;inset:3px;border-radius:50%;border:1px solid var(--brass)}
-  .pv-mark::after{inset:5.5px;background:var(--brass);border:0}
+  .rp-hero{position:relative;overflow:hidden;margin-top:16px;border-radius:28px;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;color:#F3F8F2;
+    background:radial-gradient(120% 90% at 50% 110%,var(--g3) 0%,var(--g2) 38%,var(--g1) 100%)}
+  .rp-hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .rp-ascii{position:relative;z-index:1;display:block;width:100%;height:clamp(240px,30vw,330px);margin:8px 0 0;padding:0;background:none;border:0;overflow:hidden;
+    font:11px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.06em;text-align:center;color:rgb(225 247 228 / .78);white-space:pre;pointer-events:none;user-select:none;
+    -webkit-mask-image:radial-gradient(48% 50% at 50% 50%,#000 45%,transparent);mask-image:radial-gradient(48% 50% at 50% 50%,#000 45%,transparent)}
+  .rp-hero-in{position:relative;z-index:1;padding:clamp(48px,6vw,80px) 20px 0;max-width:820px}
+  .rp-chip{display:inline-flex;align-items:center;gap:8px;margin:0 0 24px;padding:6px 14px;border-radius:999px;background:rgb(255 255 255 / .1);
+    border:1px solid rgb(255 255 255 / .16);font:500 11.5px "Inter",sans-serif;letter-spacing:.04em;color:rgb(243 248 242 / .85)}
+  .rp-chip i{width:7px;height:7px;border-radius:50%;background:#8EF0A8;box-shadow:0 0 0 3px rgb(142 240 168 / .2)}
+  .rp-hero h1{margin:0 auto;max-width:18ch;font-size:clamp(34px,4.4vw,60px);line-height:1.05;letter-spacing:-.035em;font-weight:500;color:#FFFFFF}
+  .rp-sub{margin:20px auto 0;max-width:58ch;font-size:clamp(15px,1.2vw,17px);line-height:1.6;color:rgb(230 242 232 / .8)}
+  .rp-actions{position:relative;z-index:1;display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:8px;padding-bottom:64px}
+  .rp-btn{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:999px;background:#FFFFFF;color:#0B1A10;
+    border:1px solid #FFFFFF;font-size:14px;font-weight:500;text-decoration:none;transition:transform .25s ease,background .25s ease}
+  .rp-btn:hover{transform:translateY(-1px)}
+  .rp-btn.line{background:transparent;color:#FFFFFF;border-color:rgb(255 255 255 / .45)}
+  .rp-btn.line:hover{background:rgb(255 255 255 / .1)}
+  .rp-hero-cap{position:absolute;bottom:18px;left:0;right:0;z-index:1;margin:0;font-size:12px;color:rgb(230 242 232 / .6)}
 
-  .pv-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);align-items:center;gap:clamp(32px,5vw,72px);
-    padding:clamp(56px,9vw,120px) 0 clamp(40px,6vw,72px);border-bottom:1px solid var(--rule)}
-  .pv-kicker{display:flex;align-items:center;gap:12px;margin:0 0 28px;font-size:11.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}
-  .pv-h1{margin:0;max-width:14ch;font-size:clamp(42px,5.2vw,76px);line-height:1.02;letter-spacing:-.02em;font-weight:400;color:var(--ink)}
-  .pv-h1 em{font-style:italic;color:var(--brass)}
-  .pv-lede{margin:30px 0 0;max-width:52ch;font-size:clamp(16px,1.3vw,18px);line-height:1.7;color:var(--muted)}
-  .pv-actions{display:flex;align-items:center;flex-wrap:wrap;gap:14px 28px;margin-top:38px}
-  .pv-btn{display:inline-flex;align-items:center;min-height:48px;padding:0 26px;border-radius:2px;background:var(--ink);color:var(--ground);border:1px solid var(--ink);
-    font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;transition:background .25s ease,color .25s ease}
-  .pv-btn:hover,.pv-btn:focus-visible{background:transparent;color:var(--ink)}
-  .pv-link{display:inline-flex;gap:8px;align-items:center;font-size:14.5px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:3px;transition:border-color .2s ease}
-  .pv-link:hover,.pv-link:focus-visible{border-color:var(--ink)}
-  .pv-link span{transition:transform .3s ease}
-  .pv-link:hover span{transform:translateX(3px)}
+  .rp-trust{padding:44px 0 8px;text-align:center}
+  .rp-trust p{margin:0;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .rp-trust ul{list-style:none;display:flex;justify-content:center;flex-wrap:wrap;gap:12px clamp(28px,5vw,64px);margin:18px 0 0;padding:0}
+  .rp-trust li{font-size:clamp(19px,2vw,26px);font-weight:600;letter-spacing:-.03em;color:color-mix(in srgb,var(--ink) 38%,var(--ground))}
+  .rp-trust small{display:block;margin-top:12px;font-size:11px;color:var(--faint)}
 
-  .pv-seal{margin:0;justify-self:center;width:min(440px,100%)}
-  .pv-seal svg{display:block;width:100%;height:auto;overflow:visible}
-  .pv-guilloche path{fill:none;stroke:var(--brass);stroke-width:.4;opacity:.6}
-  .pv-guilloche{transform-origin:200px 200px;animation:pv-turn 360s linear infinite}
-  @keyframes pv-turn{to{transform:rotate(360deg)}}
-  .pv-hair{fill:none;stroke:var(--ink);stroke-width:.6;opacity:.55}
-  .pv-ring-t{font:500 9.5px var(--sans);letter-spacing:.32em;fill:var(--ink)}
-  .pv-core{fill:var(--ground);stroke:var(--brass);stroke-width:.8}
-  .pv-core-k{font:500 8px var(--sans);letter-spacing:.24em;fill:var(--faint)}
-  .pv-core-n{font:500 21px var(--serif);fill:var(--ink);font-variant-numeric:lining-nums tabular-nums}
-  .pv-core-s{font:500 6.5px var(--sans);letter-spacing:.24em;fill:var(--brass)}
-  .pv-ripples circle{fill:none;stroke:var(--brass);stroke-width:.8}
-  .pv-ripples .wave{opacity:0}
-  .pv-seal figcaption{margin-top:14px;text-align:center;font:italic 15px/1.5 var(--serif);color:var(--faint)}
+  .rp-sec{padding-top:clamp(72px,10vw,120px)}
+  .rp-sec h2{margin:0;font-size:clamp(28px,3.4vw,44px);line-height:1.1;letter-spacing:-.035em;font-weight:500}
+  .rp-c{text-align:center;margin-inline:auto !important;max-width:22ch}
+  .rp-lead{max-width:56ch !important;margin-top:14px !important;color:var(--muted);font-size:16px;line-height:1.6}
+  .rp-small{max-width:none !important;margin-top:18px;font-size:13.5px;color:var(--muted)}
+  .rp-small a{color:var(--brand)}
 
-  .pv-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;border-bottom:1px solid var(--rule)}
-  .pv-facts div{padding:26px 24px 28px 0}
-  .pv-facts div+div{padding-left:24px;border-left:1px solid var(--rule)}
-  .pv-facts dt{font:500 21px/1.2 var(--serif);color:var(--ink)}
-  .pv-facts dd{margin:8px 0 0;font-size:14px;line-height:1.55;color:var(--muted)}
+  .rp-quiet{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,2fr);gap:clamp(28px,5vw,72px);align-items:start}
+  .rp-quiet h2{max-width:12ch}
+  .rp-feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 32px}
+  .rp-feats a{color:var(--ink);text-decoration:none}
+  .rp-feats h3{margin:12px 0 6px;font-size:16.5px;font-weight:600;letter-spacing:-.015em}
+  .rp-feats p{margin:0;font-size:14px;line-height:1.6;color:var(--muted)}
+  .rp-feats a:hover h3{color:var(--brand)}
+  .rp-ico{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--soft);color:var(--brand)}
+  .rp-ico svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
-  .pv-sec{padding:clamp(64px,9vw,112px) 0 0}
-  .pv-stage.bx-stage{display:block;max-width:none;width:auto;margin:0 0 0 88px;justify-items:initial}
-  .pv-stage .pv-table{width:100%}
-  header.pv-sec-h{position:static;z-index:auto;background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0;height:auto}
-  .pv-sec-h{display:grid;grid-template-columns:64px minmax(0,1fr);column-gap:24px;margin-bottom:34px}
-  .pv-num{grid-row:span 2;font:italic 500 26px/1.15 var(--serif);color:var(--brass)}
-  .pv-sec-h h2{margin:0;font-size:clamp(30px,3.4vw,44px);line-height:1.1;letter-spacing:-.01em;font-weight:400}
-  .pv-sec-h p{margin:14px 0 0;max-width:60ch;font-size:16px;line-height:1.7;color:var(--muted)}
-  .pv-sec > :not(.pv-sec-h){margin-left:88px}
+  .rp-mods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:40px}
+  .rp-mod h3{margin:16px 0 6px;font-size:16.5px;font-weight:600}
+  .rp-mod p{margin:0;font-size:14px;line-height:1.6;color:var(--muted)}
+  .rp-art{height:210px;border-radius:18px;background:var(--surface);border:1px solid var(--rule);display:grid;place-items:center;padding:18px;overflow:hidden}
+  .rp-mod-g .rp-art{background:radial-gradient(100% 100% at 50% 100%,var(--g3),var(--g1));border:0}
+  .rp-art-checks ul{list-style:none;margin:0;padding:0;width:100%;display:grid;gap:8px}
+  .rp-art-checks li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--ground);
+    border:1px solid var(--rule);font-size:12.5px;opacity:0;transform:translateY(6px);animation:rp-in .5s ease forwards;animation-delay:calc(var(--n,0) * 110ms)}
+  .rp-art-checks li.wait{opacity:1;transform:none;animation:none;color:var(--faint);justify-content:center}
+  .rp-art-checks li em{font-style:normal;font-size:10.5px;font-weight:600;letter-spacing:.06em;padding:3px 8px;border-radius:999px}
+  .rp-art-checks li em.yes{background:var(--soft);color:var(--go)}
+  .rp-art-checks li em.no{background:color-mix(in srgb,var(--hold) 16%,transparent);color:var(--hold)}
+  @keyframes rp-in{to{opacity:1;transform:none}}
+  .rp-chain{display:flex;align-items:flex-end;gap:7px;height:120px;width:100%;justify-content:center}
+  .rp-chain .wait{color:rgb(230 242 232 / .7);font-size:12.5px;align-self:center}
+  .rp-chain i{flex:0 0 22px;height:var(--h,40%);min-height:10px;border-radius:6px;background:rgb(255 255 255 / .22);position:relative;transition:height .6s ease}
+  .rp-chain i:first-child{background:#FFFFFF}
+  .rp-chain i.enter{animation:rp-grow .7s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes rp-grow{from{transform:scaleY(.1);transform-origin:bottom;opacity:0}}
+  .rp-art-receipt{text-align:left;place-items:stretch;align-content:center}
+  .rp-r-k{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .rp-r-v{margin:10px 0;font:12px/1.55 "IBM Plex Mono",ui-monospace,monospace;color:var(--ink);overflow-wrap:anywhere;padding:12px;border-radius:10px;background:var(--ground);border:1px solid var(--rule)}
 
-  .pv-table{width:calc(100% - 88px);border-collapse:collapse;border-top:1px solid var(--ink)}
-  .pv-table th,.pv-table td{padding:17px 0;border-bottom:1px solid var(--rule);text-align:left;vertical-align:baseline}
-  .pv-table th{font-weight:400;font-size:15.5px;color:var(--muted);padding-right:24px}
-  .pv-table td{font:500 22px/1.25 var(--serif);color:var(--ink);text-align:right;font-variant-numeric:lining-nums tabular-nums;transition:color .6s ease}
-  .pv-table td.pv-fresh{color:var(--brass)}
-  .pv-table td.pv-quiet{font:italic 16px var(--serif);color:var(--faint)}
-  .pv-state{margin-left:10px;font:500 10px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
-  .pv-state[data-state="live"]{color:var(--go)}
-  .pv-foot{margin-top:16px;max-width:72ch;font-size:13px;line-height:1.6;color:var(--faint)}
-  .pv-foot a{color:inherit}
-  .pv-fees thead th{font:500 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding-top:0}
-  .pv-fees thead th:last-child{text-align:right}
-  .pv-fees tbody th{font:500 20px var(--serif);color:var(--ink)}
-  .pv-fees tbody th a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
-  .pv-fees tbody th a:hover{border-color:var(--ink)}
-  .pv-fees tbody td:nth-child(2){font:400 15px/1.5 var(--sans);color:var(--muted);text-align:left}
+  .rp-cta-s{display:flex;justify-content:center;gap:10px;margin-top:20px}
+  .rp-pill{display:inline-flex;align-items:center;min-height:34px;padding:0 14px;border-radius:999px;background:var(--soft);color:var(--brand);font-size:13px;font-weight:500;text-decoration:none}
+  .rp-pill.line{background:transparent;color:var(--ink)}
+  .rp-bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:36px}
+  .rp-b{padding:22px;border-radius:18px;background:var(--surface);border:1px solid var(--rule);color:var(--ink);text-decoration:none;transition:border-color .2s ease,transform .25s ease}
+  a.rp-b:hover{transform:translateY(-2px)}
+  .rp-b h3{margin:16px 0 6px;font-size:16.5px;font-weight:600}
+  .rp-b p{margin:0;font-size:14px;line-height:1.6;color:var(--muted)}
+  .rp-b-g{grid-row:span 2;background:radial-gradient(120% 100% at 30% 100%,var(--g3),var(--g1));border:0;color:#F3F8F2;display:flex;flex-direction:column;justify-content:flex-end;min-height:280px}
+  .rp-b-g p{color:rgb(230 242 232 / .8)}
+  .rp-b-g .rp-ico{background:rgb(255 255 255 / .14);color:#FFFFFF}
+  .rp-b-wide{grid-column:span 3}
+  .rp-b-top{display:flex;justify-content:space-between;align-items:center}
+  .rp-tag{padding:4px 10px;border-radius:999px;border:1px solid var(--rule);font-size:11.5px;color:var(--muted)}
+  .rp-depth{margin-top:18px}
+  .rp-depth b{font-size:30px;font-weight:500;letter-spacing:-.03em}
+  .rp-bar{height:8px;margin:10px 0 8px;border-radius:999px;background:var(--elevated);overflow:hidden}
+  .rp-bar i{display:block;height:100%;width:0;border-radius:999px;background:var(--brand);transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
+  .rp-depth small{font-size:12px;color:var(--faint)}
 
-  .pv-list{list-style:none;margin-top:0;margin-bottom:0;padding:0;border-top:1px solid var(--ink)}
-  .pv-list a{display:grid;grid-template-columns:48px minmax(160px,.7fr) minmax(0,1.3fr) 24px;gap:20px;align-items:baseline;
-    padding:24px 0;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none;transition:background .3s ease,padding .3s ease}
-  .pv-list a:hover,.pv-list a:focus-visible{background:var(--surface);padding-left:14px;padding-right:14px}
-  .pv-ix{font:italic 18px var(--serif);color:var(--brass)}
-  .pv-list b{font:500 23px/1.2 var(--serif)}
-  .pv-list span:not(.pv-ix){font-size:15px;line-height:1.6;color:var(--muted)}
-  .pv-list i{font-style:normal;color:var(--faint);transition:transform .3s ease}
-  .pv-list a:hover i{transform:translateX(4px);color:var(--ink)}
+  .rp-proof{display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px;max-width:none !important;width:auto !important;justify-items:stretch !important}
+  .rp-p{padding:24px;border-radius:18px;background:var(--surface);border:1px solid var(--rule);min-width:0}
+  .rp-p-g{background:radial-gradient(120% 100% at 50% 100%,var(--g3),var(--g1));border:0;color:#F3F8F2}
+  .rp-p-k{display:flex;justify-content:space-between;gap:8px;margin:0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .rp-p-g .rp-p-k{color:rgb(230 242 232 / .7)}
+  .rp-p-k span{text-transform:none;letter-spacing:0}
+  .rp-p-v{margin:22px 0 8px;font-size:clamp(28px,3vw,40px);font-weight:500;letter-spacing:-.035em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .rp-p-d{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+  .rp-p-g .rp-p-d{color:rgb(230 242 232 / .75)}
 
-  .pv-cases{margin-top:22px}
-  .pv-cases > summary{display:inline-flex;gap:10px;align-items:center;cursor:pointer;list-style:none;font:italic 18px var(--serif);color:var(--ink);border-bottom:1px solid var(--rule);padding-bottom:3px}
-  .pv-cases > summary::-webkit-details-marker{display:none}
-  .pv-cases > summary::after{content:"+";font-style:normal;color:var(--brass)}
-  .pv-cases[open] > summary::after{content:"−"}
-  .pv-cases > div{margin-top:20px}
-  .pv-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--ink)}
-  .pv-cols > div{padding:26px 28px 6px 0}
-  .pv-cols > div+div{padding-left:28px;border-left:1px solid var(--rule)}
-  .pv-cols h3{margin:0;font-size:24px;font-weight:500}
-  .pv-cols p{margin:12px 0 18px;font-size:15px;line-height:1.7;color:var(--muted)}
+  .rp-plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:36px}
+  .rp-plans a{display:flex;flex-direction:column;padding:22px;border-radius:18px;border:1px solid var(--rule);background:var(--ground);color:var(--ink);text-decoration:none;transition:border-color .2s ease}
+  .rp-plans a:hover{border-color:var(--brand)}
+  .rp-plans a.hi{background:var(--surface);border-color:var(--brand)}
+  .rp-plans span{font-size:13px;font-weight:600;color:var(--brand)}
+  .rp-plans b{margin-top:14px;font-size:34px;font-weight:500;letter-spacing:-.035em}
+  .rp-plans em{font-style:normal;font-size:12.5px;color:var(--faint)}
+  .rp-plans p{margin:14px 0 0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+  .rp-cases{margin-top:28px;text-align:center}
+  .rp-cases > summary{display:inline-flex;cursor:pointer;list-style:none;padding:8px 16px;border-radius:999px;border:1px solid var(--rule);font-size:13.5px;color:var(--ink)}
+  .rp-cases > summary::-webkit-details-marker{display:none}
+  .rp-cases > div{margin-top:20px;text-align:left}
 
-  .pv-letter blockquote{margin-top:0;margin-bottom:0;max-width:62ch;padding:0}
-  .pv-letter blockquote p{margin:0 0 18px;font:400 clamp(20px,1.9vw,25px)/1.55 var(--serif);color:var(--ink)}
-  .pv-letter blockquote p:first-child::first-letter{float:left;font-size:3.4em;line-height:.82;padding:6px 10px 0 0;color:var(--brass)}
-  .pv-letter footer{margin-top:22px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-  .pv-sign{display:block;margin-bottom:4px;font:italic 30px var(--serif);letter-spacing:0;text-transform:none;color:var(--ink)}
+  .rp-final{position:relative;overflow:hidden;margin-top:clamp(80px,11vw,140px);border-radius:28px;padding:clamp(56px,8vw,96px) 20px;text-align:center;color:#FFFFFF;
+    background:radial-gradient(120% 120% at 50% 120%,var(--g3) 0%,var(--g2) 40%,var(--g1) 100%)}
+  .rp-ascii-s{position:absolute;inset:0;height:auto;margin:0;opacity:.5}
+  .rp-final-in{position:relative;z-index:1}
+  .rp-final h2{margin:0 auto;max-width:18ch;font-size:clamp(28px,3.6vw,46px);line-height:1.1;letter-spacing:-.035em;font-weight:500;color:#FFFFFF}
 
-  .pv-close{margin:clamp(80px,11vw,144px) 0 0;padding:clamp(48px,7vw,88px) 24px;border-block:1px solid var(--ink);text-align:center}
-  .pv-close .pv-mark{width:22px;height:22px}
-  .pv-close .pv-mark::before{inset:5px}.pv-close .pv-mark::after{inset:9px}
-  .pv-close h2{margin:22px 0 0;font-size:clamp(34px,4.4vw,58px);font-weight:400;letter-spacing:-.015em}
-  .pv-close p{margin:16px auto 0;max-width:54ch;font-size:16px;line-height:1.7;color:var(--muted)}
-  .pv-close .pv-actions{justify-content:center}
-
-
-  /* ── Private desk, as a product (v2) ─────────────────────────────── */
-  .pv-btn.ghost{background:transparent;color:var(--ink)}
-  .pv-btn.ghost:hover,.pv-btn.ghost:focus-visible{background:var(--ink);color:var(--ground)}
-  .pv-meta{margin:20px 0 0;font-size:13px;color:var(--faint)}
-
-  .pv-app{min-width:0;border:1px solid var(--rule);border-radius:6px;background:var(--surface);overflow:hidden;
-    box-shadow:0 1px 0 rgb(15 27 45 / .04),0 40px 80px -40px rgb(15 27 45 / .35)}
-  .pv-app-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 16px;background:#0F1B2D;color:#EEE8DC}
-  .pv-app-brand{font:500 12px var(--serif);letter-spacing:.22em}
-  .pv-app-brand i{font-style:italic;letter-spacing:0;font-size:13px;color:#C9A66B;margin-left:6px}
-  .pv-app-live{display:flex;align-items:center;gap:6px;font:500 10px var(--sans);letter-spacing:.12em;color:#B3B0A8}
-  .pv-app-live > i{width:6px;height:6px;border-radius:50%;background:#7FBF97}
-  .pv-app-body{display:grid;grid-template-columns:138px minmax(0,1fr);min-height:360px}
-  .pv-app-nav{display:flex;flex-direction:column;gap:2px;padding:16px 10px;background:var(--elevated);border-right:1px solid var(--rule);font-size:12.5px;color:var(--muted)}
-  .pv-app-nav b{margin:0 8px 8px;font:500 10px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
-  .pv-app-nav span{padding:7px 8px;border-radius:3px}
-  .pv-app-nav .on{background:var(--surface);color:var(--ink);box-shadow:inset 2px 0 0 var(--brass)}
-  .pv-app-main{padding:18px 20px 16px;min-width:0}
-  .pv-app-k{margin:0;font:500 10px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
-  .pv-app-asset{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 12px;margin:8px 0 12px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
-  .pv-app-asset b{font:500 24px var(--serif)}
-  .pv-app-asset span{font:11px "IBM Plex Mono",monospace;color:var(--faint);overflow-wrap:anywhere}
-  .pv-pill{margin-left:auto;padding:3px 9px;border:1px solid var(--rule);border-radius:999px;font:500 10px var(--sans);letter-spacing:.12em;text-transform:uppercase;font-style:normal;color:var(--muted)}
-  .pv-pill[data-tone="kept"]{border-color:color-mix(in srgb,var(--hold) 45%,transparent);color:var(--hold)}
-  .pv-pill[data-tone="clear"]{border-color:color-mix(in srgb,var(--go) 45%,transparent);color:var(--go)}
-  .pv-checks{list-style:none;margin:0;padding:0}
-  .pv-checks li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--rule);font-size:13px;color:var(--ink)}
-  .pv-checks li.wait{color:var(--faint);font-style:italic;border:0}
-  .pv-checks li em{font-style:normal;font-size:10.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-  .pv-checks li em.kept{color:var(--hold)}.pv-checks li em.clear{color:var(--go)}
-  .pv-checks li{opacity:0;transform:translateY(4px);animation:pv-row .5s ease forwards;animation-delay:calc(var(--n,0) * 90ms)}
-  .pv-checks li.wait{opacity:1;transform:none;animation:none}
-  @keyframes pv-row{to{opacity:1;transform:none}}
-  .pv-app-depth{margin-top:14px}
-  .pv-app-depth p{display:flex;justify-content:space-between;gap:10px;margin:0 0 7px;font-size:12px;color:var(--muted)}
-  .pv-app-depth b{font:500 15px var(--serif);color:var(--ink)}
-  .pv-app-bar2{height:6px;background:var(--elevated);border-radius:3px;overflow:hidden}
-  .pv-app-bar2 i{display:block;height:100%;width:0;background:var(--ink);transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
-  .pv-app-receipt{margin:14px 0 0;font:10.5px "IBM Plex Mono",monospace;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pv-app-receipt span{color:var(--muted)}
-
-  .pv-for{display:flex;align-items:center;flex-wrap:wrap;gap:10px 28px;padding:22px 0;border-bottom:1px solid var(--rule)}
-  .pv-for > span{font:500 11px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
-  .pv-for ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px 30px;margin:0;padding:0}
-  .pv-for li{font:500 20px var(--serif);color:var(--muted)}
-
-  /* The private desk: one deep-navy band, the same in both themes. */
-  .pv-desk{--ground:#0B1320;--surface:#101A2A;--elevated:#162236;--ink:#EEE8DC;--muted:#B3B0A8;--faint:#8E8D89;--rule:#26324B;--brass:#C9A66B;--go:#7FBF97;
-    margin:clamp(64px,9vw,112px) calc(50% - 50vw) 0;padding:clamp(56px,8vw,104px) calc(50vw - 50%);background:var(--ground);color:var(--ink)}
-  .pv-desk-in{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,96px);align-items:center}
-  .pv-desk .pv-kicker{margin-bottom:16px}
-  .pv-desk .pv-kicker .pv-num{font-size:18px}
-  .pv-desk h2{margin:0;font-size:clamp(32px,3.6vw,48px);font-weight:400}
-  .pv-desk-text > p:not(.pv-kicker):not(.pv-foot){margin:14px 0 26px;max-width:56ch;color:var(--muted);line-height:1.7}
-  .pv-desk .pv-stage.bx-stage{margin:0}
-  .pv-desk .pv-seal{width:min(420px,100%)}
-
-  .pv-api{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);align-items:start}
-  .pv-api-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
-  .pv-api-list li{padding:18px 0;border-bottom:1px solid var(--rule)}
-  .pv-api-list b{display:block;font:500 21px var(--serif)}
-  .pv-api-list span{display:block;margin-top:6px;font-size:14.5px;line-height:1.6;color:var(--muted)}
-  .pv-code{margin:0;border-radius:6px;background:#0F1B2D;color:#EEE8DC;overflow:hidden}
-  .pv-code figcaption{display:flex;justify-content:space-between;gap:10px;padding:12px 18px;border-bottom:1px solid #26324B;font:500 10.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#8E8D89}
-  .pv-code figcaption a{color:#C9A66B;text-decoration:none;letter-spacing:.06em}
-  .pv-code pre{margin:0;padding:16px 18px 18px;overflow:auto;font:12.5px/1.65 "IBM Plex Mono",ui-monospace,monospace;color:#EEE8DC;background:none;border:0}
-  .pv-code pre + figcaption{border-top:1px solid #26324B}
-  #pv-code-out{color:#C9C3B6}
-  #pv-code-out .k{color:#C9A66B}
-
-  .pv-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--ink)}
-  .pv-grid li{padding:24px 26px 26px 0;border-bottom:1px solid var(--rule)}
-  .pv-grid li:not(:nth-child(3n+1)){padding-left:26px;border-left:1px solid var(--rule)}
-  .pv-grid b{display:block;font:500 21px var(--serif)}
-  .pv-grid span{display:block;margin-top:8px;font-size:14.5px;line-height:1.6;color:var(--muted)}
-  .pv-grid a{color:var(--ink)}
-
-  .pv-plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink)}
-  .pv-plans a{display:flex;flex-direction:column;padding:26px 24px 24px 0;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule);transition:background .3s ease}
-  .pv-plans a+a{padding-left:24px;border-left:1px solid var(--rule)}
-  .pv-plans a:hover{background:var(--surface)}
-  .pv-plan-hi{box-shadow:inset 0 3px 0 var(--brass)}
-  .pv-plan-n{font:500 11px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
-  .pv-plans b{margin-top:16px;font:400 40px/1 var(--serif);font-variant-numeric:lining-nums}
-  .pv-plans em{margin-top:6px;font-style:normal;font-size:13px;color:var(--faint)}
-  .pv-plan-d{margin-top:16px;font-size:14.5px;line-height:1.6;color:var(--muted);flex:1}
-  .pv-plan-c{margin-top:20px;font-size:13.5px;font-weight:500}
-  .pv-sec details.pv-cases{margin-top:26px}
-  .pv-fees{width:100%}
+  [data-reveal].will-reveal{opacity:0;transform:translateY(16px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+  [data-reveal].will-reveal.is-in{opacity:1;transform:none}
+  #ticker{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
   @media (max-width:980px){
-    .pv-desk-in,.pv-api{grid-template-columns:1fr}
-    .pv-desk .pv-seal{width:min(320px,100%)}
-    .pv-grid,.pv-plans{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .pv-grid li,.pv-grid li:not(:nth-child(3n+1)){padding:22px 20px 22px 0;border-left:0}
-    .pv-grid li:nth-child(2n){padding-left:20px;border-left:1px solid var(--rule)}
-    .pv-plans a,.pv-plans a+a{padding:22px 20px 22px 0;border-left:0}
-    .pv-plans a:nth-child(2n){padding-left:20px;border-left:1px solid var(--rule)}
+    .rp-quiet{grid-template-columns:1fr}
+    .rp-feats,.rp-mods,.rp-proof{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .rp-bento{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .rp-b-g{grid-row:auto}
+    .rp-b-wide{grid-column:span 2}
+    .rp-plans{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
-  @media (max-width:640px){
-    .pv-app-body{grid-template-columns:1fr}
-    .pv-app-nav{display:none}
-    .pv-grid,.pv-plans{grid-template-columns:1fr}
-    .pv-grid li:nth-child(2n),.pv-plans a:nth-child(2n){padding-left:0;border-left:0}
-  }
-  [data-reveal].will-reveal{opacity:0;transform:translateY(14px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
-  [data-reveal].will-reveal.is-in{opacity:1;transform:none}
-  /* The live ticker still feeds the statement (XRP / RLUSD); it is read
-     by assistive technology but not drawn. */
-  #ticker{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  @media (prefers-reduced-motion:reduce){.pv-guilloche{animation:none}.pv-ripples .wave{display:none}}
-
-  @media (max-width:900px){
-    .pv-hero{grid-template-columns:1fr}
-    .pv-seal{width:min(360px,100%)}
-    .pv-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .pv-facts div:nth-child(3){padding-left:0;border-left:0}
-    .pv-facts div:nth-child(n+3){border-top:1px solid var(--rule)}
-    .pv-sec > :not(.pv-sec-h),.pv-stage.bx-stage{margin-left:0}
-    .pv-table{width:100%}
-    .pv-sec-h{grid-template-columns:44px minmax(0,1fr);column-gap:14px}
-    .pv-cols{grid-template-columns:1fr}
-    .pv-cols > div+div{padding-left:0;border-left:0;border-top:1px solid var(--rule)}
-    .pv-list a{grid-template-columns:36px minmax(0,1fr) 20px}
-    .pv-list span:not(.pv-ix){grid-column:2}
-  }
-  @media (max-width:560px){
-    .pv-facts{grid-template-columns:1fr}
-    .pv-facts div,.pv-facts div+div{padding:20px 0;border-left:0}
-    .pv-facts div+div{border-top:1px solid var(--rule)}
-    .pv-table th,.pv-table td{display:block;text-align:left;padding:0;border:0}
-    .pv-table tr{display:block;padding:14px 0;border-bottom:1px solid var(--rule)}
-    .pv-table td{margin-top:4px}
-    .pv-fees thead{display:none}
+  @media (max-width:600px){
+    .rp-hero{border-radius:20px}
+    .rp-feats,.rp-mods,.rp-proof,.rp-bento,.rp-plans{grid-template-columns:minmax(0,1fr)}
+    .rp-b-wide{grid-column:auto}
+    .rp-ascii{font-size:8px}
   }
 </style>
 </head>
@@ -1700,180 +1597,104 @@
     its caption carries the ledger it was taken at. The ASCII field stays
     behind the hero, answering each validated ledger.
   -->
-  <section class="pv-hero" data-garden-field>
+  <section class="rp-hero" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
-    <div class="pv-hero-text">
-      <p class="pv-kicker"><i class="pv-mark" aria-hidden="true"></i>Ledger intelligence for digital-asset banking</p>
-      <h1 class="pv-h1">Due diligence on digital assets, <em>read from the ledger.</em></h1>
-      <p class="pv-lede">NOSHASHI is the read-only risk and compliance workspace for banks, custodians and token issuers on the XRP Ledger. Issuer controls, delivered amounts, fillable liquidity and counterparty screening, each answer recorded with the ledger it came from and a receipt.</p>
-      <div class="pv-actions">
-        <a class="pv-btn" href="/app/">Start free</a>
-        <a class="pv-btn ghost" href="/contact/?topic=institutions">Book a demo</a>
-      </div>
-      <p class="pv-meta">Free plan, no card · Never holds keys · macOS, Windows, Linux and the browser</p>
+    <div class="rp-hero-in">
+      <p class="rp-chip"><i aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span> · ledger <span data-sys-ledger translate="no">—</span> · <!--SLOT:TOKENCOUNT--> tokens tracked</p>
+      <h1>Stay certain on the XRP Ledger without slowing down</h1>
+      <p class="rp-sub">Check what an issuer can do, what a payment delivered and how much of a book can really fill, read live from the ledger with a receipt for every answer. Read-only. Never your keys.</p>
     </div>
+    <pre class="rp-ascii" id="rp-ascii" aria-hidden="true"></pre>
+    <div class="rp-actions">
+      <a class="rp-btn" href="/app/">Start free</a>
+      <a class="rp-btn line" href="/contact/?topic=institutions">Book a compliance demo</a>
+    </div>
+    <p class="rp-hero-cap">Each ring is a ledger validated on the XRP Ledger while you are on this page.</p>
+  </section>
 
-    <div class="pv-app" aria-label="The NOSHASHI workspace, reviewing the RLUSD issuer on live mainnet">
-      <div class="pv-app-bar"><span class="pv-app-brand">NOSHASHI <i>Workspace</i></span><span class="pv-app-live"><i aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span> · <span data-sys-ledger translate="no">—</span></span></div>
-      <div class="pv-app-body">
-        <nav class="pv-app-nav" aria-hidden="true"><b>Desk</b><span>Overview</span><span class="on">Issuer review</span><span>Payments</span><span>Liquidity</span><span>Screening</span><span>Evidence</span></nav>
-        <div class="pv-app-main">
-          <p class="pv-app-k">Issuer review</p>
-          <div class="pv-app-asset"><b>RLUSD</b><span translate="no">rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De</span><em id="pv-app-verdict" class="pv-pill">Reading</em></div>
-          <ul class="pv-checks" id="pv-app-checks"><li class="wait">Reading the issuer account from mainnet…</li></ul>
-          <div class="pv-app-depth"><p><span>Order book, within 10% of mid</span><b id="pv-app-fill">—</b></p><div class="pv-app-bar2"><i id="pv-app-fillbar"></i></div></div>
-          <p class="pv-app-receipt">Receipt <span id="pv-app-receipt" translate="no">pending</span></p>
-        </div>
+  <div class="rp-trust">
+    <p>Reads tokens issued by</p>
+    <ul aria-label="Issuers whose tokens NOSHASHI reads"><li>Ripple</li><li>Circle</li><li>GateHub</li><li>Bitstamp</li><li>Sologenic</li></ul>
+    <small>Named only to describe the ledger data read. No affiliation or endorsement.</small>
+  </div>
+
+  <section class="rp-sec rp-quiet" data-reveal>
+    <h2>Compliance that works quietly in the background</h2>
+    <div class="rp-feats">
+      <a href="/certificate/"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Issuer powers</h3><p>Whether an issuer can freeze, claw back, gate holding or sign alone, before you hold its token.</p></a>
+      <a href="/xapp/"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span><h3>Counterparty screening</h3><p>OFAC-listed senders up to three hops back, the scam registry and lookalike addresses.</p></a>
+      <a href="/delivered/"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg></span><h3>Delivered amounts</h3><p>What a payment actually delivered, not what it asked for, on partial payments too.</p></a>
+      <a href="/book-health/"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h3>Fillable liquidity</h3><p>Advertised order-book depth against the depth that is funded and can fill.</p></a>
+      <a href="/evidence-report/"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg></span><h3>Audit evidence</h3><p>A PDF of what the ledger showed, with a SHA-256 fingerprint anyone can verify.</p></a>
+      <a href="/alerts/"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1112 0v5l2 2H4z"/><path d="M10 21h4"/></svg></span><h3>Issuer alerts</h3><p>Telegram or Discord tells you the moment an issuer's powers change.</p></a>
+    </div>
+  </section>
+
+  <section class="rp-sec" data-reveal>
+    <h2 class="rp-c">Modules built for compliance teams</h2>
+    <div class="rp-mods">
+      <div class="rp-mod">
+        <div class="rp-art rp-art-checks"><ul id="rp-checks"><li class="wait">Reading RLUSD's issuer…</li></ul></div>
+        <h3>Issuer review</h3><p>Every power an issuer keeps over its holders, read from its account at a named ledger.</p>
+      </div>
+      <div class="rp-mod rp-mod-g">
+        <div class="rp-art rp-art-chain"><div class="rp-chain" id="rp-chain"><span class="wait">Waiting for the next ledger…</span></div></div>
+        <h3>Ledger monitoring</h3><p>Each validated ledger as it closes, with the issuers you watch re-read and alerts when they change.</p>
+      </div>
+      <div class="rp-mod">
+        <div class="rp-art rp-art-receipt"><p class="rp-r-k">Receipt · SHA-256</p><p class="rp-r-v" id="rp-receipt" translate="no">pending</p><p class="rp-r-k" id="rp-receipt-l">read at ledger —</p></div>
+        <h3>Evidence and receipts</h3><p>A fingerprint over every answer, so an auditor can confirm exactly what was read.</p>
       </div>
     </div>
   </section>
 
-  <div class="pv-for" aria-label="Who uses NOSHASHI"><span>Built for</span><ul><li>Banks</li><li>Custodians</li><li>Exchanges</li><li>Token issuers</li><li>Auditors</li><li>Funds</li></ul></div>
-
-  <section class="pv-desk" data-reveal aria-labelledby="pv-s1">
-    <div class="pv-desk-in">
-      <figure class="pv-seal">
-        <svg id="pv-seal" viewBox="0 0 400 400" role="img" aria-label="An engraved seal. A ring ripples outward from its centre each time the XRP Ledger validates a new ledger.">
-          <defs><path id="pv-ring-path" d="M200 200 m-176 0 a176 176 0 1 1 352 0 a176 176 0 1 1 -352 0"/></defs>
-          <g class="pv-ripples" id="pv-ripples"></g>
-          <g class="pv-guilloche" id="pv-guilloche"></g>
-          <circle class="pv-hair" cx="200" cy="200" r="188"/>
-          <circle class="pv-hair" cx="200" cy="200" r="164"/>
-          <text class="pv-ring-t"><textPath href="#pv-ring-path" startOffset="0">READ FROM VALIDATED LEDGERS · NO KEYS HELD · EVERY ANSWER RECEIPTED · NOSHASHI ·</textPath></text>
-          <circle class="pv-core" cx="200" cy="200" r="62"/>
-          <text class="pv-core-k" x="200" y="186" text-anchor="middle">LEDGER №</text>
-          <text class="pv-core-n" x="200" y="214" text-anchor="middle" id="pv-seal-n">—</text>
-          <text class="pv-core-s" x="200" y="234" text-anchor="middle">VALIDATED</text>
-        </svg>
-        <figcaption>Each ring is a ledger validated while this page has been open.</figcaption>
-      </figure>
-      <div class="pv-desk-text">
-        <p class="pv-kicker"><span class="pv-num">I.</span>The private desk</p>
-        <h2 id="pv-s1">The ledger, as of this page</h2>
-        <p>A short statement read from the XRP Ledger while you were reading. Nothing here is sample data; a line that could not be read says so.</p>
-        <div class="pv-stage bx-stage"><table class="pv-table">
-          <tbody>
-            <tr><th scope="row">Latest validated ledger</th><td id="pv-ledger" translate="no">Waiting for the next close</td></tr>
-            <tr><th scope="row">Transactions in that ledger</th><td id="pv-tx">—</td></tr>
-            <tr><th scope="row">Average interval between closes</th><td id="pv-close">—</td></tr>
-            <tr><th scope="row">XRP against RLUSD <span class="pv-state" data-bx-state>Connecting</span></th><td><span data-bx-mirror="tk-xrp" translate="no">—</span></td></tr>
-            <tr><th scope="row">RLUSD issuer: powers retained</th><td id="pv-kept">Reading…</td></tr>
-            <tr><th scope="row">RLUSD book: depth that can fill</th><td id="pv-fill">Reading…</td></tr>
-          </tbody>
-        </table></div>
-        <p class="pv-foot" id="pv-foot">Sources: the public XRPL WebSocket for closes; NOSHASHI's own reads of the RLUSD issuer account and its DEX order book (AMM pools excluded).</p>
-      </div>
+  <section class="rp-sec" data-reveal>
+    <h2 class="rp-c">Move faster without compromising on proof</h2>
+    <div class="rp-cta-s"><a class="rp-pill" href="/app/">Explore the workspace</a><a class="rp-pill line" href="/docs/api/">See the API</a></div>
+    <div class="rp-bento">
+      <a class="rp-b rp-b-g" href="/docs/api/"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg></span><h3>Asset Risk API</h3><p>One free call for an issued asset: issuer controls, fillable depth, an exit estimate and a receipt.</p></a>
+      <div class="rp-b rp-b-wide"><div class="rp-b-top"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="rp-tag">RLUSD · live</span></div><h3>Real liquidity, not quoted liquidity</h3><p>How much of the RLUSD book within 10% of mid can actually fill right now.</p>
+        <div class="rp-depth"><b id="rp-fill">—</b><div class="rp-bar"><i id="rp-fillbar"></i></div><small id="rp-fill-l">Reading the book…</small></div></div>
+      <div class="rp-b"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h3>Every ledger, around the clock</h3><p>Readings come from validated ledgers only, never pending state.</p></div>
+      <div class="rp-b"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></span><h3>Read-only access</h3><p>No keys held, nothing signed, nothing to connect.</p></div>
+      <div class="rp-b"><span class="rp-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><h3>Complete audit trail</h3><p>GO, HOLD or NO-GO against a versioned policy, logged with who checked what.</p></div>
     </div>
   </section>
 
-  <dl class="pv-facts" aria-label="How NOSHASHI works">
-    <div><dt>Read-only</dt><dd>No keys held, nothing signed, nothing to connect.</dd></div>
-    <div><dt>Validated ledgers</dt><dd>Readings come from validated state, never pending.</dd></div>
-    <div><dt>Receipted</dt><dd>Every answer carries a SHA-256 receipt anyone can check.</dd></div>
-    <div><dt><!--SLOT:TOKENCOUNT--> tokens</dt><dd>Covered today, each with a live issuer page.</dd></div>
-  </dl>
+  <section class="rp-sec" data-reveal>
+    <h2 class="rp-c">Why compliance teams can check us</h2>
+    <p class="rp-c rp-lead">We are new, so instead of testimonials here is what the ledger says right now. Every figure is read live.</p>
+    <div class="rp-proof bx-stage">
+      <div class="rp-p"><p class="rp-p-k">RLUSD issuer</p><p class="rp-p-v" id="rp-verdict">—</p><p class="rp-p-d" id="rp-verdict-d">Reading the issuer account…</p></div>
+      <div class="rp-p rp-p-g"><p class="rp-p-k">XRP / RLUSD <span data-bx-state>Connecting</span></p><p class="rp-p-v"><span data-bx-mirror="tk-xrp" translate="no">—</span></p><p class="rp-p-d" data-bx-note>From the public XRPL WebSocket, as each ledger closes.</p></div>
+      <div class="rp-p"><p class="rp-p-k">Latest validated ledger</p><p class="rp-p-v" id="rp-ledger" translate="no">—</p><p class="rp-p-d" id="rp-ledger-d">Waiting for the next close…</p></div>
+    </div>
+  </section>
 
-  <section class="pv-sec" data-reveal aria-labelledby="pv-s2">
-    <header class="pv-sec-h"><span class="pv-num">II.</span><h2 id="pv-s2">One workspace, five instruments</h2>
-      <p>The questions a risk or treasury team asks before an asset moves. Each is in the workspace and the desktop app, and each has a free version on this site.</p></header>
-    <ol class="pv-list">
-      <li><a href="/certificate/"><span class="pv-ix">i</span><b>Issuer powers</b><span>Whether an issuer can freeze, claw back, gate who holds its token, or sign alone.</span><i aria-hidden="true">→</i></a></li>
-      <li><a href="/delivered/"><span class="pv-ix">ii</span><b>Delivered amounts</b><span>What a payment actually delivered, which is not always what it asked for.</span><i aria-hidden="true">→</i></a></li>
-      <li><a href="/book-health/"><span class="pv-ix">iii</span><b>Fillable liquidity</b><span>Advertised order-book depth, set against the depth that is funded and can fill.</span><i aria-hidden="true">→</i></a></li>
-      <li><a href="/xapp/"><span class="pv-ix">iv</span><b>Counterparty screening</b><span>OFAC-listed senders up to three hops back, the scam registry, lookalike addresses.</span><i aria-hidden="true">→</i></a></li>
-      <li><a href="/evidence-report/"><span class="pv-ix">v</span><b>Evidence on record</b><span>A signed PDF of what the ledger showed, with a fingerprint anyone can verify.</span><i aria-hidden="true">→</i></a></li>
-    </ol>
-    <details class="traps pv-cases">
+  <section class="rp-sec" data-reveal>
+    <h2 class="rp-c">Plans</h2>
+    <div class="rp-plans">
+      <a href="/app/"><span>Free</span><b>$0</b><em>forever</em><p>For trying NOSHASHI on your own addresses.</p></a>
+      <a href="/pricing/"><span>Pro</span><b>$749</b><em>per seat, per month</em><p>For trading desks and funds holding XRPL tokens.</p></a>
+      <a href="/pricing/" class="hi"><span>Institutional</span><b>$4,000</b><em>per month, unlimited seats</em><p>For exchanges, custodians and token issuers who answer to auditors.</p></a>
+      <a href="/contact/?topic=institutions"><span>Enterprise</span><b>$120,000</b><em>per year</em><p>For banks and large operations. Strategic from $250,000 a year.</p></a>
+    </div>
+    <p class="rp-c rp-small">One-off <a href="/evidence-report/">Ledger Evidence Reports</a> from $950. Invoice or bank transfer on request.</p>
+    <details class="traps rp-cases">
       <summary>Six real cases from mainnet, each read two ways</summary>
       <div>
         <!--SLOT:MISREAD-->
-        <p class="pv-foot"><a href="/misread/">Each case, with the code behind it</a></p>
+        <p class="rp-small"><a href="/misread/">Each case, with the code behind it</a></p>
       </div>
     </details>
   </section>
 
-  <section class="pv-sec" data-reveal aria-labelledby="pv-s3">
-    <header class="pv-sec-h"><span class="pv-num">III.</span><h2 id="pv-s3">Into your own systems</h2>
-      <p>The same readings the workspace uses, as an API your onboarding, treasury or monitoring systems can call.</p></header>
-    <div class="pv-api">
-      <ul class="pv-api-list">
-        <li><b>Asset Risk API</b><span>One call for an issued asset: issuer controls, fillable depth, an exit estimate and a receipt. Free to try, no key.</span></li>
-        <li><b>Compliance API</b><span>Every verb the desktop app runs, with keys, scopes and rate limits.</span></li>
-        <li><b>Issuer alerts</b><span>Telegram or Discord, the moment an issuer's powers change.</span></li>
-        <li><b>Evidence files</b><span>PDF, print copy and a JSON record with its SHA-256 fingerprint.</span></li>
-      </ul>
-      <figure class="pv-code">
-        <figcaption><span>Request</span><a href="/docs/api/">API reference →</a></figcaption>
-<pre><code>curl "https://www.noshashi.app/api/v1/asset-risk\
-  ?issuer=rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De\
-  &amp;currency=524C555344000000000000000000000000000000"</code></pre>
-        <figcaption><span>Response, read live from this page</span></figcaption>
-<pre><code id="pv-code-out">{ "schema": "noshashi.asset-risk.v1", … }</code></pre>
-      </figure>
+  <section class="rp-final" data-reveal>
+    <pre class="rp-ascii rp-ascii-s" id="rp-ascii-2" aria-hidden="true"></pre>
+    <div class="rp-final-in">
+      <h2>Build certainty into every XRPL transaction</h2>
+      <div class="rp-actions"><a class="rp-btn" href="/app/">Start free</a><a class="rp-btn line" href="/contact/?topic=institutions">Talk to us</a></div>
     </div>
-  </section>
-
-  <section class="pv-sec" data-reveal aria-labelledby="pv-s4">
-    <header class="pv-sec-h"><span class="pv-num">IV.</span><h2 id="pv-s4">Security and controls</h2>
-      <p>Built for the people who sign off on it: compliance, risk and audit.</p></header>
-    <ul class="pv-grid">
-      <li><b>Read-only by design</b><span>NOSHASHI never holds keys and never signs. There is nothing to connect and nothing to move.</span></li>
-      <li><b>Validated state only</b><span>Every reading comes from a validated ledger and names its index.</span></li>
-      <li><b>Receipts</b><span>A SHA-256 digest over every answer, so anyone can confirm what was read.</span></li>
-      <li><b>Versioned policy</b><span>GO, HOLD or NO-GO against a policy your team versions and reviews.</span></li>
-      <li><b>Audit log</b><span>Who checked what, when, and what the ledger said at the time.</span></li>
-      <li><b>Open source</b><span>The code is public on <a href="https://github.com/Ignosha/noshashi">GitHub</a>, for your own review.</span></li>
-    </ul>
-  </section>
-
-  <section class="pv-sec" data-reveal aria-labelledby="pv-s5">
-    <header class="pv-sec-h"><span class="pv-num">V.</span><h2 id="pv-s5">Plans</h2>
-      <p>Start free on your own addresses. Pay when your team needs seats, scale or an audit trail.</p></header>
-    <div class="pv-plans">
-      <a href="/pricing/"><span class="pv-plan-n">Free</span><b>$0</b><em>forever</em><span class="pv-plan-d">For trying NOSHASHI on your own addresses.</span><span class="pv-plan-c">Start free →</span></a>
-      <a href="/pricing/"><span class="pv-plan-n">Pro</span><b>$749</b><em>per seat, per month</em><span class="pv-plan-d">For trading desks and funds holding XRPL tokens.</span><span class="pv-plan-c">Choose Pro →</span></a>
-      <a href="/pricing/" class="pv-plan-hi"><span class="pv-plan-n">Institutional</span><b>$4,000</b><em>per month, unlimited seats</em><span class="pv-plan-d">For exchanges, custodians and token issuers who answer to auditors.</span><span class="pv-plan-c">Choose Institutional →</span></a>
-      <a href="/contact/?topic=institutions"><span class="pv-plan-n">Enterprise</span><b>$120,000</b><em>per year</em><span class="pv-plan-d">For banks and large operations. Strategic from $250,000 a year.</span><span class="pv-plan-c">Talk to us →</span></a>
-    </div>
-    <details class="pv-cases">
-      <summary>Ledger Evidence Report: one-off engagements from $950</summary>
-      <div>
-        <table class="pv-table pv-fees">
-          <thead><tr><th scope="col">Engagement</th><th scope="col">Scope</th><th scope="col">Fee</th></tr></thead>
-          <tbody>
-            <tr><th scope="row"><a href="/evidence-report/?tier=issuer">Issuer check</a></th><td>One token issuer, up to three team wallets and its order book</td><td>$950</td></tr>
-            <tr><th scope="row"><a href="/evidence-report/?tier=standard">Standard</a></th><td>One report, read now</td><td>$2,500</td></tr>
-            <tr><th scope="row"><a href="/evidence-report/?tier=quarterly">Quarterly</a></th><td>Now, and at each of the next four quarter-ends</td><td>$7,500</td></tr>
-            <tr><th scope="row"><a href="/evidence-report/?tier=audit">Audit support</a></th><td>Now, and at each of the next twelve month-ends</td><td>$15,000</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </details>
-  </section>
-
-  <section class="pv-sec" data-reveal aria-labelledby="pv-s6">
-    <header class="pv-sec-h"><span class="pv-num">VI.</span><h2 id="pv-s6">Who it is for</h2></header>
-    <div class="pv-cols">
-      <div><h3>Banks and custodians</h3><p>Screen XRP and RLUSD deposits before they are credited, and keep a record of why each one was accepted or held.</p><a class="pv-link" href="/solutions/">Solutions <span aria-hidden="true">→</span></a></div>
-      <div><h3>Token issuers</h3><p>Show holders, exchanges and partners exactly which powers your issuer account keeps, read from the ledger rather than claimed.</p><a class="pv-link" href="/tokens/">Token directory <span aria-hidden="true">→</span></a></div>
-      <div><h3>Auditors and funds</h3><p>Support a fair-value mark with the depth that could actually fill at the date that matters, not the depth that was quoted.</p><a class="pv-link" href="/partners/">Partner programmes <span aria-hidden="true">→</span></a></div>
-    </div>
-  </section>
-
-  <section class="pv-sec pv-letter" data-reveal aria-labelledby="pv-s7">
-    <header class="pv-sec-h"><span class="pv-num">VII.</span><h2 id="pv-s7">A note from the founder</h2></header>
-    <blockquote>
-      <p>Institutions looking at the XRP Ledger are asked to take a great deal on trust: that an issuer will not freeze a balance, that a quoted book is really there, that a payment delivered what it said. The ledger already holds the answers. NOSHASHI reads them, names the ledger they came from, and keeps the receipt.</p>
-      <p>We are a young company and we say so plainly. There are no borrowed logos here, only readings you can check for yourself.</p>
-      <footer><span class="pv-sign">Joshua Edmond</span>Founder, NOSHASHI</footer>
-    </blockquote>
-  </section>
-
-  <section class="pv-close" data-reveal>
-    <i class="pv-mark" aria-hidden="true"></i>
-    <h2>Arrange a private briefing</h2>
-    <p>Thirty minutes, remote, on your own addresses if you wish. Or start on the free plan today: read-only, on live mainnet, no card.</p>
-    <div class="pv-actions"><a class="pv-btn" href="/contact/?topic=institutions">Book a demo</a><a class="pv-btn ghost" href="/app/">Start free</a></div>
   </section>
 
   <!-- Live mainnet ticker: real data over the same public WebSocket the
@@ -2081,7 +1902,7 @@
 <script src="/assets/intelligence.js" defer></script>
 <script src="/assets/hero-live.js" defer></script>
 <script src="/assets/motion.js" defer></script>
-<script src="/assets/pv.js" defer></script>
+<script src="/assets/rp.js" defer></script>
 
 <!--SLOT:JSONLD-->
 <script>
