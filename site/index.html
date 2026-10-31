@@ -1573,6 +1573,80 @@
     .sx-head-r{width:100%;justify-content:space-between}
     .sx-px{text-align:left}
   }
+
+  /* ── Presentation (2026-10-31) ─────────────────────────────────────
+     Presence from the product and real figures, not ornament: the window
+     settles from a slight tilt as the page scrolls; big numerals; two
+     showcase rows with live visuals; a paper report that reads as a
+     document in either theme; an inverted closing panel. */
+  .sx-window{transform-origin:50% 0;transition:transform .2s linear}
+  .sx-tilt{transform:perspective(1800px) rotateX(var(--tilt,9deg)) scale(var(--sc,.96))}
+
+  .sx-stats{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr) minmax(0,1fr) minmax(0,.8fr);margin:clamp(64px,9vw,104px) 0 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .sx-stats div{padding:28px 24px 30px 0;min-width:0}
+  .sx-stats div+div{padding-left:24px;border-left:1px solid var(--rule)}
+  .sx-stats dt{font-size:13px;color:var(--faint)}
+  .sx-stats dd{margin:10px 0 0;font-size:clamp(30px,3.9vw,56px);font-weight:600;letter-spacing:-.05em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .sx-show{padding-top:clamp(72px,10vw,128px);display:grid;gap:clamp(72px,10vw,128px)}
+  .sx-row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+  .sx-row-r .sx-row-text{order:2}
+  .sx-kicker{margin:0 0 14px;font-size:14px;color:var(--muted)}
+  .sx-row h2{margin:0;font-size:clamp(30px,3.6vw,48px);line-height:1.06;letter-spacing:-.04em;font-weight:600}
+  .sx-row-text > p:not(.sx-kicker){margin:18px 0 0;max-width:46ch;font-size:16.5px;line-height:1.65;color:var(--muted)}
+  .sx-link{display:inline-flex;gap:8px;margin-top:22px;font-size:15px;font-weight:500;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:3px}
+  .sx-link:hover{border-color:var(--ink)}
+  .sx-link span{transition:transform .25s ease}
+  .sx-link:hover span{transform:translateX(3px)}
+  .sx-visual{margin:0;min-width:0}
+
+  .sx-depth{padding:24px;border:1px solid var(--rule);border-radius:14px;background:var(--surface)}
+  .sx-depth figcaption{display:flex;justify-content:space-between;gap:12px;margin-bottom:20px;font-size:13px;color:var(--muted)}
+  .sx-depth figcaption span:last-child{color:var(--faint);font-variant-numeric:tabular-nums}
+  .sx-dp-side{padding:16px 0;border-top:1px solid var(--rule)}
+  .sx-dp-side > p{margin:0 0 12px;font-size:13px;font-weight:500;color:var(--ink)}
+  .sx-dp-bar{display:grid;grid-template-columns:64px minmax(0,1fr) 92px;align-items:center;gap:12px;margin-top:10px;font-size:12.5px;color:var(--faint)}
+  .sx-dp-bar i{display:block;height:22px;width:0;border-radius:4px;transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
+  .sx-dp-bar i.q{background:repeating-linear-gradient(135deg,var(--rule) 0 5px,transparent 5px 10px);border:1px solid var(--rule)}
+  .sx-dp-bar i.f{background:var(--ink)}
+  .sx-dp-bar b{font-weight:500;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+  .sx-dp-mid{margin:14px 0 0;font-size:12px;color:var(--faint)}
+
+  .sx-paper-wrap{display:flex;flex-direction:column;align-items:center}
+  .sx-paper{width:min(460px,100%);aspect-ratio:1/1.24;padding:34px 34px 28px;background:#FAFAF7;color:#141416;border-radius:4px;
+    box-shadow:0 1px 0 rgb(0 0 0 / .04),0 30px 60px -30px rgb(0 0 0 / .55),0 0 0 1px rgb(0 0 0 / .06);transform:rotate(-1.2deg);
+    display:flex;flex-direction:column}
+  .sx-paper-h{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1.5px solid #141416;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase}
+  .sx-paper-h span:first-child{font-weight:700}
+  .sx-paper h3{margin:22px 0 16px;font-size:21px;font-weight:600;letter-spacing:-.02em;color:#141416}
+  .sx-paper dl{margin:0}
+  .sx-paper dl div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #E2E2DD;font-size:12.5px}
+  .sx-paper dt{color:#55555A}
+  .sx-paper dd{margin:0;text-align:right;font-weight:500;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;min-width:0}
+  .sx-paper dl div:first-child dd{font:11px "IBM Plex Mono",ui-monospace,monospace}
+  .sx-paper-k{margin:20px 0 6px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#55555A}
+  .sx-paper-hash{margin:0;padding:10px 12px;background:#EFEFEA;border-radius:3px;font:11px/1.55 "IBM Plex Mono",ui-monospace,monospace;overflow-wrap:anywhere}
+  .sx-paper-foot{margin:auto 0 0;padding-top:14px;font-size:10px;color:#77777C}
+  .sx-paper-cap{margin-top:22px;font-size:13px;color:var(--faint)}
+
+  .sx-cta{padding:clamp(64px,9vw,112px) clamp(24px,5vw,72px) !important;background:var(--ink) !important;border:0 !important;border-radius:20px}
+  .sx-cta h2{max-width:16ch;margin:0 auto;font-size:clamp(34px,4.6vw,64px) !important;line-height:1.02;letter-spacing:-.045em;font-weight:600;color:var(--ground) !important}
+  .sx-cta p{color:color-mix(in srgb,var(--ground) 62%,var(--ink)) !important;font-size:17px;margin-top:18px !important}
+  .sx-cta .mn-btn.light{background:var(--ground) !important;color:var(--ink) !important;border-color:var(--ground) !important}
+  .sx-cta .mn-btn.ghost-light{color:var(--ground) !important;border-color:color-mix(in srgb,var(--ground) 35%,var(--ink)) !important;background:transparent !important}
+
+  @media (prefers-reduced-motion:reduce){.sx-tilt{transform:none}}
+  @media (max-width:900px){
+    .sx-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .sx-stats div:nth-child(3){padding-left:0;border-left:0}
+    .sx-stats div:nth-child(n+3){border-top:1px solid var(--rule)}
+    .sx-row{grid-template-columns:1fr}
+    .sx-row-r .sx-row-text{order:0}
+  }
+  @media (max-width:520px){
+    .sx-dp-bar{grid-template-columns:52px minmax(0,1fr) 70px}
+    .sx-paper{padding:24px 20px;aspect-ratio:auto}
+  }
 </style>
 </head>
 <body>
@@ -1676,6 +1750,62 @@
     <small>Named only to describe the ledger data read. No affiliation or endorsement.</small>
   </div>
 
+
+  <dl class="sx-stats" aria-label="NOSHASHI in numbers, read live">
+    <div><dt>Tokens with a live issuer page</dt><dd>51</dd></div>
+    <div><dt>Latest validated ledger</dt><dd id="sx-st-ledger" translate="no">—</dd></div>
+    <div><dt>Average time between closes</dt><dd id="sx-st-close">—</dd></div>
+    <div><dt>Private keys we hold</dt><dd>0</dd></div>
+  </dl>
+
+  <section class="sx-show" aria-label="What NOSHASHI shows">
+    <div class="sx-row" data-reveal>
+      <div class="sx-row-text">
+        <p class="sx-kicker">Liquidity</p>
+        <h2>Quoted depth is a promise. Fillable depth is a fact.</h2>
+        <p>Order books on the XRP Ledger can advertise offers their owners cannot fund. NOSHASHI counts only what each offer's owner actually holds at the ledger it reads, so the number you see is the number that can trade.</p>
+        <a class="sx-link" href="/book-health/">Check any book <span aria-hidden="true">→</span></a>
+      </div>
+      <figure class="sx-visual sx-depth" aria-label="RLUSD order book, quoted against fillable depth, read live">
+        <figcaption><span>XRP / RLUSD order book</span><span id="sx-dp-l">Reading…</span></figcaption>
+        <div class="sx-dp-side"><p>Bids</p>
+          <div class="sx-dp-bar"><span>Quoted</span><i class="q" id="sx-dp-bq"></i><b id="sx-dp-bqv">—</b></div>
+          <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-bf"></i><b id="sx-dp-bfv">—</b></div>
+        </div>
+        <div class="sx-dp-side"><p>Asks</p>
+          <div class="sx-dp-bar"><span>Quoted</span><i class="q" id="sx-dp-aq"></i><b id="sx-dp-aqv">—</b></div>
+          <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-af"></i><b id="sx-dp-afv">—</b></div>
+        </div>
+        <p class="sx-dp-mid" id="sx-dp-mid">Within 10% of the reference mid · DEX book only, AMM pools excluded</p>
+      </figure>
+    </div>
+
+    <div class="sx-row sx-row-r" data-reveal>
+      <div class="sx-row-text">
+        <p class="sx-kicker">Evidence</p>
+        <h2>Hand your auditor a page they can check themselves.</h2>
+        <p>Every Ledger Evidence Report names the ledger it was read at and carries a SHA-256 fingerprint over its contents. Anyone can re-read the same ledger and get the same answer. It records ledger facts; it is not an opinion.</p>
+        <a class="sx-link" href="/evidence-report/">See the report <span aria-hidden="true">→</span></a>
+      </div>
+      <figure class="sx-visual sx-paper-wrap" aria-label="The first page of an evidence report for RLUSD, filled with values read now">
+        <div class="sx-paper">
+          <div class="sx-paper-h"><span>NOSHASHI</span><span>Ledger Evidence Report</span></div>
+          <h3>RLUSD issuer and order book</h3>
+          <dl>
+            <div><dt>Issuer</dt><dd translate="no">rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De</dd></div>
+            <div><dt>Read at ledger</dt><dd id="sx-pp-ledger">—</dd></div>
+            <div><dt>Issuer controls verdict</dt><dd id="sx-pp-verdict">—</dd></div>
+            <div><dt>Powers retained</dt><dd id="sx-pp-kept">—</dd></div>
+            <div><dt>Fillable within 10% of mid</dt><dd id="sx-pp-fill">—</dd></div>
+          </dl>
+          <p class="sx-paper-k">Fingerprint, SHA-256</p>
+          <p class="sx-paper-hash" id="sx-pp-hash" translate="no">—</p>
+          <p class="sx-paper-foot">A record of ledger facts. Not an audit opinion, attestation, valuation or advice.</p>
+        </div>
+        <figcaption class="sx-paper-cap">First page, filled with what the ledger says right now.</figcaption>
+      </figure>
+    </div>
+  </section>
 
   <section class="mn-section">
     <div class="mn-head" data-reveal>
@@ -2045,9 +2175,9 @@
   </div>
   </section>
 
-  <section class="mn-cta" data-reveal>
-    <h2>Start with one address</h2>
-    <p>Free, read-only, on live mainnet. No account needed.</p>
+  <section class="mn-cta sx-cta" data-reveal>
+    <h2>Read your first issuer in under a minute.</h2>
+    <p>Paste one address. Free, read-only, on live mainnet. No account, no card, no keys.</p>
     <div class="mn-actions"><a class="mn-btn light" href="/app/">Open the workspace</a><a class="mn-btn ghost-light" href="/contact/?topic=institutions">Talk to us</a></div>
   </section>
 </main>
