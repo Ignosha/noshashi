@@ -138,7 +138,7 @@ function contextPanel(details) {
 
 function page({ key, path, title, crumb, description, main, details = "", ctx = true, scripts = "", version }) {
   return `<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

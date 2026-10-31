@@ -1,12 +1,12 @@
 
 (function () {
-  /* Keep the chosen reading mode local to this device. No preference leaves
-     the OS/browser choice in charge, which is the safest first visit. */
+  /* Keep the chosen reading mode local to this device. With no saved
+     choice the site opens in its light palette. */
   var themeToggle = document.getElementById("themeToggle");
   var themeLabel = document.getElementById("themeLabel");
   var savedTheme = "";
   try { savedTheme = localStorage.getItem("noshashi-theme") || ""; } catch (e) {}
-  if (savedTheme === "light" || savedTheme === "dark") document.documentElement.setAttribute("data-theme", savedTheme);
+  document.documentElement.setAttribute("data-theme", savedTheme === "dark" ? "dark" : "light");
   function updateThemeButton() {
     var light = document.documentElement.getAttribute("data-theme") === "light";
     var map = window.__NOSHASHI_I18N || {};

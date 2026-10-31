@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1102,29 +1102,32 @@
   }
   @media (max-width:520px){ .cx-pill .opt{display:none} .cx-btn{flex:1 1 100%} }
   @media (prefers-reduced-motion:reduce){ .cx-btn,.cx-card{transition:none} .cx-btn:hover,.cx-card:hover{transform:none} }
-  /* ── Ledger Green (2026-10-31) ──────────────────────────────────────
-     Black and green, after the owner's Web3 references: a black hero
-     block with a big condensed headline and a line illustration, pill
+  /* ── Soft Periwinkle (2026-10-31) ──────────────────────────────────────
+     White and a soft blue-purple, after the owner's Web3 references: a
+     lavender hero block with a big condensed headline and a line illustration, pill
      tags, a live chart card, three link cards, and one giant word. The
      same tokens as /assets/accent.css, which the other pages use. */
   :root{
-    --ground:#0A0B0A; --surface:#121512; --elevated:#1A1E19;
-    --ink:#F2F6EE; --muted:#AAB4A6; --faint:#808B7C; --rule:#262C24;
-    --brand:#3DF07A; --tele:#C8F560; --on-brand:#04140A;
-    --go:#3DF07A; --hold:#F2D16B; --nogo:#FF7A7A;
-    --glow:linear-gradient(120deg,#3DF07A 0%,#C8F560 55%,#EFFFD1 100%);
-    --black:#050605;
+    --ground:#0F0E22; --surface:#17162F; --elevated:#211F40;
+    --ink:#EEEDFC; --muted:#B4B2D4; --faint:#8C8AB0; --rule:#2D2B50;
+    --brand:#A3A6FF; --tele:#C9BCFF; --on-brand:#12112A;
+    --go:#6FD9A6; --hold:#F2D16B; --nogo:#FF8A8A;
+    --glow:linear-gradient(120deg,#8E9BFF 0%,#B6A6FF 55%,#E8E2FF 100%);
+    --black:#0A0920;
+    --hero-bg:radial-gradient(70% 90% at 85% 15%,#3A3680 0%,transparent 60%),linear-gradient(160deg,#1D1B44,#121130);
+    --hero-ink:#F1F0FF; --hero-muted:#C2C0E4; --hero-faint:#9391BC; --hero-line:#36346A; --hero-field:rgb(255 255 255 / .06);
   }
   html[data-theme="light"]{
-    --ground:#F2F2EC; --surface:#FFFFFF; --elevated:#E7E8E0;
-    --ink:#0A0B0A; --muted:#3F463D; --faint:#5E665B; --rule:#D5D8CC;
-    --brand:#0B8A3E; --tele:#4E7A00; --on-brand:#FFFFFF;
-    --go:#0B7A38; --hold:#8B6500; --nogo:#B42332;
-    --glow:linear-gradient(120deg,#5BF28F 0%,#D4F77A 55%,#F4FFE0 100%);
-    --black:#0A0B0A;
+    --ground:#F7F7FC; --surface:#FFFFFF; --elevated:#EFEFFA;
+    --ink:#15142E; --muted:#4A4968; --faint:#66658A; --rule:#E2E1F1;
+    --brand:#5B5BD6; --tele:#7A5CE0; --on-brand:#FFFFFF;
+    --go:#16784A; --hold:#8B6500; --nogo:#B42332;
+    --glow:linear-gradient(120deg,#9AA8FF 0%,#C3B4FF 55%,#EFEAFF 100%);
+    --black:#1B1A3F;
+    --hero-bg:radial-gradient(60% 90% at 88% 10%,#C9C3FF 0%,transparent 60%),radial-gradient(50% 70% at 0% 100%,#DCE3FF 0%,transparent 60%),linear-gradient(160deg,#EEEDFF,#F8F7FF);
+    --hero-ink:#15142E; --hero-muted:#4A4968; --hero-faint:#6E6D90; --hero-line:#D9D7F2; --hero-field:#FFFFFF;
   }
   .garden-field,.garden-page,.garden-bg{display:none !important}
-  .brand-mark{filter:hue-rotate(-95deg) saturate(1.3)}
   .nav-links a:not(.btn){border:1px solid var(--rule);border-radius:999px;padding:6px 14px;min-height:32px}
   .nav-links a:not(.btn)::before{display:none}
   .nav-links a:not(.btn):hover,.nav-links a:not(.btn):focus-visible{border-color:var(--ink);background:transparent}
@@ -1136,28 +1139,28 @@
 
   .lg-hero{text-align:left;padding:18px 0 0}
   .lg-black{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:24px;align-items:center;
-    background:var(--black);color:#F2F6EE;border-radius:28px;padding:clamp(28px,5vw,64px);
-    border:1px solid #1E231D;overflow:hidden;position:relative}
+    background:var(--hero-bg);color:var(--hero-ink);border-radius:28px;padding:clamp(28px,5vw,64px);
+    border:1px solid var(--hero-line);overflow:hidden;position:relative}
   .lg-black::after{content:"";position:absolute;right:-12%;top:-30%;width:60%;aspect-ratio:1;border-radius:50%;
-    background:radial-gradient(closest-side,rgb(61 240 122 / .22),transparent);pointer-events:none}
-  .lg-black .cx-pill{color:#AAB4A6;border-color:#2A3028;background:rgb(255 255 255 / .03);margin:0 0 22px}
+    background:radial-gradient(closest-side,rgb(140 150 255 / .28),transparent);pointer-events:none}
+  .lg-black .cx-pill{color:var(--hero-muted);border-color:var(--hero-line);background:var(--hero-field);margin:0 0 22px}
   .lg-hero .lg-h1{margin:0;max-width:none;font:400 clamp(64px,9.6vw,140px)/.86 "Bebas Neue","Space Grotesk",Impact,sans-serif;
-    letter-spacing:.005em;text-transform:uppercase;color:#F2F6EE}
+    letter-spacing:.005em;text-transform:uppercase;color:var(--hero-ink)}
   .lg-glyph{display:inline-flex;align-items:flex-end;gap:5px;height:.62em;margin-right:.14em;vertical-align:baseline}
   .lg-glyph i{display:block;width:.32em;height:.62em;border-radius:.32em .32em 0 0;background:var(--glow)}
-  .lg-glyph i+i{height:.4em;background:transparent;border:3px solid #F2F6EE;border-bottom:0}
-  .lg-sub{margin:22px 0 0;max-width:44ch;color:#C3CCBF;font-size:clamp(15px,1.4vw,18px);line-height:1.55}
+  .lg-glyph i+i{height:.4em;background:transparent;border:3px solid var(--hero-ink);border-bottom:0}
+  .lg-sub{margin:22px 0 0;max-width:44ch;color:var(--hero-muted);font-size:clamp(15px,1.4vw,18px);line-height:1.55}
   .lg-check{display:flex;gap:8px;margin-top:26px;max-width:520px;padding:6px;border-radius:999px;
-    background:#151915;border:1px solid #2A3028}
-  .lg-check input{flex:1;min-width:0;background:transparent;border:0;color:#F2F6EE;padding:0 16px;
+    background:var(--hero-field);border:1px solid var(--hero-line);box-shadow:0 10px 30px -18px rgb(60 50 160 / .35)}
+  .lg-check input{flex:1;min-width:0;background:transparent;border:0;color:var(--hero-ink);padding:0 16px;
     font:13px "IBM Plex Mono",monospace;outline:none}
-  .lg-check input::placeholder{color:#7C8779}
+  .lg-check input::placeholder{color:var(--hero-faint)}
   .lg-check button{border:0;border-radius:999px;padding:12px 20px;font:600 13.5px "Space Grotesk",sans-serif;
-    background:var(--glow);color:#04140A;cursor:pointer;white-space:nowrap}
-  .lg-check:focus-within{border-color:#3DF07A}
-  .lg-fine{margin:12px 0 0 6px;font:11.5px "IBM Plex Mono",monospace;color:#7C8779;letter-spacing:.04em}
+    background:#15142E;color:#FFFFFF;cursor:pointer;white-space:nowrap}
+  .lg-check:focus-within{border-color:var(--brand)}
+  .lg-fine{margin:12px 0 0 6px;font:11.5px "IBM Plex Mono",monospace;color:var(--hero-faint);letter-spacing:.04em}
   .lg-art{margin:0;display:flex;justify-content:center;position:relative;z-index:1}
-  .lg-svg{width:100%;max-width:500px;height:auto;color:#F2F6EE}
+  .lg-svg{width:100%;max-width:500px;height:auto;color:var(--hero-ink)}
   .lg-svg-sm{max-width:300px;color:var(--ink)}
 
   #ticker.ticker{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:0;margin:14px 0 0;padding:12px 4px;
@@ -1198,15 +1201,15 @@
   .lg-trio{display:grid;grid-template-columns:.8fr .8fr 1.4fr;gap:14px;margin-top:clamp(56px,8vw,96px)}
   .lg-card{position:relative;display:flex;flex-direction:column;min-height:300px;padding:24px;border-radius:24px;
     text-decoration:none;color:var(--ink);border:1px solid var(--rule);background:var(--surface);overflow:hidden}
-  .lg-dark{background:var(--black);color:#F2F6EE;border-color:#1E231D;justify-content:flex-end;gap:0}
-  .lg-dark .lg-label{margin:0 0 auto;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#7C8779}
-  .lg-dark a{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid #2A3028;color:#F2F6EE;
+  .lg-dark{background:var(--black);color:#EEEDFC;border-color:#2D2B50;justify-content:flex-end;gap:0}
+  .lg-dark .lg-label{margin:0 0 auto;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#9391BC}
+  .lg-dark a{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid #36346A;color:#EEEDFC;
     text-decoration:none;font-size:15px}
-  .lg-dark a:hover,.lg-dark a:focus-visible{color:#3DF07A}
-  .lg-green{background:var(--glow);color:#04140A;border:0;justify-content:space-between}
+  .lg-dark a:hover,.lg-dark a:focus-visible{color:#B6A6FF}
+  .lg-green{background:var(--glow);color:#15142E;border:0;justify-content:space-between}
   .lg-green h3{font-size:clamp(24px,2.4vw,32px);line-height:1.05;letter-spacing:-.03em;font-weight:600;max-width:12ch}
   .lg-round{align-self:flex-end;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;
-    background:#04140A;color:#C8F560;font-size:18px}
+    background:#15142E;color:#FFFFFF;font-size:18px}
   .lg-illo{justify-content:space-between;align-items:flex-start}
   .lg-chip{padding:5px 13px;border:1px solid var(--rule);border-radius:999px;font-size:12.5px;color:var(--muted)}
   .lg-illo .lg-svg{align-self:center}
@@ -1234,13 +1237,13 @@
   .fx-card:hover,.fx-card:focus-visible{transform:translateY(-2px);border-color:var(--ink)}
   .fx-card h3{font:400 30px/1 "Bebas Neue",sans-serif;letter-spacing:.01em;margin:2px 0 4px}
   .fx-card p:not(.cx-eyebrow){color:var(--muted);font-size:14px;line-height:1.5}
-  .fx-card.big{grid-row:span 2;background:var(--black);color:#F2F6EE;border-color:#1E231D}
-  .fx-card.big p:not(.cx-eyebrow){color:#AAB4A6}
+  .fx-card.big{grid-row:span 2;background:var(--black);color:#EEEDFC;border-color:#2D2B50}
+  .fx-card.big p:not(.cx-eyebrow){color:#B4B2D4}
   .fx-card.big h3{font-size:clamp(40px,4.4vw,60px)}
-  .fx-card.hot{background:var(--glow);border-color:transparent;color:#04140A}
-  .fx-card.hot p,.fx-card.hot .cx-eyebrow{color:#04140A !important}
+  .fx-card.hot{background:var(--glow);border-color:transparent;color:#15142E}
+  .fx-card.hot p,.fx-card.hot .cx-eyebrow{color:#15142E !important}
   .cx-eyebrow{color:var(--brand)}
-  .fx-card.big .cx-eyebrow{color:#3DF07A}
+  .fx-card.big .cx-eyebrow{color:#B6A6FF}
 
   @media (max-width:980px){
     .lg-black,.lg-split,.lg-giant-row{grid-template-columns:1fr}
@@ -1712,13 +1715,13 @@
 <!--SLOT:JSONLD-->
 <script>
 (function () {
-  /* Keep the chosen reading mode local to this device. No preference leaves
-     the OS/browser choice in charge, which is the safest first visit. */
+  /* Keep the chosen reading mode local to this device. With no saved
+     choice the site opens in its light palette. */
   var themeToggle = document.getElementById("themeToggle");
   var themeLabel = document.getElementById("themeLabel");
   var savedTheme = "";
   try { savedTheme = localStorage.getItem("noshashi-theme") || ""; } catch (e) {}
-  if (savedTheme === "light" || savedTheme === "dark") document.documentElement.setAttribute("data-theme", savedTheme);
+  document.documentElement.setAttribute("data-theme", savedTheme === "dark" ? "dark" : "light");
   function updateThemeButton() {
     var light = document.documentElement.getAttribute("data-theme") === "light";
     var map = window.__NOSHASHI_I18N || {};

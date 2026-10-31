@@ -140,7 +140,7 @@ export function renderFooter() {
     <nav class="foot-map" aria-label="Site map">
       ${groups}
     </nav>
-    <p class="mono foot-legal">© ${new Date().getUTCFullYear()} NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
+    <p class="mono foot-legal">© ${new Date().getUTCFullYear()} NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
   </div>
 </footer>`;
 }
@@ -154,7 +154,7 @@ export function renderFooter() {
  */
 export const THEME_BOOT = `<script>
 (function(){try{var t=localStorage.getItem("noshashi-theme");
-if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+document.documentElement.setAttribute("data-theme",t==="dark"?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}})();
 </script>`;
 
 export const THEME_TOGGLE = `<script>
@@ -236,7 +236,7 @@ export function renderPage({
 }) {
   const canonical = `${ORIGIN}${path}`;
   return `<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

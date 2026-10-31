@@ -1,8 +1,8 @@
 /* ─────────────────────────────────────────────────────────────────────
-   NOSHASHI · Ledger Green (2026-10-31)
+   NOSHASHI · Soft Periwinkle (2026-10-31)
    ─────────────────────────────────────────────────────────────────────
-   The site-wide skin: black and green, after the owner's Web3
-   references. Bold condensed headlines, pill navigation and buttons,
+   The site-wide skin: white and a soft blue-purple, after the owner's
+   Web3 references, with a deep-indigo dark mode. Bold condensed headlines, pill navigation and buttons,
    rounded cards, and soft green-to-lime gradients as the only colour.
 
    It lives in this file because every server-rendered page already
@@ -14,19 +14,19 @@
    block). Removing that block brings it back.
    ───────────────────────────────────────────────────────────────── */
 :root{
-  --ground:#0A0B0A; --surface:#121512; --elevated:#1A1E19;
-  --ink:#F2F6EE; --muted:#AAB4A6; --faint:#808B7C; --rule:#262C24;
-  --brand:#3DF07A; --tele:#C8F560; --on-brand:#04140A;
-  --go:#3DF07A; --hold:#F2D16B; --nogo:#FF7A7A;
-  --glow:linear-gradient(120deg,#3DF07A 0%,#C8F560 55%,#EFFFD1 100%);
+  --ground:#0F0E22; --surface:#17162F; --elevated:#211F40;
+  --ink:#EEEDFC; --muted:#B4B2D4; --faint:#8C8AB0; --rule:#2D2B50;
+  --brand:#A3A6FF; --tele:#C9BCFF; --on-brand:#12112A;
+  --go:#6FD9A6; --hold:#F2D16B; --nogo:#FF8A8A;
+  --glow:linear-gradient(120deg,#8E9BFF 0%,#B6A6FF 55%,#E8E2FF 100%);
   --r:16px;
 }
 html[data-theme="light"]{
-  --ground:#F2F2EC; --surface:#FFFFFF; --elevated:#E7E8E0;
-  --ink:#0A0B0A; --muted:#3F463D; --faint:#5E665B; --rule:#D5D8CC;
-  --brand:#0B8A3E; --tele:#4E7A00; --on-brand:#FFFFFF;
-  --go:#0B7A38; --hold:#8B6500; --nogo:#B42332;
-  --glow:linear-gradient(120deg,#5BF28F 0%,#D4F77A 55%,#F4FFE0 100%);
+  --ground:#F7F7FC; --surface:#FFFFFF; --elevated:#EFEFFA;
+  --ink:#15142E; --muted:#4A4968; --faint:#66658A; --rule:#E2E1F1;
+  --brand:#5B5BD6; --tele:#7A5CE0; --on-brand:#FFFFFF;
+  --go:#16784A; --hold:#8B6500; --nogo:#B42332;
+  --glow:linear-gradient(120deg,#9AA8FF 0%,#C3B4FF 55%,#EFEAFF 100%);
 }
 
 /* Type: the big condensed display face for page titles. */
@@ -35,8 +35,7 @@ html[data-theme="light"]{
 .page-head::before,.section-head::before{width:56px;height:6px;border-radius:999px;background:var(--glow)}
 .section-head h2{letter-spacing:-.03em}
 
-/* The lotus mark, tinted green with the rest. */
-.brand-mark{filter:hue-rotate(-95deg) saturate(1.3)}
+/* The lotus mark is already blue-purple; it keeps its own colour. */
 
 /* Header: outlined pills, like a row of tags. */
 header{background:color-mix(in srgb,var(--ground) 88%,transparent)}
@@ -48,7 +47,7 @@ header{background:color-mix(in srgb,var(--ground) 88%,transparent)}
 .theme-toggle{border-radius:999px}
 
 /* Buttons: solid pills. Primary is ink on ground (black on light,
-   white on black); the green is kept for the one action that matters. */
+   white on black); the periwinkle is kept for hover and the one action that matters. */
 .btn{border-radius:999px;background:var(--ink);border-color:var(--ink);color:var(--ground);padding:11px 22px}
 .nav-links a.btn{color:var(--ground)}
 .btn:hover,.btn:focus-visible{filter:none;background:var(--brand);border-color:var(--brand);color:var(--on-brand);

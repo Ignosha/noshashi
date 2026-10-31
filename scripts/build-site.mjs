@@ -1734,11 +1734,38 @@ async function main() {
   await buildRobots();
   // Last: every page, generated or committed, loses its inline scripts so
   // the CSP can be script-src 'self' (scripts/inline-scripts.mjs).
+  await accentLast(SITE);
   const inline = await externalizeSite(SITE);
   log(`inline scripts: ${inline.files} files for ${inline.pages} pages (${inline.removed} unused removed)`);
 
   log(`canonical origin: ${ORIGIN}`);
   log("done.");
+}
+
+/*
+ * Every page opens in the light palette unless a theme was saved. And a
+ * few older pages (pricing, the edge-pack download) carry their own
+ * inline colour tokens, which would override the site skin in
+ * /assets/accent.css. Linking the skin again at the end of <head> keeps it
+ * last, so every page shares one palette. The homepage sets its own.
+ */
+async function accentLast(dir) {
+  const LINK = '<link rel="stylesheet" href="/assets/accent.css" data-skin-last>';
+  const walk = async (d) => {
+    for (const entry of await readdir(d, { withFileTypes: true })) {
+      const full = path.join(d, entry.name);
+      if (entry.isDirectory()) { await walk(full); continue; }
+      if (entry.name !== "index.html" || full === path.join(dir, "index.html")) continue;
+      let html = await readFile(full, "utf8");
+      const before = html;
+      // Light is the default palette: a page whose <html> names no theme
+      // opens light until the visitor's saved choice says otherwise.
+      html = html.replace(/<html lang="en">/, '<html lang="en" data-theme="light">');
+      if (/--ground:\s*#/.test(html) && !html.includes("data-skin-last")) html = html.replace("</head>", `${LINK}\n</head>`);
+      if (html !== before) await writeFile(full, html);
+    }
+  };
+  await walk(dir);
 }
 
 main().catch((error) => {
