@@ -150,7 +150,7 @@ async function buildHome({ news, market, feed, status, release }) {
 
   // The short homepage leaves out the newsroom, mission log and edge lab;
   // their slots are optional so those panels can come back without code.
-  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE", "SHOTHERO"]);
+  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE", "SHOTHERO", "TOKENTAPE", "SHOTVERIFICATION", "SHOTAUDIT", "SHOTADDRESS"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
     if (!html.includes(token)) {

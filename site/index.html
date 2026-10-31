@@ -1536,7 +1536,22 @@
   .sx-trust li{font-size:clamp(18px,1.8vw,22px);font-weight:600;letter-spacing:-.03em;color:var(--faint)}
   .sx-trust small{display:block;margin-top:12px;font-size:11.5px;color:var(--faint);opacity:.8}
 
-  .mn-tape a{border-radius:6px}
+  /* Review fixes: features read as text, not boxes; plumbing hidden;
+     faint text at 4.5:1 or better. */
+  :root,html[data-theme="dark"]{--faint:#8A8A90}
+  html[data-theme="light"]{--faint:#636368}
+  .mn-features{gap:28px 40px !important;border-top:0 !important}
+  html:not(#x) .mn-features a,html:not(#x) .mn-features a:nth-child(n){background:none !important;border:0 !important;border-top:1px solid var(--rule) !important;
+    border-radius:0 !important;padding:22px 0 0 !important}
+  html:not(#x) .mn-features a:hover{border-top-color:var(--ink) !important}
+  html:not(#x) main .eyebrow{font-family:"Inter",sans-serif;font-size:14px;letter-spacing:0;text-transform:none;color:var(--muted)}
+  .sx-px em:not([data-state="live"]){display:none}
+  .sx-cases{margin-top:36px}
+  html:not(#x) .sx-cases > summary{background:none;border-radius:0;padding:0 0 3px;width:auto}
+  .sx-cases > summary{display:inline-flex;cursor:pointer;list-style:none;font-size:14px;color:var(--ink);border-bottom:1px solid var(--rule);padding-bottom:3px}
+  .sx-cases > summary::-webkit-details-marker{display:none}
+  .sx-cases > div{margin-top:20px}
+  #ticker{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .mn-core{fill:var(--elevated) !important;stroke:var(--ink);stroke-width:1}
   .mn-core-t,.mn-core-n{fill:var(--ink) !important}
   .mn-features h3::before,.mn-features a:nth-child(n) h3::before{display:none !important}
@@ -1600,7 +1615,7 @@
     <p class="sx-sub">Check what an issuer can do, what a payment delivered and how much of a book can really fill, before you hold or move an asset. Read-only, with a receipt for every answer.</p>
     <div class="sx-actions">
       <a class="sx-btn" href="/app/">Start free</a>
-      <a class="sx-btn ghost" href="/contact/?topic=institutions">Book a demo</a>
+      <a class="sx-btn ghost" href="/contact/?topic=institutions">Request a demo</a>
     </div>
     <p class="sx-fine">Free plan, no card · macOS, Windows, Linux and the browser</p>
   </section>
@@ -1661,12 +1676,11 @@
     <small>Named only to describe the ledger data read. No affiliation or endorsement.</small>
   </div>
 
-  <div class="mn-tape" aria-label="Tokens with a live issuer page"><div class="mn-tape-track"><a href="/tokens/rlusd-ripple/"><b translate="no">RLUSD</b><span>Ripple</span></a><a href="/tokens/usdc-circle/"><b translate="no">USDC</b><span>Circle</span></a><a href="/tokens/solo-sologenic/"><b translate="no">SOLO</b><span>Sologenic</span></a><a href="/tokens/csc-casinocoin/"><b translate="no">CSC</b><span>CasinoCoin</span></a><a href="/tokens/vgb-vagabond/"><b translate="no">VGB</b><span>Vagabond</span></a><a href="/tokens/btc-gatehub/"><b translate="no">BTC</b><span>GateHub</span></a><a href="/tokens/phnix-phoenix/"><b translate="no">PHNIX</b><span>Phoenix</span></a><a href="/tokens/eth-gatehub/"><b translate="no">ETH</b><span>GateHub</span></a><a href="/tokens/army/"><b translate="no">ARMY</b><span>ARMY</span></a><a href="/tokens/usd-gatehub/"><b translate="no">USD</b><span>GateHub</span></a><a href="/tokens/eur-gatehub/"><b translate="no">EUR</b><span>GateHub</span></a><a href="/tokens/xpm-xpmarket/"><b translate="no">XPM</b><span>XPMarket</span></a><a href="/tokens/bear/"><b translate="no">BEAR</b><span>BEAR</span></a><a href="/tokens/xrps/"><b translate="no">XRPS</b><span>XRPS</span></a><a href="/tokens/fuzzy-fuzzybear/"><b translate="no">FUZZY</b><span>Fuzzybear</span></a><a href="/tokens/cny-ripplefox/"><b translate="no">CNY</b><span>RippleFox</span></a><a href="/tokens/drop/"><b translate="no">DROP</b><span>DROP</span></a><a href="/tokens/atm-all-the-money/"><b translate="no">ATM</b><span>ALL THE MONEY</span></a><a href="/tokens/589/"><b translate="no">589</b><span>589</span></a><a href="/tokens/sgb-gatehub/"><b translate="no">SGB</b><span>GateHub</span></a><a href="/tokens/mag-magnetic-x/"><b translate="no">MAG</b><span>Magnetic X</span></a><a href="/tokens/usd-bitstamp/"><b translate="no">USD</b><span>Bitstamp</span></a><a href="/tokens/xah-gatehub/"><b translate="no">XAH</b><span>GateHub</span></a><a href="/tokens/flr-gatehub/"><b translate="no">FLR</b><span>GateHub</span></a><a href="/tokens/666-666-xrp-meme-coin/"><b translate="no">666</b><span>666 XRP Meme Coin</span></a><a href="/tokens/plr-pillars/"><b translate="no">PLR</b><span>Pillars</span></a><a href="/tokens/scrap-scrappy/"><b translate="no">scrap</b><span>scrappy</span></a><a href="/tokens/real-realfi/"><b translate="no">REAL</b><span>RealFI</span></a><a href="/tokens/btc-bitstamp/"><b translate="no">BTC</b><span>Bitstamp</span></a><a href="/tokens/sigma/"><b translate="no">SIGMA</b><span>SIGMA</span></a><a href="/tokens/nxs-nexus-water/"><b translate="no">NXS</b><span>Nexus Water</span></a><a href="/tokens/opulence-opulencex/"><b translate="no">Opulence</b><span>OpulenceX</span></a><a href="/tokens/bert-bert-the-bird/"><b translate="no">BERT</b><span>Bert the Bird</span></a><a href="/tokens/britto/"><b translate="no">BRITTO</b><span>BRITTO</span></a><a href="/tokens/xho/"><b translate="no">XHO</b><span>XHO</span></a><a href="/tokens/evr-gatehub/"><b translate="no">EVR</b><span>GateHub</span></a><a href="/tokens/lht-luckyhash/"><b translate="no">LHT</b><span>LuckyHash</span></a><a href="/tokens/usdc-gatehub/"><b translate="no">USDC</b><span>GateHub</span></a><a href="/tokens/bchamp-bear-champ/"><b translate="no">BCHAMP</b><span>Bear Champ</span></a><a href="/tokens/xlm-ripplefox/"><b translate="no">XLM</b><span>RippleFox</span></a><a href="/tokens/cbird-common-bird/"><b translate="no">CBIRD</b><span>Common Bird</span></a><a href="/tokens/usdt-gatehub/"><b translate="no">USDT</b><span>GateHub</span></a><a href="/tokens/xrt-xrpturbo/"><b translate="no">XRT</b><span>XrpTurbo</span></a><a href="/tokens/xmen-xrp-men/"><b translate="no">Xmen</b><span>Xrp Men</span></a><a href="/tokens/uga-ugabuga/"><b translate="no">UGA</b><span>UgABugA</span></a><a href="/tokens/lions-xrp-lions/"><b translate="no">LIONS</b><span>XRP LIONS</span></a><a href="/tokens/tazz-tasmanian-tiger/"><b translate="no">TAZZ</b><span>Tasmanian Tiger</span></a><a href="/tokens/xox-xrp-on-xrp/"><b translate="no">XOX</b><span>XRP on XRP</span></a><a href="/tokens/seal/"><b translate="no">SEAL</b><span>SEAL</span></a><a href="/tokens/box-bitcoin-on-xrp/"><b translate="no">BOX</b><span>Bitcoin On Xrp</span></a><a href="/tokens/plx-pollux/"><b translate="no">PLX</b><span>Pollux</span></a><a href="/tokens/rlusd-ripple/"><b translate="no">RLUSD</b><span>Ripple</span></a><a href="/tokens/usdc-circle/"><b translate="no">USDC</b><span>Circle</span></a><a href="/tokens/solo-sologenic/"><b translate="no">SOLO</b><span>Sologenic</span></a><a href="/tokens/csc-casinocoin/"><b translate="no">CSC</b><span>CasinoCoin</span></a><a href="/tokens/vgb-vagabond/"><b translate="no">VGB</b><span>Vagabond</span></a><a href="/tokens/btc-gatehub/"><b translate="no">BTC</b><span>GateHub</span></a><a href="/tokens/phnix-phoenix/"><b translate="no">PHNIX</b><span>Phoenix</span></a><a href="/tokens/eth-gatehub/"><b translate="no">ETH</b><span>GateHub</span></a><a href="/tokens/army/"><b translate="no">ARMY</b><span>ARMY</span></a><a href="/tokens/usd-gatehub/"><b translate="no">USD</b><span>GateHub</span></a><a href="/tokens/eur-gatehub/"><b translate="no">EUR</b><span>GateHub</span></a><a href="/tokens/xpm-xpmarket/"><b translate="no">XPM</b><span>XPMarket</span></a><a href="/tokens/bear/"><b translate="no">BEAR</b><span>BEAR</span></a><a href="/tokens/xrps/"><b translate="no">XRPS</b><span>XRPS</span></a><a href="/tokens/fuzzy-fuzzybear/"><b translate="no">FUZZY</b><span>Fuzzybear</span></a><a href="/tokens/cny-ripplefox/"><b translate="no">CNY</b><span>RippleFox</span></a><a href="/tokens/drop/"><b translate="no">DROP</b><span>DROP</span></a><a href="/tokens/atm-all-the-money/"><b translate="no">ATM</b><span>ALL THE MONEY</span></a><a href="/tokens/589/"><b translate="no">589</b><span>589</span></a><a href="/tokens/sgb-gatehub/"><b translate="no">SGB</b><span>GateHub</span></a><a href="/tokens/mag-magnetic-x/"><b translate="no">MAG</b><span>Magnetic X</span></a><a href="/tokens/usd-bitstamp/"><b translate="no">USD</b><span>Bitstamp</span></a><a href="/tokens/xah-gatehub/"><b translate="no">XAH</b><span>GateHub</span></a><a href="/tokens/flr-gatehub/"><b translate="no">FLR</b><span>GateHub</span></a><a href="/tokens/666-666-xrp-meme-coin/"><b translate="no">666</b><span>666 XRP Meme Coin</span></a><a href="/tokens/plr-pillars/"><b translate="no">PLR</b><span>Pillars</span></a><a href="/tokens/scrap-scrappy/"><b translate="no">scrap</b><span>scrappy</span></a><a href="/tokens/real-realfi/"><b translate="no">REAL</b><span>RealFI</span></a><a href="/tokens/btc-bitstamp/"><b translate="no">BTC</b><span>Bitstamp</span></a><a href="/tokens/sigma/"><b translate="no">SIGMA</b><span>SIGMA</span></a><a href="/tokens/nxs-nexus-water/"><b translate="no">NXS</b><span>Nexus Water</span></a><a href="/tokens/opulence-opulencex/"><b translate="no">Opulence</b><span>OpulenceX</span></a><a href="/tokens/bert-bert-the-bird/"><b translate="no">BERT</b><span>Bert the Bird</span></a><a href="/tokens/britto/"><b translate="no">BRITTO</b><span>BRITTO</span></a><a href="/tokens/xho/"><b translate="no">XHO</b><span>XHO</span></a><a href="/tokens/evr-gatehub/"><b translate="no">EVR</b><span>GateHub</span></a><a href="/tokens/lht-luckyhash/"><b translate="no">LHT</b><span>LuckyHash</span></a><a href="/tokens/usdc-gatehub/"><b translate="no">USDC</b><span>GateHub</span></a><a href="/tokens/bchamp-bear-champ/"><b translate="no">BCHAMP</b><span>Bear Champ</span></a><a href="/tokens/xlm-ripplefox/"><b translate="no">XLM</b><span>RippleFox</span></a><a href="/tokens/cbird-common-bird/"><b translate="no">CBIRD</b><span>Common Bird</span></a><a href="/tokens/usdt-gatehub/"><b translate="no">USDT</b><span>GateHub</span></a><a href="/tokens/xrt-xrpturbo/"><b translate="no">XRT</b><span>XrpTurbo</span></a><a href="/tokens/xmen-xrp-men/"><b translate="no">Xmen</b><span>Xrp Men</span></a><a href="/tokens/uga-ugabuga/"><b translate="no">UGA</b><span>UgABugA</span></a><a href="/tokens/lions-xrp-lions/"><b translate="no">LIONS</b><span>XRP LIONS</span></a><a href="/tokens/tazz-tasmanian-tiger/"><b translate="no">TAZZ</b><span>Tasmanian Tiger</span></a><a href="/tokens/xox-xrp-on-xrp/"><b translate="no">XOX</b><span>XRP on XRP</span></a><a href="/tokens/seal/"><b translate="no">SEAL</b><span>SEAL</span></a><a href="/tokens/box-bitcoin-on-xrp/"><b translate="no">BOX</b><span>Bitcoin On Xrp</span></a><a href="/tokens/plx-pollux/"><b translate="no">PLX</b><span>Pollux</span></a></div></div>
 
   <section class="mn-section">
     <div class="mn-head" data-reveal>
       <p class="mn-eyebrow">What it reads</p>
-      <h2>Built to help you move value with certainty</h2>
+      <h2>Six questions, answered from the ledger</h2>
       <p>Each answer names the validated ledger it was read at. Anything that could not be read is shown as not read, never as a pass.</p>
     </div>
     <div class="mn-features" data-reveal>
@@ -1677,157 +1691,9 @@
       <a data-spot href="/alerts/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1112 0v5l2 2H4z"/><path d="M10 21h4"/></svg></span><h3>Issuer alerts</h3><p>Telegram or Discord tells you the moment an issuer's powers change.</p></a>
       <a data-spot href="/evidence-report/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg></span><h3>Evidence reports</h3><p>A PDF of what the ledger shows, with a fingerprint anyone can verify.</p></a>
     </div>
-  </section>
-
-  <section class="mn-section mn-steps-wrap">
-    <div class="mn-head" data-reveal>
-      <p class="mn-eyebrow">How it works</p>
-      <h2>One address in. Facts and a receipt out.</h2>
-    </div>
-    <div class="mn-how">
-    <figure class="mn-consensus" id="mn-consensus" aria-label="Validators agreeing on each ledger; pulses once per validated XRP Ledger">
-      <svg viewBox="0 0 320 320" aria-hidden="true">
-        <defs><radialGradient id="mnCore" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#A3E635"/><stop offset="1" stop-color="#3F7A1D"/></radialGradient></defs>
-        <circle class="mn-orbit" cx="160" cy="160" r="118"/>
-        <circle class="mn-orbit o2" cx="160" cy="160" r="78"/>
-        <g class="mn-links">
-          <line x1="160" y1="160" x2="160" y2="42"/><line x1="160" y1="160" x2="243" y2="77"/><line x1="160" y1="160" x2="278" y2="160"/><line x1="160" y1="160" x2="243" y2="243"/>
-          <line x1="160" y1="160" x2="160" y2="278"/><line x1="160" y1="160" x2="77" y2="243"/><line x1="160" y1="160" x2="42" y2="160"/><line x1="160" y1="160" x2="77" y2="77"/>
-        </g>
-        <g class="mn-nodes">
-          <circle cx="160" cy="42" r="9"/><circle cx="243" cy="77" r="9"/><circle cx="278" cy="160" r="9"/><circle cx="243" cy="243" r="9"/>
-          <circle cx="160" cy="278" r="9"/><circle cx="77" cy="243" r="9"/><circle cx="42" cy="160" r="9"/><circle cx="77" cy="77" r="9"/>
-        </g>
-        <circle class="mn-core" cx="160" cy="160" r="50" fill="url(#mnCore)"/>
-        <text x="160" y="155" text-anchor="middle" class="mn-core-t">LEDGER</text>
-        <text x="160" y="173" text-anchor="middle" class="mn-core-n" data-ring-ledger>live</text>
-      </svg>
-      <figcaption>Validators agree on each ledger. This pulses once for every real validated close.</figcaption>
-    </figure>
-    <ol class="mn-steps">
-      <li><b>Paste an address</b><span>An issuer, a wallet or a payment hash. Nothing to connect, nothing to sign.</span></li>
-      <li><b>Read the ledger</b><span>NOSHASHI reads validated XRP Ledger state directly, at a named ledger index.</span></li>
-      <li><b>Keep the receipt</b><span>Each answer carries a SHA-256 receipt, so you can show anyone exactly what was read.</span></li>
-    </ol>
-    </div>
-  </section>
-
-  <section class="mn-section mn-pricing">
-    <div class="mn-head" data-reveal>
-      <p class="mn-eyebrow">Ledger Evidence Report</p>
-      <h2>Evidence you can hand to an auditor</h2>
-      <p>Issuer controls, holdings and who can move them, and real against advertised depth, for the addresses you name. A record of ledger facts, not an opinion.</p>
-    </div>
-    <div class="mn-tiers" data-reveal>
-      <a data-spot href="/evidence-report/?tier=issuer"><span>Issuer check</span><b>$950</b><em>One token issuer</em></a>
-      <a data-spot href="/evidence-report/?tier=standard"><span>Standard</span><b>$2,500</b><em>One report</em></a>
-      <a data-spot href="/evidence-report/?tier=quarterly"><span>Quarterly</span><b>$7,500</b><em>Now + four quarter-ends</em></a>
-      <a data-spot href="/evidence-report/?tier=audit"><span>Audit support</span><b>$15,000</b><em>Now + twelve month-ends</em></a>
-    </div>
-  </section>
-
-  <section class="mn-cta" data-reveal>
-    <h2>Start with one address</h2>
-    <p>Free, read-only, on live mainnet. No account needed.</p>
-    <div class="mn-actions"><a class="mn-btn light" href="/app/">Open the workspace</a><a class="mn-btn ghost-light" href="/contact/?topic=institutions">Talk to us</a></div>
-  </section>
-
-  <!-- Live mainnet ticker: real data over the same public WebSocket the
-       desktop app uses. If it cannot connect it says so. -->
-  <div class="ticker" id="ticker" aria-live="polite" aria-label="Live XRP Ledger telemetry">
-    <span class="tk"><b id="tk-state">CONNECTING</b><i>LIVE LEDGER</i></span>
-    <span class="tk"><b id="tk-xrp">—</b><i>XRP / RLUSD PRICE</i></span>
-    <span class="tk"><b id="tk-spread">—</b><i>SPREAD THAT CAN FILL</i></span>
-    <span class="tk"><b id="tk-ledger">—</b><i>LATEST LEDGER</i></span>
-    <span class="tk"><b id="tk-tx">—</b><i>TRANSACTIONS</i></span>
-    <span class="tk"><b id="tk-fee">—</b><i>FEE</i></span>
-    <span class="tk"><b id="tk-close">—</b><i>CLOSE TIME</i></span>
-  </div>
-
-  <section id="demo" class="cx-demo">
-    <div class="cx-head">
-      <h2>Watch it on live mainnet data.</h2>
-      <p>Under two minutes, recorded on the public workspace: real issuers, a real account and a real order book. Nothing staged.</p>
-    </div>
-    <figure class="cx-video">
-      <video controls playsinline preload="none" poster="/assets/video/noshashi-demo.jpg" width="1280" height="720"
-        aria-describedby="demoTranscript">
-        <source src="/assets/video/noshashi-demo.mp4" type="video/mp4">
-        Your browser can't play this video. <a href="/assets/video/noshashi-demo.mp4">Download it</a>.
-      </video>
-      <figcaption>Recorded on XRPL mainnet with the public workspace. Narrated by a synthetic voice (Piper); captions on screen. Figures move with the ledger, so yours will differ.</figcaption>
-    </figure>
-    <details class="cx-transcript" id="demoTranscript">
-      <summary>What the video shows</summary>
-      <ol>
-        <li>Issuer analysis on Bitstamp's USD issuer (rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B): freeze, clawback, authorization and transfer fee, read from a validated ledger.</li>
-        <li>What the ledger does not show, listed so you know what to verify yourself, and the evidence: ledger index and raw reply.</li>
-        <li>The same check on GateHub (rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq) and Ripple's RLUSD issuer (rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De).</li>
-        <li>Asset intelligence on a public account (rMZKeAt1vMjhuNCWDiB4SdzJRiymdpERw4): what it holds and from which issuers.</li>
-        <li>Liquidity on XRP/USD at Bitstamp: advertised against fillable depth.</li>
-        <li>Where to send feedback.</li>
-      </ol>
-    </details>
-    <div class="cx-review">
+    <details class="traps sx-cases">
+      <summary>See six real cases from mainnet, each read two ways</summary>
       <div>
-        <p class="cx-eyebrow">Help us improve NOSHASHI</p>
-        <h3>Try it, then tell us what you think.</h3>
-        <p>Run the same checks on a token you care about. Your review goes privately to the founder: what was useful, what was confusing, what's missing. Email is optional, and nothing is published.</p>
-      </div>
-      <div class="cx-actions">
-        <a class="cx-btn" href="/app/issuer/">Start analyzing</a>
-        <a class="cx-btn ghost" href="/app/issuer/?feedback=1">Leave a review</a>
-      </div>
-    </div>
-  </section>
-
-  <section id="features" class="cx-features">
-    <div class="cx-head">
-      <h2>Three answers before you sign.</h2>
-      <p>Each one read from validated ledgers, with the evidence attached.</p>
-    </div>
-    <article class="cx-row">
-      <div class="cx-copy">
-        <p class="cx-eyebrow">Verification</p>
-        <h3>Can this move under your rules?</h3>
-        <p>Enter an account and an amount. Get GO, HOLD or NO-GO, every reason, and a SHA-256 receipt.</p>
-        <a class="cx-link" href="/institutional-demo/">Try the guided demo &rarr;</a>
-      </div>
-      <figure class="cx-shot">
-        <img src="/assets/shots/verification.webp" srcset="/assets/shots/verification.webp 1440w, /assets/shots/verification@2x.webp 2880w" sizes="(min-width:1240px) 1180px, 100vw"
-          width="1440" height="900" alt="Verification screen: a 1,000 XRP settlement to Bitstamp&#39;s account evaluated against a rule profile, with the verdict and its reasons." loading="lazy" decoding="async">
-        <figcaption>Desktop app · live on XRPL mainnet · ledger 107,979,694 · 29 Oct 2026</figcaption>
-      </figure>
-    </article>
-    <article class="cx-row flip">
-      <div class="cx-copy">
-        <p class="cx-eyebrow">Audit trail</p>
-        <h3>What actually moved?</h3>
-        <p>Delivered amounts, not requested ones. Every counterparty screened against OFAC and known scams.</p>
-        <a class="cx-link" href="/app/payment/">Verify a payment &rarr;</a>
-      </div>
-      <figure class="cx-shot">
-        <img src="/assets/shots/audit.webp" srcset="/assets/shots/audit.webp 1440w, /assets/shots/audit@2x.webp 2880w" sizes="(min-width:1240px) 1180px, 100vw"
-          width="1440" height="900" alt="Audit trail screen: an account&#39;s validated payment history with delivered amounts and counterparty screening." loading="lazy" decoding="async">
-        <figcaption>Desktop app · live on XRPL mainnet · ledger 107,979,696 · 29 Oct 2026</figcaption>
-      </figure>
-    </article>
-    <article class="cx-row">
-      <div class="cx-copy">
-        <p class="cx-eyebrow">Address check</p>
-        <h3>Who is on the other side?</h3>
-        <p>Who controls an account, what it can do, and whether its issuer can freeze or claw back.</p>
-        <a class="cx-link" href="/app/asset/">Analyze an account &rarr;</a>
-      </div>
-      <figure class="cx-shot">
-        <img src="/assets/shots/address.webp" srcset="/assets/shots/address.webp 1440w, /assets/shots/address@2x.webp 2880w" sizes="(min-width:1240px) 1180px, 100vw"
-          width="1440" height="900" alt="Address check: what an XRPL account is, who controls it and what it can do, read from the ledger." loading="lazy" decoding="async">
-        <figcaption>Desktop app · live on XRPL mainnet · ledger 107,979,698 · 29 Oct 2026</figcaption>
-      </figure>
-    </article>
-    <details class="traps cx-traps">
-      <summary class="cx-btn ghost">See real cases from mainnet</summary>
-      <div style="margin-top:18px">
         <div class="traps">
       <div class="trap mis">
         <div>
@@ -1884,33 +1750,109 @@
         <div class="mis-v"><p class="mk">What NOSHASHI verifies</p><p class="ml">date from 2000-01-01</p><p class="mv">2026-09-24 02:42:12 UTC</p></div>
       </div>
     </div>
-        <p class="micro" style="margin-top:12px"><a href="/misread/">Each case, with the code behind it</a></p>
+        <p class="sx-small"><a href="/misread/">Each case, with the code behind it</a></p>
       </div>
     </details>
   </section>
 
-  <section id="surfaces" class="cx-surfaces">
-    <div class="cx-head">
-      <h2>Use it where you work.</h2>
+  <section class="mn-section mn-steps-wrap">
+    <div class="mn-head" data-reveal>
+      <p class="mn-eyebrow">How it works</p>
+      <h2>One address in. Facts and a receipt out.</h2>
     </div>
-    <div class="cx-cards">
-      <a class="cx-card" href="#download">
-        <p class="cx-eyebrow">Desktop app</p>
-        <h3>macOS, Windows, Linux</h3>
-        <p>Every screen, your policy, receipts and exports.</p>
-      </a>
-      <a class="cx-card" href="/app/">
-        <p class="cx-eyebrow">Web workspace</p>
-        <h3>Nothing to install</h3>
-        <p>Issuer, payment, liquidity and asset checks in the browser.</p>
-      </a>
-      <a class="cx-card" href="/developers/">
-        <p class="cx-eyebrow">API</p>
-        <h3>Wire it into your stack</h3>
-        <p>The same checks as JSON, with webhooks for alerts.</p>
-      </a>
+    <div class="mn-how">
+    <figure class="mn-consensus" id="mn-consensus" aria-label="Validators agreeing on each ledger; pulses once per validated XRP Ledger">
+      <svg viewBox="0 0 320 320" aria-hidden="true">
+        <defs><radialGradient id="mnCore" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#A3E635"/><stop offset="1" stop-color="#3F7A1D"/></radialGradient></defs>
+        <circle class="mn-orbit" cx="160" cy="160" r="118"/>
+        <circle class="mn-orbit o2" cx="160" cy="160" r="78"/>
+        <g class="mn-links">
+          <line x1="160" y1="160" x2="160" y2="42"/><line x1="160" y1="160" x2="243" y2="77"/><line x1="160" y1="160" x2="278" y2="160"/><line x1="160" y1="160" x2="243" y2="243"/>
+          <line x1="160" y1="160" x2="160" y2="278"/><line x1="160" y1="160" x2="77" y2="243"/><line x1="160" y1="160" x2="42" y2="160"/><line x1="160" y1="160" x2="77" y2="77"/>
+        </g>
+        <g class="mn-nodes">
+          <circle cx="160" cy="42" r="9"/><circle cx="243" cy="77" r="9"/><circle cx="278" cy="160" r="9"/><circle cx="243" cy="243" r="9"/>
+          <circle cx="160" cy="278" r="9"/><circle cx="77" cy="243" r="9"/><circle cx="42" cy="160" r="9"/><circle cx="77" cy="77" r="9"/>
+        </g>
+        <circle class="mn-core" cx="160" cy="160" r="50" fill="url(#mnCore)"/>
+        <text x="160" y="155" text-anchor="middle" class="mn-core-t">LEDGER</text>
+        <text x="160" y="173" text-anchor="middle" class="mn-core-n" data-ring-ledger>live</text>
+      </svg>
+      <figcaption>Validators agree on each ledger. This pulses once for every real validated close.</figcaption>
+    </figure>
+    <ol class="mn-steps">
+      <li><b>Paste an address</b><span>An issuer, a wallet or a payment hash. Nothing to connect, nothing to sign.</span></li>
+      <li><b>Read the ledger</b><span>NOSHASHI reads validated XRP Ledger state directly, at a named ledger index.</span></li>
+      <li><b>Keep the receipt</b><span>Each answer carries a SHA-256 receipt, so you can show anyone exactly what was read.</span></li>
+    </ol>
     </div>
   </section>
+
+  <section class="mn-section mn-pricing">
+    <div class="mn-head" data-reveal>
+      <p class="mn-eyebrow">Ledger Evidence Report</p>
+      <h2>Evidence you can hand to an auditor</h2>
+      <p>Issuer controls, holdings and who can move them, and real against advertised depth, for the addresses you name. A record of ledger facts, not an opinion.</p>
+    </div>
+    <div class="mn-tiers" data-reveal>
+      <a data-spot href="/evidence-report/?tier=issuer"><span>Issuer check</span><b>$950</b><em>One token issuer</em></a>
+      <a data-spot href="/evidence-report/?tier=standard"><span>Standard</span><b>$2,500</b><em>One report</em></a>
+      <a data-spot href="/evidence-report/?tier=quarterly"><span>Quarterly</span><b>$7,500</b><em>Now + four quarter-ends</em></a>
+      <a data-spot href="/evidence-report/?tier=audit"><span>Audit support</span><b>$15,000</b><em>Now + twelve month-ends</em></a>
+    </div>
+  </section>
+
+
+  <!-- Live mainnet ticker: real data over the same public WebSocket the
+       desktop app uses. If it cannot connect it says so. -->
+  <div class="ticker" id="ticker" aria-live="polite" aria-label="Live XRP Ledger telemetry">
+    <span class="tk"><b id="tk-state">CONNECTING</b><i>LIVE LEDGER</i></span>
+    <span class="tk"><b id="tk-xrp">—</b><i>XRP / RLUSD PRICE</i></span>
+    <span class="tk"><b id="tk-spread">—</b><i>SPREAD THAT CAN FILL</i></span>
+    <span class="tk"><b id="tk-ledger">—</b><i>LATEST LEDGER</i></span>
+    <span class="tk"><b id="tk-tx">—</b><i>TRANSACTIONS</i></span>
+    <span class="tk"><b id="tk-fee">—</b><i>FEE</i></span>
+    <span class="tk"><b id="tk-close">—</b><i>CLOSE TIME</i></span>
+  </div>
+
+  <section id="demo" class="cx-demo">
+    <div class="cx-head">
+      <h2>Watch it on live mainnet data.</h2>
+      <p>Under two minutes, recorded on the public workspace: real issuers, a real account and a real order book. Nothing staged.</p>
+    </div>
+    <figure class="cx-video">
+      <video controls playsinline preload="none" poster="/assets/video/noshashi-demo.jpg" width="1280" height="720"
+        aria-describedby="demoTranscript">
+        <source src="/assets/video/noshashi-demo.mp4" type="video/mp4">
+        Your browser can't play this video. <a href="/assets/video/noshashi-demo.mp4">Download it</a>.
+      </video>
+      <figcaption>Recorded on XRPL mainnet with the public workspace. Narrated by a synthetic voice (Piper); captions on screen. Figures move with the ledger, so yours will differ.</figcaption>
+    </figure>
+    <details class="cx-transcript" id="demoTranscript">
+      <summary>What the video shows</summary>
+      <ol>
+        <li>Issuer analysis on Bitstamp's USD issuer (rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B): freeze, clawback, authorization and transfer fee, read from a validated ledger.</li>
+        <li>What the ledger does not show, listed so you know what to verify yourself, and the evidence: ledger index and raw reply.</li>
+        <li>The same check on GateHub (rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq) and Ripple's RLUSD issuer (rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De).</li>
+        <li>Asset intelligence on a public account (rMZKeAt1vMjhuNCWDiB4SdzJRiymdpERw4): what it holds and from which issuers.</li>
+        <li>Liquidity on XRP/USD at Bitstamp: advertised against fillable depth.</li>
+        <li>Where to send feedback.</li>
+      </ol>
+    </details>
+    <div class="cx-review">
+      <div>
+        <p class="cx-eyebrow">Help us improve NOSHASHI</p>
+        <h3>Try it, then tell us what you think.</h3>
+        <p>Run the same checks on a token you care about. Your review goes privately to the founder: what was useful, what was confusing, what's missing. Email is optional, and nothing is published.</p>
+      </div>
+      <div class="cx-actions">
+        <a class="cx-btn" href="/app/issuer/">Start analyzing</a>
+        <a class="cx-btn ghost" href="/app/issuer/?feedback=1">Leave a review</a>
+      </div>
+    </div>
+  </section>
+
+
 
   <section id="public" class="reveal">
     <div class="kicker-block">
@@ -2033,67 +1975,6 @@
     </p>
   </section>
 
-  <section id="pricing" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">Pricing</p>
-      <h2>Start free. Pay when your team needs more.</h2>
-      <p>Published prices. No sales call needed to start.</p>
-    </div>
-    <div class="price">
-      <div class="tier">
-        <span class="cap"></span>
-        <p class="name">FREE</p>
-        <p class="amt">$0</p><p class="per">forever</p>
-        <p class="for">For anyone checking a token, payment or order book.</p>
-        <ul>
-          <li>Desktop app and free web tools</li>
-          <li>Unlimited GO / HOLD / NO-GO checks</li>
-          <li>10 address checks a month</li>
-        </ul>
-        <a class="btn ghost block" href="#download" style="margin-top:22px">Download</a>
-      </div>
-      <div class="tier focus">
-        <span class="cap"></span>
-        <p class="name">PRO</p>
-        <p class="amt">$749</p><p class="per">per seat / month</p>
-        <p class="for">For analysts, traders and small desks.</p>
-        <ul>
-          <li>Unlimited address checks</li>
-          <li>Real exit liquidity and freeze analysis</li>
-          <li>Saved decisions and alerts</li>
-        </ul>
-        <form class="checkout-form" action="/api/create-checkout-session" method="post" style="margin-top:22px">
-          <button class="btn block" type="submit">Subscribe</button>
-          <p class="checkout-error" role="alert" hidden></p>
-        </form>
-      </div>
-      <div class="tier institutional">
-        <span class="cap"></span>
-        <p class="name">INSTITUTIONAL</p>
-        <p class="amt">$40,000</p><p class="per">per year</p>
-        <p class="for">For exchanges, issuers and compliance teams.</p>
-        <ul>
-          <li>Compliance API and webhooks</li>
-          <li>Issuer surveillance: who holds your tokens</li>
-          <li>Signed audit exports</li>
-        </ul>
-        <a class="btn ghost block" href="/contact/?topic=institutions" style="margin-top:22px">Talk to us</a>
-      </div>
-      <div class="tier enterprise">
-        <span class="cap"></span>
-        <p class="name">ENTERPRISE</p>
-        <p class="amt">From $120,000</p><p class="per">per year</p>
-        <p class="for">For large operators that need scale and integration.</p>
-        <ul>
-          <li>Everything above, at scale</li>
-          <li>High-volume API and event feeds</li>
-          <li>Architecture review</li>
-        </ul>
-        <a class="btn ghost block" href="/enterprise/" style="margin-top:22px">Learn more</a>
-      </div>
-    </div>
-    <p class="micro" style="margin-top:18px;text-align:center">API checks also sold in prepaid packs. <a href="/pricing/">Compare every plan and limit</a></p>
-  </section>
 
   <section id="download" class="reveal">
     <div class="kicker-block">
@@ -2164,35 +2045,10 @@
   </div>
   </section>
 
-  <section id="contact-cta" class="reveal">
-    <div class="kicker-block">
-      <p class="eyebrow">Get started</p>
-      <h2>Understand the ledger before you act.</h2>
-      <p>Start with free XRPL analysis tools or discuss an institutional use case with our team.</p>
-    </div>
-    <div class="cta">
-      <a class="btn" href="#public">Explore free tools</a>
-      <a class="btn ghost" href="/contact/?topic=institutions">Contact NOSHASHI</a>
-    </div>
-    <div style="margin-top:36px"><div class="subscribe">
-    <div class="subscribe-copy">
-      <p class="num" data-i18n="sub.title">GET UPDATES</p>
-      <p data-i18n="sub.body">New releases, new free checks, and real risks we find on the XRP Ledger.
-         Only when there is news. One click to leave.</p>
-    </div>
-    <form class="subscribe-form" id="subscribe-form" novalidate>
-      <label class="sr-only" for="subscribe-email">Your email address</label>
-      <input id="subscribe-email" name="email" type="email" autocomplete="email"
-             maxlength="200" placeholder="you@company.com" data-i18n="sub.placeholder" required>
-      <button class="btn" type="submit" id="subscribe-send" data-i18n="sub.button">Get updates</button>
-      <div class="form-trap" aria-hidden="true">
-        <label for="subscribe_company">Leave empty</label>
-        <input id="subscribe_company" name="company_website" type="text" tabindex="-1" autocomplete="off">
-      </div>
-      <p class="form-status" id="subscribe-status" role="status" aria-live="polite"></p>
-    </form>
-  </div></div>
-    <p class="micro" style="margin-top:28px;text-align:center">Not legal, tax or investment advice. A GO means your rules passed; it does not make a transaction lawful. NOSHASHI sells software and never holds funds.</p>
+  <section class="mn-cta" data-reveal>
+    <h2>Start with one address</h2>
+    <p>Free, read-only, on live mainnet. No account needed.</p>
+    <div class="mn-actions"><a class="mn-btn light" href="/app/">Open the workspace</a><a class="mn-btn ghost-light" href="/contact/?topic=institutions">Talk to us</a></div>
   </section>
 </main>
 

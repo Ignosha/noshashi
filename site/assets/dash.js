@@ -76,7 +76,8 @@
         var v = $("sx-verdict");
         if (v) {
           var verdict = String(ctl.authority_verdict || "");
-          v.textContent = verdict ? verdict.replace(/-/g, " ").replace(/^\w/, function (c) { return c.toUpperCase(); }) : "Read";
+          v.textContent = "Ledger verdict: " + (verdict ? verdict.replace(/-/g, " ").replace(/^\w/, function (c) { return c.toUpperCase(); }) : "read");
+          v.title = "The authority rules' verdict on this issuer's ledger controls. Not a rating of the asset.";
           v.setAttribute("data-tone", verdict === "go" ? "go" : "hold");
         }
       }
