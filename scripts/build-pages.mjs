@@ -272,7 +272,7 @@ ${band("Talk to the founder.", "A straight answer from the person who built it."
 
 /* ── /design-partners/ ────────────────────────────────────────────── */
 async function buildDesignPartners(write) {
-  const body = `${head("DESIGN PARTNERS", "Help shape the next generation of XRPL intelligence.",
+  const body = `<div class="desk">${head("Design partners", "Help shape the next generation of XRPL intelligence.",
     "Work directly with the NOSHASHI team to evaluate real workflows, identify operational gaps, and help prioritize the next stage of development.")}
 
 <section>
@@ -329,7 +329,7 @@ async function buildDesignPartners(write) {
     </div>
   </form>
   <p class="micro">Nothing on this page is an offer. Any pilot's scope and terms are agreed in writing first.</p>
-</section>`;
+</section></div>`;
 
   await write("design-partners/index.html", renderPage({
     title: "Design partners · NOSHASHI",
