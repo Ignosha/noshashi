@@ -16,100 +16,112 @@
    itself to anyone.
    ------------------------------------------------------------ */
 /* ============================================================
-   NOSHASHI · NOVA THEME
-   Navy ground, electric-blue brand, cyan for live signal.
+   NOSHASHI · LEDGER DESK THEME (2026-10-31)
+   The website's monochrome: near-black ground and graphite surfaces in
+   dark, warm paper in light; ink for the brand; colour kept for signal
+   only (GO / HOLD / NO-GO). Instrument Serif for headings, Inter for text,
+   IBM Plex Mono for every number, address and hash.
    Mission colors: GO / HOLD / NO-GO.
    ============================================================ */
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 0%;
-  --card: 0 0% 98%;
-  --card-foreground: 0 0% 0%;
-  --popover: 0 0% 98%;
-  --popover-foreground: 0 0% 0%;
-  --primary: 219 76% 48%;          /* #1D5FD6 */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 94%;
-  --secondary-foreground: 0 0% 0%;
-  --muted: 0 0% 94%;
-  --muted-foreground: 0 0% 32%;
-  --accent: 0 0% 90%;
-  --accent-foreground: 0 0% 0%;
+  --background: 60 8% 95%;          /* #F4F4F2 */
+  --foreground: 240 3% 7%;          /* #111112 */
+  --card: 0 0% 100%;          /* #FFFFFF */
+  --card-foreground: 240 3% 7%;          /* #111112 */
+  --popover: 0 0% 100%;          /* #FFFFFF */
+  --popover-foreground: 240 3% 7%;          /* #111112 */
+  --primary: 240 3% 7%;          /* #111112 */
+  --primary-foreground: 60 8% 95%;          /* #F4F4F2 */
+  --secondary: 60 7% 92%;          /* #ECECE9 */
+  --secondary-foreground: 240 3% 7%;          /* #111112 */
+  --muted: 60 7% 92%;          /* #ECECE9 */
+  --muted-foreground: 240 3% 32%;          /* #505055 */
+  --accent: 60 7% 89%;          /* #E4E4E0 */
+  --accent-foreground: 240 3% 7%;          /* #111112 */
   --destructive: 0 84% 50%;
   --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 88%;
-  --input: 0 0% 88%;
-  --ring: 219 76% 48%;          /* #1D5FD6 */
-  --radius: 0.5rem;
+  --border: 60 7% 86%;          /* #DDDDD8 */
+  --input: 60 7% 86%;          /* #DDDDD8 */
+  --ring: 240 3% 7%;          /* #111112 */
+  --radius: 0.25rem;
 
-  --faint: 210 11% 38%;
+  --faint: 240 3% 42%;          /* #68686E */
 
   /* Light mode matches the website's light theme */
-  --brand: 219 76% 48%;          /* #1D5FD6 */
-  --telemetry: 194 85% 30%;          /* #0B6E8C */
+  --brand: 240 3% 7%;          /* #111112 */
+  --telemetry: 240 5% 24%;          /* #3A3A40 */
 
   /* Status colours are also text (GO / HOLD / NO-GO, DEGRADED, NONE
      ACTIVE), so on the light ground they are deepened to WCAG AA: at least
      4.5:1 on white, the card and their own dim tint. The previous values
      measured 3.2, 2.3 and 4.5 — amber HOLD was unreadable. */
-  --status-go: 145 61% 30%;          /* #1E7A45 */
-  --status-hold: 38 95% 30%;         /* #955F03 — 5.3:1 on white */
-  --status-no-go: 355 85% 44%;       /* #CF1020 — 5.6:1 on white */
-  --status-go-dim: 138 55% 93%;
-  --status-hold-dim: 42 85% 93%;
-  --status-no-go-dim: 355 70% 95%;
+  --status-go: 150 74% 27%;          /* #127A46 */
+  --status-hold: 44 100% 27%;          /* #8B6500 */
+  --status-no-go: 354 67% 42%;          /* #B42332 */
+  --status-go-dim: 141 33% 92%;          /* #E3F1E8 */
+  --status-hold-dim: 42 55% 90%;          /* #F4ECD9 */
+  --status-no-go-dim: 354 51% 93%;          /* #F6E3E5 */
 
-  --spectral: 210 20% 96%;
+  --spectral: 60 7% 92%;          /* #ECECE9 */
   /* The board's rule colour — a hairline on a light ground is darker
      than the card, and on a dark ground lighter than the surface. This
      is the one neutral that is not the same on both themes, because a
      rule is a printed thing and has to read against whatever it sits on. */
-  --line: 210 16% 78%;
+  --line: 60 6% 80%;          /* #CFCFC9 */
 }
 
 .dark {
-  /* ------------------------------------------------------------------
-     Palette matching the website's navy brand palette:
-       ground   #070B14   surface  #0D1424   elevated #142036
-       brand    #4C8DFF   tele     #5CD6F2
-       neutrals #E8EEF8 #A6B2C8 #7A89A6 #22304A
-     ------------------------------------------------------------------ */
-  --background: 222 48% 5%;          /* #070B14 */
-  --foreground: 218 53% 94%;          /* #E8EEF8 */
-  --card: 222 47% 10%;          /* #0D1424 */
-  --card-foreground: 218 53% 94%;          /* #E8EEF8 */
-  --popover: 219 46% 15%;          /* #142036 */
-  --popover-foreground: 218 53% 94%;          /* #E8EEF8 */
-  --primary: 218 100% 65%;          /* #4C8DFF */
-  --primary-foreground: 220 60% 5%;          /* #050A14 */
-  --secondary: 219 46% 15%;          /* #142036 */
-  --secondary-foreground: 218 53% 94%;          /* #E8EEF8 */
-  --muted: 219 37% 21%;          /* #22304A */
-  --muted-foreground: 219 24% 72%;          /* #A6B2C8 */
-  --faint: 220 20% 56%;          /* #7A89A6 */
-  --accent: 219 46% 15%;          /* #142036 */
-  --accent-foreground: 218 53% 94%;          /* #E8EEF8 */
+  /* The website's dark monochrome (site/assets/accent.css). */
+  --background: 240 4% 5%;          /* #0B0B0C */
+  --foreground: 0 0% 93%;          /* #EDEDED */
+  --card: 240 2% 8%;          /* #141415 */
+  --card-foreground: 0 0% 93%;          /* #EDEDED */
+  --popover: 240 4% 11%;          /* #1B1B1D */
+  --popover-foreground: 0 0% 93%;          /* #EDEDED */
+  --primary: 0 0% 93%;          /* #EDEDED */
+  --primary-foreground: 240 4% 5%;          /* #0B0B0C */
+  --secondary: 240 4% 11%;          /* #1B1B1D */
+  --secondary-foreground: 0 0% 93%;          /* #EDEDED */
+  --muted: 240 5% 16%;          /* #26262A */
+  --muted-foreground: 240 3% 66%;          /* #A6A6AB */
+  --faint: 240 2% 50%;          /* #7D7D83 */
+  --accent: 240 4% 11%;          /* #1B1B1D */
+  --accent-foreground: 0 0% 93%;          /* #EDEDED */
   --destructive: 355 85% 50%;
   --destructive-foreground: 220 60% 5%;          /* #050A14 */
-  --border: 219 37% 21%;          /* #22304A */
-  --input: 219 37% 21%;          /* #22304A */
-  --ring: 218 100% 65%;          /* #4C8DFF */
+  --border: 240 5% 16%;          /* #26262A */
+  --input: 240 5% 16%;          /* #26262A */
+  --ring: 240 4% 86%;          /* #D9D9DC */
 
-  --brand: 218 100% 65%;          /* #4C8DFF */
-  --telemetry: 191 85% 65%;          /* #5CD6F2 */
+  --brand: 240 4% 86%;          /* #D9D9DC */
+  --telemetry: 222 11% 77%;          /* #BFC3CC */
 
-  --status-go: 151 65% 54%;          /* #3DD68C */
-  --status-hold: 40 90% 61%;          /* #F5B942 */
-  --status-no-go: 355 100% 71%;          /* #FF6B78 */
-  --status-go-dim: 151 45% 12%;
-  --status-hold-dim: 42 60% 12%;
-  --status-no-go-dim: 355 55% 13%;
+  --status-go: 147 47% 66%;          /* #7FD1A4 */
+  --status-hold: 44 65% 68%;          /* #E3C77A */
+  --status-no-go: 0 76% 75%;          /* #F08F8F */
+  --status-go-dim: 148 27% 11%;          /* #14231B */
+  --status-hold-dim: 42 29% 12%;          /* #262115 */
+  --status-no-go-dim: 357 29% 13%;          /* #2A1718 */
 
-  --spectral: 218 53% 94%;          /* #E8EEF8 */
-  --line: 219 37% 21%;          /* #22304A */
+  --spectral: 0 0% 93%;          /* #EDEDED */
+  --line: 240 5% 19%;          /* #2E2E33 */
 }
 
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter-var-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/instrument-serif-400-latin.woff2") format("woff2");
+}
 @font-face {
   font-family: "IBM Plex Mono";
   font-style: normal;
@@ -228,8 +240,8 @@
      --font-data and --font-interface are kept as aliases so the existing
      call sites keep working while scenes migrate. Both now resolve to the
      same two faces, so nothing renders in a retired font meanwhile. */
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-interface: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-interface: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
@@ -918,3 +930,12 @@ tbody tr:hover {
     display: none;
   }
 }
+
+/* ── Ledger Desk theme pass (2026-10-31) ─────────────────────────────
+   Headings in the website's serif; the console's HUD effects (scanlines,
+   vignette, grid coordinates, glow) switched off so the app reads like
+   the site: flat ink on a quiet ground, hairline rules, square edges. */
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em !important; text-transform: none !important; }
+.scanlines::after, .vignette::before { display: none !important; }
+.grid-coords, .grid-fine { background-image: none !important; }
+.text-glow { text-shadow: none !important; }
