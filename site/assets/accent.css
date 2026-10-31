@@ -1,67 +1,61 @@
 /* ─────────────────────────────────────────────────────────────────────
-   NOSHASHI · Soft Periwinkle (2026-10-31)
+   NOSHASHI · Clean (2026-10-31)
    ─────────────────────────────────────────────────────────────────────
-   The site-wide skin: white and a soft blue-purple, after the owner's
-   Web3 references, with a deep-indigo dark mode. Bold condensed headlines, pill navigation and buttons,
-   rounded cards, and soft green-to-lime gradients as the only colour.
+   The site-wide skin, after the calm, minimal fintech sites (Mercury,
+   Ramp, Stripe): white space, one typeface (Inter), plain navigation,
+   thin rules, and one soft blue-purple accent used sparingly. Light by
+   default; a quiet deep-indigo dark mode.
 
-   It lives in this file because every server-rendered page already
-   links it last, after core.css and modules.css, so its tokens win
-   without touching each page. The landing page sets the same tokens in
-   its own inline style.
-
-   The ASCII ledger field is switched off here for now (see the last
-   block). Removing that block brings it back.
+   It lives here because every server-rendered page already links this
+   file last, so its tokens win without touching each page. The landing
+   page sets the same tokens in its own inline style.
    ───────────────────────────────────────────────────────────────── */
 :root{
-  --ground:#0F0E22; --surface:#17162F; --elevated:#211F40;
-  --ink:#EEEDFC; --muted:#B4B2D4; --faint:#8C8AB0; --rule:#2D2B50;
-  --brand:#A3A6FF; --tele:#C9BCFF; --on-brand:#12112A;
-  --go:#6FD9A6; --hold:#F2D16B; --nogo:#FF8A8A;
-  --glow:linear-gradient(120deg,#8E9BFF 0%,#B6A6FF 55%,#E8E2FF 100%);
-  --r:16px;
+  --ground:#0E0F17; --surface:#15161F; --elevated:#1C1D29;
+  --ink:#ECEDF5; --muted:#A3A6B8; --faint:#7E8196; --rule:#262836;
+  --brand:#9EA2FF; --tele:#C2B8FF; --on-brand:#11121C;
+  --go:#5FD39C; --hold:#E8C86A; --nogo:#FF8A8A;
+  --r:12px;
 }
 html[data-theme="light"]{
-  --ground:#F7F7FC; --surface:#FFFFFF; --elevated:#EFEFFA;
-  --ink:#15142E; --muted:#4A4968; --faint:#66658A; --rule:#E2E1F1;
-  --brand:#5B5BD6; --tele:#7A5CE0; --on-brand:#FFFFFF;
-  --go:#16784A; --hold:#8B6500; --nogo:#B42332;
-  --glow:linear-gradient(120deg,#9AA8FF 0%,#C3B4FF 55%,#EFEAFF 100%);
+  --ground:#FFFFFF; --surface:#FFFFFF; --elevated:#F6F6F9;
+  --ink:#0F1222; --muted:#545A6E; --faint:#6C7186; --rule:#E7E8EE;
+  --brand:#5B5BD6; --tele:#6E56CF; --on-brand:#FFFFFF;
+  --go:#127A46; --hold:#8B6500; --nogo:#B42332;
 }
 
-/* Type: the big condensed display face for page titles. */
-.page-head h1{font:400 clamp(44px,7vw,92px)/.9 "Bebas Neue","Space Grotesk",Impact,sans-serif;
-  letter-spacing:.005em;text-transform:uppercase;max-width:16ch}
-.page-head::before,.section-head::before{width:56px;height:6px;border-radius:999px;background:var(--glow)}
-.section-head h2{letter-spacing:-.03em}
+/* One typeface, set the way the fintech sites set it: tight headlines in
+   sentence case, quiet body text, tabular figures. */
+body,button,input,select,textarea{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-feature-settings:"cv11","ss01"}
+h1,h2,h3{font-weight:600;letter-spacing:-.025em}
+.page-head h1{font-size:clamp(34px,4.6vw,56px);line-height:1.05;letter-spacing:-.035em;font-weight:600}
+.page-head p{font-size:17px;line-height:1.6}
+.page-head::before,.section-head::before{display:none}
+.eyebrow{font-family:"Inter",sans-serif;font-size:12.5px;letter-spacing:0;text-transform:none;font-weight:500;color:var(--brand)}
 
-/* The lotus mark is already blue-purple; it keeps its own colour. */
-
-/* Header: outlined pills, like a row of tags. */
-header{background:color-mix(in srgb,var(--ground) 88%,transparent)}
-.nav-links{gap:6px}
-.nav-links a:not(.btn){border:1px solid var(--rule);border-radius:999px;padding:6px 14px;min-height:32px}
+/* Header: plain text links, one dark button. */
+header{background:color-mix(in srgb,var(--ground) 86%,transparent);border-bottom-color:var(--rule)}
+.brand span{letter-spacing:.14em;font-weight:600}
+.nav-links a{font-size:13.5px}
+.nav-links a:not(.btn){border:0;padding:8px 10px;color:var(--muted)}
 .nav-links a:not(.btn)::before{display:none}
-.nav-links a:not(.btn):hover,.nav-links a:not(.btn):focus-visible{border-color:var(--ink);background:transparent}
-.nav-links a[aria-current="page"]{border-color:var(--ink)}
-.theme-toggle{border-radius:999px}
+.nav-links a:not(.btn):hover,.nav-links a:not(.btn):focus-visible{background:transparent;color:var(--ink);transform:none}
+.nav-links a[aria-current="page"]{color:var(--ink)}
+.theme-toggle{border:0;color:var(--muted)}
 
-/* Buttons: solid pills. Primary is ink on ground (black on light,
-   white on black); the periwinkle is kept for hover and the one action that matters. */
-.btn{border-radius:999px;background:var(--ink);border-color:var(--ink);color:var(--ground);padding:11px 22px}
+/* Buttons: small radius, solid ink primary, quiet secondary. */
+.btn{border-radius:10px;background:var(--ink);border-color:var(--ink);color:var(--ground);
+  font-size:13.5px;font-weight:500;letter-spacing:0;padding:10px 18px}
 .nav-links a.btn{color:var(--ground)}
-.btn:hover,.btn:focus-visible{filter:none;background:var(--brand);border-color:var(--brand);color:var(--on-brand);
-  box-shadow:0 8px 24px -8px color-mix(in srgb,var(--brand) 60%,transparent)}
+.btn:hover,.btn:focus-visible{filter:none;transform:none;background:color-mix(in srgb,var(--ink) 86%,var(--brand));box-shadow:none}
 .btn.ghost,.nav-links a.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
-.btn.ghost:hover{border-color:var(--ink);background:transparent;color:var(--ink);box-shadow:none}
+.btn.ghost:hover{border-color:color-mix(in srgb,var(--ink) 40%,var(--rule));background:transparent}
 
-/* Cards and chips. */
-.panel,.card-link,.tool-out,.tk-card{border-radius:20px}
-.chip{border-radius:999px}
-.eyebrow{letter-spacing:.18em}
-.panel .num,.panel p.num{display:inline-block;padding:4px 11px;border:1px solid var(--rule);border-radius:999px;
-  font:500 10.5px/1.3 "IBM Plex Mono",monospace;letter-spacing:.12em}
-input,select,textarea{border-radius:12px}
+/* Cards: thin rule, no shadow, generous padding. */
+.panel,.card-link,.tool-out,.tk-card{border-radius:14px;box-shadow:none}
+.panel .num,.panel p.num{font-family:"Inter",sans-serif;letter-spacing:0;font-size:12.5px;font-weight:500;color:var(--brand)}
+input,select,textarea{border-radius:10px}
 
 /* The ASCII ledger field, off for now. Delete this block to bring it back. */
 .garden-field,.garden-page,.garden-bg{display:none !important}

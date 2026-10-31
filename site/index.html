@@ -1102,168 +1102,140 @@
   }
   @media (max-width:520px){ .cx-pill .opt{display:none} .cx-btn{flex:1 1 100%} }
   @media (prefers-reduced-motion:reduce){ .cx-btn,.cx-card{transition:none} .cx-btn:hover,.cx-card:hover{transform:none} }
-  /* ── Soft Periwinkle (2026-10-31) ──────────────────────────────────────
-     White and a soft blue-purple, after the owner's Web3 references: a
-     lavender hero block with a big condensed headline and a line illustration, pill
-     tags, a live chart card, three link cards, and one giant word. The
-     same tokens as /assets/accent.css, which the other pages use. */
+  /* ── Clean (2026-10-31) ─────────────────────────────────────────────
+     After the calm, minimal fintech sites: white space, Inter, plain
+     navigation, thin rules, one soft blue-purple accent. The hero shows
+     the product itself: a live issuer reading for RLUSD. Same tokens as
+     /assets/accent.css, which the other pages use. */
   :root{
-    --ground:#0F0E22; --surface:#17162F; --elevated:#211F40;
-    --ink:#EEEDFC; --muted:#B4B2D4; --faint:#8C8AB0; --rule:#2D2B50;
-    --brand:#A3A6FF; --tele:#C9BCFF; --on-brand:#12112A;
-    --go:#6FD9A6; --hold:#F2D16B; --nogo:#FF8A8A;
-    --glow:linear-gradient(120deg,#8E9BFF 0%,#B6A6FF 55%,#E8E2FF 100%);
-    --black:#0A0920;
-    --hero-bg:radial-gradient(70% 90% at 85% 15%,#3A3680 0%,transparent 60%),linear-gradient(160deg,#1D1B44,#121130);
-    --hero-ink:#F1F0FF; --hero-muted:#C2C0E4; --hero-faint:#9391BC; --hero-line:#36346A; --hero-field:rgb(255 255 255 / .06);
+    --ground:#0E0F17; --surface:#15161F; --elevated:#1C1D29;
+    --ink:#ECEDF5; --muted:#A3A6B8; --faint:#7E8196; --rule:#262836;
+    --brand:#9EA2FF; --tele:#C2B8FF; --on-brand:#11121C;
+    --go:#5FD39C; --hold:#E8C86A; --nogo:#FF8A8A;
+    --wash:linear-gradient(180deg,#151626 0%,var(--ground) 100%);
   }
   html[data-theme="light"]{
-    --ground:#F7F7FC; --surface:#FFFFFF; --elevated:#EFEFFA;
-    --ink:#15142E; --muted:#4A4968; --faint:#66658A; --rule:#E2E1F1;
-    --brand:#5B5BD6; --tele:#7A5CE0; --on-brand:#FFFFFF;
-    --go:#16784A; --hold:#8B6500; --nogo:#B42332;
-    --glow:linear-gradient(120deg,#9AA8FF 0%,#C3B4FF 55%,#EFEAFF 100%);
-    --black:#1B1A3F;
-    --hero-bg:radial-gradient(60% 90% at 88% 10%,#C9C3FF 0%,transparent 60%),radial-gradient(50% 70% at 0% 100%,#DCE3FF 0%,transparent 60%),linear-gradient(160deg,#EEEDFF,#F8F7FF);
-    --hero-ink:#15142E; --hero-muted:#4A4968; --hero-faint:#6E6D90; --hero-line:#D9D7F2; --hero-field:#FFFFFF;
+    --ground:#FFFFFF; --surface:#FFFFFF; --elevated:#F6F6F9;
+    --ink:#0F1222; --muted:#545A6E; --faint:#6C7186; --rule:#E7E8EE;
+    --brand:#5B5BD6; --tele:#6E56CF; --on-brand:#FFFFFF;
+    --go:#127A46; --hold:#8B6500; --nogo:#B42332;
+    --wash:linear-gradient(180deg,#F4F3FF 0%,#FFFFFF 100%);
   }
+  body,button,input{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+  h1,h2,h3{font-weight:600;letter-spacing:-.025em}
   .garden-field,.garden-page,.garden-bg{display:none !important}
-  .nav-links a:not(.btn){border:1px solid var(--rule);border-radius:999px;padding:6px 14px;min-height:32px}
+  .nav-links a{font-size:13.5px}
+  .nav-links a:not(.btn){border:0;color:var(--muted);background:transparent}
   .nav-links a:not(.btn)::before{display:none}
-  .nav-links a:not(.btn):hover,.nav-links a:not(.btn):focus-visible{border-color:var(--ink);background:transparent}
-  .nav-links .btn,.theme-toggle{border-radius:999px}
+  .nav-links a:not(.btn):hover,.nav-links a:not(.btn):focus-visible{color:var(--ink);background:transparent;transform:none}
+  .nav-links .btn{border-radius:10px;font-weight:500;letter-spacing:0}
   .nav-links a.btn:not(.ghost){background:var(--ink);border-color:var(--ink);color:var(--ground)}
-  .cx-btn{background:var(--ink);color:var(--ground);border-color:var(--ink)}
-  .cx-btn:hover,.cx-btn:focus-visible{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+  .theme-toggle{border:0}
+  .cx-btn{border-radius:10px;background:var(--ink);color:var(--ground);border-color:var(--ink);font-weight:500}
   .cx-btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
 
-  .lg-hero{text-align:left;padding:18px 0 0}
-  .lg-black{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:24px;align-items:center;
-    background:var(--hero-bg);color:var(--hero-ink);border-radius:28px;padding:clamp(28px,5vw,64px);
-    border:1px solid var(--hero-line);overflow:hidden;position:relative}
-  .lg-black::after{content:"";position:absolute;right:-12%;top:-30%;width:60%;aspect-ratio:1;border-radius:50%;
-    background:radial-gradient(closest-side,rgb(140 150 255 / .28),transparent);pointer-events:none}
-  .lg-black .cx-pill{color:var(--hero-muted);border-color:var(--hero-line);background:var(--hero-field);margin:0 0 22px}
-  .lg-hero .lg-h1{margin:0;max-width:none;font:400 clamp(64px,9.6vw,140px)/.86 "Bebas Neue","Space Grotesk",Impact,sans-serif;
-    letter-spacing:.005em;text-transform:uppercase;color:var(--hero-ink)}
-  .lg-glyph{display:inline-flex;align-items:flex-end;gap:5px;height:.62em;margin-right:.14em;vertical-align:baseline}
-  .lg-glyph i{display:block;width:.32em;height:.62em;border-radius:.32em .32em 0 0;background:var(--glow)}
-  .lg-glyph i+i{height:.4em;background:transparent;border:3px solid var(--hero-ink);border-bottom:0}
-  .lg-sub{margin:22px 0 0;max-width:44ch;color:var(--hero-muted);font-size:clamp(15px,1.4vw,18px);line-height:1.55}
-  .lg-check{display:flex;gap:8px;margin-top:26px;max-width:520px;padding:6px;border-radius:999px;
-    background:var(--hero-field);border:1px solid var(--hero-line);box-shadow:0 10px 30px -18px rgb(60 50 160 / .35)}
-  .lg-check input{flex:1;min-width:0;background:transparent;border:0;color:var(--hero-ink);padding:0 16px;
-    font:13px "IBM Plex Mono",monospace;outline:none}
-  .lg-check input::placeholder{color:var(--hero-faint)}
-  .lg-check button{border:0;border-radius:999px;padding:12px 20px;font:600 13.5px "Space Grotesk",sans-serif;
-    background:#15142E;color:#FFFFFF;cursor:pointer;white-space:nowrap}
-  .lg-check:focus-within{border-color:var(--brand)}
-  .lg-fine{margin:12px 0 0 6px;font:11.5px "IBM Plex Mono",monospace;color:var(--hero-faint);letter-spacing:.04em}
-  .lg-art{margin:0;display:flex;justify-content:center;position:relative;z-index:1}
-  .lg-svg{width:100%;max-width:500px;height:auto;color:var(--hero-ink)}
-  .lg-svg-sm{max-width:300px;color:var(--ink)}
+  .mn-hero{text-align:left;padding:clamp(48px,8vw,104px) 0 clamp(32px,5vw,56px);margin:0 calc(50% - 50vw);
+    padding-inline:calc(50vw - 50%);background:var(--wash)}
+  .mn-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.95fr);gap:clamp(32px,5vw,72px);align-items:center}
+  .mn-badge{display:inline-flex;align-items:center;gap:8px;margin:0 0 22px;padding:5px 12px;border:1px solid var(--rule);
+    border-radius:999px;background:var(--surface);font:500 12px/1.3 "Inter",sans-serif;color:var(--muted)}
+  .mn-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--hold)}
+  .mn-badge:has([data-state="operational"]) .dot{background:var(--go)}
+  .mn-badge:has([data-state="reconnecting"]) .dot{background:var(--nogo)}
+  .mn-badge .sep{color:var(--faint)}
+  .mn-hero h1{margin:0;max-width:14ch;font-size:clamp(40px,5.6vw,68px);line-height:1.02;letter-spacing:-.045em;font-weight:600;color:var(--ink)}
+  .mn-sub{margin:22px 0 0;max-width:46ch;font-size:clamp(16px,1.4vw,18.5px);line-height:1.6;color:var(--muted)}
+  .mn-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
+  .mn-btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--ink);
+    background:var(--ink);color:var(--ground);font-weight:500;font-size:14.5px;text-decoration:none;transition:background .15s ease}
+  .mn-btn:hover,.mn-btn:focus-visible{background:color-mix(in srgb,var(--ink) 85%,var(--brand))}
+  .mn-btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--rule)}
+  .mn-btn.ghost:hover{border-color:color-mix(in srgb,var(--ink) 35%,var(--rule))}
+  .mn-fine{margin:16px 0 0;font-size:13px;color:var(--faint)}
 
-  #ticker.ticker{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:0;margin:14px 0 0;padding:12px 4px;
-    border:0;border-block:1px solid var(--rule);background:transparent;border-radius:0;scrollbar-width:none}
-  #ticker .tk{flex:0 0 auto;flex-direction:row-reverse;align-items:baseline;gap:8px;min-width:0;padding:0 18px}
-  #ticker .tk+.tk{border-left:1px solid var(--rule)}
-  #ticker .tk b{font-size:13px}
-  #ticker .tk i{font-size:10px;letter-spacing:.12em}
+  .mn-window{margin:0;border:1px solid var(--rule);border-radius:16px;background:var(--surface);overflow:hidden;
+    box-shadow:0 1px 2px rgb(15 18 34 / .04),0 24px 60px -24px rgb(60 56 160 / .22)}
+  .mn-bar{display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid var(--rule);background:var(--elevated)}
+  .mn-bar i{width:9px;height:9px;border-radius:50%;background:var(--rule)}
+  .mn-bar span{margin-left:10px;font-size:12.5px;color:var(--muted);font-weight:500}
+  .mn-body{padding:20px}
+  .mn-asset{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--rule)}
+  .mn-avatar{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:color-mix(in srgb,var(--brand) 14%,var(--surface));
+    color:var(--brand);font-weight:600}
+  .mn-asset b{display:block;font-size:15px}
+  .mn-asset span{font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .mn-asset em{margin-left:auto;font-style:normal;font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums;text-align:right}
+  .mn-checks{list-style:none;margin:0;padding:0}
+  .mn-checks li{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--rule);font-size:14px}
+  .mn-checks li.mn-wait{color:var(--faint);border-bottom:0}
+  .mn-pill{flex:none;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:500}
+  .mn-pill.go{color:var(--go);background:color-mix(in srgb,var(--go) 12%,transparent)}
+  .mn-pill.hold{color:var(--hold);background:color-mix(in srgb,var(--hold) 14%,transparent)}
+  .mn-pill.nogo{color:var(--nogo);background:color-mix(in srgb,var(--nogo) 12%,transparent)}
+  .mn-pill.na{color:var(--faint);background:var(--elevated)}
+  .mn-more{display:inline-block;margin-top:14px;font-size:13.5px;font-weight:500;color:var(--brand);text-decoration:none}
 
-  .lg-split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(24px,4vw,56px);
-    align-items:center;margin-top:clamp(56px,8vw,96px)}
-  .lg-tags{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-wrap:wrap;gap:6px}
-  .lg-tags li{padding:5px 13px;border:1px solid var(--rule);border-radius:999px;font-size:12.5px;color:var(--muted)}
-  .lg-split h2{font-size:clamp(36px,5.4vw,72px);line-height:.98;letter-spacing:-.045em;font-weight:600;max-width:12ch}
-  .lg-arrow{display:inline-block;color:var(--brand)}
-  .lg-split-copy > p{margin-top:18px;max-width:46ch;color:var(--muted);line-height:1.6}
-  .lg-stat{display:flex;align-items:flex-end;gap:16px;margin-top:30px}
-  .lg-stat b{font:400 clamp(72px,9vw,120px)/.8 "Bebas Neue",sans-serif;color:var(--ink)}
-  .lg-stat span{max-width:22ch;font-size:13.5px;color:var(--muted);line-height:1.45;padding-bottom:6px}
-  .lg-stat a{color:var(--ink)}
-  .lg-chart{display:block;text-align:left;justify-items:stretch;padding:24px;border-radius:24px;background:var(--surface);border:1px solid var(--rule);
-    box-shadow:0 30px 60px -40px rgb(0 0 0 / .5)}
-  .lg-chart .bx-head{display:flex;justify-content:space-between;font:500 11.5px "IBM Plex Mono",monospace;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--muted);margin:0}
-  .lg-chart .bx-state{padding:2px 9px;border-radius:999px;border:1px solid var(--rule);color:var(--hold)}
-  .lg-chart .bx-state[data-state="live"]{color:var(--go)}
-  .lg-chart .bx-state[data-state="down"]{color:var(--nogo)}
-  .lg-price{margin:14px 0 0;font:400 64px/1 "Bebas Neue",sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
-  .lg-chart .bx-spark{display:block;width:100%;height:120px;margin-top:12px;padding:10px 0;overflow:visible;
-    background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 14%,transparent),transparent);border-radius:14px}
-  .lg-chart .bx-spark path{fill:none;stroke:var(--brand);stroke-width:2.4;vector-effect:non-scaling-stroke}
-  .lg-chart .bx-note{margin:8px 0 0;font-size:11px;color:var(--faint)}
-  .lg-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 0}
-  .lg-facts div{padding:12px;border-radius:14px;background:var(--elevated)}
-  .lg-facts dt{font-size:11.5px;color:var(--muted)}
-  .lg-facts dd{margin:4px 0 0;font:500 14px "IBM Plex Mono",monospace;color:var(--ink);overflow-wrap:anywhere}
+  .mn-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:clamp(40px,6vw,64px) 0 0;
+    border:1px solid var(--rule);border-radius:16px;overflow:hidden;justify-items:stretch;align-content:normal}
+  .mn-metrics div{padding:22px 24px;display:flex;flex-direction:column;gap:4px}
+  .mn-metrics div+div{border-left:1px solid var(--rule)}
+  .mn-metrics b{font-size:clamp(22px,2.4vw,30px);font-weight:600;letter-spacing:-.03em;color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .mn-metrics span{font-size:13px;color:var(--muted)}
+  .bx-stage.mn-metrics{max-width:none;width:auto;margin-inline:0;padding:0}
+  #ticker.ticker{margin:14px 0 0;border:0;background:transparent;padding:0 2px;opacity:.85}
 
-  .lg-trio{display:grid;grid-template-columns:.8fr .8fr 1.4fr;gap:14px;margin-top:clamp(56px,8vw,96px)}
-  .lg-card{position:relative;display:flex;flex-direction:column;min-height:300px;padding:24px;border-radius:24px;
-    text-decoration:none;color:var(--ink);border:1px solid var(--rule);background:var(--surface);overflow:hidden}
-  .lg-dark{background:var(--black);color:#EEEDFC;border-color:#2D2B50;justify-content:flex-end;gap:0}
-  .lg-dark .lg-label{margin:0 0 auto;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#9391BC}
-  .lg-dark a{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid #36346A;color:#EEEDFC;
-    text-decoration:none;font-size:15px}
-  .lg-dark a:hover,.lg-dark a:focus-visible{color:#B6A6FF}
-  .lg-green{background:var(--glow);color:#15142E;border:0;justify-content:space-between}
-  .lg-green h3{font-size:clamp(24px,2.4vw,32px);line-height:1.05;letter-spacing:-.03em;font-weight:600;max-width:12ch}
-  .lg-round{align-self:flex-end;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;
-    background:#15142E;color:#FFFFFF;font-size:18px}
-  .lg-illo{justify-content:space-between;align-items:flex-start}
-  .lg-chip{padding:5px 13px;border:1px solid var(--rule);border-radius:999px;font-size:12.5px;color:var(--muted)}
-  .lg-illo .lg-svg{align-self:center}
-  .lg-caption{font-size:13.5px;color:var(--muted);max-width:40ch;line-height:1.5}
-  .lg-card:hover,.lg-card:focus-visible{transform:translateY(-2px)}
-  .lg-card{transition:transform .2s ease}
-
-  .lg-giant{margin-top:clamp(56px,8vw,96px);padding:clamp(24px,4vw,48px);border-radius:28px;
-    background:var(--surface);border:1px solid var(--rule);overflow:hidden}
-  .lg-word{font:400 clamp(90px,19vw,280px)/.8 "Bebas Neue",sans-serif;letter-spacing:-.01em;color:var(--ink);
-    white-space:nowrap;margin:0 0 24px}
-  .lg-giant-row{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);align-items:end}
-  .lg-giant h2{font-size:clamp(26px,3vw,36px);letter-spacing:-.03em}
-  .lg-giant-row p{margin:12px 0 22px;color:var(--muted);max-width:46ch;line-height:1.6}
-  .lg-prices{margin:0;display:grid;gap:0}
-  .lg-prices div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-top:1px solid var(--rule)}
-  .lg-prices dt{color:var(--muted)}
-  .lg-prices dd{margin:0;font:400 32px/1 "Bebas Neue",sans-serif;color:var(--ink)}
-
-  .fx-new{margin-top:clamp(56px,8vw,96px)}
-  .fx-new .cx-head h2{font:400 clamp(44px,6vw,80px)/.95 "Bebas Neue",sans-serif;letter-spacing:.01em;text-transform:uppercase}
-  .fx-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
-  .fx-card{display:flex;flex-direction:column;gap:6px;padding:22px;border-radius:22px;border:1px solid var(--rule);
-    background:var(--surface);color:var(--ink);text-decoration:none;transition:transform .2s ease,border-color .2s ease}
-  .fx-card:hover,.fx-card:focus-visible{transform:translateY(-2px);border-color:var(--ink)}
-  .fx-card h3{font:400 30px/1 "Bebas Neue",sans-serif;letter-spacing:.01em;margin:2px 0 4px}
-  .fx-card p:not(.cx-eyebrow){color:var(--muted);font-size:14px;line-height:1.5}
-  .fx-card.big{grid-row:span 2;background:var(--black);color:#EEEDFC;border-color:#2D2B50}
-  .fx-card.big p:not(.cx-eyebrow){color:#B4B2D4}
-  .fx-card.big h3{font-size:clamp(40px,4.4vw,60px)}
-  .fx-card.hot{background:var(--glow);border-color:transparent;color:#15142E}
-  .fx-card.hot p,.fx-card.hot .cx-eyebrow{color:#15142E !important}
-  .cx-eyebrow{color:var(--brand)}
-  .fx-card.big .cx-eyebrow{color:#B6A6FF}
-
+  .mn-section{margin-top:clamp(72px,10vw,128px)}
+  .mn-head{max-width:640px}
+  .mn-eyebrow{margin:0 0 10px;font-size:13.5px;font-weight:500;color:var(--brand)}
+  .mn-head h2{font-size:clamp(28px,3.4vw,42px);line-height:1.1;letter-spacing:-.035em}
+  .mn-head p:not(.mn-eyebrow){margin-top:14px;color:var(--muted);line-height:1.65;font-size:16px}
+  .mn-features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:36px;border-top:1px solid var(--rule)}
+  .mn-features a{display:block;padding:28px 28px 30px 0;text-decoration:none;color:var(--ink);border-bottom:1px solid var(--rule)}
+  .mn-features a:nth-child(3n+2),.mn-features a:nth-child(3n+3){padding-left:28px;border-left:1px solid var(--rule)}
+  .mn-features a:hover h3{color:var(--brand)}
+  .mn-ico{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--elevated);margin-bottom:16px}
+  .mn-ico svg{width:19px;height:19px;fill:none;stroke:var(--brand);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .mn-features h3{font-size:16.5px;margin:0 0 6px;transition:color .15s ease}
+  .mn-features p{font-size:14.5px;color:var(--muted);line-height:1.6}
+  .mn-steps{list-style:none;margin:32px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:s}
+  .mn-steps li{counter-increment:s;padding:24px;border-radius:14px;background:var(--elevated);display:flex;flex-direction:column;gap:6px}
+  .mn-steps li::before{content:counter(s,decimal-leading-zero);font-size:13px;font-weight:600;color:var(--brand);margin-bottom:10px}
+  .mn-steps b{font-size:16.5px;font-weight:600}
+  .mn-steps span{font-size:14.5px;color:var(--muted);line-height:1.6}
+  .mn-tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:32px}
+  .mn-tiers a{display:flex;flex-direction:column;gap:6px;padding:22px;border:1px solid var(--rule);border-radius:14px;color:var(--ink);text-decoration:none;
+    transition:border-color .15s ease}
+  .mn-tiers a:hover,.mn-tiers a:focus-visible{border-color:var(--brand)}
+  .mn-tiers span{font-size:13.5px;color:var(--muted);font-weight:500}
+  .mn-tiers b{font-size:30px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .mn-tiers em{font-style:normal;font-size:13px;color:var(--faint)}
+  .mn-cta{margin-top:clamp(72px,10vw,128px);padding:clamp(40px,6vw,72px);border-radius:20px;text-align:center;
+    background:#14152A;color:#ECEDF5}
+  .mn-cta h2{font-size:clamp(28px,3.6vw,44px);letter-spacing:-.035em}
+  .mn-cta p{margin-top:10px;color:#A9ABC4}
+  .mn-cta .mn-actions{justify-content:center}
+  .mn-btn.light{background:#FFFFFF;color:#0F1222;border-color:#FFFFFF}
+  .mn-btn.light:hover{background:#E9E8FF}
+  .mn-btn.ghost-light{background:transparent;color:#ECEDF5;border-color:#3A3C58}
   @media (max-width:980px){
-    .lg-black,.lg-split,.lg-giant-row{grid-template-columns:1fr}
-    .lg-art{order:-1}
-    .lg-svg{max-width:360px}
-    .lg-trio{grid-template-columns:1fr 1fr}
-    .lg-illo{grid-column:1/-1}
-    .fx-cards{grid-template-columns:1fr 1fr}
-    .fx-card.big{grid-column:span 2;grid-row:auto}
+    .mn-grid{grid-template-columns:1fr}
+    .mn-metrics{grid-template-columns:1fr 1fr}
+    .mn-metrics div:nth-child(3){border-left:0}
+    .mn-metrics div:nth-child(n+3){border-top:1px solid var(--rule)}
+    .mn-features{grid-template-columns:1fr 1fr}
+    .mn-features a,.mn-features a:nth-child(n){padding:24px 20px 26px 0;border-left:0}
+    .mn-features a:nth-child(2n){padding-left:20px;border-left:1px solid var(--rule)}
+    .mn-steps{grid-template-columns:1fr}
+    .mn-tiers{grid-template-columns:1fr 1fr}
   }
   @media (max-width:560px){
-    .lg-black{border-radius:22px}
-    .lg-check{flex-direction:column;border-radius:20px}
-    .lg-check input{padding:12px}
-    .lg-trio,.fx-cards{grid-template-columns:1fr}
-    .fx-card.big{grid-column:auto}
-    .lg-facts{grid-template-columns:1fr}
-    .lg-card{min-height:220px}
+    .mn-features{grid-template-columns:1fr}
+    .mn-features a:nth-child(n){padding:22px 0;border-left:0}
+    .mn-metrics{grid-template-columns:1fr}
+    .mn-metrics div:nth-child(n){border-left:0}
+    .mn-metrics div+div{border-top:1px solid var(--rule)}
+    .mn-tiers{grid-template-columns:1fr}
   }
-  @media (prefers-reduced-motion:reduce){ .lg-card,.fx-card{transition:none} }
 </style>
 </head>
 <body>
@@ -1299,130 +1271,87 @@
     its caption carries the ledger it was taken at. The ASCII field stays
     behind the hero, answering each validated ledger.
   -->
-  <section class="cx-hero lg-hero" data-garden-field>
+  <section class="cx-hero mn-hero" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
-    <div class="lg-black">
-      <div class="lg-copy">
-        <p class="cx-pill"><i class="dot" aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span><span class="sep" aria-hidden="true">·</span>XRPL mainnet<span class="sep" aria-hidden="true">·</span><span data-sys-ledger translate="no">waiting</span></p>
-        <h1 class="lg-h1">Read.<br>Verify.<br><span class="lg-glyph" aria-hidden="true"><i></i><i></i></span>Prove.</h1>
-        <p class="lg-sub">Ledger intelligence for the XRP Ledger. Who controls a token, what a payment really delivered, how deep a book really is. A receipt for every answer.</p>
-        <form class="lg-check" action="/certificate/" method="get" role="search">
-          <label class="sr-only" for="lg-issuer">XRPL issuer address</label>
-          <input id="lg-issuer" name="issuer" type="text" spellcheck="false" autocomplete="off" placeholder="Paste an XRPL issuer, r…" maxlength="40">
-          <button type="submit">Check issuer &rarr;</button>
-        </form>
-        <p class="lg-fine">Free · read-only · no wallet, no keys</p>
+    <div class="mn-grid">
+      <div class="mn-copy">
+        <p class="mn-badge"><i class="dot" aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span><span class="sep" aria-hidden="true">·</span>XRPL mainnet<span class="sep" aria-hidden="true">·</span><span data-sys-ledger translate="no">waiting</span></p>
+        <h1>Know what you hold on the XRP Ledger.</h1>
+        <p class="mn-sub">Who controls a token, what a payment really delivered, how much of a book can really fill. Read from validated ledgers, with a receipt for every answer.</p>
+        <div class="mn-actions">
+          <a class="mn-btn" href="/app/">Open the workspace</a>
+          <a class="mn-btn ghost" href="/tokens/">Browse 51 tokens</a>
+        </div>
+        <p class="mn-fine">Free to start · Read-only · Never asks for keys</p>
       </div>
-      <figure class="lg-art" aria-hidden="true">
-        <svg class="lg-svg" viewBox="0 0 520 440" role="img" aria-label="An open box with XRP coins rising out of it">
-  <defs><linearGradient id="lgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8E9BFF"/><stop offset=".55" stop-color="#B9A8FF"/><stop offset="1" stop-color="#F1EEFF"/></linearGradient><linearGradient id="lgB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9BCFF"/><stop offset=".55" stop-color="#F1EEFF"/><stop offset="1" stop-color="#9AA8FF"/></linearGradient><linearGradient id="lgC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6F78F0"/><stop offset=".55" stop-color="#8E9BFF"/><stop offset="1" stop-color="#C3B4FF"/></linearGradient></defs>
-  <g class="lg-line" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-    <path d="M70 92h46M70 102h60M70 112h38"/>
-    <path d="M362 300 L448 318"/>
-    <circle cx="462" cy="321" r="13"/>
-    <circle cx="462" cy="321" r="4" fill="currentColor"/>
-    <path d="M96 300 v44 M104 300 v44 M112 300 v44 M120 300 v44"/>
-  </g>
-  <path d="M160 240 L260 190 L230 128 L130 178 Z" fill="url(#lgB)" stroke="#15142E" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M260 190 L360 240 L404 176 L304 126 Z" fill="url(#lgA)" stroke="#15142E" stroke-width="2.5" stroke-linejoin="round"/>
-  <g transform="translate(262 128)">
-  <circle r="44" fill="url(#lgA)" stroke="#15142E" stroke-width="2.5"/>
-  <circle r="31.7" fill="none" stroke="#15142E" stroke-width="2"/>
-  <text y="7.5" text-anchor="middle" font-family="Bebas Neue, Impact, sans-serif" font-size="27.3" fill="#15142E" letter-spacing="1">XRP</text>
-</g>
-  <g transform="translate(352 62)">
-  <circle r="28" fill="url(#lgB)" stroke="#15142E" stroke-width="2.5"/>
-  <circle r="20.2" fill="none" stroke="#15142E" stroke-width="2"/>
-  <text y="4.8" text-anchor="middle" font-family="Bebas Neue, Impact, sans-serif" font-size="17.4" fill="#15142E" letter-spacing="1">XRP</text>
-</g>
-  <path d="M160 240 L260 290 L260 400 L160 350 Z" fill="url(#lgC)" stroke="#15142E" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M260 290 L360 240 L360 350 L260 400 Z" fill="url(#lgA)" stroke="#15142E" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M260 290 L360 240 L432 268 L332 318 Z" fill="url(#lgB)" stroke="#15142E" stroke-width="2.5" stroke-linejoin="round"/>
-  <circle cx="205" cy="318" r="9" fill="#15142E"/>
-  <path d="M205 318 L205 352" stroke="#15142E" stroke-width="3" stroke-linecap="round"/>
-  <g class="lg-line" fill="currentColor"><circle cx="440" cy="120" r="3"/><circle cx="96" cy="210" r="3"/><circle cx="420" cy="410" r="3"/></g>
-</svg>
+      <figure class="mn-window" aria-label="Live issuer reading for RLUSD">
+        <div class="mn-bar" aria-hidden="true"><i></i><i></i><i></i><span>Issuer analysis</span></div>
+        <div class="mn-body" id="mn-issuer" data-issuer="rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">
+          <div class="mn-asset">
+            <span class="mn-avatar" aria-hidden="true">R</span>
+            <div><b>RLUSD</b><span translate="no">Ripple · rMxCKb…J8m5De</span></div>
+            <em id="mn-ledger">Reading…</em>
+          </div>
+          <ul class="mn-checks" id="mn-checks"><li class="mn-wait">Reading validated ledger state…</li></ul>
+          <a class="mn-more" href="/tokens/rlusd-ripple/">Full reading &rarr;</a>
+        </div>
       </figure>
     </div>
   </section>
 
-  <section class="lg-split">
-    <div class="lg-split-copy">
-      <ul class="lg-tags"><li>Issuer controls</li><li>Delivered amounts</li><li>Fillable depth</li><li>Evidence</li></ul>
-      <h2>Bringing <span class="lg-arrow">&rarr;</span> evidence to XRPL liquidity</h2>
-      <p>Order books advertise depth that is not funded. NOSHASHI counts only offers their owners can pay, read at a validated ledger, and keeps the ledger index so anyone can check it again.</p>
-      <div class="lg-stat"><b>51</b><span>XRPL tokens read live, one page each. <a href="/tokens/">Open the directory &rarr;</a></span></div>
+  <section class="bx-stage mn-metrics" aria-label="Live XRP Ledger readings">
+    <div><b>51</b><span>XRPL tokens read live</span></div>
+    <div><b data-bx-mirror="tk-ledger" translate="no">—</b><span>Latest validated ledger</span></div>
+    <div><b data-bx-mirror="tk-xrp" translate="no">—</b><span>XRP / RLUSD, live</span></div>
+    <div><b>0</b><span>Keys we hold. Ever.</span></div>
+  </section>
+
+  <section class="mn-section">
+    <div class="mn-head">
+      <p class="mn-eyebrow">What it reads</p>
+      <h2>Ledger facts, before you move value.</h2>
+      <p>Each answer names the validated ledger it was read at. Anything that could not be read is shown as not read, never as a pass.</p>
     </div>
-    <div class="bx-stage lg-chart" aria-label="Live XRP Ledger readings">
-      <p class="bx-head"><span>XRP / RLUSD · live</span><span class="bx-state" data-bx-state>Connecting</span></p>
-      <p class="lg-price" data-bx-mirror="tk-xrp" translate="no">—</p>
-      <svg class="bx-spark" viewBox="0 0 240 48" preserveAspectRatio="none" aria-hidden="true"><path data-bx-spark d=""/></svg>
-      <p class="bx-note" data-bx-note>Each validated ledger since this page opened</p>
-      <dl class="lg-facts">
-        <div><dt>Spread that can fill</dt><dd data-bx-mirror="tk-spread" translate="no">—</dd></div>
-        <div><dt>Latest ledger</dt><dd data-bx-mirror="tk-ledger" translate="no">—</dd></div>
-        <div><dt>Transactions</dt><dd data-bx-mirror="tk-tx" translate="no">—</dd></div>
-      </dl>
+    <div class="mn-features">
+      <a href="/certificate/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Issuer controls</h3><p>Whether an issuer can freeze, claw back, gate holding or sign alone.</p></a>
+      <a href="/delivered/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg></span><h3>Delivered amounts</h3><p>What a payment actually delivered, not what it asked for.</p></a>
+      <a href="/book-health/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h3>Real liquidity</h3><p>Advertised order-book depth against the depth that can fill.</p></a>
+      <a href="/xapp/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span><h3>Address screening</h3><p>OFAC sanctions, the scam registry and lookalike addresses, before you send.</p></a>
+      <a href="/alerts/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1112 0v5l2 2H4z"/><path d="M10 21h4"/></svg></span><h3>Issuer alerts</h3><p>Telegram or Discord tells you the moment an issuer's powers change.</p></a>
+      <a href="/evidence-report/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg></span><h3>Evidence reports</h3><p>A PDF of what the ledger shows, with a fingerprint anyone can verify.</p></a>
     </div>
   </section>
 
-  <section class="lg-trio">
-    <nav class="lg-card lg-dark" aria-label="Free tools">
-      <p class="lg-label">Free tools</p>
-      <a href="/tokens/">Token directory <span>&nearr;</span></a>
-      <a href="/certificate/">Issuer certificate <span>&nearr;</span></a>
-      <a href="/delivered/">Delivered amounts <span>&nearr;</span></a>
-      <a href="/book-health/">Book health <span>&nearr;</span></a>
-      <a href="/treasury/">Treasury report <span>&nearr;</span></a>
-    </nav>
-    <a class="lg-card lg-green" href="/xapp/">
-      <h3>Check an address before you send &mdash; one paste.</h3>
-      <span class="lg-round" aria-hidden="true">&nearr;</span>
-    </a>
-    <a class="lg-card lg-illo" href="/alerts/">
-      <p class="lg-chip">Issuer alerts</p>
-      <svg class="lg-svg lg-svg-sm" viewBox="0 0 320 180" role="img" aria-label="An eye watching an issuer">
-  <defs><linearGradient id="lgD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8E9BFF"/><stop offset=".55" stop-color="#B9A8FF"/><stop offset="1" stop-color="#F1EEFF"/></linearGradient></defs>
-  <circle cx="110" cy="96" r="58" fill="url(#lgD)" opacity=".55"/>
-  <circle cx="214" cy="84" r="44" fill="url(#lgD)" opacity=".35"/>
-  <path d="M58 92 Q160 18 262 92 Q160 166 58 92 Z" fill="#FFFFFF" stroke="#15142E" stroke-width="2.5"/>
-  <circle cx="160" cy="92" r="30" fill="url(#lgD)" stroke="#15142E" stroke-width="2.5"/>
-  <circle cx="160" cy="92" r="12" fill="#15142E"/>
-  <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M24 40h30M24 50h44M276 140h22M276 150h30"/></g>
-</svg>
-      <p class="lg-caption">Freeze, clawback or a new signing key: Telegram or Discord tells you the moment it changes.</p>
-    </a>
+  <section class="mn-section mn-steps-wrap">
+    <div class="mn-head">
+      <p class="mn-eyebrow">How it works</p>
+      <h2>One address in. Facts and a receipt out.</h2>
+    </div>
+    <ol class="mn-steps">
+      <li><b>Paste an address</b><span>An issuer, a wallet or a payment hash. Nothing to connect, nothing to sign.</span></li>
+      <li><b>Read the ledger</b><span>NOSHASHI reads validated XRP Ledger state directly, at a named ledger index.</span></li>
+      <li><b>Keep the receipt</b><span>Each answer carries a SHA-256 receipt, so you can show anyone exactly what was read.</span></li>
+    </ol>
   </section>
 
-  <section class="lg-giant">
-    <div class="lg-word" aria-hidden="true">EVIDENCE</div>
-    <div class="lg-giant-row">
-      <div>
-        <h2>Ledger Evidence Report</h2>
-        <p>A PDF of what the XRP Ledger shows for the issuer, wallets and book you name, with a fingerprint anyone can verify. A record of facts, not an opinion.</p>
-        <a class="cx-btn" href="/evidence-report/">Order a report</a>
-      </div>
-      <dl class="lg-prices">
-        <div><dt>Issuer check</dt><dd>$950</dd></div>
-        <div><dt>Standard</dt><dd>$2,500</dd></div>
-        <div><dt>Quarterly</dt><dd>$7,500</dd></div>
-        <div><dt>Audit support</dt><dd>$15,000</dd></div>
-      </dl>
+  <section class="mn-section mn-pricing">
+    <div class="mn-head">
+      <p class="mn-eyebrow">Ledger Evidence Report</p>
+      <h2>Evidence you can hand to an auditor.</h2>
+      <p>Issuer controls, holdings and who can move them, and real against advertised depth, for the addresses you name. A record of ledger facts, not an opinion.</p>
+    </div>
+    <div class="mn-tiers">
+      <a href="/evidence-report/?tier=issuer"><span>Issuer check</span><b>$950</b><em>One token issuer</em></a>
+      <a href="/evidence-report/?tier=standard"><span>Standard</span><b>$2,500</b><em>One report</em></a>
+      <a href="/evidence-report/?tier=quarterly"><span>Quarterly</span><b>$7,500</b><em>Now + four quarter-ends</em></a>
+      <a href="/evidence-report/?tier=audit"><span>Audit support</span><b>$15,000</b><em>Now + twelve month-ends</em></a>
     </div>
   </section>
 
-  <section id="new" class="fx-new">
-    <div class="cx-head">
-      <h2>New this month</h2>
-      <p>Free to try. No account, no wallet.</p>
-    </div>
-    <div class="fx-cards">
-      <a class="fx-card big" href="/tokens/"><p class="cx-eyebrow">Token directory</p><h3>51 XRPL tokens, one page each</h3><p>Freeze, clawback, signing keys and fillable depth, read live for RLUSD, SOLO, USDC, CSC and more.</p></a>
-      <a class="fx-card" href="/alerts/"><p class="cx-eyebrow">Telegram &amp; Discord</p><h3>/check r…</h3><p>Ask the bot what an issuer can do. /watch to be told when it changes.</p></a>
-      <a class="fx-card" href="/badge/"><p class="cx-eyebrow">Issuer badge</p><h3>Live facts on your site</h3><p>One image tag. Turns grey if it can't read the ledger, never green.</p></a>
-      <a class="fx-card hot" href="/partners/"><p class="cx-eyebrow">Partners</p><h3>Explorers, auditors, wallets</h3><p>Free keyless API for token pages. Referral terms for firms.</p></a>
-      <a class="fx-card" href="/academy/"><p class="cx-eyebrow">Academy</p><h3>Certificate on LinkedIn</h3><p>Free course on live mainnet. Pass it, add it to your profile.</p></a>
-    </div>
+  <section class="mn-cta">
+    <h2>Start with one address.</h2>
+    <p>Free, read-only, on live mainnet. No account needed.</p>
+    <div class="mn-actions"><a class="mn-btn light" href="/app/">Open the workspace</a><a class="mn-btn ghost-light" href="/contact/?topic=institutions">Talk to us</a></div>
   </section>
 
   <!-- Live mainnet ticker: real data over the same public WebSocket the
@@ -1911,6 +1840,8 @@
 <script src="/assets/garden-field.js" defer></script>
 <script src="/assets/intelligence.js" defer></script>
 <script src="/assets/hero-live.js" defer></script>
+<script src="/assets/inline/59b45a834cdf056406d0.js"></script>
+
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"SoftwareApplication","name":"NOSHASHI","applicationCategory":"FinanceApplication","operatingSystem":"macOS, Windows, Linux","releaseNotes":"https://github.com/Ignosha/noshashi/releases","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"USD"},{"@type":"Offer","name":"Pro","price":"749","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"749","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Institutional","price":"4000","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"4000","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Enterprise","price":"10000","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"10000","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Strategic Infrastructure","price":"20833","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"20833","priceCurrency":"USD","unitCode":"MON"}}],"url":"https://www.noshashi.app/"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does NOSHASHI do?","acceptedAnswer":{"@type":"Answer","text":"NOSHASHI reads validated XRP Ledger state and answers two questions from it at the same moment: whether a transfer is permitted under the rules you configured, and whether you could actually exit the position. It returns a GO, HOLD or NO-GO verdict with the evidence attached. It is informational tooling — it never holds, signs or moves an asset."}},{"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"The console is free forever, including unlimited GO/HOLD/NO-GO checks, live mainnet telemetry and 10 address checks a month. Pro is $749 per seat per month and adds unlimited address checks, exit-liquidity and freeze-rights analysis, the persistent adjudication ledger and 5,000 API verifications. Institutional is $4,000 a month and adds Travel Rule scoping, signed audit export, offline adjudication and 100,000 API verifications."}},{"@type":"Question","name":"Is this production-ready?","acceptedAnswer":{"@type":"Answer","text":"No — every build on this site is labelled BETA. It is pre-1.0, the binaries are not code-signed or notarised yet, and the release pipeline is still being hardened. Treat it as an evaluation build: verify the SHA-256, run it through your own software admission process, and do not make it the sole basis of a decision carrying legal consequence."}},{"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No. There are no accounts on this site — sign-in and the hosted workspace were withdrawn. The application runs on your machine and reads public ledger state directly, so there is no server-side state to log into. A paid subscription is managed through Stripe and does not create a website login."}},{"@type":"Question","name":"macOS or Windows blocks the app — is that expected?","acceptedAnswer":{"@type":"Answer","text":"Yes. The builds are not code-signed or notarised while the release pipeline is being hardened, so macOS reports an unidentified developer and Windows SmartScreen warns. On macOS, right-click the app and choose Open the first time. Verify the SHA-256 published next to the download first — that check is what actually tells you the file is the one CI built."}},{"@type":"Question","name":"Can it move my funds?","acceptedAnswer":{"@type":"Answer","text":"No, and it cannot be made to. NOSHASHI has no signing path and no custody: it reads ledger state and reports on it. It is not a bank, broker-dealer, money services business, money transmitter, qualified custodian or registered investment adviser, and nothing it produces is legal, regulatory, tax or investment advice."}},{"@type":"Question","name":"What data do you collect?","acceptedAnswer":{"@type":"Answer","text":"Without an account there is no server-side state: no analytics, no telemetry, no crash reporting. The compliance agent runs on your own machine with zero egress. Secrets are held by the OS keychain rather than by the app. Typefaces are self-hosted, so opening a page does not announce you to a font CDN."}},{"@type":"Question","name":"How do billing, cancellation and refunds work?","acceptedAnswer":{"@type":"Answer","text":"Payments run entirely through Stripe — no card data ever reaches NOSHASHI. Subscriptions renew automatically until cancelled and can be cancelled at any time, taking effect at the end of the period already paid for. A first charge is fully refundable within 14 days if no paid capability was used."}}]}]}</script>
 <script src="/assets/inline/c860242a63d46f8bb66c.js"></script>
 
