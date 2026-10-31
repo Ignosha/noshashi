@@ -24,6 +24,19 @@
   }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
+  /* ── One ring through the hero's still water per validated ledger ── */
+  var waves = $("sx-waves"), still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function wave() {
+    if (!waves || still || !waves.animate) return;
+    var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    c.setAttribute("cx", 600); c.setAttribute("cy", 760); c.setAttribute("r", 660);
+    c.style.transformOrigin = "600px 760px";
+    waves.appendChild(c);
+    c.animate([{ transform: "scale(.1)", opacity: .5 }, { transform: "scale(1)", opacity: 0 }],
+      { duration: 4200, easing: "cubic-bezier(.2,.6,.3,1)", fill: "forwards" });
+    setTimeout(function () { c.remove(); }, 4400);
+  }
+
   /* ── Validated ledgers ─────────────────────────────────────────── */
   var rows = $("sx-rows"), rate = $("sx-rate"), seen = [];
   function ago(t) {
@@ -44,6 +57,7 @@
     tr.innerHTML = "<td>" + fmt(d.index) + "</td><td>" + fmt(Math.max(0, Number(d.txnCount) || 0)) + "</td><td>just now</td>";
     rows.prepend(tr);
     while (rows.children.length > 5) rows.lastElementChild.remove();
+    wave();
     var stL = $("sx-st-ledger"); if (stL) stL.textContent = fmt(d.index);
     var stC = $("sx-st-close");
     if (stC && seen.length > 1) stC.textContent = ((seen[seen.length - 1] - seen[0]) / 1000 / (seen.length - 1)).toFixed(1) + " s";

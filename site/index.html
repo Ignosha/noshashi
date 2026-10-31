@@ -1647,6 +1647,48 @@
     .sx-dp-bar{grid-template-columns:52px minmax(0,1fr) 70px}
     .sx-paper{padding:24px 20px;aspect-ratio:auto}
   }
+
+  /* ── Ripples (2026-10-31) ──────────────────────────────────────────
+     One visual language, all drawn here: rings of still water. Behind
+     the hero (one ring spreads per validated ledger), as the icon family,
+     as the small mark before each section label, and engraved into the
+     closing panel. Original geometry; no third-party marks. */
+  .sx-hero{position:relative;isolation:isolate}
+  .sx-hero > :not(.sx-rings):not(.core){position:relative;z-index:1}
+  .sx-rings{position:absolute;z-index:0;left:50%;top:0;width:min(1500px,140vw);height:100%;transform:translateX(-50%);pointer-events:none;overflow:visible;
+    -webkit-mask-image:radial-gradient(60% 75% at 50% 100%,#000 30%,transparent 100%);mask-image:radial-gradient(60% 75% at 50% 100%,#000 30%,transparent 100%)}
+  .sx-rings circle{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+  .sx-rings-s circle{opacity:.07}
+  .sx-rings-s circle:nth-child(odd){opacity:.045}
+  #sx-waves circle{opacity:0;stroke-width:1.2}
+
+  .sx-ico{width:22px;height:22px;fill:none;stroke:var(--ink);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+  .sx-ico .f{fill:var(--ink);stroke:none}
+  html:not(#x) .mn-features .mn-ico{display:inline-grid;place-items:center;width:44px;height:44px;border:1px solid var(--rule);border-radius:50%;background:none}
+  html:not(#x) .mn-features a:hover .mn-ico{border-color:var(--ink)}
+
+  .mn-eyebrow,.sx-kicker,html:not(#x) main .eyebrow{display:inline-flex !important;align-items:center;gap:9px}
+  .mn-eyebrow::before,.sx-kicker::before,html:not(#x) main .eyebrow::before{content:"" !important;display:block !important;width:14px;height:14px;flex:none;
+    background:currentColor !important;opacity:.85;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.2'%3E%3Ccircle cx='8' cy='8' r='7'/%3E%3Ccircle cx='8' cy='8' r='4.2'/%3E%3Ccircle cx='8' cy='8' r='1.6' fill='%23000'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.2'%3E%3Ccircle cx='8' cy='8' r='7'/%3E%3Ccircle cx='8' cy='8' r='4.2'/%3E%3Ccircle cx='8' cy='8' r='1.6' fill='%23000'/%3E%3C/svg%3E") center/contain no-repeat;border:0 !important;border-radius:0 !important;transform:none !important}
+
+  .sx-cta{position:relative;overflow:hidden;isolation:isolate}
+  .sx-cta::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+    background:repeating-radial-gradient(circle at 50% 135%,transparent 0 46px,color-mix(in srgb,var(--ground) 14%,transparent) 46px 47px);
+    -webkit-mask-image:linear-gradient(to top,#000,transparent 85%);mask-image:linear-gradient(to top,#000,transparent 85%)}
+
+  /* Layout: the older lower sections in the same language. */
+  html:not(#x) main .traps.sx-cases{display:block;background:none;gap:0;border:0 !important;border-radius:0;box-shadow:none;padding:0}
+  html:not(#x) main .traps.sx-cases > div{background:none}
+  html:not(#x) .mn-features .mn-ico{margin:0 0 4px}
+  html:not(#x) .mn-features h3{margin-top:14px !important}
+  html:not(#x) main .traps.sx-cases > summary{background:none !important;border:0 !important;border-bottom:1px solid var(--rule) !important;border-radius:0 !important;padding:0 0 3px !important;width:auto !important;box-shadow:none !important}
+  html:not(#x) main .cx-demo h2,html:not(#x) main .cx-demo > p{text-align:left;margin-left:0}
+  html:not(#x) main .cx-demo{text-align:left}
+  html:not(#x) main .cx-demo video,html:not(#x) main .cx-demo .cx-video,html:not(#x) main .cx-demo figure{border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  html:not(#x) main button,html:not(#x) main .cx-btn,html:not(#x) main .tool-chip,html:not(#x) main a.btn{box-shadow:none !important}
+  html:not(#x) main .cx-eyebrow{font:400 14px "Inter",sans-serif !important;letter-spacing:0 !important;text-transform:none !important;color:var(--muted)}
+  html:not(#x) main .cx-head{text-align:left;margin-left:0;max-width:640px}
+  html:not(#x) main .cx-head h2{font-size:clamp(30px,3.6vw,48px);letter-spacing:-.04em;font-weight:600}
 </style>
 </head>
 <body>
@@ -1684,6 +1726,7 @@
   -->
   <section class="sx-hero" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
+    <svg class="sx-rings" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g class="sx-rings-s"><circle cx="600" cy="760" r="90"/><circle cx="600" cy="760" r="158"/><circle cx="600" cy="760" r="226"/><circle cx="600" cy="760" r="294"/><circle cx="600" cy="760" r="362"/><circle cx="600" cy="760" r="430"/><circle cx="600" cy="760" r="498"/><circle cx="600" cy="760" r="566"/><circle cx="600" cy="760" r="634"/></g><g id="sx-waves"></g></svg>
     <a class="sx-note" href="/docs/api/"><span>New</span>The Asset Risk API is free to call, no key needed <i aria-hidden="true">→</i></a>
     <h1 class="sx-h1">Compliance and risk for the XRP Ledger</h1>
     <p class="sx-sub">Check what an issuer can do, what a payment delivered and how much of a book can really fill, before you hold or move an asset. Read-only, with a receipt for every answer.</p>
@@ -1814,12 +1857,12 @@
       <p>Each answer names the validated ledger it was read at. Anything that could not be read is shown as not read, never as a pass.</p>
     </div>
     <div class="mn-features" data-reveal>
-      <a data-spot href="/certificate/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Issuer controls</h3><p>Whether an issuer can freeze, claw back, gate holding or sign alone.</p></a>
-      <a data-spot href="/delivered/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg></span><h3>Delivered amounts</h3><p>What a payment actually delivered, not what it asked for.</p></a>
-      <a data-spot href="/book-health/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h3>Real liquidity</h3><p>Advertised order-book depth against the depth that can fill.</p></a>
-      <a data-spot href="/xapp/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span><h3>Address screening</h3><p>OFAC sanctions, the scam registry and lookalike addresses, before you send.</p></a>
-      <a data-spot href="/alerts/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1112 0v5l2 2H4z"/><path d="M10 21h4"/></svg></span><h3>Issuer alerts</h3><p>Telegram or Discord tells you the moment an issuer's powers change.</p></a>
-      <a data-spot href="/evidence-report/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg></span><h3>Evidence reports</h3><p>A PDF of what the ledger shows, with a fingerprint anyone can verify.</p></a>
+      <a data-spot href="/certificate/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.8" class="f"/></svg></span><h3>Issuer controls</h3><p>Whether an issuer can freeze, claw back, gate holding or sign alone.</p></a>
+      <a data-spot href="/delivered/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.2" class="f"/></svg></span><h3>Delivered amounts</h3><p>What a payment actually delivered, not what it asked for.</p></a>
+      <a data-spot href="/book-health/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><path d="M2.5 18.5h19"/><path d="M3.5 18.5a8.5 8.5 0 0117 0"/><path d="M7.5 18.5a4.5 4.5 0 019 0"/><circle cx="12" cy="18.5" r="1.2" class="f"/></svg></span><h3>Real liquidity</h3><p>Advertised order-book depth against the depth that can fill.</p></a>
+      <a data-spot href="/xapp/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></svg></span><h3>Address screening</h3><p>OFAC sanctions, the scam registry and lookalike addresses, before you send.</p></a>
+      <a data-spot href="/alerts/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="6" cy="18" r="1.7" class="f"/><path d="M6 12.5a5.5 5.5 0 015.5 5.5"/><path d="M6 7a11 11 0 0111 11"/><path d="M6 2a16 16 0 0116 16"/></svg></span><h3>Issuer alerts</h3><p>Telegram or Discord tells you the moment an issuer's powers change.</p></a>
+      <a data-spot href="/evidence-report/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="12" cy="12" r="9" stroke-dasharray="1.6 2.2"/><circle cx="12" cy="12" r="5.8"/><path d="M9.6 12.1l1.7 1.7 3.2-3.4"/></svg></span><h3>Evidence reports</h3><p>A PDF of what the ledger shows, with a fingerprint anyone can verify.</p></a>
     </div>
     <details class="traps sx-cases">
       <summary>See six real cases from mainnet, each read two ways</summary>
