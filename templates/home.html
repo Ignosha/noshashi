@@ -1516,13 +1516,6 @@
   .rh-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(28px,5vw,64px);align-items:start}
   .rh-fig{margin:0;padding:18px 0 0;border-top:1px solid var(--ink)}
   .rh-fig figcaption{display:flex;justify-content:space-between;gap:12px;margin-bottom:6px;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
-  .sx-dp-side{padding:14px 0;border-top:1px solid var(--rule)}
-  .sx-dp-side > p{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--ink)}
-  .sx-dp-bar{display:grid;grid-template-columns:64px minmax(0,1fr) 84px;align-items:center;gap:12px;margin-top:8px;font-size:12.5px;color:var(--faint)}
-  .sx-dp-bar i{display:block;height:18px;width:0;transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
-  .sx-dp-bar i.q{background:repeating-linear-gradient(135deg,var(--faint) 0 1px,transparent 1px 6px);outline:1px solid var(--rule)}
-  .sx-dp-bar i.f{background:var(--ink)}
-  .sx-dp-bar b{font-weight:500;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
 
   .rh-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:clamp(24px,3vw,40px)}
   .rh-cols > .rh-h2{grid-column:1/-1;margin-bottom:22px}
@@ -1585,16 +1578,6 @@
   .rh-pull p{margin:0;font-family:"Instrument Serif",Georgia,serif;font-size:clamp(24px,2.5vw,32px);line-height:1.25;color:var(--ink)}
 
   .rh-ripple{margin:0}
-  .rh-ripple svg{display:block;width:100%;max-width:520px;margin:0 auto;height:auto;overflow:visible}
-  .rh-ripple .r{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
-  .rh-ripple .r1{opacity:.55}.rh-ripple .r2{opacity:.4}.rh-ripple .r3{opacity:.28}.rh-ripple .r4{opacity:.18}
-  .rh-ripple .core{fill:var(--ground);stroke:var(--ink);stroke-width:1.2}
-  .rh-ripple .t{font:400 15px "Instrument Serif",Georgia,serif;fill:var(--ink)}
-  .rh-ripple .t.s{font:400 11px "Inter",sans-serif;fill:var(--faint)}
-  .rh-ripple .t.c{font-size:14px}
-  .rh-ripple .t.c.s{font-size:10.5px}
-  .rh-ripple text{paint-order:stroke;stroke:var(--ground);stroke-width:5px;stroke-linejoin:round}
-  #rh-rip-live circle{fill:none;stroke:var(--ink);stroke-width:1.2;opacity:0}
   .rh-ripple figcaption{margin-top:14px;font-size:12.5px;line-height:1.6;color:var(--faint);text-align:center}
   .rh-ripple figcaption span{font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px}
 
@@ -1625,6 +1608,22 @@
     .rh-steps li + li{border-top:1px solid var(--rule)}
     .rh-problems li{grid-template-columns:40px minmax(0,1fr)}
   }
+
+  /* ── Live figures (desk-visuals.js) ──────────────────────────────── */
+  .rh-canvas{display:block;width:100%;touch-action:pan-y}
+  .rh-band{margin:0;padding:clamp(18px,2.5vw,28px) 0 0;border-bottom:1px solid var(--rule)}
+  .rh-sky{height:clamp(230px,24vw,330px)}
+  .rh-band figcaption{padding:10px 0 18px;font-size:12.5px;line-height:1.6;color:var(--faint)}
+  .rh-band figcaption span{font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+  .rh-band figcaption em{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums}
+  .rh-surface{height:clamp(250px,25vw,360px)}
+  @media (max-width:639px){.rh-surface{height:62vw}}
+  .rh-legend{list-style:none;margin:10px 0 0;padding:0;font-size:13px;line-height:1.5;color:var(--faint)}
+  .rh-legend li{padding:8px 0;border-top:1px solid var(--rule)}
+  .rh-legend b{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:17px;color:var(--ink);margin-right:8px}
+  @media (min-width:640px){.rh-legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0}}
+  .rh-depthc{height:clamp(270px,26vw,350px);cursor:crosshair}
+  .rh-dp-sum{margin:10px 0 0;font-size:12.5px;line-height:1.6;color:var(--faint);font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -1667,6 +1666,11 @@
     </div>
   </section>
 
+  <figure class="rh-band" aria-labelledby="rh-f1c">
+    <canvas id="rh-sky" class="rh-canvas rh-sky" role="img" aria-label="Validated XRP Ledger ledgers drawn as blocks, the latest on the right; the height of each is its number of transactions, on a square-root scale."></canvas>
+    <figcaption id="rh-f1c"><span>Figure 1.</span> Validated ledgers on XRP Ledger mainnet, drawn as they close, the latest on the right. Each block&rsquo;s height is its number of transactions. <em id="rh-sky-stats">Reading the latest validated ledgers.</em></figcaption>
+  </figure>
+
   <div class="rh-dinkus" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18"/><circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="4" class="f"/></svg></div>
 
   <section class="rh-sec rh-explain" data-reveal aria-labelledby="rh-x">
@@ -1680,25 +1684,15 @@
       </blockquote>
     </div>
     <figure class="rh-ripple" aria-labelledby="rh-f2c">
-      <svg viewBox="0 0 520 520" role="img" aria-label="Concentric rings from the issuer outward: holders, the order book, payments and counterparties.">
-        <g id="rh-rip-live"></g>
-        <circle class="r r4" cx="260" cy="260" r="236"/>
-        <circle class="r r3" cx="260" cy="260" r="184"/>
-        <circle class="r r2" cx="260" cy="260" r="132"/>
-        <circle class="r r1" cx="260" cy="260" r="80"/>
-        <circle class="core" cx="260" cy="260" r="34"/>
-        <text class="t c" x="260" y="256" text-anchor="middle">Issuer</text>
-        <text class="t c s" x="260" y="272" text-anchor="middle">account</text>
-        <text class="t" x="260" y="198" text-anchor="middle">Holders</text>
-        <text class="t" x="260" y="146" text-anchor="middle">Order book</text>
-        <text class="t" x="260" y="94" text-anchor="middle">Payments</text>
-        <text class="t" x="260" y="42" text-anchor="middle">Counterparties</text>
-        <text class="t s" x="260" y="352" text-anchor="middle">freeze · clawback · authorisation</text>
-        <text class="t s" x="260" y="402" text-anchor="middle">quoted against fillable depth</text>
-        <text class="t s" x="260" y="452" text-anchor="middle">delivered, not requested</text>
-        <text class="t s" x="260" y="503" text-anchor="middle">sanctions three hops back</text>
-      </svg>
-      <figcaption id="rh-f2c"><span>Figure 1.</span> How a token's risk ripples outward, and what NOSHASHI reads at each ring. A faint ring passes through each time the XRP Ledger validates a ledger.</figcaption>
+      <canvas id="rh-surface" class="rh-canvas rh-surface" role="img" aria-label="A surface of rings spreading from the issuer outward: holders, the order book, payments and counterparties. Each validated ledger sends a wave across it."></canvas>
+      <ol class="rh-legend">
+        <li><b>Issuer account</b> keys, signer list and flags</li>
+        <li><b>Holders</b> freeze, clawback, authorisation</li>
+        <li><b>Order book</b> quoted against fillable depth</li>
+        <li><b>Payments</b> delivered, not requested</li>
+        <li><b>Counterparties</b> sanctions three hops back</li>
+      </ol>
+      <figcaption id="rh-f2c"><span>Figure 2.</span> How a token's risk ripples outward from its issuer, and what NOSHASHI reads at each ring. Each validated ledger sends a wave across the surface.</figcaption>
     </figure>
   </section>
 
@@ -1706,7 +1700,7 @@
     <h2 class="rh-h2" id="rh-p">The problems it solves</h2>
     <ol class="rh-problems">
       <li><span class="rh-pn">I</span><div><h3>An issuer can freeze or claw back a balance, and its website will not tell you.</h3><p>NOSHASHI reads the issuer's account flags and signer list, so you know whether it can freeze holders, claw back, gate who may hold, or act with a single key.</p></div></li>
-      <li><span class="rh-pn">II</span><div><h3>An order book can show depth that is not there.</h3><p>It counts only the offers whose owners hold the funds at that ledger, so the depth you see is the depth that can trade. See Figure 2.</p></div></li>
+      <li><span class="rh-pn">II</span><div><h3>An order book can show depth that is not there.</h3><p>It counts only the offers whose owners hold the funds at that ledger, so the depth you see is the depth that can trade. See Figure 3.</p></div></li>
       <li><span class="rh-pn">III</span><div><h3>A payment can deliver far less than it states.</h3><p>Partial payments are legal on the XRP Ledger. NOSHASHI reports the delivered amount, the figure that should be credited.</p></div></li>
       <li><span class="rh-pn">IV</span><div><h3>A sanctioned or scam counterparty can reach you in a few hops.</h3><p>Deposits and withdrawals are screened against OFAC-listed senders up to three hops back, the scam registry, lookalike addresses and counterfeit tokens.</p></div></li>
       <li><span class="rh-pn">V</span><div><h3>An auditor asks what you saw, and on which date.</h3><p>Each reading can be exported as an evidence report with the ledger index and a fingerprint anyone can verify, now or months later.</p></div></li>
@@ -1735,20 +1729,14 @@
 
   <section class="rh-sec rh-two" data-reveal aria-labelledby="rh-f1">
     <div>
-      <h2 class="rh-h2" id="rh-f1"><span>Figure 2.</span> Quoted against fillable depth, XRP / RLUSD</h2>
+      <h2 class="rh-h2" id="rh-f1"><span>Figure 3.</span> Quoted against fillable depth, XRP / RLUSD</h2>
       <p class="rh-body">An order book on the XRP Ledger can advertise offers its owners cannot fund. NOSHASHI counts only what each offer's owner holds at the ledger it reads. The difference between the two bars is liquidity that exists only on paper.</p>
-      <p class="rh-notes">Within 10% of the reference mid. DEX order book only; AMM pools are not included. <span id="sx-dp-mid"></span></p>
+      <p class="rh-notes">Within 10% of the reference mid. DEX order book only; AMM pools are not included. Hover the chart to read any price. Refreshed every minute while on screen.</p>
     </div>
-    <figure class="rh-fig" aria-label="RLUSD order book, quoted against fillable depth, read live">
-      <figcaption><span>RLUSD, both sides</span><span id="sx-dp-l">Reading…</span></figcaption>
-      <div class="sx-dp-side"><p>Bids</p>
-        <div class="sx-dp-bar"><span>Quoted</span><i class="q" id="sx-dp-bq"></i><b id="sx-dp-bqv">—</b></div>
-        <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-bf"></i><b id="sx-dp-bfv">—</b></div>
-      </div>
-      <div class="sx-dp-side"><p>Asks</p>
-        <div class="sx-dp-bar"><span>Quoted</span><i class="q" id="sx-dp-aq"></i><b id="sx-dp-aqv">—</b></div>
-        <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-af"></i><b id="sx-dp-afv">—</b></div>
-      </div>
+    <figure class="rh-fig rh-depth" aria-labelledby="rh-f3c">
+      <figcaption id="rh-f3c"><span>Cumulative depth within 10% of mid, both sides</span><span id="rh-dp-l">Reading the book…</span></figcaption>
+      <canvas id="rh-depth" class="rh-canvas rh-depthc" role="img" aria-label="Cumulative order-book depth for XRP / RLUSD: what can fill as a shaded area, what is quoted as a dashed line."></canvas>
+      <p class="rh-dp-sum" id="rh-dp-sum"></p>
     </figure>
   </section>
 
@@ -1999,6 +1987,7 @@
 <script src="/assets/hero-live.js" defer></script>
 <script src="/assets/motion.js" defer></script>
 <script src="/assets/dash.js" defer></script>
+<script src="/assets/desk-visuals.js" defer></script>
 
 <!--SLOT:JSONLD-->
 <script>

@@ -9,7 +9,8 @@
  *               names the ledger and the receipt.
  *   Table 1     /api/authority for six widely held issuers, read when the
  *               table comes near the screen.
- *   Figure 1    RLUSD quoted against fillable depth, from the same reply.
+ *
+ * The three live figures are drawn by desk-visuals.js.
  *
  * A read that fails says so in place. Nothing is filled with sample values.
  */
@@ -29,11 +30,7 @@
   /* ── Dateline ──────────────────────────────────────────────────── */
   set("rh-date", new Date().toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long", year: "numeric" }));
 
-  /* ── Lead story and Figure 1, from one Asset Risk reply ─────────── */
-  function width(id, v, max) {
-    var el = $(id);
-    if (el) requestAnimationFrame(function () { requestAnimationFrame(function () { el.style.width = (max > 0 ? Math.max(1, (v / max) * 100) : 0) + "%"; }); });
-  }
+  /* ── Lead story, from one Asset Risk reply ─────────────────────── */
   fetch("/api/v1/asset-risk?issuer=" + RLUSD.issuer + "&currency=" + RLUSD.currency)
     .then(function (r) { return r.json(); })
     .then(function (a) {
@@ -41,16 +38,9 @@
       var ctl = a.issuer_controls, liq = a.liquidity, lg = a.ledgers || {};
       var pct = null;
       if (liq && liq.quoted) {
-        var q = liq.quoted, f = liq.fillable, max = Math.max(q.bid || 0, q.ask || 0, 1);
-        var tot = (q.bid || 0) + (q.ask || 0), fil = (f.bid || 0) + (f.ask || 0);
+        var tot = (liq.quoted.bid || 0) + (liq.quoted.ask || 0), fil = (liq.fillable.bid || 0) + (liq.fillable.ask || 0);
         if (tot > 0) pct = Math.round((fil / tot) * 100);
-        width("sx-dp-bq", q.bid, max); width("sx-dp-bf", f.bid, max);
-        width("sx-dp-aq", q.ask, max); width("sx-dp-af", f.ask, max);
-        set("sx-dp-bqv", compact(q.bid)); set("sx-dp-bfv", compact(f.bid));
-        set("sx-dp-aqv", compact(q.ask)); set("sx-dp-afv", compact(f.ask));
-        set("sx-dp-l", "Ledger " + fmt(liq.ledger_index));
-        if (liq.reference && liq.reference.mid) set("sx-dp-mid", "Reference mid " + Number(liq.reference.mid).toFixed(4) + " XRP per RLUSD.");
-      } else { set("sx-dp-l", "The book could not be read just now"); }
+      }
 
       if (ctl && ctl.checks) {
         var checks = ctl.checks.filter(function (k) { return k.state !== "INSUFFICIENT_DATA"; });
@@ -79,22 +69,7 @@
     })
     .catch(function () {
       set("rh-by", "The ledger could not be read just now; the figures below will say so too.");
-      set("sx-dp-l", "The book could not be read just now");
     });
-
-  /* ── Figure 2: one ring through the ripple diagram per ledger ───── */
-  var rip = $("rh-rip-live"), still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  window.addEventListener("noshashi:ledger", function (ev) {
-    var d = ev.detail || {};
-    if (!rip || still || !Number.isInteger(d.index) || !rip.animate) return;
-    var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    c.setAttribute("cx", 260); c.setAttribute("cy", 260); c.setAttribute("r", 236);
-    c.style.transformOrigin = "260px 260px";
-    rip.appendChild(c);
-    c.animate([{ transform: "scale(.15)", opacity: .7 }, { transform: "scale(1)", opacity: 0 }],
-      { duration: 3800, easing: "cubic-bezier(.2,.6,.3,1)", fill: "forwards" });
-    setTimeout(function () { c.remove(); }, 4000);
-  });
 
   /* ── Table 1: issuer controls, read when the table is near ──────── */
   var table = $("rh-issuers");
