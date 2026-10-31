@@ -140,7 +140,7 @@ export function renderFooter() {
     <nav class="foot-map" aria-label="Site map">
       ${groups}
     </nav>
-    <p class="mono foot-legal">© ${new Date().getUTCFullYear()} NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
+    <p class="mono foot-legal">© ${new Date().getUTCFullYear()} NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
   </div>
 </footer>`;
 }
@@ -154,7 +154,7 @@ export function renderFooter() {
  */
 export const THEME_BOOT = `<script>
 (function(){try{var t=localStorage.getItem("noshashi-theme");
-if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();
 </script>`;
 
 export const THEME_TOGGLE = `<script>
@@ -196,7 +196,7 @@ export const ORGANIZATION = {
   "@type": "Organization",
   name: "NOSHASHI Labs",
   url: `${ORIGIN}/`,
-  logo: `${ORIGIN}/favicon.svg`,
+  logo: `${ORIGIN}/assets/ledger-mark-512.png`,
   description:
     "Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.",
   sameAs: ["https://github.com/Ignosha/noshashi"],
@@ -236,7 +236,7 @@ export function renderPage({
 }) {
   const canonical = `${ORIGIN}${path}`;
   return `<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -253,7 +253,7 @@ export function renderPage({
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">

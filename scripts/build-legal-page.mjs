@@ -85,7 +85,7 @@ const body = policies
   .join("\n");
 
 const html = `<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -94,7 +94,7 @@ const html = `<!doctype html>
 <meta name="description" content="Terms, privacy, accessibility statement, billing, data processing, acceptable use and regulatory disclosures for NOSHASHI.">
 <link rel="canonical" href="https://noshashi.app/legal/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
 <!-- Typefaces served from this origin; no font CDN is contacted. -->
 <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
@@ -103,7 +103,7 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="/assets/modules.css">
 <script>
 (function(){try{var t=localStorage.getItem("noshashi-theme");
-if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
+document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();
 </script>
 <style>
   :root{

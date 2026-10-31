@@ -109,7 +109,7 @@
         '<button class="sub-close" type="button" aria-label="Close" data-close>✕</button>' +
         '<div class="sub-mark" aria-hidden="true">' +
           '<span class="ring"></span><span class="ring"></span>' +
-          '<img src="/assets/flower-mark-128.png" alt="" width="44" height="44" decoding="async">' +
+          '<img src="/assets/ledger-mark.svg" alt="" width="44" height="44" decoding="async">' +
         '</div>' +
         '<h2 id="sub-dlg-title">Stay ahead of XRPL risk</h2>' +
         '<p class="lede">Get an email when we ship something new or find a risk on the ' +

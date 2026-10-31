@@ -27,6 +27,7 @@
  * wagging the dog.
  */
 
+import { MARK } from "../api/_lib/brand-mark.js";
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -53,7 +54,7 @@ import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
 import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
-import { buildTokens, TOKEN_INDEX_PAGES } from "./build-tokens.mjs";
+import { buildTokens, TOKEN_INDEX_PAGES, loadTokens } from "./build-tokens.mjs";
 import { buildPartners, PARTNER_PAGES } from "./build-partners.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -116,6 +117,8 @@ async function buildHome({ news, market, feed, status, release }) {
     SUBSCRIBE: renderSubscribe(),
     MISREAD: renderMisread(misread),
     SHOTHERO: renderShot(shots, "overview", { eager: true }),
+    TOKENCOUNT: String((await loadTokens()).tokens.length),
+    TOKENTAPE: (await loadTokens()).tokens.map((t) => `<a href="/tokens/${esc(t.slug)}/"><b translate="no">${esc(t.label)}</b><span>${esc(t.by)}</span></a>`).join(""),
     SHOTVERIFICATION: renderShot(shots, "verification"),
     SHOTAUDIT: renderShot(shots, "audit"),
     SHOTADDRESS: renderShot(shots, "address"),
@@ -147,7 +150,7 @@ async function buildHome({ news, market, feed, status, release }) {
 
   // The short homepage leaves out the newsroom, mission log and edge lab;
   // their slots are optional so those panels can come back without code.
-  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
+  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE", "SHOTHERO", "TOKENTAPE", "SHOTVERIFICATION", "SHOTAUDIT", "SHOTADDRESS"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
     if (!html.includes(token)) {
@@ -1730,11 +1733,44 @@ async function main() {
   await buildRobots();
   // Last: every page, generated or committed, loses its inline scripts so
   // the CSP can be script-src 'self' (scripts/inline-scripts.mjs).
+  await accentLast(SITE);
   const inline = await externalizeSite(SITE);
   log(`inline scripts: ${inline.files} files for ${inline.pages} pages (${inline.removed} unused removed)`);
 
   log(`canonical origin: ${ORIGIN}`);
   log("done.");
+}
+
+/*
+ * Every page opens in the light palette unless a theme was saved. And a
+ * few older pages (pricing, the edge-pack download) carry their own
+ * inline colour tokens, which would override the site skin in
+ * /assets/accent.css. Linking the skin again at the end of <head> keeps it
+ * last, so every page shares one palette. The homepage sets its own.
+ */
+async function accentLast(dir) {
+  const LINK = '<link rel="stylesheet" href="/assets/accent.css" data-skin-last>';
+  const walk = async (d) => {
+    for (const entry of await readdir(d, { withFileTypes: true })) {
+      const full = path.join(d, entry.name);
+      if (entry.isDirectory()) { await walk(full); continue; }
+      if (entry.name !== "index.html" || full === path.join(dir, "index.html")) continue;
+      let html = await readFile(full, "utf8");
+      const before = html;
+      // Dark monochrome is the default palette: every page's <html> opens
+      // dark until the visitor's saved choice says otherwise.
+      html = html.replace(/<html lang="en"(?: data-theme="light")?>/, '<html lang="en" data-theme="dark">');
+      // Older static pages still name the flower; the website mark is the
+      // ledger mark (scripts/gen-brand.mjs).
+      html = html
+        .replaceAll('href="/assets/flower-mark-180.png"', 'href="/assets/ledger-mark-180.png"')
+        .replace(/<img class="brand-mark" src="\/assets\/flower-mark-128\.png" width="(\d+)" height="\d+"[^>]*>/g,
+          (_, w) => MARK.replace('width="26" height="26"', `width="${w}" height="${w}"`));
+      if (/--ground:\s*#/.test(html) && !html.includes("data-skin-last")) html = html.replace("</head>", `${LINK}\n</head>`);
+      if (html !== before) await writeFile(full, html);
+    }
+  };
+  await walk(dir);
 }
 
 main().catch((error) => {

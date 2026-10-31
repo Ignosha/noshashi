@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -16,7 +16,7 @@
 <meta name="twitter:title" content="SGB (GateHub) on the XRP Ledger: freeze, clawback and issuer keys, live">
 <meta name="twitter:description" content="Can the SGB issuer (GateHub) freeze holders or claw back tokens? Read live from the XRP Ledger: issuer flags, signing keys and real order-book depth for rctArjqVvTHihekzDeecKo6mkTYTUSBNc.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">
@@ -24,8 +24,8 @@
 <link rel="stylesheet" href="/assets/modules.css">
 <link rel="stylesheet" href="/assets/accent.css">
 <script src="/assets/accent.js"></script>
-<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Tokens","item":"https://www.noshashi.app/tokens/"},{"@type":"ListItem","position":3,"name":"SGB (GateHub)","item":"https://www.noshashi.app/tokens/sgb-gatehub/"}]}]}</script>
+<script src="/assets/inline/c5a81e5a06d4616fef91.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/assets/ledger-mark-512.png","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Tokens","item":"https://www.noshashi.app/tokens/"},{"@type":"ListItem","position":3,"name":"SGB (GateHub)","item":"https://www.noshashi.app/tokens/sgb-gatehub/"}]}]}</script>
 <style>
 .tk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:18px 0}
 .tk-card{display:block;border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;text-decoration:none;color:inherit}
@@ -50,7 +50,7 @@
 <body>
 <header>
   <div class="shell nav">
-    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <a class="brand" href="/" style="color:var(--ink)"><svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true" focusable="false"><path d="M8.5 23.5V8.5M23.5 8.5V23.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><rect x="11" y="10" width="3.8" height="3.8" rx=".9" fill="currentColor" opacity=".5"/><rect x="14.1" y="14.1" width="3.8" height="3.8" rx=".9" fill="currentColor" opacity=".78"/><rect x="17.2" y="18.2" width="3.8" height="3.8" rx=".9" fill="currentColor"/></svg><span>NOSHASHI</span></a>
     <nav class="nav-links" aria-label="Primary">
       <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
       <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
@@ -105,7 +105,7 @@
       <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/news/">Newsroom</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
       <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/partners/">Partner programs</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
     </nav>
-    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
   </div>
 </footer>
 <script src="/assets/i18n.js" defer></script>
