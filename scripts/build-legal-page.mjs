@@ -85,7 +85,7 @@ const body = policies
   .join("\n");
 
 const html = `<!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -103,7 +103,7 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="/assets/modules.css">
 <script>
 (function(){try{var t=localStorage.getItem("noshashi-theme");
-document.documentElement.setAttribute("data-theme",t==="dark"?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}})();
+document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();
 </script>
 <style>
   :root{

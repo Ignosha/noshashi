@@ -55,7 +55,6 @@ import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
 import { buildTokens, TOKEN_INDEX_PAGES, loadTokens } from "./build-tokens.mjs";
 import { buildPartners, PARTNER_PAGES } from "./build-partners.mjs";
-import { SCENE } from "./scene-art.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
@@ -118,7 +117,6 @@ async function buildHome({ news, market, feed, status, release }) {
     MISREAD: renderMisread(misread),
     SHOTHERO: renderShot(shots, "overview", { eager: true }),
     TOKENCOUNT: String((await loadTokens()).tokens.length),
-    SCENE,
     TOKENTAPE: (await loadTokens()).tokens.map((t) => `<a href="/tokens/${esc(t.slug)}/"><b translate="no">${esc(t.label)}</b><span>${esc(t.by)}</span></a>`).join(""),
     SHOTVERIFICATION: renderShot(shots, "verification"),
     SHOTAUDIT: renderShot(shots, "audit"),
@@ -1758,9 +1756,9 @@ async function accentLast(dir) {
       if (entry.name !== "index.html" || full === path.join(dir, "index.html")) continue;
       let html = await readFile(full, "utf8");
       const before = html;
-      // Light is the default palette: a page whose <html> names no theme
-      // opens light until the visitor's saved choice says otherwise.
-      html = html.replace(/<html lang="en">/, '<html lang="en" data-theme="light">');
+      // Dark monochrome is the default palette: every page's <html> opens
+      // dark until the visitor's saved choice says otherwise.
+      html = html.replace(/<html lang="en"(?: data-theme="light")?>/, '<html lang="en" data-theme="dark">');
       if (/--ground:\s*#/.test(html) && !html.includes("data-skin-last")) html = html.replace("</head>", `${LINK}\n</head>`);
       if (html !== before) await writeFile(full, html);
     }

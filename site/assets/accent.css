@@ -1,28 +1,31 @@
 /* ─────────────────────────────────────────────────────────────────────
-   NOSHASHI · Clean (2026-10-31)
+   NOSHASHI · Monochrome (2026-10-31)
    ─────────────────────────────────────────────────────────────────────
-   The site-wide skin, after the calm, minimal fintech sites (Mercury,
-   Ramp, Stripe): white space, one typeface (Inter), plain navigation,
-   thin rules, and one soft blue-purple accent used sparingly. Light by
-   default; a quiet deep-indigo dark mode.
+   The site-wide skin, after the private-banking dashboards: near-black
+   ground, graphite cards, silver type, a fine grain, and colour kept for
+   signal only (pass, hold, fail). Dark by default; a warm paper light mode.
 
    It lives here because every server-rendered page already links this
    file last, so its tokens win without touching each page. The landing
    page sets the same tokens in its own inline style.
    ───────────────────────────────────────────────────────────────── */
-:root{
-  --ground:#0E0F17; --surface:#15161F; --elevated:#1C1D29;
-  --ink:#ECEDF5; --muted:#A3A6B8; --faint:#7E8196; --rule:#262836;
-  --brand:#9EA2FF; --tele:#C2B8FF; --on-brand:#11121C;
-  --go:#5FD39C; --hold:#E8C86A; --nogo:#FF8A8A;
+:root,html[data-theme="dark"]{
+  --ground:#0B0B0C; --surface:#141415; --elevated:#1B1B1D;
+  --ink:#EDEDED; --muted:#A6A6AB; --faint:#7D7D83; --rule:#26262A;
+  --brand:#D9D9DC; --tele:#BFC3CC; --on-brand:#0B0B0C;
+  --go:#7FD1A4; --hold:#E3C77A; --nogo:#F08F8F;
   --r:12px;
 }
 html[data-theme="light"]{
-  --ground:#FFFFFF; --surface:#FFFFFF; --elevated:#F6F6F9;
-  --ink:#0F1222; --muted:#545A6E; --faint:#6C7186; --rule:#E7E8EE;
-  --brand:#5B5BD6; --tele:#6E56CF; --on-brand:#FFFFFF;
+  --ground:#F4F4F2; --surface:#FFFFFF; --elevated:#ECECE9;
+  --ink:#111112; --muted:#505055; --faint:#68686E; --rule:#DDDDD8;
+  --brand:#111112; --tele:#3A3A40; --on-brand:#F4F4F2;
   --go:#127A46; --hold:#8B6500; --nogo:#B42332;
 }
+body{background:var(--ground)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+html[data-theme="light"] body::after{opacity:.04}
 
 /* One typeface, set the way the fintech sites set it: tight headlines in
    sentence case, quiet body text, tabular figures. */

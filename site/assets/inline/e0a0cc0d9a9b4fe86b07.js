@@ -6,7 +6,7 @@
   var themeLabel = document.getElementById("themeLabel");
   var savedTheme = "";
   try { savedTheme = localStorage.getItem("noshashi-theme") || ""; } catch (e) {}
-  document.documentElement.setAttribute("data-theme", savedTheme === "dark" ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", savedTheme === "light" ? "light" : "dark");
   function updateThemeButton() {
     var light = document.documentElement.getAttribute("data-theme") === "light";
     var map = window.__NOSHASHI_I18N || {};
