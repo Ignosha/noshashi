@@ -1454,241 +1454,117 @@
   body{background:var(--ground)}
   body::after{content:none}
 
-  /* ── SaaS (2026-10-31) ─────────────────────────────────────────────
-     Plain and specific: a centred headline in solid type, two buttons,
-     then the product itself, a workspace window filled from mainnet as
-     the page is read. No gradients on type, no glass, no glow. */
-  .sx-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:clamp(64px,9vw,112px) 0 clamp(40px,5vw,56px)}
-  .sx-note{display:inline-flex;align-items:center;gap:10px;margin-bottom:28px;padding:5px 12px 5px 5px;border:1px solid var(--rule);border-radius:999px;
-    font-size:13px;color:var(--muted);text-decoration:none;transition:border-color .2s ease,color .2s ease}
-  .sx-note span{padding:2px 8px;border-radius:999px;background:var(--elevated);color:var(--ink);font-size:12px;font-weight:500}
-  .sx-note:hover{border-color:var(--faint);color:var(--ink)}
-  .sx-h1{margin:0;max-width:15ch;font-size:clamp(40px,5.8vw,78px);line-height:1.02;letter-spacing:-.045em;font-weight:600;color:var(--ink)}
-  .sx-sub{margin:22px 0 0;max-width:56ch;font-size:clamp(16px,1.3vw,18px);line-height:1.6;color:var(--muted)}
-  .sx-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:32px}
-  .sx-btn{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:8px;background:var(--ink);color:var(--ground);border:1px solid var(--ink);
-    font-size:14.5px;font-weight:500;text-decoration:none;transition:opacity .15s ease}
-  .sx-btn:hover{opacity:.88}
-  .sx-btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
-  .sx-btn.ghost:hover{opacity:1;border-color:var(--faint)}
-  .sx-fine{margin:16px 0 0;font-size:13px;color:var(--faint)}
-
-  .sx-window{display:block !important;max-width:none !important;width:auto !important;margin:0 !important;justify-items:initial !important;
-    border:1px solid var(--rule);border-radius:14px;background:var(--surface);overflow:hidden;text-align:left;
-    box-shadow:0 1px 0 rgb(255 255 255 / .04) inset,0 50px 100px -50px rgb(0 0 0 / .7)}
-  html[data-theme="light"] .sx-window{box-shadow:0 50px 100px -60px rgb(0 0 0 / .25)}
-  .sx-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:10px 16px;border-bottom:1px solid var(--rule);font-size:12.5px;color:var(--faint)}
-  .sx-crumb i{font-style:normal;margin:0 6px;color:var(--rule)}
-  .sx-crumb b{font-weight:500;color:var(--ink)}
-  .sx-search{display:flex;align-items:center;gap:24px;padding:5px 8px 5px 12px;border:1px solid var(--rule);border-radius:7px;background:var(--ground);color:var(--faint);white-space:nowrap}
-  .sx-search kbd{padding:1px 6px;border:1px solid var(--rule);border-radius:4px;font:11px "Inter",sans-serif;color:var(--faint);background:var(--surface)}
-  .sx-net{justify-self:end;display:flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
-  .sx-dot{width:7px;height:7px;border-radius:50%;background:var(--go)}
-  .sx-body{display:grid;grid-template-columns:190px minmax(0,1fr);min-height:520px}
-  .sx-side{display:flex;flex-direction:column;gap:1px;padding:14px 10px;border-right:1px solid var(--rule);font-size:13px;color:var(--muted)}
-  .sx-side p{margin:12px 8px 6px;font-size:11.5px;color:var(--faint)}
-  .sx-side p:first-child{margin-top:2px}
-  .sx-side span{padding:6px 8px;border-radius:6px}
-  .sx-side .on{background:var(--elevated);color:var(--ink)}
-  .sx-main{padding:20px 22px 22px;min-width:0}
-  .sx-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
-  .sx-head h2{margin:0;font-size:22px;font-weight:600;letter-spacing:-.02em}
-  .sx-head p{margin:4px 0 0;font:12px "IBM Plex Mono",ui-monospace,monospace;color:var(--faint);overflow-wrap:anywhere}
-  .sx-head-r{display:flex;align-items:center;gap:18px}
-  .sx-px{text-align:right}
-  .sx-px span{display:block;font-size:11.5px;color:var(--faint)}
-  .sx-px em{font-style:normal;margin-left:4px}
-  .sx-px em[data-state="live"]{color:var(--go)}
-  .sx-px b{font-size:17px;font-weight:500;font-variant-numeric:tabular-nums}
-  .sx-verdict{padding:4px 10px;border-radius:6px;border:1px solid var(--rule);font-size:12px;font-weight:500;color:var(--muted)}
-  .sx-verdict[data-tone="hold"]{color:var(--hold);border-color:color-mix(in srgb,var(--hold) 40%,var(--rule))}
-  .sx-verdict[data-tone="go"]{color:var(--go);border-color:color-mix(in srgb,var(--go) 40%,var(--rule))}
-  .sx-tabs{display:flex;gap:20px;margin:18px 0 16px;border-bottom:1px solid var(--rule);font-size:13px;color:var(--faint)}
-  .sx-tabs span{padding:0 0 10px}
-  .sx-tabs .on{color:var(--ink);box-shadow:inset 0 -1.5px 0 var(--ink)}
-  .sx-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px}
-  .sx-col{display:grid;gap:12px}
-  .sx-card{min-width:0;padding:14px 16px;border:1px solid var(--rule);border-radius:10px;background:var(--ground)}
-  .sx-k{display:flex;justify-content:space-between;gap:8px;margin:0 0 10px;font-size:12.5px;font-weight:500;color:var(--muted)}
-  .sx-k span{font-weight:400;color:var(--faint);font-variant-numeric:tabular-nums}
-  .sx-card table{width:100%;border-collapse:collapse;font-size:13px}
-  .sx-card th{padding:0 0 8px;text-align:left;font-weight:400;font-size:12px;color:var(--faint);border-bottom:1px solid var(--rule)}
-  .sx-card th:last-child,.sx-card td:last-child{text-align:right}
-  .sx-card td{padding:9px 0;border-bottom:1px solid var(--rule);color:var(--ink);font-variant-numeric:tabular-nums}
-  .sx-card tr:last-child td{border-bottom:0}
-  .sx-card td.sx-wait{color:var(--faint);text-align:left !important}
-  .sx-res{display:inline-block;min-width:36px;padding:1px 8px;border-radius:5px;font-size:12px;text-align:center}
-  .sx-res.yes{background:color-mix(in srgb,var(--go) 14%,transparent);color:var(--go)}
-  .sx-res.no{background:color-mix(in srgb,var(--hold) 16%,transparent);color:var(--hold)}
-  .sx-ledgers{grid-column:1/-1}
-  .sx-ledgers tbody tr.new td{animation:sx-new 1.4s ease}
-  @keyframes sx-new{from{background:color-mix(in srgb,var(--ink) 8%,transparent)}}
-  .sx-big{margin:0;font-size:30px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-  .sx-bar{height:6px;margin:10px 0 8px;border-radius:3px;background:var(--elevated);overflow:hidden}
-  .sx-bar i{display:block;height:100%;width:0;background:var(--ink);transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
-  .sx-small{margin:0;font-size:12px;color:var(--faint)}
-  .sx-hash{margin:0 0 8px;font:12px/1.55 "IBM Plex Mono",ui-monospace,monospace;color:var(--ink);overflow-wrap:anywhere}
-  .sx-cap{margin:14px 0 0;text-align:center;font-size:13px;color:var(--faint)}
-
-  .sx-trust{margin-top:clamp(56px,8vw,88px);text-align:center}
-  .sx-trust p{margin:0;font-size:13px;color:var(--faint)}
-  .sx-trust ul{list-style:none;display:flex;justify-content:center;flex-wrap:wrap;gap:10px clamp(24px,4vw,56px);margin:16px 0 0;padding:0}
-  .sx-trust li{font-size:clamp(18px,1.8vw,22px);font-weight:600;letter-spacing:-.03em;color:var(--faint)}
-  .sx-trust small{display:block;margin-top:12px;font-size:11.5px;color:var(--faint);opacity:.8}
-
-  /* Review fixes: features read as text, not boxes; plumbing hidden;
-     faint text at 4.5:1 or better. */
+  /* ── The Ledger Desk (2026-10-31) ──────────────────────────────────
+     A research publication, not a landing page: a masthead with the live
+     dateline, a lead story written from the reading itself, numbered
+     tables and figures with footnotes, a method section that says what
+     is not read, and services as a ruled list. Serif headlines, Inter
+     text, tabular figures, hairline rules; no cards, no icon grids. */
   :root,html[data-theme="dark"]{--faint:#8A8A90}
   html[data-theme="light"]{--faint:#636368}
-  .mn-features{gap:28px 40px !important;border-top:0 !important}
-  html:not(#x) .mn-features a,html:not(#x) .mn-features a:nth-child(n){background:none !important;border:0 !important;border-top:1px solid var(--rule) !important;
-    border-radius:0 !important;padding:22px 0 0 !important}
-  html:not(#x) .mn-features a:hover{border-top-color:var(--ink) !important}
-  html:not(#x) main .eyebrow{font-family:"Inter",sans-serif;font-size:14px;letter-spacing:0;text-transform:none;color:var(--muted)}
-  .sx-px em:not([data-state="live"]){display:none}
-  .sx-cases{margin-top:36px}
-  html:not(#x) .sx-cases > summary{background:none;border-radius:0;padding:0 0 3px;width:auto}
-  .sx-cases > summary{display:inline-flex;cursor:pointer;list-style:none;font-size:14px;color:var(--ink);border-bottom:1px solid var(--rule);padding-bottom:3px}
-  .sx-cases > summary::-webkit-details-marker{display:none}
-  .sx-cases > div{margin-top:20px}
   #ticker{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .mn-core{fill:var(--elevated) !important;stroke:var(--ink);stroke-width:1}
-  .mn-core-t,.mn-core-n{fill:var(--ink) !important}
-  .mn-features h3::before,.mn-features a:nth-child(n) h3::before{display:none !important}
-  .mn-features h3{margin-top:14px}
-  .mn-eyebrow{text-transform:none;letter-spacing:0;font-size:14px;color:var(--muted)}
-  .mn-eyebrow::before{display:none}
-  @media (max-width:900px){
-    .sx-top{grid-template-columns:1fr auto}
-    .sx-search{display:none}
-    .sx-body{grid-template-columns:1fr}
-    .sx-side{display:none}
-    .sx-grid{grid-template-columns:1fr}
-  }
-  @media (max-width:520px){
-    .sx-crumb{display:none}
-    .sx-top{grid-template-columns:1fr}
-    .sx-net{justify-self:start}
-    .sx-main{padding:16px 14px}
-    .sx-head-r{width:100%;justify-content:space-between}
-    .sx-px{text-align:left}
-  }
+  .rh-h1,.rh-h2,.rh-col h3,.rh-services dt,.rh-end p:first-child{font-family:"Instrument Serif",Georgia,"Times New Roman",serif;font-weight:400}
 
-  /* ── Presentation (2026-10-31) ─────────────────────────────────────
-     Presence from the product and real figures, not ornament: the window
-     settles from a slight tilt as the page scrolls; big numerals; two
-     showcase rows with live visuals; a paper report that reads as a
-     document in either theme; an inverted closing panel. */
-  .sx-window{transform-origin:50% 0;transition:transform .2s linear}
-  .sx-tilt{transform:perspective(1800px) rotateX(var(--tilt,9deg)) scale(var(--sc,.96))}
+  .rh-mast{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;margin-top:28px;padding:10px 0;
+    border-top:3px double var(--ink);border-bottom:1px solid var(--ink);font-size:12.5px;color:var(--muted)}
+  .rh-mast-l{font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+  .rh-mast-c{text-align:center}
+  .rh-mast-r{text-align:right;font-variant-numeric:tabular-nums}
+  .rh-mast-r b{font-weight:500;color:var(--ink)}
 
-  .sx-stats{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr) minmax(0,1fr) minmax(0,.8fr);margin:clamp(64px,9vw,104px) 0 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
-  .sx-stats div{padding:28px 24px 30px 0;min-width:0}
-  .sx-stats div+div{padding-left:24px;border-left:1px solid var(--rule)}
-  .sx-stats dt{font-size:13px;color:var(--faint)}
-  .sx-stats dd{margin:10px 0 0;font-size:clamp(30px,3.9vw,56px);font-weight:600;letter-spacing:-.05em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rh-lead{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(0,1fr);gap:0;border-bottom:1px solid var(--rule)}
+  .rh-story{padding:clamp(36px,5vw,60px) clamp(24px,4vw,56px) clamp(32px,4vw,48px) 0;border-right:1px solid var(--rule)}
+  .rh-kicker{margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+  .rh-h1{margin:0;font-size:clamp(40px,5.4vw,76px);line-height:1.02;letter-spacing:-.015em;color:var(--ink);text-wrap:balance}
+  .rh-dek{margin:22px 0 0;max-width:60ch;font-size:clamp(17px,1.4vw,19.5px);line-height:1.55;color:var(--muted)}
+  .rh-by{margin:24px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .rh-by code{font:11.5px "IBM Plex Mono",ui-monospace,monospace;color:var(--muted)}
+  .rh-side{padding:clamp(36px,5vw,60px) 0 32px clamp(24px,3vw,40px);font-size:15px;line-height:1.65;color:var(--muted)}
+  .rh-side p{margin:0 0 14px}
+  .rh-side-k{font-size:13px !important;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+  .rh-side-cta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px !important}
+  .rh-side-fine{font-size:13px;color:var(--faint)}
+  .rh-btn{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border:1px solid var(--ink);background:var(--ink);color:var(--ground);
+    font-size:14px;font-weight:500;text-decoration:none;border-radius:2px;transition:opacity .15s ease}
+  .rh-btn:hover{opacity:.85}
+  .rh-btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+  .rh-btn.ghost:hover{opacity:1;border-color:var(--ink)}
 
-  .sx-show{padding-top:clamp(72px,10vw,128px);display:grid;gap:clamp(72px,10vw,128px)}
-  .sx-row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
-  .sx-row-r .sx-row-text{order:2}
-  .sx-kicker{margin:0 0 14px;font-size:14px;color:var(--muted)}
-  .sx-row h2{margin:0;font-size:clamp(30px,3.6vw,48px);line-height:1.06;letter-spacing:-.04em;font-weight:600}
-  .sx-row-text > p:not(.sx-kicker){margin:18px 0 0;max-width:46ch;font-size:16.5px;line-height:1.65;color:var(--muted)}
-  .sx-link{display:inline-flex;gap:8px;margin-top:22px;font-size:15px;font-weight:500;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:3px}
-  .sx-link:hover{border-color:var(--ink)}
-  .sx-link span{transition:transform .25s ease}
-  .sx-link:hover span{transform:translateX(3px)}
-  .sx-visual{margin:0;min-width:0}
+  .rh-sec{padding-top:clamp(56px,7vw,88px)}
+  .rh-h2{margin:0;font-size:clamp(28px,3vw,40px);line-height:1.12;letter-spacing:-.01em;color:var(--ink);padding-bottom:12px;border-bottom:1px solid var(--ink)}
+  .rh-h2 span{font-family:"Inter",sans-serif;font-size:.5em;font-weight:600;letter-spacing:.06em;text-transform:uppercase;vertical-align:.35em;margin-right:8px;color:var(--muted)}
+  .rh-sub{margin:12px 0 0;font-size:14.5px;color:var(--muted)}
+  .rh-body{margin:16px 0 0;max-width:58ch;font-size:16px;line-height:1.7;color:var(--muted)}
+  .rh-notes{margin:14px 0 0;font-size:12.5px;line-height:1.6;color:var(--faint)}
+  .rh-notes a{color:inherit}
 
-  .sx-depth{padding:24px;border:1px solid var(--rule);border-radius:14px;background:var(--surface)}
-  .sx-depth figcaption{display:flex;justify-content:space-between;gap:12px;margin-bottom:20px;font-size:13px;color:var(--muted)}
-  .sx-depth figcaption span:last-child{color:var(--faint);font-variant-numeric:tabular-nums}
-  .sx-dp-side{padding:16px 0;border-top:1px solid var(--rule)}
-  .sx-dp-side > p{margin:0 0 12px;font-size:13px;font-weight:500;color:var(--ink)}
-  .sx-dp-bar{display:grid;grid-template-columns:64px minmax(0,1fr) 92px;align-items:center;gap:12px;margin-top:10px;font-size:12.5px;color:var(--faint)}
-  .sx-dp-bar i{display:block;height:22px;width:0;border-radius:4px;transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
-  .sx-dp-bar i.q{background:repeating-linear-gradient(135deg,var(--rule) 0 5px,transparent 5px 10px);border:1px solid var(--rule)}
+  .rh-tablewrap{margin-top:18px;overflow-x:auto}
+  .rh-table{width:100%;min-width:760px;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+  .rh-table thead th{padding:0 12px 10px 0;text-align:left;font-size:12px;font-weight:500;color:var(--faint);border-bottom:1px solid var(--rule);white-space:nowrap}
+  .rh-table tbody th,.rh-table td{padding:14px 12px 14px 0;border-bottom:1px solid var(--rule);text-align:left;vertical-align:baseline}
+  .rh-table tbody th{font-weight:400}
+  .rh-table tbody th b{font-weight:600;color:var(--ink);margin-right:8px}
+  .rh-table tbody th span{color:var(--faint)}
+  .rh-table .n{text-align:right;padding-right:28px}
+  .rh-table td{color:var(--ink)}
+  .rh-table td.no{color:var(--hold)}
+  .rh-table td.na{color:var(--faint)}
+  .rh-table td.v{font-weight:600}
+  .rh-table tbody tr{transition:background .2s ease}
+  .rh-table tbody tr:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+
+  .rh-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(28px,5vw,64px);align-items:start}
+  .rh-fig{margin:0;padding:18px 0 0;border-top:1px solid var(--ink)}
+  .rh-fig figcaption{display:flex;justify-content:space-between;gap:12px;margin-bottom:6px;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .sx-dp-side{padding:14px 0;border-top:1px solid var(--rule)}
+  .sx-dp-side > p{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--ink)}
+  .sx-dp-bar{display:grid;grid-template-columns:64px minmax(0,1fr) 84px;align-items:center;gap:12px;margin-top:8px;font-size:12.5px;color:var(--faint)}
+  .sx-dp-bar i{display:block;height:18px;width:0;transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
+  .sx-dp-bar i.q{background:repeating-linear-gradient(135deg,var(--faint) 0 1px,transparent 1px 6px);outline:1px solid var(--rule)}
   .sx-dp-bar i.f{background:var(--ink)}
   .sx-dp-bar b{font-weight:500;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
-  .sx-dp-mid{margin:14px 0 0;font-size:12px;color:var(--faint)}
 
-  .sx-paper-wrap{display:flex;flex-direction:column;align-items:center}
-  .sx-paper{width:min(460px,100%);aspect-ratio:1/1.24;padding:34px 34px 28px;background:#FAFAF7;color:#141416;border-radius:4px;
-    box-shadow:0 1px 0 rgb(0 0 0 / .04),0 30px 60px -30px rgb(0 0 0 / .55),0 0 0 1px rgb(0 0 0 / .06);transform:rotate(-1.2deg);
-    display:flex;flex-direction:column}
-  .sx-paper-h{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1.5px solid #141416;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase}
-  .sx-paper-h span:first-child{font-weight:700}
-  .sx-paper h3{margin:22px 0 16px;font-size:21px;font-weight:600;letter-spacing:-.02em;color:#141416}
-  .sx-paper dl{margin:0}
-  .sx-paper dl div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #E2E2DD;font-size:12.5px}
-  .sx-paper dt{color:#55555A}
-  .sx-paper dd{margin:0;text-align:right;font-weight:500;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;min-width:0}
-  .sx-paper dl div:first-child dd{font:11px "IBM Plex Mono",ui-monospace,monospace}
-  .sx-paper-k{margin:20px 0 6px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#55555A}
-  .sx-paper-hash{margin:0;padding:10px 12px;background:#EFEFEA;border-radius:3px;font:11px/1.55 "IBM Plex Mono",ui-monospace,monospace;overflow-wrap:anywhere}
-  .sx-paper-foot{margin:auto 0 0;padding-top:14px;font-size:10px;color:#77777C}
-  .sx-paper-cap{margin-top:22px;font-size:13px;color:var(--faint)}
+  .rh-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:clamp(24px,3vw,40px)}
+  .rh-cols > .rh-h2{grid-column:1/-1;margin-bottom:22px}
+  .rh-col{font-size:15px;line-height:1.7;color:var(--muted)}
+  .rh-col + .rh-col{padding-left:clamp(24px,3vw,40px);border-left:1px solid var(--rule)}
+  .rh-col h3{margin:0 0 10px;font-size:23px;color:var(--ink)}
+  .rh-col p{margin:0 0 12px}
+  .rh-col a{color:var(--ink)}
+  html:not(#x) main .traps.sx-cases{display:block;background:none;gap:0;border:0 !important;padding:0;margin-top:6px}
+  html:not(#x) main .traps.sx-cases > summary{display:inline-flex;cursor:pointer;list-style:none;background:none !important;border:0 !important;border-bottom:1px solid var(--rule) !important;border-radius:0 !important;padding:0 0 2px !important;color:var(--ink);font-size:14.5px;box-shadow:none !important}
+  html:not(#x) main .traps.sx-cases > summary::-webkit-details-marker{display:none}
+  html:not(#x) main .traps.sx-cases > div{margin-top:16px;background:none}
 
-  .sx-cta{padding:clamp(64px,9vw,112px) clamp(24px,5vw,72px) !important;background:var(--ink) !important;border:0 !important;border-radius:20px}
-  .sx-cta h2{max-width:16ch;margin:0 auto;font-size:clamp(34px,4.6vw,64px) !important;line-height:1.02;letter-spacing:-.045em;font-weight:600;color:var(--ground) !important}
-  .sx-cta p{color:color-mix(in srgb,var(--ground) 62%,var(--ink)) !important;font-size:17px;margin-top:18px !important}
-  .sx-cta .mn-btn.light{background:var(--ground) !important;color:var(--ink) !important;border-color:var(--ground) !important}
-  .sx-cta .mn-btn.ghost-light{color:var(--ground) !important;border-color:color-mix(in srgb,var(--ground) 35%,var(--ink)) !important;background:transparent !important}
+  .rh-services{margin:0}
+  .rh-services div{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(0,2fr) minmax(160px,1fr);gap:20px;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--rule)}
+  .rh-services dt{font-size:22px}
+  .rh-services dt a{color:var(--ink);text-decoration:none}
+  .rh-services dt a:hover{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+  .rh-services dd{margin:0;font-size:15px;line-height:1.6;color:var(--muted)}
+  .rh-services dd.p{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
 
-  @media (prefers-reduced-motion:reduce){.sx-tilt{transform:none}}
+  .rh-end{margin-top:clamp(64px,8vw,96px);padding:28px 0 0;border-top:3px double var(--ink)}
+  .rh-end p:first-child{margin:0;max-width:32ch;font-size:clamp(26px,2.8vw,36px);line-height:1.25;color:var(--ink)}
+  .rh-end p:first-child a{color:inherit;text-underline-offset:5px;text-decoration-thickness:1px}
+
+  /* The older lower sections, in the same voice. */
+  html:not(#x) main .cx-eyebrow,html:not(#x) main .eyebrow{font:600 13px "Inter",sans-serif !important;letter-spacing:.06em !important;text-transform:uppercase !important;color:var(--ink)}
+  html:not(#x) main .cx-head{text-align:left;margin-left:0;max-width:none;padding-bottom:12px;border-bottom:1px solid var(--ink)}
+  html:not(#x) main .cx-head h2,html:not(#x) main #public h2,html:not(#x) main #download h2,html:not(#x) main #questions h2{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(28px,3vw,40px);letter-spacing:-.01em}
+  html:not(#x) main button,html:not(#x) main .cx-btn,html:not(#x) main a.btn{box-shadow:none !important}
+
   @media (max-width:900px){
-    .sx-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .sx-stats div:nth-child(3){padding-left:0;border-left:0}
-    .sx-stats div:nth-child(n+3){border-top:1px solid var(--rule)}
-    .sx-row{grid-template-columns:1fr}
-    .sx-row-r .sx-row-text{order:0}
+    .rh-mast{grid-template-columns:1fr;gap:4px;text-align:left}
+    .rh-mast-c,.rh-mast-r{text-align:left}
+    .rh-lead{grid-template-columns:1fr}
+    .rh-story{padding-right:0;border-right:0}
+    .rh-side{padding:24px 0 32px;border-top:1px solid var(--rule)}
+    .rh-two,.rh-cols{grid-template-columns:1fr}
+    .rh-col + .rh-col{padding-left:0;border-left:0;border-top:1px solid var(--rule);padding-top:18px}
+    .rh-services div{grid-template-columns:1fr;gap:6px}
+    .rh-services dd.p{text-align:left}
   }
-  @media (max-width:520px){
-    .sx-dp-bar{grid-template-columns:52px minmax(0,1fr) 70px}
-    .sx-paper{padding:24px 20px;aspect-ratio:auto}
-  }
-
-  /* ── Ripples (2026-10-31) ──────────────────────────────────────────
-     One visual language, all drawn here: rings of still water. Behind
-     the hero (one ring spreads per validated ledger), as the icon family,
-     as the small mark before each section label, and engraved into the
-     closing panel. Original geometry; no third-party marks. */
-  .sx-hero{position:relative;isolation:isolate}
-  .sx-hero > :not(.sx-rings):not(.core){position:relative;z-index:1}
-  .sx-rings{position:absolute;z-index:0;left:50%;top:0;width:min(1500px,140vw);height:100%;transform:translateX(-50%);pointer-events:none;overflow:visible;
-    -webkit-mask-image:radial-gradient(60% 75% at 50% 100%,#000 30%,transparent 100%);mask-image:radial-gradient(60% 75% at 50% 100%,#000 30%,transparent 100%)}
-  .sx-rings circle{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
-  .sx-rings-s circle{opacity:.07}
-  .sx-rings-s circle:nth-child(odd){opacity:.045}
-  #sx-waves circle{opacity:0;stroke-width:1.2}
-
-  .sx-ico{width:22px;height:22px;fill:none;stroke:var(--ink);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-  .sx-ico .f{fill:var(--ink);stroke:none}
-  html:not(#x) .mn-features .mn-ico{display:inline-grid;place-items:center;width:44px;height:44px;border:1px solid var(--rule);border-radius:50%;background:none}
-  html:not(#x) .mn-features a:hover .mn-ico{border-color:var(--ink)}
-
-  .mn-eyebrow,.sx-kicker,html:not(#x) main .eyebrow{display:inline-flex !important;align-items:center;gap:9px}
-  .mn-eyebrow::before,.sx-kicker::before,html:not(#x) main .eyebrow::before{content:"" !important;display:block !important;width:14px;height:14px;flex:none;
-    background:currentColor !important;opacity:.85;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.2'%3E%3Ccircle cx='8' cy='8' r='7'/%3E%3Ccircle cx='8' cy='8' r='4.2'/%3E%3Ccircle cx='8' cy='8' r='1.6' fill='%23000'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.2'%3E%3Ccircle cx='8' cy='8' r='7'/%3E%3Ccircle cx='8' cy='8' r='4.2'/%3E%3Ccircle cx='8' cy='8' r='1.6' fill='%23000'/%3E%3C/svg%3E") center/contain no-repeat;border:0 !important;border-radius:0 !important;transform:none !important}
-
-  .sx-cta{position:relative;overflow:hidden;isolation:isolate}
-  .sx-cta::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
-    background:repeating-radial-gradient(circle at 50% 135%,transparent 0 46px,color-mix(in srgb,var(--ground) 14%,transparent) 46px 47px);
-    -webkit-mask-image:linear-gradient(to top,#000,transparent 85%);mask-image:linear-gradient(to top,#000,transparent 85%)}
-
-  /* Layout: the older lower sections in the same language. */
-  html:not(#x) main .traps.sx-cases{display:block;background:none;gap:0;border:0 !important;border-radius:0;box-shadow:none;padding:0}
-  html:not(#x) main .traps.sx-cases > div{background:none}
-  html:not(#x) .mn-features .mn-ico{margin:0 0 4px}
-  html:not(#x) .mn-features h3{margin-top:14px !important}
-  html:not(#x) main .traps.sx-cases > summary{background:none !important;border:0 !important;border-bottom:1px solid var(--rule) !important;border-radius:0 !important;padding:0 0 3px !important;width:auto !important;box-shadow:none !important}
-  html:not(#x) main .cx-demo h2,html:not(#x) main .cx-demo > p{text-align:left;margin-left:0}
-  html:not(#x) main .cx-demo{text-align:left}
-  html:not(#x) main .cx-demo video,html:not(#x) main .cx-demo .cx-video,html:not(#x) main .cx-demo figure{border:1px solid var(--rule);border-radius:14px;overflow:hidden}
-  html:not(#x) main button,html:not(#x) main .cx-btn,html:not(#x) main .tool-chip,html:not(#x) main a.btn{box-shadow:none !important}
-  html:not(#x) main .cx-eyebrow{font:400 14px "Inter",sans-serif !important;letter-spacing:0 !important;text-transform:none !important;color:var(--muted)}
-  html:not(#x) main .cx-head{text-align:left;margin-left:0;max-width:640px}
-  html:not(#x) main .cx-head h2{font-size:clamp(30px,3.6vw,48px);letter-spacing:-.04em;font-weight:600}
 </style>
 </head>
 <body>
@@ -1706,214 +1582,104 @@
     its caption carries the ledger it was taken at. The ASCII field stays
     behind the hero, answering each validated ledger.
   -->
-  <section class="sx-hero" data-garden-field>
+  <section class="rh" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
-    <svg class="sx-rings" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g class="sx-rings-s"><circle cx="600" cy="760" r="90"/><circle cx="600" cy="760" r="158"/><circle cx="600" cy="760" r="226"/><circle cx="600" cy="760" r="294"/><circle cx="600" cy="760" r="362"/><circle cx="600" cy="760" r="430"/><circle cx="600" cy="760" r="498"/><circle cx="600" cy="760" r="566"/><circle cx="600" cy="760" r="634"/></g><g id="sx-waves"></g></svg>
-    <a class="sx-note" href="/docs/api/"><span>New</span>The Asset Risk API is free to call, no key needed <i aria-hidden="true">→</i></a>
-    <h1 class="sx-h1">Compliance and risk for the XRP Ledger</h1>
-    <p class="sx-sub">Check what an issuer can do, what a payment delivered and how much of a book can really fill, before you hold or move an asset. Read-only, with a receipt for every answer.</p>
-    <div class="sx-actions">
-      <a class="sx-btn" href="/app/">Start free</a>
-      <a class="sx-btn ghost" href="/contact/?topic=institutions">Request a demo</a>
-    </div>
-    <p class="sx-fine">Free plan, no card · macOS, Windows, Linux and the browser</p>
-  </section>
-
-  <div class="sx-window bx-stage" aria-label="The NOSHASHI workspace reviewing the RLUSD issuer, with live XRP Ledger data">
-    <div class="sx-top">
-      <span class="sx-crumb">Workspace <i>/</i> Issuer review <i>/</i> <b>RLUSD</b></span>
-      <span class="sx-search">Search an address, token or transaction<kbd>⌘K</kbd></span>
-      <span class="sx-net"><i class="sx-dot" data-bx-state-dot></i>Mainnet · <span data-sys-ledger translate="no">—</span></span>
-    </div>
-    <div class="sx-body">
-      <nav class="sx-side" aria-hidden="true">
-        <p>Desk</p>
-        <span>Overview</span><span class="on">Issuer review</span><span>Payments</span><span>Liquidity</span><span>Screening</span><span>Evidence</span>
-        <p>Account</p>
-        <span>Policy</span><span>Audit log</span><span>API keys</span>
-      </nav>
-      <div class="sx-main">
-        <div class="sx-head">
-          <div><h2>RLUSD</h2><p translate="no">rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De</p></div>
-          <div class="sx-head-r">
-            <div class="sx-px"><span>XRP / RLUSD <em data-bx-state>Connecting</em></span><b data-bx-mirror="tk-xrp" translate="no">—</b></div>
-            <span class="sx-verdict" id="sx-verdict">Reading</span>
-          </div>
-        </div>
-        <div class="sx-tabs" aria-hidden="true"><span class="on">Controls</span><span>Liquidity</span><span>Holders</span><span>History</span></div>
-        <div class="sx-grid">
-          <div class="sx-card sx-controls">
-            <p class="sx-k">Issuer controls</p>
-            <table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody id="sx-checks"><tr><td colspan="2" class="sx-wait">Reading the issuer account from mainnet…</td></tr></tbody></table>
-          </div>
-          <div class="sx-col">
-            <div class="sx-card">
-              <p class="sx-k">Order book, within 10% of mid</p>
-              <p class="sx-big" id="sx-fill">—</p>
-              <div class="sx-bar"><i id="sx-fillbar"></i></div>
-              <p class="sx-small" id="sx-fill-l">Reading the book…</p>
-            </div>
-            <div class="sx-card">
-              <p class="sx-k">Receipt</p>
-              <p class="sx-hash" id="sx-receipt" translate="no">pending</p>
-              <p class="sx-small" id="sx-receipt-l">SHA-256 over the full answer</p>
-            </div>
-          </div>
-          <div class="sx-card sx-ledgers">
-            <p class="sx-k">Validated ledgers <span id="sx-rate"></span></p>
-            <table><thead><tr><th>Ledger</th><th>Transactions</th><th>Closed</th></tr></thead><tbody id="sx-rows"><tr><td colspan="3" class="sx-wait">Waiting for the next validated ledger…</td></tr></tbody></table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <p class="sx-cap">The workspace above is reading XRP Ledger mainnet as you look at it. Nothing in it is sample data.</p>
-
-  <div class="sx-trust">
-    <p><!--SLOT:TOKENCOUNT--> XRPL tokens covered, including those issued by</p>
-    <ul aria-label="Issuers whose tokens NOSHASHI reads"><li>Ripple</li><li>Circle</li><li>GateHub</li><li>Bitstamp</li><li>Sologenic</li><li>CasinoCoin</li></ul>
-    <small>Named only to describe the ledger data read. No affiliation or endorsement.</small>
-  </div>
-
-
-  <dl class="sx-stats" aria-label="NOSHASHI in numbers, read live">
-    <div><dt>Tokens with a live issuer page</dt><dd><!--SLOT:TOKENCOUNT--></dd></div>
-    <div><dt>Latest validated ledger</dt><dd id="sx-st-ledger" translate="no">—</dd></div>
-    <div><dt>Average time between closes</dt><dd id="sx-st-close">—</dd></div>
-    <div><dt>Private keys we hold</dt><dd>0</dd></div>
-  </dl>
-
-  <section class="sx-show" aria-label="What NOSHASHI shows">
-    <div class="sx-row" data-reveal>
-      <div class="sx-row-text">
-        <p class="sx-kicker">Liquidity</p>
-        <h2>Quoted depth is a promise. Fillable depth is a fact.</h2>
-        <p>Order books on the XRP Ledger can advertise offers their owners cannot fund. NOSHASHI counts only what each offer's owner actually holds at the ledger it reads, so the number you see is the number that can trade.</p>
-        <a class="sx-link" href="/book-health/">Check any book <span aria-hidden="true">→</span></a>
-      </div>
-      <figure class="sx-visual sx-depth" aria-label="RLUSD order book, quoted against fillable depth, read live">
-        <figcaption><span>XRP / RLUSD order book</span><span id="sx-dp-l">Reading…</span></figcaption>
-        <div class="sx-dp-side"><p>Bids</p>
-          <div class="sx-dp-bar"><span>Quoted</span><i class="q" id="sx-dp-bq"></i><b id="sx-dp-bqv">—</b></div>
-          <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-bf"></i><b id="sx-dp-bfv">—</b></div>
-        </div>
-        <div class="sx-dp-side"><p>Asks</p>
-          <div class="sx-dp-bar"><span>Quoted</span><i class="q" id="sx-dp-aq"></i><b id="sx-dp-aqv">—</b></div>
-          <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-af"></i><b id="sx-dp-afv">—</b></div>
-        </div>
-        <p class="sx-dp-mid" id="sx-dp-mid">Within 10% of the reference mid · DEX book only, AMM pools excluded</p>
-      </figure>
+    <div class="rh-mast">
+      <span class="rh-mast-l">The Ledger Desk</span>
+      <span class="rh-mast-c"><span data-sys-field data-state="connecting">Connecting</span> to XRP Ledger mainnet</span>
+      <span class="rh-mast-r">Ledger <b data-sys-ledger translate="no">—</b> · <span id="rh-date">—</span></span>
     </div>
 
-    <div class="sx-row sx-row-r" data-reveal>
-      <div class="sx-row-text">
-        <p class="sx-kicker">Evidence</p>
-        <h2>Hand your auditor a page they can check themselves.</h2>
-        <p>Every Ledger Evidence Report names the ledger it was read at and carries a SHA-256 fingerprint over its contents. Anyone can re-read the same ledger and get the same answer. It records ledger facts; it is not an opinion.</p>
-        <a class="sx-link" href="/evidence-report/">See the report <span aria-hidden="true">→</span></a>
-      </div>
-      <figure class="sx-visual sx-paper-wrap" aria-label="The first page of an evidence report for RLUSD, filled with values read now">
-        <div class="sx-paper">
-          <div class="sx-paper-h"><span>NOSHASHI</span><span>Ledger Evidence Report</span></div>
-          <h3>RLUSD issuer and order book</h3>
-          <dl>
-            <div><dt>Issuer</dt><dd translate="no">rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De</dd></div>
-            <div><dt>Read at ledger</dt><dd id="sx-pp-ledger">—</dd></div>
-            <div><dt>Issuer controls verdict</dt><dd id="sx-pp-verdict">—</dd></div>
-            <div><dt>Powers retained</dt><dd id="sx-pp-kept">—</dd></div>
-            <div><dt>Fillable within 10% of mid</dt><dd id="sx-pp-fill">—</dd></div>
-          </dl>
-          <p class="sx-paper-k">Fingerprint, SHA-256</p>
-          <p class="sx-paper-hash" id="sx-pp-hash" translate="no">—</p>
-          <p class="sx-paper-foot">A record of ledger facts. Not an audit opinion, attestation, valuation or advice.</p>
-        </div>
-        <figcaption class="sx-paper-cap">First page, filled with what the ledger says right now.</figcaption>
-      </figure>
+    <div class="rh-lead">
+      <article class="rh-story">
+        <p class="rh-kicker">Issuer controls · RLUSD</p>
+        <h1 class="rh-h1" id="rh-headline">What the XRP Ledger says about the tokens you hold</h1>
+        <p class="rh-dek" id="rh-dek">Before a bank holds an asset, it asks who can freeze it, who controls it, and whether the market for it is real. On the XRP Ledger those answers are public. NOSHASHI reads them from validated ledgers and keeps the receipt.</p>
+        <p class="rh-by" id="rh-by">Read by NOSHASHI from validated ledger state</p>
+      </article>
+      <aside class="rh-side" aria-label="About NOSHASHI">
+        <p class="rh-side-k">About this desk</p>
+        <p>NOSHASHI is a read-only compliance and risk workspace for the XRP Ledger. It reads issuer controls, delivered amounts and fillable order-book depth, screens counterparties, and records every answer with the ledger it came from and a SHA-256 receipt.</p>
+        <p>It never holds keys and never signs.</p>
+        <p class="rh-side-cta"><a class="rh-btn" href="/app/">Start free</a><a class="rh-btn ghost" href="/contact/?topic=institutions">Request a demo</a></p>
+        <p class="rh-side-fine">Free plan, no card. <!--SLOT:TOKENCOUNT--> tokens covered.</p>
+      </aside>
     </div>
   </section>
 
-  <section class="mn-section">
-    <div class="mn-head" data-reveal>
-      <p class="mn-eyebrow">What it reads</p>
-      <h2>Six questions, answered from the ledger</h2>
-      <p>Each answer names the validated ledger it was read at. Anything that could not be read is shown as not read, never as a pass.</p>
+  <section class="rh-sec" data-reveal aria-labelledby="rh-t1">
+    <h2 class="rh-h2" id="rh-t1"><span>Table 1.</span> Issuer controls of six widely held XRPL tokens</h2>
+    <p class="rh-sub">Read live as this page loaded. Yes means the issuer has given up, or does not hold, that power over holders.</p>
+    <div class="rh-tablewrap">
+      <table class="rh-table" id="rh-issuers">
+        <thead><tr><th scope="col">Token, issuer</th><th scope="col" class="n">Holders¹</th><th scope="col">Freeze given up</th><th scope="col">Not frozen now</th><th scope="col">Open holding</th><th scope="col">No single key</th><th scope="col">Verdict²</th></tr></thead>
+        <tbody>
+          <tr data-issuer="rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De"><th scope="row"><b>RLUSD</b><span>Ripple</span></th><td class="n">67,857</td><td data-c="FREEZE_SURRENDERED">…</td><td data-c="NOT_GLOBALLY_FROZEN">…</td><td data-c="OPEN_HOLDING">…</td><td data-c="NO_UNILATERAL_SIGNER">…</td><td data-c="verdict">…</td></tr>
+          <tr data-issuer="rGm7WCVp9gb4jZHWTEtGUr4dd74z2XuWhE"><th scope="row"><b>USDC</b><span>Circle</span></th><td class="n">10,457</td><td data-c="FREEZE_SURRENDERED">…</td><td data-c="NOT_GLOBALLY_FROZEN">…</td><td data-c="OPEN_HOLDING">…</td><td data-c="NO_UNILATERAL_SIGNER">…</td><td data-c="verdict">…</td></tr>
+          <tr data-issuer="rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"><th scope="row"><b>SOLO</b><span>Sologenic</span></th><td class="n">214,709</td><td data-c="FREEZE_SURRENDERED">…</td><td data-c="NOT_GLOBALLY_FROZEN">…</td><td data-c="OPEN_HOLDING">…</td><td data-c="NO_UNILATERAL_SIGNER">…</td><td data-c="verdict">…</td></tr>
+          <tr data-issuer="rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr"><th scope="row"><b>CSC</b><span>CasinoCoin</span></th><td class="n">59,054</td><td data-c="FREEZE_SURRENDERED">…</td><td data-c="NOT_GLOBALLY_FROZEN">…</td><td data-c="OPEN_HOLDING">…</td><td data-c="NO_UNILATERAL_SIGNER">…</td><td data-c="verdict">…</td></tr>
+          <tr data-issuer="rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq"><th scope="row"><b>USD</b><span>GateHub</span></th><td class="n">20,465</td><td data-c="FREEZE_SURRENDERED">…</td><td data-c="NOT_GLOBALLY_FROZEN">…</td><td data-c="OPEN_HOLDING">…</td><td data-c="NO_UNILATERAL_SIGNER">…</td><td data-c="verdict">…</td></tr>
+          <tr data-issuer="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"><th scope="row"><b>USD</b><span>Bitstamp</span></th><td class="n">7,314</td><td data-c="FREEZE_SURRENDERED">…</td><td data-c="NOT_GLOBALLY_FROZEN">…</td><td data-c="OPEN_HOLDING">…</td><td data-c="NO_UNILATERAL_SIGNER">…</td><td data-c="verdict">…</td></tr>
+        </tbody>
+      </table>
     </div>
-    <div class="mn-features" data-reveal>
-      <a data-spot href="/certificate/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.8" class="f"/></svg></span><h3>Issuer controls</h3><p>Whether an issuer can freeze, claw back, gate holding or sign alone.</p></a>
-      <a data-spot href="/delivered/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.2" class="f"/></svg></span><h3>Delivered amounts</h3><p>What a payment actually delivered, not what it asked for.</p></a>
-      <a data-spot href="/book-health/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><path d="M2.5 18.5h19"/><path d="M3.5 18.5a8.5 8.5 0 0117 0"/><path d="M7.5 18.5a4.5 4.5 0 019 0"/><circle cx="12" cy="18.5" r="1.2" class="f"/></svg></span><h3>Real liquidity</h3><p>Advertised order-book depth against the depth that can fill.</p></a>
-      <a data-spot href="/xapp/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></svg></span><h3>Address screening</h3><p>OFAC sanctions, the scam registry and lookalike addresses, before you send.</p></a>
-      <a data-spot href="/alerts/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="6" cy="18" r="1.7" class="f"/><path d="M6 12.5a5.5 5.5 0 015.5 5.5"/><path d="M6 7a11 11 0 0111 11"/><path d="M6 2a16 16 0 0116 16"/></svg></span><h3>Issuer alerts</h3><p>Telegram or Discord tells you the moment an issuer's powers change.</p></a>
-      <a data-spot href="/evidence-report/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24" class="sx-ico"><circle cx="12" cy="12" r="9" stroke-dasharray="1.6 2.2"/><circle cx="12" cy="12" r="5.8"/><path d="M9.6 12.1l1.7 1.7 3.2-3.4"/></svg></span><h3>Evidence reports</h3><p>A PDF of what the ledger shows, with a fingerprint anyone can verify.</p></a>
-    </div>
-    <details class="traps sx-cases">
-      <summary>See six real cases from mainnet, each read two ways</summary>
-      <div>
-        <!--SLOT:MISREAD-->
-        <p class="sx-small"><a href="/misread/">Each case, with the code behind it</a></p>
-      </div>
-    </details>
+    <p class="rh-notes">¹ Trust lines, from the public xrpl.to token list read on 30 October 2026. ² The authority rules' verdict on the issuer's ledger controls, not a rating of the asset. Issuer names describe the ledger data read; no affiliation or endorsement. <span id="rh-t1-l"></span></p>
   </section>
 
-  <section class="mn-section mn-steps-wrap">
-    <div class="mn-head" data-reveal>
-      <p class="mn-eyebrow">How it works</p>
-      <h2>One address in. Facts and a receipt out.</h2>
+  <section class="rh-sec rh-two" data-reveal aria-labelledby="rh-f1">
+    <div>
+      <h2 class="rh-h2" id="rh-f1"><span>Figure 1.</span> Quoted against fillable depth, XRP / RLUSD</h2>
+      <p class="rh-body">An order book on the XRP Ledger can advertise offers its owners cannot fund. NOSHASHI counts only what each offer's owner holds at the ledger it reads. The difference between the two bars is liquidity that exists only on paper.</p>
+      <p class="rh-notes">Within 10% of the reference mid. DEX order book only; AMM pools are not included. <span id="sx-dp-mid"></span></p>
     </div>
-    <div class="mn-how">
-    <figure class="mn-consensus" id="mn-consensus" aria-label="Validators agreeing on each ledger; pulses once per validated XRP Ledger">
-      <svg viewBox="0 0 320 320" aria-hidden="true">
-        <defs><radialGradient id="mnCore" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#A3E635"/><stop offset="1" stop-color="#3F7A1D"/></radialGradient></defs>
-        <circle class="mn-orbit" cx="160" cy="160" r="118"/>
-        <circle class="mn-orbit o2" cx="160" cy="160" r="78"/>
-        <g class="mn-links">
-          <line x1="160" y1="160" x2="160" y2="42"/><line x1="160" y1="160" x2="243" y2="77"/><line x1="160" y1="160" x2="278" y2="160"/><line x1="160" y1="160" x2="243" y2="243"/>
-          <line x1="160" y1="160" x2="160" y2="278"/><line x1="160" y1="160" x2="77" y2="243"/><line x1="160" y1="160" x2="42" y2="160"/><line x1="160" y1="160" x2="77" y2="77"/>
-        </g>
-        <g class="mn-nodes">
-          <circle cx="160" cy="42" r="9"/><circle cx="243" cy="77" r="9"/><circle cx="278" cy="160" r="9"/><circle cx="243" cy="243" r="9"/>
-          <circle cx="160" cy="278" r="9"/><circle cx="77" cy="243" r="9"/><circle cx="42" cy="160" r="9"/><circle cx="77" cy="77" r="9"/>
-        </g>
-        <circle class="mn-core" cx="160" cy="160" r="50" fill="url(#mnCore)"/>
-        <text x="160" y="155" text-anchor="middle" class="mn-core-t">LEDGER</text>
-        <text x="160" y="173" text-anchor="middle" class="mn-core-n" data-ring-ledger>live</text>
-      </svg>
-      <figcaption>Validators agree on each ledger. This pulses once for every real validated close.</figcaption>
+    <figure class="rh-fig" aria-label="RLUSD order book, quoted against fillable depth, read live">
+      <figcaption><span>RLUSD, both sides</span><span id="sx-dp-l">Reading…</span></figcaption>
+      <div class="sx-dp-side"><p>Bids</p>
+        <div class="sx-dp-bar"><span>Quoted</span><i class="q" id="sx-dp-bq"></i><b id="sx-dp-bqv">—</b></div>
+        <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-bf"></i><b id="sx-dp-bfv">—</b></div>
+      </div>
+      <div class="sx-dp-side"><p>Asks</p>
+        <div class="sx-dp-bar"><span>Quoted</span><i class="q" id="sx-dp-aq"></i><b id="sx-dp-aqv">—</b></div>
+        <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-af"></i><b id="sx-dp-afv">—</b></div>
+      </div>
     </figure>
-    <ol class="mn-steps">
-      <li><b>Paste an address</b><span>An issuer, a wallet or a payment hash. Nothing to connect, nothing to sign.</span></li>
-      <li><b>Read the ledger</b><span>NOSHASHI reads validated XRP Ledger state directly, at a named ledger index.</span></li>
-      <li><b>Keep the receipt</b><span>Each answer carries a SHA-256 receipt, so you can show anyone exactly what was read.</span></li>
-    </ol>
+  </section>
+
+  <section class="rh-sec rh-cols" data-reveal aria-labelledby="rh-m">
+    <h2 class="rh-h2" id="rh-m">Method</h2>
+    <div class="rh-col">
+      <h3>What is read</h3>
+      <p>Validated ledger state only: an issuer's account flags and signer list, trust lines, offers and what their owners hold, and the delivered amount recorded on each payment. Nothing pending, nothing inferred.</p>
+      <p>Every answer names the ledger index it was read at and carries a SHA-256 receipt over its contents, so anyone can re-read the same ledger and check it.</p>
+    </div>
+    <div class="rh-col">
+      <h3>What is not</h3>
+      <p>Off-ledger facts are outside the ledger and outside these readings: reserves and backing, redemption terms, attestations, and the issuer's legal identity. A domain on an issuer account is self-declared.</p>
+      <p>Nothing here says an asset is safe, legitimate or a good investment. These are records of ledger facts, not opinions.</p>
+    </div>
+    <div class="rh-col">
+      <h3>Read it yourself</h3>
+      <p>The same reads are public: <a href="/certificate/">issuer certificate</a>, <a href="/book-health/">book health</a>, <a href="/delivered/">delivered amounts</a>, and the <a href="/docs/api/">Asset Risk API</a>, free with no key. The code is on <a href="https://github.com/Ignosha/noshashi">GitHub</a>.</p>
+      <details class="traps sx-cases">
+        <summary>Six readings that are easy to get wrong</summary>
+        <div>
+          <!--SLOT:MISREAD-->
+          <p class="rh-notes"><a href="/misread/">Each case, with the code behind it</a></p>
+        </div>
+      </details>
     </div>
   </section>
 
-  <section class="mn-section mn-pricing">
-    <div class="mn-head" data-reveal>
-      <p class="mn-eyebrow">Ledger Evidence Report</p>
-      <h2>Evidence you can hand to an auditor</h2>
-      <p>Issuer controls, holdings and who can move them, and real against advertised depth, for the addresses you name. A record of ledger facts, not an opinion.</p>
-    </div>
-    <div class="mn-tiers" data-reveal>
-      <a data-spot href="/evidence-report/?tier=issuer"><span>Issuer check</span><b>$950</b><em>One token issuer</em></a>
-      <a data-spot href="/evidence-report/?tier=standard"><span>Standard</span><b>$2,500</b><em>One report</em></a>
-      <a data-spot href="/evidence-report/?tier=quarterly"><span>Quarterly</span><b>$7,500</b><em>Now + four quarter-ends</em></a>
-      <a data-spot href="/evidence-report/?tier=audit"><span>Audit support</span><b>$15,000</b><em>Now + twelve month-ends</em></a>
-    </div>
+  <section class="rh-sec" data-reveal aria-labelledby="rh-s">
+    <h2 class="rh-h2" id="rh-s">Services</h2>
+    <dl class="rh-services">
+      <div><dt><a href="/app/">Workspace</a></dt><dd>Issuer review, payment checks, liquidity, screening and evidence in one read-only desk. Desktop and browser.</dd><dd class="p">Free · Pro $749 per seat a month · Institutional $4,000 a month</dd></div>
+      <div><dt><a href="/evidence-report/">Ledger Evidence Report</a></dt><dd>A PDF record of issuer controls, holdings and fillable depth for the addresses you name, with a fingerprint anyone can verify.</dd><dd class="p">From $950</dd></div>
+      <div><dt><a href="/docs/api/">Asset Risk API</a></dt><dd>Issuer controls, depth, an exit estimate and a receipt for any issued asset, in one call.</dd><dd class="p">Free to try, no key</dd></div>
+      <div><dt><a href="/alerts/">Issuer alerts</a></dt><dd>A message on Telegram or Discord when an issuer you watch changes its powers.</dd><dd class="p">Free</dd></div>
+      <div><dt><a href="/contact/?topic=institutions">Enterprise</a></dt><dd>For banks and larger operations: volume, history, policy and an audit trail across teams.</dd><dd class="p">From $120,000 a year</dd></div>
+    </dl>
   </section>
-
-
-  <!-- Live mainnet ticker: real data over the same public WebSocket the
-       desktop app uses. If it cannot connect it says so. -->
-  <div class="ticker" id="ticker" aria-live="polite" aria-label="Live XRP Ledger telemetry">
-    <span class="tk"><b id="tk-state">CONNECTING</b><i>LIVE LEDGER</i></span>
-    <span class="tk"><b id="tk-xrp">—</b><i>XRP / RLUSD PRICE</i></span>
-    <span class="tk"><b id="tk-spread">—</b><i>SPREAD THAT CAN FILL</i></span>
-    <span class="tk"><b id="tk-ledger">—</b><i>LATEST LEDGER</i></span>
-    <span class="tk"><b id="tk-tx">—</b><i>TRANSACTIONS</i></span>
-    <span class="tk"><b id="tk-fee">—</b><i>FEE</i></span>
-    <span class="tk"><b id="tk-close">—</b><i>CLOSE TIME</i></span>
-  </div>
 
   <section id="demo" class="cx-demo">
     <div class="cx-head">
@@ -2094,10 +1860,9 @@
     <!--SLOT:FAQ-->
   </section>
 
-  <section class="mn-cta sx-cta" data-reveal>
-    <h2>Read your first issuer in under a minute.</h2>
-    <p>Paste one address. Free, read-only, on live mainnet. No account, no card, no keys.</p>
-    <div class="mn-actions"><a class="mn-btn light" href="/app/">Open the workspace</a><a class="mn-btn ghost-light" href="/contact/?topic=institutions">Talk to us</a></div>
+  <section class="rh-end" data-reveal>
+    <p>Questions about a specific issuer, a payment or a book? Read it on the free plan, or <a href="/contact/?topic=institutions">request a briefing</a> with the founder. Thirty minutes, remote.</p>
+    <p class="rh-side-cta"><a class="rh-btn" href="/app/">Start free</a><a class="rh-btn ghost" href="/contact/?topic=institutions">Request a demo</a></p>
   </section>
 </main>
 
