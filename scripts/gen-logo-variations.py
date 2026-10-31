@@ -4,6 +4,9 @@ NOSHASHI logo variations, drawn from the site's own typefaces.
 Writes standalone SVGs to site/brand/logos/ with every letter converted to
 an outline, so the files render the same anywhere (no font needed):
 
+  monogram.svg      the primary mark: a serif N on still water, rings spreading out
+  monogram-lockup.svg  the monogram beside the wordmark
+  split.svg         a drawn N whose diagonal is three ledgers with gaps
   mark.svg          the ledger mark: an N whose diagonal is three ledgers
   wordmark.svg      NOSHASHI in Instrument Serif over a hairline rule
   lockup.svg        mark + wordmark, horizontal
@@ -119,6 +122,31 @@ def build(ink, paper):
     parts["tile"] = (128, 128, f'<rect width="128" height="128" rx="28" fill="{tile_bg}"/>'
                                f'<rect x=".75" y=".75" width="126.5" height="126.5" rx="27.25" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="1.5"/>'
                                f'<path d="{n}" fill="{tile_ink}"/><rect x="44" y="108" width="40" height="2" rx="1" fill="{tile_ink}" opacity=".5"/>')
+    # 7 monogram: the serif N on still water. Rings spread from the centre
+    # and stop at the letter, which sits on a knockout in the ground colour.
+    c = 120
+    n, nw = text_path(SERIF, "N", 132, 0, 0)
+    n, nw = text_path(SERIF, "N", 132, c - nw / 2, c + 46)
+    rings = "".join(f'<circle cx="{c}" cy="{c}" r="{r}" fill="none" stroke="{ink}" stroke-width="{w}" opacity="{o}"/>'
+                    for r, w, o in [(34, 1, .22), (50, 1, .3), (66, 1, .4), (82, 1.1, .52), (98, 1.3, .7)])
+    parts["monogram"] = (240, 240, f'{rings}<circle cx="{c}" cy="{c}" r="114" fill="none" stroke="{ink}" stroke-width="2.4"/>'
+                                   f'<path d="{n}" fill="{paper}" stroke="{paper}" stroke-width="10" stroke-linejoin="round"/>'
+                                   f'<path d="{n}" fill="{ink}"/>')
+    # 9 monogram lockup: the monogram beside the wordmark
+    mono = parts["monogram"][2]
+    d, w = text_path(SERIF, "NOSHASHI", 72, 132, 82, tracking=0.012)
+    sub, sw = text_path(SANS, "XRPL INTELLIGENCE", 11.5, 134, 108, tracking=0.34)
+    parts["monogram-lockup"] = (int(132 + w + 6), 120, f'<g transform="scale(.5)">{mono}</g><path d="{d}" fill="{ink}"/><path d="{sub}" fill="{ink}" opacity=".6"/>')
+    # 8 split: a drawn N whose diagonal is three ledgers with gaps between them
+    segs = ""
+    for i in range(3):
+        t0, t1 = i / 3 + .035, (i + 1) / 3 - .035
+        x0, y0 = 70 + 100 * t0, 62 + 116 * t0
+        x1, y1 = 70 + 100 * t1, 62 + 116 * t1
+        segs += f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="{ink}" stroke-width="17" opacity="{(.45, .72, 1)[i]}"/>'
+    parts["split"] = (240, 240, f'<rect x="8" y="8" width="224" height="224" rx="52" fill="none" stroke="{ink}" stroke-width="2.4"/>'
+                                f'<line x1="70" y1="58" x2="70" y2="182" stroke="{ink}" stroke-width="12" stroke-linecap="round"/>'
+                                f'<line x1="170" y1="58" x2="170" y2="182" stroke="{ink}" stroke-width="12" stroke-linecap="round"/>{segs}')
     return parts
 
 
@@ -132,7 +160,7 @@ def main():
         if name != "tile":
             open(os.path.join(OUT, f"{name}-ink.svg"), "w").write(svg(w, h, body))
     # contact sheet: two rows, dark and light
-    order = ["mark", "lockup", "wordmark", "seal", "ripple", "tile"]
+    order = ["monogram", "monogram-lockup", "split", "wordmark", "seal", "tile"]
     cell, pad = 300, 40
     W, H = cell * 3, cell * 4
     out = []
