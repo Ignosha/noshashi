@@ -82,6 +82,20 @@
       set("sx-dp-l", "The book could not be read just now");
     });
 
+  /* ── Figure 2: one ring through the ripple diagram per ledger ───── */
+  var rip = $("rh-rip-live"), still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.addEventListener("noshashi:ledger", function (ev) {
+    var d = ev.detail || {};
+    if (!rip || still || !Number.isInteger(d.index) || !rip.animate) return;
+    var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    c.setAttribute("cx", 260); c.setAttribute("cy", 260); c.setAttribute("r", 236);
+    c.style.transformOrigin = "260px 260px";
+    rip.appendChild(c);
+    c.animate([{ transform: "scale(.15)", opacity: .7 }, { transform: "scale(1)", opacity: 0 }],
+      { duration: 3800, easing: "cubic-bezier(.2,.6,.3,1)", fill: "forwards" });
+    setTimeout(function () { c.remove(); }, 4000);
+  });
+
   /* ── Table 1: issuer controls, read when the table is near ──────── */
   var table = $("rh-issuers");
   function fill(tr, c) {

@@ -1565,6 +1565,66 @@
     .rh-services div{grid-template-columns:1fr;gap:6px}
     .rh-services dd.p{text-align:left}
   }
+
+  /* ── Ledger Desk additions: explainer, ripples, problems, guide ──── */
+  .rh-mastmark{width:14px;height:14px;margin-right:9px;vertical-align:-2px}
+  .rh-mastmark circle,.rh-dinkus circle,.rh-stepmark circle{fill:none;stroke:var(--ink);stroke-width:1.6}
+  .rh-mastmark .f,.rh-dinkus .f,.rh-stepmark .f{fill:var(--ink);stroke:none}
+  .rh-dinkus{display:flex;align-items:center;gap:18px;margin:clamp(56px,7vw,88px) 0 0}
+  .rh-dinkus::before,.rh-dinkus::after{content:"";flex:1;height:1px;background:var(--rule)}
+  .rh-dinkus svg{width:22px;height:22px;flex:none}
+  .rh-dinkus circle{stroke-width:1.4;opacity:.8}
+  .rh-dinkus + .rh-sec{padding-top:clamp(28px,4vw,48px)}
+
+  .rh-explain{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(32px,5vw,72px);align-items:center}
+  .rh-h2-plain{border-bottom:0;padding-bottom:0;margin-bottom:18px}
+  .rh-explain-text > p:not(.rh-kicker){margin:0 0 16px;max-width:60ch;font-size:16.5px;line-height:1.75;color:var(--muted)}
+  .rh-drop{color:var(--ink) !important}
+  .rh-drop::first-letter{float:left;font-family:"Instrument Serif",Georgia,serif;font-size:4.2em;line-height:.82;padding:6px 10px 0 0;color:var(--ink)}
+  .rh-pull{margin:28px 0 0;padding:20px 0 0;border-top:1px solid var(--ink)}
+  .rh-pull p{margin:0;font-family:"Instrument Serif",Georgia,serif;font-size:clamp(24px,2.5vw,32px);line-height:1.25;color:var(--ink)}
+
+  .rh-ripple{margin:0}
+  .rh-ripple svg{display:block;width:100%;max-width:520px;margin:0 auto;height:auto;overflow:visible}
+  .rh-ripple .r{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+  .rh-ripple .r1{opacity:.55}.rh-ripple .r2{opacity:.4}.rh-ripple .r3{opacity:.28}.rh-ripple .r4{opacity:.18}
+  .rh-ripple .core{fill:var(--ground);stroke:var(--ink);stroke-width:1.2}
+  .rh-ripple .t{font:400 15px "Instrument Serif",Georgia,serif;fill:var(--ink)}
+  .rh-ripple .t.s{font:400 11px "Inter",sans-serif;fill:var(--faint)}
+  .rh-ripple .t.c{font-size:14px}
+  .rh-ripple .t.c.s{font-size:10.5px}
+  .rh-ripple text{paint-order:stroke;stroke:var(--ground);stroke-width:5px;stroke-linejoin:round}
+  #rh-rip-live circle{fill:none;stroke:var(--ink);stroke-width:1.2;opacity:0}
+  .rh-ripple figcaption{margin-top:14px;font-size:12.5px;line-height:1.6;color:var(--faint);text-align:center}
+  .rh-ripple figcaption span{font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+
+  .rh-problems{list-style:none;margin:0;padding:0}
+  .rh-problems li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:16px;padding:22px 0;border-bottom:1px solid var(--rule)}
+  .rh-pn{font-family:"Instrument Serif",Georgia,serif;font-size:30px;line-height:1;color:var(--faint)}
+  .rh-problems h3{margin:0;font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(21px,2vw,26px);line-height:1.2;color:var(--ink)}
+  .rh-problems p{margin:8px 0 0;max-width:72ch;font-size:15.5px;line-height:1.65;color:var(--muted)}
+
+  .rh-steps{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink)}
+  .rh-steps li{padding:22px 22px 6px 0;min-width:0}
+  .rh-steps li + li{padding-left:22px;border-left:1px solid var(--rule)}
+  .rh-stepmark{width:40px;height:40px;margin-bottom:14px}
+  .rh-stepmark circle{stroke-width:1.1}
+  .rh-steps h3{margin:0 0 8px;font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:23px;color:var(--ink)}
+  .rh-steps p{margin:0;font-size:15px;line-height:1.65;color:var(--muted)}
+  .rh-steps a{color:var(--ink)}
+
+  @media (max-width:900px){
+    .rh-explain{grid-template-columns:1fr}
+    .rh-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .rh-steps li:nth-child(3){padding-left:0;border-left:0}
+    .rh-steps li:nth-child(n+3){border-top:1px solid var(--rule)}
+  }
+  @media (max-width:560px){
+    .rh-steps{grid-template-columns:1fr}
+    .rh-steps li,.rh-steps li + li{padding:20px 0 6px;border-left:0}
+    .rh-steps li + li{border-top:1px solid var(--rule)}
+    .rh-problems li{grid-template-columns:40px minmax(0,1fr)}
+  }
 </style>
 </head>
 <body>
@@ -1585,7 +1645,7 @@
   <section class="rh" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
     <div class="rh-mast">
-      <span class="rh-mast-l">The Ledger Desk</span>
+      <span class="rh-mast-l"><svg class="rh-mastmark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18"/><circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="4" class="f"/></svg>The Ledger Desk</span>
       <span class="rh-mast-c"><span data-sys-field data-state="connecting">Connecting</span> to XRP Ledger mainnet</span>
       <span class="rh-mast-r">Ledger <b data-sys-ledger translate="no">—</b> · <span id="rh-date">—</span></span>
     </div>
@@ -1607,6 +1667,53 @@
     </div>
   </section>
 
+  <div class="rh-dinkus" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18"/><circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="4" class="f"/></svg></div>
+
+  <section class="rh-sec rh-explain" data-reveal aria-labelledby="rh-x">
+    <div class="rh-explain-text">
+      <p class="rh-kicker">Explainer</p>
+      <h2 class="rh-h2 rh-h2-plain" id="rh-x">What NOSHASHI is</h2>
+      <p class="rh-drop">NOSHASHI is a read-only compliance and risk workspace for the XRP Ledger. Paste the address of a token issuer, a wallet or a payment, and it reads the ledger directly to tell you who controls that asset, what its market can really absorb, what a payment actually delivered, and whether a counterparty is one you should not touch.</p>
+      <p>Every answer names the validated ledger it came from and carries a SHA-256 receipt, so it can be shown to a colleague, an auditor or a regulator and checked by them. NOSHASHI never holds keys, never signs and never moves funds. It is used in the browser, as a desktop app for macOS, Windows and Linux, and through an API.</p>
+      <blockquote class="rh-pull">
+        <p>Our objective is simple: no institution should hold or move an XRPL asset without first reading what the ledger already says about it.</p>
+      </blockquote>
+    </div>
+    <figure class="rh-ripple" aria-labelledby="rh-f2c">
+      <svg viewBox="0 0 520 520" role="img" aria-label="Concentric rings from the issuer outward: holders, the order book, payments and counterparties.">
+        <g id="rh-rip-live"></g>
+        <circle class="r r4" cx="260" cy="260" r="236"/>
+        <circle class="r r3" cx="260" cy="260" r="184"/>
+        <circle class="r r2" cx="260" cy="260" r="132"/>
+        <circle class="r r1" cx="260" cy="260" r="80"/>
+        <circle class="core" cx="260" cy="260" r="34"/>
+        <text class="t c" x="260" y="256" text-anchor="middle">Issuer</text>
+        <text class="t c s" x="260" y="272" text-anchor="middle">account</text>
+        <text class="t" x="260" y="198" text-anchor="middle">Holders</text>
+        <text class="t" x="260" y="146" text-anchor="middle">Order book</text>
+        <text class="t" x="260" y="94" text-anchor="middle">Payments</text>
+        <text class="t" x="260" y="42" text-anchor="middle">Counterparties</text>
+        <text class="t s" x="260" y="352" text-anchor="middle">freeze · clawback · authorisation</text>
+        <text class="t s" x="260" y="402" text-anchor="middle">quoted against fillable depth</text>
+        <text class="t s" x="260" y="452" text-anchor="middle">delivered, not requested</text>
+        <text class="t s" x="260" y="503" text-anchor="middle">sanctions three hops back</text>
+      </svg>
+      <figcaption id="rh-f2c"><span>Figure 1.</span> How a token's risk ripples outward, and what NOSHASHI reads at each ring. A faint ring passes through each time the XRP Ledger validates a ledger.</figcaption>
+    </figure>
+  </section>
+
+  <section class="rh-sec" data-reveal aria-labelledby="rh-p">
+    <h2 class="rh-h2" id="rh-p">The problems it solves</h2>
+    <ol class="rh-problems">
+      <li><span class="rh-pn">I</span><div><h3>An issuer can freeze or claw back a balance, and its website will not tell you.</h3><p>NOSHASHI reads the issuer's account flags and signer list, so you know whether it can freeze holders, claw back, gate who may hold, or act with a single key.</p></div></li>
+      <li><span class="rh-pn">II</span><div><h3>An order book can show depth that is not there.</h3><p>It counts only the offers whose owners hold the funds at that ledger, so the depth you see is the depth that can trade. See Figure 2.</p></div></li>
+      <li><span class="rh-pn">III</span><div><h3>A payment can deliver far less than it states.</h3><p>Partial payments are legal on the XRP Ledger. NOSHASHI reports the delivered amount, the figure that should be credited.</p></div></li>
+      <li><span class="rh-pn">IV</span><div><h3>A sanctioned or scam counterparty can reach you in a few hops.</h3><p>Deposits and withdrawals are screened against OFAC-listed senders up to three hops back, the scam registry, lookalike addresses and counterfeit tokens.</p></div></li>
+      <li><span class="rh-pn">V</span><div><h3>An auditor asks what you saw, and on which date.</h3><p>Each reading can be exported as an evidence report with the ledger index and a fingerprint anyone can verify, now or months later.</p></div></li>
+    </ol>
+  </section>
+
+  <div class="rh-dinkus" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18"/><circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="4" class="f"/></svg></div>
   <section class="rh-sec" data-reveal aria-labelledby="rh-t1">
     <h2 class="rh-h2" id="rh-t1"><span>Table 1.</span> Issuer controls of six widely held XRPL tokens</h2>
     <p class="rh-sub">Read live as this page loaded. Yes means the issuer has given up, or does not hold, that power over holders.</p>
@@ -1628,7 +1735,7 @@
 
   <section class="rh-sec rh-two" data-reveal aria-labelledby="rh-f1">
     <div>
-      <h2 class="rh-h2" id="rh-f1"><span>Figure 1.</span> Quoted against fillable depth, XRP / RLUSD</h2>
+      <h2 class="rh-h2" id="rh-f1"><span>Figure 2.</span> Quoted against fillable depth, XRP / RLUSD</h2>
       <p class="rh-body">An order book on the XRP Ledger can advertise offers its owners cannot fund. NOSHASHI counts only what each offer's owner holds at the ledger it reads. The difference between the two bars is liquidity that exists only on paper.</p>
       <p class="rh-notes">Within 10% of the reference mid. DEX order book only; AMM pools are not included. <span id="sx-dp-mid"></span></p>
     </div>
@@ -1643,6 +1750,19 @@
         <div class="sx-dp-bar"><span>Fillable</span><i class="f" id="sx-dp-af"></i><b id="sx-dp-afv">—</b></div>
       </div>
     </figure>
+  </section>
+
+  <div class="rh-dinkus" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18"/><circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="4" class="f"/></svg></div>
+
+  <section class="rh-sec" data-reveal aria-labelledby="rh-g">
+    <h2 class="rh-h2" id="rh-g">How to use it</h2>
+    <p class="rh-sub">Four steps, the first of them free and without an account.</p>
+    <ol class="rh-steps">
+      <li><svg class="rh-stepmark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="4"/><circle cx="20" cy="20" r="1.8" class="f"/></svg><h3>Paste an address</h3><p>An issuer, a wallet, or a payment's transaction hash, in the <a href="/#public">free tools</a> below or in the <a href="/app/">workspace</a>. Nothing to connect, nothing to sign.</p></li>
+      <li><svg class="rh-stepmark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="4"/><circle cx="20" cy="20" r="9"/><circle cx="20" cy="20" r="1.8" class="f"/></svg><h3>Read the answer</h3><p>Each line is a ledger fact with a plain explanation: what the issuer can do, what can really fill, what was delivered. Anything that could not be read is shown as not read, never as a pass.</p></li>
+      <li><svg class="rh-stepmark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="4"/><circle cx="20" cy="20" r="9"/><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="1.8" class="f"/></svg><h3>Keep the receipt</h3><p>Decide GO, HOLD or NO-GO against your own versioned policy, and keep the SHA-256 receipt or export an <a href="/evidence-report/">evidence report</a> for the file.</p></li>
+      <li><svg class="rh-stepmark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="4"/><circle cx="20" cy="20" r="9"/><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="19"/><circle cx="20" cy="20" r="1.8" class="f"/></svg><h3>Watch what you hold</h3><p>Set <a href="/alerts/">issuer alerts</a> on Telegram or Discord, or call the <a href="/docs/api/">Asset Risk API</a> from your own onboarding and treasury systems.</p></li>
+    </ol>
   </section>
 
   <section class="rh-sec rh-cols" data-reveal aria-labelledby="rh-m">
