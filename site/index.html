@@ -1102,6 +1102,117 @@
   }
   @media (max-width:520px){ .cx-pill .opt{display:none} .cx-btn{flex:1 1 100%} }
   @media (prefers-reduced-motion:reduce){ .cx-btn,.cx-card{transition:none} .cx-btn:hover,.cx-card:hover{transform:none} }
+  /* ── Fintech skin (2026-10-31) ──────────────────────────────────────
+     Warm amber on deep brown, a condensed display face for the headline
+     and figures, a dark phone card holding the live readings, and a
+     marquee of what the product reads. Homepage only: these tokens
+     override the navy ones above, so the ASCII ledger field, which
+     draws in --brand, turns amber with the rest. */
+  :root{
+    --ground:#120B06; --surface:#1C130B; --elevated:#271A0F;
+    --ink:#FFF4E8; --muted:#D9C3AA; --faint:#A68D73; --rule:#3B2A1B;
+    --brand:#FF8A1F; --tele:#FFC46B; --on-brand:#1A0E04;
+    --go:#7BD88F; --hold:#FFC46B; --nogo:#FF7B6B;
+  }
+  html[data-theme="light"]{
+    --ground:#FBF1E6; --surface:#FFFFFF; --elevated:#F4E3D1;
+    --ink:#1E1108; --muted:#5B4430; --faint:#7A6048; --rule:#E6CDB4;
+    --brand:#D9640A; --tele:#A84E05; --on-brand:#FFFFFF;
+    --go:#1E7A45; --hold:#8B5A00; --nogo:#B42332;
+  }
+  .fx-hero{text-align:left;padding:clamp(40px,6vw,80px) 0 clamp(36px,5vw,64px);border-radius:28px;margin-top:14px;
+    background:radial-gradient(90% 80% at 85% 10%,color-mix(in srgb,var(--brand) 55%,transparent),transparent 60%),
+               radial-gradient(70% 70% at 10% 100%,color-mix(in srgb,var(--tele) 22%,transparent),transparent 60%),
+               linear-gradient(160deg,var(--elevated),var(--ground) 70%)}
+  .fx-hero > .garden-field{opacity:.28;-webkit-mask-image:none;mask-image:none}
+  .fx-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr);gap:clamp(24px,4vw,56px);
+    align-items:center;padding:0 clamp(18px,4vw,48px)}
+  .fx-copy .cx-pill{margin-bottom:18px}
+  .fx-hero .fx-h1{margin:0;max-width:none;font:400 clamp(64px,9.4vw,150px)/.86 "Bebas Neue","Space Grotesk",Impact,sans-serif;
+    letter-spacing:.005em;text-transform:uppercase;color:var(--ink)}
+  .fx-h1 span{display:block;position:relative;width:max-content;max-width:100%;white-space:nowrap}
+  .fx-tag{position:absolute;right:-.2em;bottom:.22em;transform:translateX(70%) rotate(-10deg);
+    padding:.08em .32em .02em;border-radius:999px;background:var(--ink);color:var(--ground);
+    font:400 .36em/1 "Bebas Neue",sans-serif;letter-spacing:.02em;font-style:normal;box-shadow:0 10px 30px rgb(0 0 0 / .35)}
+  .fx-sub{margin:22px 0 0;max-width:40ch;font-size:clamp(17px,1.7vw,21px);line-height:1.45;color:var(--muted)}
+  .fx-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+  .fx-btn{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border-radius:999px;
+    background:var(--brand);color:var(--on-brand);border:1px solid var(--brand);font-weight:600;text-decoration:none;
+    box-shadow:0 10px 30px -10px color-mix(in srgb,var(--brand) 70%,transparent);transition:transform .2s ease}
+  .fx-btn:hover,.fx-btn:focus-visible{transform:translateY(-1px)}
+  .fx-btn.ghost{background:color-mix(in srgb,var(--surface) 60%,transparent);color:var(--ink);border-color:var(--rule);box-shadow:none;backdrop-filter:blur(6px)}
+  .fx-row{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:32px}
+  .fx-stats{display:flex;margin:0;padding:16px 8px;border-radius:20px;border:1px solid var(--rule);
+    background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(8px)}
+  .fx-stats div{padding:0 18px;text-align:center}
+  .fx-stats div+div{border-left:1px solid var(--rule)}
+  .fx-stats dd{margin:0;order:-1;font:400 clamp(28px,3.4vw,40px)/1 "Bebas Neue",sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+  .fx-stats div{display:flex;flex-direction:column-reverse;gap:4px}
+  .fx-stats dt{font-size:12.5px;color:var(--muted)}
+  .fx-pills{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+  .fx-pills li{padding:6px 14px;border:1px solid color-mix(in srgb,var(--ink) 40%,transparent);border-radius:999px;
+    font:500 12.5px/1.2 "IBM Plex Mono",monospace;color:var(--ink)}
+  .fx-stage{position:relative;justify-items:center}
+  .fx-phone{position:relative;width:min(340px,100%);padding:22px 20px 20px;border-radius:38px;
+    background:#0E0905;color:#FFF4E8;border:6px solid #050302;
+    box-shadow:0 40px 90px -30px rgb(0 0 0 / .8),0 0 0 1px rgb(255 255 255 / .05) inset}
+  .fx-phone .bx-head{font:500 11.5px/1.3 "IBM Plex Mono",monospace;letter-spacing:.08em;color:#C9B29A;text-transform:uppercase}
+  .fx-phone .bx-state{border-color:#3B2A1B}
+  .fx-price{margin:10px 0 0;font:400 56px/1 "Bebas Neue",sans-serif;color:#FFF4E8;font-variant-numeric:tabular-nums}
+  .fx-meta{margin:6px 0 0;font:400 12px/1.4 "IBM Plex Mono",monospace;color:#C9B29A}
+  .fx-meta b{color:#FFC46B;font-weight:500}
+  .fx-phone .bx-spark{border-top-color:#3B2A1B;height:64px}
+  .fx-phone .bx-spark path{stroke:#FF8A1F;stroke-width:2}
+  .fx-phone .bx-note{color:#A68D73}
+  .fx-phone-h{margin:16px 0 10px;display:flex;justify-content:space-between;font-size:13px;color:#C9B29A}
+  .fx-phone-h b{color:#FFF4E8;font:500 13px "IBM Plex Mono",monospace}
+  .fx-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .fx-tiles a{display:grid;gap:2px;padding:14px;border-radius:18px;background:#1E140C;color:#FFF4E8;text-decoration:none;border:1px solid #2E2015}
+  .fx-tiles a.hot{background:linear-gradient(150deg,#FF9A3C,#E8650A);border-color:transparent;color:#1A0E04}
+  .fx-tiles b{font:400 26px/1 "Bebas Neue",sans-serif}
+  .fx-tiles span{font-size:12px;opacity:.75}
+  .fx-tiles i{font-style:normal;font-size:11.5px;margin-top:6px}
+  .fx-float{position:absolute;left:-6%;bottom:-13%;transform:rotate(-6deg);display:grid;gap:2px;max-width:250px;
+    padding:12px 18px;border-radius:999px;background:color-mix(in srgb,#F1D4B3 92%,transparent);color:#3A2410;
+    text-decoration:none;box-shadow:0 18px 40px -16px rgb(0 0 0 / .6)}
+  .fx-float b{font-size:15px;color:#C2560A}
+  .fx-float span{font-size:12px;line-height:1.3}
+  .fx-marquee{overflow:hidden;margin:18px 0 0;border-block:1px solid var(--rule);padding:14px 0}
+  .fx-track{display:flex;gap:28px;width:max-content;animation:fx-slide 38s linear infinite;
+    font:400 clamp(22px,2.6vw,30px)/1 "Bebas Neue",sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+  .fx-track i{font-style:normal;color:var(--brand)}
+  @keyframes fx-slide{to{transform:translateX(-50%)}}
+  .fx-new{margin-top:clamp(56px,8vw,96px)}
+  .fx-new .cx-head h2{font:400 clamp(44px,6vw,80px)/.95 "Bebas Neue",sans-serif;letter-spacing:.01em;text-transform:uppercase}
+  .fx-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+  .fx-card{display:flex;flex-direction:column;gap:6px;padding:22px;border-radius:22px;border:1px solid var(--rule);
+    background:var(--surface);color:var(--ink);text-decoration:none;transition:transform .2s ease,border-color .2s ease}
+  .fx-card:hover,.fx-card:focus-visible{transform:translateY(-2px);border-color:var(--brand)}
+  .fx-card h3{font:400 30px/1 "Bebas Neue",sans-serif;letter-spacing:.01em;margin:2px 0 4px}
+  .fx-card p:not(.cx-eyebrow){color:var(--muted);font-size:14px;line-height:1.5}
+  .fx-card.big{grid-row:span 2;background:radial-gradient(80% 70% at 100% 0%,color-mix(in srgb,var(--brand) 40%,transparent),transparent 70%),var(--surface)}
+  .fx-card.big h3{font-size:clamp(40px,4.4vw,60px)}
+  .fx-card.wide{grid-column:1/-1}
+  .fx-card.hot{background:linear-gradient(150deg,#FF9A3C,#E8650A);border-color:transparent;color:#1A0E04}
+  .fx-card.hot p,.fx-card.hot .cx-eyebrow{color:#2A1404 !important}
+  @media (max-width:980px){
+    .fx-grid{grid-template-columns:1fr}
+    .fx-float{position:relative;left:auto;top:auto;transform:rotate(-3deg);margin-top:-18px}
+    .fx-tag{transform:translateX(40%) rotate(-10deg)}
+    .fx-cards{grid-template-columns:1fr 1fr}
+    .fx-card.big{grid-column:span 2;grid-row:auto}
+  }
+  @media (max-width:560px){
+    .fx-hero{border-radius:20px}
+    .fx-tag{position:static;display:inline-block;transform:rotate(-8deg);margin-left:.15em;vertical-align:.5em}
+    .fx-h1 span{width:auto;white-space:normal}
+    .fx-stats{width:100%;justify-content:space-between}
+    .fx-stats div{padding:0 10px}
+    .fx-pills{display:flex;flex-wrap:wrap}
+    .fx-cards{grid-template-columns:1fr}
+    .fx-card.big{grid-column:auto}
+  }
+  @media (prefers-reduced-motion:reduce){ .fx-track{animation:none} .fx-btn,.fx-card{transition:none} }
 </style>
 </head>
 <body>
@@ -1137,48 +1248,64 @@
     its caption carries the ledger it was taken at. The ASCII field stays
     behind the hero, answering each validated ledger.
   -->
-  <section class="cx-hero" data-garden-field>
+  <section class="cx-hero fx-hero" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
-    <div class="bx-hero">
-      <div class="cx-hero-text">
+    <div class="fx-grid">
+      <div class="fx-copy">
         <p class="cx-pill"><i class="dot" aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span><span class="sep" aria-hidden="true">·</span>XRPL mainnet<span class="sep" aria-hidden="true">·</span><span data-sys-ledger translate="no">waiting</span></p>
-        <h1>Know what you hold before you act.</h1>
-        <p class="cx-sub">Token and issuer risk, delivered amounts and real liquidity, read straight from validated XRP Ledger data, with the evidence attached.</p>
-        <div class="cx-actions">
-          <a class="cx-btn" href="/app/">Explore XRPL intelligence</a>
-          <a class="cx-btn ghost" href="/docs/">View documentation</a>
+        <h1 class="fx-h1"><span>Know what</span><span>you hold<em class="fx-tag" aria-hidden="true">XRPL</em></span></h1>
+        <p class="fx-sub">Who can freeze it, claw it back or sign for it, and how much really trades. Read live from the XRP Ledger, with a receipt.</p>
+        <div class="fx-actions">
+          <a class="fx-btn" href="/tokens/">Check a token</a>
+          <a class="fx-btn ghost" href="#download">Get the desktop app</a>
         </div>
-        <p class="bx-tags"><span>XRPL intelligence</span><span>Token &amp; issuer risk</span><span>Ledger verification</span><span>Developer infrastructure</span></p>
-        <p class="cx-trust">Free · Read-only · No wallet, no keys</p>
-      </div>
-      <div class="bx-stage" aria-label="Live XRP Ledger readings">
-        <div class="bx-glass bx-live">
-          <p class="bx-head"><span>XRPL mainnet</span><span class="bx-state" data-bx-state>Connecting</span></p>
-          <dl class="bx-rows">
+        <div class="fx-row">
+          <dl class="fx-stats">
+            <div><dt>Tokens tracked</dt><dd>51</dd></div>
             <div><dt>Latest ledger</dt><dd data-bx-mirror="tk-ledger" translate="no">—</dd></div>
-            <div><dt>XRP / RLUSD</dt><dd data-bx-mirror="tk-xrp" translate="no">—</dd></div>
-            <div><dt>Spread that can fill</dt><dd data-bx-mirror="tk-spread" translate="no">—</dd></div>
-            <div><dt>Transactions</dt><dd data-bx-mirror="tk-tx" translate="no">—</dd></div>
+            <div><dt>Keys we hold</dt><dd>0</dd></div>
           </dl>
-          <svg class="bx-spark" viewBox="0 0 240 48" preserveAspectRatio="none" aria-hidden="true"><path data-bx-spark d=""/></svg>
-          <p class="bx-note" data-bx-note>XRP / RLUSD, each validated ledger since this page opened</p>
-        </div>
-        <div class="bx-glass bx-reads">
-          <p class="bx-head"><span>What it reads</span></p>
-          <ul>
-            <li><a href="/app/asset/">Token analysis</a></li>
-            <li><a href="/app/issuer/">Issuer risk</a></li>
-            <li><a href="/app/payment/">Payment verification</a></li>
-            <li><a href="/app/liquidity/">Liquidity &amp; order books</a></li>
+          <ul class="fx-pills" aria-label="How it works">
+            <li>#ReadOnly</li><li>#LedgerEvidence</li><li>#NoKeysEver</li>
           </ul>
         </div>
       </div>
+      <div class="bx-stage fx-stage" aria-label="Live XRP Ledger readings">
+        <div class="fx-phone">
+          <p class="bx-head"><span>XRP / RLUSD</span><span class="bx-state" data-bx-state>Connecting</span></p>
+          <p class="fx-price"><span data-bx-mirror="tk-xrp" translate="no">—</span></p>
+          <p class="fx-meta">Ledger <b data-bx-mirror="tk-ledger" translate="no">—</b> · <b data-bx-mirror="tk-tx" translate="no">—</b> tx</p>
+          <svg class="bx-spark" viewBox="0 0 240 48" preserveAspectRatio="none" aria-hidden="true"><path data-bx-spark d=""/></svg>
+          <p class="bx-note" data-bx-note>Each validated ledger since this page opened</p>
+          <p class="fx-phone-h">Spread that can fill <b data-bx-mirror="tk-spread" translate="no">—</b></p>
+          <div class="fx-tiles">
+            <a href="/tokens/rlusd-ripple/"><b>RLUSD</b><span>Ripple</span><i>Issuer controls &rarr;</i></a>
+            <a class="hot" href="/tokens/solo-sologenic/"><b>SOLO</b><span>Sologenic</span><i>Issuer controls &rarr;</i></a>
+          </div>
+        </div>
+        <a class="fx-float" href="/alerts/"><b>Issuer alerts</b><span>Freeze, clawback, keys: told the moment they change</span></a>
+      </div>
     </div>
-    <figure class="cx-shot">
-        <img src="/assets/shots/overview.webp" srcset="/assets/shots/overview.webp 1440w, /assets/shots/overview@2x.webp 2880w" sizes="(min-width:1240px) 1180px, 100vw"
-          width="1440" height="900" alt="NOSHASHI desktop app overview, connected to XRPL mainnet, showing how much of the Bitstamp USD order book can actually fill." fetchpriority="high" decoding="async">
-        <figcaption>Desktop app · live on XRPL mainnet · ledger 107,979,691 · 29 Oct 2026</figcaption>
-      </figure>
+  </section>
+
+  <div class="fx-marquee" aria-hidden="true"><div class="fx-track">
+    <span>Issuer controls</span><i>✺</i><span>Delivered amounts</span><i>✺</i><span>Real order-book depth</span><i>✺</i><span>Evidence reports</span><i>✺</i><span>Sanctions screening</span><i>✺</i>
+    <span>Issuer controls</span><i>✺</i><span>Delivered amounts</span><i>✺</i><span>Real order-book depth</span><i>✺</i><span>Evidence reports</span><i>✺</i><span>Sanctions screening</span><i>✺</i>
+  </div></div>
+
+  <section id="new" class="fx-new">
+    <div class="cx-head">
+      <h2>New this month</h2>
+      <p>Free to try. No account, no wallet.</p>
+    </div>
+    <div class="fx-cards">
+      <a class="fx-card big" href="/tokens/"><p class="cx-eyebrow">Token directory</p><h3>51 XRPL tokens, one page each</h3><p>Freeze, clawback, signing keys and fillable depth, read live for RLUSD, SOLO, USDC, CSC and more.</p></a>
+      <a class="fx-card" href="/alerts/"><p class="cx-eyebrow">Telegram &amp; Discord</p><h3>/check r…</h3><p>Ask the bot what an issuer can do. /watch to be told when it changes.</p></a>
+      <a class="fx-card" href="/badge/"><p class="cx-eyebrow">Issuer badge</p><h3>Live facts on your site</h3><p>One image tag. Turns grey if it can't read the ledger, never green.</p></a>
+      <a class="fx-card hot" href="/evidence-report/"><p class="cx-eyebrow">Ledger Evidence Report</p><h3>From $950</h3><p>A signed PDF of what the ledger shows for your issuer, wallets and book.</p></a>
+      <a class="fx-card" href="/partners/"><p class="cx-eyebrow">Partners</p><h3>Explorers, auditors, wallets</h3><p>Free keyless API for token pages. Referral terms for firms.</p></a>
+      <a class="fx-card wide" href="/academy/"><p class="cx-eyebrow">Academy</p><h3>Certificate on LinkedIn</h3><p>Free course on live mainnet. Pass it, add it to your profile.</p></a>
+    </div>
   </section>
 
   <!-- Live mainnet ticker: real data over the same public WebSocket the

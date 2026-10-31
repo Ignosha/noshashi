@@ -53,7 +53,7 @@ import { externalizeSite } from "./inline-scripts.mjs";
 import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
 import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
-import { buildTokens, TOKEN_INDEX_PAGES } from "./build-tokens.mjs";
+import { buildTokens, TOKEN_INDEX_PAGES, loadTokens } from "./build-tokens.mjs";
 import { buildPartners, PARTNER_PAGES } from "./build-partners.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -116,6 +116,7 @@ async function buildHome({ news, market, feed, status, release }) {
     SUBSCRIBE: renderSubscribe(),
     MISREAD: renderMisread(misread),
     SHOTHERO: renderShot(shots, "overview", { eager: true }),
+    TOKENCOUNT: String((await loadTokens()).tokens.length),
     SHOTVERIFICATION: renderShot(shots, "verification"),
     SHOTAUDIT: renderShot(shots, "audit"),
     SHOTADDRESS: renderShot(shots, "address"),
@@ -147,7 +148,7 @@ async function buildHome({ news, market, feed, status, release }) {
 
   // The short homepage leaves out the newsroom, mission log and edge lab;
   // their slots are optional so those panels can come back without code.
-  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE"]);
+  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE", "SHOTHERO"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
     if (!html.includes(token)) {
