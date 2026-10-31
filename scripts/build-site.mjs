@@ -117,6 +117,7 @@ async function buildHome({ news, market, feed, status, release }) {
     MISREAD: renderMisread(misread),
     SHOTHERO: renderShot(shots, "overview", { eager: true }),
     TOKENCOUNT: String((await loadTokens()).tokens.length),
+    TOKENTAPE: (await loadTokens()).tokens.map((t) => `<a href="/tokens/${esc(t.slug)}/"><b translate="no">${esc(t.label)}</b><span>${esc(t.by)}</span></a>`).join(""),
     SHOTVERIFICATION: renderShot(shots, "verification"),
     SHOTAUDIT: renderShot(shots, "audit"),
     SHOTADDRESS: renderShot(shots, "address"),

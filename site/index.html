@@ -1184,7 +1184,7 @@
   .bx-stage.mn-metrics{max-width:none;width:auto;margin-inline:0;padding:0}
   #ticker.ticker{margin:14px 0 0;border:0;background:transparent;padding:0 2px;opacity:.85}
 
-  .mn-section{margin-top:clamp(72px,10vw,128px)}
+  .mn-section{margin-top:clamp(56px,7vw,96px)}
   .mn-head{max-width:640px}
   .mn-eyebrow{margin:0 0 10px;font-size:13.5px;font-weight:500;color:var(--brand)}
   .mn-head h2{font-size:clamp(28px,3.4vw,42px);line-height:1.1;letter-spacing:-.035em}
@@ -1236,6 +1236,94 @@
     .mn-metrics div+div{border-top:1px solid var(--rule)}
     .mn-tiers{grid-template-columns:1fr}
   }
+  /* ── Motion and live visuals ──────────────────────────────────────
+     Decoration stops under reduced motion; the ledger stream and the
+     consensus pulse only move when a real validated ledger arrives. */
+  .mn-hero{position:relative;isolation:isolate;overflow:hidden}
+  .mn-aura{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .mn-aura i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;mix-blend-mode:multiply}
+  .mn-aura i:nth-child(1){width:520px;height:520px;right:4%;top:-18%;background:#C9C3FF;animation:mn-drift 18s ease-in-out infinite}
+  .mn-aura i:nth-child(2){width:380px;height:380px;right:28%;top:30%;background:#B9D4FF;animation:mn-drift 22s ease-in-out -6s infinite reverse}
+  .mn-aura i:nth-child(3){width:300px;height:300px;left:-6%;bottom:-20%;background:#E4D9FF;animation:mn-drift 26s ease-in-out -12s infinite}
+  html:not([data-theme="light"]) .mn-aura i{mix-blend-mode:screen;opacity:.22}
+  @keyframes mn-drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-40px,30px) scale(1.08)}66%{transform:translate(30px,-20px) scale(.95)}}
+  .mn-gridlines{position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+    background-size:56px 56px;-webkit-mask-image:radial-gradient(70% 60% at 70% 30%,#000,transparent 75%);mask-image:radial-gradient(70% 60% at 70% 30%,#000,transparent 75%)}
+  .mn-window{animation:mn-float 9s ease-in-out infinite}
+  @keyframes mn-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .mn-checks li:not(.mn-wait){animation:mn-in .5s cubic-bezier(.2,.7,.2,1) both}
+  .mn-checks li:nth-child(2){animation-delay:.07s}.mn-checks li:nth-child(3){animation-delay:.14s}
+  .mn-checks li:nth-child(4){animation-delay:.21s}.mn-checks li:nth-child(5){animation-delay:.28s}
+  @keyframes mn-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .mn-stream{margin-top:20px;padding:22px 24px;border:1px solid var(--rule);border-radius:16px;background:var(--surface)}
+  .mn-stream-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .mn-stream-head p{margin:0;font-size:14px;color:var(--muted);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .mn-live{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;
+    color:var(--go);background:color-mix(in srgb,var(--go) 12%,transparent)}
+  .mn-live i{width:6px;height:6px;border-radius:50%;background:var(--go);animation:mn-blink 1.6s ease-in-out infinite}
+  @keyframes mn-blink{50%{opacity:.25}}
+  .mn-rate{font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .mn-blocks{display:flex;gap:8px;align-items:flex-end;height:132px;margin-top:18px;overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,#000 70%,transparent);mask-image:linear-gradient(90deg,#000 70%,transparent)}
+  .mn-blocks .mn-wait{margin:auto 0;font-size:13.5px;color:var(--faint)}
+  .mn-block{flex:0 0 96px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:4px}
+  .mn-block i{display:block;height:var(--h);min-height:8px;border-radius:8px 8px 4px 4px;
+    background:linear-gradient(180deg,#A9A6FF,#5B5BD6);transform-origin:bottom}
+  .mn-block:first-child i{background:linear-gradient(180deg,#C9C3FF,#6E56CF);box-shadow:0 8px 24px -8px rgb(91 91 214 / .6)}
+  .mn-block b{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .mn-block span{font-size:11.5px;color:var(--faint)}
+  .mn-block.enter{animation:mn-slide .6s cubic-bezier(.2,.7,.2,1) both}
+  .mn-block.enter i{animation:mn-grow .7s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes mn-slide{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+  @keyframes mn-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+  .mn-tape{margin-top:20px;overflow:hidden;border-block:1px solid var(--rule);padding:14px 0;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .mn-tape-track{display:flex;gap:10px;width:max-content;animation:mn-tape 90s linear infinite}
+  .mn-tape:hover .mn-tape-track{animation-play-state:paused}
+  .mn-tape a{display:inline-flex;align-items:baseline;gap:8px;padding:6px 14px;border:1px solid var(--rule);border-radius:999px;
+    text-decoration:none;color:var(--ink);background:var(--surface);white-space:nowrap}
+  .mn-tape a:hover{border-color:var(--brand)}
+  .mn-tape b{font-size:13.5px;font-weight:600}
+  .mn-tape span{font-size:12px;color:var(--faint)}
+  @keyframes mn-tape{to{transform:translateX(-50%)}}
+
+  .mn-how{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,56px);align-items:center;margin-top:32px}
+  .mn-how .mn-steps{grid-template-columns:1fr;margin-top:0}
+  .mn-consensus{margin:0;text-align:center}
+  .mn-consensus svg{width:100%;max-width:340px;height:auto;overflow:visible}
+  .mn-consensus figcaption{margin-top:10px;font-size:12.5px;color:var(--faint)}
+  .mn-orbit{fill:none;stroke:var(--rule);stroke-dasharray:3 6}
+  .mn-orbit.o2{stroke-dasharray:2 5}
+  .mn-consensus svg{animation:mn-spin 80s linear infinite}
+  .mn-core,.mn-core-t,.mn-core-n{animation:mn-spin 80s linear infinite reverse;transform-origin:160px 160px}
+  @keyframes mn-spin{to{transform:rotate(360deg)}}
+  .mn-links line{stroke:var(--brand);stroke-width:1.5;stroke-dasharray:120;stroke-dashoffset:120;opacity:.5}
+  .mn-nodes circle{fill:var(--surface);stroke:var(--brand);stroke-width:2;transition:fill .3s ease}
+  .mn-core-t{font:600 9px "Inter",sans-serif;letter-spacing:.14em;fill:#FFFFFF}
+  .mn-core-n{font:600 10px "Inter",sans-serif;fill:#FFFFFF;font-variant-numeric:tabular-nums}
+  .mn-consensus.pulse .mn-links line{animation:mn-link 1.1s cubic-bezier(.2,.7,.2,1) both}
+  .mn-consensus.pulse .mn-nodes circle{animation:mn-node 1.1s ease both}
+  .mn-consensus.pulse .mn-core{animation:mn-spin 80s linear infinite reverse,mn-core 1.1s ease}
+  @keyframes mn-link{0%{stroke-dashoffset:120;opacity:.9}70%{stroke-dashoffset:0;opacity:.9}100%{stroke-dashoffset:0;opacity:.25}}
+  @keyframes mn-node{30%{fill:var(--brand)}100%{fill:var(--surface)}}
+  @keyframes mn-core{40%{r:56}}
+
+  [data-spot]{position:relative}
+  [data-spot]::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .25s ease;
+    background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--brand) 12%,transparent),transparent 60%)}
+  [data-spot]:hover::after{opacity:1}
+
+  .will-reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .will-reveal.is-in{opacity:1;transform:none}
+
+  @media (max-width:980px){ .mn-how{grid-template-columns:1fr} .mn-consensus svg{max-width:260px} }
+  @media (prefers-reduced-motion:reduce){
+    .mn-aura i,.mn-window,.mn-live i,.mn-tape-track,.mn-consensus svg,.mn-core,.mn-core-t,.mn-core-n,.mn-checks li{animation:none !important}
+    .mn-tape{overflow-x:auto}
+  }
 </style>
 </head>
 <body>
@@ -1273,6 +1361,8 @@
   -->
   <section class="cx-hero mn-hero" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
+    <div class="mn-aura" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="mn-gridlines" aria-hidden="true"></div>
     <div class="mn-grid">
       <div class="mn-copy">
         <p class="mn-badge"><i class="dot" aria-hidden="true"></i><span data-sys-field data-state="connecting">CONNECTING</span><span class="sep" aria-hidden="true">·</span>XRPL mainnet<span class="sep" aria-hidden="true">·</span><span data-sys-ledger translate="no">waiting</span></p>
@@ -1300,55 +1390,86 @@
   </section>
 
   <section class="bx-stage mn-metrics" aria-label="Live XRP Ledger readings">
-    <div><b>51</b><span>XRPL tokens read live</span></div>
+    <div><b data-count="51">51</b><span>XRPL tokens read live</span></div>
     <div><b data-bx-mirror="tk-ledger" translate="no">—</b><span>Latest validated ledger</span></div>
     <div><b data-bx-mirror="tk-xrp" translate="no">—</b><span>XRP / RLUSD, live</span></div>
     <div><b>0</b><span>Keys we hold. Ever.</span></div>
   </section>
 
+  <section class="mn-stream" data-reveal aria-label="Validated XRP Ledger closes, live">
+    <div class="mn-stream-head">
+      <p><span class="mn-live"><i></i>Live</span>Every validated XRP Ledger close, as it happens. Bar height is that ledger's transaction count.</p>
+      <span class="mn-rate" id="mn-rate"></span>
+    </div>
+    <div class="mn-blocks" id="mn-blocks"><p class="mn-wait">Waiting for the next validated ledger…</p></div>
+  </section>
+
+  <div class="mn-tape" aria-label="Tokens with a live issuer page"><div class="mn-tape-track"><a href="/tokens/rlusd-ripple/"><b translate="no">RLUSD</b><span>Ripple</span></a><a href="/tokens/usdc-circle/"><b translate="no">USDC</b><span>Circle</span></a><a href="/tokens/solo-sologenic/"><b translate="no">SOLO</b><span>Sologenic</span></a><a href="/tokens/csc-casinocoin/"><b translate="no">CSC</b><span>CasinoCoin</span></a><a href="/tokens/vgb-vagabond/"><b translate="no">VGB</b><span>Vagabond</span></a><a href="/tokens/btc-gatehub/"><b translate="no">BTC</b><span>GateHub</span></a><a href="/tokens/phnix-phoenix/"><b translate="no">PHNIX</b><span>Phoenix</span></a><a href="/tokens/eth-gatehub/"><b translate="no">ETH</b><span>GateHub</span></a><a href="/tokens/army/"><b translate="no">ARMY</b><span>ARMY</span></a><a href="/tokens/usd-gatehub/"><b translate="no">USD</b><span>GateHub</span></a><a href="/tokens/eur-gatehub/"><b translate="no">EUR</b><span>GateHub</span></a><a href="/tokens/xpm-xpmarket/"><b translate="no">XPM</b><span>XPMarket</span></a><a href="/tokens/bear/"><b translate="no">BEAR</b><span>BEAR</span></a><a href="/tokens/xrps/"><b translate="no">XRPS</b><span>XRPS</span></a><a href="/tokens/fuzzy-fuzzybear/"><b translate="no">FUZZY</b><span>Fuzzybear</span></a><a href="/tokens/cny-ripplefox/"><b translate="no">CNY</b><span>RippleFox</span></a><a href="/tokens/drop/"><b translate="no">DROP</b><span>DROP</span></a><a href="/tokens/atm-all-the-money/"><b translate="no">ATM</b><span>ALL THE MONEY</span></a><a href="/tokens/589/"><b translate="no">589</b><span>589</span></a><a href="/tokens/sgb-gatehub/"><b translate="no">SGB</b><span>GateHub</span></a><a href="/tokens/mag-magnetic-x/"><b translate="no">MAG</b><span>Magnetic X</span></a><a href="/tokens/usd-bitstamp/"><b translate="no">USD</b><span>Bitstamp</span></a><a href="/tokens/xah-gatehub/"><b translate="no">XAH</b><span>GateHub</span></a><a href="/tokens/flr-gatehub/"><b translate="no">FLR</b><span>GateHub</span></a><a href="/tokens/666-666-xrp-meme-coin/"><b translate="no">666</b><span>666 XRP Meme Coin</span></a><a href="/tokens/plr-pillars/"><b translate="no">PLR</b><span>Pillars</span></a><a href="/tokens/scrap-scrappy/"><b translate="no">scrap</b><span>scrappy</span></a><a href="/tokens/real-realfi/"><b translate="no">REAL</b><span>RealFI</span></a><a href="/tokens/btc-bitstamp/"><b translate="no">BTC</b><span>Bitstamp</span></a><a href="/tokens/sigma/"><b translate="no">SIGMA</b><span>SIGMA</span></a><a href="/tokens/nxs-nexus-water/"><b translate="no">NXS</b><span>Nexus Water</span></a><a href="/tokens/opulence-opulencex/"><b translate="no">Opulence</b><span>OpulenceX</span></a><a href="/tokens/bert-bert-the-bird/"><b translate="no">BERT</b><span>Bert the Bird</span></a><a href="/tokens/britto/"><b translate="no">BRITTO</b><span>BRITTO</span></a><a href="/tokens/xho/"><b translate="no">XHO</b><span>XHO</span></a><a href="/tokens/evr-gatehub/"><b translate="no">EVR</b><span>GateHub</span></a><a href="/tokens/lht-luckyhash/"><b translate="no">LHT</b><span>LuckyHash</span></a><a href="/tokens/usdc-gatehub/"><b translate="no">USDC</b><span>GateHub</span></a><a href="/tokens/bchamp-bear-champ/"><b translate="no">BCHAMP</b><span>Bear Champ</span></a><a href="/tokens/xlm-ripplefox/"><b translate="no">XLM</b><span>RippleFox</span></a><a href="/tokens/cbird-common-bird/"><b translate="no">CBIRD</b><span>Common Bird</span></a><a href="/tokens/usdt-gatehub/"><b translate="no">USDT</b><span>GateHub</span></a><a href="/tokens/xrt-xrpturbo/"><b translate="no">XRT</b><span>XrpTurbo</span></a><a href="/tokens/xmen-xrp-men/"><b translate="no">Xmen</b><span>Xrp Men</span></a><a href="/tokens/uga-ugabuga/"><b translate="no">UGA</b><span>UgABugA</span></a><a href="/tokens/lions-xrp-lions/"><b translate="no">LIONS</b><span>XRP LIONS</span></a><a href="/tokens/tazz-tasmanian-tiger/"><b translate="no">TAZZ</b><span>Tasmanian Tiger</span></a><a href="/tokens/xox-xrp-on-xrp/"><b translate="no">XOX</b><span>XRP on XRP</span></a><a href="/tokens/seal/"><b translate="no">SEAL</b><span>SEAL</span></a><a href="/tokens/box-bitcoin-on-xrp/"><b translate="no">BOX</b><span>Bitcoin On Xrp</span></a><a href="/tokens/plx-pollux/"><b translate="no">PLX</b><span>Pollux</span></a><a href="/tokens/rlusd-ripple/"><b translate="no">RLUSD</b><span>Ripple</span></a><a href="/tokens/usdc-circle/"><b translate="no">USDC</b><span>Circle</span></a><a href="/tokens/solo-sologenic/"><b translate="no">SOLO</b><span>Sologenic</span></a><a href="/tokens/csc-casinocoin/"><b translate="no">CSC</b><span>CasinoCoin</span></a><a href="/tokens/vgb-vagabond/"><b translate="no">VGB</b><span>Vagabond</span></a><a href="/tokens/btc-gatehub/"><b translate="no">BTC</b><span>GateHub</span></a><a href="/tokens/phnix-phoenix/"><b translate="no">PHNIX</b><span>Phoenix</span></a><a href="/tokens/eth-gatehub/"><b translate="no">ETH</b><span>GateHub</span></a><a href="/tokens/army/"><b translate="no">ARMY</b><span>ARMY</span></a><a href="/tokens/usd-gatehub/"><b translate="no">USD</b><span>GateHub</span></a><a href="/tokens/eur-gatehub/"><b translate="no">EUR</b><span>GateHub</span></a><a href="/tokens/xpm-xpmarket/"><b translate="no">XPM</b><span>XPMarket</span></a><a href="/tokens/bear/"><b translate="no">BEAR</b><span>BEAR</span></a><a href="/tokens/xrps/"><b translate="no">XRPS</b><span>XRPS</span></a><a href="/tokens/fuzzy-fuzzybear/"><b translate="no">FUZZY</b><span>Fuzzybear</span></a><a href="/tokens/cny-ripplefox/"><b translate="no">CNY</b><span>RippleFox</span></a><a href="/tokens/drop/"><b translate="no">DROP</b><span>DROP</span></a><a href="/tokens/atm-all-the-money/"><b translate="no">ATM</b><span>ALL THE MONEY</span></a><a href="/tokens/589/"><b translate="no">589</b><span>589</span></a><a href="/tokens/sgb-gatehub/"><b translate="no">SGB</b><span>GateHub</span></a><a href="/tokens/mag-magnetic-x/"><b translate="no">MAG</b><span>Magnetic X</span></a><a href="/tokens/usd-bitstamp/"><b translate="no">USD</b><span>Bitstamp</span></a><a href="/tokens/xah-gatehub/"><b translate="no">XAH</b><span>GateHub</span></a><a href="/tokens/flr-gatehub/"><b translate="no">FLR</b><span>GateHub</span></a><a href="/tokens/666-666-xrp-meme-coin/"><b translate="no">666</b><span>666 XRP Meme Coin</span></a><a href="/tokens/plr-pillars/"><b translate="no">PLR</b><span>Pillars</span></a><a href="/tokens/scrap-scrappy/"><b translate="no">scrap</b><span>scrappy</span></a><a href="/tokens/real-realfi/"><b translate="no">REAL</b><span>RealFI</span></a><a href="/tokens/btc-bitstamp/"><b translate="no">BTC</b><span>Bitstamp</span></a><a href="/tokens/sigma/"><b translate="no">SIGMA</b><span>SIGMA</span></a><a href="/tokens/nxs-nexus-water/"><b translate="no">NXS</b><span>Nexus Water</span></a><a href="/tokens/opulence-opulencex/"><b translate="no">Opulence</b><span>OpulenceX</span></a><a href="/tokens/bert-bert-the-bird/"><b translate="no">BERT</b><span>Bert the Bird</span></a><a href="/tokens/britto/"><b translate="no">BRITTO</b><span>BRITTO</span></a><a href="/tokens/xho/"><b translate="no">XHO</b><span>XHO</span></a><a href="/tokens/evr-gatehub/"><b translate="no">EVR</b><span>GateHub</span></a><a href="/tokens/lht-luckyhash/"><b translate="no">LHT</b><span>LuckyHash</span></a><a href="/tokens/usdc-gatehub/"><b translate="no">USDC</b><span>GateHub</span></a><a href="/tokens/bchamp-bear-champ/"><b translate="no">BCHAMP</b><span>Bear Champ</span></a><a href="/tokens/xlm-ripplefox/"><b translate="no">XLM</b><span>RippleFox</span></a><a href="/tokens/cbird-common-bird/"><b translate="no">CBIRD</b><span>Common Bird</span></a><a href="/tokens/usdt-gatehub/"><b translate="no">USDT</b><span>GateHub</span></a><a href="/tokens/xrt-xrpturbo/"><b translate="no">XRT</b><span>XrpTurbo</span></a><a href="/tokens/xmen-xrp-men/"><b translate="no">Xmen</b><span>Xrp Men</span></a><a href="/tokens/uga-ugabuga/"><b translate="no">UGA</b><span>UgABugA</span></a><a href="/tokens/lions-xrp-lions/"><b translate="no">LIONS</b><span>XRP LIONS</span></a><a href="/tokens/tazz-tasmanian-tiger/"><b translate="no">TAZZ</b><span>Tasmanian Tiger</span></a><a href="/tokens/xox-xrp-on-xrp/"><b translate="no">XOX</b><span>XRP on XRP</span></a><a href="/tokens/seal/"><b translate="no">SEAL</b><span>SEAL</span></a><a href="/tokens/box-bitcoin-on-xrp/"><b translate="no">BOX</b><span>Bitcoin On Xrp</span></a><a href="/tokens/plx-pollux/"><b translate="no">PLX</b><span>Pollux</span></a></div></div>
+
   <section class="mn-section">
-    <div class="mn-head">
+    <div class="mn-head" data-reveal>
       <p class="mn-eyebrow">What it reads</p>
       <h2>Ledger facts, before you move value.</h2>
       <p>Each answer names the validated ledger it was read at. Anything that could not be read is shown as not read, never as a pass.</p>
     </div>
-    <div class="mn-features">
-      <a href="/certificate/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Issuer controls</h3><p>Whether an issuer can freeze, claw back, gate holding or sign alone.</p></a>
-      <a href="/delivered/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg></span><h3>Delivered amounts</h3><p>What a payment actually delivered, not what it asked for.</p></a>
-      <a href="/book-health/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h3>Real liquidity</h3><p>Advertised order-book depth against the depth that can fill.</p></a>
-      <a href="/xapp/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span><h3>Address screening</h3><p>OFAC sanctions, the scam registry and lookalike addresses, before you send.</p></a>
-      <a href="/alerts/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1112 0v5l2 2H4z"/><path d="M10 21h4"/></svg></span><h3>Issuer alerts</h3><p>Telegram or Discord tells you the moment an issuer's powers change.</p></a>
-      <a href="/evidence-report/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg></span><h3>Evidence reports</h3><p>A PDF of what the ledger shows, with a fingerprint anyone can verify.</p></a>
+    <div class="mn-features" data-reveal>
+      <a data-spot href="/certificate/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Issuer controls</h3><p>Whether an issuer can freeze, claw back, gate holding or sign alone.</p></a>
+      <a data-spot href="/delivered/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg></span><h3>Delivered amounts</h3><p>What a payment actually delivered, not what it asked for.</p></a>
+      <a data-spot href="/book-health/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h3>Real liquidity</h3><p>Advertised order-book depth against the depth that can fill.</p></a>
+      <a data-spot href="/xapp/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span><h3>Address screening</h3><p>OFAC sanctions, the scam registry and lookalike addresses, before you send.</p></a>
+      <a data-spot href="/alerts/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1112 0v5l2 2H4z"/><path d="M10 21h4"/></svg></span><h3>Issuer alerts</h3><p>Telegram or Discord tells you the moment an issuer's powers change.</p></a>
+      <a data-spot href="/evidence-report/"><span class="mn-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg></span><h3>Evidence reports</h3><p>A PDF of what the ledger shows, with a fingerprint anyone can verify.</p></a>
     </div>
   </section>
 
   <section class="mn-section mn-steps-wrap">
-    <div class="mn-head">
+    <div class="mn-head" data-reveal>
       <p class="mn-eyebrow">How it works</p>
       <h2>One address in. Facts and a receipt out.</h2>
     </div>
+    <div class="mn-how">
+    <figure class="mn-consensus" id="mn-consensus" aria-label="Validators agreeing on each ledger; pulses once per validated XRP Ledger">
+      <svg viewBox="0 0 320 320" aria-hidden="true">
+        <defs><radialGradient id="mnCore" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#C9C3FF"/><stop offset="1" stop-color="#6E6BE8"/></radialGradient></defs>
+        <circle class="mn-orbit" cx="160" cy="160" r="118"/>
+        <circle class="mn-orbit o2" cx="160" cy="160" r="78"/>
+        <g class="mn-links">
+          <line x1="160" y1="160" x2="160" y2="42"/><line x1="160" y1="160" x2="243" y2="77"/><line x1="160" y1="160" x2="278" y2="160"/><line x1="160" y1="160" x2="243" y2="243"/>
+          <line x1="160" y1="160" x2="160" y2="278"/><line x1="160" y1="160" x2="77" y2="243"/><line x1="160" y1="160" x2="42" y2="160"/><line x1="160" y1="160" x2="77" y2="77"/>
+        </g>
+        <g class="mn-nodes">
+          <circle cx="160" cy="42" r="9"/><circle cx="243" cy="77" r="9"/><circle cx="278" cy="160" r="9"/><circle cx="243" cy="243" r="9"/>
+          <circle cx="160" cy="278" r="9"/><circle cx="77" cy="243" r="9"/><circle cx="42" cy="160" r="9"/><circle cx="77" cy="77" r="9"/>
+        </g>
+        <circle class="mn-core" cx="160" cy="160" r="50" fill="url(#mnCore)"/>
+        <text x="160" y="155" text-anchor="middle" class="mn-core-t">LEDGER</text>
+        <text x="160" y="173" text-anchor="middle" class="mn-core-n" data-ring-ledger>live</text>
+      </svg>
+      <figcaption>Validators agree on each ledger. This pulses once for every real validated close.</figcaption>
+    </figure>
     <ol class="mn-steps">
       <li><b>Paste an address</b><span>An issuer, a wallet or a payment hash. Nothing to connect, nothing to sign.</span></li>
       <li><b>Read the ledger</b><span>NOSHASHI reads validated XRP Ledger state directly, at a named ledger index.</span></li>
       <li><b>Keep the receipt</b><span>Each answer carries a SHA-256 receipt, so you can show anyone exactly what was read.</span></li>
     </ol>
+    </div>
   </section>
 
   <section class="mn-section mn-pricing">
-    <div class="mn-head">
+    <div class="mn-head" data-reveal>
       <p class="mn-eyebrow">Ledger Evidence Report</p>
       <h2>Evidence you can hand to an auditor.</h2>
       <p>Issuer controls, holdings and who can move them, and real against advertised depth, for the addresses you name. A record of ledger facts, not an opinion.</p>
     </div>
-    <div class="mn-tiers">
-      <a href="/evidence-report/?tier=issuer"><span>Issuer check</span><b>$950</b><em>One token issuer</em></a>
-      <a href="/evidence-report/?tier=standard"><span>Standard</span><b>$2,500</b><em>One report</em></a>
-      <a href="/evidence-report/?tier=quarterly"><span>Quarterly</span><b>$7,500</b><em>Now + four quarter-ends</em></a>
-      <a href="/evidence-report/?tier=audit"><span>Audit support</span><b>$15,000</b><em>Now + twelve month-ends</em></a>
+    <div class="mn-tiers" data-reveal>
+      <a data-spot href="/evidence-report/?tier=issuer"><span>Issuer check</span><b>$950</b><em>One token issuer</em></a>
+      <a data-spot href="/evidence-report/?tier=standard"><span>Standard</span><b>$2,500</b><em>One report</em></a>
+      <a data-spot href="/evidence-report/?tier=quarterly"><span>Quarterly</span><b>$7,500</b><em>Now + four quarter-ends</em></a>
+      <a data-spot href="/evidence-report/?tier=audit"><span>Audit support</span><b>$15,000</b><em>Now + twelve month-ends</em></a>
     </div>
   </section>
 
-  <section class="mn-cta">
+  <section class="mn-cta" data-reveal>
     <h2>Start with one address.</h2>
     <p>Free, read-only, on live mainnet. No account needed.</p>
     <div class="mn-actions"><a class="mn-btn light" href="/app/">Open the workspace</a><a class="mn-btn ghost-light" href="/contact/?topic=institutions">Talk to us</a></div>
@@ -1840,6 +1961,7 @@
 <script src="/assets/garden-field.js" defer></script>
 <script src="/assets/intelligence.js" defer></script>
 <script src="/assets/hero-live.js" defer></script>
+<script src="/assets/motion.js" defer></script>
 <script src="/assets/inline/59b45a834cdf056406d0.js"></script>
 
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"SoftwareApplication","name":"NOSHASHI","applicationCategory":"FinanceApplication","operatingSystem":"macOS, Windows, Linux","releaseNotes":"https://github.com/Ignosha/noshashi/releases","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"USD"},{"@type":"Offer","name":"Pro","price":"749","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"749","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Institutional","price":"4000","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"4000","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Enterprise","price":"10000","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"10000","priceCurrency":"USD","unitCode":"MON"}},{"@type":"Offer","name":"Strategic Infrastructure","price":"20833","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"20833","priceCurrency":"USD","unitCode":"MON"}}],"url":"https://www.noshashi.app/"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does NOSHASHI do?","acceptedAnswer":{"@type":"Answer","text":"NOSHASHI reads validated XRP Ledger state and answers two questions from it at the same moment: whether a transfer is permitted under the rules you configured, and whether you could actually exit the position. It returns a GO, HOLD or NO-GO verdict with the evidence attached. It is informational tooling — it never holds, signs or moves an asset."}},{"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"The console is free forever, including unlimited GO/HOLD/NO-GO checks, live mainnet telemetry and 10 address checks a month. Pro is $749 per seat per month and adds unlimited address checks, exit-liquidity and freeze-rights analysis, the persistent adjudication ledger and 5,000 API verifications. Institutional is $4,000 a month and adds Travel Rule scoping, signed audit export, offline adjudication and 100,000 API verifications."}},{"@type":"Question","name":"Is this production-ready?","acceptedAnswer":{"@type":"Answer","text":"No — every build on this site is labelled BETA. It is pre-1.0, the binaries are not code-signed or notarised yet, and the release pipeline is still being hardened. Treat it as an evaluation build: verify the SHA-256, run it through your own software admission process, and do not make it the sole basis of a decision carrying legal consequence."}},{"@type":"Question","name":"Do I need an account?","acceptedAnswer":{"@type":"Answer","text":"No. There are no accounts on this site — sign-in and the hosted workspace were withdrawn. The application runs on your machine and reads public ledger state directly, so there is no server-side state to log into. A paid subscription is managed through Stripe and does not create a website login."}},{"@type":"Question","name":"macOS or Windows blocks the app — is that expected?","acceptedAnswer":{"@type":"Answer","text":"Yes. The builds are not code-signed or notarised while the release pipeline is being hardened, so macOS reports an unidentified developer and Windows SmartScreen warns. On macOS, right-click the app and choose Open the first time. Verify the SHA-256 published next to the download first — that check is what actually tells you the file is the one CI built."}},{"@type":"Question","name":"Can it move my funds?","acceptedAnswer":{"@type":"Answer","text":"No, and it cannot be made to. NOSHASHI has no signing path and no custody: it reads ledger state and reports on it. It is not a bank, broker-dealer, money services business, money transmitter, qualified custodian or registered investment adviser, and nothing it produces is legal, regulatory, tax or investment advice."}},{"@type":"Question","name":"What data do you collect?","acceptedAnswer":{"@type":"Answer","text":"Without an account there is no server-side state: no analytics, no telemetry, no crash reporting. The compliance agent runs on your own machine with zero egress. Secrets are held by the OS keychain rather than by the app. Typefaces are self-hosted, so opening a page does not announce you to a font CDN."}},{"@type":"Question","name":"How do billing, cancellation and refunds work?","acceptedAnswer":{"@type":"Answer","text":"Payments run entirely through Stripe — no card data ever reaches NOSHASHI. Subscriptions renew automatically until cancelled and can be cancelled at any time, taking effect at the end of the period already paid for. A first charge is fully refundable within 14 days if no paid capability was used."}}]}]}</script>
