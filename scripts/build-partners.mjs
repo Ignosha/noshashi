@@ -14,7 +14,7 @@ import { renderPage, breadcrumb, ORIGIN } from "../api/_lib/shell.js";
 const CONTACT = "/contact/?topic=institutions";
 
 export async function buildPartners(write) {
-  const body = `<div class="page-head">
+  const body = `<div class="desk"><div class="page-head">
   <p class="eyebrow">Partners</p>
   <h1>Put ledger facts where your users already look.</h1>
   <p>NOSHASHI reads what XRP Ledger issuers can still do: freeze, claw back, gate holding, sign alone,
@@ -68,7 +68,7 @@ export async function buildPartners(write) {
        read is shown as not read, never as a pass. There is no score and no verdict on a token.</p></div>
   <p class="tool-note" style="margin-top:14px">Developers: the same reads are in the
      <a href="/developers/">SDK and Compliance API</a>. Source: <a href="https://github.com/Ignosha/noshashi">GitHub</a>.</p>
-</section>`;
+</section></div>`;
 
   await write("partners/index.html", renderPage({
     title: "Partners — issuer facts for explorers, DEXes, auditors and wallets",
@@ -78,7 +78,7 @@ export async function buildPartners(write) {
     structured: [breadcrumb("Partners", "/partners/")],
   }));
 
-  const become = `<div class="page-head">
+  const become = `<div class="desk"><div class="page-head">
   <p class="eyebrow">Become a partner</p>
   <h1>Carry ledger facts to your users, with us.</h1>
   <p>NOSHASHI is a read-only intelligence tool for the XRP Ledger. Partners put its readings where
@@ -136,19 +136,18 @@ export async function buildPartners(write) {
   </div>
 </section>
 <section>
-  <div class="panel">
-    <p class="num">HOW IT WORKS</p>
-    <h3>Three steps, all remote.</h3>
-    <p><b>1. Tell us what you run.</b> A short note through the <a href="${CONTACT}">contact form</a>: your
+  <h2>How it works: three steps, all remote</h2>
+  <div class="partner-steps">
+    <p><b>I.</b><strong>Tell us what you run.</strong> A short note through the <a href="${CONTACT}">contact form</a>: your
        product, your users, and where ledger facts would help them.</p>
-    <p><b>2. A 30-minute call.</b> We look at your flow together and pick the lightest integration that works.</p>
-    <p><b>3. Go live.</b> Any commercial terms are written down first; then you connect, and we check the
+    <p><b>II.</b><strong>A 30-minute call.</strong> We look at your flow together and pick the lightest integration that works.</p>
+    <p><b>III.</b><strong>Go live.</strong> Any commercial terms are written down first; then you connect, and we check the
        readings render the way the ledger reports them.</p>
-    <p><a class="btn" href="${CONTACT}">Apply to partner</a></p>
   </div>
+  <p style="margin-top:22px"><a class="btn" href="${CONTACT}">Apply to partner</a></p>
   <p class="tool-note" style="margin-top:14px">NOSHASHI never holds keys, never signs, and never asks anyone for a seed,
      a key or a balance. It is not affiliated with Ripple Labs or the XRPL Foundation.</p>
-</section>`;
+</section></div>`;
 
   await write("partners/become/index.html", renderPage({
     title: "Become a partner — NOSHASHI, an XRPL intelligence tool",

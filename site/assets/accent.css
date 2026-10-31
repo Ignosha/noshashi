@@ -62,3 +62,41 @@ input,select,textarea{border-radius:10px}
 
 /* The ASCII ledger field, off for now. Delete this block to bring it back. */
 .garden-field,.garden-page,.garden-bg{display:none !important}
+
+/* ── The Ledger Desk type, site-wide (2026-10-31) ─────────────────────
+   Every page shares the homepage's voice: Instrument Serif for headlines,
+   Inter for text. Scoped to the shell's <main> so app chrome keeps its UI
+   type. */
+main.shell .page-head h1,main.shell section h2,main.shell .sec-head h2{
+  font-family:"Instrument Serif",Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.01em}
+main.shell .page-head h1{font-size:clamp(44px,6.2vw,84px);line-height:1;letter-spacing:-.015em;text-wrap:balance}
+main.shell section h2,main.shell .sec-head h2{font-size:clamp(28px,3vw,40px);line-height:1.12}
+main.shell .panel h3{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:24px;line-height:1.2;letter-spacing:0}
+
+/* ── Desk pages: ruled, square, no cards (partners, design partners) ── */
+.desk .page-head{border-top:3px double var(--ink);padding-top:clamp(28px,4vw,48px);max-width:none}
+.desk .page-head p:not(.eyebrow){max-width:62ch;font-size:17px;line-height:1.7;color:var(--muted)}
+.desk .eyebrow,.desk .panel .num,.desk .sec-head .eyebrow{font-family:"Inter",sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.desk .panel,.desk .panel:hover{background:transparent;border:0;border-top:1px solid var(--ink);border-radius:0;box-shadow:none;padding:22px 0 10px}
+.desk .grid.g2{column-gap:clamp(28px,4vw,56px);row-gap:28px}
+.desk section{padding-top:clamp(40px,5vw,72px)}
+.desk section h2,.desk .sec-head h2{padding-bottom:12px;border-bottom:1px solid var(--ink);margin-bottom:18px}
+.desk .panel p,.desk .panel li{font-size:15.5px;line-height:1.7;color:var(--muted)}
+.desk .btn,.desk input,.desk textarea,.desk select{border-radius:2px}
+.desk .btn{min-height:44px}
+.desk .proof-list,.desk .ticks{list-style:none;padding:0;margin:0}
+.desk .proof-list li,.desk .ticks li{padding:10px 0 10px 28px;border-top:1px solid var(--rule);position:relative}
+.desk .proof-list li:first-child,.desk .ticks li:first-child{border-top:0}
+.desk .proof-list li::before,.desk .ticks li::before{content:"";position:absolute;left:2px;top:17px;width:9px;height:9px;border:1px solid var(--ink);border-radius:50%;background:none}
+.desk .steps4{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;border-top:1px solid var(--ink)}
+.desk .steps4 li{padding:18px 20px 8px 0;border:0;border-radius:0;background:none}
+.desk .steps4 li .num{font-family:"Instrument Serif",Georgia,serif;font-size:30px;letter-spacing:0;color:var(--ink);margin:0 0 6px}
+.desk .steps4 li p{font-size:15px;line-height:1.6;color:var(--muted)}
+.desk .tool-note,.desk .micro{font-size:13px;color:var(--faint)}
+.desk .partner-steps p{margin:0;padding:14px 0;border-top:1px solid var(--rule);font-size:15.5px;line-height:1.7;color:var(--muted)}
+.desk .partner-steps p b{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:22px;color:var(--ink);margin-right:8px}
+.desk .partner-steps p:first-child{border-top:0}
+main.shell h1{font-family:"Instrument Serif",Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.015em}
+.desk .sec-head{max-width:none}
+.desk .steps4 li::before,.desk .steps4 li::after{content:none !important;display:none !important}
