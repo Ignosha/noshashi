@@ -77,6 +77,86 @@ export async function buildPartners(write) {
     body,
     structured: [breadcrumb("Partners", "/partners/")],
   }));
+
+  const become = `<div class="page-head">
+  <p class="eyebrow">Become a partner</p>
+  <h1>Carry ledger facts to your users, with us.</h1>
+  <p>NOSHASHI is a read-only intelligence tool for the XRP Ledger. Partners put its readings where
+     decisions are made: on token pages, in client files, inside wallets and in compliance stacks.
+     Tell us what you run, and we will work out the simplest way to connect it.</p>
+  <p><a class="btn" href="${CONTACT}">Apply to partner</a> <a class="btn ghost" href="/partners/">See how partners use it</a></p>
+</div>
+<section>
+  <div class="grid g2">
+    <div class="panel">
+      <p class="num">01 · INTEGRATION PARTNERS</p>
+      <h3>Explorers, DEXes, launchpads and wallets</h3>
+      <p>Show issuer controls next to every token, or check a destination before a user sends. The
+         <a href="/docs/api/">Asset Risk API</a> and the live badge are free and need no key.</p>
+    </div>
+    <div class="panel">
+      <p class="num">02 · REFERRAL PARTNERS</p>
+      <h3>Auditors, accountants, law firms and advisers</h3>
+      <p>Refer clients who hold XRPL assets, or order <a href="/evidence-report/">Ledger Evidence Reports</a>
+         for several clients at once. A referral fee or volume pricing is agreed in writing with each firm.</p>
+    </div>
+    <div class="panel">
+      <p class="num">03 · CHANNEL PARTNERS</p>
+      <h3>Consultancies, integrators and compliance vendors</h3>
+      <p>Bring the <a href="/app/">workspace</a> and its receipts to banks, custodians and treasuries you
+         already serve, with terms set out per partner before anything is sold.</p>
+    </div>
+    <div class="panel">
+      <p class="num">04 · DATA AND TECHNOLOGY PARTNERS</p>
+      <h3>Node operators, analytics and custody technology</h3>
+      <p>Use the same reads in your own product through the <a href="/developers/">SDK and Compliance API</a>,
+         with every answer carrying the ledger index it was read at.</p>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="grid g2">
+    <div class="panel">
+      <p class="num">WHAT PARTNERS GET</p>
+      <ul class="proof-list">
+        <li>Keyless access to issuer controls and the live badge from day one</li>
+        <li>A direct line to the founder for integration questions</li>
+        <li>Early access to new readings before they reach the public tools</li>
+        <li>A listing on the partners page once your integration is live, if you want one</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <p class="num">WHAT WE ASK</p>
+      <ul class="proof-list">
+        <li>A visible "Issuer facts by NOSHASHI" link wherever the readings appear</li>
+        <li>Show facts as facts: with the ledger they were read at, never as a score or a rating</li>
+        <li>Never present NOSHASHI as endorsing a token, an issuer or an investment</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="panel">
+    <p class="num">HOW IT WORKS</p>
+    <h3>Three steps, all remote.</h3>
+    <p><b>1. Tell us what you run.</b> A short note through the <a href="${CONTACT}">contact form</a>: your
+       product, your users, and where ledger facts would help them.</p>
+    <p><b>2. A 30-minute call.</b> We look at your flow together and pick the lightest integration that works.</p>
+    <p><b>3. Go live.</b> Any commercial terms are written down first; then you connect, and we check the
+       readings render the way the ledger reports them.</p>
+    <p><a class="btn" href="${CONTACT}">Apply to partner</a></p>
+  </div>
+  <p class="tool-note" style="margin-top:14px">NOSHASHI never holds keys, never signs, and never asks anyone for a seed,
+     a key or a balance. It is not affiliated with Ripple Labs or the XRPL Foundation.</p>
+</section>`;
+
+  await write("partners/become/index.html", renderPage({
+    title: "Become a partner — NOSHASHI, an XRPL intelligence tool",
+    description: "Partner with NOSHASHI: show XRPL issuer controls on your token pages, refer clients for ledger evidence, or bring the read-only workspace to the institutions you serve.",
+    path: "/partners/become/",
+    body: become,
+    structured: [breadcrumb("Become a partner", "/partners/become/")],
+  }));
 }
 
-export const PARTNER_PAGES = [["/partners/", "monthly", "0.8"]];
+export const PARTNER_PAGES = [["/partners/", "monthly", "0.8"], ["/partners/become/", "monthly", "0.7"]];
