@@ -1623,17 +1623,47 @@
   .rh-btn.lg{min-height:48px;padding:0 22px;font-size:15px;gap:10px}
   .rh-btn.lg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .rh-title-fine{margin:16px 0 0;font-size:13px;color:var(--faint)}
-  .rh-emblem{margin:0;position:relative;color:var(--ink)}
-  .rh-emblem svg{display:block;width:100%;max-width:400px;margin:0 auto;overflow:visible}
-  .rh-emblem .mono circle[r="34"],.rh-emblem .mono circle[r="50"],.rh-emblem .mono circle[r="66"],.rh-emblem .mono circle[r="82"],.rh-emblem .mono circle[r="98"]{transform-box:view-box;transform-origin:120px 120px;animation:mono-breathe 7s ease-in-out infinite}
-  @keyframes mono-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
-  .rh-emblem .em-wave{fill:none;stroke:currentColor;stroke-width:1;opacity:0;transform-box:fill-box;transform-origin:center}
-  .rh-emblem .em-wave.go{animation:em-wave 2.6s cubic-bezier(.2,.7,.3,1) forwards}
-  .rh-emblem .em-wave.go2{animation:em-wave 2.6s .4s cubic-bezier(.2,.7,.3,1) forwards}
-  @keyframes sl-turn{to{transform:rotate(360deg)}}
-  @keyframes em-wave{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.42)}}
-  .rh-emblem figcaption{margin-top:18px;text-align:center;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
-  @media (prefers-reduced-motion:reduce){.rh-emblem .mono circle,.rh-emblem .em-wave.go,.rh-emblem .em-wave.go2{animation:none}}
+  .rh-emblem{margin:0;position:relative}
+  .rh-emblem svg{display:block;width:100%;max-width:480px;margin:0 auto;overflow:visible}
+  .rh-emblem .em-shadow{fill:#000;opacity:.55}
+  html[data-theme="light"] .rh-emblem .em-shadow{opacity:.2}
+  .rh-emblem .em-edge0{stop-color:color-mix(in srgb,var(--ink) 34%,var(--ground))}
+  .rh-emblem .em-edge2{stop-color:color-mix(in srgb,var(--ink) 14%,var(--ground))}
+  .rh-emblem .em-edge1{stop-color:color-mix(in srgb,var(--ink) 4%,var(--ground))}
+  .rh-emblem .em-top0{stop-color:color-mix(in srgb,var(--ink) 20%,var(--ground))}
+  .rh-emblem .em-top1{stop-color:color-mix(in srgb,var(--ink) 8%,var(--ground))}
+  .rh-emblem .em-top2{stop-color:color-mix(in srgb,var(--ink) 3%,var(--ground))}
+  html[data-theme="light"] .rh-emblem .em-top0{stop-color:#fff}
+  html[data-theme="light"] .rh-emblem .em-top1{stop-color:color-mix(in srgb,var(--ink) 5%,var(--ground))}
+  html[data-theme="light"] .rh-emblem .em-top2{stop-color:color-mix(in srgb,var(--ink) 10%,var(--ground))}
+  .rh-emblem .em-hi{stop-color:var(--ink);stop-opacity:.85}
+  html[data-theme="light"] .rh-emblem .em-hi{stop-color:#fff;stop-opacity:1}
+  .rh-emblem .em-hi0{stop-color:var(--ink);stop-opacity:0}
+  .rh-emblem .em-drop0{stop-color:var(--ink)}
+  .rh-emblem .em-drop1{stop-color:color-mix(in srgb,var(--ink) 55%,var(--ground))}
+  .rh-emblem .em-drop2{stop-color:color-mix(in srgb,var(--ink) 25%,var(--ground))}
+  html[data-theme="light"] .rh-emblem .em-drop0{stop-color:color-mix(in srgb,var(--ink) 55%,var(--ground))}
+  html[data-theme="light"] .rh-emblem .em-drop2{stop-color:var(--ink)}
+  .rh-emblem .em-reed{fill:none;stroke:var(--ground);stroke-opacity:.38;stroke-width:1.1}
+  .rh-emblem .em-lip{fill:none;stroke:var(--ink);stroke-opacity:.18}
+  .rh-emblem .em-bevel,.rh-emblem .em-eng{fill:none;stroke:#000;stroke-opacity:.35;stroke-width:1.2}
+  html[data-theme="light"] .rh-emblem .em-bevel,html[data-theme="light"] .rh-emblem .em-eng{stroke:#fff;stroke-opacity:.9}
+  .rh-emblem .em-mark{color:var(--ink);fill:var(--ink);stroke:var(--ink);opacity:.8}
+  .rh-emblem .em-markd{fill:#000;stroke:#000;opacity:.4}
+  html[data-theme="light"] .rh-emblem .em-markd{fill:#fff;stroke:#fff;opacity:1}
+  .rh-emblem .em-dropr{fill:none;stroke:var(--ground);stroke-opacity:.35;stroke-width:2;stroke-linecap:round}
+  html[data-theme="light"] .rh-emblem .em-dropr{stroke:#fff;stroke-opacity:.5}
+  .rh-emblem .em-glint{fill:#fff;opacity:.85}
+  html[data-theme="light"] .rh-emblem .em-glint{fill:#fff;opacity:.8}
+  .rh-emblem .em-ring{fill:none;stroke:var(--ink);stroke-width:1.2}
+  .rh-emblem .em-wave{fill:none;stroke:var(--ink);stroke-width:1.6;opacity:0;transform-box:fill-box;transform-origin:center}
+  .rh-emblem .em-dropg{animation:em-bob 6s ease-in-out infinite}
+  .rh-emblem .em-wave.go{animation:em-wave 2.4s cubic-bezier(.2,.7,.3,1) forwards}
+  .rh-emblem .em-wave.go2{animation:em-wave 2.4s .35s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes em-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes em-wave{0%{opacity:.85;transform:scale(.18)}100%{opacity:0;transform:scale(1)}}
+  .rh-emblem figcaption{margin-top:6px;text-align:center;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+  @media (prefers-reduced-motion:reduce){.rh-emblem .em-dropg,.rh-emblem .em-wave.go,.rh-emblem .em-wave.go2{animation:none}}
   @media (max-width:900px){.rh-title{grid-template-columns:1fr}.rh-emblem svg{max-width:340px}}
 
   /* ── Who it is for, and the partner plate ── */
@@ -1708,13 +1738,38 @@
         <p class="rh-title-fine">Free plan, no card. Never holds keys, never signs.</p>
       </div>
       <figure class="rh-emblem" aria-labelledby="rh-em-c">
-        <svg viewBox="-40 -40 320 320" role="img" aria-labelledby="rh-em-t">
-          <title id="rh-em-t">The NOSHASHI monogram</title>
-          <circle class="em-wave" id="rh-em-w1" cx="120" cy="120" r="114"/>
-          <circle class="em-wave" id="rh-em-w2" cx="120" cy="120" r="114"/>
-          <g class="mono"><circle cx="120" cy="120" r="34" fill="none" stroke="currentColor" stroke-width="1" opacity="0.22"/><circle cx="120" cy="120" r="50" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"/><circle cx="120" cy="120" r="66" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/><circle cx="120" cy="120" r="82" fill="none" stroke="currentColor" stroke-width="1.1" opacity="0.52"/><circle cx="120" cy="120" r="98" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.7"/><circle cx="120" cy="120" r="114" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M140.988 167.188Q138.876 167.188 137.424 164.02L101.652 86.404Q101.256 85.47999999999999 100.662 85.612Q100.068 85.744 100.068 86.8V154.648Q100.068 158.344 101.322 160.25799999999998Q102.576 162.172 105.876 162.7L107.592 162.964Q109.30799999999999 163.096 109.30799999999999 164.548Q109.30799999999999 166.0 107.328 166.0H88.452Q86.472 166.0 86.472 164.548Q86.472 163.096 88.188 162.964L89.904 162.7Q93.336 162.172 94.656 160.25799999999998Q95.976 158.344 95.976 154.648V79.672Q95.976 76.89999999999999 95.118 75.976Q94.26 75.05199999999999 91.224 74.524L88.188 73.996Q86.472 73.6 86.472 72.41199999999999Q86.472 70.96 88.452 70.96H102.576Q105.876 70.96 107.196 73.86399999999999L138.348 142.372Q138.744 143.164 139.33800000000002 143.03199999999998Q139.93200000000002 142.9 139.93200000000002 142.108V82.312Q139.93200000000002 78.088 138.48000000000002 76.43799999999999Q137.028 74.788 134.784 74.392L132.40800000000002 73.996Q130.692 73.6 130.692 72.41199999999999Q130.692 70.96 132.672 70.96H151.548Q153.52800000000002 70.96 153.52800000000002 72.41199999999999Q153.52800000000002 73.86399999999999 151.812 73.996L150.096 74.25999999999999Q146.664 74.788 145.344 76.43799999999999Q144.024 78.088 144.024 82.312V162.964Q144.024 165.34 143.166 166.264Q142.308 167.188 140.988 167.188Z" fill="var(--ground)" stroke="var(--ground)" stroke-width="10" stroke-linejoin="round"/><path d="M140.988 167.188Q138.876 167.188 137.424 164.02L101.652 86.404Q101.256 85.47999999999999 100.662 85.612Q100.068 85.744 100.068 86.8V154.648Q100.068 158.344 101.322 160.25799999999998Q102.576 162.172 105.876 162.7L107.592 162.964Q109.30799999999999 163.096 109.30799999999999 164.548Q109.30799999999999 166.0 107.328 166.0H88.452Q86.472 166.0 86.472 164.548Q86.472 163.096 88.188 162.964L89.904 162.7Q93.336 162.172 94.656 160.25799999999998Q95.976 158.344 95.976 154.648V79.672Q95.976 76.89999999999999 95.118 75.976Q94.26 75.05199999999999 91.224 74.524L88.188 73.996Q86.472 73.6 86.472 72.41199999999999Q86.472 70.96 88.452 70.96H102.576Q105.876 70.96 107.196 73.86399999999999L138.348 142.372Q138.744 143.164 139.33800000000002 143.03199999999998Q139.93200000000002 142.9 139.93200000000002 142.108V82.312Q139.93200000000002 78.088 138.48000000000002 76.43799999999999Q137.028 74.788 134.784 74.392L132.40800000000002 73.996Q130.692 73.6 130.692 72.41199999999999Q130.692 70.96 132.672 70.96H151.548Q153.52800000000002 70.96 153.52800000000002 72.41199999999999Q153.52800000000002 73.86399999999999 151.812 73.996L150.096 74.25999999999999Q146.664 74.788 145.344 76.43799999999999Q144.024 78.088 144.024 82.312V162.964Q144.024 165.34 143.166 166.264Q142.308 167.188 140.988 167.188Z" fill="currentColor"/></g>
+        <svg viewBox="0 0 440 380" role="img" aria-labelledby="rh-em-t">
+          <title id="rh-em-t">The NOSHASHI emblem: a drop above a ledger seal, spreading in rings</title>
+          <defs>
+            <linearGradient id="em-edge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" class="em-edge1"/><stop offset=".38" class="em-edge0"/><stop offset=".7" class="em-edge2"/><stop offset="1" class="em-edge1"/></linearGradient>
+            <radialGradient id="em-top" cx=".38" cy=".3" r=".8"><stop offset="0" class="em-top0"/><stop offset=".6" class="em-top1"/><stop offset="1" class="em-top2"/></radialGradient>
+            <linearGradient id="em-rimg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="em-hi"/><stop offset=".55" class="em-hi0"/></linearGradient>
+            <linearGradient id="em-drop" x1=".2" y1="0" x2=".85" y2="1"><stop offset="0" class="em-drop0"/><stop offset=".6" class="em-drop1"/><stop offset="1" class="em-drop2"/></linearGradient>
+            <radialGradient id="em-spec" cx=".5" cy=".5" r=".5"><stop offset="0" class="em-hi"/><stop offset="1" class="em-hi0"/></radialGradient>
+            <filter id="em-blur" x="-30%" y="-200%" width="160%" height="500%"><feGaussianBlur stdDeviation="14"/></filter>
+            <filter id="em-soft" x="-50%" y="-80%" width="200%" height="260%"><feGaussianBlur stdDeviation="5"/></filter>
+          </defs>
+          <ellipse class="em-shadow" cx="230" cy="330" rx="170" ry="22" filter="url(#em-blur)"/>
+          <path d="M40 232 A180 62 0 0 0 400 232 L400 260 A180 62 0 0 1 40 260 Z" fill="url(#em-edge)"/>
+          <path class="em-reed" d="M399.6 238.3v24 M398.7 241.6v24 M397.3 244.8v24 M395.4 247.9v24 M393.0 251.1v24 M390.2 254.2v24 M386.9 257.2v24 M383.1 260.2v24 M378.9 263.1v24 M374.3 265.9v24 M369.2 268.7v24 M363.8 271.3v24 M357.9 273.9v24 M351.6 276.3v24 M345.0 278.6v24 M338.1 280.8v24 M330.8 282.9v24 M323.2 284.8v24 M315.4 286.6v24 M307.3 288.2v24 M298.9 289.7v24 M290.3 291.1v24 M281.6 292.3v24 M272.6 293.3v24 M263.5 294.2v24 M254.3 294.9v24 M245.1 295.4v24 M235.7 295.8v24 M226.3 296.0v24 M216.9 296.0v24 M207.4 295.8v24 M198.1 295.5v24 M188.7 295.1v24 M179.5 294.4v24 M170.4 293.6v24 M161.4 292.6v24 M152.6 291.5v24 M143.9 290.2v24 M135.5 288.7v24 M127.3 287.1v24 M119.3 285.4v24 M111.7 283.5v24 M104.3 281.5v24 M97.2 279.3v24 M90.5 277.1v24 M84.2 274.7v24 M78.2 272.2v24 M72.6 269.6v24 M67.4 266.9v24 M62.6 264.1v24 M58.2 261.2v24 M54.3 258.2v24 M50.9 255.2v24 M47.9 252.1v24 M45.3 249.0v24 M43.3 245.8v24 M41.8 242.6v24 M40.7 239.4v24"/>
+          <ellipse class="em-lip" cx="220" cy="260" rx="180" ry="62"/>
+          <ellipse cx="220" cy="232" rx="180" ry="62" fill="url(#em-top)"/>
+          <ellipse cx="220" cy="232" rx="179.5" ry="61.5" fill="none" stroke="url(#em-rimg)" stroke-width="1.6"/>
+          <ellipse class="em-bevel" cx="220" cy="233.5" rx="170" ry="58.6"/>
+          <ellipse class="em-ring" cx="220" cy="232" rx="170" ry="58.6" stroke-opacity=".35"/>
+          <ellipse class="em-eng" cx="220" cy="233.2" rx="150" ry="51.7"/><ellipse class="em-ring" cx="220" cy="232" rx="150" ry="51.7" stroke-opacity="0.3"/><ellipse class="em-eng" cx="220" cy="233.2" rx="118" ry="40.6"/><ellipse class="em-ring" cx="220" cy="232" rx="118" ry="40.6" stroke-opacity="0.42"/><ellipse class="em-eng" cx="220" cy="233.2" rx="86" ry="29.6"/><ellipse class="em-ring" cx="220" cy="232" rx="86" ry="29.6" stroke-opacity="0.55"/><ellipse class="em-eng" cx="220" cy="233.2" rx="56" ry="19.3"/><ellipse class="em-ring" cx="220" cy="232" rx="56" ry="19.3" stroke-opacity="0.7"/>
+          <g transform="translate(220 232) scale(3 1.033) translate(-16 -16)"><g class="em-markd" transform="translate(0 .9)"><path d="M8.5 23.5V8.5M23.5 8.5V23.5" stroke-width="2.6" stroke-linecap="round" fill="none"/><rect x="11" y="10" width="3.8" height="3.8" rx=".9"/><rect x="14.1" y="14.1" width="3.8" height="3.8" rx=".9"/><rect x="17.2" y="18.2" width="3.8" height="3.8" rx=".9"/></g><g class="em-mark"><path d="M8.5 23.5V8.5M23.5 8.5V23.5" stroke-width="2.6" stroke-linecap="round" fill="none"/><rect x="11" y="10" width="3.8" height="3.8" rx=".9" opacity=".5"/><rect x="14.1" y="14.1" width="3.8" height="3.8" rx=".9" opacity=".78"/><rect x="17.2" y="18.2" width="3.8" height="3.8" rx=".9"/></g></g>
+          <ellipse class="em-wave" id="rh-em-w1" cx="220" cy="232" rx="166" ry="57"/>
+          <ellipse class="em-wave" id="rh-em-w2" cx="220" cy="232" rx="166" ry="57"/>
+          <ellipse cx="228" cy="236" rx="30" ry="8" fill="#000" opacity=".4" filter="url(#em-soft)"/>
+          <g class="em-dropg">
+            <path d="M220 34 C220 34 264 98 264 130 A44 44 0 0 1 176 130 C176 98 220 34 220 34 Z" fill="url(#em-drop)"/>
+            <path class="em-dropr" d="M252 108 C259 118 262 126 262 132 A42 42 0 0 1 238 168"/>
+            <ellipse cx="203" cy="112" rx="9" ry="20" transform="rotate(24 203 112)" fill="url(#em-spec)" opacity=".75"/>
+            <circle cx="212" cy="150" r="3" class="em-glint"/>
+          </g>
         </svg>
-        <figcaption id="rh-em-c">Each validated ledger sends a ripple out from the mark.</figcaption>
+        <figcaption id="rh-em-c">The ledger seal. Each validated ledger sends a ring across it.</figcaption>
       </figure>
     </div>
 
