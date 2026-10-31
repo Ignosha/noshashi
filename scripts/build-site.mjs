@@ -150,7 +150,7 @@ async function buildHome({ news, market, feed, status, release }) {
 
   // The short homepage leaves out the newsroom, mission log and edge lab;
   // their slots are optional so those panels can come back without code.
-  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE", "SHOTHERO"]);
+  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE", "SHOTHERO", "TOKENTAPE", "MISREAD", "SHOTVERIFICATION", "SHOTAUDIT", "SHOTADDRESS"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
     if (!html.includes(token)) {
@@ -1757,9 +1757,9 @@ async function accentLast(dir) {
       if (entry.name !== "index.html" || full === path.join(dir, "index.html")) continue;
       let html = await readFile(full, "utf8");
       const before = html;
-      // Dark monochrome is the default palette: every page's <html> opens
-      // dark until the visitor's saved choice says otherwise.
-      html = html.replace(/<html lang="en"(?: data-theme="light")?>/, '<html lang="en" data-theme="dark">');
+      // Ivory is the default palette: every page's <html> opens light
+      // until the visitor's saved choice says otherwise.
+      html = html.replace(/<html lang="en"(?: data-theme="dark")?>/, '<html lang="en" data-theme="light">');
       // Older static pages still name the flower; the website mark is the
       // ledger mark (scripts/gen-brand.mjs).
       html = html
