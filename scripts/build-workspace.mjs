@@ -148,7 +148,7 @@ function page({ key, path, title, crumb, description, main, details = "", ctx = 
 <link rel="canonical" href="${esc(ORIGIN + path)}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
-<link rel="preload" as="font" type="font/woff2" href="/fonts/geist-var-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/core.css">
 <link rel="stylesheet" href="/assets/modules.css">

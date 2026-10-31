@@ -12,22 +12,6 @@
 (function () {
   "use strict";
   var NS = "http://www.w3.org/2000/svg";
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function ease(t) { return 1 - Math.pow(1 - t, 4); }
-  /* Roll a figure from what it shows now to its new value. */
-  function roll(node, to, format, ms) {
-    if (!node) return;
-    var from = Number(node.getAttribute("data-v"));
-    node.setAttribute("data-v", to);
-    if (reduce || !isFinite(from)) { node.textContent = format(to); return; }
-    var t0 = null;
-    (function step(t) {
-      if (t0 === null) t0 = t;
-      var p = Math.min(1, (t - t0) / (ms || 700));
-      node.textContent = format(from + (to - from) * ease(p));
-      if (p < 1) requestAnimationFrame(step);
-    })(performance.now());
-  }
 
   /* ── Radar ─────────────────────────────────────────────────────── */
   var ISSUERS = [
@@ -55,7 +39,7 @@
     var a = -Math.PI / 2 + (i * 2 * Math.PI) / AXES.length;
     return [110 + r * Math.cos(a), 104 + r * Math.sin(a)];
   }
-  function drawRadar(shares, read, moving) {
+  function drawRadar(shares, read) {
     radar.textContent = "";
     [0.25, 0.5, 0.75, 1].forEach(function (f) {
       radar.appendChild(el("polygon", { class: "md-ring", points: AXES.map(function (_, i) { return point(i, 72 * f).join(","); }).join(" ") }));
@@ -70,18 +54,8 @@
     shares.forEach(function (v, i) {
       var p = point(i, 72 * v);
       radar.appendChild(el("circle", { class: "md-dot", cx: p[0], cy: p[1], r: 3 }));
-      if (v > 0 && !moving) radar.appendChild(el("text", { class: "md-val", x: p[0], y: p[1] - 7, "text-anchor": "middle" }, Math.round(v * read) + "/" + read));
+      if (v > 0) radar.appendChild(el("text", { class: "md-val", x: p[0], y: p[1] - 7, "text-anchor": "middle" }, Math.round(v * read) + "/" + read));
     });
-  }
-  function morphRadar(target, read) {
-    if (reduce) { drawRadar(target, read); return; }
-    var t0 = null;
-    (function step(t) {
-      if (t0 === null) t0 = t;
-      var p = Math.min(1, (t - t0) / 1100), k = ease(p);
-      drawRadar(target.map(function (v) { return v * k; }), read, p < 1);
-      if (p < 1) requestAnimationFrame(step);
-    })(performance.now());
   }
   function loadRadar() {
     var reads = ISSUERS.map(function (a) {
@@ -97,7 +71,7 @@
         });
         return kept.length / ok.length;
       });
-      morphRadar(shares, ok.length);
+      drawRadar(shares, ok.length);
       var top = ok.reduce(function (m, c) { return Math.max(m, c.ledgerIndex || 0); }, 0);
       note.textContent = ok.length + " of " + ISSUERS.length + " issuers read, latest at ledger " + top.toLocaleString("en-US") + ".";
     });
@@ -128,42 +102,10 @@
           ["Advertised, unfunded", 100 - pct, fmt(Math.max(0, quoted - fill)) + " RLUSD"],
         ];
         comp.innerHTML = '<div class="md-pcts">' + rows.map(function (r) { return '<div><b>' + r[1] + '%</b><em>' + r[0] + '</em></div>'; }).join("") + '</div>' +
-          '<div class="md-barline"><i style="flex:0 1 0"></i><i class="u" style="flex:0 1 0"></i></div>';
-        var bars = comp.querySelectorAll(".md-barline i");
-        requestAnimationFrame(function () { requestAnimationFrame(function () {
-          bars[0].style.flexGrow = Math.max(pct, 1); bars[1].style.flexGrow = Math.max(100 - pct, 1);
-        }); });
+          '<div class="md-barline"><i style="flex:' + Math.max(pct, 1) + '"></i><i class="u" style="flex:' + Math.max(100 - pct, 1) + '"></i></div>';
         compNote.textContent = "Within 10% of mid at ledger " + fmt(b.ledger_index) + " · DEX book only, AMM pools excluded";
       }).catch(function () { comp.innerHTML = '<p class="md-note">The order book could not be read just now.</p>'; });
   }
-
-  /* ── Hero stat strip and ledger chain ──────────────────────────── */
-  var stLedger = document.getElementById("fl-ledger"), stTx = document.getElementById("fl-tx"),
-      stClose = document.getElementById("fl-close"), chain = document.getElementById("fl-chain");
-  var heroSeen = [], chainPeak = 1;
-  window.addEventListener("noshashi:ledger", function (ev) {
-    var d = ev.detail || {};
-    if (!Number.isInteger(d.index)) return;
-    var tx = Math.max(0, Number(d.txnCount) || 0);
-    heroSeen.push(Date.now());
-    if (heroSeen.length > 10) heroSeen.shift();
-    if (stLedger) roll(stLedger, d.index, function (v) { return Math.round(v).toLocaleString("en-US"); }, 600);
-    if (stTx) roll(stTx, tx, function (v) { return Math.round(v).toLocaleString("en-US"); }, 600);
-    if (stClose && heroSeen.length > 1) {
-      var span = (heroSeen[heroSeen.length - 1] - heroSeen[0]) / 1000 / (heroSeen.length - 1);
-      roll(stClose, span, function (v) { return v.toFixed(1) + " s"; }, 600);
-    }
-    if (!chain) return;
-    var wait = chain.querySelector(".fl-wait");
-    if (wait) wait.remove();
-    chainPeak = Math.max(chainPeak * 0.98, tx, 1);
-    var b = document.createElement("i");
-    b.className = reduce ? "" : "enter";
-    b.title = "Ledger " + d.index.toLocaleString("en-US") + " · " + tx + " transactions";
-    b.style.setProperty("--h", Math.max(18, Math.round((tx / chainPeak) * 100)) + "%");
-    chain.prepend(b);
-    while (chain.children.length > 12) chain.lastElementChild.remove();
-  });
 
   /* ── Digest ────────────────────────────────────────────────────── */
   var digest = document.getElementById("md-digest"), state = document.getElementById("md-dg-state");
