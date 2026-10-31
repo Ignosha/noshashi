@@ -93,6 +93,7 @@ export const FOOTER_GROUPS = [
   { title: "Company", links: [
     { href: "/about/", label: "About" },
     { href: "/design-partners/", label: "Design partners" },
+    { href: "/partners/", label: "Partner programs" },
     { href: "/contact/", label: "Contact" },
     { href: "/brief/", label: "Product brief" },
     { href: "/trust/", label: "Trust & security" },

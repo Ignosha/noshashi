@@ -7,7 +7,7 @@
 
   var form=document.getElementById("er-form"); if(!form)return;
   var status=document.getElementById("er-status"), pay=document.getElementById("er-pay"), preview=document.getElementById("er-preview");
-  var PRICES={"issuer":"$950","standard":"$2,500","quarterly":"$7,500","audit":"$10,000","test":"$1"}, LIMITS={"issuer":{"issuers":1,"wallets":3,"books":1},"standard":{"issuers":3,"wallets":10,"books":3},"quarterly":{"issuers":3,"wallets":10,"books":3},"audit":{"issuers":6,"wallets":10,"books":6},"test":{"issuers":3,"wallets":10,"books":3}};
+  var PRICES={"issuer":"$950","standard":"$2,500","quarterly":"$7,500","audit":"$15,000","test":"$1"}, LIMITS={"issuer":{"issuers":1,"wallets":3,"books":1},"standard":{"issuers":3,"wallets":10,"books":3},"quarterly":{"issuers":3,"wallets":10,"books":3},"audit":{"issuers":6,"wallets":10,"books":6},"test":{"issuers":3,"wallets":10,"books":3}};
   // ?tier=test starts the unlisted $1.00 test purchase (promotion codes allowed); the server decides
   // whether it is offered and where its report goes.
   var forced=null; try{if(new URLSearchParams(location.search).get("tier")==="test")forced="test";}catch(e){}

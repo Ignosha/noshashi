@@ -54,6 +54,7 @@ import { buildTools, TOOL_PAGES } from "./build-tools.mjs";
 import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
 import { buildTokens, TOKEN_INDEX_PAGES } from "./build-tokens.mjs";
+import { buildPartners, PARTNER_PAGES } from "./build-partners.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
@@ -1609,6 +1610,7 @@ async function buildSitemap(docs = [], tokenPages = []) {
     ["/certificate/", "weekly", "0.9"],
     ...TOOL_PAGES,
     ...TOKEN_INDEX_PAGES,
+    ...PARTNER_PAGES,
     ...tokenPages,
     ...REPORT_PAGES,
     ...BRIEF_PAGES,
@@ -1709,6 +1711,7 @@ async function main() {
   await buildCertificate();
   await buildTools(write);
   const tokenPages = await buildTokens(write);
+  await buildPartners(write);
   await buildReport(write);
   await buildBrief(write);
   await buildProtection();

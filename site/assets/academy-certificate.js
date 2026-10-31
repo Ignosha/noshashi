@@ -60,6 +60,29 @@
     ].forEach(function (row) { dl.appendChild(el("dt", row[0])); dl.appendChild(el("dd", String(row[1]))); });
     var note = el("p", "If the code printed on the certificate matches this one, the certificate states exactly what is shown here. Change any detail and the code changes completely. This is a record of a completed self-paced course, not a licence, accreditation or offer of employment.");
     note.className = "ac-fine";
-    out.replaceChildren(title, dl, note);
+    // The holder's own choice to show it: LinkedIn's documented add-to-profile
+    // link, filled from the record. Nothing is sent until they press it.
+    var done = String(record.completed_on || "").split("-");
+    var add = new URL("https://www.linkedin.com/profile/add");
+    add.search = new URLSearchParams({
+      startTask: "CERTIFICATION_NAME",
+      name: "NOSHASHI Academy: " + String(record.course || "XRP Ledger compliance"),
+      organizationName: "NOSHASHI",
+      issueYear: done[0] || "",
+      issueMonth: String(Number(done[1] || 0) || ""),
+      certUrl: location.href,
+      certId: short,
+    }).toString();
+    var share = "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent("https://www.noshashi.app/academy/");
+    var actions = el("p");
+    actions.className = "ac-share";
+    [[add.toString(), "Add to LinkedIn profile"], [share, "Share the course on LinkedIn"]].forEach(function (a, i) {
+      var link = el("a", a[1]);
+      link.href = a[0]; link.target = "_blank"; link.rel = "noopener";
+      link.className = i === 0 ? "btn" : "btn ghost";
+      actions.appendChild(link);
+      actions.appendChild(document.createTextNode(" "));
+    });
+    out.replaceChildren(title, dl, actions, note);
   });
 })();
