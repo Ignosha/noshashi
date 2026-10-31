@@ -258,7 +258,7 @@ describe("the Ledger Evidence Report", () => {
   });
 
   it("charges each tier its own price, and refuses a tier that does not exist", async () => {
-    for (const [tier, cents] of [["standard", "250000"], ["quarterly", "750000"], ["audit", "1000000"]]) {
+    for (const [tier, cents] of [["standard", "250000"], ["quarterly", "750000"], ["audit", "1500000"]]) {
       const res = mockRes();
       await handler(report({ tier, wallets: WALLET }), res);
       expect(res.statusCode).toBe(200);

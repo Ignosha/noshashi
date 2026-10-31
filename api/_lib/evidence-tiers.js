@@ -32,7 +32,7 @@ export const EVIDENCE_TIERS = {
   },
   audit: {
     name: "Audit support",
-    cents: 1_000_000,
+    cents: 1_500_000,
     cadence: "monthly",
     limits: { issuers: 6, wallets: 10, books: 6 },
     summary: "A report now, then one at each of the next twelve month-ends, with a larger scope.",

@@ -18,7 +18,7 @@ export const TIERS: Record<Tier, { name: string; cents: number; cadence: "once" 
   issuer: { name: "Issuer check", cents: 95_000, cadence: "once", limits: { issuers: 1, wallets: 3, books: 1 } },
   standard: { name: "Standard", cents: 250_000, cadence: "once", limits: { issuers: 3, wallets: 10, books: 3 } },
   quarterly: { name: "Quarterly", cents: 750_000, cadence: "quarterly", limits: { issuers: 3, wallets: 10, books: 3 } },
-  audit: { name: "Audit support", cents: 1_000_000, cadence: "monthly", limits: { issuers: 6, wallets: 10, books: 6 } },
+  audit: { name: "Audit support", cents: 1_500_000, cadence: "monthly", limits: { issuers: 6, wallets: 10, books: 6 } },
   // Not sold: a Standard report at Stripe's minimum charge, so the owner can
   // test a real card payment end to end. The checkout only offers it when
   // EVIDENCE_TEST_EMAIL is set, and locks the receipt to that address.

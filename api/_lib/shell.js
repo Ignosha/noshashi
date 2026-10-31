@@ -71,6 +71,7 @@ export const FOOTER_GROUPS = [
     { href: "/strategic-infrastructure/", label: "Strategic infrastructure" },
   ] },
   { title: "Free tools", links: [
+    { href: "/tokens/", label: "XRPL token directory" },
     { href: "/xapp/", label: "Check an address" },
     { href: "/certificate/", label: "Authority certificate" },
     { href: "/badge/", label: "Issuer badge" },
@@ -92,6 +93,7 @@ export const FOOTER_GROUPS = [
   { title: "Company", links: [
     { href: "/about/", label: "About" },
     { href: "/design-partners/", label: "Design partners" },
+    { href: "/partners/", label: "Partner programs" },
     { href: "/contact/", label: "Contact" },
     { href: "/brief/", label: "Product brief" },
     { href: "/trust/", label: "Trust & security" },

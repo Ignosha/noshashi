@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>XRPL tokens: what each issuer can still do, read live</title>
+<meta name="description" content="Freeze, clawback, permissioned holding, signing keys and real order-book depth for 51 XRP Ledger tokens, read live from validated ledger state. Free, no account.">
+<link rel="canonical" href="https://www.noshashi.app/tokens/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/tokens/">
+<meta property="og:title" content="XRPL tokens: what each issuer can still do, read live">
+<meta property="og:description" content="Freeze, clawback, permissioned holding, signing keys and real order-book depth for 51 XRP Ledger tokens, read live from validated ledger state. Free, no account.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="XRPL tokens: what each issuer can still do, read live">
+<meta name="twitter:description" content="Freeze, clawback, permissioned holding, signing keys and real order-book depth for 51 XRP Ledger tokens, read live from validated ledger state. Free, no account.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/flower-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/71ecf472d65ca3152980.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/favicon.svg","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Tokens","item":"https://www.noshashi.app/tokens/"}]}]}</script>
+<style>
+.tk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:18px 0}
+.tk-card{display:block;border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;text-decoration:none;color:inherit}
+.tk-card:hover,.tk-card:focus-visible{border-color:var(--accent,currentColor)}
+.tk-card b{display:block;font-size:16px}
+.tk-card span{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.tk-card code{display:block;font:11px "IBM Plex Mono",monospace;color:var(--muted);margin-top:8px;word-break:break-all}
+.tk-filter{max-width:420px;margin:8px 0 4px}
+.tk-facts{display:grid;gap:0;margin:8px 0;max-width:760px}
+.tk-facts div{display:grid;grid-template-columns:minmax(150px,240px) 1fr;gap:14px;border-bottom:1px solid var(--rule);padding:10px 0;font-size:13.5px}
+.tk-facts b{font:12px "IBM Plex Mono",monospace;letter-spacing:.04em}
+.tk-facts p{margin:4px 0 0;color:var(--muted);font-size:12.5px;line-height:1.55}
+.tk-id{font:12px "IBM Plex Mono",monospace;word-break:break-all;color:var(--muted)}
+.tk-badge{margin:14px 0 6px;max-width:100%;height:auto}
+.tk-cta{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+#tk-live h2{margin-top:28px}
+.tk-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
+.t-go{color:var(--go)} .t-hold{color:var(--hold)} .t-nogo{color:var(--nogo)} .t-unknown{color:var(--muted)}
+@media (max-width:560px){.tk-facts div{grid-template-columns:1fr;gap:4px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><img class="brand-mark" src="/assets/flower-mark-128.png" width="26" height="26" alt="" aria-hidden="true" decoding="async"><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
+      <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/"><span data-i18n="nav.demo2">Demo</span></a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/resources/"><span data-i18n="nav.resources">Resources</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head">
+  <p class="eyebrow">Free · 51 tokens on the XRP Ledger</p>
+  <h1>What can each token's issuer still do?</h1>
+  <p>Pick a token to see, read live from the XRP Ledger, whether its issuer can freeze holders,
+     claw tokens back, require permission to hold, or sign alone with one key, and how much of its
+     order book can really fill. No score and no verdict, just the ledger's answer.</p>
+</div>
+<section>
+  <div class="form-field tk-filter"><label for="tk-q">Find a token</label>
+    <input id="tk-q" type="search" placeholder="Name, issuer or r-address" autocomplete="off" spellcheck="false"></div>
+  <div class="tk-grid" id="tk-list"><a class="tk-card" href="/tokens/rlusd-ripple/" data-q="rlusd rlusd ripple rmxckbedwqr76quhesumdegf4b9xj8m5de ripple.com">
+  <b translate="no">RLUSD</b><span>Ripple · ripple.com</span>
+  <code translate="no">rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De</code></a>
+<a class="tk-card" href="/tokens/usdc-circle/" data-q="usdc usdc circle rgm7wcvp9gb4jzhwtetgur4dd74z2xuwhe www.circle.com">
+  <b translate="no">USDC</b><span>Circle · www.circle.com</span>
+  <code translate="no">rGm7WCVp9gb4jZHWTEtGUr4dd74z2XuWhE</code></a>
+<a class="tk-card" href="/tokens/solo-sologenic/" data-q="solo solo sologenic rsolo2s1kigeccn6hcuxvrcpgmwlrrrlzz sologenic.com">
+  <b translate="no">SOLO</b><span>Sologenic · sologenic.com</span>
+  <code translate="no">rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz</code></a>
+<a class="tk-card" href="/tokens/csc-casinocoin/" data-q="csc csc casinocoin rcscmantz8me9eolrshhykw8ppwwmgkwr casinocoin.im">
+  <b translate="no">CSC</b><span>CasinoCoin · casinocoin.im</span>
+  <code translate="no">rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr</code></a>
+<a class="tk-card" href="/tokens/vgb-vagabond/" data-q="vgb vgb vagabond rhcybrowwapgnonehkbj8po5z4gtyrknau vagabondapp.io">
+  <b translate="no">VGB</b><span>Vagabond · vagabondapp.io</span>
+  <code translate="no">rhcyBrowwApgNonehKBj8Po5z4gTyRknaU</code></a>
+<a class="tk-card" href="/tokens/btc-gatehub/" data-q="btc btc gatehub rchgbxcd1a1c2tdxf6papqyz8kjrkmycl gatehub.net">
+  <b translate="no">BTC</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rchGBxcD1A1C2tdxF6papQYZ8kjRKMYcL</code></a>
+<a class="tk-card" href="/tokens/phnix-phoenix/" data-q="phnix phnix phoenix rdfxbw2zzcg5wgptqwnia2xzoklmm9ivmn phnix.lol">
+  <b translate="no">PHNIX</b><span>Phoenix · phnix.lol</span>
+  <code translate="no">rDFXbW2ZZCG5WgPtqwNiA2xZokLMm9ivmN</code></a>
+<a class="tk-card" href="/tokens/eth-gatehub/" data-q="eth eth gatehub rca8x3tvmst1n3cjeadgk1rdrchii7n2h gatehub.net">
+  <b translate="no">ETH</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h</code></a>
+<a class="tk-card" href="/tokens/army/" data-q="army army army rgg3wq4kuzd7jnmk1n5nwpzjjut62kcbfc xrparmytoken.com">
+  <b translate="no">ARMY</b><span>ARMY · xrparmytoken.com</span>
+  <code translate="no">rGG3wQ4kUzd7Jnmk1n5NWPZjjut62kCBfC</code></a>
+<a class="tk-card" href="/tokens/usd-gatehub/" data-q="usd usd gatehub rhub8vrn55s94qwkdv6jmdy1puykjzf3wq gatehub.net">
+  <b translate="no">USD</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq</code></a>
+<a class="tk-card" href="/tokens/eur-gatehub/" data-q="eur eur gatehub rhub8vrn55s94qwkdv6jmdy1puykjzf3wq gatehub.net">
+  <b translate="no">EUR</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq</code></a>
+<a class="tk-card" href="/tokens/xpm-xpmarket/" data-q="xpm xpm xpmarket rxpmxbeefhgxx2k7g5qmmwq3gfsgawkoa xpmarket.com">
+  <b translate="no">XPM</b><span>XPMarket · xpmarket.com</span>
+  <code translate="no">rXPMxBeefHGxx2K7g5qmmWq3gFsgawkoa</code></a>
+<a class="tk-card" href="/tokens/bear/" data-q="bear bear bear rbearguasyu7tuw53rufqzfdwmjhpjeqfw bearableguy.xyz">
+  <b translate="no">BEAR</b><span>BEAR · bearableguy.xyz</span>
+  <code translate="no">rBEARGUAsyu7tUw53rufQzFdWmJHpJEqFW</code></a>
+<a class="tk-card" href="/tokens/xrps/" data-q="xrps xrps xrps rn1bcpaxhdvyjzvkuso1l2wvxufge4gxpl xrps.io">
+  <b translate="no">XRPS</b><span>XRPS · xrps.io</span>
+  <code translate="no">rN1bCPAxHDvyJzvkUso1L2wvXufgE4gXPL</code></a>
+<a class="tk-card" href="/tokens/fuzzy-fuzzybear/" data-q="fuzzy fuzzy fuzzybear rhcat4hrdi2y9pundkpmzxrdka5wkppr62 fuzzyxrp.com">
+  <b translate="no">FUZZY</b><span>Fuzzybear · fuzzyxrp.com</span>
+  <code translate="no">rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62</code></a>
+<a class="tk-card" href="/tokens/cny-ripplefox/" data-q="cny cny ripplefox rkicet8sdvwxpxnagyarfuxmh1zcpz432y ripplefox.com">
+  <b translate="no">CNY</b><span>RippleFox · ripplefox.com</span>
+  <code translate="no">rKiCet8SdvWxPXnAgYarFUXMh1zCPz432Y</code></a>
+<a class="tk-card" href="/tokens/drop/" data-q="drop drop drop rszenfjoddigjyezqc8pme9kwdqh43tswh xrp-drop.com">
+  <b translate="no">DROP</b><span>DROP · xrp-drop.com</span>
+  <code translate="no">rszenFJoDdiGjyezQc8pME9KWDQH43Tswh</code></a>
+<a class="tk-card" href="/tokens/atm-all-the-money/" data-q="atm atm all the money radz4t8wpxkmdfjwmlbcnzmmshmbc523nz allthe.money">
+  <b translate="no">ATM</b><span>ALL THE MONEY · allthe.money</span>
+  <code translate="no">raDZ4t8WPXkmDfJWMLBcNZmmSHmBC523NZ</code></a>
+<a class="tk-card" href="/tokens/589/" data-q="589 589 589 rfcasq9urbvwcmlfvc4ti3j8qt1cycgghz 589onxrpl.com">
+  <b translate="no">589</b><span>589 · 589onxrpl.com</span>
+  <code translate="no">rfcasq9uRbvwcmLFvc4ti3j8Qt1CYCGgHz</code></a>
+<a class="tk-card" href="/tokens/sgb-gatehub/" data-q="sgb sgb gatehub rctarjqvvthihekzdeecko6mktytusbnc gatehub.net">
+  <b translate="no">SGB</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rctArjqVvTHihekzDeecKo6mkTYTUSBNc</code></a>
+<a class="tk-card" href="/tokens/mag-magnetic-x/" data-q="mag mag magnetic x rxmagwmmnftvet3ul26q2iwk287srvvmj xmagnetic.org">
+  <b translate="no">MAG</b><span>Magnetic X · xmagnetic.org</span>
+  <code translate="no">rXmagwMmnFtVet3uL26Q2iwk287SRvVMJ</code></a>
+<a class="tk-card" href="/tokens/usd-bitstamp/" data-q="usd usd bitstamp rvyafwj5gh67ov6fw32zzp3aw4eubs59b bitstamp.net">
+  <b translate="no">USD</b><span>Bitstamp · bitstamp.net</span>
+  <code translate="no">rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B</code></a>
+<a class="tk-card" href="/tokens/xah-gatehub/" data-q="xah xah gatehub rswh1fvylqhizbs2awu1vs6qcmwtbd9qiv gatehub.net">
+  <b translate="no">XAH</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rswh1fvyLqHizBS2awu1vs6QcmwTBd9qiv</code></a>
+<a class="tk-card" href="/tokens/flr-gatehub/" data-q="flr flr gatehub rcxjwvnftzzxqyh9yheb8tgeizuhno1eu gatehub.net">
+  <b translate="no">FLR</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rcxJwVnftZzXqyH9YheB8TgeiZUhNo1Eu</code></a>
+<a class="tk-card" href="/tokens/666-666-xrp-meme-coin/" data-q="666 666 666 xrp meme coin rhvf9fe6pp3gc8bku2ug7iqpjpdxyzfrxn 666memecoin.com">
+  <b translate="no">666</b><span>666 XRP Meme Coin · 666memecoin.com</span>
+  <code translate="no">rhvf9fe6PP3GC8Bku2Ug7iQPjPDxYZfrxN</code></a>
+<a class="tk-card" href="/tokens/plr-pillars/" data-q="plr plr pillars rnsyhwlhuhvmurwwbjpbkzmspsyg5qek17 xrpillars.com">
+  <b translate="no">PLR</b><span>Pillars · xrpillars.com</span>
+  <code translate="no">rNSYhWLhuHvmURwWbJPBKZMSPsyG5Qek17</code></a>
+<a class="tk-card" href="/tokens/scrap-scrappy/" data-q="scrap scrap scrappy rghtynnigyuahehwgfadoehkoirkgndzzo scrappyxrp.fun">
+  <b translate="no">scrap</b><span>scrappy · scrappyxrp.fun</span>
+  <code translate="no">rGHtYnnigyuaHehWGfAdoEhkoirkGNdZzo</code></a>
+<a class="tk-card" href="/tokens/real-realfi/" data-q="real real realfi rkvyxn1ahqmtvna9hs6xkfjqnn2ve8nz88 www.payrealfi.com">
+  <b translate="no">REAL</b><span>RealFI · www.payrealfi.com</span>
+  <code translate="no">rKVyXn1AhqMTvNA9hS6XkFjQNn2VE8Nz88</code></a>
+<a class="tk-card" href="/tokens/btc-bitstamp/" data-q="btc btc bitstamp rvyafwj5gh67ov6fw32zzp3aw4eubs59b bitstamp.net">
+  <b translate="no">BTC</b><span>Bitstamp · bitstamp.net</span>
+  <code translate="no">rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B</code></a>
+<a class="tk-card" href="/tokens/sigma/" data-q="sigma sigma sigma rfkywz84fm9evedotcsqco1wdqmpyauf5z sigmaonxrpl.com">
+  <b translate="no">SIGMA</b><span>SIGMA · sigmaonxrpl.com</span>
+  <code translate="no">rfKYWZ84fm9eVEdoTcsQCo1WdqMPyaUF5z</code></a>
+<a class="tk-card" href="/tokens/nxs-nexus-water/" data-q="nxs nxs nexus water rnexusa23zqdtejtcehzzaikojrsrnxboq nexuswater.xyz">
+  <b translate="no">NXS</b><span>Nexus Water · nexuswater.xyz</span>
+  <code translate="no">rNexusA23ZQdtejTCeHZZaiKoJRsrnXboq</code></a>
+<a class="tk-card" href="/tokens/opulence-opulencex/" data-q="opulence opulence opulencex rs5wxrbtserywddfps5ny4zorrca5qmgvd www.opulencex.io">
+  <b translate="no">Opulence</b><span>OpulenceX · www.opulencex.io</span>
+  <code translate="no">rs5wxrBTSErywDDfPs5NY4Zorrca5QMGVd</code></a>
+<a class="tk-card" href="/tokens/bert-bert-the-bird/" data-q="bert bert bert the bird rpwanf1mmzrszxdinetfhwzgqipgsv3jhr bertthebird.com">
+  <b translate="no">BERT</b><span>Bert the Bird · bertthebird.com</span>
+  <code translate="no">rpwAnF1mMZRszxdinETFHwzGQiPgsv3jHR</code></a>
+<a class="tk-card" href="/tokens/britto/" data-q="britto britto britto rfxwxdzenkyoxsebna4czjat9fy3eel47e brittotoken.com">
+  <b translate="no">BRITTO</b><span>BRITTO · brittotoken.com</span>
+  <code translate="no">rfxwXDzenkYoXSEbNA4cZjaT9FY3eeL47e</code></a>
+<a class="tk-card" href="/tokens/xho/" data-q="xho xho xho r9rcp6xcn3wihwjmus7c1gbz85vscfx4ur xheronft.com">
+  <b translate="no">XHO</b><span>XHO · xheronft.com</span>
+  <code translate="no">r9rCp6XCn3WiHWjMUs7c1GBZ85VsCFX4Ur</code></a>
+<a class="tk-card" href="/tokens/evr-gatehub/" data-q="evr evr gatehub ra9g3lajm9xju8awe7owzr6vxfb1mpftse gatehub.net">
+  <b translate="no">EVR</b><span>GateHub · gatehub.net</span>
+  <code translate="no">ra9g3LAJm9xJu8Awe7oWzR6VXFB1mpFtSe</code></a>
+<a class="tk-card" href="/tokens/lht-luckyhash/" data-q="lht lht luckyhash rhashlabsu2h6hxdsunl8acvdmtye17z35 lhtoken.io">
+  <b translate="no">LHT</b><span>LuckyHash · lhtoken.io</span>
+  <code translate="no">rHashLabsu2H6hXDSunL8AcVDmTyE17Z35</code></a>
+<a class="tk-card" href="/tokens/usdc-gatehub/" data-q="usdc usdc gatehub rcegred8nmkkre8ge424sksyt1tjvfzwu gatehub.net">
+  <b translate="no">USDC</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rcEGREd8NmkKRE8GE424sksyt1tJVFZwu</code></a>
+<a class="tk-card" href="/tokens/bchamp-bear-champ/" data-q="bchamp bchamp bear champ rhyhn7s6z4hafujm7ehuse7wxeproupwpi xrp.cafe">
+  <b translate="no">BCHAMP</b><span>Bear Champ · xrp.cafe</span>
+  <code translate="no">rhYhn7s6z4HAfuJm7ehuSE7wxepRoUPwpi</code></a>
+<a class="tk-card" href="/tokens/xlm-ripplefox/" data-q="xlm xlm ripplefox rkicet8sdvwxpxnagyarfuxmh1zcpz432y ripplefox.com">
+  <b translate="no">XLM</b><span>RippleFox · ripplefox.com</span>
+  <code translate="no">rKiCet8SdvWxPXnAgYarFUXMh1zCPz432Y</code></a>
+<a class="tk-card" href="/tokens/cbird-common-bird/" data-q="cbird cbird common bird rhcu3jwtp7fnea3xgvbv8pcbep9s3hjsuz commonbirdxrpl.com">
+  <b translate="no">CBIRD</b><span>Common Bird · commonbirdxrpl.com</span>
+  <code translate="no">rHcU3JWTp7fnea3xgvbV8pCbEp9S3HjSUz</code></a>
+<a class="tk-card" href="/tokens/usdt-gatehub/" data-q="usdt usdt gatehub rcvxe9ps9ybwxtgg1qneewv6zb3wgubzq gatehub.net">
+  <b translate="no">USDT</b><span>GateHub · gatehub.net</span>
+  <code translate="no">rcvxE9PS9YBwxtGg1qNeewV6ZB3wGubZq</code></a>
+<a class="tk-card" href="/tokens/xrt-xrpturbo/" data-q="xrt xrt xrpturbo rpvucxw1m8u2swtqtrn6zecb1xpbu4cpfr xrpturbo.com">
+  <b translate="no">XRT</b><span>XrpTurbo · xrpturbo.com</span>
+  <code translate="no">rPvuCxw1m8u2SWTqtRN6ZEcb1xPbU4cPFR</code></a>
+<a class="tk-card" href="/tokens/xmen-xrp-men/" data-q="xmen xmen xrp men rmfl2kufpmuiujdbvgbmznnjj5qkyd6dzf xrp-men.com">
+  <b translate="no">Xmen</b><span>Xrp Men · xrp-men.com</span>
+  <code translate="no">rMFL2KuFPMuiujdbVGbMzNNjj5QKyd6dZf</code></a>
+<a class="tk-card" href="/tokens/uga-ugabuga/" data-q="uga uga ugabuga rbfjgmwj6yaabvcxfsjicm8pfyxs8xfdec ">
+  <b translate="no">UGA</b><span>UgABugA</span>
+  <code translate="no">rBFJGmWj6YaabVCxfsjiCM8pfYXs8xFdeC</code></a>
+<a class="tk-card" href="/tokens/lions-xrp-lions/" data-q="lions lions xrp lions rghtf1gtfxexspxmzfnqrumgupajyqauzs xrplions.com">
+  <b translate="no">LIONS</b><span>XRP LIONS · xrplions.com</span>
+  <code translate="no">rGHtf1GTfXEXSPxmZfnQrUMGUpajYqAuzS</code></a>
+<a class="tk-card" href="/tokens/tazz-tasmanian-tiger/" data-q="tazz tazz tasmanian tiger rdyzrltk4eqymj86eshk5hps1qhtjzjxwc tazzxrp.life">
+  <b translate="no">TAZZ</b><span>Tasmanian Tiger · tazzxrp.life</span>
+  <code translate="no">rDyzRLTk4eqYMJ86esHK5HPs1QHTJzjXwC</code></a>
+<a class="tk-card" href="/tokens/xox-xrp-on-xrp/" data-q="xox xox xrp on xrp rgjbfqildh23e9wigq5sxtffqtenvelx21 xrponxrp.com">
+  <b translate="no">XOX</b><span>XRP on XRP · xrponxrp.com</span>
+  <code translate="no">rGJbFqiLdh23e9WigQ5sxTfFqTENveLX21</code></a>
+<a class="tk-card" href="/tokens/seal/" data-q="seal seal seal r4pxxqzj8soysx4qkeew4bzrqs1pctvylj sealonxrp.com">
+  <b translate="no">SEAL</b><span>SEAL · sealonxrp.com</span>
+  <code translate="no">r4pXXQzJ8soYSX4QKeeW4BzRQS1PCtVYLJ</code></a>
+<a class="tk-card" href="/tokens/box-bitcoin-on-xrp/" data-q="box box bitcoin on xrp rhlj2ma5pscsxvhl5eqr71w3fgasvlwp84 btconxrp.com">
+  <b translate="no">BOX</b><span>Bitcoin On Xrp · btconxrp.com</span>
+  <code translate="no">rhLJ2ma5pScsxVhL5EQr71w3FgASVLwP84</code></a>
+<a class="tk-card" href="/tokens/plx-pollux/" data-q="plx plx pollux rglegqdkton4be5thhk6seg1hifgpbxy5q polluxxrpl.com">
+  <b translate="no">PLX</b><span>Pollux · polluxxrpl.com</span>
+  <code translate="no">rGLEgQdktoN4Be5thhk6seg1HifGPBxY5Q</code></a></div>
+  <p class="tk-note">Not listed? Paste any issuer into the <a href="/certificate/">free certificate</a>.
+     Token list: <a href="https://xrpl.to" rel="noopener">Data by xrpl.to</a>, top tokens by 24-hour volume with
+     1,000 or more holders, read 2026-10-30. Every fact on a token page is read from the ledger itself.</p>
+  <p class="tk-note">Run a token project? Put a <a href="/badge/">live badge</a> on your site, or order an
+     <a href="/evidence-report/?tier=issuer">Issuer check</a> to show holders, exchanges and partners.</p>
+</section>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/tokens/">XRPL token directory</a><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/news/">Newsroom</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/partners/">Partner programs</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/inline/33c66f840c5169f15c04.js"></script>
+</body>
+</html>
