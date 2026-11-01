@@ -1672,8 +1672,9 @@
   .rh-dp-sum{margin:10px 0 0;font-size:12.5px;line-height:1.6;color:var(--faint);font-variant-numeric:tabular-nums}
 </style>
 <link rel="stylesheet" href="/assets/desk-editorial.css">
+<link rel="stylesheet" href="/assets/desk-experience.css">
 </head>
-<body data-ledger-editorial>
+<body data-ledger-editorial data-ledger-experience>
 <div class="garden-bg">
 </div>
 <div class="layer">
@@ -1681,13 +1682,7 @@
 <!--SLOT:HEADER-->
 
 <main class="shell" id="main">
-  <!--
-    Hero, after the shape of chatgpt.com/codex: one short headline, one
-    line under it, two actions, then the product itself. The screenshot
-    is the real desktop app on live mainnet (scripts/capture-app-shots.mjs);
-    its caption carries the ledger it was taken at. The ASCII field stays
-    behind the hero, answering each validated ledger.
-  -->
+  <!-- Ledger Desk experience: explanatory geometry, user-triggered reads, verifiable records. -->
   <section class="rh" data-garden-field>
     <div class="core core-anchor" data-garden-origin aria-hidden="true"></div>
     <div class="rh-mast">
@@ -1696,50 +1691,58 @@
       <span class="rh-mast-r">Ledger <b data-sys-ledger translate="no">—</b> · <span id="rh-date">—</span></span>
     </div>
 
-    <div class="rh-title">
+    <div class="rh-title lx-hero">
       <div class="rh-title-text">
-        <p class="rh-title-k">Read-only intelligence for the XRP Ledger</p>
-        <h1 class="rh-wordmark"><span class="ed-title-line"><span>NOSHASHI</span></span><span class="rh-vh">: </span><span class="sub ed-title-line"><span>Intelligence. With evidence.</span></span></h1>
-        <p class="rh-title-dek">Read the powers behind a token, the liquidity behind a quote, and the evidence behind every answer. Directly from the XRP Ledger.</p>
-        <p class="rh-title-cta">
-          <a class="rh-btn lg" href="#download"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download</a>
-          <a class="rh-btn lg ghost" href="/app/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 9h16M9 9v10"/></svg>Open workspace</a>
-        </p>
-        <p class="rh-title-fine">Free plan, no card. Never holds keys, never signs.</p>
+        <p class="rh-title-k"><span class="lx-overline-rule" aria-hidden="true"></span>Intelligence. With evidence.</p>
+        <h1 class="lx-headline">The ledger<br>is public.<br><em>Look closer.</em></h1>
+        <p class="rh-title-dek">The powers behind a token. The liquidity behind a quote. NOSHASHI turns validated XRPL state into answers you can inspect.</p>
+        <p class="rh-title-cta"><a class="rh-btn lg" href="#lx-investigate">Run an investigation <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="rh-btn lg ghost" href="/institutional-demo/">Explore the workflows <span aria-hidden="true">→</span></a></p>
+        <p class="rh-title-fine">No account. No wallet connection. Nothing to sign.</p>
+        <div class="lx-hero-bottom"><span>01—03 / An instrument for the questions that matter</span><a href="#lx-investigate" aria-label="Scroll to the live issuer investigation">Scroll to investigate <span aria-hidden="true">↓</span></a></div>
       </div>
-      <figure class="rh-emblem ed-seal" aria-labelledby="rh-em-c">
-        <div class="ed-seal-meta"><span>Fig. 01 / The evidence seal</span><span>XRPL · Read only</span></div>
-        <div class="ed-seal-stage">
-          <svg viewBox="-60 -60 360 360" role="img" aria-labelledby="rh-em-t">
-            <title id="rh-em-t">The NOSHASHI evidence seal, with a ring for each validated ledger</title>
-            <defs>
-              <linearGradient id="ed-metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="currentColor" stop-opacity=".8"/><stop offset=".28" stop-color="currentColor" stop-opacity=".1"/><stop offset=".55" stop-color="currentColor" stop-opacity=".65"/><stop offset="1" stop-color="currentColor" stop-opacity=".12"/></linearGradient>
-              <radialGradient id="ed-face"><stop stop-color="currentColor" stop-opacity=".085"/><stop offset="1" stop-color="currentColor" stop-opacity=".015"/></radialGradient>
-              <path id="ed-letter-ring" d="M120,120 m-96,0 a96,96 0 1,1 192,0 a96,96 0 1,1 -192,0"/>
-            </defs>
-            <circle class="ed-orbit" cx="120" cy="120" r="153"/>
-            <path class="ed-axis" d="M-48 120H288M120-48V288"/>
-            <g class="ed-ticks"><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(0 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(6 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(12 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(18 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(24 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(30 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(36 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(42 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(48 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(54 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(60 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(66 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(72 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(78 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(84 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(90 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(96 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(102 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(108 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(114 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(120 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(126 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(132 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(138 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(144 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(150 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(156 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(162 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(168 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(174 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(180 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(186 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(192 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(198 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(204 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(210 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(216 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(222 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(228 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(234 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(240 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(246 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(252 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(258 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(264 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(270 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(276 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(282 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(288 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(294 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(300 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(306 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(312 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(318 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(324 120 120)"/><line x1="120" y1="-13" x2="120" y2="-7" transform="rotate(330 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(336 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(342 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(348 120 120)"/><line x1="120" y1="-13" x2="120" y2="-10" transform="rotate(354 120 120)"/></g>
-            <circle class="em-wave" id="rh-em-w1" cx="120" cy="120" r="118"/>
-            <circle class="em-wave" id="rh-em-w2" cx="120" cy="120" r="118"/>
-            <g class="ed-seal-object">
-              <circle cx="120" cy="120" r="119" fill="url(#ed-face)" stroke="url(#ed-metal)" stroke-width="3"/>
-              <circle cx="120" cy="120" r="114" class="ed-rim"/>
-              <circle cx="120" cy="120" r="107" class="ed-rim fine"/>
-              <text class="ed-engraving"><textPath href="#ed-letter-ring" textLength="598">NOSHASHI · LEDGER EVIDENCE · READ ONLY · XRPL INTELLIGENCE · </textPath></text>
-              <circle cx="120" cy="120" r="83" stroke="url(#ed-metal)" stroke-width="1" fill="none"/>
-              <circle cx="120" cy="120" r="77" class="ed-rim fine"/>
-              <text class="ed-monogram" x="120" y="153" text-anchor="middle">N</text>
-              <text class="ed-seal-foot" x="120" y="178" text-anchor="middle">VALIDATED STATE</text>
-            </g>
-            <circle cx="120" cy="-33" r="2" fill="currentColor"/>
+      <figure class="rh-emblem ed-seal lx-machine" aria-labelledby="rh-em-c">
+        <div class="ed-seal-meta"><span>Fig. 01 / Inside the reading</span><span>Exploratory instrument</span></div>
+        <div class="ed-seal-stage lx-machine-stage">
+          <svg viewBox="0 0 560 460" role="img" aria-labelledby="lx-machine-title">
+            <title id="lx-machine-title">An explanatory stack of three reading layers: issuer authority, liquidity and evidence. Select a layer using the buttons below.</title>
+            <defs><linearGradient id="lx-plate-metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="currentColor" stop-opacity=".8"/><stop offset=".45" stop-color="currentColor" stop-opacity=".15"/><stop offset="1" stop-color="currentColor" stop-opacity=".5"/></linearGradient><pattern id="lx-hatch" width="7" height="7" patternUnits="userSpaceOnUse"><path d="M0 7 7 0" stroke="currentColor" stroke-width=".5" opacity=".15"/></pattern></defs>
+            <path class="lx-machine-axis" d="M280 24V430M20 275H540"/>
+            <ellipse class="lx-machine-orbit" cx="280" cy="270" rx="244" ry="94"/>
+            <g class="lx-machine-layer" data-lx-plane="2"><path class="lx-plate-side" d="M65 272 280 185 495 272V287L280 374 65 287Z"/><path class="lx-plate" d="M65 272 280 185 495 272 280 359Z"/><path d="M65 272 280 359 495 272" class="lx-plate-edge"/><ellipse cx="280" cy="272" rx="123" ry="47" class="lx-plate-engraving"/><ellipse cx="280" cy="272" rx="98" ry="37" class="lx-plate-engraving"/><text x="280" y="285" text-anchor="middle" class="lx-plate-initial">N</text><text x="94" y="301" class="lx-plate-number">03 / EVIDENCE</text></g>
+            <g class="lx-machine-layer" data-lx-plane="1"><path class="lx-plate-side" d="M65 207 280 120 495 207V222L280 309 65 222Z"/><path class="lx-plate" d="M65 207 280 120 495 207 280 294Z"/><path class="lx-plate-edge" d="M65 207 280 294 495 207"/><path class="lx-plate-engraving" d="M150 211 230 179 230 214 280 194 280 219 363 185M160 225 240 193 240 228 290 208 290 233 373 199"/><text x="94" y="236" class="lx-plate-number">02 / LIQUIDITY</text></g>
+            <g class="lx-machine-layer" data-lx-plane="0" data-active><path class="lx-plate-side" d="M65 142 280 55 495 142V157L280 244 65 157Z"/><path class="lx-plate" d="M65 142 280 55 495 142 280 229Z"/><path class="lx-plate-edge" d="M65 142 280 229 495 142"/><ellipse cx="280" cy="142" rx="107" ry="42" class="lx-plate-engraving"/><ellipse cx="280" cy="142" rx="77" ry="30" class="lx-plate-engraving"/><ellipse cx="280" cy="142" rx="39" ry="15" class="lx-plate-engraving"/><path d="M280 100V184M173 142H387" class="lx-plate-engraving"/><text x="94" y="171" class="lx-plate-number">01 / AUTHORITY</text></g>
+            <path d="M35 395H525" class="lx-machine-axis"/><text x="40" y="418" class="lx-diagram-caption">READ → INTERPRET → VERIFY</text><text x="519" y="418" text-anchor="end" class="lx-diagram-caption">N / XRPL</text>
           </svg>
         </div>
+        <div class="lx-layer-controls" role="group" aria-label="Explore the reading layers"><button type="button" data-lx-layer="0" aria-pressed="true" aria-controls="lx-layer-detail"><span>01</span>Authority</button><button type="button" data-lx-layer="1" aria-pressed="false" aria-controls="lx-layer-detail"><span>02</span>Liquidity</button><button type="button" data-lx-layer="2" aria-pressed="false" aria-controls="lx-layer-detail"><span>03</span>Evidence</button></div>
+        <div class="lx-layer-detail" id="lx-layer-detail" aria-live="polite"><p data-lx-layer-title>Who still holds the power?</p><span data-lx-layer-copy>Inspect the controls an issuer retains over the assets you hold.</span><a href="/certificate/" data-lx-layer-link>Inspect issuer authority <span aria-hidden="true"><svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></span></a></div>
         <figcaption id="rh-em-c"><span class="ed-signal-dot" aria-hidden="true"></span><span data-ed-seal-status>Awaiting a validated ledger</span></figcaption>
+        <p class="lx-illustration-note">Explanatory geometry. Not a measured chart.</p>
       </figure>
     </div>
 
-    <nav class="ed-index" aria-label="Explore the ledger desk"><span>Inside the desk</span><a href="#ed-evidence"><i>01</i> The evidence</a><a href="#rh-x"><i>02</i> The instrument</a><a href="#rh-t1"><i>03</i> The readings</a><a href="#public"><i>04</i> Try it yourself <span aria-hidden="true"><svg class="ed-arrow" viewBox="0 0 16 16"><path d="M3 13 13 3M3 3h10v10"/></svg></span></a></nav>
+    <nav class="ed-index" aria-label="Explore the ledger desk"><span>Inside the desk</span><a href="#lx-investigate"><i>01</i> Investigate</a><a href="#rh-x"><i>02</i> The instrument</a><a href="#rh-t1"><i>03</i> The readings</a><a href="#public"><i>04</i> Try it yourself <span aria-hidden="true"><svg class="ed-arrow" viewBox="0 0 16 16"><path d="M3 13 13 3M3 3h10v10"/></svg></span></a></nav>
+
+    <section class="lx-investigation" id="lx-investigate" aria-labelledby="lx-investigate-title">
+      <div class="lx-section-heading"><div><p class="ed-kicker">01 / Try the instrument</p><h2 id="lx-investigate-title">One issuer.<br><em>A closer reading.</em></h2></div><p>Choose a public issuer. Read its controls.<br>Verify the record in your browser.</p></div>
+      <div class="lx-lab-grid">
+        <div class="lx-lab-input"><div class="lx-lab-label"><span>Input / Issuer account</span><span>Read only</span></div><h3>Start with an issuer<br>you recognize.</h3><p>Inspect the powers it retains. The answer comes from the ledger, not from the name on the token.</p>
+          <div class="lx-presets" role="group" aria-label="Example public issuers"><button type="button" data-lx-issuer="rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De" aria-pressed="true">RLUSD <span>Ripple</span></button><button type="button" data-lx-issuer="rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B" aria-pressed="false">USD <span>Bitstamp</span></button><button type="button" data-lx-issuer="rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz" aria-pressed="false">SOLO <span>Sologenic</span></button></div>
+          <form id="lx-issuer-form" action="/certificate/" method="get"><label for="lx-issuer">Public issuer address</label><input id="lx-issuer" name="issuer" value="rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De" autocomplete="off" spellcheck="false" required pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" aria-describedby="lx-input-note"><button class="rh-btn" type="submit" id="lx-read">Read issuer controls <span aria-hidden="true">→</span></button></form>
+          <p class="lx-micro" id="lx-input-note">A public address only. Never enter a secret or recovery phrase. Issuer labels identify the examples; no affiliation or endorsement.</p>
+          <noscript><p class="lx-micro">Use the <a href="/certificate/">standalone issuer certificate</a> to run this investigation with JavaScript enabled.</p></noscript>
+          <ol class="lx-journey" aria-label="Investigation progress"><li data-lx-step="choose" data-complete><span>01</span>Choose the subject</li><li data-lx-step="read"><span>02</span>Read the ledger</li><li data-lx-step="verify"><span>03</span>Verify the fingerprint</li><li data-lx-step="keep"><span>04</span>Keep the evidence</li></ol>
+        </div>
+        <article class="lx-lab-record" id="lx-result" data-state="idle" aria-labelledby="lx-result-title"><div class="lx-lab-label"><span>Output / Authority record</span><span data-lx-record-ref>Awaiting your investigation</span></div><div class="lx-record-heading"><div><p class="ed-kicker">A record you can inspect</p><h3 id="lx-result-title">Issuer authority.</h3></div><span class="lx-verdict" data-lx-verdict>Not read</span></div>
+          <p class="lx-record-status" data-lx-status role="status">Press “Read issuer controls” to retrieve a validated reading.</p>
+          <dl class="lx-record-facts"><div><dt>Validated ledger</dt><dd data-lx-ledger>—</dd></div><div><dt>Rules version</dt><dd data-lx-rules>—</dd></div></dl>
+          <ul class="lx-control-list"><li><span>Freeze permanently surrendered</span><b data-lx-check="FREEZE_SURRENDERED">Not read</b></li><li><span>Issuance not globally frozen</span><b data-lx-check="NOT_GLOBALLY_FROZEN">Not read</b></li><li><span>Holding needs no issuer permission</span><b data-lx-check="OPEN_HOLDING">Not read</b></li><li><span>No single controlling key</span><b data-lx-check="NO_UNILATERAL_SIGNER">Not read</b></li></ul>
+          <div class="lx-record-fingerprint"><span class="ed-kicker">SHA-256 / Independently recomputed here</span><code data-lx-digest>No fingerprint until a complete reply is verified.</code><p data-lx-verified>The record remains empty until verification succeeds.</p></div>
+          <div class="lx-record-actions"><button type="button" class="rh-btn ghost" id="lx-download" disabled>Download the record <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v9M4 7l4 4 4-4M3 14h10"/></svg></button><a class="lx-inline-link" href="/certificate/" id="lx-full-certificate">Full certificate <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a></div>
+          <p class="lx-micro">A verdict concerns issuer controls, not investment quality or legal compliance. Backing, redemption and legal identity are outside this reading. Supply is not walked.</p>
+        </article>
+      </div>
+    </section>
     <section class="ed-evidence" id="ed-evidence" aria-labelledby="ed-evidence-title">
       <div class="ed-evidence-copy">
         <p class="ed-kicker">01 / From a reading to a record</p>
@@ -1927,6 +1930,14 @@
     </div>
   </section>
 
+
+  <section class="lx-product" aria-labelledby="lx-product-title">
+    <div class="lx-section-heading"><div><p class="ed-kicker">The workstation / From finding to decision</p><h2 id="lx-product-title">A closer look<br><em>at the desk.</em></h2></div><p>Explore recorded views of the desktop app.<br>The captions name the ledger in each capture.</p></div>
+    <div class="lx-product-grid"><div><div class="lx-tour-controls" role="group" aria-label="Explore recorded desktop views"><button type="button" data-lx-view="verification" aria-pressed="true" aria-controls="lx-product-image lx-product-caption"><span>01 / Evaluate</span><strong>Every rule. Every reason.</strong><span>See the decision and the checks that produced it.</span></button><button type="button" data-lx-view="audit" aria-pressed="false" aria-controls="lx-product-image lx-product-caption"><span>02 / Investigate</span><strong>Follow what actually arrived.</strong><span>Inspect validated payment history and delivered amounts.</span></button><button type="button" data-lx-view="sync" aria-pressed="false" aria-controls="lx-product-image lx-product-caption"><span>03 / Compare</span><strong>Check the sources themselves.</strong><span>Read named public nodes side by side.</span></button></div><a class="ed-text-link" href="/institutional-demo/">Try the live workflows <span aria-hidden="true">→</span></a></div>
+      <figure class="lx-workstation"><div class="lx-windowbar"><span><i></i><i></i><i></i></span><span data-lx-window-title>Verification / Recorded desktop view</span><button type="button" class="lx-zoom" data-lx-zoom hidden aria-label="Enlarge the recorded desktop screenshot">Expand <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></button></div><img id="lx-product-image" src="<!--SLOT:SHOTTOURSRC-->" width="1440" height="900" loading="lazy" alt="Recorded NOSHASHI verification screen showing a settlement decision and the rules evaluated."><figcaption id="lx-product-caption"><!--SLOT:SHOTTOURCAPTION--></figcaption></figure>
+    </div>
+  </section>
+  <section class="lx-invitation" aria-labelledby="lx-invite-title"><div><p class="ed-kicker">For the people who ask the next question</p><h2 id="lx-invite-title">Bring a real workflow.<br><em>Leave with evidence.</em></h2></div><div><p>Help evaluate issuer controls, executable liquidity and payment evidence. Start with a public address or transaction you already know.</p><ol><li>Run one investigation.</li><li>Check the evidence against your workflow.</li><li>Tell us where the answer falls short.</li></ol><a class="rh-btn" href="/design-partners/#apply">Join the evaluation <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="lx-inline-link" href="/institutional-demo/#feedback">Already testing? Leave feedback →</a><p class="lx-micro">No wallet connection required. Evaluation scope and any pilot terms are agreed separately.</p></div></section>
   <section id="demo" class="cx-demo">
     <div class="cx-head">
       <h2>Watch it on live mainnet data.</h2>
@@ -2130,6 +2141,11 @@
 <script src="/assets/motion.js" defer></script>
 <script src="/assets/dash.js" defer></script>
 <script src="/assets/desk-visuals.js" defer></script>
+<button type="button" class="lx-command-trigger" data-lx-command hidden>Find a tool <kbd>⌘ / Ctrl K</kbd></button>
+<dialog id="lx-command-dialog" class="lx-dialog" aria-labelledby="lx-command-title"><form method="dialog" class="lx-dialog-heading"><h2 id="lx-command-title">What would you like to know?</h2><button type="submit" aria-label="Close tool finder">×</button></form><label for="lx-command-search" class="sr-only">Search public tools and workflows</label><input id="lx-command-search" type="search" placeholder="Issuer controls, liquidity, evidence…" autocomplete="off"><nav aria-label="Tool finder results"><a href="#lx-investigate" data-lx-tool>Read issuer controls <span>Investigate a public issuer</span></a><a href="/book-health/" data-lx-tool>Inspect executable liquidity <span>Compare quoted and funded depth</span></a><a href="/delivered/" data-lx-tool>Verify a payment <span>Read what was actually delivered</span></a><a href="/evidence-report/" data-lx-tool>Inspect evidence reports <span>Records and independent verification</span></a><a href="/institutional-demo/" data-lx-tool>Try the guided workflows <span>Issuer, payment and liquidity investigations</span></a><a href="/design-partners/#apply" data-lx-tool>Join the evaluation <span>Bring a workflow and help shape the desk</span></a></nav><p class="lx-micro" data-lx-empty hidden>No matching tool. Try “issuer”, “payment” or “evidence”.</p><p class="lx-micro">Tab to a result. Enter to open. Escape to return.</p></dialog>
+<dialog id="lx-image-dialog" class="lx-image-dialog" aria-label="Recorded desktop screenshot"><form method="dialog"><button type="submit" aria-label="Close enlarged screenshot">Close ×</button></form><img alt=""><p class="lx-micro"></p></dialog>
+<script type="application/json" id="lx-shot-data"><!--SLOT:SHOTDATA--></script>
+<script type="module" src="/assets/desk-experience.mjs"></script>
 <script src="/assets/desk-editorial.js" defer></script>
 
 <!--SLOT:JSONLD-->

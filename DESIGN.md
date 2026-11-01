@@ -25,6 +25,47 @@ radius: "0.125rem"
 
 # NOSHASHI — Design System
 
+## Website: the closer reading experience (2026-11)
+
+The homepage now opens with “The ledger is public. Look closer.” and an
+explorable three-layer instrument. This extends the original Ledger Desk
+notes below and replaces the earlier hero seal with authority, liquidity and
+evidence plates. The geometry is labeled as explanatory; it never represents
+invented measurements. Native pressed buttons select a plate and its next step.
+
+`templates/home.html` remains the source and `site/index.html` the generated
+page. The new layer is in `site/assets/desk-experience.css`,
+`desk-experience.mjs`, and the pure `desk-experience-core.mjs`.
+
+The homepage issuer investigation accepts a public address or one of three
+labeled examples. It requests `/api/authority` only on submission, requires a
+complete reply, and independently recomputes the published SHA-256 authority
+fingerprint in the browser before displaying the verdict. A missing, altered,
+unreadable or unverifiable reply remains unfilled. Changing the subject aborts
+the pending read, clears previous facts and tooltips, disables export and guards
+against late replies. JSON export contains the exact verified response.
+Fingerprint verification checks the response's documented canonical fields;
+it is not an identity attestation or independent corroboration of ledger state.
+
+Recorded product views have their capture date and ledger in the caption. The
+full-size view uses a native modal. The searchable tool finder uses the same
+native dialog behavior, supports Ctrl/Command K, traps focus and returns it on
+close. Escape closes it even when the search field has a query. The evaluation
+invitation links to the existing design-partner form and feedback workflow;
+it does not enroll visitors or send messages automatically.
+
+No-JavaScript content and direct tool links remain readable. OS reduced motion
+removes plate lift, pointer perspective and screenshot tilt. Dark and light
+surfaces use the existing website tokens. Nothing new requires a font CDN,
+tracking, an animation framework, an account or wallet access.
+
+Verification: `npm run site:build`, `npm test`, then run
+`scripts/verify-web-experience.mjs` against a local static server. Browser tests
+use unmodified, recorded mainnet certificates and exercise downloads, incomplete
+and altered replies, retries, subject-change races, both themes, mobile, reduced
+motion, search, modal focus and the no-JavaScript fallback. Review screenshots
+are local artifacts, not published as fresh mainnet readings.
+
 ## Website: the living Ledger Desk (2026-11)
 
 The public homepage uses the newer Ledger Desk direction: near-black or warm
