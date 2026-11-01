@@ -1,204 +1,52 @@
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Panel, DataRow, Eyebrow } from "@/components/nova/Panel";
+import { DeskArrow } from "@/components/nova/DeskArrow";
 import { DecisionCard } from "@/components/nova/DecisionCard";
+import { LedgerInstrument } from "@/components/nova/LedgerInstrument";
 import { FirstRunGuide } from "@/components/scenes/FirstRunGuide";
 import { QuestionShowcase } from "@/components/scenes/QuestionShowcase";
-import { NovaLogo } from "@/components/nova/NovaLogo";
-import { CountUp } from "@/components/nova/CountUp";
-import { StatusDot } from "@/components/nova/StatusDot";
-import {
-  NovaBolt,
-  NovaCredit,
-  NovaEye,
-  NovaGrid,
-  NovaSat,
-  NovaShield,
-  NovaTerminal,
-} from "@/components/nova/NovaIcon";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CAPABILITIES, type Maturity } from "@/lib/roadmap";
-import { BRAND, CONTACT, LINKS, copyrightLine } from "@/lib/brand";
+import { CAPABILITIES } from "@/lib/roadmap";
+import { BRAND, copyrightLine } from "@/lib/brand";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
-import { cn } from "@/lib/utils";
-import { SPRING } from "@/lib/motion";
 
-const RELAY_REGIONS = [
-  { name: "AMERICAS", short: "US", x: 22, y: 40 },
-  { name: "EUROPE", short: "EU", x: 47, y: 30 },
-  { name: "ASIA PACIFIC", short: "AP", x: 78, y: 47 },
-  { name: "OCEANIA", short: "OC", x: 86, y: 76 },
-];
+const TOOLS = [
+  {
+    number: "01",
+    title: "Issuer authority",
+    copy: "Flags, freeze rights and signing power.",
+    scene: "authority",
+  },
+  {
+    number: "02",
+    title: "Order book",
+    copy: "Quoted depth against what owners can fund.",
+    scene: "book",
+  },
+  {
+    number: "03",
+    title: "Settlement",
+    copy: "What was requested. What actually arrived.",
+    scene: "settlement",
+  },
+  {
+    number: "04",
+    title: "Exposure analysis",
+    copy: "Position risk and the available exit.",
+    scene: "risk",
+  },
+  {
+    number: "05",
+    title: "Ledger & policy",
+    copy: "Recorded decisions and versioned rules.",
+    scene: "workstation",
+  },
+  {
+    number: "06",
+    title: "Ledger sync",
+    copy: "Named public sources, compared directly.",
+    scene: "network",
+  },
+] as const;
 
-function RelayWorld({
-  connected,
-  eventCount,
-  ledgerIndex,
-}: {
-  connected: boolean;
-  eventCount: number;
-  ledgerIndex: number;
-}) {
-  const pulseKey = `${ledgerIndex}-${eventCount}`;
-  const relayNodes = [
-    { short: "US", x: 22, y: 40 },
-    { short: "EU", x: 47, y: 30 },
-    { short: "AP", x: 78, y: 47 },
-    { short: "OC", x: 86, y: 76 },
-    { short: "CA", x: 30, y: 34 },
-    { short: "ME", x: 59, y: 36 },
-    { short: "IN", x: 69, y: 54 },
-    { short: "BR", x: 31, y: 65 },
-  ];
-  return (
-    <div className="relative overflow-hidden rounded-md border border-border/70 bg-background/35">
-      <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
-        <div>
-          <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
-            GLOBAL RELAY PULSE
-          </p>
-          <p className="mono-font mt-1 text-[10.5px] text-muted-foreground">
-            {connected ? "LIVE CONNECTION FABRIC" : "RECONNECTING TO RELAY FABRIC"}
-          </p>
-        </div>
-        <span className="flex items-center gap-1.5 mono-font text-[10.5px] text-muted-foreground">
-          <StatusDot status={connected ? "go" : "hold"} size={5} pulse={connected} />
-          {eventCount} EVENTS
-        </span>
-      </div>
-      <svg
-        viewBox="0 0 100 88"
-        className="block h-[260px] w-full text-brand/30"
-        role="img"
-        aria-label="Illustrative XRPL relay regions and live event pulse"
-      >
-        <defs>
-          <pattern id="world-grid" width="5" height="5" patternUnits="userSpaceOnUse">
-            <path d="M5 0H0V5" fill="none" stroke="currentColor" strokeWidth=".12" opacity=".32" />
-          </pattern>
-          <radialGradient id="world-atmo" cx="50%" cy="45%" r="58%">
-            <stop offset="0" stopColor="hsl(var(--brand))" stopOpacity=".18" />
-            <stop offset=".7" stopColor="hsl(var(--brand))" stopOpacity=".04" />
-            <stop offset="1" stopColor="hsl(var(--brand))" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="world-fade" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="currentColor" stopOpacity=".22" />
-            <stop offset="1" stopColor="currentColor" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <rect width="100" height="88" fill="url(#world-grid)" opacity=".6" />
-        <rect width="100" height="88" fill="url(#world-atmo)" />
-        <g fill="none" stroke="currentColor" strokeWidth=".12" opacity=".3">
-          <ellipse cx="50" cy="43" rx="42" ry="13" />
-          <ellipse cx="50" cy="43" rx="34" ry="25" />
-          <path d="M8 43h84M14 30c20 6 52 6 72 0M14 56c20-6 52-6 72 0" />
-        </g>
-        <path
-          d="M5 31 12 25 20 23 28 28 34 27 39 33 47 27 55 26 62 30 69 26 78 29 87 25 96 31V53L89 58 81 57 73 63 65 59 57 65 48 58 39 62 30 57 21 61 12 55 5 57Z"
-          fill="url(#world-fade)"
-          stroke="currentColor"
-          strokeWidth=".22"
-          opacity=".42"
-        />
-        <path d="M22 40C34 24 55 22 78 47M47 30C56 40 69 50 86 76M22 40C39 52 61 51 86 76M30 34C45 36 59 36 69 54M31 65C38 53 45 45 47 30M59 36C67 39 74 43 78 47" fill="none" stroke="currentColor" strokeWidth=".22" strokeDasharray="1.3 1.2" opacity=".7" />
-        <path d="M22 40C34 24 55 22 78 47M47 30C56 40 69 50 86 76M31 65C42 62 57 55 69 54" fill="none" stroke="hsl(var(--telemetry))" strokeWidth=".32" strokeDasharray="1 3" opacity=".8">
-          <animate attributeName="stroke-dashoffset" from="0" to="-16" dur="2.4s" repeatCount="indefinite" />
-        </path>
-        {relayNodes.map((region, index) => (
-          <g key={region.short}>
-            <circle cx={region.x} cy={region.y} r="4.8" fill="currentColor" opacity=".1">
-              {connected && (
-                <animate attributeName="r" values="3;6;3" dur={`${2.8 + index * 0.4}s`} repeatCount="indefinite" />
-              )}
-            </circle>
-            <circle cx={region.x} cy={region.y} r={index < 4 ? "1.45" : "1"} fill="hsl(var(--telemetry))">
-              {connected && (
-                <animate attributeName="opacity" values=".35;1;.35" dur={`${1.7 + index * 0.25}s`} repeatCount="indefinite" />
-              )}
-            </circle>
-            <text x={region.x + 3} y={region.y - 2.5} fill="currentColor" fontSize="2.3" fontFamily="IBM Plex Mono, monospace">
-              {region.short}
-            </text>
-          </g>
-        ))}
-        <g key={pulseKey}>
-          <circle cx="50" cy="43" r="2" fill="hsl(var(--brand))" opacity=".9">
-            {connected && <animate attributeName="r" values="1.5;5;1.5" dur="2.2s" repeatCount="indefinite" />}
-            {connected && <animate attributeName="opacity" values=".9;0;.9" dur="2.2s" repeatCount="indefinite" />}
-          </circle>
-          <text x="53" y="42" fill="hsl(var(--foreground))" fontSize="2.4" fontFamily="IBM Plex Mono, monospace">VALIDATED</text>
-          <text x="53" y="45" fill="currentColor" fontSize="2.1" fontFamily="IBM Plex Mono, monospace">XRPL FABRIC</text>
-        </g>
-        <g fill="currentColor" fontSize="1.8" fontFamily="IBM Plex Mono, monospace" opacity=".65">
-          <text x="5" y="7">N 60°</text><text x="5" y="84">S 60°</text>
-          <text x="14" y="82">01</text><text x="47" y="82">02</text><text x="80" y="82">03</text>
-        </g>
-      </svg>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 px-3 py-2">
-        <span className="mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
-          LEDGER {ledgerIndex ? ledgerIndex.toLocaleString() : "—"}
-        </span>
-        <span className="mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
-          RELAY NODES {relayNodes.length} · REGIONS {RELAY_REGIONS.length}
-        </span>
-      </div>
-      <p className="px-3 pb-3 pt-2 text-[10.5px] leading-relaxed text-muted-foreground">
-        Illustrative map of live ledger events. Not where transactions came from.
-      </p>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border/40 px-3 pb-3 pt-2 mono-font text-[10px] tracking-[0.1em] text-muted-foreground">
-        <span><i className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[hsl(var(--telemetry))]" />RELAY NODE</span>
-        <span><i className="mr-1.5 inline-block h-px w-4 align-middle bg-[hsl(var(--telemetry))]" />EVENT LANE</span>
-        <span><i className="mr-1.5 inline-block h-px w-4 align-middle border-t border-dashed border-brand" />SECONDARY ROUTE</span>
-      </div>
-    </div>
-  );
-}
-
-const maturityTone: Record<Maturity, "go" | "hold" | "outline"> = {
-  live: "go",
-  building: "hold",
-  planned: "outline",
-};
-
-const maturityLabel: Record<Maturity, string> = {
-  live: "LIVE",
-  building: "IN FLIGHT",
-  planned: "PLANNED",
-};
-
-/** Reveal a section once as it scrolls into the viewport. */
-function Reveal({
-  children,
-  delay = 0,
-  className,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-/**
- * HomeScene — what this is, what it does, and what it is going to be.
- *
- * The console's front door. It states the mission in one breath, proves
- * it with live numbers rather than claims, then lays out the capability
- * set and the differentiated bets behind it.
- */
 export function HomeScene({
   data,
   onNavigate,
@@ -212,357 +60,154 @@ export function HomeScene({
   modeChosen: boolean;
   onChooseMode: (mode: "executive" | "analyst") => void;
 }) {
-  const { ledger, connected, events, successRate } = data;
-  const [filter, setFilter] = useState<"all" | Maturity>("all");
-
-  const capabilities =
-    filter === "all"
-      ? CAPABILITIES
-      : CAPABILITIES.filter((capability) => capability.maturity === filter);
-
-  const liveCount = CAPABILITIES.filter((c) => c.maturity === "live").length;
-
+  const { ledger, connected, events, latencyMs } = data;
   return (
-    <div className="h-full min-w-0 overflow-y-auto overflow-x-hidden">
-      <div className="mx-auto w-full max-w-[1180px] px-6 pb-10 pt-8">
-        {/* ── Hero ─────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden">
-          <PatternMark element="orbital" size={380} opacity={0.07} className="-right-24 -top-28" />
-          <PatternMark element="hatch" size={140} opacity={0.06} className="-left-16 top-24" />
-
-          <motion.div
-            className="relative flex flex-col items-start gap-5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1">
-              <StatusDot status={connected ? "go" : "no-go"} size={5} pulse={connected} />
-              <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
-                {connected ? "CONNECTED · XRPL MAINNET" : "RECONNECTING TO MAINNET"}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-5">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85, rotate: -8 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ ...SPRING, delay: 0.1 }}
-              >
-                <NovaLogo size={72} tone="color" />
-              </motion.div>
-              <div>
-                <h1 className="display text-[46px] font-[900] leading-[0.9] tracking-[0.02em] text-foreground">
-                  NOSHASHI
-                </h1>
-                <p className="stencil mt-2 text-[11px] tracking-[0.14em] text-muted-foreground">
-                  {BRAND.tagline}
-                </p>
-              </div>
-            </div>
-
-            <p className="max-w-[680px] text-[16px] leading-relaxed text-foreground/85">
-              Check any XRPL token or payment before you sign:{" "}
-              <span className="text-go">GO</span> /{" "}
-              <span className="text-hold">HOLD</span> /{" "}
-              <span className="text-no-go">NO-GO</span>, with a receipt.
+    <div className="desk-home h-full min-w-0 overflow-y-auto overflow-x-hidden">
+      <div className="desk-page">
+        <div className="desk-mast">
+          <span>The Ledger Desk</span>
+          <span>Research edition / {BRAND.version}</span>
+          <span>XRPL · Read only</span>
+        </div>
+        <section className="desk-home-hero" aria-labelledby="desk-home-title">
+          <div className="desk-home-intro">
+            <p className="desk-kicker">
+              Independent readings. Inspectable evidence.
             </p>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <Button className="gap-2" onClick={() => onNavigate("verify")}>
-                <NovaShield size={14} />
-                RUN A GATE CHECK
+            <h1 id="desk-home-title">
+              See what
+              <br />
+              the ledger
+              <br />
+              <em>really says.</em>
+            </h1>
+            <p className="desk-dek">
+              The powers behind a token. The liquidity behind a quote. The
+              evidence behind your next decision.
+            </p>
+            <div className="desk-actions">
+              <Button size="lg" onClick={() => onNavigate("verify")}>
+                Check a settlement <DeskArrow />
               </Button>
-              <Button variant="outline" className="gap-2" onClick={() => onNavigate("history")}>
-                <NovaBolt size={14} />
-                OPEN THE AUDIT TRAIL
-              </Button>
-              <Button variant="ghost" className="gap-2" onClick={() => onNavigate("agent")}>
-                <NovaTerminal size={14} />
-                ASK THE AGENT
-              </Button>
-            </div>
-          </motion.div>
-
-          {/* The three questions, shown live rather than described. */}
-          <Reveal delay={0.03} className="mt-8">
-            <QuestionShowcase connected={connected} onNavigate={onNavigate} />
-          </Reveal>
-
-          {/* First run: view → analysis → evidence → policy. */}
-          <Reveal delay={0.05} className="mt-8">
-            <FirstRunGuide mode={mode} modeChosen={modeChosen} onChooseMode={onChooseMode} onNavigate={onNavigate} />
-          </Reveal>
-
-          {/* What was decided, why, and whether it can be proved: the
-              first thing an executive reads, before any telemetry. */}
-          <Reveal delay={0.1} className="mt-8">
-            <DecisionCard onNavigate={onNavigate} />
-          </Reveal>
-
-          {/* Live proof strip */}
-          <Reveal delay={0.15} className="mt-6">
-            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-              {[
-                {
-                  label: "VALIDATED LEDGER",
-                  value: ledger?.ledgerIndex ?? null,
-                  icon: <NovaSat size={14} />,
-                },
-                {
-                  label: "LIVE TX OBSERVED",
-                  value: events.length,
-                  icon: <NovaBolt size={14} />,
-                },
-                {
-                  label: "STREAM SUCCESS",
-                  value: successRate,
-                  suffix: "%",
-                  icon: <NovaEye size={14} />,
-                },
-                {
-                  label: "CAPABILITIES LIVE",
-                  value: liveCount,
-                  icon: <NovaGrid size={14} />,
-                },
-              ].map((stat) => (
-                <Panel key={stat.label} bodyClassName="p-3">
-                  <div className="flex items-start justify-between">
-                    <div className="min-w-0">
-                      <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
-                        {stat.label}
-                      </p>
-                      <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
-                        {stat.value === null ? "—" : <CountUp value={stat.value} />}
-                        {stat.suffix && stat.value !== null && (
-                          <span className="ml-0.5 text-[11px] font-normal text-muted-foreground">
-                            {stat.suffix}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <span className="shrink-0 text-muted-foreground/70">{stat.icon}</span>
-                  </div>
-                </Panel>
-              ))}
-            </div>
-          </Reveal>
-        </section>
-
-        {/* ── Live network picture ────────────────────────────── */}
-        <Reveal className="mt-10">
-          <div className="grid gap-3 lg:grid-cols-[1.35fr_.65fr]">
-            <Panel
-              label="LIVE NETWORK PICTURE"
-              right={
-                <span className="mono-font text-[10.5px] tabular-nums text-muted-foreground">
-                  {data.history.length}/48 CLOSES
-                </span>
-              }
-              bodyClassName="p-3"
-            >
-              <RelayWorld
-                connected={connected}
-                eventCount={events.length}
-                ledgerIndex={ledger?.ledgerIndex ?? 0}
-              />
-            </Panel>
-            <Panel label="EVENT VELOCITY" bodyClassName="p-3">
-              <div className="flex h-full flex-col justify-between gap-4">
-                <div>
-                  <p className="data-font text-[34px] font-[600] leading-none text-foreground">
-                    {events.length}
-                  </p>
-                  <p className="stencil mt-2 text-[10px] tracking-[0.14em] text-muted-foreground">
-                    OBSERVED IN LIVE WINDOW
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <DataRow label="STREAM" value={connected ? "LOCKED" : "OFFLINE"} tone={connected ? "go" : "hold"} />
-                  <DataRow label="SUCCESS" value={successRate === null ? "—" : `${successRate}%`} tone={successRate === null ? undefined : successRate > 95 ? "go" : "hold"} />
-                  <DataRow label="LATEST" value={events[0]?.type ?? "WAITING"} />
-                  <DataRow label="LEDGER" value={events[0]?.ledger?.toLocaleString() ?? "—"} />
-                </div>
-              </div>
-            </Panel>
-          </div>
-        </Reveal>
-
-        {/* ── Capabilities ─────────────────────────────────────── */}
-        <Reveal className="mt-10">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <Eyebrow>CAPABILITY MATRIX</Eyebrow>
-              <h2 className="display mt-1.5 text-[20px] font-[700] text-foreground">
-                EVERYTHING IT DOES
-              </h2>
-            </div>
-            <Tabs value={filter} onValueChange={(value) => setFilter(value as typeof filter)}>
-              <TabsList>
-                <TabsTrigger value="all">ALL</TabsTrigger>
-                <TabsTrigger value="live">LIVE</TabsTrigger>
-                <TabsTrigger value="building">IN FLIGHT</TabsTrigger>
-                <TabsTrigger value="planned">PLANNED</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-          <div className="mt-3 h-px bg-border" />
-
-          <motion.div layout className="mt-4 grid grid-cols-3 gap-3">
-            {capabilities.map((capability, index) => (
-              <motion.div
-                key={capability.id}
-                layout
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ ...SPRING, delay: Math.min(0.25, index * 0.03) }}
+              <Button
+                size="lg"
+                variant="ghost"
+                onClick={() => onNavigate("authority")}
               >
-                <Panel
-                  className="h-full"
-                  bodyClassName="p-3.5"
-                  interactive={Boolean(capability.scene)}
-                  onClick={() => {
-                    if (capability.scene) onNavigate(sceneIdFor(capability.scene));
-                  }}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="mono-font min-w-0 text-[11.5px] leading-snug text-foreground">
-                      {capability.title}
-                    </p>
-                    <Badge
-                      variant={maturityTone[capability.maturity]}
-                      className="shrink-0 text-[10px]"
-                    >
-                      {maturityLabel[capability.maturity]}
-                    </Badge>
-                  </div>
-                  {capability.scene && (
-                    <p className="stencil mt-3 border-t border-border pt-2 text-[10px] tracking-[0.14em] text-muted-foreground/70">
-                      → {capability.scene}
-                    </p>
-                  )}
-                </Panel>
-              </motion.div>
+                Investigate an issuer <span aria-hidden="true">→</span>
+              </Button>
+            </div>
+            <p className="desk-fine">
+              Never holds keys. Never signs. People decide.
+            </p>
+          </div>
+          <LedgerInstrument onNavigate={onNavigate} />
+        </section>
+        <dl className="desk-telemetry" aria-label="Current connection readings">
+          <div>
+            <dt>Connection</dt>
+            <dd>
+              <span
+                className="desk-connection-dot"
+                data-connected={connected}
+              />
+              {connected ? "Connected" : "Reconnecting"}
+            </dd>
+          </div>
+          <div>
+            <dt>Validated ledger</dt>
+            <dd>
+              {ledger?.ledgerIndex.toLocaleString() ?? "Awaiting a reading"}
+            </dd>
+          </div>
+          <div>
+            <dt>Observed events</dt>
+            <dd>
+              {events.length.toLocaleString()} <small>in this window</small>
+            </dd>
+          </div>
+          <div>
+            <dt>Round-trip latency</dt>
+            <dd>
+              {connected && typeof latencyMs === "number"
+                ? `${latencyMs} ms`
+                : "Not available"}
+            </dd>
+          </div>
+        </dl>
+        <section
+          className="desk-section"
+          aria-labelledby="desk-questions-title"
+        >
+          <div className="desk-section-heading">
+            <div>
+              <p className="desk-kicker">01 / The questions that matter</p>
+              <h2 id="desk-questions-title">From a reading to a reason.</h2>
+            </div>
+            <p>
+              Three ways into the same investigation.
+              <br />
+              Every finding keeps its source.
+            </p>
+          </div>
+          <QuestionShowcase connected={connected} onNavigate={onNavigate} />
+        </section>
+        <section
+          className="desk-section"
+          aria-label="Your most recent decision"
+        >
+          <DecisionCard onNavigate={onNavigate} />
+        </section>
+        <section className="desk-section" aria-labelledby="desk-tools-title">
+          <div className="desk-section-heading">
+            <div>
+              <p className="desk-kicker">02 / Your instruments</p>
+              <h2 id="desk-tools-title">Follow the next question.</h2>
+            </div>
+            <span className="desk-fine">Search every tool / Ctrl or ⌘ K</span>
+          </div>
+          <div className="desk-tool-grid">
+            {TOOLS.map((tool) => (
+              <button
+                type="button"
+                key={tool.scene}
+                onClick={() => onNavigate(tool.scene)}
+              >
+                <span className="desk-tool-number">{tool.number}</span>
+                <span>
+                  <strong>{tool.title}</strong>
+                  <span>{tool.copy}</span>
+                </span>
+                <DeskArrow />
+              </button>
             ))}
-          </motion.div>
-        </Reveal>
-
-        {/* ── Standards & contact ──────────────────────────────── */}
-        <Reveal className="mt-10">
-          <div className="grid grid-cols-3 gap-3">
-            <Panel label="BUILT ON" bodyClassName="p-3.5">
-              <div className="space-y-2">
-                {[
-                  { label: "XLS-70 · Credentials", href: LINKS.xls70 },
-                  { label: "XLS-80 · Permissioned Domains", href: LINKS.xls80 },
-                  { label: "XRPL Developer Docs", href: LINKS.xrplDocs },
-                ].map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="flex items-center gap-2 text-[11.5px] text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    <NovaCredit size={11} className="shrink-0" />
-                    <span className="min-w-0 truncate underline-offset-2 hover:underline">
-                      {link.label}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </Panel>
-
-            <Panel label="TALK TO US" bodyClassName="p-3.5">
-              <div className="space-y-2">
-                {[
-                  { label: "Support", email: CONTACT.support },
-                  { label: "Institutions", email: CONTACT.sales },
-                  { label: "Security", email: CONTACT.security },
-                ].map((route) => (
-                  <a
-                    key={route.email}
-                    href={`mailto:${route.email}`}
-                    className="flex items-center justify-between gap-2 text-[11.5px] transition-colors hover:text-foreground"
-                  >
-                    <span className="text-muted-foreground">{route.label}</span>
-                    <span className="mono-font min-w-0 truncate text-foreground/80 underline-offset-2 hover:underline">
-                      {route.email}
-                    </span>
-                  </a>
-                ))}
-              </div>
-              <p className="mono-font mt-3 border-t border-border pt-2 text-[10px] text-muted-foreground/70">
-                {CONTACT.hours} · REPLY WITHIN {CONTACT.responseTarget.toUpperCase()}
-              </p>
-            </Panel>
-
-            <Panel label="POSITION" bodyClassName="relative p-3.5">
-              <PatternMark element="orbit" size={130} className="-bottom-8 -right-8" opacity={0.08} />
-              <p className="relative text-[11.5px] leading-relaxed text-muted-foreground">
-                Live mainnet only. Every number on every screen is the real ledger.
-              </p>
-              <div className="relative mt-3 flex flex-wrap gap-1.5">
-                {["MAINNET ONLY", "ZERO EGRESS", "AUDITABLE", "DARK BY DEFAULT"].map(
-                  (tag) => (
-                    <span
-                      key={tag}
-                      className="mono-font rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground"
-                    >
-                      {tag}
-                    </span>
-                  )
-                )}
-              </div>
-            </Panel>
           </div>
-        </Reveal>
-
-        {/* ── Footer ───────────────────────────────────────────── */}
-        <footer className="mt-10 border-t border-border pt-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <NovaLogo size={16} animated={false} tone="color" />
-              <span className="mono-font text-[10.5px] text-muted-foreground">
-                {copyrightLine()} · v{BRAND.version} · {BRAND.network}
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              {[
-                { label: "LEGAL & ACCESSIBILITY", scene: "legal" },
-                { label: "SUPPORT", scene: "agent" },
-              ].map((link) => (
-                <button
-                  key={link.scene}
-                  onClick={() => onNavigate(link.scene)}
-                  className={cn(
-                    "stencil text-[10px] tracking-[0.14em] text-muted-foreground",
-                    "underline-offset-4 transition-colors hover:text-foreground hover:underline"
-                  )}
-                >
-                  {link.label}
-                </button>
-              ))}
-            </div>
-          </div>
+        </section>
+        <section
+          className="desk-section desk-onboarding"
+          aria-label="Getting started"
+        >
+          <FirstRunGuide
+            mode={mode}
+            modeChosen={modeChosen}
+            onChooseMode={onChooseMode}
+            onNavigate={onNavigate}
+          />
+        </section>
+        <footer className="desk-page-footer">
+          <span>{copyrightLine()}</span>
+          <span>
+            {CAPABILITIES.filter((c) => c.maturity === "live").length} available
+            capabilities / Read-only intelligence
+          </span>
+          <button
+            className="desk-text-link"
+            onClick={() => onNavigate("trust")}
+          >
+            Trust & methodology <DeskArrow />
+          </button>
         </footer>
       </div>
     </div>
   );
-}
-
-/** Map a human scene name in the capability data to a scene id. */
-function sceneIdFor(scene: string): string {
-  const map: Record<string, string> = {
-    "Mission Control": "control",
-    Verification: "verify",
-    Credentials: "credentials",
-    "Domain Grid": "domains",
-    "Audit Trail": "history",
-    "Exposure Analysis": "risk",
-    "Ledger & Policy": "workstation",
-    NOSHX: "agent",
-    Agent: "agent",
-  };
-  return map[scene] ?? "control";
 }

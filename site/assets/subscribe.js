@@ -76,6 +76,8 @@
 (function () {
   "use strict";
 
+  if (document.body.hasAttribute("data-ledger-editorial")) return;
+
   var KEY = "noshashi-subscribe-state";
   var DISMISS_DAYS = 90;
   var DELAY_MS = 30000;

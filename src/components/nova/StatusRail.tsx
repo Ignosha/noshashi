@@ -43,7 +43,7 @@ export function StatusRail({
   const ticker = events.slice(0, 14);
 
   return (
-    <footer className="statusrail relative z-20 flex h-7 shrink-0 items-center gap-3 whitespace-nowrap border-t border-border bg-background/95 px-3 backdrop-blur">
+    <footer className="statusrail relative z-20 flex h-8 shrink-0 items-center gap-3 whitespace-nowrap border-t border-border bg-background px-4">
       <span className="flex shrink-0 items-center gap-1.5">
         <StatusDot status={status} size={6} pulse={status === "go"} />
         <span
@@ -89,7 +89,7 @@ export function StatusRail({
             AWAITING VALIDATED TRANSACTIONS…
           </span>
         ) : (
-          <div className="marquee-track flex w-max items-center gap-6">
+          <div className="desk-event-feed flex w-max items-center gap-6">
             {[0, 1].map((copy) => (
               <div key={copy} className="flex items-center gap-6" aria-hidden={copy === 1}>
                 {ticker.map((event) => (
