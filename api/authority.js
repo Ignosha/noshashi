@@ -23,6 +23,9 @@ import { cacheHeaders } from "./_lib/html.js";
 import { queryOf } from "./_lib/query.js";
 
 export default async function handler(req, res) {
+  // Errors and unreadable certificates must not survive a retry in the
+  // browser or edge cache. Only a successful source read opts into caching.
+  res.setHeader("Cache-Control", "no-store");
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ error: "Method not allowed" });
@@ -54,7 +57,9 @@ export default async function handler(req, res) {
     // A certificate is a claim about one ledger, so a cached copy is
     // only as good as the ledger it names — which the body states. Five
     // minutes at the edge, an hour of stale-while-revalidate.
-    cacheHeaders(res, 300, 3600);
+    if (surface.control && surface.posture && surface.ledgerIndex > 0 && surface.unreadable.length === 0) {
+      cacheHeaders(res, 300, 3600);
+    }
     // Public ledger facts: readable from any page, so the SDK works in a
     // browser too. No cookies are read or set, so this exposes nothing.
     res.setHeader("Access-Control-Allow-Origin", "*");

@@ -1,0 +1,374 @@
+{
+  "provenance": "Unmodified public authority replies recorded in a real browser on 1 November 2026. Each certificate retains its own scope, evaluatedAt and validated ledger; cached and stale readings are not simultaneous.",
+  "records": [
+    {
+      "request": "https://www.noshashi.app/api/authority?issuer=rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+      "headers": {
+        "cache-control": "public, max-age=0",
+        "date": "Sun, 01 Nov 2026 17:47:11 GMT",
+        "x-vercel-cache": "HIT"
+      },
+      "certificate": {
+        "verdict": "hold",
+        "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+        "checks": [
+          {
+            "id": "FREEZE_SURRENDERED",
+            "label": "Freeze permanently surrendered",
+            "severity": "warn",
+            "passed": false,
+            "detail": "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder."
+          },
+          {
+            "id": "NOT_GLOBALLY_FROZEN",
+            "label": "Issuance not frozen now",
+            "severity": "block",
+            "passed": true,
+            "detail": "lsfGlobalFreeze is clear. Lines are not under a global freeze at this ledger."
+          },
+          {
+            "id": "OPEN_HOLDING",
+            "label": "Holding does not require issuer permission",
+            "severity": "warn",
+            "passed": true,
+            "detail": "lsfRequireAuth is clear. Any account may open a line without the issuer's permission."
+          },
+          {
+            "id": "NO_UNILATERAL_SIGNER",
+            "label": "No single key controls the issuer",
+            "severity": "block",
+            "passed": true,
+            "detail": "2 signers must agree to reach the quorum of 25, derived from summed weights rather than a headcount."
+          },
+          {
+            "id": "SUPPLY_CONCENTRATION",
+            "label": "Supply concentration",
+            "severity": "warn",
+            "passed": false,
+            "state": "INSUFFICIENT_DATA",
+            "detail": "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass."
+          }
+        ],
+        "digest": "A98313502CEDA8589000387530BA7A90F4C5A3239BA7BA2AA59932A99C9592B5",
+        "ledgerIndex": 108049990,
+        "evaluatedAt": "2026-11-01T17:47:11.088Z",
+        "source": "none",
+        "rulesVersion": 2,
+        "walk": null,
+        "disclaimer": "Ledger facts about authority retained by this issuer at the stated ledger index. Not a score, and not a determination that any asset is or is not decentralised, a security, or compliant with any statute."
+      }
+    },
+    {
+      "request": "https://www.noshashi.app/api/authority?issuer=rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+      "headers": {
+        "age": "2712",
+        "cache-control": "public, max-age=0",
+        "date": "Sun, 01 Nov 2026 17:02:01 GMT",
+        "x-vercel-cache": "STALE"
+      },
+      "certificate": {
+        "verdict": "no-go",
+        "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+        "checks": [
+          {
+            "id": "FREEZE_SURRENDERED",
+            "label": "Freeze permanently surrendered",
+            "severity": "warn",
+            "passed": false,
+            "detail": "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder."
+          },
+          {
+            "id": "NOT_GLOBALLY_FROZEN",
+            "label": "Issuance not frozen now",
+            "severity": "block",
+            "passed": true,
+            "detail": "lsfGlobalFreeze is clear. Lines are not under a global freeze at this ledger."
+          },
+          {
+            "id": "OPEN_HOLDING",
+            "label": "Holding does not require issuer permission",
+            "severity": "warn",
+            "passed": true,
+            "detail": "lsfRequireAuth is clear. Any account may open a line without the issuer's permission."
+          },
+          {
+            "id": "NO_UNILATERAL_SIGNER",
+            "label": "No single key controls the issuer",
+            "severity": "block",
+            "passed": false,
+            "detail": "No signer list. The master key is disabled and a regular key is set, so rUUs1jns6tdUQwAABDJyHMUHvdGNvNADvJ signs for this issuer on its own."
+          },
+          {
+            "id": "NO_TRANSFER_FEE",
+            "label": "No issuer transfer fee",
+            "severity": "warn",
+            "passed": false,
+            "detail": "The issuer charges 0.15% on every transfer between holders. The rate is set by the issuer and can be changed by them."
+          },
+          {
+            "id": "SUPPLY_CONCENTRATION",
+            "label": "Supply concentration",
+            "severity": "warn",
+            "passed": false,
+            "state": "INSUFFICIENT_DATA",
+            "detail": "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass."
+          }
+        ],
+        "digest": "7804BEE7C263DFC220A1B580CCB6FB5F549302D9EAEDC5F61C1A663B9D04F353",
+        "ledgerIndex": 108049324,
+        "evaluatedAt": "2026-11-01T17:02:01.544Z",
+        "source": "none",
+        "rulesVersion": 2,
+        "walk": null,
+        "disclaimer": "Ledger facts about authority retained by this issuer at the stated ledger index. Not a score, and not a determination that any asset is or is not decentralised, a security, or compliant with any statute."
+      }
+    },
+    {
+      "request": "https://www.noshashi.app/api/authority?issuer=rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+      "headers": {
+        "age": "0",
+        "cache-control": "public, max-age=0",
+        "date": "Sun, 01 Nov 2026 17:47:13 GMT",
+        "x-vercel-cache": "MISS"
+      },
+      "certificate": {
+        "verdict": "hold",
+        "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "checks": [
+          {
+            "id": "FREEZE_SURRENDERED",
+            "label": "Freeze permanently surrendered",
+            "severity": "warn",
+            "passed": true,
+            "detail": "lsfNoFreeze is set. The issuer has irrevocably given up the ability to freeze any line of this issuance."
+          },
+          {
+            "id": "NOT_GLOBALLY_FROZEN",
+            "label": "Issuance not frozen now",
+            "severity": "block",
+            "passed": true,
+            "detail": "lsfGlobalFreeze is clear. Lines are not under a global freeze at this ledger."
+          },
+          {
+            "id": "OPEN_HOLDING",
+            "label": "Holding does not require issuer permission",
+            "severity": "warn",
+            "passed": true,
+            "detail": "lsfRequireAuth is clear. Any account may open a line without the issuer's permission."
+          },
+          {
+            "id": "NO_UNILATERAL_SIGNER",
+            "label": "No single key controls the issuer",
+            "severity": "block",
+            "passed": true,
+            "detail": "The master key is disabled and the regular key is set to rrrrrrrrrrrrrrrrrrrrBZbvji, an address whose private key does not exist. The account is blackholed: it can never sign another transaction, so no party can act on this issuance."
+          },
+          {
+            "id": "NO_TRANSFER_FEE",
+            "label": "No issuer transfer fee",
+            "severity": "warn",
+            "passed": false,
+            "detail": "The issuer charges 0.01% on every transfer between holders. The rate is set by the issuer and can be changed by them."
+          },
+          {
+            "id": "SUPPLY_CONCENTRATION",
+            "label": "Supply concentration",
+            "severity": "warn",
+            "passed": false,
+            "state": "INSUFFICIENT_DATA",
+            "detail": "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass."
+          }
+        ],
+        "digest": "17B009F39F2EB859B5596C1DEFA35982D18E73CA5C8FC68D633DD854589052D3",
+        "ledgerIndex": 108049991,
+        "evaluatedAt": "2026-11-01T17:47:13.864Z",
+        "source": "none",
+        "rulesVersion": 2,
+        "walk": null,
+        "disclaimer": "Ledger facts about authority retained by this issuer at the stated ledger index. Not a score, and not a determination that any asset is or is not decentralised, a security, or compliant with any statute."
+      }
+    },
+    {
+      "request": "https://www.noshashi.app/api/authority?issuer=rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
+      "headers": {
+        "age": "0",
+        "cache-control": "public, max-age=0",
+        "date": "Sun, 01 Nov 2026 17:47:14 GMT",
+        "x-vercel-cache": "MISS"
+      },
+      "certificate": {
+        "verdict": "no-go",
+        "issuer": "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
+        "checks": [
+          {
+            "id": "FREEZE_SURRENDERED",
+            "label": "Freeze permanently surrendered",
+            "severity": "warn",
+            "passed": false,
+            "detail": "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder."
+          },
+          {
+            "id": "NOT_GLOBALLY_FROZEN",
+            "label": "Issuance not frozen now",
+            "severity": "block",
+            "passed": true,
+            "detail": "lsfGlobalFreeze is clear. Lines are not under a global freeze at this ledger."
+          },
+          {
+            "id": "OPEN_HOLDING",
+            "label": "Holding does not require issuer permission",
+            "severity": "warn",
+            "passed": true,
+            "detail": "lsfRequireAuth is clear. Any account may open a line without the issuer's permission."
+          },
+          {
+            "id": "NO_UNILATERAL_SIGNER",
+            "label": "No single key controls the issuer",
+            "severity": "block",
+            "passed": false,
+            "detail": "No signer list. The master key is enabled and a regular key is set, so rregCwVvZRdQPdNKXD5bpFq3esu9hreK3 signs for this issuer on its own."
+          },
+          {
+            "id": "NO_TRANSFER_FEE",
+            "label": "No issuer transfer fee",
+            "severity": "warn",
+            "passed": false,
+            "detail": "The issuer charges 0.20% on every transfer between holders. The rate is set by the issuer and can be changed by them."
+          },
+          {
+            "id": "SUPPLY_CONCENTRATION",
+            "label": "Supply concentration",
+            "severity": "warn",
+            "passed": false,
+            "state": "INSUFFICIENT_DATA",
+            "detail": "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass."
+          }
+        ],
+        "digest": "01F48593735919E11DCCCD213DB32ED4297CFADE3F1091CDA65D949DE25E3200",
+        "ledgerIndex": 108049991,
+        "evaluatedAt": "2026-11-01T17:47:14.240Z",
+        "source": "none",
+        "rulesVersion": 2,
+        "walk": null,
+        "disclaimer": "Ledger facts about authority retained by this issuer at the stated ledger index. Not a score, and not a determination that any asset is or is not decentralised, a security, or compliant with any statute."
+      }
+    },
+    {
+      "request": "https://www.noshashi.app/api/authority?issuer=rGm7WCVp9gb4jZHWTEtGUr4dd74z2XuWhE",
+      "headers": {
+        "age": "0",
+        "cache-control": "public, max-age=0",
+        "date": "Sun, 01 Nov 2026 17:47:14 GMT",
+        "x-vercel-cache": "MISS"
+      },
+      "certificate": {
+        "verdict": "hold",
+        "issuer": "rGm7WCVp9gb4jZHWTEtGUr4dd74z2XuWhE",
+        "checks": [
+          {
+            "id": "FREEZE_SURRENDERED",
+            "label": "Freeze permanently surrendered",
+            "severity": "warn",
+            "passed": false,
+            "detail": "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder."
+          },
+          {
+            "id": "NOT_GLOBALLY_FROZEN",
+            "label": "Issuance not frozen now",
+            "severity": "block",
+            "passed": true,
+            "detail": "lsfGlobalFreeze is clear. Lines are not under a global freeze at this ledger."
+          },
+          {
+            "id": "OPEN_HOLDING",
+            "label": "Holding does not require issuer permission",
+            "severity": "warn",
+            "passed": true,
+            "detail": "lsfRequireAuth is clear. Any account may open a line without the issuer's permission."
+          },
+          {
+            "id": "NO_UNILATERAL_SIGNER",
+            "label": "No single key controls the issuer",
+            "severity": "block",
+            "passed": true,
+            "detail": "2 signers must agree to reach the quorum of 2, derived from summed weights rather than a headcount."
+          },
+          {
+            "id": "SUPPLY_CONCENTRATION",
+            "label": "Supply concentration",
+            "severity": "warn",
+            "passed": false,
+            "state": "INSUFFICIENT_DATA",
+            "detail": "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass."
+          }
+        ],
+        "digest": "C5E67F8C3D01D34CA95323EC03FAF2521EFEA312E36E60232AD03D4257D6C074",
+        "ledgerIndex": 108049991,
+        "evaluatedAt": "2026-11-01T17:47:14.300Z",
+        "source": "none",
+        "rulesVersion": 2,
+        "walk": null,
+        "disclaimer": "Ledger facts about authority retained by this issuer at the stated ledger index. Not a score, and not a determination that any asset is or is not decentralised, a security, or compliant with any statute."
+      }
+    },
+    {
+      "request": "https://www.noshashi.app/api/authority?issuer=rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr",
+      "headers": {
+        "age": "0",
+        "cache-control": "public, max-age=0",
+        "date": "Sun, 01 Nov 2026 17:47:14 GMT",
+        "x-vercel-cache": "MISS"
+      },
+      "certificate": {
+        "verdict": "hold",
+        "issuer": "rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr",
+        "checks": [
+          {
+            "id": "FREEZE_SURRENDERED",
+            "label": "Freeze permanently surrendered",
+            "severity": "warn",
+            "passed": false,
+            "detail": "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder."
+          },
+          {
+            "id": "NOT_GLOBALLY_FROZEN",
+            "label": "Issuance not frozen now",
+            "severity": "block",
+            "passed": true,
+            "detail": "lsfGlobalFreeze is clear. Lines are not under a global freeze at this ledger."
+          },
+          {
+            "id": "OPEN_HOLDING",
+            "label": "Holding does not require issuer permission",
+            "severity": "warn",
+            "passed": true,
+            "detail": "lsfRequireAuth is clear. Any account may open a line without the issuer's permission."
+          },
+          {
+            "id": "NO_UNILATERAL_SIGNER",
+            "label": "No single key controls the issuer",
+            "severity": "block",
+            "passed": true,
+            "detail": "The master key is disabled and the regular key is set to rrrrrrrrrrrrrrrrrrrrBZbvji, an address whose private key does not exist. The account is blackholed: it can never sign another transaction, so no party can act on this issuance."
+          },
+          {
+            "id": "SUPPLY_CONCENTRATION",
+            "label": "Supply concentration",
+            "severity": "warn",
+            "passed": false,
+            "state": "INSUFFICIENT_DATA",
+            "detail": "Supply was not walked for this certificate, so no concentration finding is made. This is an abstention, not a pass."
+          }
+        ],
+        "digest": "F807457F3B74BF1BE73273AA5ECC070BF8CD651876362843399F2E83CDBF4315",
+        "ledgerIndex": 108049991,
+        "evaluatedAt": "2026-11-01T17:47:14.300Z",
+        "source": "none",
+        "rulesVersion": 2,
+        "walk": null,
+        "disclaimer": "Ledger facts about authority retained by this issuer at the stated ledger index. Not a score, and not a determination that any asset is or is not decentralised, a security, or compliant with any statute."
+      }
+    }
+  ],
+  "recording_completed_utc": "2026-11-01T17:47:36.426145+00:00"
+}

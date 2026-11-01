@@ -1,116 +1,73 @@
-/*
- * The Ledger Desk (homepage). Everything printed here is read live:
- *
- *   dateline    today's date, and the latest validated ledger (filled by
- *               the existing data-sys-ledger hook).
- *   lead story  written from one reply of the public Asset Risk API for
- *               RLUSD: the headline states what the issuer has and has not
- *               given up and how much of its book can fill; the byline
- *               names the ledger and the receipt.
- *   Table 1     /api/authority for six widely held issuers, read when the
- *               table comes near the screen.
- *
- * The three live figures are drawn by desk-visuals.js.
- *
- * A read that fails says so in place. Nothing is filled with sample values.
- */
-(function () {
-  "use strict";
-  var RLUSD = { issuer: "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De", currency: "524C555344000000000000000000000000000000" };
-  function $(id) { return document.getElementById(id); }
-  function set(id, t) { var el = $(id); if (el) el.textContent = t; }
-  function fmt(n) { return Number(n || 0).toLocaleString("en-US", { maximumFractionDigits: 0 }); }
-  function compact(n) {
-    n = Number(n || 0);
-    if (n >= 1e6) return (n / 1e6).toFixed(2) + "M";
-    if (n >= 1e4) return (n / 1e3).toFixed(1) + "K";
-    return fmt(n);
+/* The comparison uses the same bounded, fail-closed receipt path as the
+ * first investigation. Each row is its own issuer/ledger/scope; no maximum
+ * ledger or cross-request digest is presented as a shared snapshot. */
+import { readVerifiedAuthority, authorityReadMessage, downloadCertificate } from './desk-experience-core.mjs?v=20261101-first-use';
+
+const date = document.getElementById('rh-date');
+if (date) date.textContent = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+const table = document.getElementById('rh-issuers');
+if (table) {
+  const rows = [...table.querySelectorAll('tbody tr[data-issuer]')];
+  const retryAll = document.getElementById('rh-t1-retry');
+  const status = document.getElementById('rh-t1-l');
+  function summary() {
+    const pending = rows.filter(row => row.dataset.state === 'reading').length;
+    const verified = rows.filter(row => row.dataset.state === 'verified').length;
+    const failed = rows.filter(row => row.dataset.state === 'unavailable').length;
+    table.setAttribute('aria-busy', String(pending > 0));
+    retryAll.disabled = pending > 0;
+    status.textContent = pending
+      ? `${pending} issuer readings pending; ${verified} verified. Each request is limited to 20 seconds.`
+      : `${verified} of ${rows.length} issuer receipts verified. ${failed ? `${failed} unavailable; retry those readings.` : 'Each row names its own ledger and read time.'} This is not a simultaneous snapshot.`;
   }
-
-  /* ── Dateline ──────────────────────────────────────────────────── */
-  set("rh-date", new Date().toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long", year: "numeric" }));
-
-  /* ── Lead story, from one Asset Risk reply ─────────────────────── */
-  fetch("/api/v1/asset-risk?issuer=" + RLUSD.issuer + "&currency=" + RLUSD.currency)
-    .then(function (r) { return r.json(); })
-    .then(function (a) {
-      if (!a || !a.schema) throw new Error("no report");
-      var ctl = a.issuer_controls, liq = a.liquidity, lg = a.ledgers || {};
-      var pct = null;
-      if (liq && liq.quoted) {
-        var tot = (liq.quoted.bid || 0) + (liq.quoted.ask || 0), fil = (liq.fillable.bid || 0) + (liq.fillable.ask || 0);
-        if (tot > 0) pct = Math.round((fil / tot) * 100);
-      }
-
-      if (ctl && ctl.checks) {
-        var checks = ctl.checks.filter(function (k) { return k.state !== "INSUFFICIENT_DATA"; });
-        var freeze = checks.filter(function (k) { return k.id === "FREEZE_SURRENDERED"; })[0];
-        var signer = checks.filter(function (k) { return k.id === "NO_UNILATERAL_SIGNER"; })[0];
-        var head = freeze && !freeze.passed
-          ? "RLUSD's issuer has not given up the power to freeze its holders."
-          : "RLUSD's issuer has permanently given up the power to freeze its holders.";
-        if (pct !== null) head += " " + pct + "% of its order book can actually fill.";
-        set("rh-headline", head);
-        var kept = checks.filter(function (k) { return !k.passed; }).length;
-        set("rh-dek", "Of the " + checks.length + " issuer controls NOSHASHI checks, RLUSD's issuer keeps " + kept + "." +
-          (signer && signer.passed ? " No single key can act for it alone." : "") +
-          " Its order book, read at the same ledger, holds " + (liq && liq.quoted ? compact((liq.fillable.bid || 0) + (liq.fillable.ask || 0)) + " RLUSD that can trade within 10% of mid." : "no readable depth just now.") +
-          " The verdict on its controls is " + String(ctl.authority_verdict || "unknown").replace(/-/g, " ").toUpperCase() + ", which describes the issuer's powers, not the quality of the asset.");
-      }
-      var by = $("rh-by");
-      if (by) {
-        by.innerHTML = "";
-        by.appendChild(document.createTextNode("Read by NOSHASHI at ledger " + fmt(lg.issuer_controls || lg.liquidity) + ", " +
-          new Date(a.evaluated_at).toUTCString().replace(" GMT", " UTC") + ". Receipt "));
-        var c = document.createElement("code");
-        c.textContent = a.receipt ? a.receipt.digest.slice(0, 16) + "…" : "not issued";
-        by.appendChild(c);
-      }
-    })
-    .catch(function () {
-      set("rh-by", "The ledger could not be read just now; the figures below will say so too.");
-    });
-
-  /* ── Table 1: issuer controls, read when the table is near ──────── */
-  var table = $("rh-issuers");
-  function fill(tr, c) {
-    if (!c || !c.checks) {
-      tr.querySelectorAll("td[data-c]").forEach(function (td) { td.textContent = "Not read"; td.className = "na"; });
-      return 0;
+  async function readRow(row) {
+    if (row.dataset.state === 'reading') return;
+    row.dataset.state = 'reading';
+    row.setAttribute('aria-busy', 'true');
+    row.querySelectorAll('td[data-c]').forEach(cell => { cell.textContent = cell.dataset.c === 'record' ? 'Reading…' : 'Pending'; cell.className = ''; });
+    summary();
+    const record = row.querySelector('[data-c=record]');
+    try {
+      const { certificate, provenance } = await readVerifiedAuthority(row.dataset.issuer);
+      row.querySelectorAll('td[data-c]').forEach(cell => {
+        if (cell.dataset.c === 'record') return;
+        if (cell.dataset.c === 'verdict') { cell.textContent = certificate.verdict.replaceAll('-', ' '); return; }
+        const check = certificate.checks.find(item => item.id === cell.dataset.c);
+        cell.textContent = !check || check.state === 'INSUFFICIENT_DATA' ? 'Not established' : check.state === 'NOT_APPLICABLE' ? 'Not applicable' : check.passed ? 'Yes' : 'No';
+      });
+      record.replaceChildren();
+      const ledger = document.createElement('p');
+      ledger.textContent = `Validated ledger ${certificate.ledgerIndex.toLocaleString('en-US')} · rules ${certificate.rulesVersion}`;
+      const freshness = document.createElement('p');
+      freshness.textContent = `${provenance.stale ? 'Stale' : provenance.cached ? 'Cached' : 'Recorded'} · ${new Date(certificate.evaluatedAt).toISOString()}`;
+      const details = document.createElement('details');
+      const title = document.createElement('summary'); title.textContent = 'Inspect receipt (SHA-256)';
+      const subject = document.createElement('p'); subject.textContent = 'Issuer: ' + certificate.issuer;
+      const scope = document.createElement('p'); scope.textContent = provenance.label;
+      const digest = document.createElement('code'); digest.textContent = certificate.digest;
+      const explanation = document.createElement('p'); explanation.textContent = 'Canonical payload hash matches; not a digital signature or independent node confirmation. JSON includes all findings and any abstentions.';
+      const download = document.createElement('button'); download.type = 'button'; download.dataset.downloadIssuer = '';
+      download.textContent = 'Download this JSON'; download.addEventListener('click', () => downloadCertificate(certificate));
+      const certificateLink = document.createElement('a');
+      certificateLink.href = '/certificate/?issuer=' + encodeURIComponent(row.dataset.issuer);
+      certificateLink.textContent = 'Certificate tool (new read)';
+      details.append(title, subject, scope, digest, explanation, download, certificateLink);
+      record.append(ledger, freshness, details);
+      row.dataset.state = 'verified';
+    } catch (error) {
+      row.querySelectorAll('td[data-c]').forEach(cell => { cell.textContent = 'Not read'; cell.className = 'na'; });
+      record.textContent = authorityReadMessage(error);
+      row.dataset.state = 'unavailable';
+    } finally {
+      const retry = document.createElement('button'); retry.type = 'button'; retry.dataset.retryIssuer = '';
+      retry.textContent = row.dataset.state === 'verified' ? 'Read again' : 'Retry issuer';
+      retry.setAttribute('aria-label', `${retry.textContent}: ${row.querySelector('th').textContent.trim()}`);
+      retry.addEventListener('click', () => readRow(row));
+      record.append(retry);
+      row.removeAttribute('aria-busy');
+      summary();
     }
-    tr.querySelectorAll("td[data-c]").forEach(function (td) {
-      var id = td.getAttribute("data-c");
-      if (id === "verdict") {
-        td.textContent = String(c.verdict || "—").replace(/-/g, " ").replace(/^\w/, function (m) { return m.toUpperCase(); });
-        td.className = "v" + (c.verdict === "go" ? "" : " no");
-        return;
-      }
-      var k = c.checks.filter(function (x) { return x.id === id; })[0];
-      if (!k || k.state === "INSUFFICIENT_DATA") { td.textContent = "Not read"; td.className = "na"; return; }
-      td.textContent = k.passed ? "Yes" : "No";
-      td.className = k.passed ? "" : "no";
-    });
-    return c.ledgerIndex || 0;
   }
-  function readTable() {
-    var rows = Array.prototype.slice.call(table.querySelectorAll("tbody tr"));
-    Promise.all(rows.map(function (tr) {
-      return fetch("/api/authority?issuer=" + tr.getAttribute("data-issuer"))
-        .then(function (r) { return r.json(); })
-        .then(function (c) { return fill(tr, c); })
-        .catch(function () { return fill(tr, null); });
-    })).then(function (ledgers) {
-      var top = Math.max.apply(null, ledgers.concat([0]));
-      if (top) set("rh-t1-l", "Read at ledger " + fmt(top) + ".");
-    });
-  }
-  if (table) {
-    if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (es) {
-        if (!es[0].isIntersecting) return;
-        io.disconnect(); readTable();
-      }, { rootMargin: "400px" });
-      io.observe(table);
-    } else { readTable(); }
-  }
-})();
+  retryAll.addEventListener('click', () => rows.forEach(readRow));
+  rows.forEach(readRow);
+}

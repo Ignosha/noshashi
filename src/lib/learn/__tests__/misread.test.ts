@@ -91,17 +91,20 @@ describe("the /misread/ page", () => {
   });
 });
 
-describe("the landing page section", () => {
-  it("the template carries the slot the build fills", () => {
-    expect(readFileSync("templates/home.html", "utf8")).toContain("<!--SLOT:MISREAD-->");
-    expect(readFileSync("scripts/build-site.mjs", "utf8")).toContain("MISREAD: renderMisread(misread)");
+describe("recorded cases after shortening the homepage", () => {
+  it("keeps the supporting evidence page accessible without repeating its full section", () => {
+    expect(readFileSync("templates/home.html", "utf8")).toContain('href="/misread/"');
+    expect(readFileSync("site/index.html", "utf8")).toContain('href="/misread/"');
+    expect(readFileSync("templates/home.html", "utf8")).not.toContain("<!--SLOT:MISREAD-->");
   });
 
-  it("the committed landing page carries exactly what the renderer produces from the code's cases", async () => {
+  it("the reusable case renderer retains the code's findings and evidence references", async () => {
     // @ts-expect-error — plain ESM JavaScript shared with the site build.
     const { renderMisread } = await import("../../../../api/_lib/misread.js");
     const html = renderMisread(misreadCases());
-    expect(readFileSync("site/index.html", "utf8")).toContain(html);
-    for (const c of misreadCases()) expect(html).toContain(c.verified.label);
+    for (const c of misreadCases()) {
+      expect(html).toContain(c.verified.label);
+      expect(html).toContain(c.evidence.ref);
+    }
   });
 });
