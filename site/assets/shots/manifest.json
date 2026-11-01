@@ -5,56 +5,56 @@
     {
       "name": "overview",
       "alt": "NOSHASHI desktop app overview, connected to XRPL mainnet, showing how much of the Bitstamp USD order book can actually fill.",
-      "ledger": 107979691,
-      "captured_at": "2026-10-29T12:09:03.656Z"
+      "ledger": 108045989,
+      "captured_at": "2026-11-01T13:20:22.004Z"
     },
     {
       "name": "verification",
       "alt": "Verification screen: a 1,000 XRP settlement to Bitstamp's account evaluated against a rule profile, with the verdict and its reasons.",
-      "ledger": 107979694,
-      "captured_at": "2026-10-29T12:09:12.762Z"
+      "ledger": 108045993,
+      "captured_at": "2026-11-01T13:20:38.586Z"
     },
     {
       "name": "audit",
       "alt": "Audit trail screen: an account's validated payment history with delivered amounts and counterparty screening.",
-      "ledger": 107979696,
-      "captured_at": "2026-10-29T12:09:20.023Z"
+      "ledger": 108045995,
+      "captured_at": "2026-11-01T13:20:46.763Z"
     },
     {
       "name": "address",
       "alt": "Address check: what an XRPL account is, who controls it and what it can do, read from the ledger.",
-      "ledger": 107979698,
-      "captured_at": "2026-10-29T12:09:31.088Z"
+      "ledger": 108045998,
+      "captured_at": "2026-11-01T13:20:57.714Z"
     },
     {
       "name": "learn",
       "alt": "Learn screen: hands-on labs that walk through the real screens with mainnet data, plus short explainers.",
-      "ledger": 107979699,
-      "captured_at": "2026-10-29T12:09:33.987Z"
+      "ledger": 108045999,
+      "captured_at": "2026-11-01T13:21:00.576Z"
     },
     {
       "name": "control",
       "alt": "Mission Control: live XRPL mainnet telemetry, ledger by ledger.",
-      "ledger": 107979706,
-      "captured_at": "2026-10-29T12:10:00.138Z"
+      "ledger": 108046006,
+      "captured_at": "2026-11-01T13:21:26.673Z"
     },
     {
       "name": "domains",
       "alt": "Domain Grid: every permissioned domain on XRPL mainnet and the credentials each requires.",
-      "ledger": 107979708,
-      "captured_at": "2026-10-29T12:10:06.142Z"
+      "ledger": 108046007,
+      "captured_at": "2026-11-01T13:21:32.607Z"
     },
     {
       "name": "security",
       "alt": "Security Center: an account check showing how an XRPL account can be taken over, read from the ledger.",
-      "ledger": 107979709,
-      "captured_at": "2026-10-29T12:10:11.110Z"
+      "ledger": 108046009,
+      "captured_at": "2026-11-01T13:21:37.534Z"
     },
     {
       "name": "sync",
       "alt": "Ledger Sync: what four public XRPL nodes each report, side by side.",
-      "ledger": 107979712,
-      "captured_at": "2026-10-29T12:10:24.018Z"
+      "ledger": 108046012,
+      "captured_at": "2026-11-01T13:21:50.416Z"
     }
   ]
 }
