@@ -53,7 +53,7 @@
 
 <section>
   <div class="sec-head"><p class="eyebrow">Capabilities</p><h2>What it does today</h2>
-    <p>Each card names the plan that includes it. Free capabilities run on this website with no account.</p></div>
+    <p>Each card names the plan that includes it. Free capabilities run on this website with no account. Paid workstation and API capabilities remain beta; Institutional and higher require an agreed contract.</p></div>
   <div class="grid g2"><div class="panel">
   <p class="num">ISSUER CONTROLS</p><h3>Who can freeze, claw back or gate an asset</h3><p>Reads the issuer's freeze, clawback and authorization settings and whether each right has been given up.</p>
   <p class="where"><span class="chip ok">Free</span><span class="chip ok">Pro</span></p>
@@ -80,7 +80,7 @@
   <a class="go" href="/docs/policies/">How policies work &rarr;</a>
 </div>
 <div class="panel">
-  <p class="num">EVIDENCE</p><h3>A receipt for every decision</h3><p>A SHA-256 receipt over a fixed form of the decision, plus the ledger it was read at. Signed audit exports on Institutional.</p>
+  <p class="num">EVIDENCE</p><h3>A receipt for every decision</h3><p>A SHA-256 receipt over a fixed form of the decision, plus the ledger it was read at. SHA-256 audit exports on Institutional; a digest is not a digital signature.</p>
   <p class="where"><span class="chip ok">Pro</span><span class="chip ok">Institutional</span></p>
   <a class="go" href="/docs/receipts/">How receipts work &rarr;</a>
 </div>
@@ -102,7 +102,7 @@
     <li><p class="num">01 · READ</p><h3>Read the ledger</h3><p>Inspect the relevant XRPL data from validated ledgers.</p></li>
     <li><p class="num">02 · ANALYZE</p><h3>Run the checks</h3><p>Issuer controls, delivered amounts, fillable depth and account settings.</p></li>
     <li><p class="num">03 · VERIFY</p><h3>See the evidence</h3><p>The result, the rule behind it and the ledger it was read at.</p></li>
-    <li><p class="num">04 · EXPORT</p><h3>Keep the proof</h3><p>A SHA-256 receipt and exportable evidence for review.</p></li>
+    <li><p class="num">04 · EXPORT</p><h3>Keep the proof</h3><p>A SHA-256 receipt and exportable evidence for review. It detects changes to the recorded body; it does not identify its author or independently verify ledger proofs.</p></li>
   </ol>
 </section>
 
@@ -141,7 +141,7 @@
 </footer>
 <script src="/assets/i18n.js" defer></script>
 <script src="/assets/nav.js" defer></script>
-<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>

@@ -284,9 +284,11 @@
         <span class="v">XRPL Mainnet</span>
       </div>
     </div>
-  </section>
-
-  <section id="plans">
+  </section><!-- NOSHASHI-EVALUATION-STATUS --><section class="evaluation-status" aria-label="Availability and evaluation limits">
+  <div class="panel"><p class="eyebrow">BETA · CURRENT AVAILABILITY</p><p>Public issuer, payment and funded-depth tools are available without an account. Paid desktop and API capabilities are beta; Institutional, Enterprise and Strategic Infrastructure require an agreed contract and scope.</p>
+  <p>SSO, uptime SLAs with service credits and dedicated environments are planned, not offered today. No completed independent security assessment or security certification is claimed. Desktop installers are not OS code-signed or notarised; updater signatures are separate.</p>
+  <p><a href="/institutional-demo/">Try the working demo</a> · <a href="/design-partners/#apply">Request a scoped pilot</a> · <a href="/trust/">Read the trust limits</a></p></div>
+</section><!-- /NOSHASHI-EVALUATION-STATUS --><section id="plans">
     <div class="kicker-block">
       <p class="eyebrow">01 / Plans</p>
       <h2>Pick the plan that fits your team</h2>
@@ -399,7 +401,7 @@
         <ul class="spec">
           <li>Everything in Pro, unlimited seats</li>
           <li>Compliance API and webhooks · 100,000 checks a month</li>
-          <li>Tamper-proof audit log and signed exports</li>
+          <li>Append-only audit log and SHA-256 exports</li>
           <li>Issuer surveillance: who holds your tokens</li>
           <li>Proof of reserves, attested daily</li>
           <li>Travel Rule scoping</li>
@@ -423,7 +425,9 @@
     <div class="kicker-block">
       <p class="eyebrow"><span data-i18n="pricing.comparison.eyebrow">02 / Comparison</span></p>
       <h2>Every feature, plan by plan</h2>
-      <p>What each plan includes. "Contracted" means it is set in your contract.</p>
+      <p>What each plan includes. "Contracted" means the delivered scope is agreed in writing. Entitlement flags do not make a planned capability available.</p>
+      <p>The free web tools answer individual issuer, payment and funded-depth questions and let you inspect the evidence. Free desktop checks and CSV exports remain available. Pro adds portfolios, alerts, custom policies, persistent history and 5,000 API verifications a month. Institutional adds shared controls, audit records, webhooks and 100,000 API verifications; an MSA is required. Public API endpoints remain free separately from paid Compliance API capacity.</p>
+      <p>Audit exports use SHA-256 digests. They detect changes against the recorded hash; they are not digital signatures, publisher authentication or independent verification of ledger proofs.</p>
     </div>
     <div class="tier-compare">
       <table>
@@ -468,7 +472,7 @@
           <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>
           <tr><th scope="row">Sanctioned-address screening (OFAC SDN)</th><td class="yes">Address check</td><td class="yes">Address check</td><td class="yes">Address check</td><td class="yes">Deposits &amp; funders</td><td class="yes">Deposits &amp; funders</td></tr>
           <tr><th scope="row">Deposit screening</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
-          <tr><th scope="row">Evidence &amp; audit export</th><td class="yes">CSV</td><td class="yes">CSV</td><td class="yes">Signed export</td><td class="contracted">Immutable audit</td><td class="contracted">Data delivery</td></tr>
+          <tr><th scope="row">Evidence &amp; audit export</th><td class="yes">CSV</td><td class="yes">CSV</td><td class="yes">SHA-256 export</td><td class="contracted">Append-only audit</td><td class="contracted">Data delivery</td></tr>
           <tr><th scope="row">Custom schemas</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="optional">Optional</td><td class="contracted">Included in scope</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">API &amp; delivery</th></tr>
           <tr><th scope="row">API access</th><td class="no">Unavailable</td><td>5,000 / month</td><td>100,000 / month</td><td class="contracted">Institutional API</td><td class="contracted">High-volume API</td></tr>

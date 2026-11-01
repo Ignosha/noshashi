@@ -62,7 +62,7 @@
     <div><span class="label">CURRENT BUILD</span><strong>—</strong><small>Beta channel, unsigned, built by CI.</small></div>
     <div><span class="label">RELEASES SHIPPED</span><strong>8</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
     <div><span class="label">TESTS PASSING</span><strong>1,200+</strong><small>Across the app, the API and the website. Run with npm test.</small></div>
-    <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>No sign-up exists. Nothing is held server-side.</small></div>
+    <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>Public tools and the browser workspace need no account. Organization features use hosted accounts.</small></div>
   </div>
 </section>
 
@@ -97,7 +97,7 @@
     <div class="prog-line" data-state="open">
       <div class="prog-head"><b>Release signing and notarisation</b><span>in progress</span></div>
       <div class="prog-track"><div class="prog-fill" style="width:25%"></div></div>
-      <p class="prog-note">Builds are reproducible from CI and hash-verified, but not yet code-signed or notarised. This is the single largest thing standing between the beta channel and a 1.0.</p>
+      <p class="prog-note">Builds are produced by CI with published checksums, but are not yet OS code-signed or notarised. Updater bundles carry separate minisign signatures. A 1.x version number does not remove the beta limitations.</p>
     </div>
     <div class="prog-line" data-state="done">
       <div class="prog-head"><b>Compliance API and webhooks</b><span>shipped</span></div>
@@ -214,7 +214,7 @@
     <div class="panel">
       <h3>What is not</h3>
       <p>Distribution. Unsigned binaries mean your operating system will warn you, and you are
-         relying on a SHA-256 check rather than a signature. That is a real gap, not a formality.</p>
+         relying on a published SHA-256 comparison rather than OS publisher authentication. Updater signatures are a separate mechanism.</p>
     </div>
     <div class="panel">
       <h3>What that means for you</h3>
@@ -238,7 +238,7 @@
 </footer>
 <script src="/assets/i18n.js" defer></script>
 <script src="/assets/nav.js" defer></script>
-<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>

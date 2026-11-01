@@ -2874,7 +2874,7 @@ function na(e) {
   Dt = e, Q = null;
 }
 function Ct() {
-  return Q ?? (Q = import("./pages-CnYpl5mx.js").then(({ default: e }) => ea([...Js(), ...Dt, ...e]))), Q;
+  return Q ?? (Q = import("./pages-BNgoJUWP.js").then(({ default: e }) => ea([...Js(), ...Dt, ...e]))), Q;
 }
 function sa() {
   if (Q) return;
@@ -5514,7 +5514,7 @@ const M = {
     id: "price",
     keywords: ["price", "pricing", "cost", "costs", "much", "free", "tier", "plan", "plans", "seat", "pay", "expensive", "cheap"],
     q: "What does it cost?",
-    a: "The console is free forever, including unlimited GO/HOLD/NO-GO checks, live mainnet telemetry and 10 address checks a month. Pro is $749 per seat per month and adds unlimited address checks, exit-liquidity and freeze-rights analysis, the persistent adjudication ledger and 5,000 API verifications. Institutional is $4,000 a month and adds Travel Rule scoping, signed audit export, offline adjudication and 100,000 API verifications.",
+    a: "The console is free forever, including unlimited GO/HOLD/NO-GO checks, live mainnet telemetry and 10 address checks a month. Pro is $749 per seat per month and adds unlimited address checks, exit-liquidity and freeze-rights analysis, the persistent adjudication ledger and 5,000 API verifications. Institutional is $4,000 a month and adds Travel Rule scoping, SHA-256 audit export, offline adjudication and 100,000 API verifications.",
     links: [{ label: "Full pricing", href: "/pricing/" }]
   },
   {
@@ -5528,14 +5528,14 @@ const M = {
     id: "beta",
     keywords: ["beta", "stable", "release", "channel", "production", "ready", "version", "pre-release"],
     q: "Is this production-ready?",
-    a: "No — every build on this site is labelled BETA. It is pre-1.0, the binaries are not code-signed or notarised yet, and the release pipeline is still being hardened. Treat it as an evaluation build: verify the SHA-256, run it through your own software admission process, and do not make it the sole basis of a decision carrying legal consequence.",
+    a: "No — every build on this site is labelled BETA. The 1.x version number does not change the beta status: the binaries are not OS code-signed or notarised yet, and the release pipeline is still being hardened. Treat it as an evaluation build: verify the SHA-256, run it through your own software admission process, and do not make it the sole basis of a decision carrying legal consequence.",
     links: [{ label: "Downloads", href: "/#download" }, { label: "Status", href: "/status/" }]
   },
   {
     id: "unsigned",
     keywords: ["gatekeeper", "smartscreen", "unsigned", "unidentified", "developer", "warn", "blocked", "notarised", "notarized", "signature"],
     q: "macOS or Windows blocks the app — is that expected?",
-    a: "Yes. The builds are not code-signed or notarised while the release pipeline is being hardened, so macOS reports an unidentified developer and Windows SmartScreen warns. On macOS, right-click the app and choose Open the first time. Verify the SHA-256 published next to the download first — that check is what actually tells you the file is the one CI built.",
+    a: "Yes. The builds are not code-signed or notarised while the release pipeline is being hardened, so macOS reports an unidentified developer and Windows SmartScreen warns. On macOS, right-click the app and choose Open the first time. Compare the download with the SHA-256 published on the release. A matching hash detects changed bytes against that reference; it does not authenticate the publisher. The in-app updater separately checks minisign signatures against the bundled public key.",
     links: [{ label: "Verify a download", href: "/#download" }]
   },
   {
@@ -5549,14 +5549,14 @@ const M = {
     id: "account",
     keywords: ["account", "sign", "signup", "login", "register", "dashboard", "workspace", "password"],
     q: "Do I need an account?",
-    a: "No. There are no accounts on this site — sign-in and the hosted workspace were withdrawn. The application runs on your machine and reads public ledger state directly, so there is no server-side state to log into. A paid subscription is managed through Stripe and does not create a website login.",
+    a: "The public web tools, institutional demo and browser workspace need no account. The desktop app can also read public ledger data without one. Paid entitlements, shared organization features and API access use the app's account and hosted services; billing runs through Stripe.",
     links: [{ label: "Security posture", href: "/trust/" }]
   },
   {
     id: "privacy",
     keywords: ["privacy", "data", "telemetry", "analytics", "tracking", "collect", "gdpr", "store", "egress"],
     q: "What data do you collect?",
-    a: "Without an account there is no server-side state: no analytics, no telemetry, no crash reporting. The compliance agent runs on your own machine with zero egress. Secrets are held by the OS keychain rather than by the app. Typefaces are self-hosted, so opening a page does not announce you to a font CDN.",
+    a: "Public ledger servers receive the queries you ask them to read. Hosted services keep account, subscription and organization data when you use those features; contact and update forms also transmit the information you submit. AI questions stay local only when you choose a local model; a configured hosted provider receives the attached context. API secrets use the OS keychain, and typefaces are self-hosted.",
     links: [{ label: "Security posture", href: "/trust/" }, { label: "Legal", href: "/legal/" }]
   },
   {
@@ -5586,14 +5586,14 @@ const M = {
     id: "pro",
     keywords: ["pro", "upgrade", "unlock", "exit", "liquidity", "freeze", "concentration", "api", "webhook", "institutional", "enterprise"],
     q: "What do the paid tiers add?",
-    a: "Pro adds unlimited address checks, exit-liquidity analysis (freeze risk × depth × concentration), settlement forensics, order-book integrity, counterparty provenance, issuer freeze-rights and XLS-77 deep-freeze analysis, a 10,000-verdict persistent ledger and 5,000 API verifications. Institutional adds issuance surveillance, Travel Rule (FATF R.16) scoping, signed audit export with a SHA-256 chain of custody, offline adjudication on segregated networks, and regulator read-only seats.",
+    a: "Pro adds unlimited address checks, exit-liquidity analysis (freeze risk × depth × concentration), settlement forensics, order-book integrity, counterparty provenance, issuer freeze-rights and XLS-77 deep-freeze analysis, a 10,000-verdict persistent ledger and 5,000 API verifications. Institutional adds issuance surveillance, Travel Rule (FATF R.16) scoping, audit export with a SHA-256 digest (not a digital signature), offline adjudication on segregated networks, and regulator read-only seats.",
     links: [{ label: "Compare tiers", href: "/pricing/" }]
   },
   {
     id: "network",
     keywords: ["xrpl", "xrp", "ledger", "mainnet", "testnet", "network", "node", "rippled", "chain"],
     q: "Which network does it read?",
-    a: "XRPL mainnet only — no testnet path exists in the build. It reads public nodes directly (xrplcluster.com, s1/s2.ripple.com and others) and compares several so a single node's view is never taken on trust.",
+    a: "Production investigations read XRPL mainnet from public servers. The Academy separately offers testnet practice. The Network view compares servers, but ordinary analysis reads do not independently verify validator signatures or ledger proofs; NOSHASHI trusts the public servers it reads.",
     links: [{ label: "Free tools", href: "/#public" }]
   },
   {
@@ -5607,7 +5607,7 @@ const M = {
     id: "coming-soon",
     keywords: ["sla", "uptime", "availability", "guarantee", "sso", "saml", "oidc", "scim", "sign-on", "dedicated", "environment", "isolated", "coming"],
     q: "Is there an uptime SLA, single sign-on or a dedicated environment?",
-    a: "Not yet. All three are coming soon and are marked that way on the pricing page. No plan includes an uptime SLA today, and NOSHASHI does not promise an uptime figure. Sign-in is by email and password with two-factor authentication until single sign-on arrives, and every organization uses the shared service until dedicated environments are offered.",
+    a: "Not yet. All three are coming soon and are marked that way on the pricing page. No plan includes an uptime SLA today, and NOSHASHI does not promise an uptime figure. The app has email/password account features; the public tools and browser workspace need no account. SAML/OIDC/SCIM and dedicated environments are planned, not capabilities supplied by an existing contract or entitlement flag.",
     links: [{ label: "Pricing", href: "/pricing/#compare" }]
   },
   {
@@ -5621,7 +5621,7 @@ const M = {
     id: "source",
     keywords: ["source", "code", "github", "open", "repo", "audit", "test", "review"],
     q: "Can I read the source?",
-    a: "Yes. Every build on the download page was produced by CI from a public commit, and the logic that makes claims carries 272 tests. The repository is public on GitHub.",
+    a: "Yes. Every build on the download page was produced by CI from a public commit, and the repository includes automated tests for its analysis and trust boundaries. Tests are implementation checks, not an independent security assessment. The repository is public on GitHub.",
     links: [{ label: "GitHub", href: "https://github.com/Ignosha/noshashi" }]
   },
   {
