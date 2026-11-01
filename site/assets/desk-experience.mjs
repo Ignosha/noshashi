@@ -1,4 +1,8 @@
-import { ADDRESS_RE, verifyCertificate } from "./desk-experience-core.mjs";
+import {
+  ADDRESS_RE,
+  verifyCertificate,
+  capturedView,
+} from "./desk-experience-core.mjs";
 
 if (document.body.hasAttribute("data-ledger-experience")) {
   const layers = [
@@ -203,38 +207,50 @@ if (document.body.hasAttribute("data-ledger-experience")) {
   const views = {
     verification: {
       title: "Verification",
-      ledger: "107,979,694",
       alt: "Recorded NOSHASHI verification screen showing a settlement decision and the rules evaluated.",
     },
     audit: {
       title: "Audit trail",
-      ledger: "107,979,696",
       alt: "Recorded NOSHASHI audit trail showing validated payment history and delivered amounts.",
     },
     sync: {
       title: "Ledger sync",
-      ledger: "107,979,712",
       alt: "Recorded NOSHASHI ledger sync screen comparing four named public nodes.",
     },
   };
   const image = document.getElementById("lx-product-image"),
     caption = document.getElementById("lx-product-caption");
+  let captureManifest = {};
+  try {
+    captureManifest = JSON.parse(
+      document.getElementById("lx-shot-data").textContent,
+    );
+  } catch {
+    /* Leave the record honestly unavailable. */
+  }
   const viewButtons = [...document.querySelectorAll("[data-lx-view]")];
+  function selectView(key) {
+    const view = views[key];
+    if (!view) return;
+    viewButtons.forEach((button) =>
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.lxView === key),
+      ),
+    );
+    const capture = capturedView(captureManifest, key);
+    image.src = capture?.src ?? `/assets/shots/${key}.webp`;
+    image.alt = capture?.alt ?? view.alt;
+    caption.textContent =
+      capture?.caption ??
+      "Recorded desktop view. Capture date and ledger metadata are unavailable.";
+    document.querySelector("[data-lx-window-title]").textContent =
+      `${view.title} / Recorded desktop view`;
+  }
   viewButtons.forEach((button) =>
-    button.addEventListener("click", () => {
-      const key = button.dataset.lxView,
-        view = views[key];
-      if (!view) return;
-      viewButtons.forEach((b) =>
-        b.setAttribute("aria-pressed", String(b === button)),
-      );
-      image.src = `/assets/shots/${key}.webp`;
-      image.alt = view.alt;
-      caption.textContent = `Recorded 29 October 2026 · XRPL mainnet · ledger ${view.ledger}. This is a captured view, not a live result.`;
-      document.querySelector("[data-lx-window-title]").textContent =
-        `${view.title} / Recorded desktop view`;
-    }),
+    button.addEventListener("click", () => selectView(button.dataset.lxView)),
   );
+  selectView("verification");
 
   const imageDialog = document.getElementById("lx-image-dialog");
   const commandDialog = document.getElementById("lx-command-dialog");

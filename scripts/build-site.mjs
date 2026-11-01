@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { capturedView } from "../site/assets/desk-experience-core.mjs";
 /*
  * Renders the public site.
  *
@@ -119,6 +120,9 @@ async function buildHome({ news, market, feed, status, release }) {
     SHOTHERO: renderShot(shots, "overview", { eager: true }),
     TOKENCOUNT: String((await loadTokens()).tokens.length),
     TOKENTAPE: (await loadTokens()).tokens.map((t) => `<a href="/tokens/${esc(t.slug)}/"><b translate="no">${esc(t.label)}</b><span>${esc(t.by)}</span></a>`).join(""),
+    SHOTDATA: JSON.stringify(shots ?? {}).replace(/</g, "\\u003c"),
+    SHOTTOURSRC: esc(capturedView(shots, "verification")?.src ?? "/assets/shots/verification.webp"),
+    SHOTTOURCAPTION: esc(capturedView(shots, "verification")?.caption ?? "Recorded desktop view. Capture metadata is unavailable."),
     SHOTVERIFICATION: renderShot(shots, "verification"),
     SHOTAUDIT: renderShot(shots, "audit"),
     SHOTADDRESS: renderShot(shots, "address"),

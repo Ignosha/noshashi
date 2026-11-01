@@ -19,6 +19,13 @@ const solo = JSON.parse(
     "utf8",
   ),
 );
+const manifest = JSON.parse(
+  await readFile(new URL("site/assets/shots/manifest.json", root), "utf8"),
+);
+const shotLedger = (name) =>
+  manifest.shots
+    .find((shot) => shot.name === name)
+    .ledger.toLocaleString("en-US");
 const base = process.env.APP_URL || "http://127.0.0.1:4186/";
 const out = process.env.SHOTS_DIR || "/tmp/noshashi-web-experience";
 await mkdir(out, { recursive: true });
@@ -227,12 +234,12 @@ try {
     await page.locator("[data-lx-view=audit]").click();
     assert(
       (await page.locator("#lx-product-caption").textContent()).includes(
-        "107,979,696",
+        shotLedger("audit"),
       ),
     );
     await page.locator("[data-lx-view=sync]").click();
     assert(
-      (await page.locator("#lx-product-image").getAttribute("src")).endsWith(
+      (await page.locator("#lx-product-image").getAttribute("src")).includes(
         "sync.webp",
       ),
     );
@@ -240,7 +247,7 @@ try {
     assert(await page.locator("#lx-image-dialog").evaluate((el) => el.open));
     assert(
       (await page.locator("#lx-image-dialog p").textContent()).includes(
-        "107,979,712",
+        shotLedger("sync"),
       ),
     );
     await page.keyboard.press("Escape");

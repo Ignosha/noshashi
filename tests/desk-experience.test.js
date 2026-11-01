@@ -5,6 +5,7 @@ import {
   completeCertificate,
   verifyCertificate,
   ADDRESS_RE,
+  capturedView,
 } from "../site/assets/desk-experience-core.mjs";
 import { digestOf } from "../api/_lib/authority.js";
 
@@ -117,5 +118,23 @@ describe("homepage investigation evidence", () => {
     expect(ADDRESS_RE.test(bitstamp.issuer)).toBe(true);
     for (const input of ["", "r<script>", "sExampleSecret", "0x1234"])
       expect(ADDRESS_RE.test(input)).toBe(false);
+  });
+});
+
+describe("recorded desktop capture provenance", () => {
+  it("binds the caption and cache-busted image to the current capture manifest", () => {
+    const manifest = JSON.parse(
+      readFileSync("site/assets/shots/manifest.json", "utf8"),
+    );
+    const shot = manifest.shots.find((s) => s.name === "verification");
+    const view = capturedView(manifest, "verification");
+    expect(view.caption).toContain(shot.ledger.toLocaleString("en-US"));
+    expect(view.src).toContain(encodeURIComponent(shot.captured_at));
+    expect(view.alt).toBe(shot.alt);
+  });
+  it("never invents metadata for missing captures", () => {
+    expect(capturedView({}, "verification")).toBe(null);
+    expect(capturedView({ shots: [] }, "verification")).toBe(null);
+    expect(capturedView({ shots: [] }, "../secret")).toBe(null);
   });
 });

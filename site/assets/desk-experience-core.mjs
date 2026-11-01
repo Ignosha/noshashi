@@ -86,3 +86,32 @@ export async function verifyCertificate(c, issuer) {
     .toUpperCase();
   return digest === c.digest.toUpperCase();
 }
+
+/** Bind the image URL and caption to the same committed capture manifest. */
+export function capturedView(manifest, name) {
+  if (!/^[a-z0-9-]+$/i.test(name) || !Array.isArray(manifest?.shots))
+    return null;
+  const capture = manifest.shots.find((shot) => shot.name === name);
+  if (
+    !capture ||
+    !Number.isInteger(capture.ledger) ||
+    capture.ledger <= 0 ||
+    typeof capture.captured_at !== "string" ||
+    !Number.isFinite(Date.parse(capture.captured_at))
+  )
+    return null;
+  const date = new Date(capture.captured_at).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  return {
+    src: `/assets/shots/${name}.webp?capture=${encodeURIComponent(capture.captured_at)}`,
+    caption: `Recorded ${date} · ${typeof manifest.network === "string" ? manifest.network : "Network not recorded"} · ledger ${capture.ledger.toLocaleString("en-US")}. This is a captured view, not a live result.`,
+    alt:
+      typeof capture.alt === "string"
+        ? capture.alt
+        : `Recorded desktop view: ${name}`,
+  };
+}
