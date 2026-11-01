@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.0.26
+
+### The Ledger Desk
+
+- A new graphite and warm-paper interface shared with the website's
+  editorial direction: Instrument Serif headings, Inter controls and
+  IBM Plex Mono evidence, with engraved rules and restrained geometry.
+- Rebuilt welcome and overview screens with a direct settlement check,
+  selectable authority/liquidity/evidence layers, recent decisions,
+  the instrument directory and the existing first-run guide.
+- Redesigned navigation, scene headings, panels, inputs, tables, tabs,
+  buttons and the status rail. Native window commands are unchanged.
+- Command search now uses an accessible dialog with immediate input focus,
+  contained keyboard navigation, Escape dismissal and focus restoration.
+- Quoted and funded depth share a linear scale in the dimensional overview
+  figure. Zero funded depth is rendered at zero width.
+- Startup no longer reports services ONLINE on a timer. Connection state
+  comes from the actual ledger link; the event feed is stationary.
+- The public homepage adds an interactive issuer investigation, browser
+  verification of authority fingerprints, JSON export, searchable tools,
+  recorded desktop views and an evaluation invitation.
+- Screenshot captions and image URLs follow the committed capture manifest.
+  The Academy's bundled workstation is rebuilt from the same interface.
+
+Policy evaluation, existing receipts, entitlements and signing restrictions
+retain their behavior. The app remains read-only and cannot submit a transaction.
+
 ## 1.0.25
 
 ### Test addresses
