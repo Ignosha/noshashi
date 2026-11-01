@@ -49,7 +49,7 @@ export function Panel({
         // No backdrop-blur: it is glassmorphism, it is on this project's
         // banned list, and a blur per panel costs real frames on a screen
         // that renders a dozen of them over live telemetry.
-        "panel-lit relative flex flex-col",
+        "desk-panel relative flex min-w-0 flex-col",
         // The board renders panels with a soft corner, not a hard one.
         // overflow-hidden is load-bearing twice over: it clips children to
         // the rounded corner, and it stops a tall body escaping the box and
@@ -74,16 +74,16 @@ export function Panel({
             "flex shrink-0 items-center justify-between gap-2",
             nested
               ? "h-6 border-b border-border/40"
-              : "h-9 border-b border-border/70 px-3.5"
+              : "h-10 border-b border-border/70 px-4"
           )}
         >
-          <span className="stencil truncate text-[10.5px] tracking-[0.14em] text-muted-foreground">
+          <span className="stencil truncate text-[11px] tracking-[0.1em] text-muted-foreground">
             {label}
           </span>
           {right && <span className="flex shrink-0 items-center gap-2">{right}</span>}
         </header>
       )}
-      <div className={cn("min-h-0 flex-1", nested ? "pt-3" : "p-3.5", bodyClassName)}>
+      <div className={cn("min-h-0 flex-1", nested ? "pt-3" : "p-4", bodyClassName)}>
         {children}
       </div>
     </motion.section>
@@ -117,7 +117,7 @@ export function DataRow({
       </span>
       <span
         className={cn(
-          "data-font truncate text-[11px] tabular-nums",
+          "data-font min-w-0 text-right break-words text-[12px] tabular-nums",
           tone === "go" && "text-go",
           tone === "hold" && "text-hold",
           tone === "no-go" && "text-no-go",

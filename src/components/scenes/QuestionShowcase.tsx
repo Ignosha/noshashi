@@ -1,3 +1,4 @@
+import { DepthComparison } from "@/components/nova/DepthComparison";
 import { useEffect, useState } from "react";
 import { Panel } from "@/components/nova/Panel";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,11 @@ import { cn } from "@/lib/utils";
  * receipt this install has recorded. Nothing here is a sample figure.
  */
 
-const SHOWCASE_BOOK = { label: "Bitstamp USD", currency: "USD", issuer: "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B" };
+const SHOWCASE_BOOK = {
+  label: "Bitstamp USD",
+  currency: "USD",
+  issuer: "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+};
 
 function useLiveDepth(connected: boolean) {
   const [reading, setReading] = useState<QuotedVsFillable | null>(null);
@@ -33,7 +38,11 @@ function useLiveDepth(connected: boolean) {
 }
 
 const money = (n: number) =>
-  n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(1)}K` : `$${n.toFixed(0)}`;
+  n >= 1_000_000
+    ? `$${(n / 1_000_000).toFixed(2)}M`
+    : n >= 1_000
+      ? `$${(n / 1_000).toFixed(1)}K`
+      : `$${n.toFixed(0)}`;
 
 function Card({
   step,
@@ -49,13 +58,27 @@ function Card({
   onAction: () => void;
 }) {
   return (
-    <Panel className="h-full" bodyClassName="flex h-full flex-col gap-4 p-4">
+    <Panel
+      className="desk-question-card h-full"
+      bodyClassName="flex h-full flex-col gap-4 p-4"
+    >
       <div>
-        <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{step}</p>
-        <h3 className="display mt-1 text-[18px] font-[700] leading-tight text-foreground">{question}</h3>
+        <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
+          {step}
+        </p>
+        <h3 className="display mt-1 text-[18px] font-[700] leading-tight text-foreground">
+          {question}
+        </h3>
       </div>
-      <div className="flex min-h-[112px] flex-1 flex-col justify-center">{children}</div>
-      <Button size="sm" variant="outline" className="self-start" onClick={onAction}>
+      <div className="flex min-h-[112px] flex-1 flex-col justify-center">
+        {children}
+      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        className="self-start"
+        onClick={onAction}
+      >
         {action}
       </Button>
     </Panel>
@@ -79,31 +102,68 @@ export function QuestionShowcase({
 
   return (
     <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-      <Card step="01 · COMPLIANCE" question="Can it move?" action="RUN A CHECK" onAction={() => onNavigate("verify")}>
+      <Card
+        step="01 · COMPLIANCE"
+        question="Can it move?"
+        action="RUN A CHECK"
+        onAction={() => onNavigate("verify")}
+      >
         <div className="flex flex-wrap gap-2">
           {[
             { label: "GO", tone: "border-go/50 bg-go/10 text-go" },
             { label: "HOLD", tone: "border-hold/50 bg-hold/10 text-hold" },
             { label: "NO-GO", tone: "border-no-go/50 bg-no-go/10 text-no-go" },
           ].map((v) => (
-            <span key={v.label} className={cn("display rounded-md border px-3 py-2 text-[20px] font-[800]", v.tone)}>
+            <span
+              key={v.label}
+              className={cn(
+                "display rounded-md border px-3 py-2 text-[20px] font-[800]",
+                v.tone,
+              )}
+            >
               {v.label}
             </span>
           ))}
         </div>
-        <p className="mt-3 text-[12px] text-muted-foreground">Your rules, every reason shown.</p>
+        <p className="mt-3 text-[12px] text-muted-foreground">
+          Your rules, every reason shown.
+        </p>
       </Card>
 
-      <Card step="02 · LIQUIDITY" question="Can you actually sell?" action="OPEN ORDER BOOK" onAction={() => onNavigate("book")}>
+      <Card
+        step="02 · LIQUIDITY"
+        question="Can you actually sell?"
+        action="OPEN ORDER BOOK"
+        onAction={() => onNavigate("book")}
+      >
         {reading && quoted > 0 ? (
           <div className="space-y-2.5">
+            <DepthComparison
+              quoted={quoted}
+              funded={fillable}
+              ledgerIndex={reading.ledgerIndex}
+            />
             <p className="data-font text-[30px] font-[600] leading-none text-foreground">
-              {ratio === undefined ? "—" : `${(ratio * 100).toFixed(ratio < 0.1 ? 1 : 0)}%`}
-              <span className="ml-2 text-[12px] font-normal text-muted-foreground">is real</span>
+              {ratio === undefined
+                ? "—"
+                : `${(ratio * 100).toFixed(ratio < 0.1 ? 1 : 0)}%`}
+              <span className="ml-2 text-[12px] font-normal text-muted-foreground">
+                is fillable
+              </span>
             </p>
             {[
-              { label: "QUOTED", value: quoted, width: 100, bar: "bg-muted-foreground/40" },
-              { label: "CAN FILL", value: fillable, width: Math.max(1.5, (fillable / quoted) * 100), bar: "bg-go" },
+              {
+                label: "QUOTED",
+                value: quoted,
+                width: 100,
+                bar: "bg-muted-foreground/40",
+              },
+              {
+                label: "CAN FILL",
+                value: fillable,
+                width: (fillable / quoted) * 100,
+                bar: "bg-foreground",
+              },
             ].map((row) => (
               <div key={row.label}>
                 <div className="mono-font flex justify-between text-[10px] tracking-[0.1em] text-muted-foreground">
@@ -111,12 +171,16 @@ export function QuestionShowcase({
                   <span>{money(row.value)}</span>
                 </div>
                 <div className="mt-1 h-2 rounded-sm bg-border/60">
-                  <div className={cn("h-full rounded-sm", row.bar)} style={{ width: `${row.width}%` }} />
+                  <div
+                    className={cn("h-full rounded-sm", row.bar)}
+                    style={{ width: `${row.width}%` }}
+                  />
                 </div>
               </div>
             ))}
             <p className="mono-font text-[10px] text-muted-foreground">
-              {SHOWCASE_BOOK.label} · sell side · ledger {reading.ledgerIndex.toLocaleString()}
+              {SHOWCASE_BOOK.label} · captured sell side · ledger{" "}
+              {reading.ledgerIndex.toLocaleString()}
             </p>
           </div>
         ) : (
@@ -125,24 +189,40 @@ export function QuestionShowcase({
               ? "Ledger did not answer. Open the order book to retry."
               : reading
                 ? `Nothing quoted on the ${SHOWCASE_BOOK.label} sell side at ledger ${reading.ledgerIndex.toLocaleString()}.`
-                : "Reading the live order book…"}
+                : connected
+                  ? "Reading the order book…"
+                  : "Connect to the ledger to read the order book."}
           </p>
         )}
       </Card>
 
-      <Card step="03 · EVIDENCE" question="Can you prove it?" action="OPEN AUDIT TRAIL" onAction={() => onNavigate("history")}>
+      <Card
+        step="03 · EVIDENCE"
+        question="Can you prove it?"
+        action="OPEN AUDIT TRAIL"
+        onAction={() => onNavigate("history")}
+      >
         {latest ? (
           <div className="space-y-2">
-            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">LATEST RECEIPT · SHA-256</p>
-            <p className="data-font break-all text-[13px] leading-snug text-foreground">{latest.digest}</p>
+            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
+              LATEST RECEIPT · SHA-256
+            </p>
+            <p className="data-font break-all text-[13px] leading-snug text-foreground">
+              {latest.digest}
+            </p>
             <p className="mono-font text-[10px] text-muted-foreground">
-              {latest.verdict.toUpperCase()} · {new Date(latest.at).toLocaleString()}
+              {latest.verdict.toUpperCase()} ·{" "}
+              {new Date(latest.at).toLocaleString()}
             </p>
           </div>
         ) : (
           <div className="space-y-2">
-            <p className="data-font text-[30px] font-[600] leading-none text-foreground">SHA-256</p>
-            <p className="text-[12px] text-muted-foreground">A receipt for every decision. Run a check to get your first.</p>
+            <p className="data-font text-[30px] font-[600] leading-none text-foreground">
+              SHA-256
+            </p>
+            <p className="text-[12px] text-muted-foreground">
+              A receipt for every decision. Run a check to get your first.
+            </p>
           </div>
         )}
       </Card>

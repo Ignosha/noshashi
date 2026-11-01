@@ -79,7 +79,7 @@ export function DecisionCard({ onNavigate }: { onNavigate: (scene: string) => vo
 
   if (!latest) {
     return (
-      <Panel label="DECISION" right={<NovaShield size={13} className="text-muted-foreground" />}>
+      <Panel className="desk-decision" label="DECISION" right={<NovaShield size={13} className="text-muted-foreground" />}>
         <p className="text-[15px] text-foreground">No analyses yet.</p>
         <p className="mt-1 max-w-[560px] text-[12.5px] leading-relaxed text-muted-foreground">
           Run a gate check on a settlement to get a GO, HOLD or NO-GO decision, the rules that decided it, and a receipt anyone can re-check.
@@ -106,12 +106,13 @@ export function DecisionCard({ onNavigate }: { onNavigate: (scene: string) => vo
 
   return (
     <Panel
+      className="desk-decision"
       label="LATEST DECISION"
       right={<span className="mono-font text-[11px] text-muted-foreground">{new Date(latest.at).toLocaleString()}</span>}
     >
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div>
-          <div className={cn("rounded-md border px-4 py-3", tone.border, tone.bg)}>
+          <div className={cn("desk-decision-stamp rounded-md border px-4 py-3", tone.border, tone.bg)}>
             <p className={cn("display text-[34px] font-[700] leading-none tracking-[0.06em]", tone.text)} aria-label={`Decision: ${tone.word}`}>
               {tone.word}
             </p>

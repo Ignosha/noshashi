@@ -76,10 +76,10 @@ async function shoot(name, alt) {
 }
 
 await page.goto(BASE);
-const start = page.getByRole("button", { name: /get started/i }).first();
+const start = page.getByRole("button", { name: /open the Ledger Desk/i }).first();
 await page.waitForTimeout(3000);
 if (await start.count()) await start.click();
-await until((b) => /CONNECTED · XRPL MAINNET/i.test(b) && /is real/i.test(b), 60_000, "a live mainnet connection");
+await until((b) => /\bONLINE\b/i.test(b) && /is fillable/i.test(b), 60_000, "a live mainnet connection");
 // The getting-started card is for first runs; the screenshot shows the product.
 const hide = page.getByRole("button", { name: /hide the getting-started guide/i }).first();
 await hide.waitFor({ timeout: 10_000 }).then(() => hide.click()).catch(() => {});
