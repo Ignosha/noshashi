@@ -78,6 +78,11 @@
       .then(function (c) {
         // Never turn a failed or partial authority read into a plausible receipt.
         if (c.issuer !== issuer || !Number.isInteger(c.ledgerIndex) || c.ledgerIndex <= 0 || !Array.isArray(c.checks) || !/^[a-f0-9]{64}$/i.test(c.digest) || !['go','hold','no-go'].includes(c.verdict) || !Number.isFinite(Date.parse(c.evaluatedAt)) || c.unreadable && c.unreadable.length || c.checks.some(function (k) { return k.id === 'AUTHORITY_READABLE' && !k.passed; })) throw new Error('incomplete');
+        var requiredChecks = ['FREEZE_SURRENDERED', 'NOT_GLOBALLY_FROZEN', 'NO_UNILATERAL_SIGNER'];
+        if (!Number.isInteger(c.rulesVersion) || c.rulesVersion <= 0 || c.checks.some(function (k) { return !k || typeof k.id !== 'string' || typeof k.passed !== 'boolean'; }) || requiredChecks.some(function (id) {
+          var matches = c.checks.filter(function (k) { return k.id === id; });
+          return matches.length !== 1 || matches[0].state === 'INSUFFICIENT_DATA';
+        })) throw new Error('incomplete');
         text('[data-ed-ledger]', c.ledgerIndex.toLocaleString('en-US'));
         text('[data-ed-rules]', c.rulesVersion || 'Not provided');
         text('[data-ed-verdict]', c.verdict.replace(/-/g, ' '));
