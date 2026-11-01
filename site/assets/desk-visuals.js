@@ -415,7 +415,15 @@
   var PHI = 0.5, FOCAL = 3.4;
   var LIGHT = [-0.74, 0.67];                    // where the light comes from, across the water
   var LEVELS = 12, LMAX = 0.3;
-  if (surfEl) { surface = view(surfEl, drawSurface); surface.pulses = []; surface.live = !REDUCE; }
+  if (surfEl) {
+    surface = view(surfEl, drawSurface); surface.pulses = []; surface.live = !REDUCE;
+    surface.focus = 0; surface.focusAt = now();
+    window.addEventListener("noshashi:ring-focus", function (event) {
+      var index = event.detail && event.detail.index;
+      if (!Number.isInteger(index) || index < 0 || index > 4) return;
+      surface.focus = index; surface.focusAt = now(); surface.dirty = true;
+    });
+  }
 
   function heightAt(r, t, pulses) {
     var z = 0.02 * Math.sin(16 * r - (REDUCE ? 0 : 1.4 * t)) * Math.exp(-r * 1.5);
@@ -452,6 +460,8 @@
       var depth = Y * cphi - Z * sphi, up = Y * sphi + Z * cphi, sc = FOCAL / (FOCAL + depth);
       return [cx + X * k * sc, cy - up * k * sc];
     }
+    var focused = surface.focus;
+    var focusIn = REDUCE ? 1 : ease((t - surface.focusAt) / 0.55);
     var pulses = surface.pulses.filter(function (p) { return t - p < 5.5; });
     surface.pulses = pulses;
 
@@ -517,25 +527,41 @@
       }
       ctx.stroke();
     }
-    var zs = radii.map(function (x) { return heightAt(x.r, t, pulses); });
+    var zs = radii.map(function (x) {
+      var active = focused > 0 && Math.abs(x.r - RINGS[focused - 1].r) < 0.001;
+      return heightAt(x.r, t, pulses) + (active ? 0.075 * focusIn : 0);
+    });
     radii.forEach(function (x, i) {
+      var active = focused > 0 && Math.abs(x.r - RINGS[focused - 1].r) < 0.001;
       var lift = clamp(zs[i] * 7, 0, 0.55);
       ring(x.r, zs[i], 0, Math.PI, (x.named ? 0.3 : 0.07) + lift * 0.5, x.named ? 1 : 0.8);
     });
     radii.forEach(function (x, i) {
+      var active = focused > 0 && Math.abs(x.r - RINGS[focused - 1].r) < 0.001;
       var lift = clamp(zs[i] * 7, 0, 0.55);
-      ring(x.r, zs[i], Math.PI, Math.PI * 2, (x.named ? 0.72 : 0.15) + lift, (x.named ? 1.25 : 0.85) + clamp(zs[i] * 10, 0, 1.2));
+      ring(x.r, zs[i], Math.PI, Math.PI * 2, (x.named ? 0.72 : 0.15) + lift, (active ? 2.3 : x.named ? 1.25 : 0.85) + clamp(zs[i] * 10, 0, 1.2));
     });
 
     // The issuer at the centre: a marker standing on the surface.
     var zc = heightAt(0, t, pulses), base = P(0, 0, zc), tip = P(0, 0, zc + 0.2);
     ctx.strokeStyle = ink(0.85); ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(base[0], base[1]); ctx.lineTo(tip[0], tip[1]); ctx.stroke();
-    ring(0.035, zc, 0, Math.PI * 2, 0.75, 1.1);
+    ring(focused === 0 ? 0.055 : 0.035, zc, 0, Math.PI * 2, 0.85, focused === 0 ? 1.8 : 1.1);
     ctx.fillStyle = ink(1); ctx.beginPath(); ctx.arc(tip[0], tip[1], 3.4, 0, Math.PI * 2); ctx.fill();
     ctx.textAlign = "center"; ctx.textBaseline = "bottom";
     ctx.font = "16px " + SERIF; ctx.fillStyle = ink(1); label(ctx, "Issuer account", tip[0], tip[1] - 22, 5);
     ctx.font = "10.5px " + SANS; ctx.fillStyle = tone("faint", 1); label(ctx, "keys · signer list · flags", tip[0], tip[1] - 8, 4);
+
+    if (!labels && focused > 0) {
+      var selected = RINGS[focused - 1], theta = -0.55;
+      var selectedZ = heightAt(selected.r, t, pulses) + 0.075 * focusIn;
+      var point = P(selected.r * Math.cos(theta), selected.r * Math.sin(theta), selectedZ);
+      ctx.fillStyle = ink(1); ctx.beginPath(); ctx.arc(point[0], point[1], 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = ink(0.55); ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(point[0], point[1] + 8); ctx.lineTo(point[0], point[1] + 27); ctx.stroke();
+      ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.font = "17px " + SERIF;
+      label(ctx, selected.name, point[0], point[1] + 34, 5);
+    }
 
     // What is read at each ring, with leaders to a label column.
     if (labels) {
@@ -692,6 +718,8 @@
     grad.addColorStop(0, ink(C.dark ? 0.32 : 0.2)); grad.addColorStop(1, ink(C.dark ? 0.05 : 0.04));
     [[b.bids, lo], [b.asks, hi]].forEach(function (side) {
       var f = stepPts(side[0], "f", side[1]), q = stepPts(side[0], "l", side[1]);
+      ctx.save();
+      ctx.globalAlpha = REDUCE ? 1 : ease((t - depth.shownAt - 0.35) / 1.1);
       trace(f, DXd, DYd, true); ctx.fillStyle = ink(C.dark ? 0.1 : 0.07); ctx.fill();
       for (var i = 1; i < f.length; i++) {
         var p0 = f[i - 1], p1 = f[i];
@@ -706,6 +734,7 @@
       ctx.shadowColor = ink(C.dark ? 0.4 : 0.25); ctx.shadowBlur = 12 * DPR; ctx.shadowOffsetY = 4 * DPR;
       ctx.strokeStyle = ink(0.95); ctx.lineWidth = 1.6;
       trace(f, 0, 0, false); ctx.stroke();
+      ctx.restore();
       ctx.restore();
       // Quoted: a dashed outline. Where it rises above the solid, the book
       // advertises more than its owners can deliver.
@@ -751,6 +780,6 @@
       ctx.strokeStyle = tone("rule", 1); ctx.lineWidth = 1; ctx.strokeRect(bx + 0.5, by + 0.5, tw - 1, 21);
       ctx.fillStyle = ink(1); ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(text, bx + 8, by + 11.5);
     }
-    v.live = !REDUCE && t - depth.shownAt < 1.2;
+    v.live = !REDUCE && t - depth.shownAt < 1.6;
   }
 })();
