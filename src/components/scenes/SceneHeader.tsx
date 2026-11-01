@@ -35,11 +35,14 @@ export function SceneHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("shrink-0", className)}>
+    <div className={cn("desk-scene-header shrink-0", className)}>
       <div className="flex items-end justify-between gap-4">
         <div className="flex min-w-0 items-end gap-3">
           {index && (
-            <span aria-hidden className="display shrink-0 text-[20px] font-[700] leading-none text-muted-foreground/70">
+            <span
+              aria-hidden
+              className="display shrink-0 text-[20px] font-[700] leading-none text-muted-foreground/70"
+            >
               {index}
             </span>
           )}
@@ -47,8 +50,11 @@ export function SceneHeader({
             <p className="stencil text-[10.5px] tracking-[0.14em] text-muted-foreground">
               {kicker}
             </p>
-            <h1 className="display mt-0.5 truncate text-[18px] font-[700] leading-none text-foreground">
-              {title}
+            <h1 className="display mt-1 text-[30px] font-normal leading-tight text-foreground">
+              {(title.charAt(0) + title.slice(1).toLowerCase()).replace(
+                /\b(xrpl|noshx|nft|amm|api|xrp)\b/gi,
+                (word) => word.toUpperCase(),
+              )}
             </h1>
           </div>
         </div>
@@ -62,7 +68,7 @@ export function SceneHeader({
                   "stencil text-[10.5px] tracking-[0.14em]",
                   status === "go" && "text-go",
                   status === "hold" && "text-hold",
-                  status === "no-go" && "text-no-go"
+                  status === "no-go" && "text-no-go",
                 )}
               >
                 {statusLabel}
@@ -88,7 +94,7 @@ export function SceneHeader({
       />
 
       {sub && (
-        <p className="mt-1.5 max-w-4xl text-[11px] leading-snug text-muted-foreground">
+        <p className="mt-1.5 max-w-4xl text-[12px] leading-relaxed text-muted-foreground">
           {sub}
         </p>
       )}

@@ -77,7 +77,7 @@ export function TitleBar({
       // one instead of being absolutely centred over the others, and the
       // bar sheds its least important readouts as it narrows (index.css,
       // .titlebar container queries).
-      className="titlebar relative z-30 grid h-11 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-border bg-background/90 px-3 backdrop-blur"
+      className="titlebar relative z-30 grid h-14 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-b border-border bg-background px-4"
     >
       <div data-tauri-drag-region className="flex min-w-0 items-center gap-3">
         <div className="flex items-center gap-2">
@@ -156,7 +156,7 @@ export function TitleBar({
       {onCommand && (
         <button
           onClick={onCommand}
-          className="tb-search group flex h-7 items-center gap-2 justify-self-center rounded-full border border-border bg-card px-3 text-left transition-colors hover:border-brand/40 hover:bg-popover"
+          className="tb-search group flex h-7 items-center gap-2 justify-self-center rounded-sm border border-border bg-card px-3 text-left transition-colors hover:border-brand/40 hover:bg-popover"
           aria-label="Open command palette"
           title="Search scenes, wallets, commands"
         >

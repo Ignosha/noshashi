@@ -1,6 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { PatternMark } from "@/components/nova/brand/BrandPattern";
 import { TitleBar } from "@/components/nova/TitleBar";
 import { StatusRail } from "@/components/nova/StatusRail";
 import { Preloader } from "@/components/nova/Preloader";
@@ -986,7 +985,7 @@ function ConsoleApp() {
       <StressScheduleRunner />
       <PersonalGuardianRunner />
       <OrgContextSync />
-      <div className="scanlines vignette relative flex h-full w-full overflow-hidden bg-background text-foreground">
+      <div className="ledger-desktop relative flex h-full w-full overflow-hidden bg-background text-foreground">
         <SkipLink />
         <Announcer
           message={
@@ -999,27 +998,6 @@ function ConsoleApp() {
                 : "Ledger link offline. Reconnecting."
           }
         />
-        {/*
-          Board section 07 geometry rather than a starfield. The starfield ran
-          a requestAnimationFrame loop for the life of the session behind live
-          telemetry — a continuous cost, competing with the data for
-          attention. This is static, and it never asks to be looked at.
-        */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <PatternMark
-            element="orbital"
-            size={620}
-            opacity={0.035}
-            className="-right-56 -top-40"
-          />
-          <PatternMark
-            element="hatch"
-            size={300}
-            opacity={0.03}
-            className="-bottom-16 -left-16"
-          />
-        </div>
-
         <AnimatePresence>
           {stage === "boot" && <Preloader onDone={finishBoot} />}
         </AnimatePresence>
@@ -1050,9 +1028,9 @@ function ConsoleApp() {
           {/* Sidebar — board section 10 */}
           <aside
             className={cn(
-              "flex h-full shrink-0 flex-col border-r border-border bg-card/40",
+              "desk-sidebar flex h-full shrink-0 flex-col border-r border-border bg-card/40",
               shortRail && "overflow-y-auto overscroll-contain",
-              railOpen ? "w-[212px]" : "w-[60px]"
+              railOpen ? "w-[224px]" : "w-[64px]"
             )}
           >
             {/* Brand */}
@@ -1062,7 +1040,7 @@ function ConsoleApp() {
                 className="flex min-w-0 items-center gap-2.5 text-left"
                 aria-label={`${BRAND.name} overview`}
               >
-                <NovaLogo size={24} animated={false} tone="color" />
+                <NovaLogo size={28} animated={false} />
                 {railOpen && (
                   <BrandName />
                 )}
@@ -1470,7 +1448,7 @@ function NavButton({
       aria-label={item.label}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative flex items-center rounded-md transition-colors",
+        "desk-nav-row group relative flex items-center rounded-md transition-colors",
         expanded ? "h-8 gap-2.5 px-2" : "h-9 w-9 justify-center",
         active
           ? "bg-brand/12 text-foreground"
@@ -1565,7 +1543,7 @@ function RailAction({
 function BrandName() {
   const { brand } = useWorkstationOrg();
   if (!brand.name) {
-    return <span className="display truncate text-[13px] font-[600] tracking-[0.14em] text-foreground">NOSHASHI</span>;
+    return <span className="desk-wordmark truncate text-foreground">NOSHASHI</span>;
   }
   return (
     <span className="flex min-w-0 flex-col leading-tight">
