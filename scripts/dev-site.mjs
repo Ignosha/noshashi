@@ -25,7 +25,7 @@ const config = JSON.parse(await readFile(path.join(ROOT, "vercel.json"), "utf8")
 
 const TYPES = {
   ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png",
   ".pdf": "application/pdf", ".xml": "application/xml; charset=utf-8",
   ".txt": "text/plain; charset=utf-8", ".toml": "text/plain; charset=utf-8",

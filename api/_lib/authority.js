@@ -226,7 +226,7 @@ export function signerListOf(info) {
   return { list: lists[0], unreadable: undefined };
 }
 
-async function readControl(issuer) {
+async function readIssuerState(issuer) {
   // The signer list comes from account_info itself (signer_lists: true),
   // not from account_objects. account_objects with a type filter pages
   // through the WHOLE owner directory: with `limit: 10` it returned an
@@ -240,6 +240,32 @@ async function readControl(issuer) {
     signer_lists: true,
   });
 
+  // Both halves of an authority claim must describe this exact validated
+  // account snapshot. Two independent `validated` requests can cross a
+  // ledger boundary, and a missing account/Flags must not become zero flags.
+  if (info.validated !== true || !Number.isInteger(info.ledger_index) || info.ledger_index <= 0 ||
+      info.account_data?.Account !== issuer || !Number.isInteger(info.account_data?.Flags) || info.account_data.Flags < 0) {
+    throw new Error("The server did not return a validated issuer account snapshot");
+  }
+  const rate = info.account_data.TransferRate;
+  if (rate !== undefined && (!Number.isInteger(rate) || rate < 0)) {
+    throw new Error("The server returned an unreadable issuer transfer rate");
+  }
+  const { list, unreadable } = signerListOf(info);
+  if (unreadable) {
+    throw new Error("The server did not return the issuer signer lists");
+  }
+  const lists = Array.isArray(info.signer_lists) ? info.signer_lists : info.account_data.signer_lists;
+  if (lists.length > 1 || (lists.length === 1 && (!list || !Array.isArray(list.SignerEntries) ||
+      list.SignerEntries.length === 0 || !Number.isInteger(list.SignerQuorum) || list.SignerQuorum <= 0 ||
+      list.SignerEntries.some(entry => !ADDRESS_RE.test(entry?.SignerEntry?.Account ?? "") ||
+        !Number.isInteger(entry?.SignerEntry?.SignerWeight) || entry.SignerEntry.SignerWeight <= 0)))) {
+    throw new Error("The server returned unreadable issuer signer lists");
+  }
+  return { control: controlFromInfo(issuer, info), posture: postureFromInfo(issuer, info) };
+}
+
+function controlFromInfo(issuer, info) {
   const data = info.account_data ?? {};
   const flags = Number(data.Flags ?? 0);
   const { list, unreadable } = signerListOf(info);
@@ -268,15 +294,11 @@ async function readControl(issuer) {
       minimumSigners: signers.length > 0 ? minimumSignersForQuorum(signers, quorum) : 0,
       unilateralSigners: signers.filter((s) => quorum > 0 && s.weight >= quorum).map((s) => s.account),
     },
-    ledgerIndex: Number(info.ledger_index ?? info.ledger_current_index ?? 0),
+    ledgerIndex: info.ledger_index,
   };
 }
 
-async function readPosture(issuer) {
-  const result = await rippleRpc("account_info", {
-    account: issuer,
-    ledger_index: "validated",
-  });
+function postureFromInfo(issuer, result) {
   const data = result.account_data ?? {};
   const flags = Number(data.Flags ?? 0);
   const rate = Number(data.TransferRate ?? 0);
@@ -518,17 +540,18 @@ async function readSupply(issuer) {
   }
 }
 
-/** Read everything the certificate needs, at one ledger. */
+/**
+ * Read issuer controls and posture from one validated account snapshot.
+ * The optional holder survey retains its own existing bounded read/indexer
+ * path and source disclosure; it is not a simultaneous snapshot with this
+ * account read. A no-walk certificate makes no concentration finding.
+ */
 export async function readAuthoritySurface(issuer, { walkSupply = false } = {}) {
   const unreadable = [];
 
-  const [control, posture, issuance] = await Promise.all([
-    readControl(issuer).catch((error) => {
+  const [state, issuance] = await Promise.all([
+    readIssuerState(issuer).catch((error) => {
       unreadable.push(`control: ${error?.message ?? String(error)}`);
-      return null;
-    }),
-    readPosture(issuer).catch((error) => {
-      unreadable.push(`posture: ${error?.message ?? String(error)}`);
       return null;
     }),
     walkSupply
@@ -538,6 +561,8 @@ export async function readAuthoritySurface(issuer, { walkSupply = false } = {}) 
         })
       : Promise.resolve(null),
   ]);
+  const control = state?.control ?? null;
+  const posture = state?.posture ?? null;
 
   return {
     issuer,

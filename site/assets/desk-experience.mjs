@@ -1,8 +1,10 @@
 import {
   ADDRESS_RE,
-  verifyCertificate,
+  readVerifiedAuthority,
+  authorityReadMessage,
+  downloadCertificate,
   capturedView,
-} from "./desk-experience-core.mjs";
+} from "./desk-experience-core.mjs?v=20261101-first-use";
 
 if (document.body.hasAttribute("data-ledger-experience")) {
   const layers = [
@@ -75,6 +77,9 @@ if (document.body.hasAttribute("data-ledger-experience")) {
     set("[data-lx-record-ref]", "Awaiting your investigation");
     set("[data-lx-ledger]", "—");
     set("[data-lx-rules]", "—");
+    set("[data-lx-subject]", "No verified issuer");
+    set("[data-lx-provenance]", "No reading yet.");
+    result.querySelector("[data-lx-findings]").replaceChildren();
     result.querySelectorAll("[data-lx-check]").forEach((el) => {
       el.textContent = "Not read";
       el.removeAttribute("title");
@@ -126,7 +131,6 @@ if (document.body.hasAttribute("data-ledger-experience")) {
     activeRequest?.abort();
     const controller = new AbortController();
     activeRequest = controller;
-    const timeout = setTimeout(() => controller.abort(), 20000);
     clearRecord(
       "Reading validated issuer controls. Waiting for the public ledger…",
     );
@@ -134,16 +138,17 @@ if (document.body.hasAttribute("data-ledger-experience")) {
     result.setAttribute("aria-busy", "true");
     submit.disabled = true;
     try {
-      const response = await fetch(
-        "/api/authority?issuer=" + encodeURIComponent(issuer),
-        { signal: controller.signal },
-      );
-      if (!response.ok) throw new Error("unavailable");
-      const reply = await response.json();
-      if (!(await verifyCertificate(reply, issuer)))
-        throw new Error("unverified");
+      const { certificate: reply, provenance } = await readVerifiedAuthority(issuer, { signal: controller.signal });
       if (version !== generation) return;
       certificate = reply;
+      set("[data-lx-subject]", reply.issuer);
+      set("[data-lx-provenance]", provenance.label);
+      result.querySelector("[data-lx-findings]").replaceChildren(...reply.checks.map((check) => {
+        const item = document.createElement("li");
+        const state = ["INSUFFICIENT_DATA", "NOT_APPLICABLE"].includes(check.state) ? check.state.replaceAll("_", " ").toLowerCase() : check.passed ? "Yes" : "No";
+        item.textContent = `${check.id}: ${state}. ${check.detail || "No additional annotation provided."}`;
+        return item;
+      }));
       set(
         "[data-lx-record-ref]",
         `Ledger ${reply.ledgerIndex.toLocaleString("en-US")}`,
@@ -160,7 +165,7 @@ if (document.body.hasAttribute("data-ledger-experience")) {
       set("[data-lx-digest]", reply.digest);
       set(
         "[data-lx-verified]",
-        "Fingerprint verified in this browser. The published record matches the recomputed SHA-256 digest.",
+        "Canonical payload matches its SHA-256 fingerprint. A hash is not a digital signature or independent ledger confirmation; descriptive annotations are outside this fingerprint.",
       );
       set(
         "[data-lx-status]",
@@ -172,14 +177,11 @@ if (document.body.hasAttribute("data-ledger-experience")) {
       step("verify", true);
       document.getElementById("lx-full-certificate").href =
         "/certificate/?issuer=" + encodeURIComponent(issuer);
-    } catch {
+    } catch (error) {
       if (version !== generation) return;
-      clearRecord(
-        "A complete, verifiable reply was not available. No verdict or fingerprint is shown. Press “Read issuer controls” to retry.",
-      );
+      clearRecord(authorityReadMessage(error));
       result.dataset.state = "unavailable";
     } finally {
-      clearTimeout(timeout);
       if (version === generation) {
         submit.disabled = false;
         result.removeAttribute("aria-busy");
@@ -189,18 +191,7 @@ if (document.body.hasAttribute("data-ledger-experience")) {
   });
   download.addEventListener("click", () => {
     if (!certificate) return;
-    const url = URL.createObjectURL(
-      new Blob([JSON.stringify(certificate, null, 2) + "\n"], {
-        type: "application/json",
-      }),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `noshashi-authority-${certificate.issuer}-${certificate.ledgerIndex}.json`;
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    downloadCertificate(certificate);
     step("keep", true);
   });
 

@@ -184,7 +184,7 @@ export function renderRail(cells) {
    asks people to verify a SHA-256 against a number it printed. A wrong
    number teaches them the check is noise.
 
-   Every artifact is labelled BETA. The builds are pre-1.0 and unsigned,
+   Every artifact is labelled BETA. The builds use the beta channel and are not OS code-signed,
    and that belongs on each one rather than only in a note underneath.
    ──────────────────────────────────────────────────────────────────── */
 
@@ -311,9 +311,9 @@ export function renderDownloads(release) {
     <div class="download-note">
       <span class="signal" aria-hidden="true"></span>
       <span><strong style="color:var(--ink)" data-i18n="release.operator">Operator note.</strong> Every build on this page is a
-        <strong style="color:var(--hold)" data-i18n="release.beta">beta</strong>: pre-1.0, and intentionally unsigned while the
-        release pipeline is being hardened. Verify the SHA-256 value above, then follow your
-        institution's software admission process before deployment.</span>
+        <strong style="color:var(--hold)" data-i18n="release.beta">beta</strong>, including version 1.x. Installers are not OS code-signed or notarised, so platform warnings remain.
+        SHA-256 checks detect a changed download when compared with the published value; they do not authenticate the publisher. The in-app updater separately verifies minisign signatures against its bundled public key.
+        Follow your institution's software admission process before deployment.</span>
     </div>`;
 }
 

@@ -154,7 +154,7 @@ async function buildHome({ news, market, feed, status, release }) {
 
   // The short homepage leaves out the newsroom, mission log and edge lab;
   // their slots are optional so those panels can come back without code.
-  const OPTIONAL = new Set(["VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE", "SHOTHERO", "TOKENTAPE", "SHOTVERIFICATION", "SHOTAUDIT", "SHOTADDRESS"]);
+  const OPTIONAL = new Set(["ACADEMY", "MISREAD", "TOKENCOUNT", "VERSION", "MARKETHEAD", "MARKET", "MARKETFOOT", "NEWSHEAD", "NEWS", "VERIFYCMD", "CLOCK", "BOARD", "LOG", "SUBSCRIBE", "SHOTHERO", "TOKENTAPE", "SHOTVERIFICATION", "SHOTAUDIT", "SHOTADDRESS"]);
   for (const [name, value] of Object.entries(slots)) {
     const token = `<!--SLOT:${name}-->`;
     if (!html.includes(token)) {
@@ -353,7 +353,7 @@ async function buildProgress({ feed, release, releases }) {
     { label: "CURRENT BUILD", value: release?.tag || "—", note: "Beta channel, unsigned, built by CI." },
     { label: "RELEASES SHIPPED", value: String(shipped), note: `Since ${isoDate("2026-08-29T00:00:00Z")}, every one from a public commit.` },
     { label: "TESTS PASSING", value: "1,200+", note: "Across the app, the API and the website. Run with npm test." },
-    { label: "ACCOUNTS REQUIRED", value: "0", note: "No sign-up exists. Nothing is held server-side." },
+    { label: "ACCOUNTS REQUIRED", value: "0", note: "Public tools and the browser workspace need no account. Organization features use hosted accounts." },
   ]);
 
   /*
@@ -380,7 +380,7 @@ async function buildProgress({ feed, release, releases }) {
     },
     {
       title: "Release signing and notarisation", state: "open", percent: 25, reading: "in progress",
-      note: "Builds are reproducible from CI and hash-verified, but not yet code-signed or notarised. This is the single largest thing standing between the beta channel and a 1.0.",
+      note: "Builds are produced by CI with published checksums, but are not yet OS code-signed or notarised. Updater bundles carry separate minisign signatures. A 1.x version number does not remove the beta limitations.",
     },
     {
       title: "Compliance API and webhooks", state: "done", percent: 100, reading: "shipped",
@@ -443,7 +443,7 @@ async function buildProgress({ feed, release, releases }) {
     <div class="panel">
       <h3>What is not</h3>
       <p>Distribution. Unsigned binaries mean your operating system will warn you, and you are
-         relying on a SHA-256 check rather than a signature. That is a real gap, not a formality.</p>
+         relying on a published SHA-256 comparison rather than OS publisher authentication. Updater signatures are a separate mechanism.</p>
     </div>
     <div class="panel">
       <h3>What that means for you</h3>
@@ -1192,9 +1192,16 @@ async function buildAuthConfirmed() {
 }
 
 /* ── institutional product pages ─────────────────────────────────── */
+const EVALUATION_STATUS = `<section class="evaluation-status" aria-label="Availability and evaluation limits">
+  <div class="panel"><p class="eyebrow">BETA · CURRENT AVAILABILITY</p><p>Public issuer, payment and funded-depth tools are available without an account. Paid desktop and API capabilities are beta; Institutional, Enterprise and Strategic Infrastructure require an agreed contract and scope.</p>
+  <p>SSO, uptime SLAs with service credits and dedicated environments are planned, not offered today. No completed independent security assessment or security certification is claimed. Desktop installers are not OS code-signed or notarised; updater signatures are separate.</p>
+  <p><a href="/institutional-demo/">Try the working demo</a> · <a href="/design-partners/#apply">Request a scoped pilot</a> · <a href="/trust/">Read the trust limits</a></p></div>
+</section>`;
+
+
 const PRODUCT_PAGES = [
-  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "XRPL compliance for regulated teams.", "Screen deposits and withdrawals, check token risk and keep an audit trail, in one place.", `<section class="institutional-proof"><div class="grid g2"><div class="panel"><p class="eyebrow">WHAT YOU GET</p><h2>Everything in Institutional, plus:</h2><ul class="proof-list"><li>Deposit and withdrawal screening before you credit or sign</li><li>Market surveillance</li><li>A public page proving your customer protection fund</li><li>Investigation cases and audit exports</li></ul></div><div class="panel"><p class="eyebrow">HOW IT STARTS</p><h2>A call, then a scoped plan.</h2><p>We agree what you need before you sign anything. From $120,000 a year.</p><ul class="proof-list"><li>Every decision gets a receipt</li><li>Read-only: no keys, no custody</li></ul></div></div></section><section><div class="panel"><h2>Talk to us.</h2><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Security &amp; trust</a></p></div></section>`],
-  ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build on NOSHASHI's XRPL data.", "Plug our ledger readings, alerts and evidence into your own systems.", `<section class="institutional-proof"><div class="grid g2"><div class="panel"><p class="eyebrow">WHAT YOU GET</p><h2>Everything in Enterprise, plus:</h2><ul class="proof-list"><li>High-volume API and event feeds</li><li>Signed webhooks and bulk exports</li><li>Custom data formats and retention</li><li>Account takeover alerts</li></ul></div><div class="panel"><p class="eyebrow">HOW IT STARTS</p><h2>An architecture review.</h2><p>We map what you need, then propose a contract. From $250,000 a year.</p><ul class="proof-list"><li>Evidence travels with every result</li><li>Scope written down before you commit</li></ul></div></div></section><section><div class="panel"><h2>Talk to us.</h2><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>`],
+  ["enterprise", "enterprise", "NOSHASHI ENTERPRISE", "XRPL compliance for regulated teams.", "Screen deposits and withdrawals, check token risk and keep an audit trail, in one place.", `<section class="institutional-proof"><div class="grid g2"><div class="panel"><p class="eyebrow">WHAT YOU GET</p><h2>Everything in Institutional, plus:</h2><ul class="proof-list"><li>Deposit and withdrawal screening before you credit or sign</li><li>Market surveillance</li><li>A public page reporting declared protection-fund evidence and its limits</li><li>Investigation cases and audit exports</li></ul></div><div class="panel"><p class="eyebrow">HOW IT STARTS</p><h2>A call, then a scoped plan.</h2><p>We agree what you need before you sign anything. From $120,000 a year.</p><ul class="proof-list"><li>Every decision gets a receipt</li><li>Read-only: no keys, no custody</li></ul></div></div></section><section><div class="panel"><h2>Talk to us.</h2><p><a class="btn" href="mailto:sales@noshashi.app">Contact sales</a> <a class="btn ghost" href="/trust/">Security &amp; trust</a></p></div></section>`],
+  ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build on NOSHASHI's XRPL data.", "Plug our ledger readings, alerts and evidence into your own systems.", `<section class="institutional-proof"><div class="grid g2"><div class="panel"><p class="eyebrow">WHAT YOU GET</p><h2>Everything in Enterprise, plus:</h2><ul class="proof-list"><li>High-volume API and event feeds</li><li>HMAC-authenticated webhooks and bulk exports</li><li>Custom data formats and retention</li><li>Account takeover alerts</li></ul></div><div class="panel"><p class="eyebrow">HOW IT STARTS</p><h2>An architecture review.</h2><p>We map what you need, then propose a contract. From $250,000 a year.</p><ul class="proof-list"><li>Evidence travels with every result</li><li>Scope written down before you commit</li></ul></div></div></section><section><div class="panel"><h2>Talk to us.</h2><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>`],
   // The verbs are the edge function's own list (reference.json), not a
   // roadmap: an endpoint named here is one that answers today.
   ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.", `<div class="panel"><p class="eyebrow">START HERE · FREE, NO KEY</p><h2>Asset Risk API</h2><p>One issued asset in one call: what its issuer can do to holders, what its XRP order book can actually absorb, what a sale or purchase of a given size would fill at, what was not checked, and a SHA-256 receipt over the report. Read from validated ledgers. Not a rating.</p><pre><code>curl "https://www.noshashi.app/api/v1/asset-risk?issuer=rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B&amp;currency=USD&amp;size=1000"</code></pre><p>No account needed. Up to 30 uncached requests a minute per caller; answers are cached for a minute. Schema <code>noshashi.asset-risk.v1</code>, documented in the <a href="/docs/api/">API reference</a>. Need more volume, history or monitoring? <a href="mailto:institutions@noshashi.app">institutions@noshashi.app</a>.</p></div><div class="panel"><p class="eyebrow">REFERENCE · API KEY</p><h2>Compliance API verbs</h2><p>One edge function serves every verb: <code>https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify/&lt;verb&gt;</code>, with an <code>nsh_live_</code> key from the desktop app.</p><ul>${DOCS_REF.verbs.map((v) => `<li><code>${esc(v.path)}</code> — ${esc(v.description)}</li>`).join("")}</ul><p>Request and response shapes, authentication, scopes and rate limits: <a href="/docs/api/">API reference</a>. Signed event delivery: <a href="/docs/webhooks/">Webhooks</a>. Everything else: <a href="/docs/">documentation</a>.</p></div>`],
@@ -1315,7 +1322,9 @@ async function buildPricingEnhancement() {
     <div class="kicker-block">
       <p class="eyebrow">02 / Comparison</p>
       <h2>Every feature, plan by plan</h2>
-      <p>What each plan includes. "Contracted" means it is set in your contract.</p>
+      <p>What each plan includes. "Contracted" means the delivered scope is agreed in writing. Entitlement flags do not make a planned capability available.</p>
+      <p>The free web tools answer individual issuer, payment and funded-depth questions and let you inspect the evidence. Free desktop checks and CSV exports remain available. Pro adds portfolios, alerts, custom policies, persistent history and 5,000 API verifications a month. Institutional adds shared controls, audit records, webhooks and 100,000 API verifications; an MSA is required. Public API endpoints remain free separately from paid Compliance API capacity.</p>
+      <p>Audit exports use SHA-256 digests. They detect changes against the recorded hash; they are not digital signatures, publisher authentication or independent verification of ledger proofs.</p>
     </div>
     <div class="tier-compare">
       <table>
@@ -1360,7 +1369,7 @@ async function buildPricingEnhancement() {
           <tr><th scope="row">Monitoring &amp; alerting</th><td class="no">Unavailable</td><td class="limited">Issuer drift</td><td class="yes">Custom logic</td><td class="contracted">Portfolio monitoring</td><td class="contracted">Event delivery</td></tr>
           <tr><th scope="row">Sanctioned-address screening (OFAC SDN)</th><td class="yes">Address check</td><td class="yes">Address check</td><td class="yes">Address check</td><td class="yes">Deposits &amp; funders</td><td class="yes">Deposits &amp; funders</td></tr>
           <tr><th scope="row">Deposit screening</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td></tr>
-          <tr><th scope="row">Evidence &amp; audit export</th><td class="yes">CSV</td><td class="yes">CSV</td><td class="yes">Signed export</td><td class="contracted">Immutable audit</td><td class="contracted">Data delivery</td></tr>
+          <tr><th scope="row">Evidence &amp; audit export</th><td class="yes">CSV</td><td class="yes">CSV</td><td class="yes">SHA-256 export</td><td class="contracted">Append-only audit</td><td class="contracted">Data delivery</td></tr>
           <tr><th scope="row">Custom schemas</th><td class="no">Unavailable</td><td class="no">Unavailable</td><td class="optional">Optional</td><td class="optional">Optional</td><td class="contracted">Included in scope</td></tr>
           <tr class="group"><th scope="rowgroup" colspan="6">API &amp; delivery</th></tr>
           <tr><th scope="row">API access</th><td class="no">Unavailable</td><td>5,000 / month</td><td>100,000 / month</td><td class="contracted">Institutional API</td><td class="contracted">High-volume API</td></tr>
@@ -1407,6 +1416,10 @@ async function buildPricingEnhancement() {
     html = html.replace('<script src="/assets/nav.js" defer></script>',
       '<script src="/assets/i18n.js" defer></script>\n<script src="/assets/nav.js" defer></script>');
   }
+  html = html.replace(/\s*<!-- NOSHASHI-EVALUATION-STATUS -->[\s\S]*?<!-- \/NOSHASHI-EVALUATION-STATUS -->/g, "");
+  html = html.replace('<section id="plans">', `<!-- NOSHASHI-EVALUATION-STATUS -->${EVALUATION_STATUS}<!-- /NOSHASHI-EVALUATION-STATUS --><section id="plans">`);
+  html = html.replaceAll("Tamper-proof audit log and signed exports", "Append-only audit log and SHA-256 exports");
+
   // Same six destinations and the same footer map as every other page.
   // The page keeps its own header styles, so only the links are swapped.
   const navLinks = NAV.map((item) =>
@@ -1428,7 +1441,7 @@ async function buildProductPage([path, current, eyebrow, title, intro, content])
     description: intro,
     path: `/${path}/`,
     current,
-    body: `<div class="page-head"><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p>${intro}</p></div>${content}`,
+    body: `<div class="page-head"><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p>${intro}</p></div>${EVALUATION_STATUS}${content}`,
     structured: [breadcrumb(eyebrow, `/${path}/`)],
   }));
 }
@@ -1509,6 +1522,7 @@ async function buildTrust() {
   const list = (items) => `<ul class="proof-list">${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
 
   const content = `
+${EVALUATION_STATUS}
 <section><div class="grid g2 trust-bounds">${bounds}</div></section>
 <section><div class="section-head"><p class="eyebrow">01 / Data path</p><h2>From the ledger to the receipt.</h2><p>Every verdict follows this path. Open a stage to see what happens there and where it is implemented.</p></div>
   <ol class="trust-path qa">${stages}</ol></section>
@@ -1535,7 +1549,7 @@ async function buildTrust() {
 .trust-flows th,.trust-flows td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--rule)}
 .trust-flows thead th{font:12px "IBM Plex Mono",monospace;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
 </style>`,
-    body: `<div class="page-head"><p class="eyebrow">TRUST &amp; SECURITY</p><h1>Read-only. No keys. No custody.</h1><p>NOSHASHI only reads the XRP Ledger. It never holds keys, signs or moves funds. Automated tests check every claim on this page against the code.</p></div>${content}`,
+    body: `<div class="page-head"><p class="eyebrow">TRUST &amp; SECURITY</p><h1>Read-only. No keys. No custody.</h1><p>NOSHASHI only reads the XRP Ledger. It never holds XRPL private keys, signs ledger transactions or moves funds. Automated checks cover the implementation claims below; they are not an independent security assessment.</p></div>${content}`,
     structured: [breadcrumb("Trust & security", "/trust/")],
   }));
 }

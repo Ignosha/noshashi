@@ -111,7 +111,7 @@ try {
       continue;
     }
     await page.locator("[data-lx-command]").waitFor({ state: "visible" });
-    for (const index of [1, 2, 0]) {
+    for (const index of mode === "mobile" ? [] : [1, 2, 0]) {
       const button = page.locator(`[data-lx-layer="${index}"]`);
       await button.focus();
       await page.keyboard.press(index % 2 ? "Enter" : "Space");

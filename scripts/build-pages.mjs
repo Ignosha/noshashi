@@ -30,7 +30,7 @@ const CAPABILITIES = [
   ["EXECUTABLE LIQUIDITY", "Depth you can really trade", "Counts only offers whose owners can fund them and compares that with what the book advertises.", [PLAN.free, PLAN.pro], "/book-health/", "Measure a book"],
   ["EXPOSURE", "What you hold, and who controls it", "Lists every trust line on an account and whether each issuer can still freeze it.", [PLAN.free], "/#public", "Read an account"],
   ["DECISIONS", "GO, HOLD or NO-GO against your policy", "Applies a written, versioned policy to the facts and shows the result and reason for every rule.", [PLAN.pro], "/docs/policies/", "How policies work"],
-  ["EVIDENCE", "A receipt for every decision", "A SHA-256 receipt over a fixed form of the decision, plus the ledger it was read at. Signed audit exports on Institutional.", [PLAN.pro, PLAN.inst], "/docs/receipts/", "How receipts work"],
+  ["EVIDENCE", "A receipt for every decision", "A SHA-256 receipt over a fixed form of the decision, plus the ledger it was read at. SHA-256 audit exports on Institutional; a digest is not a digital signature.", [PLAN.pro, PLAN.inst], "/docs/receipts/", "How receipts work"],
   ["SCREENING", "Deposits and withdrawals", "Flags counterfeit tokens, phishing dust, lookalike addresses and OFAC-listed senders up to three hops back.", [PLAN.ent], "/enterprise/", "Enterprise screening"],
   ["ISSUANCE SURVEILLANCE", "Who holds your tokens", "Walks an issuer's trust lines to show who holds the supply and how concentrated it is.", [PLAN.inst], "/pricing/", "See the plan"],
 ];
@@ -49,7 +49,7 @@ async function buildPlatform(write) {
 
 <section>
   <div class="sec-head"><p class="eyebrow">Capabilities</p><h2>What it does today</h2>
-    <p>Each card names the plan that includes it. Free capabilities run on this website with no account.</p></div>
+    <p>Each card names the plan that includes it. Free capabilities run on this website with no account. Paid workstation and API capabilities remain beta; Institutional and higher require an agreed contract.</p></div>
   <div class="grid g2">${capabilityCards()}</div>
 </section>
 
@@ -59,7 +59,7 @@ async function buildPlatform(write) {
     <li><p class="num">01 · READ</p><h3>Read the ledger</h3><p>Inspect the relevant XRPL data from validated ledgers.</p></li>
     <li><p class="num">02 · ANALYZE</p><h3>Run the checks</h3><p>Issuer controls, delivered amounts, fillable depth and account settings.</p></li>
     <li><p class="num">03 · VERIFY</p><h3>See the evidence</h3><p>The result, the rule behind it and the ledger it was read at.</p></li>
-    <li><p class="num">04 · EXPORT</p><h3>Keep the proof</h3><p>A SHA-256 receipt and exportable evidence for review.</p></li>
+    <li><p class="num">04 · EXPORT</p><h3>Keep the proof</h3><p>A SHA-256 receipt and exportable evidence for review. It detects changes to the recorded body; it does not identify its author or independently verify ledger proofs.</p></li>
   </ol>
 </section>
 
@@ -137,7 +137,7 @@ const SOLUTIONS = [
     uses: [
       ["Versioned policy: GO, HOLD or NO-GO", PLAN.pro, "/docs/policies/"],
       ["Receipt vault", PLAN.pro, "/docs/receipts/"],
-      ["Immutable audit log, signed exports, regulator seats", PLAN.inst, "/enterprise/"],
+      ["Append-only audit log, hashed exports, regulator seats", PLAN.inst, "/enterprise/"],
     ],
     start: ["/contact/?topic=institutions", "Discuss your workflow"],
   },
@@ -282,7 +282,7 @@ async function buildDesignPartners(write) {
       <ul class="ticks">
         <li>Working sessions with the founder on your actual workflow.</li>
         <li>An honest view of what NOSHASHI does today, and what it does not.</li>
-        <li>Your feedback weighed directly in what gets built next.</li>
+        <li>A written evaluation summary: inputs, ledger references, findings, gaps and next steps.</li>
       </ul>
     </div>
     <div class="panel">
@@ -301,10 +301,19 @@ async function buildDesignPartners(write) {
   <ol class="steps4 steps5">
     <li><p class="num">01</p><p>You name an operational problem.</p></li>
     <li><p class="num">02</p><p>We show the existing capability that addresses it.</p></li>
-    <li><p class="num">03</p><p>We agree how success will be measured.</p></li>
-    <li><p class="num">04</p><p>You test it against your current workflow.</p></li>
-    <li><p class="num">05</p><p>The results decide a paid pilot, a contract or what we build next.</p></li>
+    <li><p class="num">03</p><p>We agree the inputs, deliverables, baseline and success measures in writing.</p></li>
+    <li><p class="num">04</p><p>You compare the same cases against your current workflow.</p></li>
+    <li><p class="num">05</p><p>We review discrepancies and decide whether to propose a paid pilot or contract.</p></li>
   </ol>
+</section>
+
+<section>
+  <div class="sec-head"><p class="eyebrow">A scoped evaluation</p><h2>Define the question before the pilot.</h2>
+    <p>Choose one workflow: issuer onboarding, payment-credit review or funded-depth assessment. Agree a sample of public ledger cases, a review period, named reviewers and the output you need before work starts.</p></div>
+  <div class="grid g2">
+    <div class="panel"><h3>Deliverables to agree</h3><p>A case list, ledger and rule references, exportable evidence, a discrepancy log and a written review of limitations. Integration work, access, support and any fee are scoped separately.</p></div>
+    <div class="panel"><h3>Success measures to agree</h3><p>Compare review time per case, the share of required evidence fields completed and discrepancies identified against your baseline. These are proposed measures, not achieved customer outcomes or promised savings.</p></div>
+  </div>
 </section>
 
 <section id="apply">
@@ -320,7 +329,7 @@ async function buildDesignPartners(write) {
       <div class="form-field"><label for="p-role">Role</label><input id="p-role" name="role" type="text" autocomplete="organization-title" maxlength="80" required></div>
     </div>
     <div class="form-row">
-      <div class="form-field"><label for="p-problem">The problem you want to solve</label><textarea id="p-problem" name="problem" maxlength="3000" required></textarea></div>
+      <div class="form-field"><label for="p-problem">The workflow, deliverables and success measures you want to test</label><textarea id="p-problem" name="problem" maxlength="3000" placeholder="For example: issuer onboarding; 20 public-ledger cases; exportable evidence and a discrepancy log; compare review time and required evidence fields against our current process." required></textarea></div>
     </div>
     <div class="form-trap" aria-hidden="true"><label for="p_company">Leave this field empty</label><input id="p_company" name="company_website" type="text" tabindex="-1" autocomplete="off"></div>
     <div class="form-actions">

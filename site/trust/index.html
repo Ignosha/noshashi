@@ -59,7 +59,12 @@
   </div>
 </header>
 <main class="shell">
-<div class="page-head"><p class="eyebrow">TRUST &amp; SECURITY</p><h1>Read-only. No keys. No custody.</h1><p>NOSHASHI only reads the XRP Ledger. It never holds keys, signs or moves funds. Automated tests check every claim on this page against the code.</p></div>
+<div class="page-head"><p class="eyebrow">TRUST &amp; SECURITY</p><h1>Read-only. No keys. No custody.</h1><p>NOSHASHI only reads the XRP Ledger. It never holds XRPL private keys, signs ledger transactions or moves funds. Automated checks cover the implementation claims below; they are not an independent security assessment.</p></div>
+<section class="evaluation-status" aria-label="Availability and evaluation limits">
+  <div class="panel"><p class="eyebrow">BETA · CURRENT AVAILABILITY</p><p>Public issuer, payment and funded-depth tools are available without an account. Paid desktop and API capabilities are beta; Institutional, Enterprise and Strategic Infrastructure require an agreed contract and scope.</p>
+  <p>SSO, uptime SLAs with service credits and dedicated environments are planned, not offered today. No completed independent security assessment or security certification is claimed. Desktop installers are not OS code-signed or notarised; updater signatures are separate.</p>
+  <p><a href="/institutional-demo/">Try the working demo</a> · <a href="/design-partners/#apply">Request a scoped pilot</a> · <a href="/trust/">Read the trust limits</a></p></div>
+</section>
 <section><div class="grid g2 trust-bounds"><div class="panel"><p class="eyebrow">NO PRIVATE KEYS</p><h3>NOSHASHI never asks for, generates or stores an XRPL secret, seed or private key.</h3><p>No XRPL wallet or key-pair library is imported. The app will not send a message containing an XRPL secret seed to any AI model: it checks every message before sending and refuses. The keys NOSHASHI does hold are of other kinds: model-provider API keys and the Compliance API secret sit in the operating system keyring, and nsh_live_ API keys are stored only as SHA-256 hashes.</p></div><div class="panel"><p class="eyebrow">NO CUSTODY</p><h3>NOSHASHI holds no client assets and controls no account on the ledger.</h3><p>Addresses are entered to be read. There is no deposit address, balance under management or withdrawal path.</p></div><div class="panel"><p class="eyebrow">NO SIGNING</p><h3>No code path signs an XRPL transaction.</h3><p>The signing commands (sign, sign_for, submit_multisigned, wallet_propose, channel_authorize) appear nowhere in the covered code, which a test checks. NOSHASHI does sign messages of its own kind — webhook deliveries carry an HMAC — which is unrelated to ledger transactions.</p></div><div class="panel"><p class="eyebrow">NO BROADCAST</p><h3>Nothing is ever submitted to the ledger.</h3><p>The submit command appears nowhere in the covered code, which a test checks. Every command that is sent is on the published read-only list.</p></div></div></section>
 <section><div class="section-head"><p class="eyebrow">01 / Data path</p><h2>From the ledger to the receipt.</h2><p>Every verdict follows this path. Open a stage to see what happens there and where it is implemented.</p></div>
   <ol class="trust-path qa"><li><details open><summary><span class="mono">01</span> XRPL MAINNET<span class="trust-sum">Public XRP Ledger servers, read over WebSocket and HTTPS.</span></summary>
@@ -108,7 +113,7 @@
 </footer>
 <script src="/assets/i18n.js" defer></script>
 <script src="/assets/nav.js" defer></script>
-<script src="/assets/subscribe.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
 <script src="/assets/chart.js" defer></script>
 <script src="/assets/support.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>
