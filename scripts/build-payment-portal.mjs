@@ -1,0 +1,19 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+export const PORTAL_PAGES = [["/developers/portal/", "monthly", "0.8"]];
+export async function buildPaymentPortal(write) {
+  await write(
+    "developers/portal/index.html",
+    `<!doctype html>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Review XRPL payment lists with complete ledger evidence. Sign in to NOSHASHI's browser, API and CLI developer workflow."><title>Payment Review · NOSHASHI Developer Portal</title><link rel="canonical" href="https://www.noshashi.app/developers/portal/"><link rel="icon" href="/assets/ledger-mark-128.png"><link rel="stylesheet" href="/assets/payment-portal/main.css"></head><body><div id="payment-portal"></div><noscript><h1>NOSHASHI Payment Review</h1><p>Enable JavaScript for the signed-in developer portal. Public ledger tools remain available.</p><a href="/delivered/">Check one payment</a></noscript><script type="module" src="/assets/payment-portal/portal.js"></script></body></html>`,
+  );
+}
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  await buildPaymentPortal(async (relative, html) => {
+    const file = path.join(root, "site", relative);
+    await mkdir(path.dirname(file), { recursive: true });
+    await writeFile(file, html);
+  });
+}

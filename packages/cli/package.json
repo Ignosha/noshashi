@@ -1,0 +1,11 @@
+{
+  "name": "@noshashi/payment-review-cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": { "noshashi-review": "bin/noshashi-review.mjs" },
+  "files": ["bin", "README.md", "LICENSE"],
+  "engines": { "node": ">=18" },
+  "description": "Read-only XRPL payment reconciliation and receipt checks for NOSHASHI.",
+  "license": "MIT"
+}

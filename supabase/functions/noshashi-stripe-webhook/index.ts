@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { TIERS, type Tier, schedule } from "../_shared/evidenceReport.ts";
+import { reviewBillingRisk } from "../_shared/paymentReviewBillingEvents.ts";
 
 /**
  * noshashi-stripe-webhook — Stripe is the source of truth for billing;
@@ -324,6 +325,14 @@ Deno.serve(async (request: Request) => {
   };
 
   try {
+    if (await reviewBillingRisk(db, event, async (chargeId) => {
+      if (!/^ch_[A-Za-z0-9]+$/.test(chargeId) || !STRIPE_SECRET_KEY) throw new Error('Cannot reconcile billing risk event.');
+      const response=await fetch(`https://api.stripe.com/v1/charges/${encodeURIComponent(chargeId)}`, {
+        headers:{Authorization:`Bearer ${STRIPE_SECRET_KEY}`},signal:AbortSignal.timeout(10000),
+      });
+      if(!response.ok)throw new Error('Could not reconcile Stripe charge.');
+      return await response.json();
+    })) return new Response('ok',{status:200});
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
@@ -411,15 +420,22 @@ Deno.serve(async (request: Request) => {
         break;
       }
 
+      case "invoice.paid":
       case "invoice.payment_failed": {
         const invoice = event.data.object;
-        const accountId = invoice.subscription_details?.metadata?.account_id
-          ?? invoice.parent?.subscription_details?.metadata?.account_id;
-        if (accountId) {
-          await db
-            .from("subscriptions")
-            .update({ status: "past_due", updated_at: new Date().toISOString() })
-            .eq("account_id", accountId);
+        const subscriptionId=invoice.parent?.subscription_details?.subscription ?? invoice.subscription;
+        if (typeof subscriptionId==='string') {
+          if(!STRIPE_SECRET_KEY)throw new Error('Cannot reconcile invoice subscription.');
+          const response=await fetch(`https://api.stripe.com/v1/subscriptions/${encodeURIComponent(subscriptionId)}`,{
+            headers:{Authorization:`Bearer ${STRIPE_SECRET_KEY}`},signal:AbortSignal.timeout(10000),
+          });
+          if(!response.ok)throw new Error('Could not reconcile current subscription.');
+          const subscription=await response.json();
+          const {error}=await db.from('subscriptions').update({
+            status:subscription.status,current_period_end:resolvePeriodEnd(subscription),
+            updated_at:new Date().toISOString(),
+          }).eq('stripe_subscription_id',subscriptionId);
+          if(error)throw error;
         }
         break;
       }

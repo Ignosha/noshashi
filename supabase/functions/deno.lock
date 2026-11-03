@@ -12,7 +12,8 @@
     "npm:@supabase/supabase-js@2": "2.116.0",
     "npm:openai@^4.52.5": "4.104.0",
     "npm:pdf-lib@1.17.1": "1.17.1",
-    "npm:ripple-binary-codec@2": "2.11.0"
+    "npm:ripple-binary-codec@2": "2.11.0",
+    "npm:stripe@23": "23.1.0"
   },
   "jsr": {
     "@supabase/functions-js@2.116.0": {
@@ -328,6 +329,9 @@
         "bignumber.js",
         "ripple-address-codec"
       ]
+    },
+    "stripe@23.1.0": {
+      "integrity": "sha512-fVUfMSfTPoukfoV//MUKAx2+YxyKmYaYtnAL9VkfnHfaPNQylFdWZMD+zgUFerI8rjbaiER8Vzj2XEUQ2AhAsQ=="
     },
     "tr46@0.0.3": {
       "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw=="

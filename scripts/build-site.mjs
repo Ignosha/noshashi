@@ -57,6 +57,7 @@ import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
 import { buildTokens, TOKEN_INDEX_PAGES, loadTokens } from "./build-tokens.mjs";
 import { buildPartners, PARTNER_PAGES } from "./build-partners.mjs";
+import { buildPaymentPortal, PORTAL_PAGES } from "./build-payment-portal.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
@@ -1204,7 +1205,7 @@ const PRODUCT_PAGES = [
   ["strategic-infrastructure", "strategic", "NOSHASHI STRATEGIC INFRASTRUCTURE", "Build on NOSHASHI's XRPL data.", "Plug our ledger readings, alerts and evidence into your own systems.", `<section class="institutional-proof"><div class="grid g2"><div class="panel"><p class="eyebrow">WHAT YOU GET</p><h2>Everything in Enterprise, plus:</h2><ul class="proof-list"><li>High-volume API and event feeds</li><li>HMAC-authenticated webhooks and bulk exports</li><li>Custom data formats and retention</li><li>Account takeover alerts</li></ul></div><div class="panel"><p class="eyebrow">HOW IT STARTS</p><h2>An architecture review.</h2><p>We map what you need, then propose a contract. From $250,000 a year.</p><ul class="proof-list"><li>Evidence travels with every result</li><li>Scope written down before you commit</li></ul></div></div></section><section><div class="panel"><h2>Talk to us.</h2><p><a class="btn" href="mailto:partnerships@noshashi.app">Build with NOSHASHI</a></p></div></section>`],
   // The verbs are the edge function's own list (reference.json), not a
   // roadmap: an endpoint named here is one that answers today.
-  ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.", `<div class="panel"><p class="eyebrow">START HERE · FREE, NO KEY</p><h2>Asset Risk API</h2><p>One issued asset in one call: what its issuer can do to holders, what its XRP order book can actually absorb, what a sale or purchase of a given size would fill at, what was not checked, and a SHA-256 receipt over the report. Read from validated ledgers. Not a rating.</p><pre><code>curl "https://www.noshashi.app/api/v1/asset-risk?issuer=rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B&amp;currency=USD&amp;size=1000"</code></pre><p>No account needed. Up to 30 uncached requests a minute per caller; answers are cached for a minute. Schema <code>noshashi.asset-risk.v1</code>, documented in the <a href="/docs/api/">API reference</a>. Need more volume, history or monitoring? <a href="mailto:institutions@noshashi.app">institutions@noshashi.app</a>.</p></div><div class="panel"><p class="eyebrow">REFERENCE · API KEY</p><h2>Compliance API verbs</h2><p>One edge function serves every verb: <code>https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify/&lt;verb&gt;</code>, with an <code>nsh_live_</code> key from the desktop app.</p><ul>${DOCS_REF.verbs.map((v) => `<li><code>${esc(v.path)}</code> — ${esc(v.description)}</li>`).join("")}</ul><p>Request and response shapes, authentication, scopes and rate limits: <a href="/docs/api/">API reference</a>. Signed event delivery: <a href="/docs/webhooks/">Webhooks</a>. Everything else: <a href="/docs/">documentation</a>.</p></div>`],
+  ["developers", "developers", "DEVELOPER PORTAL", "Programmable institutional intelligence.", "Call the same validated-ledger readings and rule evaluation the app runs, from your own systems.", `<div class="panel"><p class="eyebrow">SIGNED-IN WORKFLOW</p><h2>Payment Review developer portal</h2><p>Review an XRPL payment list in the browser, through an API or from the CLI. Every completed check includes its full findings and evidence. Free evaluation capacity; existing paid plans add processing volume.</p><p><a class="btn" href="/developers/portal/">Open the developer portal</a></p></div><div class="panel"><p class="eyebrow">START HERE · FREE, NO KEY</p><h2>Asset Risk API</h2><p>One issued asset in one call: what its issuer can do to holders, what its XRP order book can actually absorb, what a sale or purchase of a given size would fill at, what was not checked, and a SHA-256 receipt over the report. Read from validated ledgers. Not a rating.</p><pre><code>curl "https://www.noshashi.app/api/v1/asset-risk?issuer=rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B&amp;currency=USD&amp;size=1000"</code></pre><p>No account needed. Up to 30 uncached requests a minute per caller; answers are cached for a minute. Schema <code>noshashi.asset-risk.v1</code>, documented in the <a href="/docs/api/">API reference</a>. Need more volume, history or monitoring? <a href="mailto:institutions@noshashi.app">institutions@noshashi.app</a>.</p></div><div class="panel"><p class="eyebrow">REFERENCE · API KEY</p><h2>Compliance API verbs</h2><p>One edge function serves every verb: <code>https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-verify/&lt;verb&gt;</code>, with an <code>nsh_live_</code> key from the desktop app.</p><ul>${DOCS_REF.verbs.map((v) => `<li><code>${esc(v.path)}</code> — ${esc(v.description)}</li>`).join("")}</ul><p>Request and response shapes, authentication, scopes and rate limits: <a href="/docs/api/">API reference</a>. Signed event delivery: <a href="/docs/webhooks/">Webhooks</a>. Everything else: <a href="/docs/">documentation</a>.</p></div>`],
 ];
 
 async function buildPricingEnhancement() {
@@ -1632,6 +1633,7 @@ async function buildSitemap(docs = [], tokenPages = []) {
     ...TOOL_PAGES,
     ...TOKEN_INDEX_PAGES,
     ...PARTNER_PAGES,
+    ...PORTAL_PAGES,
     ...tokenPages,
     ...REPORT_PAGES,
     ...BRIEF_PAGES,
@@ -1742,6 +1744,7 @@ async function main() {
   for (const page of PRODUCT_PAGES) await buildProductPage(page);
   await buildRedesignPages(write);
   await buildWorkspace(write, { release });
+  await buildPaymentPortal(write);
   await buildTutorial(write, { site: SITE });
   await buildAcademy(write);
   await buildTrust();

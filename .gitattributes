@@ -31,3 +31,7 @@
 *.dmg  binary
 *.woff  binary
 *.woff2 binary
+
+# Compiled vendor code can contain significant whitespace in template strings.
+# Review the portal's source; keep the generated bundle reproducible.
+site/assets/payment-portal/portal.js linguist-generated=true -whitespace
