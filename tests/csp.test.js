@@ -28,6 +28,16 @@ describe("the website's Content-Security-Policy", () => {
   });
 });
 
+describe("the Academy course's policy", () => {
+  it("loads local caption blobs without loosening script or framing restrictions", () => {
+    const rules = JSON.parse(readFileSync("vercel.json", "utf8")).headers;
+    const course = rules.find(h => h.source === "/academy/app/(.*)").headers.find(h => h.key === "Content-Security-Policy").value;
+    expect(course).toBe(`${csp}; media-src 'self' blob:`);
+    expect(rules.findIndex(h => h.source === "/academy/app/(.*)")).toBeGreaterThan(rules.findIndex(h => h.source === "/(.*)"));
+    expect(rules.findIndex(h => h.source === "/academy/app/(.*)")).toBeLessThan(rules.findIndex(h => h.source === "/academy/app/workstation/(.*)"));
+  });
+});
+
 describe("the Academy lab workstation's policy", () => {
   it("is the site's policy, except that the Academy may frame it", () => {
     const rules = JSON.parse(readFileSync("vercel.json", "utf8")).headers;

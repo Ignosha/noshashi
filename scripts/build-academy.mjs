@@ -27,19 +27,20 @@ const LABS = (readFileSync(new URL("../src/lib/learn/labs.ts", import.meta.url),
  */
 const DESKTOP_RELEASED = true;
 const RELEASE_URL = `https://github.com/Ignosha/noshashi/releases/tag/academy-v${VERSION}`;
+const ARROW = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3h10v10M3 13 13 3" stroke="currentColor" stroke-width="1.2"/></svg>';
 
 export async function buildAcademy(write) {
   const minutes = COURSE.lessons.reduce((n, l) => n + l.minutes, 0);
   const levels = COURSE.levels
     .map((level) => {
       const lessons = COURSE.lessons.filter((l) => l.level === level.id);
-      return `<section class="ac-level">
-  <h3>Level ${level.n} · ${esc(level.title)}</h3>
+      return `<details class="ac-level"${level.n === 1 ? " open" : ""}>
+  <summary><h3><span class="ac-index">${String(level.n).padStart(2, "0")}</span>${esc(level.title)}</h3><span class="ac-meta">${lessons.length} lessons · ${lessons.reduce((n, l) => n + l.minutes, 0)} min</span></summary>
   <p>${esc(level.blurb)}</p>
   <ol>${lessons
     .map((l) => `<li><span>${esc(l.title)}</span><span class="ac-meta">${l.minutes} min${l.video ? " · video" : ""}${l.labs.length ? " · lab" : ""}</span></li>`)
     .join("")}</ol>
-</section>`;
+</details>`;
     })
     .join("\n");
 
@@ -49,23 +50,41 @@ export async function buildAcademy(write) {
 
   const body = `<div class="ac-wrap">
 <section class="ac-hero">
-  <p class="eyebrow">NOSHASHI ACADEMY · FREE</p>
-  <h1>Learn NOSHASHI and the XRP Ledger, one small step at a time.</h1>
-  <p>${COURSE.lessons.length} short lessons in ${COURSE.levels.length} levels, about ${minutes} minutes in all. Videos with captions, every card read aloud if you like, a three-question check after each lesson, hands-on labs in a lab workstation running the real NOSHASHI console, and a certificate of completion.</p>
-  <p class="cta"><a class="btn" href="/academy/app/">Start in your browser</a> ${download}</p>
-  <p class="ac-fine"><strong>On iPhone or iPad:</strong> open <a href="/academy/app/">the Academy</a> in Safari, tap Share, then Add to Home Screen. It gets its own icon and opens full screen, like an app.</p>
-  <p class="ac-fine">No account, no sign-in, no keys. Your progress stays on your own computer. Works offline: the desktop app carries everything, videos included; in the browser the course keeps working offline after your first visit, and only the videos need a connection. Offline, labs show their recorded ledger readings.</p>
+  <div class="ac-hero-copy">
+    <p class="eyebrow">THE LEARNING DESK / FREE, SELF-PACED</p>
+    <p class="ac-brand-name">Noshashi <em>Academy</em></p>
+    <h1>Learn the ledger.<br><em>Read the evidence.</em></h1>
+    <p class="ac-lead">Understand issuer controls, delivered payments and funded order-book depth. Build the judgement to ask better questions of public XRPL evidence.</p>
+    <p class="cta"><a class="btn" href="/academy/app/">Start learning ${ARROW}</a> ${download}</p>
+    <p class="ac-fine">No account. No wallet keys. Your progress stays on your device.</p>
+  </div>
+  <aside class="ac-fieldnotes" aria-label="From a lesson to an investigation">
+    <p class="eyebrow">FIELD GUIDE / HOW IT WORKS</p>
+    <ol>
+      <li><span>01</span><div><h2>Understand the idea.</h2><p>Watch, listen or read. One clear concept at a time.</p></div></li>
+      <li><span>02</span><div><h2>Examine the evidence.</h2><p>Put the concept to work in the NOSHASHI lab workstation.</p></div></li>
+      <li><span>03</span><div><h2>Check your understanding.</h2><p>Retry a short check, then move on at your own pace.</p></div></li>
+    </ol>
+    <p class="ac-fieldnotes-end">No timers. No rush. A record of what you learn.</p>
+  </aside>
 </section>
 
-<section class="ac-grid" aria-label="How the Academy is built">
-  <div><h2>Learn the way you learn</h2><p>Choose watch, listen, read or do. Each lesson starts with that, and nothing is hidden for any style.</p></div>
-  <div><h2>Short enough to finish</h2><p>One idea per card, one question at a time, a progress line that always shows how close the end is, and no timers.</p></div>
-  <div><h2>Built for everyone</h2><p>Larger text, more spacing, Atkinson Hyperlegible letters for low vision, high contrast, no movement, read-aloud, captions and transcripts, full keyboard use, and break reminders.</p></div>
-  <div><h2>A lab workstation, like Packet Tracer</h2><p>${LABS} labs, one for every NOSHASHI feature, run in the lab workstation: the real NOSHASHI console inside the Academy, beside each step's instructions, with objectives that tick off as you do them and CHECK RESULTS to score them. Real mainnet addresses, plus ${TESTNET.cases.length} real testnet payments to check against invoices. No NOSHASHI install needed.</p></div>
+<dl class="ac-facts" aria-label="Course at a glance">
+  <div><dt>Short lessons</dt><dd>${COURSE.lessons.length}</dd></div>
+  <div><dt>Learning levels</dt><dd>${COURSE.levels.length}</dd></div>
+  <div><dt>At your own pace</dt><dd>~${minutes}<small> min</small></dd></div>
+  <div><dt>Cost to learn</dt><dd class="ac-fact-word">Always free</dd></div>
+</dl>
+
+<section class="ac-grid" aria-label="Learn to read public ledger evidence">
+  <div><p class="eyebrow">01 / ISSUER CONTROLS</p><h2>Who holds the controls?</h2><p>Read freeze, clawback and authorization settings. Learn what those flags can establish, and what they cannot prove about reserves or legal rights.</p></div>
+  <div><p class="eyebrow">02 / PAYMENT EVIDENCE</p><h2>What was delivered?</h2><p>Examine the delivered amount, understand partial payments, and recognize when the evidence is incomplete.</p></div>
+  <div><p class="eyebrow">03 / FUNDED DEPTH</p><h2>What depth is funded?</h2><p>Distinguish quoted offers from funded order-book depth. A snapshot is evidence at a point in time, not an execution guarantee.</p></div>
 </section>
 
 <section class="ac-course">
-  <h2>The course</h2>
+  <p class="eyebrow">YOUR COURSE / FROM FIRST PRINCIPLES TO PRACTICE</p>
+  <h2>Build your understanding,<br><em>one chapter at a time.</em></h2>
   ${levels}
   <section class="ac-level">
     <h3>Final check and certificate</h3>
@@ -73,7 +92,13 @@ export async function buildAcademy(write) {
   </section>
 </section>
 
-<p class="ac-fine">The certificate is a record of a completed self-paced course. It is not a professional licence, an accreditation, a regulatory qualification or an offer of employment. The full written course is also on the <a href="/learn/">Learn</a> page.</p>
+<section class="ac-reading" aria-labelledby="ac-reading-title">
+  <div><p class="eyebrow">A COURSE THAT WORKS FOR YOU</p><h2 id="ac-reading-title">Your pace.<br><em>Your way of learning.</em></h2></div>
+  <div><p>Choose watch, listen, read or do. Captions, transcripts, read-aloud, larger text, Atkinson Hyperlegible, high contrast, reduced movement and break reminders are available in the course.</p><p>${LABS} labs run the NOSHASHI training console beside their instructions, with recorded mainnet examples and ${TESTNET.cases.length} testnet payment cases. No separate NOSHASHI installation is needed.</p><p>After a first browser visit, lessons and checks work offline; videos and fresh ledger readings need a connection. The desktop app bundles the videos. <strong>On iPhone or iPad:</strong> open the Academy in Safari, then Share → Add to Home Screen.</p></div>
+</section>
+
+<div class="ac-next"><div><p class="eyebrow">THE NEXT STEP IS A SMALL ONE</p><h2>Open your learning desk.</h2></div><a class="btn" href="/academy/app/">Start the free course ${ARROW}</a></div>
+<p class="ac-fine">The certificate records completion of a self-paced course; it is not a professional licence, accreditation or regulatory qualification. Its check code is a hash of the stated information, not a digital signature or independent proof of completion. The full written course is also on the <a href="/learn/">Learn</a> page.</p>
 </div>`;
 
   await write(

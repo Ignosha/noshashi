@@ -2,15 +2,9 @@
 /**
  * Raster brand files, rendered with the bundled Chromium.
  *
- *   app-icon-master.png        1024px app icon: the owner's flower artwork
- *                              (brand/flower-source.png) on the navy ground.
- *                              The previous green artwork is kept as
- *                              brand/flower-source-v1-green.png; copy it back
- *                              over flower-source.png and set ART below to
- *                              ART_V1 to restore the old logo.
- *                              Source for `npm run icon` (tauri icon).
- *   src-tauri/icons/tray.png   macOS menu-bar template images from the
- *   src-tauri/icons/tray@2x.png  single-colour vector (brand/flower-mono.svg).
+ *   Desktop launcher/tray icons are delegated to gen-app-icons.mjs after
+ *   the existing website artwork is rendered. They use the circular seal
+ *   and separate Academy wordmark, with transparent desktop corners.
  *   site/assets/flower-mark-{64,128,180}.png, public/brand/flower-mark-128.png
  *                              the artwork itself as the logo: square, cropped
  *                              around its lit core, transparent (favicons embed
@@ -19,10 +13,7 @@
  *                              website hero (the 1.4 MB PNG
  *                              source is too heavy to serve).
  *
- * Full-bleed ground by design: every OS applies its own corner mask, and a
- * second rounding under theirs is what once left white icon corners.
- *
- *   node scripts/gen-brand.mjs && node scripts/gen-brand-raster.mjs && npm run icon
+ *   node scripts/gen-brand.mjs && node scripts/gen-brand-raster.mjs
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -49,31 +40,9 @@ async function render(html, px, out) {
 // Where the artwork sits in its source image: the point the marks centre
 // on, the source width, and the half-size of the square that holds every
 // petal tip. ART_V1 is the previous green flower (1263x1245).
-const ART_V1 = { cx: 628, cy: 578, w: 1263, half: 600, ground: ["#17301D", "#0C1710", "#060B07"] };
 const ART = { cx: 954, cy: 568, w: 1920, half: 920, ground: ["#13213D", "#0A1224", "#050912"] };
 // Offset the artwork so its centre, not the image box, lands on the icon's centre.
 const flower = dataUrl("brand/flower-source.png", "image/png");
-await render(
-  `<div style="width:1024px;height:1024px;position:relative;overflow:hidden;
-     background:radial-gradient(circle at 50% 50%,${ART.ground[0]} 0%,${ART.ground[1]} 52%,${ART.ground[2]} 100%)">
-     <img src="${flower}" style="position:absolute;width:880px;
-       left:${512 - ART.cx * (880 / ART.w)}px;top:${512 - ART.cy * (880 / ART.w)}px">
-   </div>`,
-  1024,
-  "app-icon-master.png"
-);
-
-const mono = dataUrl("brand/flower-mono.svg", "image/svg+xml");
-for (const [px, pad, out] of [
-  [44, 3, "src-tauri/icons/tray.png"],
-  [88, 6, "src-tauri/icons/tray@2x.png"],
-]) {
-  await render(
-    `<img src="${mono}" style="display:block;width:${px - pad * 2}px;height:${px - pad * 2}px;margin:${pad}px">`,
-    px,
-    out
-  );
-}
 
 // Web copies of the artwork: WebP keeps the alpha channel at a fraction
 // of the PNG's weight.
@@ -147,3 +116,4 @@ for (const [px, out] of [[180, "site/assets/ledger-mark-180.png"], [512, "site/a
 }
 
 await browser.close();
+await import("./gen-app-icons.mjs");

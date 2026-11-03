@@ -20,15 +20,15 @@ export default function App() {
   const [openLab, setOpenLab] = useState<string | null>(null);
   const online = useOnline();
   return (
-    <div className="safe-area flex min-h-screen flex-col bg-background text-foreground">
+    <div className="academy-shell ledger-desktop safe-area flex min-h-screen flex-col bg-background text-foreground">
       <a href="#main" className="skip-link rounded bg-brand px-3 py-1.5 text-primary-foreground">
         Skip to the lesson
       </a>
-      <header className="flex items-center gap-4 border-b border-border/60 px-5 py-3">
-        <h1 className="text-[15px] font-semibold tracking-tight">
-          NOSHASHI <span className="text-brand">Academy</span>
+      <header className="academy-header">
+        <h1 className="academy-wordmark">
+          <img src={`${import.meta.env.BASE_URL}brand/academy-wordmark.svg`} alt="Noshashi Academy" width="234" height="48" />
         </h1>
-        <nav aria-label="Sections" className="flex gap-1.5">
+        <nav aria-label="Academy sections" className="academy-nav">
           {(
             [
               ["course", "Course"],
@@ -44,15 +44,15 @@ export default function App() {
                 setTab(id);
               }}
               className={cn(
-                "rounded-[3px] border px-3 py-1 text-[12.5px]",
-                tab === id ? "border-brand/60 bg-brand/10 text-brand" : "border-transparent text-muted-foreground hover:text-foreground"
+                "academy-nav-link",
+                tab === id && "academy-nav-link-active"
               )}
             >
               {label}
             </button>
           ))}
         </nav>
-        <p className="ml-auto hidden text-[11px] text-faint sm:block">Free · works offline · your progress stays on this computer</p>
+        <p className="academy-header-note">Self-paced. Evidence-led. <span>Always free.</span></p>
       </header>
       <InstallHint />
       {!online && (
@@ -62,7 +62,7 @@ export default function App() {
             : "You are offline. Lessons, read-aloud, checks, the final check and your certificate all work. Videos need a connection here (the desktop app has them built in), and lab readings show what was recorded."}
         </p>
       )}
-      <main id="main" className="mx-auto w-full max-w-[1000px] flex-1 px-5 py-5">
+      <main id="main" className="academy-main">
         {tab === "course" ? (
           <AcademyPanel
             onOpenLab={(id) => {
@@ -74,6 +74,10 @@ export default function App() {
           <Labs openId={openLab} onClose={() => setOpenLab(null)} />
         )}
       </main>
+      <footer className="academy-footer">
+        <span>Noshashi Academy</span>
+        <span>No account or wallet keys. Progress stays on this device.</span>
+      </footer>
     </div>
   );
 }
