@@ -1,0 +1,534 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NOSHASHI Payment Review",
+    "version": "0.1.0",
+    "description": "Read-only mainnet beta. Full findings and evidence at every tier. Capacity is shared by browser/API/CLI. Public XRPL servers remain trusted. Receipt hashes are not digital signatures. No accounting allocation or settlement booking."
+  },
+  "servers": [
+    {
+      "url": "https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1/noshashi-payment-review"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Scoped nsh_review_ key for runs/usage; Supabase account JWT for management routes. Complete MFA if enrolled."
+      }
+    }
+  },
+  "paths": {
+    "/runs": {
+      "post": {
+        "summary": "Review a batch. Free: 5 rows; Pro and higher: 25.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rows"
+                ],
+                "properties": {
+                  "rows": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 25,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "hash",
+                        "invoice"
+                      ],
+                      "properties": {
+                        "hash": {
+                          "type": "string",
+                          "pattern": "^[A-Fa-f0-9]{64}$"
+                        },
+                        "invoice": {
+                          "type": "object",
+                          "required": [
+                            "invoice_id",
+                            "destination",
+                            "expected_amount",
+                            "asset"
+                          ],
+                          "properties": {
+                            "invoice_id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 120
+                            },
+                            "destination": {
+                              "type": "string"
+                            },
+                            "destination_tag": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ],
+                              "minimum": 0,
+                              "maximum": 4294967295
+                            },
+                            "expected_amount": {
+                              "type": "string",
+                              "description": "Exact decimal string; never a JSON number."
+                            },
+                            "asset": {
+                              "oneOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "kind"
+                                  ],
+                                  "properties": {
+                                    "kind": {
+                                      "const": "xrp"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "kind",
+                                    "currency",
+                                    "issuer"
+                                  ],
+                                  "properties": {
+                                    "kind": {
+                                      "const": "issued"
+                                    },
+                                    "currency": {
+                                      "type": "string"
+                                    },
+                                    "issuer": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "underpayment_tolerance": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "allow_partial_payment": {
+                              "type": "boolean",
+                              "default": false
+                            },
+                            "hold_overpayment": {
+                              "type": "boolean",
+                              "default": false
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+            }
+          }
+        ]
+      },
+      "get": {
+        "summary": "List the latest 30 runs owned by the authenticated account.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        }
+      }
+    },
+    "/runs/{id}": {
+      "get": {
+        "summary": "Retrieve complete historical findings and evidence, regardless of current tier.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/usage": {
+      "get": {
+        "summary": "Read processing capacity and usage for the UTC calendar month. No automatic overage charges.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        }
+      }
+    },
+    "/keys": {
+      "get": {
+        "summary": "List this account\u2019s Payment Review keys. Browser session only.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a 90-day scoped key, shown once. Browser session only.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 80
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Permanently revoke an owned key. Browser session only.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/checkout": {
+      "post": {
+        "summary": "Open Stripe hosted billing. Browser session only.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cadence": {
+                    "enum": [
+                      "monthly",
+                      "annual"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portal": {
+      "post": {
+        "summary": "Open Stripe hosted billing. Browser session only.",
+        "responses": {
+          "200": {
+            "description": "Saved result or account information"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "202": {
+            "description": "Still processing; retry same request ID"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient scope or MFA required"
+          },
+          "409": {
+            "description": "Idempotency payload conflict"
+          },
+          "429": {
+            "description": "Processing capacity or request rate exceeded"
+          },
+          "503": {
+            "description": "Unavailable; no passing result inferred"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cadence": {
+                    "enum": [
+                      "monthly",
+                      "annual"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -12,7 +12,7 @@
     "vite": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "site:build": "node scripts/build-site.mjs",
+    "site:build": "npm run site:portal && node scripts/build-site.mjs",
     "site:noshx": "vite build --config vite.noshx-web.config.mts",
     "site:dev": "node scripts/build-site.mjs && node scripts/dev-site.mjs",
     "email:preview": "node scripts/send-update.mjs --headline \"Preview\" || true",
@@ -41,7 +41,9 @@
     "check:intelligence": "node scripts/build-intelligence.mjs --check",
     "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg",
     "check:noshx-web": "npm run -s site:noshx && git diff --exit-code --stat site/assets/noshx && test -z \"$(git status --porcelain site/assets/noshx)\"",
-    "check:academy-web": "npm run -s site:academy && git diff --exit-code --stat site/academy/app && test -z \"$(git status --porcelain site/academy/app)\""
+    "check:academy-web": "npm run -s site:academy && git diff --exit-code --stat site/academy/app && test -z \"$(git status --porcelain site/academy/app)\"",
+    "site:portal": "vite build --config vite.portal.config.mts && node scripts/build-payment-portal.mjs",
+    "portal:cli": "node packages/cli/bin/noshashi-review.mjs"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.2.6",

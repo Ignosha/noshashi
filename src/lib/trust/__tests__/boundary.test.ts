@@ -36,7 +36,14 @@ function commandsUsed(): Map<string, string[]> {
     // rpc("x", …) and rippleRpc("x", …) — not Supabase's `.rpc(`.
     for (const m of text.matchAll(/(?<![.\w])(?:rpc|rippleRpc)\(\s*"([a-z_]+)"/g)) add(m[1], file);
     // WebSocket frames and JSON-RPC bodies.
-    for (const m of text.matchAll(/\b(?:command|method)\s*:\s*"([a-z_]+)"/g)) add(m[1], file);
+    for (const m of text.matchAll(/\b(?:command|method)\s*:\s*"([a-z_]+)"/g)) {
+      // Supabase Auth bundles an unused Ethereum login implementation.
+      // personal_sign is an EVM method, not an XRPL read command. Keep
+      // the signing/broadcast scan below intact and separately assert
+      // that our portal never invokes the SDK's wallet-login API.
+      if (file === "site/assets/payment-portal/portal.js" && m[1] === "personal_sign") continue;
+      add(m[1], file);
+    }
     // The NFT offers reader passes its command through a helper.
     for (const m of text.matchAll(/\bask\(\s*"([a-z_]+)"\s*\)/g)) add(m[1], file);
   }
@@ -56,6 +63,12 @@ describe("the published scope is the scope tested", () => {
 });
 
 describe("NO SIGNING · NO BROADCAST", () => {
+  it("the payment portal never invokes wallet-based authentication", () => {
+    const portal = walk("src/portal").map((file) => readFileSync(file, "utf8")).join("\n");
+    expect(portal.length).toBeGreaterThan(100);
+    expect(portal).not.toMatch(/\b(?:signInWithWeb3|personal_sign|eth_requestAccounts|signMessage)\b/);
+  });
+
   it("no covered file sends a signing or submit command", () => {
     const hits: string[] = [];
     for (const { file, text } of files) {
