@@ -96,6 +96,7 @@ export function useXRPL(address: string) {
   const [history, setHistory] = useState<LedgerTick[]>([]);
   const [latencyMs, setLatencyMs] = useState(0);
   const eventSeq = useRef(0);
+  const accountRequest = useRef(0);
 
   const refresh = useCallback(async () => {
     try {
@@ -113,16 +114,23 @@ export function useXRPL(address: string) {
   }, []);
 
   const refreshAccount = useCallback(async () => {
+    const request = ++accountRequest.current;
     if (!isValidAddress(address)) {
       setAccount(null);
       setCredentials([]);
       setTransactions([]);
+      setCredentialError(null);
+      setActivityError(null);
+      setLoadingAccount(false);
       setAccountError("Address is not a valid XRPL classic address.");
       return;
     }
 
     setLoadingAccount(true);
     setAccountError(null);
+    setAccount(null);
+    setCredentials([]);
+    setTransactions([]);
     try {
       // Settled, not all-or-nothing: a node that refuses `account_tx`
       // should not also blank out the balance we did manage to read.
@@ -132,6 +140,8 @@ export function useXRPL(address: string) {
           fetchWalletCredentials(address),
           fetchWalletTransactions(address),
         ]);
+
+      if (request !== accountRequest.current) return;
 
       if (accountResult.status === "fulfilled") {
         setAccount(accountResult.value);
@@ -167,7 +177,7 @@ export function useXRPL(address: string) {
         );
       }
     } finally {
-      setLoadingAccount(false);
+      if (request === accountRequest.current) setLoadingAccount(false);
     }
   }, [address]);
 

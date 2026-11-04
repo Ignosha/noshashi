@@ -1,3 +1,4 @@
+import { isSecurityPreview } from "./edition";
 import { BRAND } from "./brand";
 import { isTauri } from "./env";
 import { readSetting, writeSetting } from "./store";
@@ -72,7 +73,7 @@ let pending: PluginUpdate | null = null;
 
 /** Whether this build was compiled with an updater public key. */
 export async function updatesConfigured(): Promise<boolean> {
-  if (!isTauri) return false;
+  if (!isTauri || isSecurityPreview) return false;
   try {
     const { invoke } = await import("@tauri-apps/api/core");
     return await invoke<boolean>("updater_configured");
@@ -90,6 +91,7 @@ export async function updatesConfigured(): Promise<boolean> {
  */
 export async function checkForUpdate(): Promise<UpdateAvailability> {
   pending = null;
+  if(isSecurityPreview) return {state:"unsupported",reason:"Security preview builds do not use the production updater. Install a reviewed preview artifact explicitly."};
 
   if (!isTauri) {
     return {

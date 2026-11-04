@@ -8,17 +8,19 @@ import { toCsv } from "@/lib/format";
 import { saveTextFile } from "@/lib/export";
 import { useToast } from "@/lib/toast";
 import {
+  checkAdmission,
+  isDomainId,
+  type AdmissionRecord,
   credentialsOf,
-  directoryDomains,
   isAddress,
   typeLabel,
   validatedLedger,
   type CredentialEntry,
-  type DirectoryDomain,
   type LedgerAt,
 } from "@/lib/compliance/registry";
 import { admission, credentialStatus, expiringWithin, rippleToIso } from "../../../supabase/functions/_shared/ledgerRegistry.ts";
 import { cn } from "@/lib/utils";
+import { accountDomainReading, type AccountDomainReading } from "@/lib/compliance/accountDomains";
 
 /**
  * Credential tools for compliance teams, all read live from the latest
@@ -248,67 +250,55 @@ export function IssuerRegister({ defaultIssuer }: { defaultIssuer?: string }) {
 
 /** The real domains on mainnet that `account` would be admitted to today. */
 export function AccountDomains({ account }: { account: string | null }) {
-  const [state, setState] = useState<{ ledger: LedgerAt; domains: DirectoryDomain[]; held: CredentialEntry[] } | null>(null);
+  const [state, setState] = useState<AccountDomainReading | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const [domainId, setDomainId] = useState("");
+  const [direct, setDirect] = useState<AdmissionRecord | null>(null);
+  const [directError, setDirectError] = useState<string | null>(null);
+  const [directBusy, setDirectBusy] = useState(false);
 
   useEffect(() => {
-    if (!account) return;
+    setState(null); setError(null); setDirect(null); setDirectError(null);
+    if (!account) { setBusy(false); return; }
     let cancelled = false;
     setBusy(true);
-    setError(null);
-    void (async () => {
-      try {
-        const [ledger, dir] = await Promise.all([validatedLedger(), directoryDomains()]);
-        const held = await credentialsOf(account, "subject", ledger.index);
-        if (!cancelled) setState({ ledger, domains: dir.domains, held });
-      } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Could not be read.");
-      } finally {
-        if (!cancelled) setBusy(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [account]);
+    void accountDomainReading(account).then(value => { if (!cancelled) setState(value); })
+      .catch(e => { if (!cancelled) setError(e instanceof Error ? e.message : "Could not read the ledger."); })
+      .finally(() => { if (!cancelled) setBusy(false); });
+    return () => { cancelled = true; };
+  }, [account, retry]);
 
-  const admitted = state ? state.domains.filter((d) => admission(d, account ?? "", state.held, state.ledger.closeTime).admitted) : [];
-  // Domains where this account holds a matching credential that is not
-  // usable (unaccepted or expired): the ones worth chasing.
-  const nearly = state
-    ? state.domains.filter((d) => {
-        const r = admission(d, account ?? "", state.held, state.ledger.closeTime);
-        return !r.admitted && r.lines.some((l) => l.status === "pending" || l.status === "expired");
-      })
-    : [];
+  const admitted = state ? state.domains.filter(d => admission(d, account ?? "", state.held, state.ledger.closeTime).admitted) : [];
+  const nearly = state ? state.domains.filter(d => { const r = admission(d, account ?? "", state.held, state.ledger.closeTime); return !r.admitted && r.lines.some(l => l.status === "pending" || l.status === "expired"); }) : [];
 
-  return (
-    <Panel label="DOMAINS THIS ACCOUNT ENTERS" className="shrink-0">
-      {!account ? (
-        <p className="text-[12px] text-muted-foreground">Load a wallet to see which permissioned domains on mainnet its credentials open.</p>
-      ) : busy ? (
-        <p className="text-[12px] text-muted-foreground">Reading the domain directory and this account's credentials…</p>
-      ) : error ? (
-        <p className="text-[12px] text-no-go">{error}</p>
-      ) : state ? (
-        <div>
-          <p className="text-[12.5px] text-foreground/85">
-            Admitted to <span className="text-go">{admitted.length}</span> of {state.domains.length} domain{state.domains.length === 1 ? "" : "s"} in the directory.
-          </p>
-          {[...admitted.map((d) => ({ d, ok: true })), ...nearly.map((d) => ({ d, ok: false }))].slice(0, 10).map(({ d, ok }) => (
-            <div key={d.domainId} className="mt-1.5 flex items-center justify-between gap-2 text-[12px]">
-              <span className="mono-font min-w-0 truncate text-muted-foreground">
-                {d.domainId.slice(0, 12)}… · owner {shortAddress(d.owner)}
-              </span>
-              <Badge variant={ok ? "go" : "hold"} className="text-[10px]">
-                {ok ? (d.owner === account ? "OWNER" : "ADMITTED") : "CREDENTIAL NOT USABLE"}
-              </Badge>
-            </div>
-          ))}
-          <p className="mono-font mt-2 text-[10.5px] text-faint">Credentials at ledger {state.ledger.index.toLocaleString()} · directory from the registry sweep</p>
-        </div>
-      ) : null}
-    </Panel>
-  );
+  return <Panel label="DOMAINS THIS ACCOUNT ENTERS" className="shrink-0">
+    {!account ? <p className="text-[12px] text-muted-foreground">Load a wallet to check permissioned-domain admission.</p> : <>
+      <div aria-live="polite" aria-busy={busy}>
+        {busy ? <p role="status" className="text-[12px] text-muted-foreground">Reading credentials and owned domains; directory discovery is bounded to 8 seconds…</p> : error ? <p role="alert" className="text-[12px] text-no-go">{error}</p> : state ? <>
+          {state.directoryError && <p role="alert" className="mb-2 text-[12px] text-hold">{state.directoryError}</p>}
+          <p className="text-[12.5px] text-foreground">{admitted.length} admission{admitted.length === 1 ? "" : "s"} among {state.domains.length} live-checked domain{state.domains.length === 1 ? "" : "s"}.</p>
+          {[...admitted.map(d => ({d, ok:true})), ...nearly.map(d => ({d,ok:false}))].slice(0,10).map(({d,ok}) => <div key={d.domainId} className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[12px]">
+            <span className="mono-font min-w-0 truncate text-muted-foreground" title={d.domainId}>{d.domainId.slice(0,12)}… · {shortAddress(d.owner)}</span>
+            <Badge variant={ok ? "go" : "hold"}>{ok ? d.owner === account ? "OWNER" : "ADMITTED" : "NOT USABLE"}</Badge>
+          </div>)}
+          <p className="mt-2 text-[12px] leading-relaxed text-muted-foreground">{state.note}</p>
+          <p className="mono-font mt-2 text-[11px] text-muted-foreground">Validated ledger {state.ledger.index.toLocaleString()} · {state.ledger.closeIso}</p>
+        </> : null}
+      </div>
+      <Button size="sm" variant="outline" className="mt-3" disabled={busy} onClick={() => setRetry(n=>n+1)}>RETRY DOMAIN DISCOVERY</Button>
+      <form className="mt-4 border-t border-border pt-3" onSubmit={async e => {
+        e.preventDefault(); if (!account || !isDomainId(domainId)) return;
+        setDirectBusy(true); setDirectError(null); setDirect(null);
+        try { setDirect(await checkAdmission(domainId,account)); } catch(e) { setDirectError(e instanceof Error ? e.message : "Domain read unavailable."); } finally { setDirectBusy(false); }
+      }}>
+        <label htmlFor="credential-domain-id" className="text-[12px] text-foreground">Check a known domain ID directly</label>
+        <Input id="credential-domain-id" value={domainId} onChange={e=>setDomainId(e.target.value)} placeholder="64-character ledger object ID" className="mono-font mt-2 text-[12px]" spellCheck={false}/>
+        <Button className="mt-2" size="sm" disabled={directBusy || !isDomainId(domainId)}>{directBusy ? "READING DOMAIN…" : "CHECK DOMAIN ID"}</Button>
+        {directError && <p role="alert" className="mt-2 text-[12px] text-no-go">{directError}</p>}
+        {direct && <p role="status" className="mono-font mt-2 break-all text-[11px] text-foreground">{direct.result.admitted ? "ADMITTED" : "NOT ADMITTED"} · ledger {direct.ledger.index} · SHA-256 {direct.digest}. Hash of this evidence, not a digital signature.</p>}
+      </form>
+    </>}
+  </Panel>;
 }

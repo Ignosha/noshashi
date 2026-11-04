@@ -25,6 +25,7 @@ const TOOLS = `<a class="btn ghost" href="/#public">Explore free tools</a>`;
 
 /* ── /platform/ ───────────────────────────────────────────────────── */
 const CAPABILITIES = [
+  ["CYBERSECURITY", "Signing controls and incident evidence", "Map account authority, test signer-loss scenarios and review control changes. Evidence and owner-reviewed options; no keys, custody or guaranteed recovery.", [PLAN.free, PLAN.pro, PLAN.ent], "/cybersecurity/", "Explore security tools"],
   ["ISSUER CONTROLS", "Who can freeze, claw back or gate an asset", "Reads the issuer's freeze, clawback and authorization settings and whether each right has been given up.", [PLAN.free, PLAN.pro], "/certificate/", "Check an issuer"],
   ["PAYMENT VERIFICATION", "What a payment actually delivered", "Separates the amount requested from the amount delivered, so partial payments are never credited at face value.", [PLAN.free], "/delivered/", "Verify a payment"],
   ["EXECUTABLE LIQUIDITY", "Depth you can really trade", "Counts only offers whose owners can fund them and compares that with what the book advertises.", [PLAN.free, PLAN.pro], "/book-health/", "Measure a book"],

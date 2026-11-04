@@ -1,4 +1,4 @@
-import { isDemo, isTraining, DEMO_LOCKED, DEMO_UPGRADE_URL, TRAINING_CLOSED } from "@/lib/edition";
+import { isSecurityPreview, isDemo, isTraining, DEMO_LOCKED, DEMO_UPGRADE_URL, TRAINING_CLOSED } from "@/lib/edition";
 import {
   createContext,
   useCallback,
@@ -160,6 +160,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
 
   const startCheckout = useCallback(async (priceId: string, seats = 1) => {
     // A demo that takes a payment is worse than one that does not exist.
+    if (isSecurityPreview) throw new Error("Checkout is disabled in the isolated security preview. Use your regular NOSHASHI installation for billing.");
     if (isDemo || isTraining) {
       await openExternal(DEMO_UPGRADE_URL);
       return;

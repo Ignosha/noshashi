@@ -1,0 +1,218 @@
+[
+  {
+    "id": "control",
+    "title": "Signing control map",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "See every direct signing path and test signer-unavailability scenarios without changing the account."
+  },
+  {
+    "id": "treasury",
+    "title": "Treasury Guard",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Flag large validated XRP payments, balance-share limits, rolling volume and split transfers. Device notifications while open; local review and evidence export. No automatic blocking or reversal."
+  },
+  {
+    "id": "contingency",
+    "title": "Treasury dependency scenarios",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Model a shared custodian or device compromise separately from an outage. Owner-supplied assumptions; no signing or changes."
+  },
+  {
+    "id": "integrity",
+    "title": "Ledger endpoint comparison",
+    "group": "investigate",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Compare AccountRoot bytes at one ledger hash across three endpoints. Agreement is not independent consensus verification."
+  },
+  {
+    "id": "dependencies",
+    "title": "Software advisory exposure",
+    "group": "protect",
+    "priority": "P1",
+    "plan": "desk",
+    "feature": "alerts",
+    "detail": "With consent, check exact npm versions against OSV and map advisory identifiers to your workflows. No installed-software discovery or security clearance."
+  },
+  {
+    "id": "readiness",
+    "title": "Encrypted response notebook",
+    "group": "investigate",
+    "priority": "P1",
+    "plan": "desk",
+    "feature": "asset_recovery",
+    "detail": "Keep response roles, official contact routes and self-reported drills encrypted on this device. Not a managed key vault; no wallet secrets."
+  },
+  {
+    "id": "sharing",
+    "title": "Reviewed indicator sharing",
+    "group": "operate",
+    "priority": "P2",
+    "plan": "institution",
+    "feature": "threat_registry",
+    "detail": "Free reviewed-indicator lookups; organization filing needs Institutional access, backend migration and independent participant review. No live network or populated coverage is implied."
+  },
+  {
+    "id": "check",
+    "title": "Account hardening",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Inspect master and regular keys, signer quorum, phishing exposure and unsigned hardening proposals."
+  },
+  {
+    "id": "presign",
+    "title": "Pre-sign inspection",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Explain a proposed transaction before a wallet signs it; flag key changes and dangerous transfers."
+  },
+  {
+    "id": "send",
+    "title": "Destination review",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Check a pasted destination against your own address book for lookalikes."
+  },
+  {
+    "id": "emergency",
+    "title": "Compromise checklist",
+    "group": "investigate",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Review containment options and preserve evidence. No keys, custody or guaranteed recovery."
+  },
+  {
+    "id": "deposit",
+    "title": "Missing-deposit evidence",
+    "group": "investigate",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Explain a payment and prepare a request for the recipient service, including destination-tag context."
+  },
+  {
+    "id": "exposure",
+    "title": "Permission exposure",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Read standing permissions and owner-reviewed revocation proposals. Batch capacity depends on plan."
+  },
+  {
+    "id": "domain",
+    "title": "Domain identity check",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Compare the account\u2019s domain claim with the domain\u2019s published account listing. This is not identity certification."
+  },
+  {
+    "id": "recover",
+    "title": "Locked-asset review",
+    "group": "investigate",
+    "priority": "P1",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Find eligible escrows, channels, checks and reserve cleanup opportunities. Different from reversing theft."
+  },
+  {
+    "id": "drift",
+    "title": "Control-change comparison",
+    "group": "operate",
+    "priority": "P1",
+    "plan": "desk",
+    "feature": "alerts",
+    "detail": "Compare a saved local control snapshot with a fresh validated-ledger reading. Changes require human review."
+  },
+  {
+    "id": "incident",
+    "title": "Incident evidence trail",
+    "group": "investigate",
+    "priority": "P1",
+    "plan": "desk",
+    "feature": "incident_response",
+    "detail": "Inspect bounded transfer paths and export a hash dossier. Links are evidence leads, not proof of ownership or recovery."
+  },
+  {
+    "id": "cluster",
+    "title": "Related-account leads",
+    "group": "investigate",
+    "priority": "P1",
+    "plan": "desk",
+    "feature": "asset_recovery",
+    "detail": "Review funding and activity similarities. A cluster is a hypothesis, not an attribution of criminal activity."
+  },
+  {
+    "id": "registry",
+    "title": "Threat-report review",
+    "group": "operate",
+    "priority": "P2",
+    "plan": "institution",
+    "feature": "threat_registry",
+    "detail": "Lookups are free. Filing organization reports requires Institutional access; reports are not adjudications."
+  },
+  {
+    "id": "whois",
+    "title": "Service attribution leads",
+    "group": "investigate",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Inspect service labels and sources; verify the recipient\u2019s official identity before sharing incident evidence."
+  },
+  {
+    "id": "withdrawal",
+    "title": "Withdrawal policy review",
+    "group": "operate",
+    "priority": "P2",
+    "plan": "enterprise",
+    "feature": "withdrawal_screening",
+    "detail": "Screen proposed withdrawals against configured controls before your signing system acts. NOSHASHI does not enforce wallet policy."
+  },
+  {
+    "id": "surveillance",
+    "title": "Market surveillance",
+    "group": "operate",
+    "priority": "P3",
+    "plan": "enterprise",
+    "feature": "market_surveillance",
+    "detail": "Investigate order-book behavior and manipulation indicators; indicators do not prove intent."
+  },
+  {
+    "id": "protection",
+    "title": "Reserve evidence",
+    "group": "operate",
+    "priority": "P2",
+    "plan": "institution",
+    "feature": "proof_of_reserves",
+    "detail": "Review supplied liabilities and named ledger accounts. Cannot independently establish control, all liabilities or solvency."
+  },
+  {
+    "id": "guardian",
+    "title": "Change monitoring",
+    "group": "operate",
+    "priority": "P3",
+    "plan": "strategic",
+    "feature": "security_guardian",
+    "detail": "On-device monitoring is free while open; hosted organization monitoring requires contracted Strategic access and configuration."
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "NOSHASHI Security Preview",
+  "identifier": "com.noshashi.security-preview",
+  "bundle": {
+    "createUpdaterArtifacts": false,
+    "shortDescription": "NOSHASHI security workflows — isolated review build",
+    "longDescription": "Review build of Treasury Guard, preflight, organization review and incident evidence. No signing, enforced hold, guaranteed alert delivery or XRP reversal. Backend setup is required for organization reviews. Unsigned and not notarized.",
+    "macOS": { "minimumSystemVersion": "12.0" }
+  }
+}

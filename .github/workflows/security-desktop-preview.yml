@@ -1,0 +1,81 @@
+name: Security desktop preview
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/security-desktop-preview.yml'
+      - 'src/components/scenes/Treasury*.tsx'
+      - 'src/lib/security/treasury*.ts'
+      - 'src-tauri/tauri.security-preview.conf.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: security-preview-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx tsc --noEmit && npm test
+      - name: Verify organization review database boundaries
+        run: |
+          npm install --prefix "$RUNNER_TEMP/security-db" --no-audit --no-fund @electric-sql/pglite@0.5.15
+          PGLITE_MODULE="$RUNNER_TEMP/security-db/node_modules/@electric-sql/pglite/dist/index.js" node scripts/test-security-network-db.mjs
+  mac-preview:
+    needs: checks
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [aarch64-apple-darwin, x86_64-apple-darwin]
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '12.0'
+      VITE_SECURITY_PREVIEW: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - run: npm ci --no-audit --no-fund
+      - name: Compile isolated preview for macOS 12
+        run: npx tauri build --config src-tauri/tauri.security-preview.conf.json --target ${{ matrix.target }} --bundles app,dmg
+      - name: Verify preview identity and deployment target
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle="src-tauri/target/${{ matrix.target }}/release/bundle/macos/NOSHASHI Security Preview.app"
+          test -d "$bundle"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$bundle/Contents/Info.plist")" = 'com.noshashi.security-preview'
+          test "$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$bundle/Contents/Info.plist")" = '12.0'
+          xcrun vtool -show-build "$bundle/Contents/MacOS/noshashi" | tee preview-build-target.txt
+          python3 - <<'PY'
+          import re
+          text=open('preview-build-target.txt').read()
+          versions=re.findall(r'minos\s+(\d+)\.(\d+)',text)
+          assert versions and all((int(a),int(b)) <= (12,0) for a,b in versions), text
+          PY
+          printf '%s\n' 'UNSIGNED / NOT NOTARIZED. Separate preview installation. No production updater or checkout. Backend review migration and signing integration are not deployed by this build.' > PREVIEW-README.txt
+          shasum -a 256 src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: noshashi-security-preview-${{ matrix.target }}-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+            PREVIEW-README.txt
+            SHA256SUMS.txt
+            preview-build-target.txt

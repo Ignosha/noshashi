@@ -88,4 +88,13 @@ describe("Supabase origin and the Tauri CSP", () => {
 
     expect(connectSrcOf(demo)).toBe(connectSrcOf(full));
   });
+  it("allows consent-based OSV checks in the desktop and browser workstation", () => {
+    for (const path of [...TAURI_CONFIGS, "academy/src-tauri/tauri.conf.json"]) {
+      expect(cspOf(path).split(";").find(d => d.trim().startsWith("connect-src"))).toContain("https://api.osv.dev");
+    }
+    const config = JSON.parse(readFileSync(resolve(root, "vercel.json"), "utf8"));
+    const workstation = config.headers.find((h: {source: string}) => h.source === "/academy/app/workstation/(.*)");
+    expect(workstation.headers.find((h: {key: string}) => h.key.toLowerCase() === "content-security-policy").value).toContain("https://api.osv.dev");
+  });
+
 });
