@@ -88,21 +88,23 @@ on its records and procedures; legal action requires appropriate professional
 advice. No custody relationship is inferred solely from a destination tag or
 self-declared domain. No recovery outcome is promised.
 
-## Recommended next research, not offered capabilities
+## Five additional security workflows
 
-1. **Cross-custodian control dependencies:** obtain verified owner-supplied key
-   custody context to reveal shared operational dependencies that ledger signer
-   weights cannot show. Never infer key possession from an address label.
-2. **Independent-node evidence comparisons:** compare the identical account
-   object at the identical ledger hash from separately operated nodes, with
-   provider provenance. Agreement is not independent consensus verification.
-3. **Reviewed incident handoff packets:** establish an agreed evidence schema and
-   verified recipient process with a willing custodian or issuer. No automated
-   accusations, outreach or guaranteed freeze/recovery process.
+The website and Security Center introduce the same tools and limits:
 
-These are proposed evaluation work, not novel-industry claims or included paid
-functionality. SSO, dedicated environments and SLAs remain planned; no independent
-security assessment, certification or OS installer-signing claim is added.
+- **Treasury scenarios (Free):** local owner-supplied dependency mappings; separate compromise authorization from outage availability. Shared custodian/device labels are assumptions, never inferred key custody.
+- **Ledger endpoint comparison (Free):** bounded reads of binary AccountRoot at one fresh validated ledger hash. Decode and match the requested account before hashing identical scope. Missing/mismatched bytes cannot pass. Ripple operates both s1 and s2; agreement is not independent consensus verification.
+- **Software advisory exposure (Pro):** up to 50 exact npm versions queried against [OSV](https://google.github.io/osv.dev/post-v1-querybatch/), only after consent. Send package names/versions, never asset IDs/workflow labels. One 20-second deadline, 1 MiB response cap, 20 advisory details, explicit partial coverage. No-result and withdrawn advisories are not security clearance. No installed-software discovery, firmware or zero-day detection.
+- **Response notebook (Pro):** procedures, roles and public contact routes encrypted on-device using AES-256-GCM and PBKDF2-SHA256 (600,000 iterations, random salt/IV). Lock on hide/five minutes. Ciphertext-only persistence/export, explicit save read-back, wrong-passphrase/tamper rejection. Never store wallet seeds or private keys. No shared vault, managed key custody or password reset; compromised devices remain a risk.
+- **Reviewed indicator sharing (free lookup, Institutional filing):** opt-in organizations, independent staff participant review (expires within 90 days), plan/role enforcement, sourced reports, separate MFA staff review, withdrawal and private audit. Public lookup excludes pending, expired, legacy-only reviews and withdrawn indicators. Private notes/identities are omitted. Indicators do not prove wrongdoing or instruct automatic blocking.
+
+### Required rollout before reviewed sharing
+
+Apply `20261104123000_security_network.sql` through the normal reviewed database process, verify RPC/schema exposure and anonymous read access, configure staff MFA, establish an independent participant/source review procedure and test correction/withdrawal. **This change does not apply a production migration, populate a participant network or promise continuous monitoring.** Missing backend functions fail closed; there is no fallback to fabricated indicators. Existing legacy registry flows remain separate.
+
+Prices, product IDs and entitlement grants are unchanged. Existing Pro alerts/asset-recovery entitlements gate the new desk tools; Institutional threat-registry entitlement is rechecked server-side. Exported hashes identify canonical evidence, not signatures. Evaluate these beta workflows against agreed institutional acceptance criteria; no guarantee of security, recovery, enterprise suitability or adoption. SSO, dedicated environments, SLAs and independent assessments are not added.
+
+Reviewed custodian handoff agreements and independently operated verification infrastructure remain future evaluation work.
 
 ## Reproduction and validation
 
@@ -130,3 +132,12 @@ direct checking during outage, retry, error-vs-empty behavior, control changes,
 evidence export and desktop/mobile public-calculator states. This is not a
 physical Mac or production deployment test. An installed desktop app needs a
 later release to receive these source changes.
+
+Additional regression commands:
+
+```sh
+node scripts/security/enterprise-smoke.mjs /tmp/noshashi-security-review
+PGLITE_MODULE=/path/to/pglite/dist/index.js node scripts/test-security-network-db.mjs
+```
+
+The in-memory database harness loads the actual new migration and existing organization, support and threat-registry definitions. It omits unrelated webhook/cron integrations; a dedicated CI step runs this harness. The existing full PostgreSQL suite continues to test its own migration dependencies. Browser tests use labeled recorded fixtures and mocked network responses; they do not establish live advisory or participant coverage.

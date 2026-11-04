@@ -89,6 +89,51 @@ export function SecurityDesk({ onOpen }: { onOpen: (id: string) => void }) {
         verified custodian, token issuer or legal process; outcomes are not
         guaranteed.
       </p>
+      <section
+        aria-labelledby="security-introduction"
+        className="border-y border-border py-6"
+      >
+        <p className="mono-font text-xs tracking-widest text-muted-foreground">
+          NEW / INSTITUTIONAL SECURITY WORKFLOWS · BETA
+        </p>
+        <h3 id="security-introduction" className="display mt-3 text-3xl">
+          Prepare. Compare. Respond.
+        </h3>
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          Trace shared signing dependencies, compare ledger evidence, check
+          software advisories and prepare an encrypted response notebook.
+          Reviewed sharing adds source-backed indicators after organization
+          verification and backend setup.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {tools
+            .filter((t) =>
+              [
+                "contingency",
+                "integrity",
+                "dependencies",
+                "readiness",
+                "sharing",
+              ].includes(t.id),
+            )
+            .map((t) => (
+              <button
+                key={t.id}
+                onClick={() => onOpen(t.id)}
+                className="border border-border p-4 text-left hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-foreground"
+              >
+                <span className="mono-font text-xs text-muted-foreground">
+                  {planFor(t.plan as PlanId).name} ·{" "}
+                  {t.id === "sharing" ? "SETUP REQUIRED" : "BETA"}
+                </span>
+                <span className="mt-2 block text-base">{t.title} →</span>
+                <span className="mt-2 block text-sm leading-relaxed text-muted-foreground">
+                  {t.detail}
+                </span>
+              </button>
+            ))}
+        </div>
+      </section>
       {(["protect", "investigate", "operate"] as const).map((group, i) => (
         <section key={group} aria-label={group}>
           <div className="mb-3 flex items-baseline gap-3 border-b border-border pb-2">
@@ -102,7 +147,17 @@ export function SecurityDesk({ onOpen }: { onOpen: (id: string) => void }) {
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {tools
-              .filter((t) => t.group === group)
+              .filter(
+                (t) =>
+                  t.group === group &&
+                  ![
+                    "contingency",
+                    "integrity",
+                    "dependencies",
+                    "readiness",
+                    "sharing",
+                  ].includes(t.id),
+              )
               .map((t) => (
                 <button
                   key={t.id}
@@ -470,7 +525,11 @@ function DriftComparison({ posture: p }: { posture: SecurityPosture }) {
                     current,
                     changes,
                     comparisonStatus: changes ? "compared" : "not_compared",
-                    comparisonNote: warning || (saved ? "Compared control fields only; not a compromise clearance." : "No local reference was selected."),
+                    comparisonNote:
+                      warning ||
+                      (saved
+                        ? "Compared control fields only; not a compromise clearance."
+                        : "No local reference was selected."),
                     limitations: [
                       "Local reference is editable",
                       "Public-node reads do not independently verify consensus",

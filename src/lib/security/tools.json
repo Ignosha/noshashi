@@ -9,6 +9,51 @@
     "detail": "See every direct signing path and test signer-unavailability scenarios without changing the account."
   },
   {
+    "id": "contingency",
+    "title": "Treasury dependency scenarios",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Model a shared custodian or device compromise separately from an outage. Owner-supplied assumptions; no signing or changes."
+  },
+  {
+    "id": "integrity",
+    "title": "Ledger endpoint comparison",
+    "group": "investigate",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Compare AccountRoot bytes at one ledger hash across three endpoints. Agreement is not independent consensus verification."
+  },
+  {
+    "id": "dependencies",
+    "title": "Software advisory exposure",
+    "group": "protect",
+    "priority": "P1",
+    "plan": "desk",
+    "feature": "alerts",
+    "detail": "With consent, check exact npm versions against OSV and map advisory identifiers to your workflows. No installed-software discovery or security clearance."
+  },
+  {
+    "id": "readiness",
+    "title": "Encrypted response notebook",
+    "group": "investigate",
+    "priority": "P1",
+    "plan": "desk",
+    "feature": "asset_recovery",
+    "detail": "Keep response roles, official contact routes and self-reported drills encrypted on this device. Not a managed key vault; no wallet secrets."
+  },
+  {
+    "id": "sharing",
+    "title": "Reviewed indicator sharing",
+    "group": "operate",
+    "priority": "P2",
+    "plan": "institution",
+    "feature": "threat_registry",
+    "detail": "Free reviewed-indicator lookups; organization filing needs Institutional access, backend migration and independent participant review. No live network or populated coverage is implied."
+  },
+  {
     "id": "check",
     "title": "Account hardening",
     "group": "protect",
@@ -69,7 +114,7 @@
     "priority": "P0",
     "plan": "operator",
     "feature": null,
-    "detail": "Compare the account’s domain claim with the domain’s published account listing. This is not identity certification."
+    "detail": "Compare the account\u2019s domain claim with the domain\u2019s published account listing. This is not identity certification."
   },
   {
     "id": "recover",
@@ -123,7 +168,7 @@
     "priority": "P0",
     "plan": "operator",
     "feature": null,
-    "detail": "Inspect service labels and sources; verify the recipient’s official identity before sharing incident evidence."
+    "detail": "Inspect service labels and sources; verify the recipient\u2019s official identity before sharing incident evidence."
   },
   {
     "id": "withdrawal",

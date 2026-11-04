@@ -41,6 +41,11 @@ jobs:
       - name: Install
         run: npm install --no-audit --no-fund
 
+      - name: Security network database regression
+        run: |
+          npm install --prefix "$RUNNER_TEMP/security-db" --no-audit --no-fund @electric-sql/pglite@0.5.15
+          PGLITE_MODULE="$RUNNER_TEMP/security-db/node_modules/@electric-sql/pglite/dist/index.js" node scripts/test-security-network-db.mjs
+
       - name: Typecheck
         run: npx tsc --noEmit
 

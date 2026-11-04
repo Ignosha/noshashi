@@ -30,6 +30,8 @@ import { useClaimedSubject } from "@/lib/nav/handoff";
 import { ClusterTab, DepositHelpTab, DomainTab, ExposureTab, PersonalGuardian, PreSignTab, RecoverTab } from "./SecurityTools";
 import { AttributionTab, EmergencyTab, ProtectionTab, RegistryTab, SurveillanceTab, WithdrawalTab } from "./InstitutionalTools";
 import { ControlLab, SecurityDesk } from "./SecurityDesk";
+import { DependencyExposureTab, RecoveryReadinessTab, TreasuryScenarioTab, LedgerIntegrityTab } from "./EnterpriseSecurity";
+import { ThreatSharingTab } from "./ThreatSharing";
 import { EvidenceTrail } from "./SecurityTrail";
 
 /**
@@ -66,6 +68,11 @@ import { EvidenceTrail } from "./SecurityTrail";
 
 const TABS = [
   { id: "desk", label: "SECURITY DESK" },
+  { id: "contingency", label: "TREASURY SCENARIOS" },
+  { id: "integrity", label: "NODE COMPARISON" },
+  { id: "dependencies", label: "SOFTWARE EXPOSURE" },
+  { id: "readiness", label: "RESPONSE NOTEBOOK" },
+  { id: "sharing", label: "REVIEWED SHARING" },
   { id: "control", label: "SIGNING MAP" },
   { id: "drift", label: "CONTROL CHANGES" },
   { id: "check", label: "ACCOUNT CHECK" },
@@ -138,7 +145,7 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
         ))}
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto pr-1" role="tabpanel" id="security-tool-panel" aria-labelledby={`security-tab-${tab}`}>
-        {tab === "desk" ? <SecurityDesk onOpen={id=>{const target=TABS.find(t=>t.id===id);if(target)setTab(target.id);}}/> : tab === "control" ? <ControlLab key={subject??""} initial={subject}/> : tab === "drift" ? <Gated feature="alerts" onUpgrade={onUpgrade} onSignIn={onSignIn}><ControlLab key={subject??""} initial={subject} drift/></Gated> : tab === "check" ? (
+        {tab === "desk" ? <SecurityDesk onOpen={id=>{const target=TABS.find(t=>t.id===id);if(target)setTab(target.id);}}/> : tab === "contingency" ? <TreasuryScenarioTab/> : tab === "integrity" ? <LedgerIntegrityTab/> : tab === "dependencies" ? <Gated feature="alerts" onUpgrade={onUpgrade} onSignIn={onSignIn}><DependencyExposureTab/></Gated> : tab === "readiness" ? <Gated feature="asset_recovery" onUpgrade={onUpgrade} onSignIn={onSignIn}><RecoveryReadinessTab/></Gated> : tab === "sharing" ? <ThreatSharingTab onUpgrade={onUpgrade} onSignIn={onSignIn}/> : tab === "control" ? <ControlLab key={subject??""} initial={subject}/> : tab === "drift" ? <Gated feature="alerts" onUpgrade={onUpgrade} onSignIn={onSignIn}><ControlLab key={subject??""} initial={subject} drift/></Gated> : tab === "check" ? (
           <CheckTab key={subject ?? ""} initial={subject} />
         ) : tab === "presign" ? (
           <PreSignTab />

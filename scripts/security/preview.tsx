@@ -7,6 +7,13 @@ import {
 } from "../../src/components/scenes/SecurityDesk";
 import { CredentialsScene } from "../../src/components/scenes/CredentialsScene";
 import { EvidenceTrail } from "../../src/components/scenes/SecurityTrail";
+import {
+  DependencyExposureTab,
+  RecoveryReadinessTab,
+  TreasuryScenarioTab,
+  LedgerIntegrityTab,
+} from "../../src/components/scenes/EnterpriseSecurity";
+import { ThreatSharingPanel } from "../../src/components/scenes/ThreatSharing";
 import { SecurityScene } from "../../src/components/scenes/SecurityScene";
 import { AuthProvider } from "../../src/lib/auth/useAuth";
 import { BillingProvider } from "../../src/lib/billing/useEntitlements";
@@ -43,6 +50,17 @@ function Preview() {
         </p>
         <nav aria-label="Component review">
           <button onClick={() => setView("desk")}>Overview</button>
+          <button onClick={() => setView("dependencies")}>
+            Software exposure
+          </button>
+          <button onClick={() => setView("readiness")}>
+            Response notebook
+          </button>
+          <button onClick={() => setView("contingency")}>
+            Treasury scenarios
+          </button>
+          <button onClick={() => setView("integrity")}>Node comparison</button>
+          <button onClick={() => setView("sharing")}>Reviewed sharing</button>
           <button onClick={() => setView("scene")}>
             Integrated security center
           </button>
@@ -61,7 +79,23 @@ function Preview() {
           </button>
           <button onClick={() => setView("trail")}>Incident graph</button>
         </nav>
-        {view === "scene" ? (
+        {view === "dependencies" ? (
+          <DependencyExposureTab />
+        ) : view === "readiness" ? (
+          <RecoveryReadinessTab />
+        ) : view === "contingency" ? (
+          <TreasuryScenarioTab />
+        ) : view === "integrity" ? (
+          <LedgerIntegrityTab />
+        ) : view === "sharing" ? (
+          <ThreatSharingPanel
+            organization={null}
+            entitled={false}
+            staff={false}
+            onUpgrade={() => {}}
+            onSignIn={() => {}}
+          />
+        ) : view === "scene" ? (
           <AuthProvider>
             <BillingProvider>
               <div style={{ height: 1000 }}>
@@ -71,7 +105,20 @@ function Preview() {
           </AuthProvider>
         ) : view === "desk" ? (
           <SecurityDesk
-            onOpen={(id) => setView(id === "drift" ? "drift" : "control")}
+            onOpen={(id) =>
+              setView(
+                [
+                  "drift",
+                  "dependencies",
+                  "readiness",
+                  "contingency",
+                  "integrity",
+                  "sharing",
+                ].includes(id)
+                  ? id
+                  : "control",
+              )
+            }
           />
         ) : view === "credentials" ? (
           <div className="credential-frame">
