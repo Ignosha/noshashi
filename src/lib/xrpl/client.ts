@@ -1,5 +1,6 @@
 import { dropsToXrp, rippleTimeToDate } from "@/lib/format";
 import { XrplError, xrplLink } from "./link";
+import { readHeldCredentials } from "./credentials";
 import type {
   AmmPool,
   BookLevel,
@@ -135,25 +136,11 @@ export async function fetchWalletCredentials(
   address: string,
   validatedIndex: number | "validated" = "validated"
 ): Promise<CredentialRecord[]> {
-  const result = await rpc("account_objects", {
-    account: address,
-    ledger_index: validatedIndex,
-    type: "credential",
-    limit: 100,
-  });
-  const records = (result.account_objects ?? []) as Array<Record<string, any>>;
-  return records.map((record) => ({
-    subject: String(record.Subject ?? ""),
-    issuer: String(record.Issuer ?? ""),
-    credentialType:
-      decodeHexDomain(String(record.CredentialType ?? "")) ??
-      String(record.CredentialType ?? "UNKNOWN"),
-    // XLS-70 marks acceptance with the lsfAccepted flag (0x00010000).
-    accepted: (Number(record.Flags ?? 0) & 0x00010000) !== 0,
-    revoked: Boolean(record.Revoked ?? false),
-    uri: record.URI ? decodeHexDomain(String(record.URI)) : undefined,
-    expiration: record.Expiration ? Number(record.Expiration) : undefined,
-  }));
+  try { return await readHeldCredentials(address, validatedIndex, rpc); }
+  catch (error) {
+    if (error instanceof XrplError && error.code === "actNotFound") return [];
+    throw error;
+  }
 }
 
 /** Recent wallet activity, shaped for the audit trail. */

@@ -1,5 +1,7 @@
-import { rpc } from "@/lib/xrpl/client";
+import { rpc, XrplError } from "@/lib/xrpl/client";
 import { lookalikeOf } from "../../../supabase/functions/_shared/xrplEvents.ts";
+import { minimumSigners } from "./quorum";
+export { minimumSigners } from "./quorum";
 
 /**
  * Account security — how hard an XRP Ledger account is to take over, and
@@ -105,6 +107,7 @@ export type SecurityPosture = {
   historyRead: number;
   /** False when the history read stopped at its limit, so older events were not seen. */
   historyComplete: boolean;
+  historyAvailable?: boolean;
 };
 
 type Json = Record<string, any>;
@@ -114,16 +117,6 @@ const rippleIso = (t: unknown) => (typeof t === "number" ? new Date((t + RIPPLE_
 function hexText(hex: string): string {
   if (!/^([0-9A-Fa-f]{2})+$/.test(hex)) return hex;
   return new TextDecoder().decode(new Uint8Array((hex.match(/../g) ?? []).map((b) => parseInt(b, 16))));
-}
-
-export function minimumSigners(signers: Signer[], quorum: number): number {
-  const weights = signers.map((s) => s.weight).sort((a, b) => b - a);
-  let total = 0;
-  for (let i = 0; i < weights.length; i++) {
-    total += weights[i];
-    if (total >= quorum) return i + 1;
-  }
-  return Infinity;
 }
 
 /** The posture from an account_info reply (signer_lists requested) and account_tx rows, newest first. Pure. */
@@ -222,15 +215,24 @@ export function postureFrom(address: string, info: Json | null, rows: Json[], co
 }
 
 /** Read an account's security posture live: its state and up to `limit` recent transactions. */
-export async function readSecurityPosture(address: string, limit = 200): Promise<SecurityPosture> {
-  const info = (await rpc("account_info", { account: address, ledger_index: "validated", signer_lists: true }).catch((error: unknown) => {
-    if (/actNotFound|not found/i.test(error instanceof Error ? error.message : String(error))) return null;
+export async function readSecurityPosture(address: string, limit = 200, request = rpc): Promise<SecurityPosture> {
+  const info = (await request("account_info", { account: address, ledger_index: "validated", signer_lists: true }).catch((error: unknown) => {
+    if (error instanceof XrplError && error.code === "actNotFound") return null;
     throw error;
   })) as Json | null;
   if (!info) return postureFrom(address, null, [], true);
-  const history = (await rpc("account_tx", { account: address, ledger_index_min: -1, ledger_index_max: -1, forward: false, limit }).catch(() => ({ transactions: [] }))) as Json;
-  const rows = (history.transactions ?? []) as Json[];
-  return postureFrom(address, info, rows, !history.marker);
+  const validatedIndex = Number(info.ledger_index);
+  if (info.validated !== true || !Number.isSafeInteger(validatedIndex) || validatedIndex <= 0 || info.account_data?.Account !== address || !Number.isSafeInteger(info.account_data?.Flags) || !/^\d+$/.test(info.account_data?.Balance ?? "")) throw new Error("The account security response is incomplete or not validated. Retry the read.");
+  const lists = info.signer_lists ?? info.account_data.signer_lists;
+  if (!Array.isArray(lists) || lists.length > 1 || lists.some(list => !Number.isInteger(list.SignerQuorum) || list.SignerQuorum <= 0 || !Array.isArray(list.SignerEntries) || list.SignerEntries.length === 0 || list.SignerEntries.length > 32 || list.SignerEntries.some((entry: Json) => typeof entry.SignerEntry?.Account !== "string" || !Number.isInteger(entry.SignerEntry?.SignerWeight) || entry.SignerEntry.SignerWeight <= 0))) throw new Error("The signing-authority response is incomplete. No control assessment was made.");
+  try {
+    const history = await request("account_tx", { account: address, ledger_index_min: -1, ledger_index_max: validatedIndex, forward: false, limit });
+    if (!Array.isArray(history.transactions)) throw new Error("History data missing");
+    if (history.transactions.some((row: Json) => row.validated !== true)) throw new Error("History validation is missing");
+    return { ...postureFrom(address, info, history.transactions, !history.marker), historyAvailable: true };
+  } catch {
+    return { ...postureFrom(address, info, [], false), historyAvailable: false };
+  }
 }
 
 // ————— Assessment —————
@@ -282,6 +284,7 @@ export function assessSecurity(p: SecurityPosture, now = Date.now()): SecurityAs
       plan: [],
     };
   }
+  if (!p.historyComplete) f.push({ id: "history-incomplete", severity: "info", title: p.historyAvailable === false ? "Transaction history is unavailable" : "Older history was not read", detail: "Current signing controls were read, but the history cannot establish the absence of earlier key changes, poisoning or an incident. Retry the reading or inspect a wider history before acting." });
 
   // Who can sign.
   const list = p.signerList;
@@ -312,6 +315,7 @@ export function assessSecurity(p: SecurityPosture, now = Date.now()): SecurityAs
     });
   }
   if (list) {
+    if (p.regularKey) f.push({ id: "regular-key-bypasses-quorum", severity: "critical", title: "The regular key bypasses signer quorum", detail: `The regular key ${p.regularKey} can sign alone even when the signer list requires several approvals.`, action: "Verify every remaining authorization path and test the intended signing setup before making owner-approved key changes." });
     if (p.masterEnabled) {
       f.push({
         id: "bypassable-multisig",
@@ -424,6 +428,6 @@ export function assessSecurity(p: SecurityPosture, now = Date.now()): SecurityAs
       ? "Serious weaknesses: fix the critical findings before holding meaningful value here."
       : warn > 0
         ? "Workable, with changes worth making."
-        : "Well protected by what the ledger can show.";
+        : !p.historyComplete ? "Current controls read; history coverage is incomplete." : "Well protected by what the ledger can show.";
   return { score, grade, summary, findings: f, plan };
 }

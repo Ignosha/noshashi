@@ -29,6 +29,8 @@ import { cn } from "@/lib/utils";
 import { useClaimedSubject } from "@/lib/nav/handoff";
 import { ClusterTab, DepositHelpTab, DomainTab, ExposureTab, PersonalGuardian, PreSignTab, RecoverTab } from "./SecurityTools";
 import { AttributionTab, EmergencyTab, ProtectionTab, RegistryTab, SurveillanceTab, WithdrawalTab } from "./InstitutionalTools";
+import { ControlLab, SecurityDesk } from "./SecurityDesk";
+import { EvidenceTrail } from "./SecurityTrail";
 
 /**
  * SECURITY CENTER — cybersecurity for XRP Ledger accounts.
@@ -63,6 +65,9 @@ import { AttributionTab, EmergencyTab, ProtectionTab, RegistryTab, SurveillanceT
  */
 
 const TABS = [
+  { id: "desk", label: "SECURITY DESK" },
+  { id: "control", label: "SIGNING MAP" },
+  { id: "drift", label: "CONTROL CHANGES" },
   { id: "check", label: "ACCOUNT CHECK" },
   { id: "presign", label: "PRE-SIGN CHECK" },
   { id: "send", label: "SAFE SEND" },
@@ -92,7 +97,7 @@ const OUTLOOK: Record<RecoveryOption["outlook"], { label: string; tone: string }
 };
 
 export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; onSignIn: () => void }) {
-  const [tab, setTab] = useState<Tab>("check");
+  const [tab, setTab] = useState<Tab>("desk");
   // An address handed over from another screen or a lab is checked straight away.
   const [subject, setSubject] = useState<string | undefined>();
   useClaimedSubject("security", (claimed) => {
@@ -106,19 +111,25 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
         index="33"
         kicker="ACCOUNT SECURITY · PRE-SIGN · RECOVERY · INCIDENT RESPONSE · GUARDIAN"
         title="SECURITY CENTER"
-        sub="Harden an XRP Ledger account against takeover, read a transaction before you sign it, get back XRP stuck in escrows, channels, checks and reserve, close the permissions others could use, and when an account is drained, follow the value and every recovery path that exists. NOSHASHI reads; it never signs."
+        sub="Review signing authority, inspect payments and preserve incident evidence. Public-ledger intelligence for wallet owners and institutional operators. NOSHASHI never signs, holds keys or moves funds."
         status="go"
         statusLabel="FREE CHECKS"
       />
-      <div className="flex flex-wrap gap-1.5" role="tablist">
+      <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Security tools" onKeyDown={e=>{
+        const index=TABS.findIndex(t=>t.id===tab);const next=e.key==="ArrowRight"?(index+1)%TABS.length:e.key==="ArrowLeft"?(index+TABS.length-1)%TABS.length:e.key==="Home"?0:e.key==="End"?TABS.length-1:-1;
+        if(next>=0){e.preventDefault();setTab(TABS[next].id);document.getElementById(`security-tab-${TABS[next].id}`)?.focus();}
+      }}>
         {TABS.map((t) => (
           <button
             key={t.id}
             role="tab"
+            id={`security-tab-${t.id}`}
+            aria-controls="security-tool-panel"
+            tabIndex={tab===t.id?0:-1}
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "stencil border px-2 py-1 text-[10.5px] tracking-[0.14em]",
+              "stencil border px-2 py-1 text-[10.5px] tracking-[0.14em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
               tab === t.id ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground"
             )}
           >
@@ -126,8 +137,8 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
           </button>
         ))}
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-        {tab === "check" ? (
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1" role="tabpanel" id="security-tool-panel" aria-labelledby={`security-tab-${tab}`}>
+        {tab === "desk" ? <SecurityDesk onOpen={id=>{const target=TABS.find(t=>t.id===id);if(target)setTab(target.id);}}/> : tab === "control" ? <ControlLab key={subject??""} initial={subject}/> : tab === "drift" ? <Gated feature="alerts" onUpgrade={onUpgrade} onSignIn={onSignIn}><ControlLab key={subject??""} initial={subject} drift/></Gated> : tab === "check" ? (
           <CheckTab key={subject ?? ""} initial={subject} />
         ) : tab === "presign" ? (
           <PreSignTab />
@@ -228,7 +239,7 @@ function CheckTab({ initial }: { initial?: string }) {
                 {result.assessment.score}/100 · {result.assessment.summary}
               </p>
               <p className="mono-font text-[10.5px] text-muted-foreground">
-                validated ledger {result.posture.ledgerIndex.toLocaleString("en-US")} · {result.posture.historyRead} recent transactions read
+                validated ledger {result.posture.ledgerIndex.toLocaleString("en-US")} · {result.posture.historyAvailable === false ? "history unavailable" : `${result.posture.historyRead} recent transactions read`}
                 {result.posture.historyComplete ? "" : " (older history not read)"}
               </p>
             </div>
@@ -452,7 +463,7 @@ function IncidentTab() {
       <p className="text-[11px] leading-relaxed text-muted-foreground">
         For an account that was drained. NOSHASHI follows the value out of it hop by hop (payments and AccountDelete sweeps, past the
         dust thieves spray), says what became of every account it reached, and lists every recovery path that actually exists. A
-        validated XRP Ledger transaction cannot be reversed by anyone; these paths work off-ledger. {deep ? "Forensic depth: five hops, 1,000 transactions an account." : "Two hops, 400 transactions an account (Enterprise traces five)."}
+        validated XRP Ledger transaction cannot be reversed by anyone; these paths work off-ledger. {deep ? "Forensic depth: five hops, 1,000 transactions an account, up to 200 accounts." : "Two hops, 400 transactions an account, up to 40 accounts (Enterprise traces five hops)."} At most 5,000 transfer records; missing or truncated history is disclosed.
       </p>
       <div className="flex flex-wrap gap-1.5">
         <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="The drained account (r…)" className="mono-font h-8 min-w-[280px] flex-1 text-[11.5px]" />
@@ -466,7 +477,7 @@ function IncidentTab() {
       {result && (
         <div className="space-y-2">
           <Eyebrow>WHAT HAPPENED</Eyebrow>
-          {result.signals.length === 0 && <p className="text-[11px] text-muted-foreground">No value left this account from that ledger in the history read.</p>}
+          {result.signals.length === 0 && <p className="text-[11px] text-muted-foreground">No takeover signals were identified in the data read. Missing or truncated history cannot establish that no incident occurred.</p>}
           {result.signals.map((s) => (
             <div key={s.id} className="border border-border p-2">
               <p className="text-[11px] text-foreground">
@@ -478,6 +489,7 @@ function IncidentTab() {
           ))}
 
           <Eyebrow>WHERE THE VALUE WENT</Eyebrow>
+          <EvidenceTrail trace={result.trace}/>
           <div className="space-y-0.5 border border-border p-2">
             {result.trace.flows.slice(0, 60).map((f) => (
               <p key={f.hash + f.to} className="mono-font text-[10.5px] text-foreground">
@@ -495,7 +507,7 @@ function IncidentTab() {
           <div className="space-y-0.5 border border-border p-2">
             {result.trace.nodes.map((n) => (
               <p key={n.address} className="mono-font text-[10.5px] text-muted-foreground">
-                hop {n.depth} · <span className="text-foreground">{n.address}</span> · {n.status.replace("_", " ")}
+                hop {n.depth} · <span className="text-foreground">{n.address}</span> · {n.status === "custodial" ? "tagged account; custodian unverified" : n.status.replace("_", " ")}
                 {n.balanceXrp !== null ? ` · ${n.balanceXrp.toLocaleString("en-US")} XRP` : ""}
                 {n.domain ? ` · claims ${n.domain}` : ""}
                 {n.sanction ? ` · OFAC SDN: ${n.sanction.entityName}` : ""}

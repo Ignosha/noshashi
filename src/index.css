@@ -844,3 +844,11 @@ tbody tr:hover {
     display: none;
   }
 }
+
+/* Ledger Desk editorial hierarchy for the security directory and control lab. */
+.security-desk h2,.security-desk h3,.security-control-lab h2{font-family:var(--font-editorial);font-weight:400}
+.security-tool svg{transition:transform .15s ease}
+.security-tool:hover svg{transform:translate(2px,-2px)}
+@media(prefers-reduced-motion:reduce){.security-tool svg{transition:none;transform:none!important}}
+
+.security-control-lab input[type=checkbox]{accent-color:hsl(var(--foreground))}

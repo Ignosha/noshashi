@@ -119,6 +119,9 @@ jobs:
       - name: Website Academy is rebuilt
         run: npm run check:academy-web
 
+      - name: Security lab is rebuilt
+        run: npm run check:security
+
       - name: Tests
         run: npm test
 

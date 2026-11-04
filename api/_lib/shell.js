@@ -53,6 +53,7 @@ export const NAV = [
 export const FOOTER_GROUPS = [
   { title: "Platform", links: [
     { href: "/platform/", label: "Platform overview" },
+    { href: "/cybersecurity/", label: "XRPL cybersecurity tools" },
     { href: "/app/", label: "Workspace" },
     { href: "/tutorial/", label: "Desktop app tutorial" },
     { href: "/institutional-demo/", label: "Interactive demo" },
