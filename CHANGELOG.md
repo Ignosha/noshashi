@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.0.27
+
+### Academy and desktop identity
+
+- Academy adopts the graphite Ledger Desk palette, editorial typography,
+  ruled layouts and clearer course navigation. Academy 0.2.1 has its own
+  Noshashi Academy wordmark and circular launcher icon.
+- The main NOSHASHI desktop icon uses the circular seal with transparency
+  outside the emblem, replacing its rounded-square backing.
+- Academy screens scroll independently of the console layout, and local
+  video captions work under the Academy's narrowly scoped content policy.
+- Updated browser and Academy workstation bundles retain existing course
+  content, saved progress and receipt formats.
+
+The repository also contains the Payment Review browser portal, API and
+CLI. Production backend and billing rollout remain separate; this desktop
+release does not activate those services. Installer signing and notarization
+status are disclosed on the release page.
+
 ## 1.0.26
 
 ### The Ledger Desk
