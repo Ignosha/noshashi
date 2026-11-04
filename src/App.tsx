@@ -157,6 +157,7 @@ import { HandoffProvider, useHandoff } from "@/lib/nav/handoff";
 import { SAMPLE_ADDRESSES } from "@/lib/samples";
 import { ObserverRunner } from "@/lib/agent/useObserver";
 import { StressScheduleRunner } from "@/lib/desk/stressSchedule";
+import { TreasuryGuardRunner } from "@/lib/security/treasuryStore";
 import { PersonalGuardianRunner } from "@/lib/security/guardian";
 import { OrgContextSync, useWorkstationOrg } from "@/lib/org/workstationContext";
 
@@ -984,6 +985,7 @@ function ConsoleApp() {
       <ObserverRunner />
       <StressScheduleRunner />
       <PersonalGuardianRunner />
+      <TreasuryGuardRunner />
       <OrgContextSync />
       <div className="ledger-desktop relative flex h-full w-full overflow-hidden bg-background text-foreground">
         <SkipLink />

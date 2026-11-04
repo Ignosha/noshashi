@@ -41,8 +41,8 @@ export function SecurityDesk({ onOpen }: { onOpen: (id: string) => void }) {
             incident reviewers. Start with signing authority, inspect a proposed
             payment, then preserve evidence if something changed.
           </p>
-          <Button className="mt-4" onClick={() => onOpen("control")}>
-            MAP SIGNING CONTROLS →
+          <Button className="mt-4" onClick={() => onOpen("treasury")}>
+            OPEN TREASURY GUARD →
           </Button>
         </div>
         <svg

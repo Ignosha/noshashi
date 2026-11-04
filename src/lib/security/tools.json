@@ -9,6 +9,15 @@
     "detail": "See every direct signing path and test signer-unavailability scenarios without changing the account."
   },
   {
+    "id": "treasury",
+    "title": "Treasury Guard",
+    "group": "protect",
+    "priority": "P0",
+    "plan": "operator",
+    "feature": null,
+    "detail": "Flag large validated XRP payments, balance-share limits, rolling volume and split transfers. Device notifications while open; local review and evidence export. No automatic blocking or reversal."
+  },
+  {
     "id": "contingency",
     "title": "Treasury dependency scenarios",
     "group": "protect",

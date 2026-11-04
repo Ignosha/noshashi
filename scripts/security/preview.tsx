@@ -14,6 +14,8 @@ import {
   LedgerIntegrityTab,
 } from "../../src/components/scenes/EnterpriseSecurity";
 import { ThreatSharingPanel } from "../../src/components/scenes/ThreatSharing";
+import { TreasuryGuardTab } from "../../src/components/scenes/TreasuryGuard";
+import { TreasuryGuardRunner } from "../../src/lib/security/treasuryStore";
 import { SecurityScene } from "../../src/components/scenes/SecurityScene";
 import { AuthProvider } from "../../src/lib/auth/useAuth";
 import { BillingProvider } from "../../src/lib/billing/useEntitlements";
@@ -50,6 +52,7 @@ function Preview() {
         </p>
         <nav aria-label="Component review">
           <button onClick={() => setView("desk")}>Overview</button>
+          <button onClick={() => setView("treasury")}>Treasury Guard</button>
           <button onClick={() => setView("dependencies")}>
             Software exposure
           </button>
@@ -79,7 +82,18 @@ function Preview() {
           </button>
           <button onClick={() => setView("trail")}>Incident graph</button>
         </nav>
-        {view === "dependencies" ? (
+        {view === "treasury" ? (
+          <AuthProvider>
+            <BillingProvider>
+              <TreasuryGuardRunner />
+              <TreasuryGuardTab
+                onOpen={(id) =>
+                  setView(id === "treasury" ? "treasury" : "scene")
+                }
+              />
+            </BillingProvider>
+          </AuthProvider>
+        ) : view === "dependencies" ? (
           <DependencyExposureTab />
         ) : view === "readiness" ? (
           <RecoveryReadinessTab />
@@ -109,6 +123,7 @@ function Preview() {
               setView(
                 [
                   "drift",
+                  "treasury",
                   "dependencies",
                   "readiness",
                   "contingency",

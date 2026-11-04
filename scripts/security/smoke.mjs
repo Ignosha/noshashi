@@ -270,13 +270,14 @@ try {
   check(
     "Integrated tab strip supports arrow-key focus",
     await page
-      .getByRole("tab", { name: "SIGNING MAP", exact: true })
+      .getByRole("tab").nth(1)
       .evaluate(
         (el) =>
           document.activeElement === el &&
           el.getAttribute("aria-selected") === "true",
       ),
   );
+  await page.getByRole("tab", {name:"SIGNING MAP",exact:true}).click();
   check(
     "Free signing map remains available in the real scene",
     await page

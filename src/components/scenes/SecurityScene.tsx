@@ -32,6 +32,7 @@ import { AttributionTab, EmergencyTab, ProtectionTab, RegistryTab, SurveillanceT
 import { ControlLab, SecurityDesk } from "./SecurityDesk";
 import { DependencyExposureTab, RecoveryReadinessTab, TreasuryScenarioTab, LedgerIntegrityTab } from "./EnterpriseSecurity";
 import { ThreatSharingTab } from "./ThreatSharing";
+import { TreasuryGuardTab } from "./TreasuryGuard";
 import { EvidenceTrail } from "./SecurityTrail";
 
 /**
@@ -68,6 +69,7 @@ import { EvidenceTrail } from "./SecurityTrail";
 
 const TABS = [
   { id: "desk", label: "SECURITY DESK" },
+  { id: "treasury", label: "TREASURY GUARD" },
   { id: "contingency", label: "TREASURY SCENARIOS" },
   { id: "integrity", label: "NODE COMPARISON" },
   { id: "dependencies", label: "SOFTWARE EXPOSURE" },
@@ -145,7 +147,7 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
         ))}
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto pr-1" role="tabpanel" id="security-tool-panel" aria-labelledby={`security-tab-${tab}`}>
-        {tab === "desk" ? <SecurityDesk onOpen={id=>{const target=TABS.find(t=>t.id===id);if(target)setTab(target.id);}}/> : tab === "contingency" ? <TreasuryScenarioTab/> : tab === "integrity" ? <LedgerIntegrityTab/> : tab === "dependencies" ? <Gated feature="alerts" onUpgrade={onUpgrade} onSignIn={onSignIn}><DependencyExposureTab/></Gated> : tab === "readiness" ? <Gated feature="asset_recovery" onUpgrade={onUpgrade} onSignIn={onSignIn}><RecoveryReadinessTab/></Gated> : tab === "sharing" ? <ThreatSharingTab onUpgrade={onUpgrade} onSignIn={onSignIn}/> : tab === "control" ? <ControlLab key={subject??""} initial={subject}/> : tab === "drift" ? <Gated feature="alerts" onUpgrade={onUpgrade} onSignIn={onSignIn}><ControlLab key={subject??""} initial={subject} drift/></Gated> : tab === "check" ? (
+        {tab === "desk" ? <SecurityDesk onOpen={id=>{const target=TABS.find(t=>t.id===id);if(target)setTab(target.id);}}/> : tab === "treasury" ? <TreasuryGuardTab onOpen={(view,address)=>{const target=TABS.find(t=>t.id===view);if(target){setSubject(address);setTab(target.id);}}}/> : tab === "contingency" ? <TreasuryScenarioTab/> : tab === "integrity" ? <LedgerIntegrityTab/> : tab === "dependencies" ? <Gated feature="alerts" onUpgrade={onUpgrade} onSignIn={onSignIn}><DependencyExposureTab/></Gated> : tab === "readiness" ? <Gated feature="asset_recovery" onUpgrade={onUpgrade} onSignIn={onSignIn}><RecoveryReadinessTab/></Gated> : tab === "sharing" ? <ThreatSharingTab onUpgrade={onUpgrade} onSignIn={onSignIn}/> : tab === "control" ? <ControlLab key={subject??""} initial={subject}/> : tab === "drift" ? <Gated feature="alerts" onUpgrade={onUpgrade} onSignIn={onSignIn}><ControlLab key={subject??""} initial={subject} drift/></Gated> : tab === "check" ? (
           <CheckTab key={subject ?? ""} initial={subject} />
         ) : tab === "presign" ? (
           <PreSignTab />
@@ -161,7 +163,7 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
           <DomainTab key={subject ?? ""} initial={subject} />
         ) : tab === "incident" ? (
           <Gated feature="incident_response" onUpgrade={onUpgrade} onSignIn={onSignIn}>
-            <IncidentTab />
+            <IncidentTab key={subject??""} initial={subject}/>
           </Gated>
         ) : tab === "emergency" ? (
           <EmergencyTab key={subject ?? ""} initial={subject} />
@@ -415,13 +417,13 @@ function incidentEntry(result: IncidentResult): LedgerEntry {
   };
 }
 
-function IncidentTab() {
+function IncidentTab({ initial }: { initial?: string }) {
   const { has } = useBilling();
   const org = useOrg();
   const membership = org.state.status === "ready" && org.state.data ? org.state.data.membership : null;
   const deep = has("forensic_trace");
   const limits = deep ? TRACE_LIMITS.deep : TRACE_LIMITS.standard;
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState(initial??"");
   const [since, setSince] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
