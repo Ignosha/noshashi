@@ -6,8 +6,8 @@ import { NoshashiMark, type MarkTone } from "./brand/NoshashiMark";
 /**
  * NOSHASHI brand mark.
  *
- * The artwork is the flower, drawn by NoshashiMark from the generated
- * brand geometry; this component is kept as the app-wide entry point so the eleven
+ * The artwork is the circular seal, rendered by NoshashiMark from the
+ * original vector; this component is kept as the app-wide entry point so the eleven
  * existing call sites keep their `size` / `animated` / `className`
  * contract and the swap is one edit rather than eleven.
  *
@@ -17,7 +17,7 @@ import { NoshashiMark, type MarkTone } from "./brand/NoshashiMark";
 export function NovaLogo({
   size = 40,
   className,
-  animated = true,
+  animated = false,
   tone = "mono",
 }: {
   size?: number;

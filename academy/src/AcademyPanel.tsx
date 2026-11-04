@@ -4,6 +4,7 @@ import "@fontsource/atkinson-hyperlegible/latin-700.css";
 import { Panel } from "@/components/nova/Panel";
 import { Button } from "@/components/ui/button";
 import { useLocal } from "./useLocal";
+import { AcademyIntro } from "./AcademyIntro";
 import { isTauri } from "@/lib/env";
 import { saveTextFile } from "@/lib/export";
 import { cn } from "@/lib/utils";
@@ -132,7 +133,10 @@ export function AcademyPanel({ onOpenLab }: { onOpenLab: (labId: string) => void
   useEffect(() => () => stopSpeaking(), []);
 
   return (
+    <>
+    {(effective.kind === "setup" || effective.kind === "home") && <AcademyIntro continuing={effective.kind === "home"} />}
     <Panel
+      id="academy-course"
       label={
         effective.kind === "lesson"
           ? `COURSE · ${lessonById(effective.id)?.title.toUpperCase() ?? ""}`
@@ -153,7 +157,7 @@ export function AcademyPanel({ onOpenLab }: { onOpenLab: (labId: string) => void
           </button>
         )
       }
-      className="lg:col-span-3 lg:min-h-0"
+      className="academy-course-panel lg:col-span-3 lg:min-h-0"
       bodyClassName="lg:min-h-0 lg:overflow-y-auto"
     >
       <div
@@ -184,6 +188,7 @@ export function AcademyPanel({ onOpenLab }: { onOpenLab: (labId: string) => void
         {effective.kind === "review" && <Review progress={progress} setProgress={setProgress} onHome={() => setView({ kind: "home" })} />}
       </div>
     </Panel>
+    </>
   );
 }
 
@@ -280,9 +285,9 @@ function Setup({ progress, setProgress, onDone }: { progress: Progress; setProgr
     </label>
   );
   return (
-    <div className="flex flex-col gap-5">
+    <div className="academy-setup flex flex-col gap-5">
       <div>
-        <h2 className="text-[16px] font-semibold text-foreground">Welcome to the NOSHASHI course</h2>
+        <h2 className="academy-section-title text-foreground">A course that works for you.</h2>
         <p className="mt-1 max-w-[62ch] text-[12.5px] leading-relaxed text-muted-foreground">
           {LESSONS.length} short lessons in {LEVELS.length} levels, about {LESSONS.reduce((n, l) => n + l.minutes, 0)} minutes in all. Every lesson is a few
           small cards, a three-question check you can retry as often as you like, and practice on the real app. Finish every lesson and the final check
@@ -387,10 +392,10 @@ function Home({ progress, labsDone, setView }: { progress: Progress; labsDone: n
   const next = nextLesson(progress);
   const ready = eligible(progress);
   return (
-    <div className="flex flex-col gap-4">
+    <div className="academy-course-map flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <div className="flex items-baseline gap-2">
-          <h2 className="text-[15px] font-semibold text-foreground">Your progress</h2>
+          <h2 className="academy-section-title text-foreground">Your next chapter.</h2>
           <span className="ml-auto font-mono text-[11px] text-muted-foreground">
             {all.passed}/{all.total} LESSONS · {labsDone}/{LABS.length} LABS · FINAL CHECK {progress.exam.passedAt ? `PASSED ${progress.exam.best}%` : progress.exam.tries ? `BEST ${progress.exam.best}%` : "NOT YET"}
           </span>
