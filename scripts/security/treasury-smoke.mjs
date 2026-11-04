@@ -113,6 +113,11 @@ try {
                 },
               })),
             };
+          if(q.command === "account_tx") result.transactions = result.transactions.map(row=>{
+            row.tx_json.DeliverMax=row.tx_json.Amount;delete row.tx_json.Amount;
+            row.close_time_iso=new Date((row.tx_json.date+946684800)*1000).toISOString();delete row.tx_json.date;
+            return row;
+          });
           setTimeout(
             () =>
               this.onmessage?.({

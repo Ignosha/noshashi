@@ -130,7 +130,11 @@ describe("Treasury Guard evidence and exact amounts", () => {
     const r: any = row();
     r.tx_json.DeliverMax = r.tx_json.Amount;
     delete r.tx_json.Amount;
+    delete r.tx_json.date;
+    r.close_time_iso = new Date(now).toISOString();
     expect(treasuryFlow(address, r).flow?.drops).toBe("1000000000");
+    r.close_time_iso = "invalid";
+    expect(treasuryFlow(address, r).flow).toBeNull();
   });
 });
 describe("owner-configured bank-style flags", () => {

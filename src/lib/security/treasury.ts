@@ -138,14 +138,27 @@ export function treasuryFlow(
     return { flow: null, issue: null };
   const hash = String(row.hash ?? tx.hash ?? "").toUpperCase(),
     ledger = Number(row.ledger_index ?? tx.ledger_index),
-    at = (Number(tx.date ?? row.date) + 946684800) * 1000;
+    rippleTime = tx.date ?? row.date,
+    isoTime =
+      typeof row.close_time_iso === "string" &&
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(
+        row.close_time_iso,
+      )
+        ? Date.parse(row.close_time_iso)
+        : NaN,
+    rippleAt =
+      Number.isInteger(rippleTime) && rippleTime >= 0
+        ? (rippleTime + 946684800) * 1000
+        : NaN,
+    at = Number.isFinite(rippleAt) ? rippleAt : isoTime;
   if (
     !HASH.test(hash) ||
     !Number.isSafeInteger(ledger) ||
     ledger < 1 ||
     !Number.isFinite(at) ||
-    !Number.isInteger(Number(tx.date ?? row.date)) ||
-    Number(tx.date ?? row.date) < 0 ||
+    (Number.isFinite(isoTime) &&
+      Number.isFinite(rippleAt) &&
+      isoTime !== rippleAt) ||
     !Number.isSafeInteger(meta.TransactionIndex) ||
     meta.TransactionIndex < 0 ||
     !isValidAddress(tx.Destination)
