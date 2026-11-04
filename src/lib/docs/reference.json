@@ -861,6 +861,7 @@
     "noshashi-issuer-alerts",
     "noshashi-ledger-registry",
     "noshashi-password",
+    "noshashi-payment-review",
     "noshashi-policy-activate",
     "noshashi-stripe-webhook",
     "noshashi-support-notify",
