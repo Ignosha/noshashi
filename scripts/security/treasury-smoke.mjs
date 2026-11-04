@@ -31,6 +31,7 @@ try {
   await page.addInitScript(
     ({ address, destinations }) => {
       window.__treasuryLedger = 100;
+      window.__treasuryDate=Math.floor(Date.now()/1000)-946684800;
       window.__notices = [];
       window.__nodeUnavailable = false;
       window.Notification = class {
@@ -56,7 +57,7 @@ try {
         }
         send(raw) {
           const q = JSON.parse(raw);
-          const date = Math.floor(Date.now() / 1000) - 946684800;
+          const date = window.__treasuryDate;
           let result = {};
           if (q.command === "ledger")
             result = {
@@ -69,12 +70,12 @@ try {
             result = {
               validated: true,
               ledger_index: window.__treasuryLedger,
-              account_data: { Account: address, Balance: "10000000000" },
+              account_data: { Account: address, Balance: window.__treasuryLedger===100?"10000000000":"7599999928", Sequence:window.__treasuryLedger===100?1:7 },
             };
           if (q.command === "account_tx")
             result = {
               validated: true,
-              ledger_index_min: q.ledger_index_min,
+              ledger_index_min: q.forward === false ? 1 : q.ledger_index_min,
               ledger_index_max: q.ledger_index_max,
               transactions: destinations.map((destination, i) => ({
                 validated: true,
@@ -113,11 +114,16 @@ try {
                 },
               })),
             };
-          if(q.command === "account_tx") result.transactions = result.transactions.map(row=>{
-            row.tx_json.DeliverMax=row.tx_json.Amount;delete row.tx_json.Amount;
-            row.close_time_iso=new Date((row.tx_json.date+946684800)*1000).toISOString();delete row.tx_json.date;
-            return row;
-          });
+          if (q.command === "account_tx")
+            result.transactions = result.transactions.map((row) => {
+              row.tx_json.DeliverMax = row.tx_json.Amount;
+              delete row.tx_json.Amount;
+              row.close_time_iso = new Date(
+                (row.tx_json.date + 946684800) * 1000,
+              ).toISOString();
+              delete row.tx_json.date;
+              return row;
+            });
           setTimeout(
             () =>
               this.onmessage?.({
@@ -265,6 +271,41 @@ try {
           exact: true,
         })
         .isVisible()),
+  );
+  await page
+    .getByLabel("Treasury unsigned proposal")
+    .fill(
+      JSON.stringify({
+        TransactionType: "Payment",
+        Account: address,
+        Destination: destinations[0],
+        Amount: "1000000000",
+        Fee: "12",
+        Sequence: 7,
+        LastLedgerSequence: 110,
+      }),
+    );
+  await page
+    .getByRole("button", { name: "RUN LIVE PREFLIGHT", exact: true })
+    .click();
+  await page
+    .getByRole("heading", {
+      name: "REVIEW REQUIRED · no signing authorization",
+      exact: true,
+    })
+    .waitFor();
+  check(
+    "Live preflight includes validated balance and actual rolling activity",
+    await page.getByText(/Validated XRP balance: 7599.999928/).isVisible(),
+  );
+  check(
+    "Live preflight flags cumulative spending without granting approval",
+    await page
+      .getByText(
+        "Recent XRP outflows plus this proposal reach the rolling-window limit.",
+        { exact: true },
+      )
+      .isVisible(),
   );
   const downloadPromise = page.waitForEvent("download");
   await page

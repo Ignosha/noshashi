@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useBilling } from "@/lib/billing/useEntitlements";
@@ -24,6 +24,12 @@ import {
   testTreasuryNotification,
   reloadTreasuryState,
 } from "@/lib/security/treasuryStore";
+import {
+  liveTreasuryPreflight,
+  type TreasuryPreflight,
+} from "@/lib/security/treasuryPreflight";
+import { TreasuryReviews } from "./TreasuryReviews";
+
 export function TreasuryGuardTab({
   onOpen,
 }: {
@@ -61,9 +67,16 @@ export function TreasuryGuardTab({
     setPolicy((p) => ({ ...p, ...patch }));
     setReview(null);
   };
+  const [live, setLive] = useState<TreasuryPreflight | null>(null);
+  useEffect(() => {
+    setLive(null);
+  }, [address, policy, allowlist, proposal]);
   const active = state.watches.filter((w) => w.enabled).length;
   return (
-    <section className="security-desk max-w-6xl space-y-6" aria-label="Treasury Guard">
+    <section
+      className="security-desk max-w-6xl space-y-6"
+      aria-label="Treasury Guard"
+    >
       <header>
         <p className="mono-font text-xs tracking-widest text-muted-foreground">
           TREASURY GUARD / LOCAL MONITORING BETA
@@ -399,6 +412,7 @@ export function TreasuryGuardTab({
           Unsigned Payment JSON
           <textarea
             aria-label="Treasury unsigned proposal"
+            disabled={busy}
             className="mono-font mt-2 min-h-32 w-full border border-border bg-background p-3 text-xs"
             maxLength={131072}
             value={proposal}
@@ -470,6 +484,148 @@ export function TreasuryGuardTab({
             ENTERPRISE WITHDRAWAL SCREENING
           </Button>
         </div>
+      </section>
+      <section
+        className="border-t border-border pt-5"
+        aria-label="Live treasury preflight"
+      >
+        <h3 className="display text-2xl">
+          Read the current balance and rolling window.
+        </h3>
+        <p className="mt-3 text-sm text-muted-foreground">
+          A fresh read checks the saved source policy, delivered-XRP history,
+          balance percentage, sequence and ledger expiry at one validated-ledger
+          scope. Include Fee, Sequence and LastLedgerSequence in the unsigned
+          proposal. Missing history remains incomplete. Funds are not reserved
+          and this is not authorization.
+        </p>
+        <Button
+          className="mt-3"
+          disabled={
+            busy ||
+            !proposal ||
+            !state.watches.some((w) => w.address === address.trim())
+          }
+          onClick={() =>
+            void run(async () => {
+              const watch = state.watches.find(
+                (w) => w.address === address.trim(),
+              );
+              if (!watch) throw Error("Select a saved watch first.");
+              setLive(null);
+              setLive(
+                await liveTreasuryPreflight(
+                  watch.address,
+                  watch.policy,
+                  (await parseWorkflowJson(proposal)) as Record<
+                    string,
+                    unknown
+                  >,
+                ),
+              );
+            })
+          }
+        >
+          RUN LIVE PREFLIGHT
+        </Button>
+        {live && (
+          <div role="status" className="mt-4 border border-border p-4">
+            <h4 className="text-xl">
+              {live.status.toUpperCase().replace(/_/g, " ")} · no signing
+              authorization
+            </h4>
+            <p className="mono-font mt-2 break-all text-xs">
+              Ledger {live.anchor.index} · {live.anchor.hash}
+            </p>
+            <p className="mt-3 text-sm">
+              Validated XRP balance: {formatDrops(live.balanceDrops)} · observed
+              window: {live.windowPayments} payments /{" "}
+              {formatDrops(live.windowDrops)} XRP · coverage{" "}
+              {live.coverageComplete
+                ? "returned for the requested window"
+                : "INCOMPLETE"}
+            </p>
+            <ul className="mt-3 text-sm text-muted-foreground">
+              {live.reasons.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+              {live.unchecked.map((r) => (
+                <li key={r}>Still requires review: {r}</li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs">{live.limitation}</p>
+            <Button
+              variant="outline"
+              className="mt-3"
+              disabled={busy}
+              onClick={() =>
+                void run(async () => {
+                  setNotice(
+                    await saveTextFile(
+                      "noshashi-live-preflight.json",
+                      JSON.stringify(live, null, 2),
+                      "application/json",
+                    ),
+                  );
+                })
+              }
+            >
+              EXPORT LIVE PREFLIGHT
+            </Button>
+          </div>
+        )}
+      </section>
+      <TreasuryReviews report={live} onOpen={(id) => onOpen(id)} />
+      <section
+        className="border-t border-border pt-5"
+        aria-label="Incident handoff packet"
+      >
+        <h3 className="display text-2xl">Prepare an incident handoff.</h3>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Bundle local findings, review notes, coverage and policy snapshots for
+          your internal response team. Verify any external custodian’s official
+          route independently before sharing; no wallet label or destination tag
+          proves custody. This action sends nothing.
+        </p>
+        <Button
+          variant="outline"
+          className="mt-3"
+          disabled={busy || !state.alerts.length}
+          onClick={() =>
+            void run(async () => {
+              const packet = await evidenceRecord(
+                "treasury-incident-handoff-v1",
+                {
+                  preparedAt: new Date().toISOString(),
+                  allegationsOnly: true,
+                  findings: state.alerts,
+                  coverage: state.monitors,
+                  preflight: live,
+                  recipient: null,
+                  recipientVerified: false,
+                  steps: [
+                    "Preserve original transaction hashes, timestamps and internal payment instructions.",
+                    "Independently confirm who controls signing authority using a clean device.",
+                    "Escalate to the institution’s authorized incident-response team.",
+                    "Verify the official recipient/custodian route before disclosing evidence.",
+                    "Do not characterize a threshold flag as proof of theft or promise a freeze/reversal.",
+                  ],
+                  limitations:
+                    "Local editable records and public-node reads; no independently verified consensus, guaranteed recovery or transmission.",
+                },
+              );
+              setNotice(
+                await saveTextFile(
+                  "noshashi-incident-handoff.json",
+                  JSON.stringify(packet, null, 2),
+                  "application/json",
+                ),
+              );
+            })
+          }
+        >
+          EXPORT INCIDENT HANDOFF PACKET
+        </Button>
       </section>
       <section className="border-t border-border pt-5">
         <h3 className="display text-2xl">Payment review queue</h3>

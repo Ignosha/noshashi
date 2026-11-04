@@ -15,6 +15,10 @@ import {
 } from "../../src/components/scenes/EnterpriseSecurity";
 import { ThreatSharingPanel } from "../../src/components/scenes/ThreatSharing";
 import { TreasuryGuardTab } from "../../src/components/scenes/TreasuryGuard";
+import { TreasuryReviewPanel } from "../../src/components/scenes/TreasuryReviews";
+import { DEFAULT_TREASURY_POLICY } from "../../src/lib/security/treasury";
+import { evidenceRecord } from "../../src/lib/security/workflowEvidence";
+import type { TreasuryPreflight } from "../../src/lib/security/treasuryPreflight";
 import { TreasuryGuardRunner } from "../../src/lib/security/treasuryStore";
 import { SecurityScene } from "../../src/components/scenes/SecurityScene";
 import { AuthProvider } from "../../src/lib/auth/useAuth";
@@ -26,6 +30,14 @@ const address = "rLdhU5DKrpztzVPnQmtzAbHfiHR8LPYtaX";
 function Preview() {
   const [view, setView] = useState("desk");
   const [failure, setFailure] = useState(false);
+  const [reviewReport, setReviewReport] = useState<TreasuryPreflight | null>(
+    null,
+  );
+  const [reviewActor, setReviewActor] = useState(
+    "00000000-0000-4000-8000-0000000000e1",
+  );
+  const [reviewMfa, setReviewMfa] = useState(false);
+
   const data = {
     account: { ...unfundedAccount(address), unfunded: false },
     credentials: [
@@ -53,6 +65,49 @@ function Preview() {
         <nav aria-label="Component review">
           <button onClick={() => setView("desk")}>Overview</button>
           <button onClick={() => setView("treasury")}>Treasury Guard</button>
+          <button
+            onClick={async () => {
+              const payload: Omit<TreasuryPreflight, "sha256"> = {
+                schema: "noshashi-treasury-preflight-v1",
+                status: "review_required",
+                source: address,
+                observedAt: new Date().toISOString(),
+                proposal: {
+                  TransactionType: "Payment",
+                  Account: address,
+                  Destination: "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+                  Amount: "100",
+                  Fee: "12",
+                  Sequence: 1,
+                  LastLedgerSequence: 120,
+                },
+                policy: DEFAULT_TREASURY_POLICY,
+                anchor: {
+                  hash: "A".repeat(64),
+                  index: 100,
+                  closeTime: Date.now(),
+                },
+                balanceDrops: "10000000000",
+                windowFrom: Date.now() - 3600000,
+                windowPayments: 0,
+                windowDrops: "0",
+                windowEvidence: [],
+                coverageComplete: true,
+                reasons: ["Recorded fixture for UI review only"],
+                unchecked: ["Signing integration"],
+                limitation:
+                  "Simulated organization/MFA and backend response. No authorization.",
+              };
+              setReviewReport({
+                ...payload,
+                sha256: (await evidenceRecord("treasury-preflight-v1", payload))
+                  .sha256,
+              });
+              setView("reviews");
+            }}
+          >
+            Organization reviews
+          </button>
           <button onClick={() => setView("dependencies")}>
             Software exposure
           </button>
@@ -82,7 +137,45 @@ function Preview() {
           </button>
           <button onClick={() => setView("trail")}>Incident graph</button>
         </nav>
-        {view === "treasury" ? (
+        {view === "reviews" ? (
+          <>
+            <p className="my-4 text-xs">
+              SIMULATED ORGANIZATION ACCOUNTS / MFA · LOCAL REVIEW ONLY
+            </p>
+            <button
+              className="mr-4 underline"
+              onClick={() =>
+                setReviewActor("00000000-0000-4000-8000-0000000000e1")
+              }
+            >
+              Fixture requester
+            </button>
+            <button
+              className="mr-4 underline"
+              onClick={() =>
+                setReviewActor("00000000-0000-4000-8000-0000000000e2")
+              }
+            >
+              Fixture reviewer
+            </button>
+            <label className="text-sm">
+              <input
+                type="checkbox"
+                checked={reviewMfa}
+                onChange={(e) => setReviewMfa(e.target.checked)}
+              />
+              Fixture MFA satisfied
+            </label>
+            <TreasuryReviewPanel
+              organization="00000000-0000-4000-8000-0000000000e4"
+              actor={reviewActor}
+              mfa={reviewMfa}
+              entitled
+              report={reviewReport}
+              onOpen={() => {}}
+            />
+          </>
+        ) : view === "treasury" ? (
           <AuthProvider>
             <BillingProvider>
               <TreasuryGuardRunner />

@@ -53,6 +53,14 @@ try {
     await read("supabase/migrations/20261104123000_security_network.sql"),
   );
   await db.exec(await read("tests/security-network.sql"));
+  await db.exec(
+    await read("supabase/migrations/20260930120000_reviewer_auditor_roles.sql"),
+  );
+  await db.exec(
+    await read("supabase/migrations/20261104150000_treasury_reviews.sql"),
+  );
+  await db.exec(await read("tests/treasury-reviews.sql"));
+  console.log("TREASURY REVIEW SQL TEST PASSED");
   console.log(
     "SECURITY NETWORK SQL TEST PASSED (in-memory PostgreSQL; actual migration, real registry functions)",
   );
