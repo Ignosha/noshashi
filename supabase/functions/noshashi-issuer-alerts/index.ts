@@ -528,7 +528,7 @@ async function walletTick(db: Db): Promise<Json> {
     read += 1;
     // With a marker, more remain: advance only to the last ledger read in
     // full. Without one, everything up to ledger_index_max has been seen.
-    const lastRowLedger = rows.length ? Math.max(...rows.map((r) => Number(r.ledger_index ?? r.tx_json?.ledger_index ?? 0))) : from;
+    const lastRowLedger = rows.length ? Math.max(...rows.map((r) => Number(r.ledger_index ?? r.tx_json?.ledger_index ?? r.tx?.ledger_index ?? 0))) : from;
     const upTo = reply.marker ? Math.max(from, lastRowLedger - 1) : maxLedger;
     const events = walletEvents(rows, wallet).filter((e) => e.ledgerIndex > from && e.ledgerIndex <= upTo);
 

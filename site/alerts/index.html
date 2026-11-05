@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light">
-<title>Issuer alerts — Discord and Telegram, when an XRPL issuer&#39;s powers change</title>
-<meta name="description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee. Read every five minutes from validated ledger state.">
+<title>Issuer and treasury alerts — Discord and Telegram, from the XRP Ledger</title>
+<meta name="description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee, and when a watched treasury wallet transacts. Read every five minutes from validated ledger state.">
 <link rel="canonical" href="https://www.noshashi.app/alerts/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NOSHASHI">
 <meta property="og:url" content="https://www.noshashi.app/alerts/">
-<meta property="og:title" content="Issuer alerts — Discord and Telegram, when an XRPL issuer&#39;s powers change">
-<meta property="og:description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee. Read every five minutes from validated ledger state.">
+<meta property="og:title" content="Issuer and treasury alerts — Discord and Telegram, from the XRP Ledger">
+<meta property="og:description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee, and when a watched treasury wallet transacts. Read every five minutes from validated ledger state.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Issuer alerts — Discord and Telegram, when an XRPL issuer&#39;s powers change">
-<meta name="twitter:description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee. Read every five minutes from validated ledger state.">
+<meta name="twitter:title" content="Issuer and treasury alerts — Discord and Telegram, from the XRP Ledger">
+<meta name="twitter:description" content="Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee, and when a watched treasury wallet transacts. Read every five minutes from validated ledger state.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
@@ -99,12 +99,32 @@
       <div class="tool-snip">/check r…
 /watch r…
 /unwatch r…
+/guard r…
+/unguard r…
 /list</div>
       <p class="tool-note" id="tg-link">The bot reads only public ledger state. It never asks for
          keys, seeds or balances. Anyone who asks for those in its name is not NOSHASHI.</p>
     </div>
   </div>
   <div id="alert-out" hidden></div>
+  <div class="panel" style="margin-top:14px" id="treasury-guard"><p class="num">TREASURY GUARD · HOSTED</p>
+    <h2>Watch a treasury wallet, even with the app closed.</h2>
+    <p>Treasury Guard in the desktop app watches while the app is open. This keeps watching on our
+       servers: within about five minutes of any validated transaction a wallet signs (money out,
+       offers, trust lines, settings, signing keys), anything done to it (a freeze or clawback), or an
+       incoming payment of 1 XRP or more or any token, your channel gets a message. Read-only: an
+       address is all it needs. Free for up to 3 wallets per channel.</p>
+    <form class="tool-form" id="wallet-form" novalidate style="margin:8px 0 0">
+      <div class="form-field"><label for="wallet-address">Treasury wallet to watch</label>
+        <input id="wallet-address" type="text" spellcheck="false" autocomplete="off" placeholder="r…" maxlength="40" required></div>
+      <div class="form-field"><label for="wallet-webhook">Discord channel webhook URL</label>
+        <input id="wallet-webhook" type="url" spellcheck="false" autocomplete="off" placeholder="https://discord.com/api/webhooks/…" required></div>
+      <button class="btn" type="submit" id="wallet-go">Watch this wallet</button>
+      <p class="form-status" id="wallet-status" role="status" aria-live="polite"></p>
+    </form>
+    <p class="tool-note">On Telegram, send the bot <span class="mono">/guard r…</span> and
+       <span class="mono">/unguard r…</span>. Incoming XRP under 1 XRP is left out: that is where
+       phishing dust arrives.</p></div>
   <div class="panel" style="margin-top:14px"><p class="num">WHAT COUNTS AS A CHANGE</p>
     <p>Global freeze on or off. Clawback enabled. Regular key set, changed or removed. Signer list or
        quorum changed. Master key disabled or re-enabled. Permissioned holding switched on or off.
@@ -135,6 +155,6 @@
 <script src="/assets/support.js" defer></script>
 <script src="/assets/garden-field.js" defer></script>
 <script src="/assets/inline/399cd11cd933868f64af.js"></script>
-<script src="/assets/inline/0869fdeffdf78600433c.js"></script>
+<script src="/assets/inline/48331f03a06407f40270.js"></script>
 </body>
 </html>
