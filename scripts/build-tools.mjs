@@ -150,12 +150,32 @@ async function buildAlerts(write) {
       <div class="tool-snip">/check r…
 /watch r…
 /unwatch r…
+/guard r…
+/unguard r…
 /list</div>
       <p class="tool-note" id="tg-link">The bot reads only public ledger state. It never asks for
          keys, seeds or balances. Anyone who asks for those in its name is not NOSHASHI.</p>
     </div>
   </div>
   <div id="alert-out" hidden></div>
+  <div class="panel" style="margin-top:14px" id="treasury-guard"><p class="num">TREASURY GUARD · HOSTED</p>
+    <h2>Watch a treasury wallet, even with the app closed.</h2>
+    <p>Treasury Guard in the desktop app watches while the app is open. This keeps watching on our
+       servers: within about five minutes of any validated transaction a wallet signs (money out,
+       offers, trust lines, settings, signing keys), anything done to it (a freeze or clawback), or an
+       incoming payment of 1 XRP or more or any token, your channel gets a message. Read-only: an
+       address is all it needs. Free for up to 3 wallets per channel.</p>
+    <form class="tool-form" id="wallet-form" novalidate style="margin:8px 0 0">
+      <div class="form-field"><label for="wallet-address">Treasury wallet to watch</label>
+        <input id="wallet-address" type="text" spellcheck="false" autocomplete="off" placeholder="r…" maxlength="40" required></div>
+      <div class="form-field"><label for="wallet-webhook">Discord channel webhook URL</label>
+        <input id="wallet-webhook" type="url" spellcheck="false" autocomplete="off" placeholder="https://discord.com/api/webhooks/…" required></div>
+      <button class="btn" type="submit" id="wallet-go">Watch this wallet</button>
+      <p class="form-status" id="wallet-status" role="status" aria-live="polite"></p>
+    </form>
+    <p class="tool-note">On Telegram, send the bot <span class="mono">/guard r…</span> and
+       <span class="mono">/unguard r…</span>. Incoming XRP under 1 XRP is left out: that is where
+       phishing dust arrives.</p></div>
   <div class="panel" style="margin-top:14px"><p class="num">WHAT COUNTS AS A CHANGE</p>
     <p>Global freeze on or off. Clawback enabled. Regular key set, changed or removed. Signer list or
        quorum changed. Master key disabled or re-enabled. Permissioned holding switched on or off.
@@ -209,12 +229,35 @@ async function buildAlerts(write) {
       .catch(function(){say(status,"Could not reach the server. Try again shortly.","bad");})
       .finally(function(){go.disabled=false;});
   });
+
+  var wform=document.getElementById("wallet-form"); if(!wform)return;
+  var wallet=document.getElementById("wallet-address"), whook=document.getElementById("wallet-webhook");
+  var wstatus=document.getElementById("wallet-status"), wgo=document.getElementById("wallet-go");
+  try{var wpre=new URLSearchParams(location.search).get("wallet");if(wpre&&ADDRESS.test(wpre))wallet.value=wpre;}catch(e){}
+  wform.addEventListener("submit",function(e){
+    e.preventDefault();
+    var a=(wallet.value||"").trim(), w=(whook.value||"").trim();
+    if(!ADDRESS.test(a)){say(wstatus,"That is not an XRP Ledger classic address. They begin with r.","bad");return;}
+    if(!HOOK.test(w)){say(wstatus,"Paste the whole Discord webhook URL. It starts with https://discord.com/api/webhooks/.","bad");return;}
+    wgo.disabled=true; say(wstatus,"Reading the wallet and sending a confirmation to your channel…","busy");
+    fetch(API+"/wallet-subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({wallet:a,discord_webhook:w})})
+      .then(function(r){return r.json().then(function(b){return {ok:r.ok,b:b};});})
+      .then(function(x){
+        if(!x.ok){say(wstatus,x.b.message||"That did not work.","bad");return;}
+        say(wstatus,"");
+        whook.value="";
+        show("<h2>Watching wallet <span translate=\\"no\\">"+esc(a)+"</span></h2>"+
+          "<p>A confirmation was posted to your channel. Transactions from ledger "+esc(x.b.ledger_index)+" on are posted there within about five minutes of validating.</p>");
+      })
+      .catch(function(){say(wstatus,"Could not reach the server. Try again shortly.","bad");})
+      .finally(function(){wgo.disabled=false;});
+  });
 })();
 </script>`;
 
   await write("alerts/index.html", renderPage({
-    title: "Issuer alerts — Discord and Telegram, when an XRPL issuer's powers change",
-    description: "Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee. Read every five minutes from validated ledger state.",
+    title: "Issuer and treasury alerts — Discord and Telegram, from the XRP Ledger",
+    description: "Free alerts when an XRP Ledger issuer turns on a freeze, enables clawback, changes its signing keys or signer list, or raises its transfer fee, and when a watched treasury wallet transacts. Read every five minutes from validated ledger state.",
     path: "/alerts/",
     head: TOOL_CSS,
     body,

@@ -45,4 +45,27 @@
       .catch(function(){say(status,"Could not reach the server. Try again shortly.","bad");})
       .finally(function(){go.disabled=false;});
   });
+
+  var wform=document.getElementById("wallet-form"); if(!wform)return;
+  var wallet=document.getElementById("wallet-address"), whook=document.getElementById("wallet-webhook");
+  var wstatus=document.getElementById("wallet-status"), wgo=document.getElementById("wallet-go");
+  try{var wpre=new URLSearchParams(location.search).get("wallet");if(wpre&&ADDRESS.test(wpre))wallet.value=wpre;}catch(e){}
+  wform.addEventListener("submit",function(e){
+    e.preventDefault();
+    var a=(wallet.value||"").trim(), w=(whook.value||"").trim();
+    if(!ADDRESS.test(a)){say(wstatus,"That is not an XRP Ledger classic address. They begin with r.","bad");return;}
+    if(!HOOK.test(w)){say(wstatus,"Paste the whole Discord webhook URL. It starts with https://discord.com/api/webhooks/.","bad");return;}
+    wgo.disabled=true; say(wstatus,"Reading the wallet and sending a confirmation to your channel…","busy");
+    fetch(API+"/wallet-subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({wallet:a,discord_webhook:w})})
+      .then(function(r){return r.json().then(function(b){return {ok:r.ok,b:b};});})
+      .then(function(x){
+        if(!x.ok){say(wstatus,x.b.message||"That did not work.","bad");return;}
+        say(wstatus,"");
+        whook.value="";
+        show("<h2>Watching wallet <span translate=\"no\">"+esc(a)+"</span></h2>"+
+          "<p>A confirmation was posted to your channel. Transactions from ledger "+esc(x.b.ledger_index)+" on are posted there within about five minutes of validating.</p>");
+      })
+      .catch(function(){say(wstatus,"Could not reach the server. Try again shortly.","bad");})
+      .finally(function(){wgo.disabled=false;});
+  });
 })();

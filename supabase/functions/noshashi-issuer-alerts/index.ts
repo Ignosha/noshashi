@@ -9,10 +9,18 @@
  *                            webhook, so only whoever owns the channel ever
  *                            sees it.
  *
- *   POST /unsubscribe        { token }  Public. The token is in every alert.
+ *   POST /wallet-subscribe   { wallet, discord_webhook }  Public. Treasury
+ *                            Guard, hosted: every validated transaction a
+ *                            treasury wallet signs or receives (1 XRP+ or
+ *                            any token) posted to the channel. Rules in
+ *                            ../_shared/walletAlerts.ts.
+ *
+ *   POST /unsubscribe        { token }  Public. The token is in every alert,
+ *                            issuer or wallet.
  *
  *   POST /telegram           The Telegram bot's webhook. Commands:
- *                            /check r…, /watch r…, /unwatch r…, /list, /start.
+ *                            /check r…, /watch r…, /unwatch r…, /guard r…,
+ *                            /unguard r…, /list, /start.
  *                            /check reads an issuer once and replies; it
  *                            subscribes nothing, so it has no limit beyond
  *                            Telegram's own.
@@ -60,9 +68,12 @@ import {
   powersFrom,
   type Powers,
 } from "../_shared/issuerPowers.ts";
+import { walletAlertText, walletEvents } from "../_shared/walletAlerts.ts";
 
 const XRPL_HTTP = ["https://xrplcluster.com/", "https://s2.ripple.com:51234/", "https://s1.ripple.com:51234/"];
 const FREE_ISSUERS_PER_TARGET = 3;
+const FREE_WALLETS_PER_TARGET = 3;
+const WALLETS_PER_TICK = 100;
 const ISSUERS_PER_TICK = 150;
 const SITE = "https://www.noshashi.app";
 const ALLOWED_ORIGINS = new Set([SITE, "https://noshashi.app"]);
@@ -77,6 +88,29 @@ function service() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } }).schema("noshashi");
 }
 type Db = NonNullable<ReturnType<typeof service>>;
+
+/** One rippled JSON-RPC call, tried on each public server in turn. */
+async function ledgerCall(method: string, params: Json): Promise<Json> {
+  let last: unknown = null;
+  for (const endpoint of XRPL_HTTP) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method, params: [params] }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!response.ok) throw new Error(`${new URL(endpoint).host} replied ${response.status}`);
+      const result = ((await response.json()) as { result?: Json }).result ?? {};
+      if (result.error === "actNotFound") return result;
+      if (result.error) throw new Error(String(result.error_message ?? result.error));
+      return result;
+    } catch (error) {
+      last = error;
+    }
+  }
+  throw last instanceof Error ? last : new Error("ledger unreachable");
+}
 
 async function accountInfo(issuer: string): Promise<{ info: Json; ledgerIndex: number | null } | null> {
   let last: unknown = null;
@@ -270,8 +304,12 @@ async function handleUnsubscribe(db: Db, request: Request, origin: string | null
   if (!/^[0-9a-f]{48}$/.test(token)) return json(400, { error: "invalid_token" }, origin);
   const { data, error } = await db.from("issuer_alert_subscriptions").update({ active: false }).eq("unsubscribe_token", token).select("issuer");
   if (error) throw error;
-  if (!data?.length) return json(404, { error: "not_found", message: "That link is not valid, or was already used." }, origin);
-  return json(200, { ok: true, issuer: data[0].issuer }, origin);
+  if (data?.length) return json(200, { ok: true, issuer: data[0].issuer }, origin);
+  const { data: wallets, error: walletError } = await db.from("wallet_alert_subscriptions").update({ active: false }).eq("unsubscribe_token", token).select("wallet");
+  if (walletError) throw walletError;
+  if (!wallets?.length) return json(404, { error: "not_found", message: "That link is not valid, or was already used." }, origin);
+  // `issuer` kept for the existing /alerts/ page, which shows it as the address.
+  return json(200, { ok: true, issuer: wallets[0].wallet, wallet: wallets[0].wallet }, origin);
 }
 
 async function handleTelegram(db: Db, request: Request): Promise<Response> {
@@ -297,11 +335,26 @@ async function handleTelegram(db: Db, request: Request): Promise<Response> {
       .eq("channel", "telegram").eq("target", chatId).eq("issuer", argument).eq("active", true).select("id");
     if (error) throw error;
     await reply(data?.length ? `Stopped watching ${argument}.` : `This chat was not watching ${argument}.`);
+  } else if (name === "/guard") {
+    const result = await subscribeWallet(db, argument, "telegram", chatId);
+    await reply(result.ok ? walletReceiptText(argument, result.ledgerIndex, result.token) : result.message);
+  } else if (name === "/unguard") {
+    const { data, error } = await db.from("wallet_alert_subscriptions").update({ active: false })
+      .eq("channel", "telegram").eq("target", chatId).eq("wallet", argument).eq("active", true).select("id");
+    if (error) throw error;
+    await reply(data?.length ? `Stopped watching wallet ${argument}.` : `This chat was not watching wallet ${argument}.`);
   } else if (name === "/list") {
     const { data, error } = await db.from("issuer_alert_subscriptions").select("issuer")
       .eq("channel", "telegram").eq("target", chatId).eq("active", true);
     if (error) throw error;
-    await reply(data?.length ? `Watching:\n${data.map((r) => r.issuer).join("\n")}` : "Not watching any issuer. Send /watch r… to start.");
+    const { data: wallets, error: walletError } = await db.from("wallet_alert_subscriptions").select("wallet")
+      .eq("channel", "telegram").eq("target", chatId).eq("active", true);
+    if (walletError) throw walletError;
+    const parts = [
+      ...(data?.length ? [`Issuers:\n${data.map((r) => r.issuer).join("\n")}`] : []),
+      ...(wallets?.length ? [`Treasury wallets:\n${wallets.map((r) => r.wallet).join("\n")}`] : []),
+    ];
+    await reply(parts.length ? parts.join("\n\n") : "Not watching anything. Send /watch r… for an issuer or /guard r… for a treasury wallet.");
   } else {
     await reply([
       "NOSHASHI issuer alerts. Read-only: this bot never asks for keys or seeds, and never will.",
@@ -309,9 +362,11 @@ async function handleTelegram(db: Db, request: Request): Promise<Response> {
       "/check r…    what an XRPL issuer can do right now, read from the ledger",
       "/watch r…    alert this chat when an XRPL issuer's powers change",
       "/unwatch r…  stop",
+      "/guard r…    alert this chat on a treasury wallet's transactions",
+      "/unguard r…  stop",
       "/list        what this chat watches",
       "",
-      `Free for up to ${FREE_ISSUERS_PER_TARGET} issuers per chat. ${SITE}/alerts/`,
+      `Free for up to ${FREE_ISSUERS_PER_TARGET} issuers and ${FREE_WALLETS_PER_TARGET} wallets per chat. ${SITE}/alerts/`,
     ].join("\n"));
   }
   return json(200, { ok: true });
@@ -359,6 +414,142 @@ async function handleDiscord(request: Request): Promise<Response> {
   // deno-lint-ignore no-explicit-any
   (globalThis as any).EdgeRuntime?.waitUntil?.(followUp);
   return json(200, { type: 5 }); // "thinking…", replaced by the follow-up
+}
+
+// ── Treasury wallets ─────────────────────────────────────────────────
+//
+// Treasury Guard in the desktop app watches only while the app is open.
+// These are the same readings kept server-side: every five minutes each
+// watched wallet's new validated transactions are read and posted to the
+// subscriber's channel. Read-only, public data: a wallet address is all
+// that is ever needed, and nothing here can move funds.
+
+type WalletSubscribeResult = { ok: true; token: string; ledgerIndex: number } | { ok: false; status: number; error: string; message: string };
+
+async function subscribeWallet(db: Db, wallet: string, channel: "discord" | "telegram", target: string): Promise<WalletSubscribeResult> {
+  if (!ADDRESS_RE.test(wallet)) return { ok: false, status: 400, error: "invalid_wallet", message: "That is not an XRPL classic address. They begin with r." };
+  const { count, error: countError } = await db
+    .from("wallet_alert_subscriptions")
+    .select("id", { count: "exact", head: true })
+    .eq("channel", channel).eq("target", target).eq("active", true).neq("wallet", wallet);
+  if (countError) throw countError;
+  if ((count ?? 0) >= FREE_WALLETS_PER_TARGET) {
+    return { ok: false, status: 402, error: "limit_reached", message: `Free treasury alerts cover ${FREE_WALLETS_PER_TARGET} wallets per channel. Unwatch one, or write to institutions@noshashi.app for more.` };
+  }
+  const info = await ledgerCall("account_info", { account: wallet, ledger_index: "validated" });
+  if (info.error === "actNotFound") return { ok: false, status: 404, error: "wallet_not_found", message: "No account with that address exists on the ledger." };
+  const ledgerIndex = Number(info.ledger_index);
+  if (!Number.isFinite(ledgerIndex) || ledgerIndex <= 0) return { ok: false, status: 502, error: "unreadable", message: "The wallet could not be read. Try again shortly." };
+
+  // Alerts start from the ledger the subscription was made at. An existing
+  // baseline is kept, so a new subscriber never replays or skips history
+  // for anyone else watching the same wallet.
+  const { error: stateError } = await db.from("wallet_alert_state").upsert(
+    { wallet, last_ledger: ledgerIndex, checked_at: new Date().toISOString() },
+    { onConflict: "wallet", ignoreDuplicates: true },
+  );
+  if (stateError) throw stateError;
+  const { data, error } = await db
+    .from("wallet_alert_subscriptions")
+    .upsert({ wallet, channel, target, active: true, failures: 0 }, { onConflict: "wallet,channel,target" })
+    .select("unsubscribe_token")
+    .single();
+  if (error) throw error;
+  return { ok: true, token: data.unsubscribe_token as string, ledgerIndex };
+}
+
+function walletReceiptText(wallet: string, ledgerIndex: number, token: string): string {
+  return [
+    "NOSHASHI · watching treasury wallet",
+    `${wallet} (from ledger ${ledgerIndex})`,
+    "",
+    "You will get a message here within five minutes of any validated transaction this wallet signs (payments out, offers, trust lines, settings, signing keys), anything done to it (freeze, clawback), and incoming payments of 1 XRP or more or any token.",
+    "Read-only: NOSHASHI never needs keys or seeds for this, and never asks for them.",
+    `Treasury report: ${SITE}/treasury/?wallets=${wallet}`,
+    `Stop: ${unsubscribeUrl(token)}`,
+  ].join("\n");
+}
+
+async function handleWalletSubscribe(db: Db, request: Request, origin: string | null): Promise<Response> {
+  let body: Json;
+  try {
+    body = await request.json();
+  } catch {
+    return json(400, { error: "invalid_json" }, origin);
+  }
+  const wallet = String(body?.wallet ?? "").trim();
+  const webhook = String(body?.discord_webhook ?? "").trim();
+  if (!DISCORD_WEBHOOK_RE.test(webhook)) {
+    return json(400, { error: "invalid_webhook", message: "Paste a Discord channel webhook URL (Server Settings → Integrations → Webhooks → Copy Webhook URL)." }, origin);
+  }
+  const result = await subscribeWallet(db, wallet, "discord", webhook);
+  if (!result.ok) return json(result.status, { error: result.error, message: result.message }, origin);
+  const sent = await sendDiscord(webhook, walletReceiptText(wallet, result.ledgerIndex, result.token));
+  if (sent === false) {
+    await db.from("wallet_alert_subscriptions").update({ active: false }).eq("unsubscribe_token", result.token);
+    return json(400, { error: "webhook_rejected", message: "Discord refused that webhook. Check it was copied whole and still exists." }, origin);
+  }
+  return json(200, { ok: true, wallet, ledger_index: result.ledgerIndex, receipt_delivered: sent === true }, origin);
+}
+
+async function walletTick(db: Db): Promise<Json> {
+  const { data: subs, error } = await db.from("wallet_alert_subscriptions")
+    .select("id, wallet, channel, target, unsubscribe_token, failures").eq("active", true);
+  if (error) throw error;
+  const byWallet = new Map<string, Json[]>();
+  for (const s of subs ?? []) byWallet.set(s.wallet, [...(byWallet.get(s.wallet) ?? []), s]);
+  if (!byWallet.size) return { wallets: 0 };
+
+  const { data: states, error: stateError } = await db.from("wallet_alert_state")
+    .select("wallet, last_ledger, checked_at").in("wallet", [...byWallet.keys()]);
+  if (stateError) throw stateError;
+  const stateOf = new Map((states ?? []).map((s) => [s.wallet, s]));
+  const order = [...byWallet.keys()]
+    .sort((a, b) => String(stateOf.get(a)?.checked_at ?? "").localeCompare(String(stateOf.get(b)?.checked_at ?? "")))
+    .slice(0, WALLETS_PER_TICK);
+
+  let read = 0, active = 0, sent = 0, unreadable = 0;
+  for (const wallet of order) {
+    const from = Number(stateOf.get(wallet)?.last_ledger ?? 0);
+    if (!from) { unreadable += 1; continue; }
+    // Up to 200 transactions per round, oldest first. A busier wallet is
+    // caught up over the following rounds, never skipped.
+    let reply: Json;
+    try {
+      reply = await ledgerCall("account_tx", { account: wallet, ledger_index_min: from + 1, ledger_index_max: -1, forward: true, limit: 200, api_version: 2 });
+    } catch {
+      unreadable += 1;
+      continue;
+    }
+    if (reply.error === "actNotFound") { unreadable += 1; continue; }
+    const rows: Json[] = reply.transactions ?? [];
+    const maxLedger = Number(reply.ledger_index_max);
+    if (!Number.isFinite(maxLedger) || maxLedger < from) { unreadable += 1; continue; }
+    read += 1;
+    // With a marker, more remain: advance only to the last ledger read in
+    // full. Without one, everything up to ledger_index_max has been seen.
+    const lastRowLedger = rows.length ? Math.max(...rows.map((r) => Number(r.ledger_index ?? r.tx_json?.ledger_index ?? r.tx?.ledger_index ?? 0))) : from;
+    const upTo = reply.marker ? Math.max(from, lastRowLedger - 1) : maxLedger;
+    const events = walletEvents(rows, wallet).filter((e) => e.ledgerIndex > from && e.ledgerIndex <= upTo);
+
+    if (events.length) {
+      active += 1;
+      for (const s of byWallet.get(wallet) ?? []) {
+        const ok = await deliver(s.channel, s.target, walletAlertText(wallet, events, unsubscribeUrl(s.unsubscribe_token)));
+        if (ok === true) {
+          sent += 1;
+          await db.from("wallet_alert_subscriptions").update({ last_notified_at: new Date().toISOString(), failures: 0 }).eq("id", s.id);
+        } else {
+          const failures = Number(s.failures ?? 0) + 1;
+          await db.from("wallet_alert_subscriptions").update({ failures, active: ok === null && failures < 288 }).eq("id", s.id);
+        }
+      }
+    }
+    // Advanced only after delivery was attempted: a crash in between sends
+    // the alert again rather than losing it.
+    await db.from("wallet_alert_state").update({ last_ledger: upTo, checked_at: new Date().toISOString() }).eq("wallet", wallet);
+  }
+  return { wallets: byWallet.size, read, active, sent, unreadable };
 }
 
 // ── The tick ─────────────────────────────────────────────────────────
@@ -437,6 +628,7 @@ Deno.serve(async (request: Request): Promise<Response> => {
       return json(powers ? 200 : 502, { issuer, ledger_index: read.ledgerIndex, powers, summary: powers ? describePowers(powers) : null }, origin);
     }
     if (route === "subscribe" && request.method === "POST") return await handleSubscribe(db, request, origin);
+    if (route === "wallet-subscribe" && request.method === "POST") return await handleWalletSubscribe(db, request, origin);
     if (route === "unsubscribe" && request.method === "POST") return await handleUnsubscribe(db, request, origin);
     if (route === "telegram" && request.method === "POST") return await handleTelegram(db, request);
     if (route === "discord" && request.method === "POST") return await handleDiscord(request);
@@ -448,9 +640,16 @@ Deno.serve(async (request: Request): Promise<Response> => {
       const { data, error } = await db.rpc("issuer_alerts_token_ok", { p_token: bearer });
       if (error) throw error;
       if (data !== true) return json(401, { error: "unauthorized" });
-      return json(200, await tick(db));
+      const issuers = await tick(db);
+      let wallets: Json;
+      try {
+        wallets = await walletTick(db);
+      } catch (error) {
+        wallets = { error: error instanceof Error ? error.message : String(error) };
+      }
+      return json(200, { ...issuers, wallets });
     }
-    return json(404, { error: "not_found", routes: ["GET /powers?issuer=", "POST /subscribe", "POST /unsubscribe", "POST /telegram", "POST /discord", "POST /tick"] }, origin);
+    return json(404, { error: "not_found", routes: ["GET /powers?issuer=", "POST /subscribe", "POST /wallet-subscribe", "POST /unsubscribe", "POST /telegram", "POST /discord", "POST /tick"] }, origin);
   } catch (error) {
     console.error(JSON.stringify({ level: "error", where: "issuer-alerts", message: error instanceof Error ? error.message : String(error) }));
     return json(500, { error: "internal" }, origin);
