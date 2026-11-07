@@ -41,10 +41,12 @@ export function ProvenanceScene({
         title="PROVENANCE"
         sub="How long an account has existed, who put the first XRP into it, and how much of that this node can actually prove."
         status="go"
-        statusLabel="DESK PLAN"
+        statusLabel="PRO PLAN"
       />
       <Gated
         feature="portfolios"
+        title="Counterparty provenance"
+        blurb="How long an account has existed, who put the first XRP into it, and how much of that this node can actually prove."
         onUpgrade={onUpgrade}
         onSignIn={onSignIn}
         className="min-h-0 flex-1"

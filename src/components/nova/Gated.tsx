@@ -38,12 +38,21 @@ export function Gated({
   onUpgrade,
   onSignIn,
   className,
+  title,
+  blurb,
 }: {
   feature: string;
   children: React.ReactNode;
   onUpgrade: () => void;
   onSignIn: () => void;
   className?: string;
+  /**
+   * What this screen is called on the gate. Several screens share one
+   * capability ("portfolios"), so the capability's own label would name
+   * a different screen; a scene passes its own name and line instead.
+   */
+  title?: string;
+  blurb?: string;
 }) {
   const { has, loading } = useBilling();
   const { user } = useAuth();
@@ -75,7 +84,7 @@ export function Gated({
       animate={{ opacity: 1, y: 0 }}
       transition={SPRING}
       role="region"
-      aria-label={`${spec?.label ?? feature} requires an upgrade`}
+      aria-label={`${title ?? spec?.label ?? feature} requires an upgrade`}
     >
       <article className="desk-gate w-full max-w-[560px] text-left">
         <p className="desk-figure-meta">
@@ -84,10 +93,11 @@ export function Gated({
         </p>
 
         <h2 className="desk-gate-title text-foreground">
-          {spec?.label ?? "Paid capability"}
+          {title ?? spec?.label ?? "Paid capability"}
         </h2>
         <p className="desk-dek">
-          {spec?.blurb ??
+          {blurb ??
+            spec?.blurb ??
             "This capability is part of a paid plan and is not available on the free tier."}
         </p>
 
