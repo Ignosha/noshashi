@@ -935,7 +935,7 @@
 }
 /* Twelve screens set their headline numbers by hand in bold mono; in the
    desk every one of them is a serif figure, whatever its call site. */
-.ledger-desktop .data-font.font-\[600\]:is(.text-\[22px\], .text-\[24px\], .text-\[26px\], .text-\[28px\], .text-\[30px\]) {
+.ledger-desktop .data-font.font-\[600\]:is(.text-\[19px\], .text-\[22px\], .text-\[24px\], .text-\[26px\], .text-\[28px\], .text-\[30px\]) {
   font-family: var(--font-editorial);
   font-weight: 400;
   font-size: 30px;
@@ -943,7 +943,7 @@
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
 }
-.ledger-desktop .data-font.font-\[600\]:is(.text-\[22px\], .text-\[24px\], .text-\[26px\], .text-\[28px\], .text-\[30px\]) > span {
+.ledger-desktop .data-font.font-\[600\]:is(.text-\[19px\], .text-\[22px\], .text-\[24px\], .text-\[26px\], .text-\[28px\], .text-\[30px\]) > span:not(:first-child) {
   margin-left: 6px;
   font: 10px var(--font-mono);
   letter-spacing: 0.06em;
