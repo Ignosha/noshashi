@@ -6,6 +6,7 @@ import { fetchOrderBook } from "@/lib/xrpl/client";
 import { quotedVsFillable, type QuotedVsFillable } from "@/lib/desk/liquidity";
 import { useLedger } from "@/lib/desk/ledger";
 import { cn } from "@/lib/utils";
+import { sentenceCase } from "@/lib/format";
 
 /**
  * The three questions, shown rather than described: one card each, with a
@@ -79,7 +80,8 @@ function Card({
         className="self-start"
         onClick={onAction}
       >
-        {action}
+        {sentenceCase(action)}
+        <span aria-hidden>↗</span>
       </Button>
     </Panel>
   );
@@ -110,14 +112,14 @@ export function QuestionShowcase({
       >
         <div className="flex flex-wrap gap-2">
           {[
-            { label: "GO", tone: "border-go/50 bg-go/10 text-go" },
-            { label: "HOLD", tone: "border-hold/50 bg-hold/10 text-hold" },
-            { label: "NO-GO", tone: "border-no-go/50 bg-no-go/10 text-no-go" },
+            { label: "GO", tone: "text-go" },
+            { label: "HOLD", tone: "text-hold" },
+            { label: "NO-GO", tone: "text-no-go" },
           ].map((v) => (
             <span
               key={v.label}
               className={cn(
-                "display rounded-md border px-3 py-2 text-[20px] font-[800]",
+                "desk-stamp",
                 v.tone,
               )}
             >
@@ -217,7 +219,7 @@ export function QuestionShowcase({
           </div>
         ) : (
           <div className="space-y-2">
-            <p className="data-font text-[30px] font-[600] leading-none text-foreground">
+            <p className="desk-figure-value">
               SHA-256
             </p>
             <p className="text-[12px] text-muted-foreground">

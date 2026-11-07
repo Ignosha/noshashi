@@ -52,7 +52,7 @@ describe("first-run steps", () => {
     for (const id of ["evidence", "policy"] as const) {
       const step = steps.find((s) => s.id === id)!;
       expect(step.requiresPlan).toBe("Pro");
-      expect(step.action).toEqual({ label: "SEE PRO", scene: "plans" });
+      expect(step.action).toEqual({ label: "See Pro", scene: "plans" });
     }
     expect(steps.find((s) => s.id === "analysis")!.requiresPlan).toBeUndefined();
     // The view step, open on every plan, comes before a Pro step.

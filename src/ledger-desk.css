@@ -788,3 +788,105 @@
   font-style: italic;
   letter-spacing: -0.005em;
 }
+
+/* ---------------------------------------------------------------------
+ * Batch 1 — Overview and Mission control.
+ * A row of readings is a figure table: one rule above and below, hairline
+ * column dividers, a mono label and a serif figure. Lists of destinations
+ * are an index: ruled rows, no boxes.
+ * ------------------------------------------------------------------- */
+.desk-figure-table {
+  border-block: 1px solid hsl(var(--border));
+}
+.desk-figure-cell {
+  padding: 12px 14px 14px;
+  border-left: 1px solid hsl(var(--border) / 0.7);
+}
+.desk-figure-cell:first-child,
+.desk-figure-table > .desk-figure-cell:nth-child(2n + 1) {
+  border-left: 0;
+  padding-left: 0;
+}
+@media (min-width: 768px) {
+  .desk-figure-table > .desk-figure-cell:nth-child(2n + 1) {
+    border-left: 1px solid hsl(var(--border) / 0.7);
+    padding-left: 14px;
+  }
+  .desk-figure-table > .desk-figure-cell:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+.desk-figure-label {
+  font: 9.5px/1.6 var(--font-mono);
+  letter-spacing: 0.06em;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 8px;
+}
+.desk-figure-cell .data-font.text-\[15px\] {
+  font: 400 30px/1.05 var(--font-editorial);
+  letter-spacing: -0.01em;
+}
+.desk-figure-cell .data-font.text-\[15px\] + p {
+  margin-top: 6px;
+}
+.desk-index-row {
+  display: block;
+  padding: 12px 0 11px;
+  border-bottom: 1px solid hsl(var(--border) / 0.7);
+  transition: background-color 0.18s;
+}
+.desk-index-row:not(:disabled):hover {
+  background: hsl(var(--foreground) / 0.025);
+}
+.desk-index-row > p:first-of-type {
+  margin-top: 4px;
+}
+.desk-figure-value {
+  font: 400 30px/1.05 var(--font-editorial);
+  letter-spacing: -0.01em;
+  color: hsl(var(--foreground));
+  font-variant-numeric: tabular-nums;
+}
+.desk-figure-unit {
+  margin-left: 6px;
+  font: 10px var(--font-mono);
+  letter-spacing: 0.06em;
+  color: hsl(var(--muted-foreground));
+}
+.desk-figure-table.xl\:grid-cols-4 > .desk-figure-cell:nth-child(2n + 1) {
+  border-left: 0;
+  padding-left: 0;
+}
+@media (min-width: 1280px) {
+  .desk-figure-table.xl\:grid-cols-4 > .desk-figure-cell:nth-child(2n + 1) {
+    border-left: 1px solid hsl(var(--border) / 0.7);
+    padding-left: 14px;
+  }
+  .desk-figure-table.xl\:grid-cols-4 > .desk-figure-cell:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+/* Console-era orbital and dot decorations: a research page has none. */
+.ledger-desktop .desk-pattern-mark {
+  display: none;
+}
+/* A verdict, printed: the double-ruled stamp from the website receipt. */
+.desk-stamp {
+  display: inline-grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border: 3px double currentColor;
+  border-radius: 50%;
+  font: 500 10px var(--font-mono);
+  letter-spacing: 0.04em;
+  transform: rotate(-10deg);
+}
+.desk-stamp:nth-child(2) {
+  transform: rotate(4deg);
+}
+.desk-stamp:nth-child(3) {
+  transform: rotate(-4deg);
+}

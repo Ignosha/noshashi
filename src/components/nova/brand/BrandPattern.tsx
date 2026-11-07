@@ -176,7 +176,7 @@ export function PatternMark({
 }) {
   const common = { opacity, size, className: "text-foreground" };
   return (
-    <div className={cn("pointer-events-none absolute select-none", className)} aria-hidden>
+    <div className={cn("desk-pattern-mark pointer-events-none absolute select-none", className)} aria-hidden>
       {element === "orbital" && <OrbitalSystem {...common} />}
       {element === "orbit" && <EllipseOrbit {...common} />}
       {element === "dots" && <DotGrid {...common} />}

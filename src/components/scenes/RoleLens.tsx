@@ -60,8 +60,8 @@ export function RoleLens({
               aria-selected={l === current}
               onClick={() => choose(l)}
               className={cn(
-                "stencil rounded border px-2 py-0.5 text-[10px] tracking-[0.14em]",
-                l === current ? "border-foreground/50 text-foreground" : "border-border text-muted-foreground hover:text-foreground"
+                "stencil px-2 py-1 text-[10px] tracking-[0.12em]",
+                l === current ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               {LENSES[l].title}
@@ -73,7 +73,7 @@ export function RoleLens({
         {def.purpose}
         {role && LENS_FOR_ROLE[role] === current ? ` Default for your role (${role}).` : ""}
       </p>
-      <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="desk-index mt-2 grid grid-cols-1 gap-x-8 sm:grid-cols-2 xl:grid-cols-3">
         {def.items.map((item) => {
           const figure = item.figure ? item.figure(metrics) : undefined;
           return (
@@ -81,7 +81,7 @@ export function RoleLens({
               key={item.id}
               onClick={() => open(item.scene, item.where)}
               disabled={!onNavigate}
-              className="group border border-border p-2 text-left hover:border-foreground/40 disabled:cursor-default"
+              className="desk-index-row group text-left disabled:cursor-default"
             >
               <div className="flex items-baseline justify-between gap-2">
                 <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{item.label}</span>

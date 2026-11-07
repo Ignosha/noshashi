@@ -85,7 +85,7 @@ export function DecisionCard({ onNavigate }: { onNavigate: (scene: string) => vo
           Run a gate check on a settlement to get a GO, HOLD or NO-GO decision, the rules that decided it, and a receipt anyone can re-check.
         </p>
         <Button size="sm" className="mt-3" onClick={() => onNavigate("verify")}>
-          RUN THE FIRST ANALYSIS
+          Run the first analysis
         </Button>
       </Panel>
     );
