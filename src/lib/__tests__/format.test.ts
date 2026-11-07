@@ -24,6 +24,10 @@ describe("sentenceCase", () => {
     expect(sentenceCase("XRPL REGISTRY UNREACHABLE")).toBe("XRPL registry unreachable");
     expect(sentenceCase("NO AMM POOL FOR THIS PAIR")).toBe("No AMM pool for this pair");
   });
+  it("keeps plan names and the XRP Ledger as names", () => {
+    expect(sentenceCase("UPGRADE TO PRO")).toBe("Upgrade to Pro");
+    expect(sentenceCase("READ THE XRP LEDGER")).toBe("Read the XRP Ledger");
+  });
   it("leaves text a person already wrote in mixed case alone", () => {
     expect(sentenceCase("No evaluation yet")).toBe("No evaluation yet");
   });

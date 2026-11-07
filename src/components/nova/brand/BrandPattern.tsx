@@ -218,7 +218,7 @@ export function PatternField({
   return (
     <div
       className={cn(
-        "pointer-events-none absolute inset-0 select-none overflow-hidden",
+        "desk-pattern-mark pointer-events-none absolute inset-0 select-none overflow-hidden",
         className
       )}
       aria-hidden

@@ -105,6 +105,16 @@ const KEEP_CAPS = new Set([
   "RPC", "SHA-256", "UI", "URL", "USD", "XLS", "XRP", "XRPL",
 ]);
 
+/** Names that keep a capital first letter wherever they fall in a label. */
+const PROPER = new Map([
+  ["PRO", "Pro"],
+  ["INSTITUTIONAL", "Institutional"],
+  ["ENTERPRISE", "Enterprise"],
+  ["STRATEGIC", "Strategic"],
+  ["MAINNET", "Mainnet"],
+  ["TESTNET", "Testnet"],
+]);
+
 /**
  * Turn an all-capitals console label into sentence case, keeping acronyms.
  * Mixed-case input is returned unchanged: it was already written for a reader.
@@ -116,10 +126,12 @@ export function sentenceCase(label: string): string {
     const upper = word.toUpperCase();
     const out = KEEP_CAPS.has(upper)
       ? upper
-      : first
+      : PROPER.has(upper)
+        ? PROPER.get(upper)!
+        : first
         ? upper.charAt(0) + upper.slice(1).toLowerCase()
         : upper.toLowerCase();
     first = false;
     return out;
-  });
+  }).replace(/\bXRP ledger\b/g, "XRP Ledger");
 }
