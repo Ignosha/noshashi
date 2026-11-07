@@ -949,3 +949,19 @@
   letter-spacing: 0.06em;
   color: hsl(var(--muted-foreground));
 }
+
+/* ---------------------------------------------------------------------
+ * Batches 4–7 — evidence, issuers, intelligence, public and system
+ * screens. Most of these read correctly from the shared frame; what is
+ * left is pricing set as a rate card and the trust page as ruled claims.
+ * ------------------------------------------------------------------- */
+.desk-plan-name {
+  font: 400 26px/1.1 var(--font-editorial);
+  letter-spacing: -0.01em;
+}
+.ledger-desktop .desk-plan-price {
+  font-size: 40px;
+}
+.desk-stage-open {
+  font: italic 400 17px/1.2 var(--font-editorial);
+}

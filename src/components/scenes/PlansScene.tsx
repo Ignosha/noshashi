@@ -7,13 +7,14 @@ import { NovaBolt, NovaCredit, NovaShield, NovaVault } from "@/components/nova/N
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CountUp } from "@/components/nova/CountUp";
-import { CREDIT_PACKS, PLANS, type Plan } from "@/lib/billing/catalog";
+import { CREDIT_PACKS, PLANS, planFor, type Plan } from "@/lib/billing/catalog";
 import { useBilling } from "@/lib/billing/useEntitlements";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useToast } from "@/lib/toast";
 import { CONTACT } from "@/lib/brand";
 import { openExternal } from "@/lib/external";
 import { cn } from "@/lib/utils";
+import { sentenceCase } from "@/lib/format";
 import { SPRING, staggerChild, staggerParent } from "@/lib/motion";
 
 /**
@@ -70,7 +71,7 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
           title="PRICING"
           sub="The console is free. Paid plans unlock portfolios, alerting, receipt anchoring and the Compliance API."
           status={entitlement.tier === "operator" ? "hold" : "go"}
-          statusLabel={`${entitlement.tier.toUpperCase()} PLAN`}
+          statusLabel={`${planFor(entitlement.tier).name} PLAN`}
           right={
             subscription ? (
               <Button size="sm" variant="outline" onClick={() => void openBillingPortal()}>
@@ -78,7 +79,7 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
               </Button>
             ) : (
               <Button size="sm" variant="outline" asChild>
-                <a href={`mailto:${CONTACT.sales}`}>TALK TO SALES</a>
+                <a href={`mailto:${CONTACT.sales}`}>Talk to sales</a>
               </Button>
             )
           }
@@ -104,10 +105,10 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
               ))}
             </div>
             <span className="text-[11.5px] text-muted-foreground">
-              Desk is billed per seat. Institution is a flat account price.
+              Pro is billed per seat. Institutional is a flat account price.
             </span>
             <span className="ml-auto">
-              <Eyebrow>DESK TOTAL</Eyebrow>
+              <Eyebrow>PRO TOTAL</Eyebrow>
               <p className="data-font text-[18px] font-[600] leading-none text-foreground">
                 <CountUp value={seats * 749} prefix="$" />
                 <span className="ml-1 text-[10.5px] font-normal text-muted-foreground">
@@ -202,7 +203,7 @@ export function PlansScene({ onSignIn }: { onSignIn: () => void }) {
               </p>
               <ul className="mt-2 space-y-1.5">
                 {[
-                  "Desk is billed $749 per seat every month. Institution is billed $4,000 every month. Both renew on the same date each period.",
+                  "Pro is billed $749 per seat every month. Institutional is billed $4,000 every month. Both renew on the same date each period.",
                   "Verification credit packs are one-time purchases. They do not renew and they do not expire.",
                   "Cancel any time from Account → Manage Billing. It takes two clicks, needs no phone call and no email, and access continues until the end of the period you already paid for.",
                   "Full refund within 14 days of a first subscription charge if you have not used a paid capability. Unused credits are refundable pro rata within 30 days.",
@@ -289,8 +290,8 @@ function PlanCard({
       >
         <div className="flex items-start justify-between">
           <div>
-            <p className="display text-[15px] font-[700] tracking-[0.1em] text-foreground">
-              {plan.name}
+            <p className="desk-plan-name text-foreground">
+              {sentenceCase(plan.name)}
             </p>
             <p className="mt-1 text-[11px] text-muted-foreground">{plan.audience}</p>
           </div>
@@ -306,7 +307,7 @@ function PlanCard({
         </div>
 
         <div className="mt-4 border-y border-border py-3">
-          <p className="data-font text-[28px] font-[700] leading-none text-foreground">
+          <p className="desk-figure-value desk-plan-price text-foreground">
             {plan.priceLabel}
           </p>
           <p className="mono-font mt-1.5 text-[10.5px] text-muted-foreground">
