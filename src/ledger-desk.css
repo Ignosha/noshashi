@@ -645,3 +645,146 @@
   flex: none;
   vertical-align: middle;
 }
+
+/* ---------------------------------------------------------------------
+ * Batch 0 — the shared frame in the research-house layout.
+ *
+ * Every tool screen is assembled from Panel, Badge, Button, EmptyState
+ * and the plan gate, so these rules move all of them at once. A panel is
+ * a figure on the page: a rule above it, a mono caption, and no box. A
+ * tag is a printed mark, not a filled chip. Colour still belongs only to
+ * verdicts, and only as ink.
+ * ------------------------------------------------------------------- */
+.ledger-desktop .desk-panel:not(.bg-transparent) {
+  border-width: 1px 0 0;
+  border-radius: 0;
+  border-color: hsl(var(--foreground) / 0.28);
+  background: transparent;
+  overflow: visible;
+}
+.ledger-desktop .desk-panel:not(.bg-transparent) > header {
+  height: auto;
+  min-height: 34px;
+  padding: 10px 0 9px;
+  border-bottom: 1px solid hsl(var(--border) / 0.7);
+}
+.ledger-desktop .desk-panel > header .stencil {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: hsl(var(--muted-foreground));
+}
+.ledger-desktop .desk-panel:not(.bg-transparent) > header > span.stencil:first-child::before {
+  content: "Fig. — ";
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: hsl(var(--muted-foreground) / 0.7);
+}
+.ledger-desktop .desk-panel:not(.bg-transparent) > header + div,
+.ledger-desktop .desk-panel:not(.bg-transparent) > div:only-child {
+  padding-inline: 0;
+}
+.ledger-desktop .desk-panel.cursor-pointer:hover {
+  background: hsl(var(--foreground) / 0.025);
+}
+/* A panel inside a panel is a sub-figure: a dotted rule, no caption box. */
+.ledger-desktop .desk-panel.bg-transparent > header {
+  border-bottom-style: dotted;
+}
+
+/* Tags: printed marks. Outline only, mono, no fill. */
+.ledger-desktop :is(.bg-go-dim, .bg-hold-dim, .bg-no-go-dim) {
+  background: transparent;
+}
+.ledger-desktop span.inline-flex.border.tracking-wider {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  border-radius: 0;
+  padding-block: 1px;
+}
+
+/* Buttons: a primary is a solid ink block, everything else a rule. */
+.ledger-desktop .desk-button {
+  font-size: 12px;
+  border-radius: 1px;
+}
+.ledger-desktop .desk-button.bg-transparent.border {
+  border-color: hsl(var(--foreground) / 0.35);
+}
+.ledger-desktop .desk-button.bg-transparent.border:hover {
+  background: hsl(var(--foreground) / 0.05);
+  color: hsl(var(--foreground));
+}
+
+/* Decorations from the console era that have no place on a research page. */
+.ledger-desktop .hud-corner::before,
+.ledger-desktop .hud-corner::after {
+  display: none;
+}
+
+/* Empty state: a quiet note in the margin, not a framed icon tile. */
+.ledger-desktop .desk-empty-mark {
+  border: 0;
+  border-radius: 0;
+  opacity: 0.55;
+}
+.ledger-desktop .desk-empty-title {
+  font: 400 21px/1.2 var(--font-editorial);
+  letter-spacing: -0.01em;
+}
+
+/* Plan gate: a page from the report the reader has not bought yet. */
+.desk-gate {
+  padding-top: 4px;
+}
+.desk-gate-title {
+  font: 400 clamp(32px, 3.2vw, 44px)/1.05 var(--font-editorial);
+  letter-spacing: -0.025em;
+  margin: 26px 0 14px;
+}
+.desk-gate .desk-dek {
+  max-width: 46ch;
+}
+.desk-gate-includes {
+  margin-top: 30px;
+  border-top: 1px solid hsl(var(--border));
+  padding-top: 14px;
+}
+.desk-gate-includes ol {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+.desk-gate-includes li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid hsl(var(--border) / 0.6);
+  font-size: 12px;
+  line-height: 1.55;
+  color: hsl(var(--muted-foreground));
+}
+.desk-gate-includes li > span {
+  font-size: 10px;
+  padding-top: 2px;
+  color: hsl(var(--muted-foreground) / 0.75);
+}
+
+/* Sidebar: a contents page. Sentence-case entries, mono section heads. */
+.ledger-desktop .desk-nav-row > span:nth-child(2) {
+  font-size: 12.5px;
+  letter-spacing: 0;
+}
+.ledger-desktop .desk-nav-row[aria-current="page"] {
+  background: transparent;
+  box-shadow: inset 0 -1px hsl(var(--foreground) / 0.35);
+}
+.ledger-desktop .desk-nav-row[aria-current="page"] > span:nth-child(2) {
+  font-family: var(--font-editorial);
+  font-size: 16px;
+  font-style: italic;
+  letter-spacing: -0.005em;
+}

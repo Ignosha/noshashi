@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
-import { NovaShield, NovaVault } from "./NovaIcon";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useBilling } from "@/lib/billing/useEntitlements";
 import { useAuth } from "@/lib/auth/useAuth";
 import { FEATURE_CATALOG, planFor } from "@/lib/billing/catalog";
@@ -79,43 +77,40 @@ export function Gated({
       role="region"
       aria-label={`${spec?.label ?? feature} requires an upgrade`}
     >
-      <div className="hud-corner relative w-full max-w-[520px] border border-border bg-card p-6 text-center">
-        <div className="mx-auto grid h-12 w-12 place-items-center rounded-md border border-border text-muted-foreground">
-          <NovaVault size={20} />
-        </div>
+      <article className="desk-gate w-full max-w-[560px] text-left">
+        <p className="desk-figure-meta">
+          <span>Fig. / Plan required</span>
+          <span>{requiredPlan.name.charAt(0) + requiredPlan.name.slice(1).toLowerCase()} plan</span>
+        </p>
 
-        <Badge variant="hold" className="mt-4 text-[10px]">
-          {requiredPlan.name} PLAN
-        </Badge>
-
-        <h2 className="display mt-3 text-[17px] font-[700] tracking-[0.08em] text-foreground">
-          {spec?.label ?? "PAID CAPABILITY"}
+        <h2 className="desk-gate-title text-foreground">
+          {spec?.label ?? "Paid capability"}
         </h2>
-        <p className="mx-auto mt-2.5 max-w-[360px] text-[11.5px] leading-relaxed text-muted-foreground">
+        <p className="desk-dek">
           {spec?.blurb ??
             "This capability is part of a paid plan and is not available on the free tier."}
         </p>
 
-        <div className="mt-5 flex items-center justify-center gap-2">
+        <div className="desk-actions">
           {user ? (
-            <Button className="gap-2" onClick={onUpgrade}>
-              <NovaShield size={14} />
-              UPGRADE TO {requiredPlan.name}
+            <Button onClick={onUpgrade}>
+              Upgrade to {requiredPlan.name.charAt(0) + requiredPlan.name.slice(1).toLowerCase()}
+              <span aria-hidden>↗</span>
             </Button>
           ) : (
             <>
-              <Button className="gap-2" onClick={onSignIn}>
-                <NovaShield size={14} />
-                SIGN IN
+              <Button onClick={onSignIn}>
+                Sign in
+                <span aria-hidden>↗</span>
               </Button>
               <Button variant="outline" onClick={onUpgrade}>
-                SEE PLANS
+                See plans
               </Button>
             </>
           )}
         </div>
 
-        <p className="mono-font mt-4 text-[10.5px] text-faint">
+        <p className="desk-fine mono-font mt-4">
           {requiredPlan.priceLabel} · {requiredPlan.cadence}
         </p>
 
@@ -126,30 +121,26 @@ export function Gated({
           reason anyone clicks through.
         */}
         {requiredPlan.features.length > 0 && (
-          <div className="mt-5 border-t border-border/60 pt-4 text-left">
-            <p className="stencil text-[10px] tracking-[0.14em] text-faint">
-              {requiredPlan.name} ALSO INCLUDES
+          <div className="desk-gate-includes">
+            <p className="desk-kicker">
+              Also in {requiredPlan.name.charAt(0) + requiredPlan.name.slice(1).toLowerCase()}
             </p>
-            <ul className="mt-2.5 grid gap-1.5">
+            <ol>
               {requiredPlan.features
                 .filter((f) => !f.startsWith("Everything in"))
                 .slice(0, 6)
-                .map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex gap-2 text-[11px] leading-snug text-muted-foreground"
-                  >
-                    <span
-                      aria-hidden
-                      className="mt-[6px] h-[3px] w-[3px] shrink-0 bg-go"
-                    />
+                .map((feature, i) => (
+                  <li key={feature}>
+                    <span aria-hidden className="mono-font">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                     {feature}
                   </li>
                 ))}
-            </ul>
+            </ol>
           </div>
         )}
-      </div>
+      </article>
     </motion.div>
   );
 }

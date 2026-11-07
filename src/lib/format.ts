@@ -93,3 +93,33 @@ export function decodeCurrency(code: string): string {
     .trim();
   return decoded && /^[\x20-\x7E]+$/.test(decoded) ? decoded : code;
 }
+
+/**
+ * Words that stay in capitals when a console-style label is set in
+ * sentence case. The Ledger Desk sets prose labels the way a research
+ * report does ("Trust lines unreadable"), but an acronym is a name.
+ */
+const KEEP_CAPS = new Set([
+  "AI", "AML", "AMM", "API", "CSV", "DEX", "DID", "ETF", "FATF", "HUD", "ID", "IOU",
+  "KYC", "LP", "MPT", "NFT", "NOSHASHI", "NOSHX", "OFAC", "PDF", "RLUSD",
+  "RPC", "SHA-256", "UI", "URL", "USD", "XLS", "XRP", "XRPL",
+]);
+
+/**
+ * Turn an all-capitals console label into sentence case, keeping acronyms.
+ * Mixed-case input is returned unchanged: it was already written for a reader.
+ */
+export function sentenceCase(label: string): string {
+  if (label !== label.toUpperCase()) return label;
+  let first = true;
+  return label.replace(/[A-Za-z][A-Za-z0-9-]*/g, (word) => {
+    const upper = word.toUpperCase();
+    const out = KEEP_CAPS.has(upper)
+      ? upper
+      : first
+        ? upper.charAt(0) + upper.slice(1).toLowerCase()
+        : upper.toLowerCase();
+    first = false;
+    return out;
+  });
+}
