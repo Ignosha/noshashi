@@ -6,7 +6,7 @@
 
 | Check | Result / limits |
 | --- | --- |
-| Full Vitest suite, final code | **1,578 passed;4 skipped**,121 test files passed and1 skipped. Includes31 new editorial regressions. |
+| Full Vitest suite, foundation commit f1a4ed1 | **1,578 passed;4 skipped**,121 test files passed and1 skipped. Includes31 new editorial regressions. Globe follow-on checks are recorded below. |
 | Focused editorial/CSP |38 passed before the final standalone-build regression was added; the final full suite includes that additional test. |
 | Main `npm run build` | Passed: TypeScript build and Vite production bundle. Existing large-chunk and Vite configuration warnings remain. |
 | Academy `tsc -p academy --noEmit` | Passed, no diagnostics. |
@@ -39,3 +39,17 @@ Screenshots and browser results are local review artifacts under `/tmp/noshashi-
 Founder review is required before pushing/opening the prepared PR under this task’s external-publication restriction, before deploying the public pages, and before approving any article. The cron example is documentation only; no new job was installed. Full hosted editorial authentication, revision database, persistent scheduler/notifications, daily issue archive, source expansion, multi-chain adapters, founder sales dashboard integration and release blockers are tracked in `intelligence-foundation-audit.md`.
 
 Current API adapters refresh attributed external headlines and existing release notices when a visitor opens the new page **after deployment**. Original NOSHASHI analysis remains manual-review-only. The film and website copy are prepared marketing materials, not a sent advertising campaign.
+
+## Animated ledger globe follow-on — November 9
+
+The newsroom hero preserves the graphite/emerald illustration and adds rotating sphere meridians, an orbit, pause/resume and reduced-motion support. Rendering stops outside the viewport or when the document is hidden. Geometry and positions remain illustrative; they never represent wallet locations, transaction routes or node geography. A single visual emphasis is requested only when a subsequent valid snapshot has a greater ledger index.
+
+The existing `/api/xrp-market` supplies the validated-ledger index reported by xrplcluster.com, base fee, responding node's peer count and fetch timestamp. Each reading is a potentially cached public-node snapshot, not independent consensus verification. Optional missing fields read Unavailable, five-minute-old snapshots read Stale, and failures clear old values. Ledger availability is validated separately from spot-price availability, including the endpoint's existing HTTP503 partial-response behavior. There is one request at a time, a ten-second deadline/cooldown and a two-minute visible-page refresh floor; no new paid provider or server schedule.
+
+- Focused Vitest: **88 passed** across ledger-globe, editorial and site-render tests.
+- Existing newsroom browser checks rerun: **28 passed**.
+- Globe browser checks: **14 passed**, covering rotation, pause, reduced motion, source/cache labels, valid ledger in a partial503 response, missing optional values, stale/unavailable states, retry cooldown, mobile overflow and runtime errors.
+- Read-only production schema probe at 15:25:57 UTC: HTTP200, all source flags true; the validator accepted ledger108220201, base fee0.00001 XRP, peers150. This was a single source-reported snapshot, not a live uptime guarantee.
+- Browser artifacts: `/tmp/noshashi-globe-validation/{desktop,mobile}.png` and `results.json`. Success values are explicitly synthetic test fixtures; screenshots show the honest outage state. No synthetic values entered the public manifest.
+
+Initial browser attempts failed because the prior local preview had stopped; restarting the preview resolved connection refusal. The reduced-motion test initially asserted before the browser dispatched its change event; it now waits for that event. All reruns above passed. No production deploy or desktop release was performed.

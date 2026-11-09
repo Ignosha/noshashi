@@ -10,6 +10,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   // Explicit outage fixtures: no fabricated news appears in screenshots.
+  await page.route('**/api/xrp-market', route => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }));
   await page.route('**/api/xrp-news?**', route => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }));
   await page.route('**/api/project-feed?**', route => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }));
   await page.goto('http://localhost:4389/intelligence/');
