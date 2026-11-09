@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { buildNewsroom, NEWSROOM_PAGES } from "./build-newsroom.mjs";
 import { capturedView } from "../site/assets/desk-experience-core.mjs";
 /*
  * Renders the public site.
@@ -1622,10 +1623,12 @@ async function buildDocs() {
 }
 
 /* ── sitemap ──────────────────────────────────────────────────────── */
-async function buildSitemap(docs = [], tokenPages = []) {
+async function buildSitemap(docs = [], tokenPages = [], intelligencePages = []) {
   const pages = [
     ["/", "daily", "1.0"],
     ["/news/", "hourly", "0.9"],
+    ...NEWSROOM_PAGES,
+    ...intelligencePages,
     // High priority deliberately: this is the page the product is
     // argued from, and the only one that answers a question for
     // somebody who will never install anything.
@@ -1750,7 +1753,8 @@ async function main() {
   await buildTrust();
   await buildMisread();
   const docs = await buildDocs();
-  await buildSitemap(docs, tokenPages);
+  const intelligencePages = await buildNewsroom(write);
+  await buildSitemap(docs, tokenPages, intelligencePages);
   await buildRobots();
   // Last: every page, generated or committed, loses its inline scripts so
   // the CSP can be script-src 'self' (scripts/inline-scripts.mjs).

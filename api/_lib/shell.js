@@ -38,6 +38,7 @@ export { MARK };
 // of them (see FOOTER_GROUPS), so a visitor never has to scan a dozen
 // links to find where to start.
 export const NAV = [
+  { href: "/intelligence/", label: "Intelligence", key: "intelligence" },
   { href: "/platform/", label: "Platform", key: "platform", i18n: "nav.platform" },
   { href: "/solutions/", label: "Solutions", key: "solutions", i18n: "nav.solutions" },
   { href: "/institutional-demo/", label: "Demo", key: "demo", i18n: "nav.demo2" },
@@ -86,7 +87,8 @@ export const FOOTER_GROUPS = [
     { href: "/misread/", label: "The ledger can be misread" },
     { href: "/learn/", label: "Learn NOSHASHI (course)" },
     { href: "/guide/", label: "Plain-language guide" },
-    { href: "/news/", label: "Newsroom" },
+    { href: "/intelligence/", label: "Intelligence & briefs" },
+    { href: "/news/", label: "External headlines" },
     { href: "/progress/", label: "Progress & releases" },
     { href: "/status/", label: "Status" },
   ] },

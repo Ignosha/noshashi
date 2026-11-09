@@ -43,7 +43,12 @@
     "check:noshx-web": "npm run -s site:noshx && git diff --exit-code --stat site/assets/noshx && test -z \"$(git status --porcelain site/assets/noshx)\"",
     "check:academy-web": "npm run -s site:academy && git diff --exit-code --stat site/academy/app && test -z \"$(git status --porcelain site/academy/app)\"",
     "site:portal": "vite build --config vite.portal.config.mts && node scripts/build-payment-portal.mjs",
-    "portal:cli": "node packages/cli/bin/noshashi-review.mjs"
+    "portal:cli": "node packages/cli/bin/noshashi-review.mjs",
+    "editorial:collect": "node scripts/editorial/cli.mjs collect",
+    "editorial:review": "node scripts/editorial/cli.mjs review",
+    "intelligence:build": "node scripts/build-newsroom.mjs",
+    "intelligence:smoke": "node scripts/newsroom-smoke.mjs",
+    "intelligence:film": "node scripts/build-desk-film.mjs"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.2.6",
