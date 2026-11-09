@@ -42,6 +42,8 @@
     "check:bloom": "node scripts/gen-hero-bloom.mjs && git diff --exit-code --stat templates/hero-bloom.svg",
     "check:noshx-web": "npm run -s site:noshx && git diff --exit-code --stat site/assets/noshx && test -z \"$(git status --porcelain site/assets/noshx)\"",
     "check:academy-web": "npm run -s site:academy && git diff --exit-code --stat site/academy/app && test -z \"$(git status --porcelain site/academy/app)\"",
+    "site:security": "node scripts/build-security.mjs",
+    "check:security": "node scripts/build-security.mjs --check",
     "site:portal": "vite build --config vite.portal.config.mts && node scripts/build-payment-portal.mjs",
     "portal:cli": "node packages/cli/bin/noshashi-review.mjs"
   },

@@ -1,3 +1,4 @@
+import { isSecurityPreview } from "@/lib/edition";
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { TitleBar } from "@/components/nova/TitleBar";
@@ -157,6 +158,7 @@ import { HandoffProvider, useHandoff } from "@/lib/nav/handoff";
 import { SAMPLE_ADDRESSES } from "@/lib/samples";
 import { ObserverRunner } from "@/lib/agent/useObserver";
 import { StressScheduleRunner } from "@/lib/desk/stressSchedule";
+import { TreasuryGuardRunner } from "@/lib/security/treasuryStore";
 import { PersonalGuardianRunner } from "@/lib/security/guardian";
 import { OrgContextSync, useWorkstationOrg } from "@/lib/org/workstationContext";
 
@@ -984,7 +986,9 @@ function ConsoleApp() {
       <ObserverRunner />
       <StressScheduleRunner />
       <PersonalGuardianRunner />
+      <TreasuryGuardRunner />
       <OrgContextSync />
+      {isSecurityPreview && <div role="status" className="fixed bottom-3 left-3 z-[9999] max-w-md border border-border bg-background px-3 py-2 text-xs text-foreground">SECURITY PREVIEW · Separate installation · unsigned / not notarized · production updater and checkout disabled. Organization review needs backend setup. No signing integration configured.</div>}
       <div className="ledger-desktop relative flex h-full w-full overflow-hidden bg-background text-foreground">
         <SkipLink />
         <Announcer

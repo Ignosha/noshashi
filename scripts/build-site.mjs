@@ -58,6 +58,7 @@ import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
 import { buildTokens, TOKEN_INDEX_PAGES, loadTokens } from "./build-tokens.mjs";
 import { buildPartners, PARTNER_PAGES } from "./build-partners.mjs";
 import { buildPaymentPortal, PORTAL_PAGES } from "./build-payment-portal.mjs";
+import { buildCybersecurity, CYBERSECURITY_PAGES } from "./build-cybersecurity.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "site");
@@ -1341,7 +1342,14 @@ async function buildPricingEnhancement() {
           <tr><th scope="row">Issuer controls &amp; freeze-rights</th><td class="limited">Single address</td><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
           <tr><th scope="row">Liquidity &amp; redemption stress</th><td class="no">Unavailable</td><td class="yes">On demand</td><td class="yes">Scheduled</td><td class="contracted">Contracted scope</td><td class="contracted">Contracted scope</td></tr>
           <tr><th scope="row">Counterparty intelligence</th><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td><td class="contracted">Included</td><td class="contracted">Included</td></tr>
-          <tr class="group"><th scope="rowgroup" colspan="6">Account security &amp; incident response</th></tr>
+          <tr class="group"><th scope="rowgroup" colspan="6">Account security &amp; incident response · <a href="/cybersecurity/">Tools and limits</a></th></tr>
+          <tr><th scope="row">Treasury live preflight / independent organization review</th><td class="limited">Local preflight</td><td class="yes">Local preflight</td><td class="yes">Local preflight</td><td class="contracted">Review records after backend setup + MFA</td><td class="contracted">Review records after backend setup + MFA</td></tr>
+          <tr><th scope="row">Treasury Guard · local XRP payment flags</th><td class="limited">3 addresses · while open</td><td class="yes">50 addresses · while open</td><td class="yes">50 addresses · while open</td><td class="yes">50 addresses · while open</td><td class="yes">50 addresses · while open</td></tr>
+          <tr><th scope="row">Treasury dependency scenarios &amp; ledger endpoint comparison</th><td class="yes">Beta</td><td class="yes">Beta</td><td class="yes">Beta</td><td class="yes">Beta</td><td class="yes">Beta</td></tr>
+          <tr><th scope="row">Software advisory checks &amp; encrypted response notebook</th><td class="no">Unavailable</td><td class="yes">Beta · consent / device-local</td><td class="yes">Beta · consent / device-local</td><td class="yes">Beta · consent / device-local</td><td class="yes">Beta · consent / device-local</td></tr>
+          <tr><th scope="row"><a href="/cybersecurity/#institutional-security">Reviewed indicator sharing</a></th><td class="limited">Lookup after setup</td><td class="limited">Lookup after setup</td><td class="contracted">Filing after setup + participant review</td><td class="contracted">Filing after setup + participant review</td><td class="contracted">Filing after setup + participant review</td></tr>
+          <tr><th scope="row">Signing map &amp; signer-loss drill</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+          <tr><th scope="row">Local control-change comparison</th><td class="no">Unavailable</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
           <tr><th scope="row">Account security check &amp; hardening plan</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
           <tr><th scope="row">Safe send (lookalike &amp; sanctions check)</th><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td><td class="yes">Included</td></tr>
           <tr><th scope="row">Incident response (fund trace, recovery paths, dossier)</th><td class="no">Unavailable</td><td class="yes">2 hops</td><td class="yes">2 hops</td><td class="yes">5 hops + case</td><td class="yes">5 hops + case</td></tr>
@@ -1634,6 +1642,7 @@ async function buildSitemap(docs = [], tokenPages = []) {
     ...TOKEN_INDEX_PAGES,
     ...PARTNER_PAGES,
     ...PORTAL_PAGES,
+    ...CYBERSECURITY_PAGES,
     ...tokenPages,
     ...REPORT_PAGES,
     ...BRIEF_PAGES,
@@ -1745,6 +1754,7 @@ async function main() {
   await buildRedesignPages(write);
   await buildWorkspace(write, { release });
   await buildPaymentPortal(write);
+  await buildCybersecurity(write);
   await buildTutorial(write, { site: SITE });
   await buildAcademy(write);
   await buildTrust();

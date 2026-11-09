@@ -136,6 +136,7 @@ export const PAGE_FILES = [
   "enterprise/index.html",
   "strategic-infrastructure/index.html",
   "trust/index.html",
+  "cybersecurity/index.html",
   "guide/index.html",
   "legal/index.html",
   "misread/index.html",

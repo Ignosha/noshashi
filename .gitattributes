@@ -35,3 +35,5 @@
 # Compiled vendor code can contain significant whitespace in template strings.
 # Review the portal's source; keep the generated bundle reproducible.
 site/assets/payment-portal/portal.js linguist-generated=true -whitespace
+# Generated PDF and SDK template strings can contain meaningful trailing spaces.
+site/academy/app/workstation/assets/*.js -whitespace

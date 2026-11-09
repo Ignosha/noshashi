@@ -111,3 +111,6 @@ export const DEMO_EXCLUDES = [
  * takes a payment is worse than one that does not exist.
  */
 export const DEMO_UPGRADE_URL = "https://noshashi.app/#pricing";
+
+/** Isolated review build: no production updater or checkout. */
+export const isSecurityPreview = import.meta.env.VITE_SECURITY_PREVIEW === "1";

@@ -39,12 +39,12 @@ describe("the Academy course's policy", () => {
 });
 
 describe("the Academy lab workstation's policy", () => {
-  it("is the site's policy, except that the Academy may frame it", () => {
+  it("adds only scoped advisory access and Academy framing to the site policy", () => {
     const rules = JSON.parse(readFileSync("vercel.json", "utf8")).headers;
     const workstation = rules
       .find((h) => h.source === "/academy/app/workstation/(.*)")
       .headers.find((h) => h.key === "Content-Security-Policy").value;
-    expect(workstation).toBe(csp.replace("frame-ancestors 'none'", "frame-ancestors 'self'"));
+    expect(workstation).toBe(csp.replace("frame-ancestors 'none'", "frame-ancestors 'self'").replace("connect-src 'self'", "connect-src 'self' https://api.osv.dev"));
     // Vercel applies matching rules in order, so the override must come after the catch-all.
     expect(rules.findIndex((h) => h.source === "/academy/app/workstation/(.*)")).toBeGreaterThan(rules.findIndex((h) => h.source === "/(.*)"));
   });

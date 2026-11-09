@@ -30,7 +30,7 @@ type CredentialState = "accepted" | "pending" | "revoked" | "expired";
 function credentialState(credential: CredentialRecord): CredentialState {
   if (credential.revoked) return "revoked";
   if (
-    credential.expiration &&
+    credential.expiration !== undefined &&
     rippleTimeToDate(credential.expiration).getTime() < Date.now()
   ) {
     return "expired";
@@ -53,7 +53,7 @@ const stateBadge: Record<CredentialState, "go" | "hold" | "no-go"> = {
  * a legitimate mainnet answer, so it is explained rather than hidden.
  */
 export function CredentialsScene({ data }: { data: XrplState }) {
-  const { credentials, account, loadingAccount, accountError, refreshAccount } = data;
+  const { credentials, account, loadingAccount, accountError, credentialError, refreshAccount } = data;
   const { push } = useToast();
 
   const [view, setView] = useState<"grid" | "table">("grid");
@@ -75,11 +75,11 @@ export function CredentialsScene({ data }: { data: XrplState }) {
             ? `Credential objects held by ${shortAddress(account.address)} on XRPL mainnet.`
             : "Load a wallet to read its credential objects."
         }
-        status={accepted > 0 ? "go" : credentials.length > 0 ? "hold" : "no-go"}
+        status={loadingAccount || accountError || credentialError ? "hold" : accepted > 0 ? "go" : "hold"}
         statusLabel={
           loadingAccount
             ? "READING"
-            : `${accepted}/${credentials.length || 0} ACTIVE`
+            : accountError || credentialError ? "UNAVAILABLE" : `${accepted}/${credentials.length || 0} ACTIVE`
         }
         right={
           <div className="flex items-center gap-2">
@@ -116,22 +116,22 @@ export function CredentialsScene({ data }: { data: XrplState }) {
           >
             <PatternField variant="orbital" />
 
-            {accountError ? (
+            {loadingAccount ? <p role="status" className="text-sm text-muted-foreground">Reading held credentials from the validated ledger…</p> : accountError || credentialError ? (
               <EmptyState
                 icon={<NovaShield size={16} />}
                 title="ACCOUNT UNREADABLE"
-                body={accountError}
+                body={credentialError ?? accountError ?? "Read unavailable"}
                 action={
                   <Button size="sm" variant="outline" onClick={() => void refreshAccount()}>
                     RETRY
                   </Button>
                 }
               />
-            ) : credentials.length === 0 ? (
+            ) : !account ? <p className="text-sm text-muted-foreground">Load a wallet to begin.</p> : credentials.length === 0 ? (
               <EmptyState
                 icon={<NovaCredit size={16} />}
                 title="NO CREDENTIALS ON THIS ACCOUNT"
-                body="This wallet holds no XLS-70 credential objects on mainnet yet. Credentials appear here the moment an issuer creates one and the subject accepts it."
+                body="The ledger read returned no held credential objects. Issued credentials appear separately in the issuer register; a pending credential is shown here before acceptance."
                 action={
                   <Button size="sm" variant="outline" onClick={() => setDisclosureOpen(true)}>
                     HOW ISSUANCE WORKS
@@ -173,11 +173,10 @@ export function CredentialsScene({ data }: { data: XrplState }) {
                     return (
                       <tr
                         key={`${credential.issuer}-${credential.credentialType}`}
-                        onClick={() => setSelected(credential)}
                         className="cursor-pointer border-b border-border/30 transition-colors hover:bg-secondary/40"
                       >
                         <td className="mono-font py-2 text-[11px] text-foreground">
-                          {credential.credentialType}
+                          <button type="button" onClick={() => setSelected(credential)} className="text-left underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-foreground">{credential.credentialType}</button>
                         </td>
                         <td className="mono-font py-2 text-[11px] text-muted-foreground">
                           {shortAddress(credential.issuer)}
@@ -229,7 +228,7 @@ export function CredentialsScene({ data }: { data: XrplState }) {
         {/* Right — live compliance reads: what this wallet enters, what a
             counterparty holds, and the state of an issuer's book. */}
         <div className="col-span-2 flex min-h-0 flex-col gap-3 overflow-y-auto [&>*]:shrink-0">
-          <AccountDomains account={account?.address ?? null} />
+          <AccountDomains key={account?.address ?? "none"} account={account?.address ?? null} />
           <CounterpartyCredentials />
           <IssuerRegister defaultIssuer={account?.address} />
 
@@ -238,8 +237,8 @@ export function CredentialsScene({ data }: { data: XrplState }) {
             <DataRow label="OBJECTS" value={credentials.length} />
             <DataRow label="ACCEPTED" value={accepted} tone={accepted > 0 ? "go" : "muted"} />
             <DataRow
-              label="REVOKED"
-              value={credentials.filter((credential) => credential.revoked).length}
+              label="REMOVED HISTORY"
+              value="Not read"
               tone="muted"
             />
             <DataRow label="OWNER RESERVE" value={`${account?.ownerCount ?? 0} OBJ`} />

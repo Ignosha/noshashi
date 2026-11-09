@@ -62,6 +62,7 @@ export type TraceNode = {
 };
 
 export type Trace = {
+  coverage?: { accountLimit: number; flowLimit: number; omittedAccounts: number; flowLimitReached: boolean };
   root: string;
   sinceLedger: number;
   depthLimit: number;
@@ -115,7 +116,7 @@ function amountOf(raw: unknown): Amount | null {
 export function outflowOf(account: string, row: Json): Flow | null {
   const tx = (row.tx_json ?? row.tx ?? row) as Json;
   const meta = (row.meta ?? {}) as Json;
-  if (row.validated === false || meta.TransactionResult !== "tesSUCCESS" || tx.Account !== account) return null;
+  if (row.validated !== true || meta.TransactionResult !== "tesSUCCESS" || tx.Account !== account) return null;
   const base = {
     from: account,
     ledger: Number(row.ledger_index ?? tx.ledger_index ?? 0),
@@ -130,10 +131,9 @@ export function outflowOf(account: string, row: Json): Flow | null {
   if (tx.TransactionType === "AccountDelete" && typeof tx.Destination === "string" && delivered) {
     return { ...base, to: tx.Destination, kind: "account_delete", amount: delivered };
   }
-  if (tx.TransactionType === "EscrowCreate" && typeof tx.Destination === "string") {
-    const amount = amountOf(tx.Amount);
-    if (amount) return { ...base, to: tx.Destination, kind: "escrow", amount };
-  }
+  // EscrowCreate locks value in an escrow object; the destination has
+  // not received it. Do not draw it as a delivered transfer or follow
+  // unrelated destination activity as though it moved that value.
   return null;
 }
 
@@ -149,9 +149,12 @@ export async function traceFunds(
   opts: { sinceLedger: number; depth?: number; perAccount?: number; minXrp?: number; reader?: TraceReader }
 ): Promise<Trace> {
   const reader = opts.reader ?? liveReader;
-  const depthLimit = opts.depth ?? TRACE_LIMITS.standard.depth;
-  const perAccount = opts.perAccount ?? TRACE_LIMITS.standard.perAccount;
+  const depthLimit = Math.max(0, Math.min(5, opts.depth ?? TRACE_LIMITS.standard.depth));
+  const perAccount = Math.max(1, Math.min(1000, opts.perAccount ?? TRACE_LIMITS.standard.perAccount));
   const minXrp = opts.minXrp ?? 1;
+  const accountLimit = depthLimit > 2 ? 200 : 40;
+  const flowLimit = 5000;
+  const omitted = new Set<string>();
 
   const nodes = new Map<string, TraceNode>();
   const flows: Flow[] = [];
@@ -159,7 +162,7 @@ export async function traceFunds(
   const queue: Array<{ address: string; from: number; depth: number }> = [{ address: root, from: opts.sinceLedger, depth: 0 }];
   nodes.set(root, { address: root, depth: 0, status: "source", receivedXrp: 0, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: false });
 
-  while (queue.length) {
+  while (queue.length && flows.length < flowLimit) {
     const { address, from, depth } = queue.shift()!;
     const node = nodes.get(address)!;
     const info = await reader.accountInfo(address).catch(() => undefined);
@@ -179,11 +182,19 @@ export async function traceFunds(
     if (node.status === "custodial") continue;
 
     let marker: unknown;
+    const markers = new Set<string>();
+    let pages = 0;
     do {
-      const page: Json = await reader.accountTx(address, from, Math.min(400, perAccount - node.read), marker).catch(() => ({ transactions: [] }));
-      const rows = (page.transactions ?? []) as Json[];
+      let page: Json;
+      try {
+        page = await reader.accountTx(address, from, Math.min(400, perAccount - node.read), marker);
+        if (!Array.isArray(page.transactions)) throw Error("History omitted");
+      } catch { node.status = "unread"; node.truncated = true; break; }
+      const rows = (page.transactions as Json[]).slice(0, perAccount - node.read);
+      if (rows.length < page.transactions.length) node.truncated = true;
       node.read += rows.length;
       for (const row of rows) {
+        if (flows.length >= flowLimit) { node.truncated = true; break; }
         const flow = outflowOf(address, row);
         if (!flow) continue;
         if (flow.amount.currency === "XRP" && flow.amount.value < minXrp && flow.kind === "payment") {
@@ -203,6 +214,7 @@ export async function traceFunds(
           continue;
         }
         const tagged = flow.destinationTag !== null;
+        if (nodes.size >= accountLimit) { omitted.add(flow.to); continue; }
         nodes.set(flow.to, { address: flow.to, depth: depth + 1, status: tagged ? "custodial" : "holding", receivedXrp: xrp, balanceXrp: null, domain: null, sanction: null, read: 0, truncated: false, tagged });
         if (!tagged && depth + 1 <= depthLimit) {
           queue.push({ address: flow.to, from: flow.ledger, depth: depth + 1 });
@@ -220,9 +232,16 @@ export async function traceFunds(
         } else if (!tagged) n.status = "not_followed";
       }
       marker = page.marker;
+      pages += 1;
+      if (marker) {
+        const identity = JSON.stringify(marker);
+        if (!rows.length || markers.has(identity) || pages >= 10) { node.truncated = true; break; }
+        markers.add(identity);
+      }
       if (node.read >= perAccount && marker) node.truncated = true;
-    } while (marker && node.read < perAccount);
+    } while (marker && node.read < perAccount && flows.length < flowLimit);
   }
+  for (const pending of queue) { const n = nodes.get(pending.address)!; n.status = "not_followed"; n.truncated = true; }
 
   const all = [...nodes.values()];
   const listed = await reader.sanctions(all.map((n) => n.address)).catch(() => null);
@@ -235,7 +254,7 @@ export async function traceFunds(
   }
   const vanity = [...byEnding].filter(([, a]) => a.length >= 2).map(([ending, accounts]) => ({ ending, accounts }));
 
-  return { root, sinceLedger: opts.sinceLedger, depthLimit, minXrp, nodes: all, flows, dust, vanity, sanctionsChecked: listed !== null };
+  return { root, sinceLedger: opts.sinceLedger, depthLimit, minXrp, nodes: all, flows, dust, vanity, sanctionsChecked: listed !== null, coverage: { accountLimit, flowLimit, omittedAccounts: omitted.size, flowLimitReached: flows.length >= flowLimit } };
 }
 
 // ————— What can be done —————
@@ -259,7 +278,7 @@ export function recoveryOptions(trace: Trace, compromised?: { stillHoldsXrp: num
       id: "finality",
       title: "No one can reverse a validated XRP Ledger transaction",
       detail:
-        "There is no chargeback on the XRP Ledger. Validators, Ripple, wallet makers and NOSHASHI cannot move funds out of an account without its keys, and anyone offering to 'recover' or 'reverse' stolen XRP for a fee is running the second half of the scam. What follows are the paths that do exist.",
+        "There is no chargeback on the XRP Ledger. NOSHASHI cannot reverse validated XRP payments. Never share a seed or trust a guaranteed-reversal claim. Evidence services may investigate an incident, but cannot guarantee recovery. Issued-token powers and custodial processes are separate, conditional paths.",
       outlook: "not_possible",
     },
   ];
@@ -270,7 +289,7 @@ export function recoveryOptions(trace: Trace, compromised?: { stillHoldsXrp: num
     out.push({
       id: `freeze-${n.address}`,
       title: `Ask the service behind ${n.address}${n.domain ? ` (${n.domain})` : ""} to freeze the deposit`,
-      detail: `This account requires destination tags, the mark of an exchange or custodial service that credits deposits to customer accounts. The service can identify and freeze the customer who received ${into.map((f) => fmt(f.amount)).join(" and ") || "the funds"} if you reach it before the funds are withdrawn, usually with a police or court reference. Send it the evidence below.`,
+      detail: `This account uses destination tags, which may indicate pooled deposits but does not identify a custodian. Independently verify the operator through official sources before sharing evidence. If a verified service received the disputed transfer, ask whether it can investigate or preserve relevant funds and records under its procedures. No freeze or recovery is guaranteed. Observed incoming transfers: ${into.map((f) => fmt(f.amount)).join(" and ") || "see ledger evidence"}.`,
       outlook: "possible",
       evidence: into.map((f) => `${f.at ?? `ledger ${f.ledger}`}: ${fmt(f.amount)} to ${f.to}${f.destinationTag !== null ? ` tag ${f.destinationTag}` : ""}, transaction ${f.hash}`),
     });

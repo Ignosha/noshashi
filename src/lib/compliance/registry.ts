@@ -64,10 +64,19 @@ type DomainRow = {
 };
 
 async function getJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${BASE}${path}`, { signal: AbortSignal.timeout(15_000) });
-  const body = (await response.json().catch(() => ({}))) as T & { error?: string };
-  if (!response.ok) throw new Error(body.error ? `Registry: ${body.error}` : `The registry replied ${response.status}.`);
-  return body;
+  // AbortController also works in older macOS WKWebViews that do not
+  // implement AbortSignal.timeout. Keep the deadline through body parsing.
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8_000);
+  try {
+    const response = await fetch(`${BASE}${path}`, { signal: controller.signal });
+    const body = await response.json() as T & { error?: string };
+    if (!response.ok) throw new Error(body.error ? `Registry: ${body.error}` : `The registry replied ${response.status}.`);
+    return body;
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error("The domain directory did not respond within 8 seconds. Retry, or check a domain ID directly against the ledger.");
+    throw error;
+  } finally { clearTimeout(timer); }
 }
 
 export async function registryStatus(): Promise<RegistryStatus> {
@@ -77,6 +86,8 @@ export async function registryStatus(): Promise<RegistryStatus> {
 export async function directoryDomains(owner?: string): Promise<{ domains: DirectoryDomain[]; status: RegistryStatus }> {
   const q = owner ? `?owner=${encodeURIComponent(owner)}` : "";
   const body = await getJson<{ domains: DomainRow[]; status: RegistryStatus }>(`/domains${q}`);
+  if (!Array.isArray(body.domains) || !body.status || !Array.isArray(body.status.sweeps)) throw new Error("The directory response is incomplete. Use a direct domain-ID check or retry discovery.");
+  if (body.domains.some(d => !HEX64.test(d.domain_id ?? "") || !ADDRESS.test(d.owner ?? "") || !Array.isArray(d.accepted_credentials))) throw new Error("The directory contains an incomplete domain record. Retry discovery or check a known domain ID directly.");
   return {
     status: body.status,
     domains: body.domains.map((d) => ({
@@ -128,6 +139,7 @@ export async function validatedLedger(): Promise<LedgerAt> {
 export async function readDomain(domainId: string, validatedIndex: number): Promise<DomainEntry | null> {
   try {
     const r = await rpc("ledger_entry", { index: domainId.trim().toUpperCase(), ledger_index: validatedIndex });
+    if (r.validated !== true || Number(r.ledger_index) !== validatedIndex) throw new Error("The domain object was not returned at the requested validated ledger.");
     return domainFromEntry(r.node ?? {}, r.index);
   } catch (e) {
     if (e instanceof XrplError && e.code === "entryNotFound") return null;
@@ -141,7 +153,9 @@ async function ownedObjects(account: string, type: "permissioned_domain" | "cred
   for (let page = 0; page < 10; page++) {
     try {
       const r = await rpc("account_objects", { account, type, ledger_index: validatedIndex, limit: 400, ...(marker ? { marker } : {}) });
-      out.push(...((r.account_objects ?? []) as Array<Record<string, unknown>>));
+      if (r.validated !== true || Number(r.ledger_index) !== validatedIndex) throw new Error("The object page was not returned at the requested validated ledger.");
+      if (!Array.isArray(r.account_objects)) throw new Error("The ledger returned an incomplete object response. Retry the read.");
+      out.push(...(r.account_objects as Array<Record<string, unknown>>));
       marker = r.marker;
       if (!marker) break;
     } catch (e) {
@@ -149,6 +163,7 @@ async function ownedObjects(account: string, type: "permissioned_domain" | "cred
       throw e;
     }
   }
+  if (marker) throw new Error("This account exceeds the 4,000-object read limit. The partial reading cannot establish credential or domain coverage.");
   return out;
 }
 
