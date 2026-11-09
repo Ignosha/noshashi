@@ -26,6 +26,16 @@ describe("the website's Content-Security-Policy", () => {
     expect(csp).toContain("object-src 'none'");
     expect(csp).toContain("base-uri 'self'");
   });
+  it('explicitly permits newsroom players on both root spellings while isolating risk tools', () => {
+    const rules = JSON.parse(readFileSync('vercel.json', 'utf8')).headers;
+    // Vercel's named optional wildcard did not match /intelligence/ in production.
+    for (const source of ['/intelligence', '/intelligence/(.*)']) {
+      const rule = rules.find(r => r.source === source);
+      expect(rule).toBeDefined();
+      expect(rule.headers.find(h => h.key === 'Content-Security-Policy').value).toBe(`${csp}; frame-src https://www.youtube-nocookie.com`);
+    }
+    expect(csp).not.toContain('youtube');
+  });
 });
 
 describe("the Academy course's policy", () => {

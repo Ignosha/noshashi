@@ -22,7 +22,7 @@ The curated registry is `scripts/newsroom-media.mjs`. Public YouTube page metada
 
 No video was downloaded, rehosted or stripped of its publisher player. No thumbnail or provider iframe loads automatically. A visitor chooses Load video; one `youtube-nocookie.com` iframe is created, with autoplay off and captions requested. This is a third-party connection after choice, not a promise of zero tracking. Close removes the iframe and restores focus. Opening another player removes the first. Direct Watch at source links work without JavaScript and remain visible when embedding is blocked. Cross-origin iframe load does not establish playback, captions, uptime or current broadcast status. No YouTube API key was added.
 
-The scoped CSP override permits only `https://www.youtube-nocookie.com` as a frame source on `/intelligence/:path*`; the public site and risk tools retain their previous policies. No external scripts are allowed by the parent page. No private founder data or business-development state is embedded.
+The scoped CSP override permits only `https://www.youtube-nocookie.com` as a frame source on the exact `/intelligence` route and `/intelligence/(.*)` descendants (including `/intelligence/`); the public site and risk tools retain their previous policies. No external scripts are allowed by the parent page. No private founder data or business-development state is embedded.
 
 Official Ripple and XRPL Commons broadcast-channel links and the XRPL event calendar are shown separately. No currently active XRPL broadcast was verified. There is no LIVE badge, active-viewer figure or invented stream status. Live broadcasting requires a fresh verified video URL and status before inclusion; do not silently relabel a recording. General market television and unrelated space photography were excluded following founder steering. This change does not install a broadcaster-monitoring job or a continuous video news feed.
 
@@ -33,3 +33,5 @@ Official Ripple and XRPL Commons broadcast-channel links and the XRPL event cale
 - Initial screenshot review found stretched photo sizing; fixed explicit dimensions and added a regression check. Initial media browser run before that additional check:14 passed; final rerun:15 passed.
 
 No merge, push, deployment, editorial publication, advertising distribution or external outreach occurred in this change.
+
+Production verification caught that the original named wildcard did not apply the iframe permission to `/intelligence/` on Vercel, although the local preview matched it. Replaced it with an explicit root rule and regex descendant rule before final release verification.

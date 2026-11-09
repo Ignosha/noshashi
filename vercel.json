@@ -83,7 +83,16 @@
       ]
     },
     {
-      "source": "/intelligence/:path*",
+      "source": "/intelligence",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://xiurbiwuwcfowqnpmwki.supabase.co https://xrplcluster.com https://xrpl.ws https://xrpl.link wss://xrplcluster.com wss://xrpl.ws wss://s1.ripple.com wss://s2.ripple.com wss://s.altnet.rippletest.net:51233 wss://testnet.xrpl-labs.com; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; frame-src https://www.youtube-nocookie.com"
+        }
+      ]
+    },
+    {
+      "source": "/intelligence/(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",
