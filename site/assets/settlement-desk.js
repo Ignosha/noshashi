@@ -84,3 +84,18 @@ form.addEventListener('submit', async event => {
   finally { button.disabled = false; }
 });
 window.addEventListener('beforeunload', event => { if (cases.length) { event.preventDefault(); event.returnValue = ''; } });
+
+// Explicitly selected public teaching case: populate only; never auto-submit.
+const evaluationId = new URLSearchParams(location.hash.slice(1)).get('evaluation');
+if (evaluationId) {
+  try {
+    const response = await fetch('/assets/settlement-evaluation.json');
+    if (!response.ok) throw new Error('Unavailable');
+    const pack = await response.json(), c = pack.cases.find(c => c.id === evaluationId && !c.evidence_modified);
+    if (!c) throw new Error('Unsupported teaching case');
+    const e = c.expectation;
+    for (const [key, value] of Object.entries({ invoice_id: e.invoice_id, transaction_hash: pack.source.transaction_hash, destination: e.destination, destination_tag: e.destination_tag ?? '', expected_amount: e.expected_amount, kind: e.asset.kind, currency: e.asset.currency ?? '', issuer: e.asset.issuer ?? '' })) form.elements.namedItem(key).value = String(value);
+    document.querySelector('#sd-kind').dispatchEvent(new Event('change'));
+    message.textContent = 'Synthetic invoice expectation loaded for a public archived transaction. Submit to fetch actual ledger evidence. No real invoice problem is claimed.';
+  } catch { message.textContent = 'Teaching case could not load. Enter an expectation manually; nothing has been checked.'; }
+}

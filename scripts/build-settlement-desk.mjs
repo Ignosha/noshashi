@@ -1,5 +1,6 @@
+import { buildSettlementEvaluation } from './build-settlement-evaluation.mjs';
 import { renderPage } from '../api/_lib/shell.js';
-export const SETTLEMENT_PAGES = [['/settlement-desk/', 'monthly', '0.8']];
+export const SETTLEMENT_PAGES = [['/settlement-desk/', 'monthly', '0.8'], ['/settlement-desk/evaluate/', 'monthly', '0.6']];
 export async function buildSettlementDesk(write) {
   await write('settlement-desk/index.html', renderPage({
     title: 'Settlement Exception Desk · NOSHASHI LABS',
@@ -22,7 +23,8 @@ export async function buildSettlementDesk(write) {
         <button class="sd-button" type="submit">Compare with ledger</button><p id="sd-message" role="status" aria-live="polite"></p>
       </form><p class="sd-small">Up to 25 checks per page session. The queue is held in memory and clears on reload. Download receipts before leaving. Nothing is automatically credited or approved.</p></div>
       <section class="sd-queue" aria-labelledby="queue-title"><div class="sd-queue-heading"><div><p class="sd-kicker">02 / REVIEW WORKLIST</p><h2 id="queue-title">Evidence before decisions.</h2></div><span id="sd-count">0 checks</span></div><div class="sd-filters" role="group" aria-label="Filter checks"><button data-filter="ALL" aria-pressed="true">All</button><button data-filter="ATTENTION" aria-pressed="false">Needs attention</button><button data-filter="MATCHED" aria-pressed="false">Matched</button></div><div id="sd-cases"><div class="sd-empty"><span>—</span><h3>No payments checked yet.</h3><p>Add an invoice expectation and transaction hash. Actual results appear here, with the responding node and observation time.</p></div></div></section></section>
-      <section class="sd-next"><p class="sd-kicker">BUILD THE OPERATING WORKFLOW</p><h2>Start with a scoped evaluation.</h2><p>Bring a small, non-sensitive payment sample and define the exceptions your team needs to review. Shared approvals, integration, monitoring and service commitments require separately agreed scope.</p><div class="sd-links"><a href="/design-partners/#apply">Discuss a pilot ↗</a><a href="/delivered/">Delivered-payment export ↗</a><a href="/certificate/">Issuer controls ↗</a><a href="/book-health/">Liquidity snapshot ↗</a></div></section>
+      <section class="sd-next"><p class="sd-kicker">BUILD THE OPERATING WORKFLOW</p><h2>Start with a scoped evaluation.</h2><p>Bring a small, non-sensitive payment sample and define the exceptions your team needs to review. Shared approvals, integration, monitoring and service commitments require separately agreed scope.</p><div class="sd-links"><a href="/settlement-desk/evaluate/">Try the evaluation cases ↗</a><a href="/design-partners/#apply">Discuss a pilot ↗</a><a href="/delivered/">Delivered-payment export ↗</a><a href="/certificate/">Issuer controls ↗</a><a href="/book-health/">Liquidity snapshot ↗</a></div></section>
     </div>`,
   }));
+  await buildSettlementEvaluation(write);
 }

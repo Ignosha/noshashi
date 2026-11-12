@@ -1,0 +1,745 @@
+{
+  "schema": "noshashi.settlement-evaluation.v1",
+  "label": "EVALUATION ONLY — SYNTHETIC EXPECTATIONS, ARCHIVED PUBLIC EVIDENCE",
+  "source": {
+    "transaction_hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+    "ledger_index": 107585451,
+    "captured_on": "2026-10-11",
+    "fixture": "tests/fixtures/account-tx-solo-107587061.json",
+    "provenance": "GET /api/delivered?account=rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz&format=raw on the PR #79 preview, 2026-10-11; entries copied unmodified from the first account_tx page (ledger_index_max 107587061)",
+    "evidence_sha256": "efa16cb1f43f59f85ab01f67d74520a57d8cb11553882efc26929c781d8f18f2",
+    "documentation": "https://xrpl.org/docs/concepts/payment-types/partial-payments"
+  },
+  "limitations": [
+    "No real customer invoice or payment problem is asserted.",
+    "Archived evidence is not a live observation.",
+    "Modified evidence is labeled synthetic.",
+    "Reviewer feedback is not a test result, guarantee, compliance determination or purchase commitment.",
+    "These issued-asset examples demonstrate XRPL behavior; amounts are not native XRP."
+  ],
+  "cases": [
+    {
+      "id": "baseline",
+      "title": "01 / Exact amount baseline",
+      "explanation": "A synthetic invoice expectation is set equal to the archived delivered amount. This checks matching behavior, not a real invoice or commercial authorization.",
+      "expectation": {
+        "invoice_id": "EVALUATION-BASELINE",
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "asset": {
+          "kind": "issued",
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+        }
+      },
+      "evidence": {
+        "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+        "Amount": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "Destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "Fee": "5093",
+        "Flags": 0,
+        "LastLedgerSequence": 107585467,
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "4275726E3B20534F4C4F3B205250525F4255524E5F52554E7C323032362D31302D3131543134"
+            }
+          }
+        ],
+        "Sequence": 82936904,
+        "SigningPubKey": "EDF4728D15B269717107E79F359E1A867B26A7796BAE8C20C864F16479E5303FCA",
+        "TransactionType": "Payment",
+        "TxnSignature": "EB0E1044C438E8E0E1E56DF3AB67052F8492B9D3F252BB2EC81594034906EEF3FADBD4BFC9A154B01895095158CD84EF92766D57AA97BEA40596CFA56558B70D",
+        "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "DeliverMax": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "ctid": "C6699FAB00430000",
+        "date": 845043992,
+        "ledger_index": 107585451,
+        "inLedger": 107585451,
+        "validated": true,
+        "meta": {
+          "AffectedNodes": [
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                  "Balance": "6077892",
+                  "Flags": 0,
+                  "OwnerCount": 21,
+                  "Sequence": 82936905
+                },
+                "LedgerEntryType": "AccountRoot",
+                "LedgerIndex": "2CB22820EFB5226E04BF2FF1CCCD025C3092393B6F3747CEAAAF61EA87C406B0",
+                "PreviousFields": {
+                  "Balance": "6082985",
+                  "Sequence": 82936904
+                },
+                "PreviousTxnID": "ACE5F524EE554BEBBE1FCF77CCBE3C8842BBE9E0F89CD66E5DCD9401829D45FB",
+                "PreviousTxnLgrSeq": 107585446
+              }
+            },
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "6500000000000000e-31"
+                  },
+                  "Flags": 1114112,
+                  "HighLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+                    "value": "0"
+                  },
+                  "HighNode": "3707",
+                  "LowLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                    "value": "399277132.38133"
+                  },
+                  "LowNode": "0"
+                },
+                "LedgerEntryType": "RippleState",
+                "LedgerIndex": "EE3E4E6C6FA7CA79F592883BBEBA483985985BB087E6F1BB0F1282C8DADD97F1",
+                "PreviousFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "0.06779143585641465"
+                  }
+                },
+                "PreviousTxnID": "203EB788A408518C7802E0E3E690C88FF7E1276CE1CD276DAD88D85976B2A57B",
+                "PreviousTxnLgrSeq": 107585314
+              }
+            }
+          ],
+          "TransactionIndex": 67,
+          "TransactionResult": "tesSUCCESS",
+          "delivered_amount": {
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+            "value": "0.067791435856414"
+          }
+        }
+      },
+      "expected_status": "MATCHED",
+      "expected_findings": [
+        "EXACT_LEDGER_MATCH"
+      ],
+      "report": {
+        "rule_version": "settlement-exceptions.v1",
+        "transaction_hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "expectation": {
+          "invoice_id": "EVALUATION-BASELINE",
+          "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "expected_amount": "0.067791435856414",
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          }
+        },
+        "ledger_index": 107585451,
+        "validated": true,
+        "findings": [
+          "EXACT_LEDGER_MATCH"
+        ],
+        "delivered": {
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          },
+          "value": "0.067791435856414"
+        },
+        "status": "MATCHED"
+      }
+    },
+    {
+      "id": "short-delivery",
+      "title": "02 / Less than expected",
+      "explanation": "The synthetic invoice expects 0.1 units of this issued asset. The real archived payment delivered less. No claim that the real payment was underpaid is made.",
+      "expectation": {
+        "invoice_id": "SYNTHETIC-SHORT",
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.1",
+        "asset": {
+          "kind": "issued",
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+        }
+      },
+      "evidence": {
+        "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+        "Amount": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "Destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "Fee": "5093",
+        "Flags": 0,
+        "LastLedgerSequence": 107585467,
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "4275726E3B20534F4C4F3B205250525F4255524E5F52554E7C323032362D31302D3131543134"
+            }
+          }
+        ],
+        "Sequence": 82936904,
+        "SigningPubKey": "EDF4728D15B269717107E79F359E1A867B26A7796BAE8C20C864F16479E5303FCA",
+        "TransactionType": "Payment",
+        "TxnSignature": "EB0E1044C438E8E0E1E56DF3AB67052F8492B9D3F252BB2EC81594034906EEF3FADBD4BFC9A154B01895095158CD84EF92766D57AA97BEA40596CFA56558B70D",
+        "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "DeliverMax": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "ctid": "C6699FAB00430000",
+        "date": 845043992,
+        "ledger_index": 107585451,
+        "inLedger": 107585451,
+        "validated": true,
+        "meta": {
+          "AffectedNodes": [
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                  "Balance": "6077892",
+                  "Flags": 0,
+                  "OwnerCount": 21,
+                  "Sequence": 82936905
+                },
+                "LedgerEntryType": "AccountRoot",
+                "LedgerIndex": "2CB22820EFB5226E04BF2FF1CCCD025C3092393B6F3747CEAAAF61EA87C406B0",
+                "PreviousFields": {
+                  "Balance": "6082985",
+                  "Sequence": 82936904
+                },
+                "PreviousTxnID": "ACE5F524EE554BEBBE1FCF77CCBE3C8842BBE9E0F89CD66E5DCD9401829D45FB",
+                "PreviousTxnLgrSeq": 107585446
+              }
+            },
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "6500000000000000e-31"
+                  },
+                  "Flags": 1114112,
+                  "HighLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+                    "value": "0"
+                  },
+                  "HighNode": "3707",
+                  "LowLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                    "value": "399277132.38133"
+                  },
+                  "LowNode": "0"
+                },
+                "LedgerEntryType": "RippleState",
+                "LedgerIndex": "EE3E4E6C6FA7CA79F592883BBEBA483985985BB087E6F1BB0F1282C8DADD97F1",
+                "PreviousFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "0.06779143585641465"
+                  }
+                },
+                "PreviousTxnID": "203EB788A408518C7802E0E3E690C88FF7E1276CE1CD276DAD88D85976B2A57B",
+                "PreviousTxnLgrSeq": 107585314
+              }
+            }
+          ],
+          "TransactionIndex": 67,
+          "TransactionResult": "tesSUCCESS",
+          "delivered_amount": {
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+            "value": "0.067791435856414"
+          }
+        }
+      },
+      "expected_status": "EXCEPTION",
+      "expected_findings": [
+        "UNDERPAYMENT"
+      ],
+      "report": {
+        "rule_version": "settlement-exceptions.v1",
+        "transaction_hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "expectation": {
+          "invoice_id": "SYNTHETIC-SHORT",
+          "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "expected_amount": "0.1",
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          }
+        },
+        "ledger_index": 107585451,
+        "validated": true,
+        "findings": [
+          "UNDERPAYMENT"
+        ],
+        "delivered": {
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          },
+          "value": "0.067791435856414"
+        },
+        "status": "EXCEPTION"
+      }
+    },
+    {
+      "id": "tag-mismatch",
+      "title": "03 / Wrong invoice tag",
+      "explanation": "The synthetic invoice expects destination tag 1042; the archived payment has no tag. This demonstrates a mismatch, not a fault in the real payment.",
+      "expectation": {
+        "invoice_id": "SYNTHETIC-TAG",
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "asset": {
+          "kind": "issued",
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+        },
+        "destination_tag": 1042
+      },
+      "evidence": {
+        "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+        "Amount": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "Destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "Fee": "5093",
+        "Flags": 0,
+        "LastLedgerSequence": 107585467,
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "4275726E3B20534F4C4F3B205250525F4255524E5F52554E7C323032362D31302D3131543134"
+            }
+          }
+        ],
+        "Sequence": 82936904,
+        "SigningPubKey": "EDF4728D15B269717107E79F359E1A867B26A7796BAE8C20C864F16479E5303FCA",
+        "TransactionType": "Payment",
+        "TxnSignature": "EB0E1044C438E8E0E1E56DF3AB67052F8492B9D3F252BB2EC81594034906EEF3FADBD4BFC9A154B01895095158CD84EF92766D57AA97BEA40596CFA56558B70D",
+        "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "DeliverMax": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "ctid": "C6699FAB00430000",
+        "date": 845043992,
+        "ledger_index": 107585451,
+        "inLedger": 107585451,
+        "validated": true,
+        "meta": {
+          "AffectedNodes": [
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                  "Balance": "6077892",
+                  "Flags": 0,
+                  "OwnerCount": 21,
+                  "Sequence": 82936905
+                },
+                "LedgerEntryType": "AccountRoot",
+                "LedgerIndex": "2CB22820EFB5226E04BF2FF1CCCD025C3092393B6F3747CEAAAF61EA87C406B0",
+                "PreviousFields": {
+                  "Balance": "6082985",
+                  "Sequence": 82936904
+                },
+                "PreviousTxnID": "ACE5F524EE554BEBBE1FCF77CCBE3C8842BBE9E0F89CD66E5DCD9401829D45FB",
+                "PreviousTxnLgrSeq": 107585446
+              }
+            },
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "6500000000000000e-31"
+                  },
+                  "Flags": 1114112,
+                  "HighLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+                    "value": "0"
+                  },
+                  "HighNode": "3707",
+                  "LowLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                    "value": "399277132.38133"
+                  },
+                  "LowNode": "0"
+                },
+                "LedgerEntryType": "RippleState",
+                "LedgerIndex": "EE3E4E6C6FA7CA79F592883BBEBA483985985BB087E6F1BB0F1282C8DADD97F1",
+                "PreviousFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "0.06779143585641465"
+                  }
+                },
+                "PreviousTxnID": "203EB788A408518C7802E0E3E690C88FF7E1276CE1CD276DAD88D85976B2A57B",
+                "PreviousTxnLgrSeq": 107585314
+              }
+            }
+          ],
+          "TransactionIndex": 67,
+          "TransactionResult": "tesSUCCESS",
+          "delivered_amount": {
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+            "value": "0.067791435856414"
+          }
+        }
+      },
+      "expected_status": "EXCEPTION",
+      "expected_findings": [
+        "DESTINATION_TAG_MISMATCH"
+      ],
+      "report": {
+        "rule_version": "settlement-exceptions.v1",
+        "transaction_hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "expectation": {
+          "invoice_id": "SYNTHETIC-TAG",
+          "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "destination_tag": 1042,
+          "expected_amount": "0.067791435856414",
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          }
+        },
+        "ledger_index": 107585451,
+        "validated": true,
+        "findings": [
+          "DESTINATION_TAG_MISMATCH"
+        ],
+        "delivered": {
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          },
+          "value": "0.067791435856414"
+        },
+        "status": "EXCEPTION"
+      }
+    },
+    {
+      "id": "unavailable",
+      "title": "04 / Evidence unavailable",
+      "explanation": "Delivered metadata is deliberately removed from a copy of the archived response to model an unavailable source. This modified response is synthetic and must remain unresolved.",
+      "expectation": {
+        "invoice_id": "SYNTHETIC-UNAVAILABLE",
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "asset": {
+          "kind": "issued",
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+        }
+      },
+      "evidence": {
+        "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+        "Amount": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "Destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "Fee": "5093",
+        "Flags": 0,
+        "LastLedgerSequence": 107585467,
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "4275726E3B20534F4C4F3B205250525F4255524E5F52554E7C323032362D31302D3131543134"
+            }
+          }
+        ],
+        "Sequence": 82936904,
+        "SigningPubKey": "EDF4728D15B269717107E79F359E1A867B26A7796BAE8C20C864F16479E5303FCA",
+        "TransactionType": "Payment",
+        "TxnSignature": "EB0E1044C438E8E0E1E56DF3AB67052F8492B9D3F252BB2EC81594034906EEF3FADBD4BFC9A154B01895095158CD84EF92766D57AA97BEA40596CFA56558B70D",
+        "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "DeliverMax": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "ctid": "C6699FAB00430000",
+        "date": 845043992,
+        "ledger_index": 107585451,
+        "inLedger": 107585451,
+        "validated": true,
+        "meta": {
+          "AffectedNodes": [
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                  "Balance": "6077892",
+                  "Flags": 0,
+                  "OwnerCount": 21,
+                  "Sequence": 82936905
+                },
+                "LedgerEntryType": "AccountRoot",
+                "LedgerIndex": "2CB22820EFB5226E04BF2FF1CCCD025C3092393B6F3747CEAAAF61EA87C406B0",
+                "PreviousFields": {
+                  "Balance": "6082985",
+                  "Sequence": 82936904
+                },
+                "PreviousTxnID": "ACE5F524EE554BEBBE1FCF77CCBE3C8842BBE9E0F89CD66E5DCD9401829D45FB",
+                "PreviousTxnLgrSeq": 107585446
+              }
+            },
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "6500000000000000e-31"
+                  },
+                  "Flags": 1114112,
+                  "HighLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+                    "value": "0"
+                  },
+                  "HighNode": "3707",
+                  "LowLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                    "value": "399277132.38133"
+                  },
+                  "LowNode": "0"
+                },
+                "LedgerEntryType": "RippleState",
+                "LedgerIndex": "EE3E4E6C6FA7CA79F592883BBEBA483985985BB087E6F1BB0F1282C8DADD97F1",
+                "PreviousFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "0.06779143585641465"
+                  }
+                },
+                "PreviousTxnID": "203EB788A408518C7802E0E3E690C88FF7E1276CE1CD276DAD88D85976B2A57B",
+                "PreviousTxnLgrSeq": 107585314
+              }
+            }
+          ],
+          "TransactionIndex": 67,
+          "TransactionResult": "tesSUCCESS",
+          "delivered_amount": "unavailable"
+        }
+      },
+      "expected_status": "UNRESOLVED",
+      "expected_findings": [
+        "DELIVERED_AMOUNT_UNAVAILABLE"
+      ],
+      "evidence_modified": true,
+      "report": {
+        "rule_version": "settlement-exceptions.v1",
+        "transaction_hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "expectation": {
+          "invoice_id": "SYNTHETIC-UNAVAILABLE",
+          "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "expected_amount": "0.067791435856414",
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          }
+        },
+        "ledger_index": 107585451,
+        "validated": true,
+        "findings": [
+          "DELIVERED_AMOUNT_UNAVAILABLE"
+        ],
+        "delivered": null,
+        "status": "UNRESOLVED"
+      }
+    },
+    {
+      "id": "reused-payment",
+      "title": "05 / One payment, two invoices",
+      "explanation": "The same archived hash is attached to two hypothetical invoice references. The amount alone can match twice. The live desk flags hash reuse within a session; this is an allocation review, not proof of fraud.",
+      "expectation": {
+        "invoice_id": "SYNTHETIC-SECOND-INVOICE",
+        "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "expected_amount": "0.067791435856414",
+        "asset": {
+          "kind": "issued",
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+        }
+      },
+      "evidence": {
+        "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+        "Amount": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "Destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+        "Fee": "5093",
+        "Flags": 0,
+        "LastLedgerSequence": 107585467,
+        "Memos": [
+          {
+            "Memo": {
+              "MemoData": "4275726E3B20534F4C4F3B205250525F4255524E5F52554E7C323032362D31302D3131543134"
+            }
+          }
+        ],
+        "Sequence": 82936904,
+        "SigningPubKey": "EDF4728D15B269717107E79F359E1A867B26A7796BAE8C20C864F16479E5303FCA",
+        "TransactionType": "Payment",
+        "TxnSignature": "EB0E1044C438E8E0E1E56DF3AB67052F8492B9D3F252BB2EC81594034906EEF3FADBD4BFC9A154B01895095158CD84EF92766D57AA97BEA40596CFA56558B70D",
+        "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "DeliverMax": {
+          "currency": "534F4C4F00000000000000000000000000000000",
+          "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "value": "0.067791435856414"
+        },
+        "ctid": "C6699FAB00430000",
+        "date": 845043992,
+        "ledger_index": 107585451,
+        "inLedger": 107585451,
+        "validated": true,
+        "meta": {
+          "AffectedNodes": [
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                  "Balance": "6077892",
+                  "Flags": 0,
+                  "OwnerCount": 21,
+                  "Sequence": 82936905
+                },
+                "LedgerEntryType": "AccountRoot",
+                "LedgerIndex": "2CB22820EFB5226E04BF2FF1CCCD025C3092393B6F3747CEAAAF61EA87C406B0",
+                "PreviousFields": {
+                  "Balance": "6082985",
+                  "Sequence": 82936904
+                },
+                "PreviousTxnID": "ACE5F524EE554BEBBE1FCF77CCBE3C8842BBE9E0F89CD66E5DCD9401829D45FB",
+                "PreviousTxnLgrSeq": 107585446
+              }
+            },
+            {
+              "ModifiedNode": {
+                "FinalFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "6500000000000000e-31"
+                  },
+                  "Flags": 1114112,
+                  "HighLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+                    "value": "0"
+                  },
+                  "HighNode": "3707",
+                  "LowLimit": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+                    "value": "399277132.38133"
+                  },
+                  "LowNode": "0"
+                },
+                "LedgerEntryType": "RippleState",
+                "LedgerIndex": "EE3E4E6C6FA7CA79F592883BBEBA483985985BB087E6F1BB0F1282C8DADD97F1",
+                "PreviousFields": {
+                  "Balance": {
+                    "currency": "534F4C4F00000000000000000000000000000000",
+                    "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                    "value": "0.06779143585641465"
+                  }
+                },
+                "PreviousTxnID": "203EB788A408518C7802E0E3E690C88FF7E1276CE1CD276DAD88D85976B2A57B",
+                "PreviousTxnLgrSeq": 107585314
+              }
+            }
+          ],
+          "TransactionIndex": 67,
+          "TransactionResult": "tesSUCCESS",
+          "delivered_amount": {
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+            "value": "0.067791435856414"
+          }
+        }
+      },
+      "expected_status": "MATCHED",
+      "expected_findings": [
+        "EXACT_LEDGER_MATCH"
+      ],
+      "allocation_warning": "Duplicate transaction reference — reconcile manually; do not credit twice.",
+      "report": {
+        "rule_version": "settlement-exceptions.v1",
+        "transaction_hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+        "expectation": {
+          "invoice_id": "SYNTHETIC-SECOND-INVOICE",
+          "destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+          "expected_amount": "0.067791435856414",
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          }
+        },
+        "ledger_index": 107585451,
+        "validated": true,
+        "findings": [
+          "EXACT_LEDGER_MATCH"
+        ],
+        "delivered": {
+          "asset": {
+            "kind": "issued",
+            "currency": "534F4C4F00000000000000000000000000000000",
+            "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+          },
+          "value": "0.067791435856414"
+        },
+        "status": "MATCHED"
+      }
+    }
+  ]
+}

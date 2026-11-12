@@ -48,3 +48,13 @@ Costs have not been benchmarked: static hosting plus one POST and one to three p
 - Chromium at 1440 px and 390 px: queue submission, duplicate prevention/warnings, filters, issued fields, review changes and JSON download passed; no JavaScript errors or horizontal mobile overflow. Browser results use a mocked ledger response and screenshots identify synthetic evidence.
 - Local API live probe for an archived public transaction: HTTP 503 UNRESOLVED. The configured nodes did not supply evidence during this test; live success is not verified. A successful live node check from the deployment environment remains required before launch. No production change was made.
 - Reproduce browser flow with `node scripts/settlement-desk-smoke.mjs http://localhost:4337`; set `SETTLEMENT_SMOKE_DIR` and optionally `CHROMIUM_PATH` for local paths. No real invoice or private customer data belongs in test artifacts.
+
+## Evaluation-kit update — 2026-11-12
+
+The earlier local live-probe failure is resolved for this environment. Curl could reach the public node through the managed proxy, while the Node process did not use it. Restarting local preview with Node 24 `NODE_USE_ENV_PROXY=1` restored the existing RPC implementation without changing production URLs or disabling TLS validation.
+
+A real mainnet `tx` read of `33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD` returned HTTP 200, validated ledger 107585451, MATCHED against the public archive's exact delivered amount. Observation: 2026-11-12T19:55:31.839Z from https://xrplcluster.com. The receipt digest was independently recomputed. A browser live check of a deliberately higher synthetic expectation correctly returned UNDERPAYMENT. This does not assert an actual underpaid invoice.
+
+The local branch adds `/settlement-desk/evaluate/`, labeled source-backed teaching examples, an explicit handoff to live checking and a local downloadable feedback worksheet. It also fixes a real mobile issue where the site's generic sticky `header` style caused the page hero to intercept clicks on the form. Site navigation remains sticky; page heroes are static.
+
+The automated checks now include 67 passing targeted tests and a Chromium flow covering all cases, retained reviewer assessments, local feedback download without a POST, mobile overflow and the explicit real-node request. These checks do not establish a production SLA or validate all XRPL transaction types. See `evaluation/README.md` for the session protocol and reproducible walkthrough production.
