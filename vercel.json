@@ -164,6 +164,10 @@
       "destination": "/api/tools?tool=book"
     },
     {
+      "source": "/api/settlement-check",
+      "destination": "/api/tools?tool=settlement-check"
+    },
+    {
       "source": "/api/delivered",
       "destination": "/api/tools?tool=delivered"
     },

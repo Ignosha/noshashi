@@ -137,6 +137,11 @@ export const isBusy = (error) =>
   BUSY_CODES.has(error?.code) || /rate.?limit|quota|too busy|slow down/i.test(String(error?.message ?? ""));
 
 export async function rippleRpc(command, params, timeout = 8000) {
+  return (await rippleRpcWithSource(command, params, timeout)).result;
+}
+
+/** Same bounded public read, with the node that actually answered. */
+export async function rippleRpcWithSource(command, params, timeout = 8000) {
   let lastError = null;
   for (const endpoint of RIPPLE_HTTP) {
     try {
@@ -158,7 +163,7 @@ export async function rippleRpc(command, params, timeout = 8000) {
       if (code) {
         throw new RippledError(String(result.error_message ?? code), code);
       }
-      return result;
+      return { result, endpoint };
     } catch (error) {
       // A refusal about the request (actNotFound, invalidParams) is the
       // ledger's answer and the next server would give the same one. A

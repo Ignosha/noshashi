@@ -58,6 +58,7 @@ import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
 import { buildTokens, TOKEN_INDEX_PAGES, loadTokens } from "./build-tokens.mjs";
 import { buildPartners, PARTNER_PAGES } from "./build-partners.mjs";
+import { buildSettlementDesk, SETTLEMENT_PAGES } from "./build-settlement-desk.mjs";
 import { buildPaymentPortal, PORTAL_PAGES } from "./build-payment-portal.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -1637,6 +1638,7 @@ async function buildSitemap(docs = [], tokenPages = [], intelligencePages = []) 
     ...TOKEN_INDEX_PAGES,
     ...PARTNER_PAGES,
     ...PORTAL_PAGES,
+    ...SETTLEMENT_PAGES,
     ...tokenPages,
     ...REPORT_PAGES,
     ...BRIEF_PAGES,
@@ -1748,6 +1750,7 @@ async function main() {
   await buildRedesignPages(write);
   await buildWorkspace(write, { release });
   await buildPaymentPortal(write);
+  await buildSettlementDesk(write);
   await buildTutorial(write, { site: SITE });
   await buildAcademy(write);
   await buildTrust();
