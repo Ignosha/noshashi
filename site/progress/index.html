@@ -50,7 +50,7 @@
   </div>
 </header>
 <main class="shell">
-<div class="page-head">
+<details class="release-record"><summary>Release evidence / v1.0.27 · beta evaluation</summary><p>One build-time snapshot from <a href="https://github.com/Ignosha/noshashi/releases">GitHub release records</a>. Source checked: 2026-11-13T16:49:37.941Z.</p><div class="table-scroll" role="region" aria-label="Desktop release evidence" tabindex="0"><table><thead><tr><th scope="col">Question</th><th scope="col">Recorded evidence</th></tr></thead><tbody><tr><th scope="row">Latest published desktop release</th><td><a href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.27">v1.0.27</a> · 2026-11-04 UTC</td></tr><tr><th scope="row">Latest downloadable, non-prerelease build</th><td><a href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.27">v1.0.27</a> · 2026-11-04 UTC</td></tr><tr><th scope="row">GitHub non-prerelease tag</th><td><a href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.27">v1.0.27</a> · 2026-11-04 UTC. Product status remains beta; a tag does not establish production readiness.</td></tr><tr><th scope="row">Development prerelease</th><td>None present in this source reading</td></tr><tr><th scope="row">Latest macOS installer artifacts</th><td><a href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.27">v1.0.27</a> · 2026-11-04 UTC. Artifact availability only.</td></tr><tr><th scope="row">Verified macOS execution / OS signing / notarization</th><td>UNKNOWN — not established by release metadata. Updater signature files are separate. <a href="https://github.com/Ignosha/noshashi/blob/main/docs/RELEASE_SIGNING.md">Signing scope</a>.</td></tr></tbody></table></div><p>Older version numbers in the historical changelog are not current download recommendations. See <a href="/#download">available downloads</a>. No independent security assessment or physical Monterey compatibility is established by this snapshot.</p></details><div class="page-head">
   <p class="eyebrow">Progress</p>
   <h1>Where this project actually is</h1>
   <p>Written the way the product reports a verdict: each line says what is counted, and anything
@@ -60,9 +60,9 @@
 
 <section>
   <div class="rail">
-    <div><span class="label">CURRENT BUILD</span><strong>—</strong><small>Beta channel, unsigned, built by CI.</small></div>
-    <div><span class="label">RELEASES SHIPPED</span><strong>8</strong><small>Since 2026-08-29, every one from a public commit.</small></div>
-    <div><span class="label">TESTS PASSING</span><strong>1,200+</strong><small>Across the app, the API and the website. Run with npm test.</small></div>
+    <div><span class="label">CURRENT BUILD</span><strong>v1.0.27</strong><small>Latest downloadable artifact; beta evaluation. Signing and runtime verification require separate evidence.</small></div>
+    <div><span class="label">RELEASE RECORDS</span><strong>24</strong><small>Published desktop records in this source window; not independently verified builds.</small></div>
+    <div><span class="label">TEST EVIDENCE</span><strong>CI</strong><small>Inspect the exact commit’s CI results; this page does not run tests.</small></div>
     <div><span class="label">ACCOUNTS REQUIRED</span><strong>0</strong><small>Public tools and the browser workspace need no account. Organization features use hosted accounts.</small></div>
   </div>
 </section>
@@ -122,6 +122,42 @@
     <div class="log" id="mission-log">
     <article class="log-entry" data-kind="release">
       <div class="log-meta">
+        <time datetime="2026-11-04T02:41:45.000Z">2026-11-04</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3 data-i18n-live>NOSHASHI v1.0.27</h3>
+      <p data-i18n-live>The desktop identity update brings the circular NOSHASHI seal to the app icon, with transparency outside the emblem instead of a rounded-square backing. Academy&#39;s matching Ledger Desk redesign is available separately as Academy 0.2.1. It includes graphite surfaces, editorial typography, clearer…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.27" rel="noopener">RELEASE NOTES →</a>
+    </article>
+    <article class="log-entry" data-kind="milestone">
+      <div class="log-meta">
+        <time datetime="2026-11-04T02:40:17.000Z">2026-11-04</time>
+        <span class="log-kind">MILESTONE</span>
+      </div>
+      <h3 data-i18n-live>NOSHASHI Academy 0.2.1</h3>
+      <p data-i18n-live>NOSHASHI Academy now follows the Ledger Desk design: graphite surfaces, editorial typography, ruled layouts and clearer course navigation. - Dedicated Noshashi Academy wordmark and circular launcher icon. - Long Academy screens scroll independently of the console layout. - Local video captions work…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/academy-v0.2.1" rel="noopener">RELEASE NOTES →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-11-01T16:56:39.000Z">2026-11-01</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3 data-i18n-live>NOSHASHI v1.0.26</h3>
+      <p data-i18n-live>The Ledger Desk NOSHASHI now shares a graphite and warm-paper design across the desktop app and website, with editorial typography, precise evidence tables and interactive dimensional layers. - Redesigned welcome, overview, navigation, panels, controls and status rail. - A direct settlement check…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.26" rel="noopener">RELEASE NOTES →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
+        <time datetime="2026-10-30T14:16:57.000Z">2026-10-30</time>
+        <span class="log-kind">RELEASE</span>
+      </div>
+      <h3 data-i18n-live>NOSHASHI v1.0.25</h3>
+      <p data-i18n-live>Built from f8da3a146bd8c22b32d81920007c38add1b79110 on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.25" rel="noopener">RELEASE NOTES →</a>
+    </article>
+    <article class="log-entry" data-kind="release">
+      <div class="log-meta">
         <time datetime="2026-10-30T14:00:00.000Z">2026-10-30</time>
         <span class="log-kind">RELEASE</span>
       </div>
@@ -129,68 +165,32 @@
       <p>Press ⌘K (Ctrl+K on Windows and Linux) and type “test” for twelve real XRP Ledger accounts to try the app with: well-known issuers, a multi-signature account, an escrow wallet, an AMM pool, an unfunded address and a Testnet account. Picking one opens the screen where it shows something, already…</p>
       <a class="log-link" href="/docs/release-notes/">OPEN →</a>
     </article>
-    <article class="log-entry" data-kind="release">
+    <article class="log-entry" data-kind="milestone">
       <div class="log-meta">
-        <time datetime="2026-10-27T13:40:00.000Z">2026-10-27</time>
-        <span class="log-kind">RELEASE</span>
+        <time datetime="2026-10-28T09:33:05.000Z">2026-10-28</time>
+        <span class="log-kind">MILESTONE</span>
       </div>
-      <h3>1.0.24: addresses you paste into the invoice check just work</h3>
-      <p>The receiving account and issuer fields ignore the spaces and invisible characters copying can add, and no longer get capitalised or autocorrected. A mistyped address is caught by its checksum before the ledger is read, with a plain message instead of a destination mismatch. X-addresses are…</p>
-      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-10-27T13:00:00.000Z">2026-10-27</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>1.0.23: did this transaction pay this invoice?</h3>
-      <p>A new Invoice check panel on the Settlement screen reads the transaction from the XRP Ledger and answers VERIFIED, HOLD or REJECTED, with the reason. It credits only what was delivered, so a partial payment that fell short is rejected; it compares amounts exactly and reads from two independent…</p>
-      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-10-23T13:50:00.000Z">2026-10-23</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>1.0.22: support can look at your app and fix it, only when you allow it</h3>
-      <p>When support asks to look, the app asks you on whatever screen you are on: 4, 24 or 72 hours, and whether fixes may run without asking. Support sees a read-only snapshot of one computer (version, ledger connection, clock, sign-in, plan, settings health, recent errors; never keys or addresses) and…</p>
-      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="release">
-      <div class="log-meta">
-        <time datetime="2026-10-20T15:50:00.000Z">2026-10-20</time>
-        <span class="log-kind">RELEASE</span>
-      </div>
-      <h3>1.0.21: large issuers load, plainer screens</h3>
-      <p>Issuer screens no longer fail on large issuers such as Bitstamp: when a public server cannot return the total supply in time, the survey shows the holders it read and says so. The welcome screen and Overview open with three live cards, and the website homepage goes from 23 sections to 8.</p>
-      <a class="log-link" href="/docs/release-notes/">OPEN →</a>
+      <h3 data-i18n-live>NOSHASHI Academy 0.2.0</h3>
+      <p data-i18n-live>NOSHASHI Academy, the free course for NOSHASHI and the XRP Ledger. These builds are not code-signed: macOS and Windows will warn about an unidentified developer.</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/academy-v0.2.0" rel="noopener">RELEASE NOTES →</a>
     </article>
     <article class="log-entry" data-kind="milestone">
       <div class="log-meta">
-        <time datetime="2026-10-20T01:00:00.000Z">2026-10-20</time>
+        <time datetime="2026-10-28T03:38:18.000Z">2026-10-28</time>
         <span class="log-kind">MILESTONE</span>
       </div>
-      <h3>Book health: quoted versus funded depth on the main XRP books, live</h3>
-      <p>A free page that reads the Bitstamp, GateHub, RLUSD and SOLO books from validated ledgers and shows how much of the advertised depth is actually funded, today and at each of the last seven daily closes. Nothing is stored; every day is re-read at the ledger index shown.</p>
-      <a class="log-link" href="/book-health/">OPEN →</a>
+      <h3 data-i18n-live>NOSHASHI Academy 0.1.0</h3>
+      <p data-i18n-live>NOSHASHI Academy, the free course for NOSHASHI and the XRP Ledger. These builds are not code-signed: macOS and Windows will warn about an unidentified developer.</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/academy-v0.1.0" rel="noopener">RELEASE NOTES →</a>
     </article>
-    <article class="log-entry" data-kind="milestone">
+    <article class="log-entry" data-kind="release">
       <div class="log-meta">
-        <time datetime="2026-10-20T00:35:00.000Z">2026-10-20</time>
-        <span class="log-kind">MILESTONE</span>
+        <time datetime="2026-10-27T13:49:05.000Z">2026-10-27</time>
+        <span class="log-kind">RELEASE</span>
       </div>
-      <h3>Product brief: the problems NOSHASHI solves, how it earns, every feature</h3>
-      <p>One page with the XRP Ledger problems the product addresses, the plans and prices checkout charges, every screen and paid feature in the build, and what is not built yet. A test keeps it in step with the app and the billing catalogue.</p>
-      <a class="log-link" href="/brief/">OPEN →</a>
-    </article>
-    <article class="log-entry" data-kind="milestone">
-      <div class="log-meta">
-        <time datetime="2026-10-20T00:12:00.000Z">2026-10-20</time>
-        <span class="log-kind">MILESTONE</span>
-      </div>
-      <h3>Treasury report for companies that hold XRP</h3>
-      <p>Holdings, reserves and who can move each wallet at a period end, and how much of the holding funded dollar offers could absorb. Read from validated ledgers with a SHA-256 digest; prints to PDF.</p>
-      <a class="log-link" href="/treasury/">OPEN →</a>
+      <h3 data-i18n-live>NOSHASHI v1.0.24</h3>
+      <p data-i18n-live>Built from 35b0fa62ef4198c2cc2fe51a2dc26e82ae771ffe on macos-latest. Verify your download before running it: shasum -a 256 # macOS / Linux certutil -hashfile SHA256 # Windows The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between this…</p>
+      <a class="log-link" href="https://github.com/Ignosha/noshashi/releases/tag/v1.0.24" rel="noopener">RELEASE NOTES →</a>
     </article>
   </div>
   </div></div>

@@ -191,11 +191,11 @@
           "scene": "workstation",
           "label": "Ledger & Policy",
           "plan": "Pro",
-          "answers": "Every verdict you have run, your policy, and a signed export.",
+          "answers": "Every verdict you have run, your policy, and a SHA-256 evidence export.",
           "steps": [
             "Write or activate your institution's policy.",
             "Every verdict is kept on this device with the rules that produced it.",
-            "Export a signed record an examiner can verify."
+            "Export a hash-bearing record an examiner can inspect."
           ]
         },
         {
@@ -242,7 +242,7 @@
           "scene": "passport",
           "label": "Passport",
           "plan": "Enterprise",
-          "answers": "A signed, portable record of an asset's posture.",
+          "answers": "A hash-bearing, portable record of an asset's observed controls.",
           "steps": [
             "Enter the issuer.",
             "Get one signed record: authority, freeze rights, concentration and eligibility.",

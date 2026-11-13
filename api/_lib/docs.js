@@ -124,6 +124,7 @@ export const PERMISSION_LABELS = {
 /** Scenes that are settings, commerce or help rather than readings of the ledger. */
 const NOT_ANALYSIS = new Set(["Overview", "Agent", "Learn", "Pricing", "Account", "Business Model (Internal)", "Legal & Accessibility", "Trust & Security", "Settings"]);
 const PLANS = ["Free", "Desk", "Institution", "Enterprise"];
+const planLabel = value => ({ Desk: "Pro", Institution: "Institutional" }[value] || value);
 
 /* ── the fourteen sections ───────────────────────────────────────── */
 
@@ -139,6 +140,18 @@ export function docsSections(ref, docs, repo) {
 
   return [
     {
+      slug: "accounts", title: "Accounts & access", intro: "Public tools, signed-in surfaces and limits of this code review.",
+      sources: ["src/lib/auth/useAuth.tsx", "src/portal/Portal.tsx", "src/lib/supabase/client.ts", "supabase/migrations/", "src/lib/billing/catalog.ts"],
+      body: `<p>Public issuer, delivered-payment and funded-depth tools, the institutional demo and the public browser workspace need no website account or wallet connection.</p>
+<h2>Which sign-in applies?</h2><div class="table-scroll"><table class="doc-table"><thead><tr><th scope="col">Surface</th><th scope="col">Implemented scope</th><th scope="col">Verification boundary</th></tr></thead><tbody>
+<tr><th>Public site / browser investigations</th><td>Read-only public tools without sign-in.</td><td>A failed public node read stays unavailable; no account removes that dependency.</td></tr>
+<tr><th>Desktop Account screen</th><td>Supabase email/password, email one-time codes, recovery and authenticator TOTP enrollment/challenge are implemented.</td><td>Hosted provider configuration, delivery and a signed-in customer session were not exercised in this review.</td></tr>
+<tr><th>Payment Review developer portal</th><td>Separate signed-in browser surface using the same hosted account provider; password/recovery and enrolled TOTP challenges exist in code.</td><td><a href="/developers/portal/">Portal</a>. Public tools are separate. This is not a general public-site account dashboard.</td></tr>
+<tr><th>Organizations and roles</th><td>Role checks, row-level security and policy approval functions are implemented in the repository.</td><td>Implementation evidence is not confirmation of deployed migrations, account entitlements or a completed organization onboarding test.</td></tr>
+<tr><th>Enterprise identity</th><td>SSO / SAML / OIDC and SCIM remain planned.</td><td>No enterprise identity integration or support SLA is established by a pricing entitlement.</td></tr>
+</tbody></table></div><h2>Two-factor authentication</h2><p>An authenticator TOTP factor and a completed second-factor challenge are different states. An email one-time sign-in code is not proof of two independent factors. Protected actions remain subject to the existing server authorization and approval rules; this documentation changes none of them.</p><h2>Availability and privacy</h2><p>No account feature is declared discontinued by this review. Unverified runtime setup stays UNKNOWN. Do not submit keys or shared credentials. Account, organization and entitlement data use hosted services; public-node queries go to third-party ledger sources. See <a href="/trust/">Trust</a> and <a href="/legal/">Legal</a>.</p>`,
+    },
+    {
       slug: "getting-started",
       title: "Getting started",
       intro: "What NOSHASHI does, how to install it, and which screens each plan opens.",
@@ -147,6 +160,7 @@ export function docsSections(ref, docs, repo) {
 <p>NOSHASHI reads the XRP Ledger's validated state, applies deterministic rules to what it reads, and shows the evidence behind every answer. It holds no keys and signs or submits nothing (see <a href="/docs/security/">Security</a>).</p>
 <h2>Install</h2>
 <p>Download the desktop app for macOS, Windows or Linux from the <a href="/#download">download section</a>. The free screens work without an account. Paid plans are on the <a href="/pricing/">pricing page</a>.</p>
+<p class="mono">VERIFY → INVESTIGATE → DECIDE → PROVE</p><p>Confirm delivered payments, investigate issuer controls and liquidity, evaluate your policy, then preserve source-scoped evidence. These are workflow stages, not a claim of legal compliance.</p>
 <h2>First steps</h2>
 <ol>
 <li>Open <strong>Check an Address</strong> and paste any XRPL address to see what the ledger publishes about it.</li>
@@ -154,7 +168,7 @@ export function docsSections(ref, docs, repo) {
 <li>Read <a href="/docs/policies/">Policies</a> for how a verdict is decided and <a href="/docs/receipts/">Receipts</a> for how it is recorded.</li>
 </ol>
 <h2>Screens by plan</h2>
-${byPlan.map(([plan, scenes]) => `<h3>${esc(plan)}</h3>${list(scenes.map((s) => s.name))}`).join("\n")}
+${byPlan.map(([plan, scenes]) => `<h3>${esc(planLabel(plan))}</h3>${list(scenes.map((s) => s.name))}`).join("\n")}
 <p>The list is the app's own console reference, which the in-app agent also reads, and a test keeps it in step with the screens the app has.</p>`,
     },
     {
@@ -197,7 +211,7 @@ ${table(["Part", "Where", "What it does"], [
       sources: ["src/lib/agent/context.ts", "src/lib/trust/boundary.json"],
       body: `
 <p>${esc(stage(ref, "ANALYSIS").detail)}</p>
-${table(["Screen", "Plan", "What it establishes"], ref.scenes.filter((s) => !NOT_ANALYSIS.has(s.name)).map((s) => [esc(s.name), esc(s.plan), esc(s.summary)]))}`,
+${table(["Screen", "Plan", "What it establishes"], ref.scenes.filter((s) => !NOT_ANALYSIS.has(s.name)).map((s) => [esc(s.name), esc(planLabel(s.plan)), esc(s.summary)]))}`,
     },
     {
       slug: "ai",

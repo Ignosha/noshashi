@@ -27,7 +27,7 @@ const TOOLS = `<a class="btn ghost" href="/#public">Explore free tools</a>`;
 const CAPABILITIES = [
   ["ISSUER CONTROLS", "Who can freeze, claw back or gate an asset", "Reads the issuer's freeze, clawback and authorization settings and whether each right has been given up.", [PLAN.free, PLAN.pro], "/certificate/", "Check an issuer"],
   ["PAYMENT VERIFICATION", "What a payment actually delivered", "Separates the amount requested from the amount delivered, so partial payments are never credited at face value.", [PLAN.free], "/delivered/", "Verify a payment"],
-  ["EXECUTABLE LIQUIDITY", "Depth you can really trade", "Counts only offers whose owners can fund them and compares that with what the book advertises.", [PLAN.free, PLAN.pro], "/book-health/", "Measure a book"],
+  ["FUNDED LIQUIDITY", "Depth funded at the snapshot", "Compares quoted offers with funded depth at the selected ledger. A snapshot is not a guarantee of execution.", [PLAN.free, PLAN.pro], "/book-health/", "Measure a book"],
   ["EXPOSURE", "What you hold, and who controls it", "Lists every trust line on an account and whether each issuer can still freeze it.", [PLAN.free], "/#public", "Read an account"],
   ["DECISIONS", "GO, HOLD or NO-GO against your policy", "Applies a written, versioned policy to the facts and shows the result and reason for every rule.", [PLAN.pro], "/docs/policies/", "How policies work"],
   ["EVIDENCE", "A receipt for every decision", "A SHA-256 receipt over a fixed form of the decision, plus the ledger it was read at. SHA-256 audit exports on Institutional; a digest is not a digital signature.", [PLAN.pro, PLAN.inst], "/docs/receipts/", "How receipts work"],
@@ -56,10 +56,10 @@ async function buildPlatform(write) {
 <section>
   <div class="sec-head"><p class="eyebrow">How it works</p><h2>From ledger data to verifiable evidence.</h2></div>
   <ol class="steps4">
-    <li><p class="num">01 · READ</p><h3>Read the ledger</h3><p>Inspect the relevant XRPL data from validated ledgers.</p></li>
-    <li><p class="num">02 · ANALYZE</p><h3>Run the checks</h3><p>Issuer controls, delivered amounts, fillable depth and account settings.</p></li>
-    <li><p class="num">03 · VERIFY</p><h3>See the evidence</h3><p>The result, the rule behind it and the ledger it was read at.</p></li>
-    <li><p class="num">04 · EXPORT</p><h3>Keep the proof</h3><p>A SHA-256 receipt and exportable evidence for review. It detects changes to the recorded body; it does not identify its author or independently verify ledger proofs.</p></li>
+    <li><p class="num">01 · VERIFY</p><h3>Read the ledger</h3><p>Inspect the relevant XRPL data from validated ledgers.</p></li>
+    <li><p class="num">02 · INVESTIGATE</p><h3>Run the checks</h3><p>Issuer controls, delivered amounts, fillable depth and account settings.</p></li>
+    <li><p class="num">03 · DECIDE</p><h3>Apply your policy</h3><p>Review GO / HOLD / NO-GO findings and the rule scope. A policy result is not legal clearance.</p></li>
+    <li><p class="num">04 · PROVE</p><h3>Keep the proof</h3><p>A SHA-256 receipt and exportable evidence for review. It detects changes to the recorded body; it does not identify its author or independently verify ledger proofs.</p></li>
   </ol>
 </section>
 
@@ -87,7 +87,7 @@ ${band("Read-only by design.", "No custody. No private-key storage. No transacti
 
   await write("platform/index.html", renderPage({
     title: "Platform · NOSHASHI",
-    description: "XRPL asset intelligence: issuer controls, payment verification, executable liquidity and traceable evidence, from validated ledger data.",
+    description: "XRPL asset intelligence: issuer controls, payment verification, funded-depth snapshots and traceable evidence, from validated ledger data.",
     path: "/platform/",
     current: "platform",
     body,

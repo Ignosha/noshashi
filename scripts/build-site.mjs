@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { renderReleaseRecord } from "../api/_lib/release-catalog.js";
 import { renderPillars, renderResearchCase, renderOperationalStatus, renderPlanGuide } from "../api/_lib/research-refinement.js";
 import { buildRLUSD, RLUSD_PAGES } from "./build-rlusd.mjs";
 import { buildNewsroom, NEWSROOM_PAGES } from "./build-newsroom.mjs";
@@ -106,7 +107,7 @@ async function buildHome({ news, market, feed, status, release }) {
   const slots = {
     PILLARS: renderPillars(),
     RESEARCHCASE: renderResearchCase(),
-    OPERATIONAL: renderOperationalStatus(release),
+    OPERATIONAL: renderOperationalStatus(release) + renderReleaseRecord(feed.releaseCatalog),
     ORIGIN: ORIGIN,
     HEADER: renderHeader("home"),
     FOOTER: renderFooter(),
@@ -289,10 +290,8 @@ async function buildStatus({ feed, status }) {
 
   const body = `<div class="page-head">
   <p class="eyebrow">Status &amp; mission log</p>
-  <h1>What is running, and what changed</h1>
-  <p>The board reports the systems NOSHASHI actually operates. The log below it carries every
-     release, maintenance window and incident. A release only appears once CI has produced an
-     artifact, so the log is a record of builds rather than a list of announcements.</p>
+  <h1>Recorded notices, releases and verification limits</h1>
+  <p>The board summarizes repository notices, not measured uptime. GitHub release records and historical development notes remain separate kinds of evidence; neither verifies runtime health.</p>
 </div>
 
 ${notice}
@@ -302,8 +301,7 @@ ${notice}
   <div style="margin-top:14px">
     ${renderBoard(status)}
   </div>
-  <p class="micro">The desktop application reads public XRPL nodes directly from your machine.
-     Nothing on this board can stop it working — an outage here affects this website only.</p>
+  <p class="micro">The desktop app has local and hosted workflows. Public nodes, accounts and paid services can fail independently; this notice board does not probe those dependencies.</p>
 </section>
 
 <section>
@@ -346,21 +344,21 @@ ${notice}
   await write("status/index.html", renderPage({
     title: "Status and mission log · NOSHASHI",
     description:
-      "Live operational status for noshashi.app, plus the full mission log: every release, maintenance window and incident, with the CI build behind each one.",
+      "Repository notices and release evidence for NOSHASHI. This board is not an uptime monitor or a runtime verification.",
     path: "/status/",
     current: "status",
-    body,
+    body: renderReleaseRecord(feed.releaseCatalog) + body,
     structured: [breadcrumb("Status", "/status/")],
   }));
 }
 
 /* ── /progress/ ───────────────────────────────────────────────────── */
 async function buildProgress({ feed, release, releases }) {
-  const shipped = releases.length;
+  const shipped = feed.releaseCatalog?.publishedCount ?? 0;
   const rail = renderRail([
-    { label: "CURRENT BUILD", value: release?.tag || "—", note: "Beta channel, unsigned, built by CI." },
-    { label: "RELEASES SHIPPED", value: String(shipped), note: `Since ${isoDate("2026-08-29T00:00:00Z")}, every one from a public commit.` },
-    { label: "TESTS PASSING", value: "1,200+", note: "Across the app, the API and the website. Run with npm test." },
+    { label: "CURRENT BUILD", value: release?.tag || "—", note: "Latest downloadable artifact; beta evaluation. Signing and runtime verification require separate evidence." },
+    { label: "RELEASE RECORDS", value: String(shipped), note: "Published desktop records in this source window; not independently verified builds." },
+    { label: "TEST EVIDENCE", value: "CI", note: "Inspect the exact commit’s CI results; this page does not run tests." },
     { label: "ACCOUNTS REQUIRED", value: "0", note: "Public tools and the browser workspace need no account. Organization features use hosted accounts." },
   ]);
 
@@ -467,7 +465,7 @@ async function buildProgress({ feed, release, releases }) {
       "An honest build state for NOSHASHI: shipped capabilities with the releases that prove them, work in progress, and what has not been started.",
     path: "/progress/",
     current: "progress",
-    body,
+    body: renderReleaseRecord(feed.releaseCatalog) + body,
     structured: [breadcrumb("Progress", "/progress/")],
   }));
 }
@@ -1173,7 +1171,7 @@ async function buildAuthConfirmed() {
 .conf ol{margin:14px 0 0 18px;line-height:1.8}
 .conf .bad{border-left:3px solid var(--nogo);padding-left:12px}
 </style>`;
-  const body = `<section class="conf"><div class="panel" id="conf-ok"><p class="eyebrow">ACCOUNT</p><h1>Your email is confirmed.</h1><p>Your NOSHASHI account is ready. Signing in happens in the desktop app, not on this website.</p><ol><li>Open the NOSHASHI app.</li><li>Go to <strong>Account</strong> and press <strong>Sign in</strong>.</li><li>Use the email and password you just registered.</li></ol><p style="margin-top:16px"><a class="btn" href="/#download">Download NOSHASHI</a> <a class="btn ghost" href="/contact/">Need help?</a></p></div>
+  const body = `<section class="conf"><div class="panel" id="conf-ok"><p class="eyebrow">ACCOUNT</p><h1>Check your email confirmation.</h1><p>Confirmation-link handling does not independently verify your account state. Use the desktop Account screen, or the separate Payment Review developer portal where applicable. Public tools do not require sign-in. See <a href="/docs/accounts/">accounts and access</a>.</p><ol><li>Open the NOSHASHI app.</li><li>Go to <strong>Account</strong> and press <strong>Sign in</strong>.</li><li>Use the email and password you just registered.</li></ol><p style="margin-top:16px"><a class="btn" href="/#download">Download NOSHASHI</a> <a class="btn ghost" href="/contact/">Need help?</a></p></div>
 <div class="panel bad" id="conf-bad" hidden><p class="eyebrow">ACCOUNT</p><h1>This link did not work.</h1><p id="conf-why">The link has expired or was already used.</p><p>Open the NOSHASHI app, go to <strong>Account</strong>, and sign in. If your address still needs confirming, create the account again or use <strong>Email me a one-time code instead</strong> to get a fresh link.</p><p style="margin-top:16px"><a class="btn ghost" href="/contact/">Contact support</a></p></div></section>`;
   const script = `<script>
 (function(){
@@ -1202,7 +1200,7 @@ async function buildAuthConfirmed() {
 /* ── institutional product pages ─────────────────────────────────── */
 const EVALUATION_STATUS = `<section class="evaluation-status" aria-label="Availability and evaluation limits">
   <div class="panel"><p class="eyebrow">BETA · CURRENT AVAILABILITY</p><p>Public issuer, payment and funded-depth tools are available without an account. Paid desktop and API capabilities are beta; Institutional, Enterprise and Strategic Infrastructure require an agreed contract and scope.</p>
-  <p>SSO, uptime SLAs with service credits and dedicated environments are planned, not offered today. No completed independent security assessment or security certification is claimed. Desktop installers are not OS code-signed or notarised; updater signatures are separate.</p>
+  <p>SSO, uptime SLAs with service credits and dedicated environments are planned, not offered today. No completed independent security assessment or security certification is claimed. The repository documents unsigned beta installers. OS code-signing and notarization of a given release require separate verification; updater signatures are separate.</p>
   <p><a href="/institutional-demo/">Try the working demo</a> · <a href="/design-partners/#apply">Request a scoped pilot</a> · <a href="/trust/">Read the trust limits</a></p></div>
 </section>`;
 
@@ -1514,7 +1512,7 @@ async function buildMisread() {
  * src/lib/trust/__tests__/boundary.test.ts checks against the code. The
  * page adds layout and nothing else: no claim is written here.
  */
-async function buildTrust() {
+async function buildTrust(feed) {
   const t = JSON.parse(await readFile(path.join(ROOT, "src/lib/trust/boundary.json"), "utf8"));
   const stages = t.stages
     .map(
@@ -1533,6 +1531,8 @@ async function buildTrust() {
 
   const content = `
 ${EVALUATION_STATUS}
+${renderReleaseRecord(feed.releaseCatalog)}
+<section><div class="panel"><p class="eyebrow">Verification boundary</p><p>Repository source demonstrates implementation, not deployment health, a completed independent audit or successful customer onboarding. Public reads depend on third-party nodes. Account and organization runtime availability is not established by this review. <a href="/docs/accounts/">Accounts, TOTP and enterprise identity scope</a>. Production secret configuration is not inspected here.</p></div></section>
 <section><div class="grid g2 trust-bounds">${bounds}</div></section>
 <section><div class="section-head"><p class="eyebrow">01 / Data path</p><h2>From the ledger to the receipt.</h2><p>Every verdict follows this path. Open a stage to see what happens there and where it is implemented.</p></div>
   <ol class="trust-path qa">${stages}</ol></section>
@@ -1570,7 +1570,7 @@ ${EVALUATION_STATUS}
  * their facts live in api/_lib/docs.js and src/lib/docs/reference.json;
  * this only reads the repository's own documents and writes the pages.
  */
-async function buildDocs() {
+async function buildDocs(feed) {
   const readRepo = (p) => readFile(path.join(ROOT, p), "utf8");
   const [api, webhooks, security, changelog, siteFunctions, migrations] = await Promise.all([
     readRepo("docs/api/COMPLIANCE_API.md"),
@@ -1610,8 +1610,8 @@ async function buildDocs() {
     description: "NOSHASHI documentation, generated from the implementation: architecture, XRPL data, analysis engines, AI, policies, evidence, receipts, API, webhooks, security, enterprise, troubleshooting and release notes.",
     path: "/docs/",
     head,
-    body: `<div class="page-head"><p class="eyebrow">DOCUMENTATION</p><h1>How NOSHASHI works, from the code.</h1><p>Every rule, verb, event, role and screen listed in these pages is read from the implementation when the site is built, and a test fails when the two disagree.</p></div>
-<section><div class="docs-grid">${sections.map((s) => `<a href="/docs/${s.slug}/"><p class="eyebrow">${esc(s.title)}</p><p>${esc(s.intro)}</p></a>`).join("")}</div></section>`,
+    body: `<div class="page-head"><p class="eyebrow">DOCUMENTATION</p><h1>How NOSHASHI works, from the code.</h1><p>These pages describe repository implementation and source snapshots. Automated checks cover selected claims; code presence does not establish deployed configuration, successful onboarding or independent assurance.</p></div>
+<section>${renderReleaseRecord(feed.releaseCatalog)}<div class="docs-grid">${sections.map((s) => `<a href="/docs/${s.slug}/"><p class="eyebrow">${esc(s.title)}</p><p>${esc(s.intro)}</p></a>`).join("")}</div></section>`,
     structured: [breadcrumb("Documentation", "/docs/")],
   }));
 
@@ -1622,7 +1622,7 @@ async function buildDocs() {
       path: `/docs/${section.slug}/`,
       head,
       body: `<div class="page-head"><p class="eyebrow"><a href="/docs/">DOCUMENTATION</a></p><h1>${esc(section.title)}</h1><p>${esc(section.intro)}</p></div>
-<section class="docs">${nav(section.slug)}<article class="doc-body">${section.body}
+<section class="docs">${nav(section.slug)}<article class="doc-body">${section.slug === "release-notes" ? renderReleaseRecord(feed.releaseCatalog) : ""}${section.body}
 <p class="doc-src mono">Generated from ${section.sources.map((p) => `<a href="https://github.com/Ignosha/noshashi/tree/main/${esc(p)}">${esc(p)}</a>`).join(" · ")}</p></article></section>`,
       structured: [breadcrumb(section.title, `/docs/${section.slug}/`)],
     }));
@@ -1720,6 +1720,7 @@ async function main() {
 
   const status = deriveStatus(feed.entries);
   const release = feed.latestRelease;
+  await write("data/releases.json", JSON.stringify(feed.releaseCatalog || null, null, 2));
   const releases = feed.entries.filter((e) => e.kind === "release");
 
   log(
@@ -1762,9 +1763,9 @@ async function main() {
   await buildRLUSD(write);
   await buildTutorial(write, { site: SITE });
   await buildAcademy(write);
-  await buildTrust();
+  await buildTrust(feed);
   await buildMisread();
-  const docs = await buildDocs();
+  const docs = await buildDocs(feed);
   const intelligencePages = await buildNewsroom(write);
   await buildSitemap(docs, tokenPages, intelligencePages);
   await buildRobots();

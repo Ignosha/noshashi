@@ -48,7 +48,7 @@
     {
       "name": "Ledger & Policy",
       "plan": "Desk",
-      "summary": "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, signed export."
+      "summary": "local adjudication history, evidence chain and receipt verification, investigations (cases a person opens on a verdict, with notes and a written resolution; a resolution never changes the verdict), the versioned institutional policy (drafts, simulation, activation, audit trail), policy simulation, SHA-256 evidence export."
     },
     {
       "name": "Check an Address",
@@ -307,7 +307,7 @@
     {
       "party": "Have I Been Pwned",
       "what": "The first five characters of a SHA-1 hash of a new password, sent from NOSHASHI's server.",
-      "why": "To refuse passwords known from breaches. The password itself never leaves NOSHASHI."
+      "why": "To refuse passwords known from breaches. The breach service receives only that hash prefix; authentication passwords are handled by the hosted Supabase Auth service."
     },
     {
       "party": "An AI provider you choose",

@@ -61,7 +61,7 @@ export function WorkstationScene({
         index="14"
         kicker="LOCAL WORKSTATION · NOTHING TRANSMITTED"
         title="LEDGER & POLICY"
-        sub="Every verdict this workstation has produced, the rule set that produced them, and a signed export an examiner can verify."
+        sub="Every verdict this workstation has produced, the rule set that produced them, and a SHA-256 evidence export an examiner can verify."
         status="go"
         statusLabel="ON DEVICE"
       />

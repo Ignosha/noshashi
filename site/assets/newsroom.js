@@ -1,3 +1,4 @@
+import { sourceAge, utcStamp } from './source-age.js';
 /* Progressive enhancement: every article and both reading modes exist without JS. */
 (() => {
   const form = document.querySelector('[data-filters]');
@@ -56,13 +57,15 @@
           if (url.protocol !== 'https:' || url.username || url.password || typeof row.title !== 'string' || row.title.length > 500) continue;
           const li = document.createElement('li'), a = document.createElement('a'), note = document.createElement('p');
           a.href = url.href; a.rel = 'noopener noreferrer'; a.textContent = row.title;
-          const stamp = at && Number.isFinite(Date.parse(at)) ? new Date(at).toLocaleString() : 'source date unknown';
+          const stamp = at && Number.isFinite(Date.parse(at)) ? utcStamp(at) : 'source date unknown';
           note.textContent = `${news ? typeof row.publisher === 'string' && row.publisher ? row.publisher : 'Publisher unknown' : 'NOSHASHI repository'} · ${stamp}`;
           note.className = 'nr-small'; li.append(a, note); list.append(li); count++;
         }
-        const fetched = data.fetchedAt && Number.isFinite(Date.parse(data.fetchedAt)) ? new Date(data.fetchedAt).toLocaleString() : 'time unavailable';
-        notice.textContent = `${count ? `${count} source item${count === 1 ? '' : 's'}` : 'No usable source items'} · ${news ? 'External feed, not editorial verification' : 'Repository updates'}${data.partial ? ' · Partial coverage' : ''} · Source read ${fetched} · May be cached`;
-        if (!count) retry.hidden = false;
+        const fetched = data.fetchedAt && Number.isFinite(Date.parse(data.fetchedAt)) ? utcStamp(data.fetchedAt) : 'time unavailable';
+        const age = sourceAge(data.fetchedAt);
+        const partial = data.partial || (Array.isArray(data.sources) && data.sources.some(s=>!s.ok));
+        notice.textContent = `${age === 'STALE' ? 'STALE source reading · ' : age === 'UNKNOWN' ? 'UNKNOWN source freshness · ' : ''}${count ? `${count} source item${count === 1 ? '' : 's'}` : 'No usable source items'} · ${news ? 'External feed, not editorial verification' : 'Repository updates'}${partial ? ' · Partial coverage' : ''} · Source read ${fetched} · May be cached`;
+        if (!count || age !== 'CURRENT' || partial) retry.hidden = false;
       } catch {
         notice.textContent = 'Source reading unavailable. No results have been substituted.';
         retry.hidden = false;

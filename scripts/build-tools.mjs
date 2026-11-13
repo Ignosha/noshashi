@@ -551,7 +551,9 @@ async function buildBookHealth(write) {
   function pct(r){if(r===null||r===undefined)return "—";var p=r*100;return '<span class="'+(r<0.5?"bh-low":"")+'">'+p.toLocaleString("en-US",{maximumFractionDigits:1})+'%</span><span class="bh-bar" aria-hidden="true"><i style="width:'+Math.max(0,Math.min(100,p))+'%"></i></span>';}
   function get(q){return fetch("/api/book-health"+q).then(function(r){return r.json().then(function(b){if(!r.ok)throw new Error(b.error||"unreadable");return b;});});}
   get("").then(function(b){
-    say(status,"Ledger "+n(b.ledger_index)+" · closed "+b.close_time.replace("T"," ").replace(".000Z"," UTC"),"");
+    var closed=typeof b.close_time==="string"?Date.parse(b.close_time):NaN, read=typeof b.read_at==="string"?Date.parse(b.read_at):NaN;
+    var freshness=!isFinite(closed)||!isFinite(read)||closed>Date.now()+60000?"UNKNOWN freshness":Date.now()-Math.min(closed,read)>300000?"STALE snapshot — refresh required":"Public-node snapshot";
+    say(status,freshness+" · Ledger "+n(b.ledger_index)+" · closed "+(isFinite(closed)?new Date(closed).toISOString():"unknown")+" · source /api/book-health · read "+(isFinite(read)?new Date(read).toISOString():"unknown"),freshness.indexOf("STALE")===0?"bad":"");
     var h='<div class="tool-scroll"><table class="tool-table"><thead><tr><th>Book</th><th class="num">Price (per XRP)</th><th class="num">Ask quoted</th><th class="num">Ask funded</th><th class="num">Ask funded share</th><th class="num">Bid funded share</th><th>AMM pool (not counted)</th></tr></thead><tbody>';
     b.books.forEach(function(k){
       var a=k.amm, price=k.mid_xrp_per_unit?1/k.mid_xrp_per_unit:null, cur=esc(k.currency_label);

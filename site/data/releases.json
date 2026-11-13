@@ -1,0 +1,458 @@
+{
+  "schema": "noshashi.release-catalog.v1",
+  "source": "https://github.com/Ignosha/noshashi/releases",
+  "checkedAt": "2026-11-13T16:49:37.941Z",
+  "available": true,
+  "publishedCount": 24,
+  "latestPublished": {
+    "tag": "v1.0.27",
+    "name": "NOSHASHI v1.0.27",
+    "prerelease": false,
+    "at": "2026-11-04T02:41:45Z",
+    "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.27",
+    "notes": "The desktop identity update brings the circular NOSHASHI seal to the app icon, with transparency outside the emblem instead of a rounded-square backing. Academy's matching Ledger Desk redesign is available separately as Academy 0.2.1. It includes graphite surfaces, editorial typography, clearer course navigation and…",
+    "assets": [
+      {
+        "name": "latest.json",
+        "size": 9139,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/latest.json",
+        "sha256": "005c8b591d2b7946468c589119d7db6dfc6d8bd654403bbeabdbb8561fa2af99"
+      },
+      {
+        "name": "NOSHASHI-1.0.27-1.x86_64.rpm",
+        "size": 4501650,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI-1.0.27-1.x86_64.rpm",
+        "sha256": "d7e46b02ff8ffb9f0abe0d5ffab2f218433ad288060c45871689a6a5bd41aabe"
+      },
+      {
+        "name": "NOSHASHI-1.0.27-1.x86_64.rpm.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI-1.0.27-1.x86_64.rpm.sig",
+        "sha256": "c6b087564850996516af53b323b9eab52675a1544851c30c353fa84f474cf0f7"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_aarch64.dmg",
+        "size": 4558487,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_aarch64.dmg",
+        "sha256": "ddfefc24a6ce300684705e37afcf7ff27cb2237b12fbd18e9af2eb0b1bd47a5f"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage",
+        "size": 82930168,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage",
+        "sha256": "2553d7a1f65ee101d5b1969ddafe8c81b464b294f18656bf2ae0d4e454ed7155"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage.sig",
+        "sha256": "a762ff8846660744e2bd55d97050433948a30675a15231976a30bb106bf0dc33"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb",
+        "size": 4497968,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb",
+        "sha256": "5cc1dac3de32e2d3147698e19cca3e585fb8f82a8036a2f6782c6328b17a662e"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb.sig",
+        "size": 436,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb.sig",
+        "sha256": "471a96448dcd256b61043e772b230bc6ce9b55647be9422a64b71b5f8e25e556"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe",
+        "size": 3287874,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe",
+        "sha256": "0c6b040cd033f490d79c96903a440112fddb767e6df39cba655aa66ce4847a14"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe.sig",
+        "sha256": "8d528b2a542c1d38d0d414d25ea0e9872bf290ba2f0fc521fd335aa4c8fbb97a"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64.dmg",
+        "size": 4770379,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64.dmg",
+        "sha256": "41cb207785f8f97ee7d8bfbb8e719305c85a8d6adc8ad2269a6693705b7e8862"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi",
+        "size": 4075520,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi",
+        "sha256": "c73add3150eacdf98d3620ca786dfcc122bd0c65352391caeb9d4c155956db35"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi.sig",
+        "sha256": "8f10f238a99db484bd504997b3b6f76cd951b104a6ec92a3b2b9e9d559e78663"
+      },
+      {
+        "name": "NOSHASHI_aarch64.app.tar.gz",
+        "size": 4192697,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_aarch64.app.tar.gz",
+        "sha256": "ae7db61402b9ac0df7f157a0d10f02a51ddc8060442f67ea003f92c803d0de1b"
+      },
+      {
+        "name": "NOSHASHI_aarch64.app.tar.gz.sig",
+        "size": 428,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_aarch64.app.tar.gz.sig",
+        "sha256": "b542ff3eb65c98fbc15b29855c5bb2a01a8947581b64561dc86a04bc765219ff"
+      },
+      {
+        "name": "NOSHASHI_x64.app.tar.gz",
+        "size": 4357556,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_x64.app.tar.gz",
+        "sha256": "4a7cc266d592242d2ccc44765e2940a5d321d70a1a2d310fc2d3cda7f4eea18b"
+      },
+      {
+        "name": "NOSHASHI_x64.app.tar.gz.sig",
+        "size": 428,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_x64.app.tar.gz.sig",
+        "sha256": "5ee2d02dc94914e3747446b7532259b5b93d455759a1819b7c8fd6655f2afaab"
+      }
+    ]
+  },
+  "latestDownloadable": {
+    "tag": "v1.0.27",
+    "name": "NOSHASHI v1.0.27",
+    "prerelease": false,
+    "at": "2026-11-04T02:41:45Z",
+    "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.27",
+    "notes": "The desktop identity update brings the circular NOSHASHI seal to the app icon, with transparency outside the emblem instead of a rounded-square backing. Academy's matching Ledger Desk redesign is available separately as Academy 0.2.1. It includes graphite surfaces, editorial typography, clearer course navigation and…",
+    "assets": [
+      {
+        "name": "latest.json",
+        "size": 9139,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/latest.json",
+        "sha256": "005c8b591d2b7946468c589119d7db6dfc6d8bd654403bbeabdbb8561fa2af99"
+      },
+      {
+        "name": "NOSHASHI-1.0.27-1.x86_64.rpm",
+        "size": 4501650,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI-1.0.27-1.x86_64.rpm",
+        "sha256": "d7e46b02ff8ffb9f0abe0d5ffab2f218433ad288060c45871689a6a5bd41aabe"
+      },
+      {
+        "name": "NOSHASHI-1.0.27-1.x86_64.rpm.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI-1.0.27-1.x86_64.rpm.sig",
+        "sha256": "c6b087564850996516af53b323b9eab52675a1544851c30c353fa84f474cf0f7"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_aarch64.dmg",
+        "size": 4558487,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_aarch64.dmg",
+        "sha256": "ddfefc24a6ce300684705e37afcf7ff27cb2237b12fbd18e9af2eb0b1bd47a5f"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage",
+        "size": 82930168,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage",
+        "sha256": "2553d7a1f65ee101d5b1969ddafe8c81b464b294f18656bf2ae0d4e454ed7155"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage.sig",
+        "sha256": "a762ff8846660744e2bd55d97050433948a30675a15231976a30bb106bf0dc33"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb",
+        "size": 4497968,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb",
+        "sha256": "5cc1dac3de32e2d3147698e19cca3e585fb8f82a8036a2f6782c6328b17a662e"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb.sig",
+        "size": 436,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb.sig",
+        "sha256": "471a96448dcd256b61043e772b230bc6ce9b55647be9422a64b71b5f8e25e556"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe",
+        "size": 3287874,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe",
+        "sha256": "0c6b040cd033f490d79c96903a440112fddb767e6df39cba655aa66ce4847a14"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe.sig",
+        "sha256": "8d528b2a542c1d38d0d414d25ea0e9872bf290ba2f0fc521fd335aa4c8fbb97a"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64.dmg",
+        "size": 4770379,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64.dmg",
+        "sha256": "41cb207785f8f97ee7d8bfbb8e719305c85a8d6adc8ad2269a6693705b7e8862"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi",
+        "size": 4075520,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi",
+        "sha256": "c73add3150eacdf98d3620ca786dfcc122bd0c65352391caeb9d4c155956db35"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi.sig",
+        "sha256": "8f10f238a99db484bd504997b3b6f76cd951b104a6ec92a3b2b9e9d559e78663"
+      },
+      {
+        "name": "NOSHASHI_aarch64.app.tar.gz",
+        "size": 4192697,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_aarch64.app.tar.gz",
+        "sha256": "ae7db61402b9ac0df7f157a0d10f02a51ddc8060442f67ea003f92c803d0de1b"
+      },
+      {
+        "name": "NOSHASHI_aarch64.app.tar.gz.sig",
+        "size": 428,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_aarch64.app.tar.gz.sig",
+        "sha256": "b542ff3eb65c98fbc15b29855c5bb2a01a8947581b64561dc86a04bc765219ff"
+      },
+      {
+        "name": "NOSHASHI_x64.app.tar.gz",
+        "size": 4357556,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_x64.app.tar.gz",
+        "sha256": "4a7cc266d592242d2ccc44765e2940a5d321d70a1a2d310fc2d3cda7f4eea18b"
+      },
+      {
+        "name": "NOSHASHI_x64.app.tar.gz.sig",
+        "size": 428,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_x64.app.tar.gz.sig",
+        "sha256": "5ee2d02dc94914e3747446b7532259b5b93d455759a1819b7c8fd6655f2afaab"
+      }
+    ]
+  },
+  "latestNonPrerelease": {
+    "tag": "v1.0.27",
+    "name": "NOSHASHI v1.0.27",
+    "prerelease": false,
+    "at": "2026-11-04T02:41:45Z",
+    "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.27",
+    "notes": "The desktop identity update brings the circular NOSHASHI seal to the app icon, with transparency outside the emblem instead of a rounded-square backing. Academy's matching Ledger Desk redesign is available separately as Academy 0.2.1. It includes graphite surfaces, editorial typography, clearer course navigation and…",
+    "assets": [
+      {
+        "name": "latest.json",
+        "size": 9139,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/latest.json",
+        "sha256": "005c8b591d2b7946468c589119d7db6dfc6d8bd654403bbeabdbb8561fa2af99"
+      },
+      {
+        "name": "NOSHASHI-1.0.27-1.x86_64.rpm",
+        "size": 4501650,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI-1.0.27-1.x86_64.rpm",
+        "sha256": "d7e46b02ff8ffb9f0abe0d5ffab2f218433ad288060c45871689a6a5bd41aabe"
+      },
+      {
+        "name": "NOSHASHI-1.0.27-1.x86_64.rpm.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI-1.0.27-1.x86_64.rpm.sig",
+        "sha256": "c6b087564850996516af53b323b9eab52675a1544851c30c353fa84f474cf0f7"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_aarch64.dmg",
+        "size": 4558487,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_aarch64.dmg",
+        "sha256": "ddfefc24a6ce300684705e37afcf7ff27cb2237b12fbd18e9af2eb0b1bd47a5f"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage",
+        "size": 82930168,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage",
+        "sha256": "2553d7a1f65ee101d5b1969ddafe8c81b464b294f18656bf2ae0d4e454ed7155"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage.sig",
+        "sha256": "a762ff8846660744e2bd55d97050433948a30675a15231976a30bb106bf0dc33"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb",
+        "size": 4497968,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb",
+        "sha256": "5cc1dac3de32e2d3147698e19cca3e585fb8f82a8036a2f6782c6328b17a662e"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb.sig",
+        "size": 436,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb.sig",
+        "sha256": "471a96448dcd256b61043e772b230bc6ce9b55647be9422a64b71b5f8e25e556"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe",
+        "size": 3287874,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe",
+        "sha256": "0c6b040cd033f490d79c96903a440112fddb767e6df39cba655aa66ce4847a14"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe.sig",
+        "sha256": "8d528b2a542c1d38d0d414d25ea0e9872bf290ba2f0fc521fd335aa4c8fbb97a"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64.dmg",
+        "size": 4770379,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64.dmg",
+        "sha256": "41cb207785f8f97ee7d8bfbb8e719305c85a8d6adc8ad2269a6693705b7e8862"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi",
+        "size": 4075520,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi",
+        "sha256": "c73add3150eacdf98d3620ca786dfcc122bd0c65352391caeb9d4c155956db35"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi.sig",
+        "sha256": "8f10f238a99db484bd504997b3b6f76cd951b104a6ec92a3b2b9e9d559e78663"
+      },
+      {
+        "name": "NOSHASHI_aarch64.app.tar.gz",
+        "size": 4192697,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_aarch64.app.tar.gz",
+        "sha256": "ae7db61402b9ac0df7f157a0d10f02a51ddc8060442f67ea003f92c803d0de1b"
+      },
+      {
+        "name": "NOSHASHI_aarch64.app.tar.gz.sig",
+        "size": 428,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_aarch64.app.tar.gz.sig",
+        "sha256": "b542ff3eb65c98fbc15b29855c5bb2a01a8947581b64561dc86a04bc765219ff"
+      },
+      {
+        "name": "NOSHASHI_x64.app.tar.gz",
+        "size": 4357556,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_x64.app.tar.gz",
+        "sha256": "4a7cc266d592242d2ccc44765e2940a5d321d70a1a2d310fc2d3cda7f4eea18b"
+      },
+      {
+        "name": "NOSHASHI_x64.app.tar.gz.sig",
+        "size": 428,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_x64.app.tar.gz.sig",
+        "sha256": "5ee2d02dc94914e3747446b7532259b5b93d455759a1819b7c8fd6655f2afaab"
+      }
+    ]
+  },
+  "latestDevelopment": null,
+  "latestMacArtifact": {
+    "tag": "v1.0.27",
+    "name": "NOSHASHI v1.0.27",
+    "prerelease": false,
+    "at": "2026-11-04T02:41:45Z",
+    "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.27",
+    "notes": "The desktop identity update brings the circular NOSHASHI seal to the app icon, with transparency outside the emblem instead of a rounded-square backing. Academy's matching Ledger Desk redesign is available separately as Academy 0.2.1. It includes graphite surfaces, editorial typography, clearer course navigation and…",
+    "assets": [
+      {
+        "name": "latest.json",
+        "size": 9139,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/latest.json",
+        "sha256": "005c8b591d2b7946468c589119d7db6dfc6d8bd654403bbeabdbb8561fa2af99"
+      },
+      {
+        "name": "NOSHASHI-1.0.27-1.x86_64.rpm",
+        "size": 4501650,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI-1.0.27-1.x86_64.rpm",
+        "sha256": "d7e46b02ff8ffb9f0abe0d5ffab2f218433ad288060c45871689a6a5bd41aabe"
+      },
+      {
+        "name": "NOSHASHI-1.0.27-1.x86_64.rpm.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI-1.0.27-1.x86_64.rpm.sig",
+        "sha256": "c6b087564850996516af53b323b9eab52675a1544851c30c353fa84f474cf0f7"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_aarch64.dmg",
+        "size": 4558487,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_aarch64.dmg",
+        "sha256": "ddfefc24a6ce300684705e37afcf7ff27cb2237b12fbd18e9af2eb0b1bd47a5f"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage",
+        "size": 82930168,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage",
+        "sha256": "2553d7a1f65ee101d5b1969ddafe8c81b464b294f18656bf2ae0d4e454ed7155"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage.sig",
+        "sha256": "a762ff8846660744e2bd55d97050433948a30675a15231976a30bb106bf0dc33"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb",
+        "size": 4497968,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb",
+        "sha256": "5cc1dac3de32e2d3147698e19cca3e585fb8f82a8036a2f6782c6328b17a662e"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb.sig",
+        "size": 436,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb.sig",
+        "sha256": "471a96448dcd256b61043e772b230bc6ce9b55647be9422a64b71b5f8e25e556"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe",
+        "size": 3287874,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe",
+        "sha256": "0c6b040cd033f490d79c96903a440112fddb767e6df39cba655aa66ce4847a14"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe.sig",
+        "sha256": "8d528b2a542c1d38d0d414d25ea0e9872bf290ba2f0fc521fd335aa4c8fbb97a"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64.dmg",
+        "size": 4770379,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64.dmg",
+        "sha256": "41cb207785f8f97ee7d8bfbb8e719305c85a8d6adc8ad2269a6693705b7e8862"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi",
+        "size": 4075520,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi",
+        "sha256": "c73add3150eacdf98d3620ca786dfcc122bd0c65352391caeb9d4c155956db35"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi.sig",
+        "size": 440,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi.sig",
+        "sha256": "8f10f238a99db484bd504997b3b6f76cd951b104a6ec92a3b2b9e9d559e78663"
+      },
+      {
+        "name": "NOSHASHI_aarch64.app.tar.gz",
+        "size": 4192697,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_aarch64.app.tar.gz",
+        "sha256": "ae7db61402b9ac0df7f157a0d10f02a51ddc8060442f67ea003f92c803d0de1b"
+      },
+      {
+        "name": "NOSHASHI_aarch64.app.tar.gz.sig",
+        "size": 428,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_aarch64.app.tar.gz.sig",
+        "sha256": "b542ff3eb65c98fbc15b29855c5bb2a01a8947581b64561dc86a04bc765219ff"
+      },
+      {
+        "name": "NOSHASHI_x64.app.tar.gz",
+        "size": 4357556,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_x64.app.tar.gz",
+        "sha256": "4a7cc266d592242d2ccc44765e2940a5d321d70a1a2d310fc2d3cda7f4eea18b"
+      },
+      {
+        "name": "NOSHASHI_x64.app.tar.gz.sig",
+        "size": 428,
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_x64.app.tar.gz.sig",
+        "sha256": "5ee2d02dc94914e3747446b7532259b5b93d455759a1819b7c8fd6655f2afaab"
+      }
+    ]
+  },
+  "macRuntimeVerification": "UNKNOWN",
+  "evaluationChannel": "BETA"
+}

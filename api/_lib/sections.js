@@ -251,11 +251,11 @@ export function renderDownloads(release) {
       </div>
       <div class="release-cell">
         <span class="label" data-i18n="release.source.label">SOURCE</span>
-        <strong class="mono">GitHub Actions</strong>
+        <strong class="mono">GitHub Releases</strong>
       </div>
       <div class="release-cell">
         <span class="label" data-i18n="release.integrity.label">INTEGRITY</span>
-        <strong class="live" data-i18n="release.integrity.value">SHA-256 listed</strong>
+        <strong class="live" data-i18n="release.integrity.value">${release.assets.some(a => a.sha256) ? "SHA-256 where provided" : "Hash metadata unavailable"}</strong>
       </div>
     </div>`;
 
@@ -311,7 +311,7 @@ export function renderDownloads(release) {
     <div class="download-note">
       <span class="signal" aria-hidden="true"></span>
       <span><strong style="color:var(--ink)" data-i18n="release.operator">Operator note.</strong> Every build on this page is a
-        <strong style="color:var(--hold)" data-i18n="release.beta">beta</strong>, including version 1.x. Installers are not OS code-signed or notarised, so platform warnings remain.
+        <strong style="color:var(--hold)" data-i18n="release.beta">beta</strong>, including version 1.x. The repository documents unsigned beta installers; current OS signing and notarization require separate verification.
         SHA-256 checks detect a changed download when compared with the published value; they do not authenticate the publisher. The in-app updater separately verifies minisign signatures against its bundled public key.
         Follow your institution's software admission process before deployment.</span>
     </div>`;

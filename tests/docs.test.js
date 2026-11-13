@@ -16,7 +16,7 @@ const html = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g,
 describe("the sections §47 asks for", () => {
   it("are all present, in order", () => {
     expect(sections.map((s) => s.title)).toEqual([
-      "Getting started", "Architecture", "XRPL data", "Analysis engines", "AI", "Policies", "Evidence",
+      "Accounts & access", "Getting started", "Architecture", "XRPL data", "Analysis engines", "AI", "Policies", "Evidence",
       "Receipts", "API", "Webhooks", "Security", "Enterprise", "Troubleshooting", "Release notes",
     ]);
   });

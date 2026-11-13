@@ -157,7 +157,7 @@ export const LENSES: Record<Lens, { title: string; purpose: string; items: LensI
       { id: "settlement", label: "SETTLEMENT STATE", answers: "Where a settlement stands", scene: "settlement" },
       { id: "verify", label: "TRANSACTION VERIFICATION", answers: "Gate a transfer and issue a receipt", scene: "verify" },
       { id: "exceptions", label: "EXCEPTIONS", answers: "Exceptions requested and awaiting a decision", scene: "workstation", where: "POLICY", figure: (m) => (m.pendingDecisions === null ? n(m.activeExceptions) : `${m.pendingDecisions} pending`) },
-      { id: "reconcile", label: "RECONCILIATION", answers: "Recorded verdicts and signed exports", scene: "workstation", where: "EXPORT", figure: (m) => `${m.verdicts30d} verdicts (30d)` },
+      { id: "reconcile", label: "RECONCILIATION", answers: "Recorded verdicts and SHA-256 evidence exports", scene: "workstation", where: "EXPORT", figure: (m) => `${m.verdicts30d} verdicts (30d)` },
       { id: "alerts", label: "ALERTS", answers: "Live alerts from the portfolio and issuer watch", scene: "control", figure: (m) => n(m.critical) },
     ],
   },

@@ -98,7 +98,7 @@ export const DEMO_EXCLUDES = [
   "AMM pool governance — fee votes and the auction slot",
   "Issuance surveillance — holder concentration for an issuer",
   "Issuer drift monitoring and native alerts",
-  "The persistent adjudication ledger and signed export",
+  "The persistent adjudication ledger and SHA-256 evidence export",
   "Offline adjudication",
   "Compliance API, webhooks and regulator seats",
 ];

@@ -88,7 +88,7 @@ export const ENTRIES = [
     id: "account",
     keywords: ["account", "sign", "signup", "login", "register", "dashboard", "workspace", "password"],
     q: "Do I need an account?",
-    a: "The public web tools, institutional demo and browser workspace need no account. The desktop app can also read public ledger data without one. Paid entitlements, shared organization features and API access use the app's account and hosted services; billing runs through Stripe.",
+    a: "The public web tools, institutional demo and browser workspace need no account. The desktop app can also read public ledger data without one. Paid entitlements and shared organization features use the hosted Supabase account. The Payment Review developer portal is a separate signed-in browser surface; public API reads remain unauthenticated. Password/OTP/TOTP clients exist, but provider configuration and customer onboarding require separate runtime verification. Billing runs through Stripe.",
     links: [{ label: "Security posture", href: "/trust/" }],
   },
   {

@@ -129,7 +129,7 @@ export const PLANS: Plan[] = [
       "AMM pool governance — who votes the fee, and who holds the discount",
       "Policy drift and credential expiry alerts",
       "Issuer freeze-rights analysis — know who can immobilise your balance",
-      "Authority certificate — a signed, re-checkable record of who can still freeze, seize or gate an issuance",
+      "Authority certificate — a SHA-256 receipt and re-checkable record of who can still freeze, seize or gate an issuance",
       "Counterparty concentration (HHI) across the settlement book",
       "Persistent adjudication ledger — 10,000 verdicts, survives restart",
       "Wallet explorer — every address ever scanned, sortable by risk",
