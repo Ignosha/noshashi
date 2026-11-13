@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { renderPillars, renderResearchCase, renderOperationalStatus, renderPlanGuide } from "../api/_lib/research-refinement.js";
 import { buildRLUSD, RLUSD_PAGES } from "./build-rlusd.mjs";
 import { buildNewsroom, NEWSROOM_PAGES } from "./build-newsroom.mjs";
 import { capturedView } from "../site/assets/desk-experience-core.mjs";
@@ -103,6 +104,9 @@ async function buildHome({ news, market, feed, status, release }) {
   const shots = JSON.parse(await readFile(path.join(SITE, "assets/shots/manifest.json"), "utf8").catch(() => "null"));
 
   const slots = {
+    PILLARS: renderPillars(),
+    RESEARCHCASE: renderResearchCase(),
+    OPERATIONAL: renderOperationalStatus(release),
     ORIGIN: ORIGIN,
     HEADER: renderHeader("home"),
     FOOTER: renderFooter(),
@@ -1330,6 +1334,7 @@ async function buildPricingEnhancement() {
       <p>The free web tools answer individual issuer, payment and funded-depth questions and let you inspect the evidence. Free desktop checks and CSV exports remain available. Pro adds portfolios, alerts, custom policies, persistent history and 5,000 API verifications a month. Institutional adds shared controls, audit records, webhooks and 100,000 API verifications; an MSA is required. Public API endpoints remain free separately from paid Compliance API capacity.</p>
       <p>Audit exports use SHA-256 digests. They detect changes against the recorded hash; they are not digital signatures, publisher authentication or independent verification of ledger proofs.</p>
     </div>
+    ${renderPlanGuide()}
     <div class="tier-compare">
       <table>
         <caption>Commercial, intelligence and infrastructure entitlements. Contracted scope is confirmed during architecture review; no live integration or certification is implied.</caption>
@@ -1436,6 +1441,7 @@ async function buildPricingEnhancement() {
   if (!html.includes(footStyle)) html = html.replace('<link rel="stylesheet" href="/assets/modules.css">', `<link rel="stylesheet" href="/assets/modules.css">\n${footStyle}`);
   const accent = '<link rel="stylesheet" href="/assets/accent.css">\n<script src="/assets/accent.js"></script>';
   if (!html.includes('href="/assets/accent.css"')) html = html.replace(footStyle, `${footStyle}\n${accent}`);
+  if (!html.includes('/assets/research-refinement.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/research-refinement.css"></head>');
   await write("pricing/index.html", html);
 }
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "git": { "deploymentEnabled": { "feat/rlusd-intelligence": false } },
+  "git": { "deploymentEnabled": { "feat/rlusd-intelligence": false, "feat/ledger-desk-refinement": false } },
   "framework": null,
   "installCommand": "npm ci --no-audit --no-fund",
   "buildCommand": "npm run site:build",
