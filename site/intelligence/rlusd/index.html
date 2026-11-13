@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>RLUSD Evidence Desk · NOSHASHI LABS</title>
+<meta name="description" content="Inspect source-stamped RLUSD issuer obligations and Ethereum contract supply. Separate supply from liquidity and volume.">
+<link rel="canonical" href="https://www.noshashi.app/intelligence/rlusd/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/intelligence/rlusd/">
+<meta property="og:title" content="RLUSD Evidence Desk · NOSHASHI LABS">
+<meta property="og:description" content="Inspect source-stamped RLUSD issuer obligations and Ethereum contract supply. Separate supply from liquidity and volume.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RLUSD Evidence Desk · NOSHASHI LABS">
+<meta name="twitter:description" content="Inspect source-stamped RLUSD issuer obligations and Ethereum contract supply. Separate supply from liquidity and volume.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/c5a81e5a06d4616fef91.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/assets/ledger-mark-512.png","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]}</script>
+<link rel="stylesheet" href="/assets/rlusd.css">
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16" cy="16" r="10.6" fill="none" stroke="currentColor" stroke-width=".9" opacity=".5"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="var(--ground)" stroke="var(--ground)" stroke-width="2.2" stroke-linejoin="round"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/intelligence/" aria-current="page">Intelligence</a>
+      <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
+      <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/"><span data-i18n="nav.demo2">Demo</span></a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/resources/"><span data-i18n="nav.resources">Resources</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="rl-desk">
+    <div class="rl-top"><a href="/intelligence/">NOSHASHI / LEDGER DESK</a><span>STABLECOIN INTELLIGENCE · PUBLIC BETA</span></div>
+    <section class="rl-hero"><p class="rl-kicker">01 / FOLLOW THE EVIDENCE</p><h1>One asset.<br><em>Different measures.</em></h1><p class="rl-intro">RLUSD across the XRP Ledger and Ethereum.<br>Know what moved. Know what it means.</p><p>Supply movement ≠ liquidity movement ≠ trading volume.</p><button id="rl-refresh" type="button">Read chain evidence ↗</button><p id="rl-status" role="status" aria-live="polite">Not read. Fetch a snapshot on demand; this page does not poll.</p></section>
+    <section class="rl-grid" aria-label="Independent chain measurements"><article class="rl-panel"><p class="rl-kicker">XRP LEDGER</p><h2>Issuer obligations</h2><strong class="rl-number" id="xrpl-value">Unavailable</strong><p>No operational-wallet exclusions. Not issuer-reported circulating supply.</p><p class="rl-meta" id="xrpl-meta">No source reading yet.</p><div id="xrpl-chart" class="rl-chart">Two distinct ledger observations are needed for a trend.</div><details><summary>Observed samples & exact values</summary><ol id="xrpl-history"></ol></details></article><article class="rl-panel"><p class="rl-kicker">ETHEREUM</p><h2>Contract totalSupply</h2><strong class="rl-number" id="ethereum-value">Unavailable</strong><p>Finalized block, not circulating supply or reserves.</p><p class="rl-meta" id="ethereum-meta">No source reading yet.</p><div id="ethereum-chart" class="rl-chart">Two distinct ledger observations are needed for a trend.</div><details><summary>Observed samples & exact values</summary><ol id="ethereum-history"></ol></details></article></section>
+    <p class="rl-note">The two measurements use different definitions and are never added together. Public node reports do not independently verify consensus, backing, redeemability or legal rights. Cached readings retain their original observation and ledger times.</p>
+    <section class="rl-panel"><p class="rl-kicker">02 / CHANGE REVIEW · LOCAL PREVIEW</p><h2>Notice a change. Investigate the cause.</h2><label>Absolute change threshold, in basis points (100 bps = 1%) <input id="rl-threshold" type="number" min="1" max="10000" step="1" value="100"></label><p id="rl-alert" role="status">Requires two distinct observations from the same chain.</p><p>Checks the last two samples in this tab only. No background monitoring, saved alert policy or notification delivery. Closing the tab clears samples. A change is not a mint/burn attribution or a liquidity alert.</p></section>
+    <section class="rl-section"><p class="rl-kicker">03 / ASK THE RIGHT QUESTION</p><h2>Evidence before interpretation.</h2><div class="rl-grid rl-three"><article class="rl-panel"><h3>Supply</h3><p>Issuer obligations and contract supply describe outstanding token accounting. Mint/burn attribution needs verified transaction evidence and a defined interval.</p><a href="/certificate/?issuer=rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De">Inspect issuer permissions ↗</a></article><article class="rl-panel"><h3>Liquidity</h3><p>Funded offers and pool reserves describe particular venues at a moment in time. They do not guarantee an executable price.</p><a href="/book-health/">Inspect funded depth ↗</a></article><article class="rl-panel"><h3>Activity</h3><p>Transfers and trades are different events. No market-wide volume, holder concentration or historical mint/burn total has been measured here.</p><a href="/delivered/">Inspect delivered evidence ↗</a></article></div></section>
+    <section class="rl-section"><p class="rl-kicker">04 / SETTLEMENT WORKFLOW · CONCEPT PROTOTYPE</p><h2>Follow the handoffs.</h2><ol class="rl-flow"><li><span>01</span><strong>Issuer</strong></li><li><span>02</span><strong>Custodian</strong></li><li><span>03</span><strong>Payment provider</strong></li><li><span>04</span><strong>Blockchain</strong></li><li><span>05</span><strong>Settlement</strong></li><li><span>06</span><strong>Verification</strong></li><li><span>07</span><strong>Audit record</strong></li></ol><p>Generic workflow, not a claimed integration. Each relationship, asset, chain, settlement condition and permission must be established separately. NOSHASHI can inspect public XRPL delivered-payment evidence; it does not verify off-chain custody or legal settlement.</p><a href="/settlement-desk/">Explore the Settlement Exception Desk ↗</a></section>
+    <section class="rl-section"><p class="rl-kicker">05 / REGULATORY EVIDENCE · STATUS MODEL</p><h2>A status is not a verdict.</h2><div class="rl-states"><span>PROPOSED</span><span>PENDING</span><span>FINAL</span><span>EFFECTIVE</span><span>WITHDRAWN</span><span>SUPERSEDED</span></div><p>Tracker prototype: no live regulatory feed loaded. Future entries require jurisdiction, original document, publication date, effective date and human review. A nomination is not an appointment. An article never changes production compliance rules.</p></section>
+    <section class="rl-panel"><p class="rl-kicker">SOURCE REGISTER</p><h2>Identity. Method. Limitations.</h2><p><a href="https://docs.ripple.com/products/stablecoin/overview/token-addresses">Ripple: official token addresses ↗</a> · Identity checked 13 November 2026.</p><p class="rl-meta">XRPL issuer: rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De<br>Currency: 524C555344000000000000000000000000000000<br>Ethereum proxy: 0x8292bb45bf1ee4d140127049757c2e0ff06317ed</p><p><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/gateway_balances">XRPL gateway_balances methodology ↗</a> · <a href="https://ripple.com/products/stablecoin/transparency/">Issuer reserve reporting ↗</a></p><p>Reserve attestations and reported circulation have separate reporting dates; they are not merged into an on-chain snapshot. Ethereum and XRPL are not an exhaustive inventory of all supported RLUSD networks.</p></section>
+    <section class="rl-close"><h2>Bring a workflow.<br><em>Inspect the evidence together.</em></h2><p>Evaluate public issuer settings, delivered payments and funded-depth snapshots with NOSHASHI.</p><a href="/institutional-demo/">Explore Risk Desk ↗</a><a href="/contact/?topic=institutions">Request a demo · Become a tester · Discuss a pilot ↗</a></section>
+  </div>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/tokens/">XRPL token directory</a><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/intelligence/">Intelligence &amp; briefs</a><a href="/news/">External headlines</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/partners/">Partner programs</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script type="module" src="/assets/rlusd.js"></script>
+</body>
+</html>

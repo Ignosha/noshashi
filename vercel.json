@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": { "deploymentEnabled": { "feat/rlusd-intelligence": false } },
   "framework": null,
   "installCommand": "npm ci --no-audit --no-fund",
   "buildCommand": "npm run site:build",
@@ -162,6 +163,10 @@
     {
       "source": "/api/book",
       "destination": "/api/tools?tool=book"
+    },
+    {
+      "source": "/api/rlusd",
+      "destination": "/api/tools?tool=rlusd"
     },
     {
       "source": "/api/settlement-check",

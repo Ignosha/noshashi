@@ -5,6 +5,7 @@ export const STATES = ['RESEARCHING', 'DRAFT', 'NEEDS REVIEW', 'APPROVED', 'SCHE
 export const EVIDENCE = ['VERIFIED', 'INFERRED', 'UNVERIFIED', 'UNKNOWN'];
 export const CATEGORIES = ['XRPL & XRP', 'Institutional Adoption', 'Stablecoins', 'Payments', 'Tokenization', 'Issuer Risk', 'Counterparty Risk', 'Liquidity', 'Compliance', 'Regulation', 'Security', 'Market Infrastructure', 'NOSHASHI Updates'];
 export const WORKFLOWS = {
+  stablecoin: { label: 'Inspect RLUSD evidence', href: '/intelligence/rlusd/' },
   issuer: { label: 'Inspect issuer controls', href: '/certificate/' },
   payment: { label: 'Inspect a delivered payment', href: '/delivered/' },
   liquidity: { label: 'Inspect funded depth', href: '/book-health/' },

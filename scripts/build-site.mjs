@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { buildRLUSD, RLUSD_PAGES } from "./build-rlusd.mjs";
 import { buildNewsroom, NEWSROOM_PAGES } from "./build-newsroom.mjs";
 import { capturedView } from "../site/assets/desk-experience-core.mjs";
 /*
@@ -1629,6 +1630,7 @@ async function buildSitemap(docs = [], tokenPages = [], intelligencePages = []) 
     ["/", "daily", "1.0"],
     ["/news/", "hourly", "0.9"],
     ...NEWSROOM_PAGES,
+    ...RLUSD_PAGES,
     ...intelligencePages,
     // High priority deliberately: this is the page the product is
     // argued from, and the only one that answers a question for
@@ -1751,6 +1753,7 @@ async function main() {
   await buildWorkspace(write, { release });
   await buildPaymentPortal(write);
   await buildSettlementDesk(write);
+  await buildRLUSD(write);
   await buildTutorial(write, { site: SITE });
   await buildAcademy(write);
   await buildTrust();
