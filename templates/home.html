@@ -4,21 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark light">
-<title>NOSHASHI · Issuer controls, payments and funded depth</title>
+<title>NOSHASHI · Intelligence for every ledger decision</title>
 <meta name="description" content="Read-only XRP Ledger analysis for treasury, custody and operations: inspect issuer controls, verify delivered payments and compare funded order-book depth, with evidence you can inspect.">
 <link rel="canonical" href="<!--SLOT:ORIGIN-->/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="<!--SLOT:ORIGIN-->/">
 <meta property="og:site_name" content="NOSHASHI">
-<meta property="og:title" content="NOSHASHI · Decentralized Intelligence">
-<meta property="og:description" content="Live signals, deterministic rules and verifiable evidence for the XRP Ledger. Read-only: nothing is ever signed.">
+<meta property="og:title" content="NOSHASHI · Intelligence for every ledger decision">
+<meta property="og:description" content="Verify XRPL payments, investigate issuers and funded depth, and review configurable policies with traceable evidence. Read-only beta.">
 <meta property="og:image" content="<!--SLOT:ORIGIN-->/assets/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="NOSHASHI: XRPL asset intelligence over the live ASCII ledger field">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="NOSHASHI · Decentralized Intelligence">
-<meta name="twitter:description" content="Live signals, deterministic rules and verifiable evidence for the XRP Ledger.">
+<meta name="twitter:title" content="NOSHASHI · Intelligence for every ledger decision">
+<meta name="twitter:description" content="Payment evidence, issuer controls and funded-depth research for XRPL operations. Read-only beta.">
 <meta name="twitter:image" content="<!--SLOT:ORIGIN-->/assets/og-card.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
@@ -1673,6 +1673,8 @@
 </style>
 <link rel="stylesheet" href="/assets/desk-editorial.css">
 <link rel="stylesheet" href="/assets/desk-experience.css?v=20261101-first-use">
+<link rel="stylesheet" href="/assets/research-refinement.css">
+<script type="module" src="/assets/research-case.js"></script>
 </head>
 <body data-ledger-editorial data-ledger-experience>
 <div class="garden-bg">
@@ -1694,11 +1696,12 @@
     <div class="rh-title lx-hero">
       <div class="rh-title-text">
         <p class="rh-title-k"><span class="lx-overline-rule" aria-hidden="true"></span>XRPL analysis for treasury, custody &amp; operations</p>
-        <h1 class="lx-headline">The ledger<br>is public.<br><em>Look closer.</em></h1>
-        <p class="rh-title-dek">Inspect issuer controls before accepting an asset. Verify what a payment delivered. Check funded order-book depth before sizing a trade. NOSHASHI turns validated XRP Ledger replies into findings and receipts you can inspect.</p>
-        <p class="rh-title-cta"><a class="rh-btn lg" href="#lx-investigate">Try issuer controls <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="rh-btn lg ghost" href="/institutional-demo/">Institutional demo <span aria-hidden="true">→</span></a></p>
+        <h1 class="lx-headline rf-headline">Intelligence for<br>every ledger<br><em>decision.</em></h1>
+        <p class="rh-title-dek">Verify XRPL payments, investigate asset issuers, assess funded liquidity and review configurable policies — with traceable evidence.</p>
+        <p class="rh-title-cta"><a class="rh-btn lg" href="#research-pillars">Explore Platform <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="rh-btn lg ghost" href="/contact/?topic=institutions">Request Institutional Demo <span aria-hidden="true">→</span></a></p>
         <p class="rh-title-fine">Free public tools · No account or wallet connection · Read-only beta</p>
-        <div class="lx-hero-bottom"><span>Issuer controls · Payments · Funded depth</span><a href="#lx-investigate" aria-label="Scroll to the live issuer investigation">Scroll to investigate <span aria-hidden="true">↓</span></a></div>
+        <p class="rf-quiet-links"><a href="/intelligence/">View Research</a><a href="/docs/">Review Documentation</a></p>
+        <div class="lx-hero-bottom"><span>01 / Verify · 02 / Investigate · 03 / Govern</span><a href="#lx-investigate" aria-label="Scroll to the live issuer investigation">Scroll to investigate <span aria-hidden="true">↓</span></a></div>
       </div>
       <figure class="rh-emblem ed-seal lx-machine" aria-labelledby="rh-em-c">
         <div class="ed-seal-meta"><span>Fig. 01 / Inside the reading</span><span>Exploratory instrument</span></div>
@@ -1721,7 +1724,8 @@
       </figure>
     </div>
 
-    <nav class="ed-index" aria-label="Explore the ledger desk"><span>Inside the desk</span><a href="#lx-investigate">Investigate</a><a href="#rh-t1">Compare issuers</a><a href="#public">Three workflows</a><a href="#pilot">Evaluate with us →</a></nav>
+    <nav class="ed-index" aria-label="Explore the ledger desk"><span>Inside the desk</span><a href="#lx-investigate">Investigate</a><a href="#rh-t1">Compare issuers</a><a href="#public">Three workflows</a><a href="#research-case">Sample case file</a><a href="#operational-status">Product status</a><a href="#pilot">Evaluate with us →</a></nav>
+    <!--SLOT:PILLARS-->
 
     <section class="lx-investigation" id="lx-investigate" aria-labelledby="lx-investigate-title">
       <div class="lx-section-heading"><div><p class="ed-kicker">01 / Try the instrument</p><h2 id="lx-investigate-title">Start with one issuer.<br><em>Keep the evidence.</em></h2></div><p>Choose a public issuer. Read its controls.<br>Verify the record in your browser.</p></div>
@@ -1744,6 +1748,8 @@
       </div>
     </section>
   </section>
+
+  <!--SLOT:RESEARCHCASE-->
 
   <section class="rh-sec" aria-labelledby="rh-t1">
     <h2 class="rh-h2" id="rh-t1"><span>Table 1.</span> Compare issuer controls</h2>
@@ -1768,9 +1774,9 @@
   <section class="rh-sec lx-use-cases" id="public" aria-labelledby="rh-x">
     <p class="ed-kicker">Three core workflows</p><h2 class="rh-h2 rh-h2-plain" id="rh-x">Know what you are accepting.</h2>
     <div class="lx-case-grid">
-      <article><p class="ed-kicker">01 / Asset review</p><h3>Who can freeze it?</h3><p>For custody and treasury teams: inspect an issuer’s freeze, authorisation and signing powers before accepting an asset.</p><a class="lx-inline-link" href="#lx-investigate">Read issuer controls →</a></article>
-      <article><p class="ed-kicker">02 / Payment operations</p><h3>What actually arrived?</h3><p>For settlement and exchange operations: check the validated delivered amount, including partial payments, before crediting a transfer.</p><a class="lx-inline-link" href="/delivered/">Verify a payment →</a><br><a class="lx-inline-link" href="/settlement-desk/">Compare an invoice →</a></article>
-      <article id="rh-f1"><p class="ed-kicker">03 / Trade sizing</p><h3>What could fill?</h3><p>For dealing and liquidity teams: compare quoted offers with the depth their owners can fund at the ledger read. This is a reading, not an execution guarantee.</p><a class="lx-inline-link" href="/book-health/">Inspect funded depth →</a></article>
+      <article><p class="ed-kicker">01 / Asset review</p><h3>Who can freeze it?</h3><dl class="rf-use-case"><div><dt>Problem</dt><dd>Exchanges and asset issuers need a clear view of retained controls.</dd></div><div><dt>Analysis</dt><dd>Inspect freeze, authorization and signing powers.</dd></div><div><dt>Evidence</dt><dd>Ledger-scoped issuer settings and coverage limits.</dd></div><div><dt>Decision</dt><dd>Escalate the controls your acceptance policy requires.</dd></div></dl><a class="lx-inline-link" href="#lx-investigate">Read issuer controls →</a></article>
+      <article><p class="ed-kicker">02 / Payment operations</p><h3>What actually arrived?</h3><dl class="rf-use-case"><div><dt>Problem</dt><dd>Banks and payment providers need to reconcile what arrived.</dd></div><div><dt>Analysis</dt><dd>Compare the expectation with delivered_amount.</dd></div><div><dt>Evidence</dt><dd>Transaction result, destination and delivered asset/amount.</dd></div><div><dt>Decision</dt><dd>Review a discrepancy before your crediting decision.</dd></div></dl><a class="lx-inline-link" href="/delivered/">Verify a payment →</a><br><a class="lx-inline-link" href="/settlement-desk/">Compare an invoice →</a></article>
+      <article id="rh-f1"><p class="ed-kicker">03 / Trade sizing</p><h3>What could fill?</h3><dl class="rf-use-case"><div><dt>Problem</dt><dd>Treasury, compliance and risk teams need context before acting.</dd></div><div><dt>Analysis</dt><dd>Inspect funded depth and configurable policy findings.</dd></div><div><dt>Evidence</dt><dd>Source snapshot, rule scope and explicit unknowns.</dd></div><div><dt>Decision</dt><dd>Apply your review limits; neither depth nor a policy result guarantees execution or compliance.</dd></div></dl><a class="lx-inline-link" href="/book-health/">Inspect funded depth →</a></article>
     </div>
     <p class="lx-micro">Try all three in the <a href="/institutional-demo/">guided institutional demo</a>, or open the <a href="/app/issuer/">workspace</a>. Public-node access can fail; unreadable data remains unknown.</p>
   </section>
@@ -1790,10 +1796,11 @@
   </section>
   <section class="rh-sec lx-trust" aria-labelledby="lx-trust-title">
     <p class="ed-kicker">Trust / Scope and limits</p><h2 class="rh-h2 rh-h2-plain" id="lx-trust-title">Evidence you can inspect. Limits you can see.</h2>
+    <!--SLOT:OPERATIONAL-->
     <div class="lx-case-grid">
       <article><h3>Read-only beta</h3><p>NOSHASHI reads public ledger replies. It does not hold keys or submit transactions. Findings name the ledger and rules; public nodes are trusted data sources, not independently verified validator proofs. Reserves, redemption and legal identity require separate diligence.</p></article>
-      <article><h3>Integrity is specific</h3><p>A SHA-256 hash detects changes to a record; it does not authenticate its author. An audit trail records activity; it is not a security assessment. Desktop updater packages have digital signatures, while the OS installers are not code-signed or notarised.</p></article>
-      <article><h3>Enterprise scope is agreed</h3><p>SSO, uptime SLAs and dedicated environments remain planned, not currently available. No independent security assessment or certification has been completed. Confirm requirements and available scope before starting a pilot.</p><a class="lx-inline-link" href="/trust/">Read the trust and beta details →</a></article>
+      <article><h3>Integrity is specific</h3><p>A SHA-256 hash detects changes to a record; it does not authenticate its author. An audit trail records activity; it is not a security assessment. Updater signature assets are published separately from OS code signing. The repository documents unsigned beta installers; signing and notarization of each release need independent verification.</p></article>
+      <article><h3>Enterprise scope is agreed</h3><p>SSO, uptime SLAs and dedicated environments remain planned, not currently available. No completed independent security assessment or certification is established by the reviewed repository. Confirm requirements and available scope before starting a pilot.</p><a class="lx-inline-link" href="/trust/">Read the trust and beta details →</a></article>
     </div>
   </section>
   <section class="lx-invitation" id="pilot" aria-labelledby="lx-invite-title"><div><p class="ed-kicker">Evaluation / A scoped pilot</p><h2 id="lx-invite-title">Bring one workflow.<br><em>Agree what success means.</em></h2></div><div><p>Review an issuer, reconcile a payment or examine funded depth with us. Agree the sample, deliverables and acceptance criteria before work starts.</p><ol><li>Choose the addresses, transactions and review period.</li><li>Agree an evidence pack and a walkthrough of discrepancies.</li><li>Measure review time, evidence completeness or discrepancies identified against your own baseline.</li></ol><a class="rh-btn" href="/contact/?topic=institutions">Request a scoped pilot <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="lx-inline-link" href="/design-partners/#apply">Join the beta evaluation →</a><p class="lx-micro">No promised savings or outcomes. Scope, fees and any contract terms are agreed separately. <a href="/institutional-demo/#feedback">Already testing? Send feedback</a>.</p></div></section>

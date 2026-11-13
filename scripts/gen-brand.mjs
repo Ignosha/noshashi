@@ -167,7 +167,7 @@ export const MARK = \`<svg class="brand-mark" viewBox="0 0 32 32" width="26" hei
 const outputs = {
   "src/components/nova/brand/flower.ts": flowerTs,
   "api/_lib/brand-mark.js": brandMarkJs,
-  "site/favicon.svg": ledgerTile(),
+  "site/favicon.svg": appIcon.replace('width="1024" height="1024"', 'width="32" height="32"'),
   "site/assets/ledger-mark.svg": ledgerTile(),
   "public/app-icon.svg": appIcon,
   "public/brand/desktop-emblem.svg": appIcon,
