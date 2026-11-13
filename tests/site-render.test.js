@@ -187,25 +187,25 @@ describe("renderLog", () => {
 describe("deriveStatus", () => {
   const at = (hoursAgo) => new Date(Date.now() - hoursAgo * 3600_000).toISOString();
 
-  it("is operational with only notes and milestones", () => {
+  it("does not infer uptime from the absence of incident notices", () => {
     const status = deriveStatus([{ kind: "note", at: at(1) }, { kind: "milestone", at: at(2) }]);
-    expect(status.overall).toBe("go");
-    expect(status.overallWord).toBe("OPERATIONAL");
+    expect(status.overall).toBe("hold");
+    expect(status.overallWord).toBe("NO RECENT NOTICE");
   });
 
   it("drops to maintenance on a recent maintenance notice", () => {
-    expect(deriveStatus([{ kind: "maintenance", at: at(2) }]).overallWord).toBe("MAINTENANCE");
+    expect(deriveStatus([{ kind: "maintenance", at: at(2) }]).overallWord).toBe("MAINTENANCE REPORTED");
   });
 
   it("lets an incident outrank a maintenance window", () => {
     const status = deriveStatus([{ kind: "maintenance", at: at(1) }, { kind: "incident", at: at(2) }]);
     expect(status.overall).toBe("nogo");
-    expect(status.overallWord).toBe("DEGRADED");
+    expect(status.overallWord).toBe("INCIDENT REPORTED");
   });
 
   it("stops colouring the board once the 72-hour window passes", () => {
     // The entry stays in the log permanently; only its effect expires.
-    expect(deriveStatus([{ kind: "incident", at: at(80) }]).overallWord).toBe("OPERATIONAL");
+    expect(deriveStatus([{ kind: "incident", at: at(80) }]).overallWord).toBe("NO RECENT NOTICE");
   });
 
   it("pairs every state with a word, never colour alone", () => {

@@ -1,4 +1,4 @@
-import { isValidClassicAddress } from 'ripple-address-codec';
+import { isValidClassicAddress } from './classic-address.js';
 export const RULE_VERSION = 'settlement-exceptions.v1';
 export const HASH = /^[A-Fa-f0-9]{64}$/;
 const currency = value => /^[a-fA-F0-9]{40}$/.test(value) ? value.toUpperCase() : value;

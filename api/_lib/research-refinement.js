@@ -5,7 +5,8 @@ export function renderPillars() {
   return `<section class="rf-pillars" id="research-pillars" aria-labelledby="rf-pillars-title"><h2 class="rf-sr-only" id="rf-pillars-title">Three ways to work with NOSHASHI</h2>${[
     ['01 / VERIFY','What arrived?','Inspect delivered amounts, transaction results and ledger-scoped payment evidence.','/delivered/','Verify a payment'],
     ['02 / INVESTIGATE','What needs scrutiny?','Examine issuer permissions and funded depth. Keep counterparty identity and coverage limits explicit.','#lx-investigate','Investigate an issuer'],
-    ['03 / GOVERN','What does your policy require?','Review configurable rules, limits and GO / HOLD / NO-GO findings. A policy check is not legal clearance.','/docs/policies/','Review policy documentation'],
+    ['03 / DECIDE','What does your policy require?','Review configurable rules, limits and GO / HOLD / NO-GO findings. A policy check is not legal clearance.','/docs/policies/','Review policy documentation'],
+    ['04 / PROVE','What supports the decision?','Preserve observations, source references, rules and unknowns in a reviewable evidence record. A hash is not a signature.','/docs/receipts/','Review evidence and receipts'],
   ].map(([k,t,p,u,a])=>`<article><p class="ed-kicker">${k}</p><h3>${t}</h3><p>${p}</p><a class="lx-inline-link" href="${u}">${a} →</a></article>`).join('')}</section>`;
 }
 export function renderResearchCase() {

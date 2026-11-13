@@ -100,3 +100,6 @@ main.shell .panel h3{font-family:"Instrument Serif",Georgia,serif;font-weight:40
 main.shell h1{font-family:"Instrument Serif",Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.015em}
 .desk .sec-head{max-width:none}
 .desk .steps4 li::before,.desk .steps4 li::after{content:none !important;display:none !important}
+
+/* Release evidence uses the existing paper/graphite research vocabulary. */
+.release-record{margin:24px 0;border-block:1px solid var(--rule);padding:16px 0;font-size:12px;line-height:1.8;color:var(--muted)}.release-record summary{font-family:"IBM Plex Mono",monospace;color:var(--ink);cursor:pointer;min-height:30px}.release-record table{border-collapse:collapse;text-align:left;width:100%;min-width:510px}.release-record th,.release-record td{padding:12px;border-bottom:1px solid var(--rule);vertical-align:top}.release-record th{font-weight:500;color:var(--ink)}.release-record .table-scroll{overflow-x:auto}.release-record :focus-visible{outline:2px solid var(--ink);outline-offset:3px}

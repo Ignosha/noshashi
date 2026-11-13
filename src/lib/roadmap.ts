@@ -110,7 +110,7 @@ export const CAPABILITIES: Capability[] = [
     id: "local-ledger",
     title: "Local adjudication ledger",
     blurb:
-      "Every verdict the workstation produces is written to disk and survives a restart, with the wallet explorer and signed export built on top. It never leaves the machine, so an institution's settlement history does not become somebody else's dataset.",
+      "Every verdict the workstation produces is written to disk and survives a restart, with the wallet explorer and SHA-256 evidence export built on top. It never leaves the machine, so an institution's settlement history does not become somebody else's dataset.",
     maturity: "live",
     scene: "Ledger & Policy",
   },

@@ -19,6 +19,7 @@
  * file alone, flagged as partial. It never fabricates an entry.
  */
 
+import { releaseCatalog } from "./release-catalog.js";
 import { decodeEntities, stripTags, clamp, fetchWithTimeout } from "./html.js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -151,7 +152,7 @@ export async function getReleases({ limit = 10, timeout = 6000 } = {}) {
 export async function getProjectFeed({ limit = 12, root, origin } = {}) {
   const [updates, releaseResult] = await Promise.all([
     loadUpdates({ root, origin }),
-    getReleases({ limit: 8 }),
+    getReleases({ limit: 30 }),
   ]);
 
   const entries = updates.map(normaliseUpdate).filter(Boolean);
@@ -171,11 +172,13 @@ export async function getProjectFeed({ limit = 12, root, origin } = {}) {
 
   entries.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
 
+  const catalog = releaseCatalog(releaseResult.releases, { checkedAt: new Date().toISOString(), available: releaseResult.ok });
   return {
+    releaseCatalog: catalog,
     entries: entries.slice(0, limit),
     // The repository also publishes NOSHASHI Academy (academy-v<version>);
     // the newest release is not necessarily the app's.
-    latestRelease: releaseResult.releases.find((r) => !isAcademyRelease(r)) || null,
+    latestRelease: catalog.latestDownloadable,
     latestAcademyRelease: releaseResult.releases.find(isAcademyRelease) || null,
     partial: !releaseResult.ok,
     fetchedAt: new Date().toISOString(),
@@ -196,8 +199,8 @@ export function deriveStatus(entries) {
   const incident = recent.find((e) => e.kind === "incident");
   const maintenance = recent.find((e) => e.kind === "maintenance");
 
-  const overall = incident ? "nogo" : maintenance ? "hold" : "go";
-  const overallWord = incident ? "DEGRADED" : maintenance ? "MAINTENANCE" : "OPERATIONAL";
+  const overall = incident ? "nogo" : "hold";
+  const overallWord = incident ? "INCIDENT REPORTED" : maintenance ? "MAINTENANCE REPORTED" : "NO RECENT NOTICE";
 
   return {
     overall,
@@ -206,27 +209,27 @@ export function deriveStatus(entries) {
     rows: [
       {
         what: "noshashi.app",
-        detail: "Static pages and the server-rendered feeds.",
+        detail: "Repository notice board; this is not an uptime probe.",
         state: overall,
         word: overallWord,
       },
       {
         what: "Release pipeline",
-        detail: "GitHub Actions builds every download on this site.",
-        state: incident ? "hold" : "go",
-        word: incident ? "CHECK LOG" : "OPERATIONAL",
+        detail: "Release artifacts are published on GitHub; current pipeline health is not measured here.",
+        state: "hold",
+        word: "NOT PROBED",
       },
       {
         what: "XRPL telemetry",
-        detail: "Public mainnet nodes read directly by your browser.",
-        state: "go",
-        word: "READ LIVE",
+        detail: "Public-node connectivity must be checked in the tool; this board does not probe it.",
+        state: "hold",
+        word: "NOT PROBED",
       },
       {
         what: "Desktop application",
-        detail: "Runs on your machine. A site outage does not affect it.",
-        state: "go",
-        word: "UNAFFECTED",
+        detail: "Local and hosted dependencies vary by workflow; runtime health is not checked here.",
+        state: "hold",
+        word: "NOT PROBED",
       },
     ],
   };
