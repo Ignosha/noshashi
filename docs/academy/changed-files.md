@@ -112,4 +112,5 @@ src/lib/academy/retention-bank.json
 src/lib/academy/retention.ts
 vercel.json
 docs/academy/changed-files.md
+tests/academy-release-sync.test.js
 ```

@@ -16,6 +16,8 @@ Date: November 14, 2026. Base `1235081`. OS/browser actually exercised: **Linux 
 | `npm run site:noshx` | Pass; published-page index regenerated for the corrected written course |
 | `npm run academy:smoke -- <local-preview>` | Pass; scenarios below, with production CSP |
 | `node scripts/academy/cache-smoke.mjs` | Pass; four isolated offline/update/rollback scenarios |
+| `npm run check:academy-web` | Pass; committed Academy/workstation/worker bundle reproduces cleanly |
+| `npm run check:noshx-web` | Pass; committed page index reproduces cleanly |
 | `git diff --check` | Pass |
 | Native `cargo test --lib ... --offline` | **Blocked: Cargo is not installed in this environment** |
 
