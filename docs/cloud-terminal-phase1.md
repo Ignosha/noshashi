@@ -45,7 +45,7 @@ The browser disables exports for missing, unvalidated, stale or digest-mismatche
 - Real public-node reads through the local API and browser returned issuer evidence at ledger **108316232** and a validated payment at ledger **107585451**. These are point-in-time observations, not continuous availability guarantees.
 - Independent [XRPL Explorer transaction view](https://livenet.xrpl.org/transactions/33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD) agreed on transaction hash, success result, ledger, sender and destination. Its displayed SOLO amount is rounded; raw delivered-amount precision was not independently checked in that view.
 
-Browser screenshots: [desktop](screenshots/cloud-terminal-desktop.png), [mobile](screenshots/cloud-terminal-mobile.png). These show the local unqueried terminal, not a deployed page. Local live evidence and test logs are retained separately as review artifacts; no prospect/customer records are included.
+Browser screenshots: [desktop](screenshots/cloud-terminal-desktop.png), [mobile](screenshots/cloud-terminal-mobile.png). The desktop image shows a real local public-node payment lookup through the visual CLI; the mobile image shows an unqueried workspace. Neither is a deployed page. Local live evidence and test logs are retained separately as review artifacts; no prospect/customer records are included.
 
 ## Manual review and release checklist
 
@@ -54,3 +54,18 @@ Completed locally: submit public issuer/payment examples, inspect actual provena
 Before release, a reviewer must independently inspect issuer flags and raw delivered metadata against source evidence; review input/response boundaries, rate-limit/IP trust, platform log retention and abuse exposure; establish appropriate deployment-wide protection/provider budget; and approve the product limitations. Full assistive-technology testing, independent penetration testing and enterprise certification are **not performed**. No credentials need to be added for this public-node implementation. Provider availability, service terms and sustained throughput remain external dependencies.
 
 Branch automatic Vercel Git deployment is disabled. Opening this PR does not merge, deploy or make the terminal available to customers. Existing production website and desktop builds remain in place. No authentication infrastructure, billing behavior, prices, outreach records or release assets are modified by this work.
+
+
+## Revision — OS-style visual command workspace
+
+Founder clarification: the cloud terminal must feel like an OS-style visual CLI environment. `/terminal/` now opens directly into a tiled browser desktop, with a launcher rail, command window, issuer/payment/guide tool tabs, independent evidence window and a ledger/session status bar. Windows minimize, maximize, restore, close and reopen without discarding the in-memory investigation. Reset layout restores the workspace; Escape restores maximized windows. On smaller screens, windows stack in one column.
+
+The CLI supports `issuer <address> <currency>` and `payment <hash>` through the existing guarded read-only forms/API; `help`, `status`, `history`, `clear`, `open`, `example` and `evidence` are local UI commands. `example` fills a public identifier without fetching. Commands have an explicit grammar and do not execute scripts, operating-system commands, arbitrary RPCs or URLs. All console output uses text nodes. No new backend endpoint, dependency, account scope or permission is introduced.
+
+Up/down command history (30 entries), unambiguous command completion, Ctrl/Command+K console focus and keyboard-operated tabs are implemented. Console output is bounded to 80 entries; neither history nor window state is persisted. Clearing output does not erase command history or current evidence; the UI states this explicitly. Closing/minimizing a window changes its visibility; it does not discard the investigation or cancel a pending read. Reload resets the session. This is a browser command workspace, not a hosted Linux machine, general-purpose shell, saved filesystem or multiuser enterprise OS.
+
+Revision validation: **22 targeted tests passed**, including rejection of shell chaining, unsupported RPCs, URL destinations and malformed identifiers. The full browser regression passes the previous evidence/error/freshness checks plus visual CLI lookup, safe output rendering, local-only helpers, history/completion, window controls, tab keyboard operation and console shortcut. A real payment CLI command returned `VERIFIED`, `tesSUCCESS`, ledger **107585451** and metadata-delivered value **0.067791435856414** of currency `534F4C4F0000000000000000000000000000000000`. Its raw precision has not been independently re-verified. Static website build passed. Screenshots above reflect the revised interface.
+
+The first full-suite attempt in the restricted shell could not run local-server/subprocess-dependent checks and was stopped; the suite was rerun with the required local execution access. This environment failure is not recorded as a successful test run. See the final PR validation for the completed result.
+
+Completed revision regression: **131 test files passed, one skipped; 1,671 tests passed, four skipped**. The permitted local-execution rerun passed. No desktop/native sources changed. The public website build and revised browser smoke passed; the browser smoke uses controlled fixtures for failure cases and the separate CLI screenshot uses an actual public-node response.
