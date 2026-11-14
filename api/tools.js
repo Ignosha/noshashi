@@ -16,6 +16,7 @@
  * tests/function-count.test.js keeps the total at or under twelve.
  */
 
+import terminal from "./_lib/routes/terminal.js";
 import rlusd from "./_lib/routes/rlusd.js";
 import settlementCheck from "./_lib/routes/settlement-check.js";
 import badge from "./_lib/routes/badge.js";
@@ -27,7 +28,7 @@ import bookHealth from "./_lib/routes/book-health.js";
 import assetRisk from "./_lib/routes/asset-risk.js";
 import { queryOf } from "./_lib/query.js";
 
-const ROUTES = { rlusd, "settlement-check": settlementCheck, badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth, "asset-risk": assetRisk, "v1/asset-risk": assetRisk };
+const ROUTES = { terminal, rlusd, "settlement-check": settlementCheck, badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth, "asset-risk": assetRisk, "v1/asset-risk": assetRisk };
 
 export default function handler(req, res) {
   // vercel.json adds ?tool=; the public path (/api/book) names it too, in

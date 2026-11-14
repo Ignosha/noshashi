@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Cloud Terminal · NOSHASHI Ledger Desk</title>
+<meta name="description" content="A read-only public beta for XRPL issuer controls and delivered-payment evidence. Inspect source, ledger and retrieval time before exporting.">
+<link rel="canonical" href="https://www.noshashi.app/terminal/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/terminal/">
+<meta property="og:title" content="Cloud Terminal · NOSHASHI Ledger Desk">
+<meta property="og:description" content="A read-only public beta for XRPL issuer controls and delivered-payment evidence. Inspect source, ledger and retrieval time before exporting.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cloud Terminal · NOSHASHI Ledger Desk">
+<meta name="twitter:description" content="A read-only public beta for XRPL issuer controls and delivered-payment evidence. Inspect source, ledger and retrieval time before exporting.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/c5a81e5a06d4616fef91.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/assets/ledger-mark-512.png","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]}</script>
+<link rel="stylesheet" href="/assets/terminal.css">
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16" cy="16" r="10.6" fill="none" stroke="currentColor" stroke-width=".9" opacity=".5"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="var(--ground)" stroke="var(--ground)" stroke-width="2.2" stroke-linejoin="round"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/intelligence/">Intelligence</a>
+      <a class="nav-link" href="/platform/" aria-current="page"><span data-i18n="nav.platform">Platform</span></a>
+      <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/"><span data-i18n="nav.demo2">Demo</span></a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/resources/"><span data-i18n="nav.resources">Resources</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="ct">
+ <div class="ct-mast"><span>NOSHASHI LABS / LEDGER DESK</span><span>XRPL MAINNET · READ-ONLY PUBLIC BETA</span></div>
+ <header class="ct-header"><p class="ct-label">VERIFY → INVESTIGATE → DECIDE → PROVE</p><h1>Cloud Terminal.<br><em>Inspect the evidence.</em></h1><p>Read public issuer controls or inspect what a transaction delivered. Keep the responding node, ledger and unknowns beside the finding.</p></header>
+ <aside class="ct-notice">Public demonstration, not an enterprise workspace. No keys, signing, file uploads or customer-data storage. Permissions are not proof of solvency; node replies do not independently verify consensus or compliance.</aside>
+ <noscript><p class="ct-notice">JavaScript is required for this interactive terminal. Use the existing <a href="/certificate/">issuer tool</a> or <a href="/delivered/">payment export</a>. No results are simulated here.</p></noscript>
+ <div class="ct-workspace"><aside class="ct-inputs" aria-label="Investigation inputs">
+ <form id="ct-issuer"><p class="ct-label">01 / INVESTIGATE AN ISSUER</p><label for="ct-account">Issuer account<input id="ct-account" name="issuer" required maxlength="35" minlength="25" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" spellcheck="false" autocomplete="off" placeholder="Classic XRPL address · r…" aria-describedby="ct-account-help"></label><p id="ct-account-help" class="ct-small">Server checks the address checksum. No identity or reserves inference.</p><label for="ct-currency">Currency identifier<input id="ct-currency" name="currency" required maxlength="40" pattern="([A-Za-z0-9]{3}|[A-Fa-f0-9]{40})" spellcheck="false" autocomplete="off" placeholder="USD or 40 hexadecimal characters" aria-describedby="ct-currency-help"></label><p id="ct-currency-help" class="ct-small">Case-sensitive currency context only. This read does not establish issuance, supply, trust lines or liquidity.</p><div class="ct-actions"><button type="submit" disabled>Read issuer controls</button><button type="button" data-example="issuer" disabled>Fill public example</button></div></form>
+ <form id="ct-payment"><p class="ct-label">02 / VERIFY A TRANSACTION</p><label for="ct-hash">Transaction hash<input id="ct-hash" name="hash" required maxlength="64" minlength="64" pattern="[A-Fa-f0-9]{64}" spellcheck="false" autocomplete="off" placeholder="64 hexadecimal characters" aria-describedby="ct-payment-help"></label><p id="ct-payment-help" class="ct-small">Submitted is not validated. Delivered amount is read from metadata, never substituted from the requested amount.</p><div class="ct-actions"><button type="submit" disabled>Read transaction</button><button type="button" data-example="payment" disabled>Fill public example</button></div></form>
+ <p class="ct-small">Examples fill identifiers only; nothing is fetched until you press Read. Use public identifiers, not confidential references. Public queries reach NOSHASHI and third-party XRPL nodes; platform logs may record requests.</p><p class="ct-small">Up to 6 requests/minute per caller per warm instance. Bounded provider budgets also apply. These are demo controls, not a globally enforced service guarantee.</p></aside>
+ <section class="ct-results" aria-labelledby="ct-result-title" aria-busy="false"><div class="ct-result-header"><p class="ct-label">03 / INVESTIGATION RECORD</p><span id="ct-state">NOT READ</span></div><h2 id="ct-result-title">One question. Traceable facts.</h2><p id="ct-message" role="status" aria-live="polite">Enter a public identifier to start. No ledger result has been loaded.</p><div id="ct-observations" hidden><h3>Observed facts</h3><dl id="ct-facts"></dl><p id="ct-scope" class="ct-small"></p><h3>Source &amp; provenance</h3><dl id="ct-provenance"></dl><a id="ct-explorer" href="https://livenet.xrpl.org/" target="_blank" rel="noopener noreferrer">Cross-check in the XRPL explorer ↗</a><p class="ct-small">Independent cross-check is required before relying on a finding. This page does not perform that independent review.</p><h3>Unknowns &amp; limitations</h3><ul id="ct-limits"></ul><details><summary>Inspect the evidence JSON</summary><pre id="ct-json" tabindex="0" aria-label="Evidence JSON"></pre></details></div><div class="ct-export"><p class="ct-label">04 / PRESERVE THE RECORD</p><div class="ct-actions"><button id="ct-copy" type="button" disabled>Copy evidence JSON</button><button id="ct-download" type="button" disabled>Download evidence JSON</button></div><p id="ct-export-status" role="status" class="ct-small">Export requires a complete validated snapshot, verified hash and current retrieval time. Nothing is saved to an account.</p></div></section></div>
+ <section class="ct-next"><p class="ct-label">AN EVALUATION, NOT A PROMISE</p><h2>Bring one workflow.<br><em>Agree what to test.</em></h2><p>Start with a free 15–20 minute guided discovery demo. Any later paid pilot, access, deliverables and success measures require a separate agreement. No payment or booking occurs here.</p><a href="/contact/?topic=institutions">Request an institutional demonstration →</a><p class="ct-small"><a href="/docs/accounts/">Account scope</a> · <a href="/trust/">Trust &amp; limitations</a> · <a href="/docs/receipts/">Hash receipts</a> · <a href="/institutional-demo/">Existing guided demo</a></p></section></div>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/terminal/">Cloud Terminal · public beta</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/tokens/">XRPL token directory</a><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/intelligence/">Intelligence &amp; briefs</a><a href="/news/">External headlines</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/partners/">Partner programs</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script type="module" src="/assets/terminal.js"></script>
+</body>
+</html>

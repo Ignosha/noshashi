@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { renderReleaseRecord } from "../api/_lib/release-catalog.js";
 import { renderPillars, renderResearchCase, renderOperationalStatus, renderPlanGuide } from "../api/_lib/research-refinement.js";
+import { buildTerminal, TERMINAL_PAGES } from "./build-terminal.mjs";
 import { buildRLUSD, RLUSD_PAGES } from "./build-rlusd.mjs";
 import { buildNewsroom, NEWSROOM_PAGES } from "./build-newsroom.mjs";
 import { capturedView } from "../site/assets/desk-experience-core.mjs";
@@ -1636,6 +1637,7 @@ async function buildSitemap(docs = [], tokenPages = [], intelligencePages = []) 
     ["/", "daily", "1.0"],
     ["/news/", "hourly", "0.9"],
     ...NEWSROOM_PAGES,
+    ...TERMINAL_PAGES,
     ...RLUSD_PAGES,
     ...intelligencePages,
     // High priority deliberately: this is the page the product is
@@ -1760,6 +1762,7 @@ async function main() {
   await buildWorkspace(write, { release });
   await buildPaymentPortal(write);
   await buildSettlementDesk(write);
+  await buildTerminal(write);
   await buildRLUSD(write);
   await buildTutorial(write, { site: SITE });
   await buildAcademy(write);

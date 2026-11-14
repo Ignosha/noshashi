@@ -54,6 +54,7 @@ export const NAV = [
 export const FOOTER_GROUPS = [
   { title: "Platform", links: [
     { href: "/platform/", label: "Platform overview" },
+    { href: "/terminal/", label: "Cloud Terminal · public beta" },
     { href: "/app/", label: "Workspace" },
     { href: "/tutorial/", label: "Desktop app tutorial" },
     { href: "/institutional-demo/", label: "Interactive demo" },
