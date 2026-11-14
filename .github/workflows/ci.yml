@@ -119,6 +119,9 @@ jobs:
       - name: Website Academy is rebuilt
         run: npm run check:academy-web
 
+      - name: Terminal account bundle is rebuilt
+        run: npm run site:terminal-account && git diff --exit-code -- site/assets/terminal-account
+
       - name: Tests
         run: npm test
 

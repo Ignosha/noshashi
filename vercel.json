@@ -1,14 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "git": {
-    "deploymentEnabled": {
-      "feat/rlusd-intelligence": false,
-      "feat/ledger-desk-refinement": false,
-      "feat/ledger-desk-readiness-v2": false,
-      "feat/academy-retention": false,
-      "academy-release-sync": false
-    }
-  },
+  "git": {"deploymentEnabled": {"feat/rlusd-intelligence":false,"feat/ledger-desk-refinement":false,"feat/ledger-desk-readiness-v2":false,"feat/academy-retention":false,"academy-release-sync":false,"feat/cloud-terminal-phase1":false,"feat/cloud-terminal-access":false,"release/merge-drafts-20261114":false}},
   "framework": null,
   "installCommand": "npm ci --no-audit --no-fund",
   "buildCommand": "npm run site:build",
@@ -164,6 +156,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/terminal", "destination": "/api/tools?tool=terminal" },
     {
       "source": "/api/badge",
       "destination": "/api/tools?tool=badge"

@@ -2,6 +2,7 @@
 // four-byte double-SHA256 checksum. No key/seed generation or signing.
 // Node built-ins avoid the codec's CommonJS -> ESM cold-start dependency failure.
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { Buffer } from 'node:buffer';
 const ALPHABET='rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz';
 export function isValidClassicAddress(value) {
   if(typeof value!=='string'||value.length<25||value.length>35||value[0]!=='r')return false;

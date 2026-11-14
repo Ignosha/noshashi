@@ -50,6 +50,7 @@ async function buildPlatform(write) {
 <section>
   <div class="sec-head"><p class="eyebrow">Capabilities</p><h2>What it does today</h2>
     <p>Each card names the plan that includes it. Free capabilities run on this website with no account. Paid workstation and API capabilities remain beta; Institutional and higher require an agreed contract.</p></div>
+  <p class="mono"><a href="/terminal/">Open the read-only Cloud Terminal beta →</a></p>
   <div class="grid g2">${capabilityCards()}</div>
 </section>
 

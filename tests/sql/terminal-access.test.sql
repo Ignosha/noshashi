@@ -1,0 +1,61 @@
+-- needs: 20261103193000_payment_review_portal.sql 20261114150000_terminal_account_access.sql
+begin;
+do $$
+declare a uuid:='b0000000-0000-0000-0000-000000000001'; b uuid:='b0000000-0000-0000-0000-000000000002'; org uuid:='b0000000-0000-0000-0000-000000000003'; req uuid:='b0000000-0000-0000-0000-000000000004'; cid uuid; r jsonb; report jsonb;
+begin
+ insert into auth.users(id,email) values(a,'a-terminal@example.invalid'),(b,'b-terminal@example.invalid');
+ insert into noshashi.accounts(id,email) values(a,'a-terminal@example.invalid'),(b,'b-terminal@example.invalid') on conflict do nothing;
+ insert into noshashi.organizations(id,name,slug) values(org,'Test terminal','test-terminal');
+ insert into noshashi.organization_members(organization_id,account_id,role) values(org,a,'owner'),(org,b,'viewer');
+ if has_table_privilege('authenticated','noshashi.terminal_cases','select') or has_table_privilege('authenticated','noshashi.terminal_contract_access','insert') or has_table_privilege('anon','noshashi.terminal_cases','select') or has_function_privilege('authenticated','noshashi.terminal_workspace(uuid,text,uuid,uuid,uuid,text,jsonb,text)','execute') or has_function_privilege('authenticated','noshashi.terminal_access(uuid,uuid)','execute') then raise exception 'FAILED: direct private access';end if;
+ if noshashi.terminal_access(a)->>'tier'<>'operator' then raise exception 'FAILED: free account';end if;
+ begin perform noshashi.terminal_workspace(a,'list');raise exception 'FAILED: free archive';exception when insufficient_privilege then null;end;
+ insert into noshashi.entitlements(account_id,tier,valid_until) values(a,'desk',now()+interval '1 month') on conflict(account_id) do update set tier='desk',valid_until=excluded.valid_until;
+ -- A UI label/entitlement without payment is insufficient.
+ if noshashi.terminal_access(a)->>'tier'<>'operator' then raise exception 'FAILED: entitlement only';end if;
+ insert into noshashi.subscriptions(account_id,stripe_subscription_id,stripe_customer_id,tier,status,current_period_end) values(a,'sub_terminal','cus_terminal','desk','active',now()+interval '1 month');
+ if noshashi.terminal_access(a)->>'tier'<>'desk' then raise exception 'FAILED: paid pro';end if;
+ begin perform noshashi.terminal_workspace(a,'list',org);raise exception 'FAILED: Pro gained Institutional';exception when insufficient_privilege then null;end;
+ update noshashi.subscriptions set status='past_due' where stripe_subscription_id='sub_terminal';
+ if noshashi.terminal_access(a)->>'tier'<>'operator' then raise exception 'FAILED: past due';end if;
+ update noshashi.subscriptions set status='trialing' where stripe_subscription_id='sub_terminal';
+ if noshashi.terminal_access(a)->>'tier'<>'operator' then raise exception 'FAILED: unpaid trial';end if;
+ update noshashi.subscriptions set status='active' where stripe_subscription_id='sub_terminal';
+ update noshashi.entitlements set valid_until=now()-interval '1 second' where account_id=a;
+ if noshashi.terminal_access(a)->>'tier'<>'operator' then raise exception 'FAILED: expired entitlement';end if;
+ update noshashi.entitlements set valid_until=now()+interval '1 month' where account_id=a;
+ insert into noshashi.payment_review_billing_holds(event_id,stripe_customer_id,reason) values('evt_terminal','cus_terminal','charge.refunded');
+ if noshashi.terminal_access(a)->>'tier'<>'operator' then raise exception 'FAILED: billing hold';end if;
+ update noshashi.payment_review_billing_holds set resolved_at=now() where event_id='evt_terminal';
+ report:=jsonb_build_object('schema','noshashi.cloud-terminal.v1','network','XRPL Mainnet','mode','payment','subject',jsonb_build_object('hash',repeat('A',64)),'status','VERIFIED','validated',true,'retrieved_at',now());
+ begin perform noshashi.terminal_workspace(a,'save',null,null,req,repeat('a',64),'{}',repeat('b',64));raise exception 'FAILED: missing evidence';exception when invalid_parameter_value then null;end;
+ r:=noshashi.terminal_workspace(a,'save',null,null,req,repeat('a',64),report,repeat('b',64));cid:=(r->>'id')::uuid;
+ if cid is null then raise exception 'FAILED: case save';end if;
+ r:=noshashi.terminal_workspace(a,'lookup',null,null,req,repeat('a',64));
+ if r->>'replayed'<>'true' then raise exception 'FAILED: replay';end if;
+ begin perform noshashi.terminal_workspace(a,'lookup',null,null,req,repeat('c',64));raise exception 'FAILED: changed replay';exception when unique_violation then null;end;
+ -- Give B Pro, then test ownership rather than relying on its free lock.
+ insert into noshashi.entitlements(account_id,tier,valid_until) values(b,'desk',now()+interval '1 month') on conflict(account_id) do update set tier='desk',valid_until=excluded.valid_until;
+ insert into noshashi.subscriptions(account_id,stripe_subscription_id,stripe_customer_id,tier,status,current_period_end) values(b,'sub_terminal_b','cus_terminal_b','desk','active',now()+interval '1 month');
+ begin perform noshashi.terminal_workspace(b,'get',null,cid);raise exception 'FAILED: other account case';exception when no_data_found then null;end;
+ insert into noshashi.terminal_contract_access(account_id,organization_id,tier,approval_reference,approved_by,signed_at,valid_from,valid_until,paid_through) values(a,org,'institution','fixture-only',a,now(),now()-interval '1 day',now()+interval '1 month',now()+interval '1 month');
+ if noshashi.terminal_access(a,org)->>'tier'<>'institution' then raise exception 'FAILED: signed paid contract';end if;
+ if noshashi.terminal_access(a)->>'tier'<>'institution' then raise exception 'FAILED: higher tier omitted personal Pro features';end if;
+ if noshashi.terminal_access(b,org)->>'tier'='institution' then raise exception 'FAILED: inherited another seat';end if;
+ update noshashi.terminal_contract_access set paid_through=now()-interval '1 second' where account_id=a;
+ begin perform noshashi.terminal_workspace(a,'list',org);raise exception 'FAILED: unpaid contract';exception when insufficient_privilege then null;end;
+ update noshashi.terminal_contract_access set paid_through=now()+interval '1 month',revoked_at=now() where account_id=a;
+ begin perform noshashi.terminal_workspace(a,'list',org);raise exception 'FAILED: revoked contract';exception when insufficient_privilege then null;end;
+ update noshashi.terminal_contract_access set revoked_at=null where account_id=a;
+ r:=noshashi.terminal_workspace(a,'save',org,null,gen_random_uuid(),repeat('d',64),report,repeat('b',64));cid:=(r->>'id')::uuid;
+ insert into noshashi.terminal_contract_access(account_id,organization_id,tier,approval_reference,approved_by,signed_at,valid_from,valid_until,paid_through) values(b,org,'institution','fixture-only',a,now(),now()-interval '1 day',now()+interval '1 month',now()+interval '1 month');
+ r:=noshashi.terminal_workspace(b,'get',org,cid);if r->>'historical'<>'true' then raise exception 'FAILED: assigned reader';end if;
+ begin perform noshashi.terminal_workspace(b,'save',org,null,gen_random_uuid(),repeat('d',64),report,repeat('b',64));raise exception 'FAILED: viewer write';exception when insufficient_privilege then null;end;
+ begin perform noshashi.terminal_workspace(b,'delete',org,cid);raise exception 'FAILED: viewer delete';exception when insufficient_privilege then null;end;
+ delete from noshashi.organization_members where account_id=b;
+ begin perform noshashi.terminal_workspace(b,'get',org,cid);raise exception 'FAILED: removed membership';exception when insufficient_privilege then null;end;
+ for i in 1..6 loop perform noshashi.terminal_workspace(a,'lookup',null,null,gen_random_uuid(),repeat('d',64));end loop;
+ begin perform noshashi.terminal_workspace(a,'lookup',null,null,gen_random_uuid(),repeat('d',64));raise exception 'FAILED: provider attempt budget';exception when program_limit_exceeded then null;end;
+ raise notice 'TERMINAL ACCESS SQL TEST PASSED';
+end $$;
+rollback;
