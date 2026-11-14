@@ -66,7 +66,7 @@ export function GardenScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; on
         title="LEDGER GARDEN"
         sub="Walk the ledger's relationships one read at a time. Every branch is grown from validated mainnet state."
         status="go"
-        statusLabel="DESK PLAN"
+        statusLabel="PRO PLAN"
       />
       <Gated feature="portfolios" onUpgrade={onUpgrade} onSignIn={onSignIn} className="min-h-0 flex-1">
         <GardenBody />

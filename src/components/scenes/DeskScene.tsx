@@ -50,7 +50,7 @@ export function DeskScene({
         title="PORTFOLIO & RADAR"
         sub="Every account in the book, evaluated against the same rule set, with the failures surfaced first."
         status="go"
-        statusLabel="DESK PLAN"
+        statusLabel="PRO PLAN"
       />
       <Gated
         feature="portfolios"

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { StatusDot } from "@/components/nova/StatusDot";
 import { cn } from "@/lib/utils";
+import { sentenceCase } from "@/lib/format";
 import type { Status } from "@/lib/xrpl/types";
 
 /**
@@ -61,17 +62,17 @@ export function SceneHeader({
 
         <div className="flex shrink-0 items-center gap-2">
           {status && statusLabel && (
-            <span className="flex items-center gap-1.5 border border-border bg-card px-2 py-1">
+            <span className="flex items-center gap-1.5 py-1">
               <StatusDot status={status} size={6} pulse={status === "go"} />
               <span
                 className={cn(
-                  "stencil text-[10.5px] tracking-[0.14em]",
+                  "mono-font text-[10.5px] tracking-[0.02em]",
                   status === "go" && "text-go",
                   status === "hold" && "text-hold",
                   status === "no-go" && "text-no-go",
                 )}
               >
-                {statusLabel}
+                {sentenceCase(statusLabel)}
               </span>
             </span>
           )}

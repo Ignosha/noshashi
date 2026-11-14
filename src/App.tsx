@@ -151,6 +151,7 @@ import { sceneVariants } from "@/lib/motion";
 import { useTrayTicker } from "@/lib/trayTicker";
 import { checkOnStartup } from "@/lib/updates";
 import { cn } from "@/lib/utils";
+import { sentenceCase } from "@/lib/format";
 import type { Status } from "@/lib/xrpl/types";
 import { DOMAIN_REGISTRY, evaluatePolicy } from "@/lib/policy";
 import { HandoffProvider, useHandoff } from "@/lib/nav/handoff";
@@ -1457,8 +1458,8 @@ function NavButton({
     >
       <span className={cn("shrink-0", active && "text-brand")}>{item.icon}</span>
       {expanded && (
-        <span className="min-w-0 flex-1 truncate text-left text-[11.5px] tracking-[0.06em]">
-          {item.label}
+        <span className="min-w-0 flex-1 truncate text-left text-[12.5px]">
+          {sentenceCase(item.label)}
         </span>
       )}
       {expanded && item.digit && (
@@ -1518,8 +1519,8 @@ function RailAction({
     >
       <span className="shrink-0">{icon}</span>
       {expanded && (
-        <span className="min-w-0 flex-1 truncate text-left text-[11.5px] tracking-[0.06em]">
-          {label}
+        <span className="min-w-0 flex-1 truncate text-left text-[12.5px]">
+          {sentenceCase(label)}
         </span>
       )}
     </button>

@@ -37,7 +37,7 @@ export function PassportScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
         title="ASSET PASSPORT"
         sub="A signed, portable record of an asset’s compliance posture — issuer authority, freeze rights, concentration, domain eligibility — that travels with the asset and can be verified by any counterparty without re-running the checks."
         status="go"
-        statusLabel="ENTERPRISE"
+        statusLabel="ENTERPRISE PLAN"
       />
       <Gated feature="asset_passports" onUpgrade={onUpgrade} onSignIn={onSignIn} className="min-h-0 flex-1">
         <PassportBody />

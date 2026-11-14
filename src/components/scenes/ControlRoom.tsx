@@ -90,7 +90,7 @@ function ControlRoomBody({
         <span className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">{scope} · RECORDED AND LIVE DATA ONLY</span>
       </div>
 
-      <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-5">
+      <div className="desk-figure-table mt-2 grid grid-cols-2 md:grid-cols-5">
         <Tile label="XRPL MAINNET">
           {ledger ? (
             <>
@@ -207,8 +207,8 @@ const SOURCE_LABEL = {
 
 function Tile({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="min-w-0 border border-border p-2">
-      <p className="stencil mb-1 text-[10px] tracking-[0.14em] text-muted-foreground">{label}</p>
+    <div className="desk-figure-cell min-w-0">
+      <p className="desk-figure-label">{label}</p>
       {children}
     </div>
   );

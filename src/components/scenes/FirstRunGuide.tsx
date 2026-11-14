@@ -8,6 +8,7 @@ import { EVIDENCE_CHECKED_KEY, GUIDE_DISMISSED_KEY, TUTORIAL_URL, firstRunSteps,
 import { useSetting } from "@/lib/store";
 import { openExternal } from "@/lib/external";
 import { cn } from "@/lib/utils";
+import { sentenceCase } from "@/lib/format";
 
 type Mode = "executive" | "analyst";
 
@@ -75,12 +76,12 @@ export function FirstRunGuide({
       </p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Button size="sm" onClick={() => window.dispatchEvent(new Event("noshashi:tour"))}>
-          TAKE THE TOUR
+          Take the tour
         </Button>
         <button
           type="button"
           onClick={() => void openExternal(TUTORIAL_URL)}
-          className="text-[12px] font-[600] text-go underline-offset-2 hover:underline"
+          className="text-[12px] text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
         >
           Read the 10-minute tutorial
         </button>
@@ -89,26 +90,26 @@ export function FirstRunGuide({
         </span>
       </div>
 
-      <ol className="mt-4 grid gap-2 md:grid-cols-2">
+      <ol className="mt-4 grid gap-x-8 md:grid-cols-2">
         {steps.map((step, i) => {
           const isNext = next?.id === step.id;
           return (
             <li
               key={step.id}
               className={cn(
-                "rounded-md border p-3",
-                step.done ? "border-border/60 opacity-70" : isNext ? "border-go/50 bg-go/5" : "border-border"
+                "desk-index-row",
+                step.done && "opacity-60"
               )}
             >
               <div className="flex items-start gap-2.5">
                 <span
                   aria-hidden
                   className={cn(
-                    "data-font mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[10.5px]",
-                    step.done ? "border-go bg-go text-background" : "border-border text-muted-foreground"
+                    "mono-font mt-0.5 w-6 shrink-0 text-[10.5px]",
+                    step.done ? "text-go" : isNext ? "text-foreground" : "text-muted-foreground"
                   )}
                 >
-                  {step.done ? "✓" : i + 1}
+                  {step.done ? "✓" : String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] font-[600] text-foreground">
@@ -117,7 +118,7 @@ export function FirstRunGuide({
                   </p>
                   <p className="mt-1 text-[12px] leading-snug text-muted-foreground">{step.body}</p>
                   {step.requiresPlan && !step.done && (
-                    <p className="stencil mt-1.5 text-[10px] tracking-[0.12em] text-hold">INCLUDED IN {step.requiresPlan.toUpperCase()}</p>
+                    <p className="mono-font mt-1.5 text-[10px] text-muted-foreground">Included in {step.requiresPlan}</p>
                   )}
                   {step.id === "view" ? (
                     <div role="radiogroup" aria-label="Choose your view" className="mt-2 flex gap-1.5">
@@ -130,7 +131,7 @@ export function FirstRunGuide({
                           variant={modeChosen && mode === m ? "default" : "outline"}
                           onClick={() => onChooseMode(m)}
                         >
-                          {m === "executive" ? "EXECUTIVE" : "ANALYST"}
+                          {m === "executive" ? "Executive" : "Analyst"}
                         </Button>
                       ))}
                     </div>
@@ -138,7 +139,7 @@ export function FirstRunGuide({
                     <p className="mt-2 text-[11.5px] text-faint">{step.blockedBy}</p>
                   ) : !step.done ? (
                     <Button size="sm" variant={isNext ? "default" : "outline"} className="mt-2" onClick={() => go(step)}>
-                      {step.action.label}
+                      {sentenceCase(step.action.label)}
                     </Button>
                   ) : null}
                 </div>

@@ -61,34 +61,22 @@ function Readout({
   tone?: "default" | "go" | "hold" | "no-go";
 }) {
   return (
-    <motion.div variants={staggerChild}>
-      <Panel className="h-full" bodyClassName="p-3">
-        <div className="flex items-start justify-between">
-          <div className="min-w-0">
-            <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
-              {label}
-            </p>
-            <p className="data-font mt-1.5 text-[22px] font-[600] leading-none text-foreground">
-              {typeof value === "number" ? <CountUp value={value} /> : value}
-              {suffix && (
-                <span className="ml-1 text-[11px] font-normal text-muted-foreground">
-                  {suffix}
-                </span>
-              )}
-            </p>
-          </div>
-          <span className="shrink-0 text-muted-foreground/70">{icon}</span>
-        </div>
-        {trend && trend.length > 1 && (
-          <Sparkline
-            values={trend}
-            height={26}
-            tone={tone}
-            className="mt-2.5"
-            showMarker={false}
-          />
+    <motion.div variants={staggerChild} className="desk-figure-cell">
+      <p className="desk-figure-label">{label}</p>
+      <p
+        className={cn(
+          "desk-figure-value",
+          tone === "hold" && "text-hold",
+          tone === "no-go" && "text-no-go"
         )}
-      </Panel>
+      >
+        {typeof value === "number" ? <CountUp value={value} /> : value}
+        {suffix && <span className="desk-figure-unit">{suffix}</span>}
+      </p>
+      <span className="sr-only">{icon}</span>
+      {trend && trend.length > 1 && (
+        <Sparkline values={trend} height={22} tone={tone} className="mt-2" showMarker={false} />
+      )}
     </motion.div>
   );
 }
@@ -258,7 +246,7 @@ export function MissionControlScene({
 
       {/* Telemetry strip */}
       <motion.div
-        className="grid shrink-0 grid-cols-2 gap-3 xl:grid-cols-4"
+        className="desk-figure-table grid shrink-0 grid-cols-2 xl:grid-cols-4"
         variants={staggerParent(0.05)}
         initial="hidden"
         animate="show"

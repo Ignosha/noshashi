@@ -101,10 +101,12 @@ export function RiskScene({
         title="EXPOSURE ANALYSIS"
         sub="Freeze rights, Travel Rule reach and counterparty concentration — read from the ledger, not estimated."
         status="go"
-        statusLabel="DESK PLAN"
+        statusLabel="PRO PLAN"
       />
       <Gated
         feature="portfolios"
+        title="Exposure analysis"
+        blurb="Freeze rights, Travel Rule reach and counterparty concentration, read from the ledger, not estimated."
         onUpgrade={onUpgrade}
         onSignIn={onSignIn}
         className="min-h-0 flex-1"

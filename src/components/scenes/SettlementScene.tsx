@@ -48,7 +48,7 @@ export function SettlementScene({
         title="SETTLEMENT"
         sub="What a transaction actually moved, as opposed to what it asked to move."
         status="go"
-        statusLabel="DESK PLAN"
+        statusLabel="PRO PLAN"
       />
       <Gated
         feature="portfolios"

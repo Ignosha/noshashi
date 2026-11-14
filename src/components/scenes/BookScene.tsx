@@ -39,10 +39,12 @@ export function BookScene({
         title="ORDER BOOK"
         sub="How much of the depth on screen is backed by someone who still holds the asset."
         status="go"
-        statusLabel="DESK PLAN"
+        statusLabel="PRO PLAN"
       />
       <Gated
         feature="portfolios"
+        title="Order book integrity"
+        blurb="Quoted depth against the depth that can actually fill: how much of the book on screen is backed by someone who still holds the asset."
         onUpgrade={onUpgrade}
         onSignIn={onSignIn}
         className="min-h-0 flex-1"

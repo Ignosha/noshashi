@@ -645,3 +645,323 @@
   flex: none;
   vertical-align: middle;
 }
+
+/* ---------------------------------------------------------------------
+ * Batch 0 — the shared frame in the research-house layout.
+ *
+ * Every tool screen is assembled from Panel, Badge, Button, EmptyState
+ * and the plan gate, so these rules move all of them at once. A panel is
+ * a figure on the page: a rule above it, a mono caption, and no box. A
+ * tag is a printed mark, not a filled chip. Colour still belongs only to
+ * verdicts, and only as ink.
+ * ------------------------------------------------------------------- */
+.ledger-desktop .desk-panel:not(.bg-transparent) {
+  border-width: 1px 0 0;
+  border-radius: 0;
+  border-color: hsl(var(--foreground) / 0.28);
+  background: transparent;
+  overflow: visible;
+}
+.ledger-desktop .desk-panel:not(.bg-transparent) > header {
+  height: auto;
+  min-height: 34px;
+  padding: 10px 0 9px;
+  border-bottom: 1px solid hsl(var(--border) / 0.7);
+}
+.ledger-desktop .desk-panel > header .stencil {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: hsl(var(--muted-foreground));
+}
+.ledger-desktop .desk-panel:not(.bg-transparent) > header > span.stencil:first-child::before {
+  content: "Fig. — ";
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: hsl(var(--muted-foreground) / 0.7);
+}
+.ledger-desktop .desk-panel:not(.bg-transparent) > header + div,
+.ledger-desktop .desk-panel:not(.bg-transparent) > div:only-child {
+  padding-inline: 0;
+}
+.ledger-desktop .desk-panel.cursor-pointer:hover {
+  background: hsl(var(--foreground) / 0.025);
+}
+/* A panel inside a panel is a sub-figure: a dotted rule, no caption box. */
+.ledger-desktop .desk-panel.bg-transparent > header {
+  border-bottom-style: dotted;
+}
+
+/* Tags: printed marks. Outline only, mono, no fill. */
+.ledger-desktop :is(.bg-go-dim, .bg-hold-dim, .bg-no-go-dim) {
+  background: transparent;
+}
+.ledger-desktop span.inline-flex.border.tracking-wider {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  border-radius: 0;
+  padding-block: 1px;
+}
+
+/* Buttons: a primary is a solid ink block, everything else a rule. */
+.ledger-desktop .desk-button {
+  font-size: 12px;
+  border-radius: 1px;
+}
+.ledger-desktop .desk-button.bg-transparent.border {
+  border-color: hsl(var(--foreground) / 0.35);
+}
+.ledger-desktop .desk-button.bg-transparent.border:hover {
+  background: hsl(var(--foreground) / 0.05);
+  color: hsl(var(--foreground));
+}
+
+/* Decorations from the console era that have no place on a research page. */
+.ledger-desktop .hud-corner::before,
+.ledger-desktop .hud-corner::after {
+  display: none;
+}
+
+/* Empty state: a quiet note in the margin, not a framed icon tile. */
+.ledger-desktop .desk-empty-mark {
+  border: 0;
+  border-radius: 0;
+  opacity: 0.55;
+}
+.ledger-desktop .desk-empty-title {
+  font: 400 21px/1.2 var(--font-editorial);
+  letter-spacing: -0.01em;
+}
+
+/* Plan gate: a page from the report the reader has not bought yet. */
+.desk-gate {
+  padding-top: 4px;
+}
+.desk-gate-title {
+  font: 400 clamp(32px, 3.2vw, 44px)/1.05 var(--font-editorial);
+  letter-spacing: -0.025em;
+  margin: 26px 0 14px;
+}
+.desk-gate .desk-dek {
+  max-width: 46ch;
+}
+.desk-gate-includes {
+  margin-top: 30px;
+  border-top: 1px solid hsl(var(--border));
+  padding-top: 14px;
+}
+.desk-gate-includes ol {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+.desk-gate-includes li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid hsl(var(--border) / 0.6);
+  font-size: 12px;
+  line-height: 1.55;
+  color: hsl(var(--muted-foreground));
+}
+.desk-gate-includes li > span {
+  font-size: 10px;
+  padding-top: 2px;
+  color: hsl(var(--muted-foreground) / 0.75);
+}
+
+/* Sidebar: a contents page. Sentence-case entries, mono section heads. */
+.ledger-desktop .desk-nav-row > span:nth-child(2) {
+  font-size: 12.5px;
+  letter-spacing: 0;
+}
+.ledger-desktop .desk-nav-row[aria-current="page"] {
+  background: transparent;
+  box-shadow: inset 0 -1px hsl(var(--foreground) / 0.35);
+}
+.ledger-desktop .desk-nav-row[aria-current="page"] > span:nth-child(2) {
+  font-family: var(--font-editorial);
+  font-size: 16px;
+  font-style: italic;
+  letter-spacing: -0.005em;
+}
+
+/* ---------------------------------------------------------------------
+ * Batch 1 — Overview and Mission control.
+ * A row of readings is a figure table: one rule above and below, hairline
+ * column dividers, a mono label and a serif figure. Lists of destinations
+ * are an index: ruled rows, no boxes.
+ * ------------------------------------------------------------------- */
+.desk-figure-table {
+  border-block: 1px solid hsl(var(--border));
+}
+.desk-figure-cell {
+  padding: 12px 14px 14px;
+  border-left: 1px solid hsl(var(--border) / 0.7);
+}
+.desk-figure-cell:first-child,
+.desk-figure-table > .desk-figure-cell:nth-child(2n + 1) {
+  border-left: 0;
+  padding-left: 0;
+}
+@media (min-width: 768px) {
+  .desk-figure-table > .desk-figure-cell:nth-child(2n + 1) {
+    border-left: 1px solid hsl(var(--border) / 0.7);
+    padding-left: 14px;
+  }
+  .desk-figure-table > .desk-figure-cell:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+.desk-figure-label {
+  font: 9.5px/1.6 var(--font-mono);
+  letter-spacing: 0.06em;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 8px;
+}
+.desk-figure-cell .data-font.text-\[15px\] {
+  font: 400 30px/1.05 var(--font-editorial);
+  letter-spacing: -0.01em;
+}
+.desk-figure-cell .data-font.text-\[15px\] + p {
+  margin-top: 6px;
+}
+.desk-index-row {
+  display: block;
+  padding: 12px 0 11px;
+  border-bottom: 1px solid hsl(var(--border) / 0.7);
+  transition: background-color 0.18s;
+}
+.desk-index-row:not(:disabled):hover {
+  background: hsl(var(--foreground) / 0.025);
+}
+.desk-index-row > p:first-of-type {
+  margin-top: 4px;
+}
+.desk-figure-value {
+  font: 400 30px/1.05 var(--font-editorial);
+  letter-spacing: -0.01em;
+  color: hsl(var(--foreground));
+  font-variant-numeric: tabular-nums;
+}
+.desk-figure-unit {
+  margin-left: 6px;
+  font: 10px var(--font-mono);
+  letter-spacing: 0.06em;
+  color: hsl(var(--muted-foreground));
+}
+.desk-figure-table.xl\:grid-cols-4 > .desk-figure-cell:nth-child(2n + 1) {
+  border-left: 0;
+  padding-left: 0;
+}
+@media (min-width: 1280px) {
+  .desk-figure-table.xl\:grid-cols-4 > .desk-figure-cell:nth-child(2n + 1) {
+    border-left: 1px solid hsl(var(--border) / 0.7);
+    padding-left: 14px;
+  }
+  .desk-figure-table.xl\:grid-cols-4 > .desk-figure-cell:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+/* Console-era orbital and dot decorations: a research page has none. */
+.ledger-desktop .desk-pattern-mark {
+  display: none;
+}
+/* A verdict, printed: the double-ruled stamp from the website receipt. */
+.desk-stamp {
+  display: inline-grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border: 3px double currentColor;
+  border-radius: 50%;
+  font: 500 10px var(--font-mono);
+  letter-spacing: 0.04em;
+  transform: rotate(-10deg);
+}
+.desk-stamp:nth-child(2) {
+  transform: rotate(4deg);
+}
+.desk-stamp:nth-child(3) {
+  transform: rotate(-4deg);
+}
+
+/* ---------------------------------------------------------------------
+ * Batch 2 — Compliance screens.
+ * A verdict is a receipt: a large double-ruled stamp and a serif line
+ * saying what it means, over the measured facts and the rules applied.
+ * ------------------------------------------------------------------- */
+.desk-stamp.desk-stamp-lg {
+  width: 112px;
+  height: 112px;
+  border-width: 4px;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  transform: rotate(-8deg);
+}
+.desk-receipt-blurb {
+  font: 400 19px/1.3 var(--font-editorial);
+  letter-spacing: -0.005em;
+}
+/* Tabs drawn as boxed chips by older screens become an underlined index. */
+.ledger-desktop [role="tab"].border {
+  border-color: transparent;
+  border-radius: 0;
+}
+.ledger-desktop [role="tab"].border[aria-selected="true"] {
+  box-shadow: inset 0 -1px hsl(var(--foreground));
+}
+.ledger-desktop .desk-tab-index {
+  border-bottom: 1px solid hsl(var(--border));
+}
+.ledger-desktop .desk-tab-index > [role="tab"][aria-selected="true"] {
+  font-family: var(--font-editorial);
+  font-size: 16px;
+  font-style: italic;
+  box-shadow: inset 0 -1px hsl(var(--foreground));
+}
+
+/* ---------------------------------------------------------------------
+ * Batch 3 — Liquidity screens.
+ * Every stat cell is a figure: mono label, serif number, mono caveat.
+ * ------------------------------------------------------------------- */
+.ledger-desktop .desk-stat-cell > div {
+  padding-top: 12px;
+}
+/* Twelve screens set their headline numbers by hand in bold mono; in the
+   desk every one of them is a serif figure, whatever its call site. */
+.ledger-desktop .data-font.font-\[600\]:is(.text-\[19px\], .text-\[22px\], .text-\[24px\], .text-\[26px\], .text-\[28px\], .text-\[30px\]) {
+  font-family: var(--font-editorial);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.ledger-desktop .data-font.font-\[600\]:is(.text-\[19px\], .text-\[22px\], .text-\[24px\], .text-\[26px\], .text-\[28px\], .text-\[30px\]) > span:not(:first-child) {
+  margin-left: 6px;
+  font: 10px var(--font-mono);
+  letter-spacing: 0.06em;
+  color: hsl(var(--muted-foreground));
+}
+
+/* ---------------------------------------------------------------------
+ * Batches 4–7 — evidence, issuers, intelligence, public and system
+ * screens. Most of these read correctly from the shared frame; what is
+ * left is pricing set as a rate card and the trust page as ruled claims.
+ * ------------------------------------------------------------------- */
+.desk-plan-name {
+  font: 400 26px/1.1 var(--font-editorial);
+  letter-spacing: -0.01em;
+}
+.ledger-desktop .desk-plan-price {
+  font-size: 40px;
+}
+.desk-stage-open {
+  font: italic 400 17px/1.2 var(--font-editorial);
+}

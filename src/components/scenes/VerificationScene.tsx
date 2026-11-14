@@ -345,7 +345,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                 ) : (
                   <>
                     <NovaShield size={14} />
-                    RUN COMPLIANCE GATE
+                    Run compliance gate
                   </>
                 )}
               </Button>
@@ -426,13 +426,13 @@ export function VerificationScene({ data }: { data: XrplState }) {
                   >
                     <span
                       className={cn(
-                        "display stamp-in text-[42px] font-[900] leading-none",
+                        "desk-stamp desk-stamp-lg stamp-in",
                         verdictText[receipt.verdict]
                       )}
                     >
                       {VERDICT_COPY[receipt.verdict].title}
                     </span>
-                    <p className="max-w-[280px] text-center text-[11px] leading-relaxed text-muted-foreground">
+                    <p className="desk-receipt-blurb max-w-[300px] text-center text-foreground">
                       {VERDICT_COPY[receipt.verdict].blurb}
                     </p>
                   </div>
@@ -458,7 +458,7 @@ export function VerificationScene({ data }: { data: XrplState }) {
                           }
                           className="stencil mt-2 border border-border px-2 py-1 text-[10px] tracking-[0.14em] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
                         >
-                          ASK NOSHASHI WHY
+                          Ask NOSHASHI why
                         </button>
                       )}
                       {run && has("portfolios") && (
