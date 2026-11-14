@@ -1,4 +1,5 @@
 import {parseCommand, completeCommand, PUBLIC_EXAMPLES} from './terminal-commands.js';
+import {initStartup} from './terminal-startup.js';
 
 const root = document.querySelector('.ct-desktop');
 if (root) {
@@ -96,7 +97,7 @@ if (root) {
 
   function run(text) {
     if (!text.trim()) return;
-    print('noshashi@mainnet › ' + text, 'ws-command-line');
+    print('NOSHASHI:\\MAINNET> ' + text, 'ws-command-line');
     if (history.at(-1) !== text) history.push(text);
     if (history.length > 30) history.shift();
     historyIndex = history.length;
@@ -169,4 +170,5 @@ if (root) {
   command.disabled = false;
   $('ws-command-form').querySelector('button').disabled = false;
   updateWindows('console');
+  initStartup(root, command);
 }

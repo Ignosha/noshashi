@@ -45,7 +45,7 @@ The browser disables exports for missing, unvalidated, stale or digest-mismatche
 - Real public-node reads through the local API and browser returned issuer evidence at ledger **108316232** and a validated payment at ledger **107585451**. These are point-in-time observations, not continuous availability guarantees.
 - Independent [XRPL Explorer transaction view](https://livenet.xrpl.org/transactions/33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD) agreed on transaction hash, success result, ledger, sender and destination. Its displayed SOLO amount is rounded; raw delivered-amount precision was not independently checked in that view.
 
-Browser screenshots: [desktop](screenshots/cloud-terminal-desktop.png), [mobile](screenshots/cloud-terminal-mobile.png). The desktop image shows a real local public-node payment lookup through the visual CLI; the mobile image shows an unqueried workspace. Neither is a deployed page. Local live evidence and test logs are retained separately as review artifacts; no prospect/customer records are included.
+Browser screenshots: [desktop](screenshots/cloud-terminal-desktop.png), [mobile](screenshots/cloud-terminal-mobile.png). The desktop and mobile images show the CMD startup workspace with no ledger query loaded. Neither is a deployed page. Local live evidence and test logs are retained separately as review artifacts; no prospect/customer records are included.
 
 ## Manual review and release checklist
 
@@ -69,3 +69,12 @@ Revision validation: **22 targeted tests passed**, including rejection of shell 
 The first full-suite attempt in the restricted shell could not run local-server/subprocess-dependent checks and was stopped; the suite was rerun with the required local execution access. This environment failure is not recorded as a successful test run. See the final PR validation for the completed result.
 
 Completed revision regression: **131 test files passed, one skipped; 1,671 tests passed, four skipped**. The permitted local-execution rerun passed. No desktop/native sources changed. The public website build and revised browser smoke passed; the browser smoke uses controlled fixtures for failure cases and the separate CLI screenshot uses an actual public-node response.
+
+
+## CMD startup refinement
+
+The console now opens with a preformatted NOSHASHI wordmark, the canonical generated Ledger emblem (reused from `api/_lib/brand-mark.js`), a finite ring/text reveal and a `NOSHASHI:\MAINNET>` prompt. The header uses the same emblem. A 1.4-second local presentation animation has skip and replay controls; the command input is enabled throughout. Typing or an investigation state change finishes the presentation immediately. Reduced-motion preference skips the animation, including changes made while it is running. No sound, video, external asset, analytics or network probe is added.
+
+Startup labels describe local command readiness and actual Web Crypto availability; the public provider is explicitly labeled **NOT QUERIED**. The reveal is not a simulated ledger connection, security scan or progress estimate. It does not claim Windows/CMD execution or an actual operating-system filesystem.
+
+Validation for this presentation change: **22 targeted tests passed** and the expanded Chromium regression passed, covering the title/emblem, automatic completion, skip/replay, immediate input, preference changes, no startup network reads and all existing evidence/CLI/window behaviors. Desktop, paper, tablet and mobile layout checks passed. The prior complete suite result (1,671 passed, four skipped) belongs to the OS-workspace revision; the full suite was not repeated for this presentation-only change. Source syntax checks and the terminal page generation passed. Screenshots above show the latest CMD treatment. Production and desktop/native sources remain unchanged.
