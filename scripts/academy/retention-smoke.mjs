@@ -72,7 +72,7 @@ try {
       .count(),
     0,
   );
-  await p.getByRole("button", { name: "NEXT CARD →", exact: true }).click();
+  await p.getByRole("button", { name: /^NEXT CARD →$/i, exact: true }).click();
   assert.match(await p.locator(".academy").innerText(), /CARD 2 OF/);
   await p.reload();
   await p
@@ -82,11 +82,11 @@ try {
   checks.push(
     "Public Start opens lesson one directly; section/card resumes after refresh",
   );
-  await p.getByRole("button", { name: "HOW I LEARN · READING" }).click();
+  await p.getByRole("button", { name: /^HOW I LEARN · READING$/i }).click();
   await p.getByRole("checkbox", { name: /High contrast/ }).check();
   await p.getByRole("checkbox", { name: /Focus mode/ }).check();
   await p
-    .getByRole("button", { name: "BACK TO LEARNING →", exact: true })
+    .getByRole("button", { name: /^BACK TO LEARNING →$/i, exact: true })
     .click();
   await p
     .getByRole("heading", { name: "One shared record", exact: true })
@@ -96,7 +96,7 @@ try {
   checks.push(
     "In-lesson reading/contrast/focus controls remain accessible and persist",
   );
-  await p.getByRole("button", { name: /^\d\. WATCH$/ }).click();
+  await p.getByRole("button", { name: /^\d\. WATCH$/i }).click();
   await p.locator("video").waitFor();
   assert.ok(await p.locator("video").evaluate((v) => v.controls));
   await p
@@ -106,19 +106,19 @@ try {
     () => document.querySelector("track")?.readyState === 2,
   );
   await p
-    .getByRole("button", { name: "READ THE WORDS INSTEAD", exact: true })
+    .getByRole("button", { name: /^READ THE WORDS INSTEAD$/i, exact: true })
     .click();
   await p
-    .getByRole("button", { name: "HIDE THE WORDS", exact: true })
+    .getByRole("button", { name: /^HIDE THE WORDS$/i, exact: true })
     .waitFor();
   checks.push(
     "Existing video controls, local captions under CSP and transcript disclosure preserved",
   );
-  await p.getByRole("button", { name: /^\d\. CHECK$/ }).click();
+  await p.getByRole("button", { name: /^\d\. CHECK$/i }).click();
   await p.locator("input[type=radio]").first().check();
   assert.equal(await p.getByText(/Yes!|Not quite\./).count(), 0);
-  await p.getByRole("button", { name: "CHECK ANSWER", exact: true }).click();
-  await p.getByRole("button", { name: "NEXT QUESTION →", exact: true }).click();
+  await p.getByRole("button", { name: /^CHECK ANSWER$/i, exact: true }).click();
+  await p.getByRole("button", { name: /^NEXT QUESTION →$/i, exact: true }).click();
   await p.reload();
   assert.match(await p.locator(".academy").innerText(), /QUESTION 2 OF 3/);
   checks.push(
@@ -127,7 +127,7 @@ try {
   await p.getByRole("button", { name: "Course map", exact: true }).click();
   assert.ok(
     await p
-      .getByRole("button", { name: /CONTINUE WHERE YOU LEFT OFF/ })
+      .getByRole("button", { name: /CONTINUE WHERE YOU LEFT OFF/i })
       .isVisible(),
   );
   await p.goto(base + "/academy/");
@@ -156,7 +156,7 @@ try {
       .check();
   await p.getByRole("radio", { name: /Hold full reconciliation/ }).check();
   assert.equal(await p.locator(".learning-feedback").count(), 0);
-  await p.getByRole("button", { name: "CHECK CASE", exact: true }).click();
+  await p.getByRole("button", { name: /^CHECK CASE$/i, exact: true }).click();
   await p
     .getByRole("heading", { name: "Evidence and decision supported." })
     .waitFor();
@@ -165,7 +165,7 @@ try {
     .fill(
       "The validated matching payment delivered forty dollars so the shortfall needs review.",
     );
-  await p.getByRole("button", { name: "COMPARE MY EXPLANATION" }).click();
+  await p.getByRole("button", { name: /^COMPARE MY EXPLANATION$/i }).click();
   await p.getByText("Model explanation", { exact: true }).waitFor();
   assert.match(
     await p.locator(".learning-teachback").innerText(),
@@ -188,7 +188,7 @@ try {
       { exact: true },
     )
     .click();
-  await p.getByRole("button", { name: "TRY FRESH MAINNET READING" }).click();
+  await p.getByRole("button", { name: /^TRY FRESH MAINNET READING$/i }).click();
   await p
     .getByText(/Fresh lookup unavailable or timed out/)
     .waitFor({ timeout: 18000 });
@@ -201,13 +201,13 @@ try {
     "Blocked public-node lookup leaves the recorded assessment usable",
   );
   await p
-    .getByRole("button", { name: "OPEN PRODUCT SCREEN", exact: true })
+    .getByRole("button", { name: /^OPEN PRODUCT SCREEN$/i, exact: true })
     .click();
   const training = p.frameLocator(
     'iframe[title^="NOSHASHI training workstation"]',
   );
   await training
-    .getByRole("img", { name: "NOSHASHI", exact: true })
+    .getByRole("img", { name: /^NOSHASHI$/i, exact: true })
     .first()
     .waitFor();
   await p.getByText("Training workstation ready.", { exact: true }).waitFor();
@@ -243,7 +243,7 @@ try {
   const reviewQ = await answer(p, false);
   assert.equal(reviewQ.id, "delivered-amount/v2");
   assert.equal(await p.locator(".learning-feedback").count(), 0);
-  await p.getByRole("button", { name: "CHECK ANSWER", exact: true }).click();
+  await p.getByRole("button", { name: /^CHECK ANSWER$/i, exact: true }).click();
   assert.match(
     await p.locator(".learning-feedback").innerText(),
     /Why that choice fails/,
@@ -311,12 +311,12 @@ try {
     localStorage.removeItem("academy.practice.v1");
   }, old);
   await p.goto(base + "/academy/app/?practice=1");
-  await p.getByRole("button", { name: "START 25-QUESTION TEST" }).click();
+  await p.getByRole("button", { name: /^START 25\-QUESTION TEST$/i }).click();
   await answer(p, false);
   assert.equal(await p.locator(".learning-feedback").count(), 0);
-  await p.getByRole("button", { name: "CHECK ANSWER", exact: true }).click();
+  await p.getByRole("button", { name: /^CHECK ANSWER$/i, exact: true }).click();
   assert.ok(await p.locator(".learning-feedback").isVisible());
-  await p.getByRole("button", { name: "NEXT QUESTION", exact: true }).click();
+  await p.getByRole("button", { name: /^NEXT QUESTION$/i, exact: true }).click();
   const nextId = await p
     .locator(".learning-question")
     .getAttribute("data-question-id");
@@ -332,13 +332,13 @@ try {
   await p.reload();
   await p.getByRole("radio", { name: /Exam — answers hidden/ }).check();
   await p.getByRole("checkbox", { name: /Optional 30-minute/ }).check();
-  await p.getByRole("button", { name: "START 25-QUESTION TEST" }).click();
+  await p.getByRole("button", { name: /^START 25\-QUESTION TEST$/i }).click();
   for (let i = 0; i < 25; i++) {
     await answer(p, i < 20);
     assert.equal(await p.locator(".learning-feedback").count(), 0);
     if (i === 0)
       await p
-        .getByRole("button", { name: "FLAG FOR REVIEW", exact: true })
+        .getByRole("button", { name: /^FLAG FOR REVIEW$/i, exact: true })
         .click();
     if (i === 2) {
       await p.reload();
@@ -349,11 +349,11 @@ try {
     }
     if (i < 24)
       await p
-        .getByRole("button", { name: "NEXT QUESTION", exact: true })
+        .getByRole("button", { name: /^NEXT QUESTION$/i, exact: true })
         .click();
   }
   await p
-    .getByRole("button", { name: "SUBMIT TEST (0 UNANSWERED)", exact: true })
+    .getByRole("button", { name: /^SUBMIT TEST \(0 UNANSWERED\)$/i, exact: true })
     .click();
   await p.getByRole("heading", { name: "80% · 20/25", exact: true }).waitFor();
   await p.screenshot({ path: out + "/practice-results.png" });
@@ -363,7 +363,7 @@ try {
   );
   assert.deepEqual(protectedProgress.certificate, cert);
   assert.deepEqual(protectedProgress.exam, old.exam);
-  await p.getByRole("button", { name: "RETRY WEAK TOPICS" }).click();
+  await p.getByRole("button", { name: /^RETRY WEAK TOPICS$/i }).click();
   assert.match(
     await p.locator(".learning-session").innerText(),
     /WEAK-TOPIC DRILL/,
@@ -372,7 +372,7 @@ try {
     "Exam answers hidden until final submission; 80% scoring, topics, flags, optional timer, weak-topic retry and certificate preservation",
   );
   await p.goto(base + "/academy/app/?map=1");
-  await p.getByRole("button", { name: "MY CERTIFICATE", exact: true }).click();
+  await p.getByRole("button", { name: /^MY CERTIFICATE$/i, exact: true }).click();
   assert.match(await p.locator(".academy").innerText(), /Training learner/);
   checks.push("Existing earned certificate still opens after the upgrade");
   await c.close();
@@ -423,9 +423,9 @@ try {
   });
   await l.goto(base + "/academy/app/?lesson=a1");
   await l.getByText(/Device storage is unavailable/).waitFor();
-  await l.getByRole("button", { name: "NEXT CARD →", exact: true }).click();
+  await l.getByRole("button", { name: /^NEXT CARD →$/i, exact: true }).click();
   await l.getByRole("button", { name: "Course map", exact: true }).click();
-  await l.getByRole("button", { name: /CONTINUE WHERE YOU LEFT OFF/ }).click();
+  await l.getByRole("button", { name: /CONTINUE WHERE YOU LEFT OFF/i }).click();
   assert.match(await l.locator(".academy").innerText(), /CARD 2 OF/);
   checks.push(
     "Refused storage is disclosed and tab-session progress survives view changes",
@@ -469,7 +469,7 @@ try {
     .getByRole("heading", { name: "Did this invoice get paid?", exact: true })
     .waitFor();
   await d.goto(base + "/academy/app/?practice=1");
-  await d.getByRole("button", { name: "START 25-QUESTION TEST" }).waitFor();
+  await d.getByRole("button", { name: /^START 25\-QUESTION TEST$/i }).waitFor();
   checks.push(
     "Malformed case/practice records fall back safely without resetting earned records",
   );
