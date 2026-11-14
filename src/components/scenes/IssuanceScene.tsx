@@ -40,7 +40,7 @@ export function IssuanceScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
         title="ISSUANCE"
         sub="Holder concentration, dormant lines and enforcement history for any issuance, read from the ledger."
         status="go"
-        statusLabel="INSTITUTION"
+        statusLabel="INSTITUTIONAL PLAN"
       />
       <Gated
         feature="issuance_surveillance"

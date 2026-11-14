@@ -41,7 +41,7 @@ function commandsUsed(): Map<string, string[]> {
       // personal_sign is an EVM method, not an XRPL read command. Keep
       // the signing/broadcast scan below intact and separately assert
       // that our portal never invokes the SDK's wallet-login API.
-      if (file === "site/assets/payment-portal/portal.js" && m[1] === "personal_sign") continue;
+      if (["site/assets/payment-portal/portal.js", "site/assets/terminal-account/account.js"].includes(file) && m[1] === "personal_sign") continue;
       add(m[1], file);
     }
     // The NFT offers reader passes its command through a helper.
@@ -64,7 +64,7 @@ describe("the published scope is the scope tested", () => {
 
 describe("NO SIGNING · NO BROADCAST", () => {
   it("the payment portal never invokes wallet-based authentication", () => {
-    const portal = walk("src/portal").map((file) => readFileSync(file, "utf8")).join("\n");
+    const portal = [...walk("src/portal"), ...walk("src/terminal-account")].map((file) => readFileSync(file, "utf8")).join("\n");
     expect(portal.length).toBeGreaterThan(100);
     expect(portal).not.toMatch(/\b(?:signInWithWeb3|personal_sign|eth_requestAccounts|signMessage)\b/);
   });

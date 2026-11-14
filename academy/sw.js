@@ -1,32 +1,57 @@
-/*
- * NOSHASHI Academy service worker (website only, scope /academy/app/).
- * Keeps a copy of the Academy's own files so the course works offline after
- * the first visit: answers from the network when it can, and from the copy
- * when it cannot. The lab workstation (/academy/app/workstation/) is kept the
- * same way once a lab has been opened. Nothing else is cached and nothing is sent anywhere.
+/* Generated with a content hash and complete core/workstation asset list.
+ * A failed precache never activates. Existing clients opt in to a consistent reload.
+ * Progress/certificates live in localStorage, which this worker never touches.
  */
-const CACHE = "noshashi-academy-v1";
-
-self.addEventListener("install", () => self.skipWaiting());
+const CACHE = "noshashi-academy-__ACADEMY_BUILD__";
+const PRECACHE = __ACADEMY_PRECACHE__;
+self.addEventListener("install", (event) => {
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)));
+});
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "ACTIVATE_VALIDATED_ACADEMY") self.skipWaiting();
+});
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k.startsWith("noshashi-academy-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())
+    (async () => {
+      const keys = (await caches.keys()).filter((k) =>
+        k.startsWith("noshashi-academy-"),
+      );
+      const previous = keys.filter((k) => k !== CACHE).at(-1);
+      await Promise.all(
+        keys
+          .filter((k) => k !== CACHE && k !== previous)
+          .map((k) => caches.delete(k)),
+      );
+      await self.clients.claim();
+    })(),
   );
 });
-
 self.addEventListener("fetch", (event) => {
-  const req = event.request;
-  const url = new URL(req.url);
-  if (req.method !== "GET" || url.origin !== location.origin || !url.pathname.startsWith("/academy/app/") || req.headers.has("range")) return;
+  const request = event.request,
+    url = new URL(request.url);
+  if (
+    request.method !== "GET" ||
+    url.origin !== location.origin ||
+    !url.pathname.startsWith("/academy/app/") ||
+    request.headers.has("range")
+  )
+    return;
   event.respondWith(
-    fetch(req)
-      .then((res) => {
-        if (res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
-        }
-        return res;
-      })
-      .catch(() => caches.match(req).then((hit) => hit || (req.mode === "navigate" ? caches.match(url.pathname.startsWith("/academy/app/workstation/") ? "/academy/app/workstation/index.html" : "/academy/app/") : undefined)).then((hit) => hit || Response.error()))
+    (async () => {
+      const cache = await caches.open(CACHE);
+      if (request.mode === "navigate") {
+        const shell = url.pathname.startsWith("/academy/app/workstation/")
+          ? "/academy/app/workstation/index.html"
+          : "/academy/app/index.html";
+        return (await cache.match(shell)) || fetch(request);
+      }
+      const pinned = await cache.match(request);
+      if (pinned) return pinned;
+      try {
+        return await fetch(request);
+      } catch {
+        return (await caches.match(request)) || Response.error();
+      }
+    })(),
   );
 });

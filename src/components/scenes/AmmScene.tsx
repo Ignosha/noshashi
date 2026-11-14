@@ -38,10 +38,12 @@ export function AmmScene({
         title="POOL GOVERNANCE"
         sub="Who votes the trading fee on an XRPL AMM, on what share of the liquidity, and who holds the discount right now."
         status="go"
-        statusLabel="DESK PLAN"
+        statusLabel="PRO PLAN"
       />
       <Gated
         feature="portfolios"
+        title="Pool governance"
+        blurb="Who votes the trading fee on an XRPL AMM, on what share of the liquidity, and who holds the discount right now."
         onUpgrade={onUpgrade}
         onSignIn={onSignIn}
         className="min-h-0 flex-1"

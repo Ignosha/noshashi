@@ -44,7 +44,7 @@ export function ControlScene({
         title="CONTROL SURFACE"
         sub="Who can sign for this account, how many of them it takes, and how much of the balance is not actually spendable."
         status="go"
-        statusLabel="DESK PLAN"
+        statusLabel="PRO PLAN"
       />
       <Gated
         feature="portfolios"

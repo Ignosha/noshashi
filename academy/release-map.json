@@ -1,0 +1,8 @@
+{
+  "schema": "academy.release-map.v1",
+  "notes": "Reviewed mappings identify affected teaching material; never generate claims or grading from release notes. Editor validates labels/examples against the release before marking reviewed. Unmapped releases can update display metadata only.",
+  "mappings": {
+    "v1.0.27": {"reviewed": false, "lessons": ["a1", "a5", "a9", "a11", "a12", "a14", "a15"], "labs": ["invoice", "authority", "book"], "reason": "Candidate impact map. Exact released screens and examples require editorial review."},
+    "academy-v0.2.1": {"reviewed": false, "lessons": [], "labs": [], "reason": "Published assets verified; signing and physical compatibility not independently verified."}
+  }
+}

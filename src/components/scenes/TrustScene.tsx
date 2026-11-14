@@ -6,6 +6,7 @@ import { TRUST, type TrustStage } from "@/lib/trust/boundary";
 import type { SceneId } from "@/App";
 import type { XrplState } from "@/lib/xrpl/useXRPL";
 import { cn } from "@/lib/utils";
+import { sentenceCase } from "@/lib/format";
 
 /**
  * TRUST & SECURITY — the trust boundary, as an interactive pipeline.
@@ -33,9 +34,9 @@ export function TrustScene({ data, onNavigate }: { data: XrplState; onNavigate?:
         statusLabel="BOUNDARY TESTED"
       />
 
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-4" role="list" aria-label="Boundaries">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-4" role="list" aria-label="Boundaries">
         {TRUST.boundaries.map((b) => (
-          <div key={b.id} role="listitem" className="border border-border p-2.5">
+          <div key={b.id} role="listitem" className="border-t border-foreground/30 pt-3 pb-2">
             <p className="stencil flex items-center gap-1.5 text-[10.5px] tracking-[0.14em] text-go">
               <StatusDot status="go" size={5} /> {b.label}
             </p>
@@ -55,19 +56,16 @@ export function TrustScene({ data, onNavigate }: { data: XrplState; onNavigate?:
                   onClick={() => setOpenId(stage.id)}
                   aria-current={stage.id === open.id ? "step" : undefined}
                   className={cn(
-                    "flex w-full items-start gap-2 border px-2.5 py-1.5 text-left transition-colors",
-                    stage.id === open.id ? "border-foreground/50 bg-foreground/[0.04]" : "border-border hover:border-foreground/30"
+                    "flex w-full items-start gap-3 border-b px-0 py-2.5 text-left transition-colors",
+                    stage.id === open.id ? "border-foreground/60" : "border-border/70 hover:bg-foreground/[0.025]"
                   )}
                 >
                   <span className="data-font mt-px text-[10.5px] text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
                   <span className="min-w-0">
-                    <span className="stencil block text-[11px] tracking-[0.14em] text-foreground">{stage.label}</span>
+                    <span className={cn("block text-foreground", stage.id === open.id ? "desk-stage-open" : "text-[13px]")}>{sentenceCase(stage.label)}</span>
                     <span className="block text-[11px] leading-snug text-muted-foreground">{stage.summary}</span>
                   </span>
                 </button>
-                {i < TRUST.stages.length - 1 && (
-                  <p aria-hidden="true" className="data-font py-0.5 pl-4 text-[10.5px] leading-none text-muted-foreground/60">↓</p>
-                )}
               </li>
             ))}
           </ol>
@@ -122,7 +120,7 @@ export function TrustScene({ data, onNavigate }: { data: XrplState; onNavigate?:
 
 function StageDetail({ stage, data, onNavigate }: { stage: TrustStage; data: XrplState; onNavigate?: (scene: SceneId) => void }) {
   return (
-    <div className="border border-border p-3" aria-live="polite">
+    <div className="border-t border-foreground/30 pt-3" aria-live="polite">
       <Eyebrow>{stage.label}</Eyebrow>
       <p className="mt-1.5 text-[11px] leading-relaxed text-foreground">{stage.detail}</p>
 

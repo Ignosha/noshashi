@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { sentenceCase } from "@/lib/format";
 
 /**
  * EmptyState — what a panel says when the ledger genuinely has
@@ -22,18 +23,18 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 px-6 py-10 text-center",
+        "desk-empty flex flex-col items-center justify-center gap-3 px-6 py-10 text-center",
         className
       )}
     >
       {icon && (
-        <span className="grid h-10 w-10 place-items-center rounded-md border border-border text-muted-foreground">
+        <span aria-hidden className="desk-empty-mark grid h-10 w-10 place-items-center text-muted-foreground">
           {icon}
         </span>
       )}
       <div className="max-w-[300px]">
-        <p className="stencil text-[11px] tracking-[0.14em] text-foreground">
-          {title}
+        <p className="desk-empty-title text-foreground">
+          {sentenceCase(title)}
         </p>
         <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
           {body}

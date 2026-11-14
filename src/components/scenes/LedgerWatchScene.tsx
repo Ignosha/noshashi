@@ -82,7 +82,7 @@ export function LedgerWatchScene({ onUpgrade, onSignIn }: { onUpgrade: () => voi
         title="LEDGER WATCH"
         sub="Every incoming payment to your deposit addresses judged before you credit it, and every account you watch read from validated ledgers each minute, delivered to your systems as signed webhooks and a feed you pull."
         status="go"
-        statusLabel="ENTERPRISE"
+        statusLabel="ENTERPRISE PLAN"
       />
       <Gated feature="deposit_screening" onUpgrade={onUpgrade} onSignIn={onSignIn} className="min-h-0 flex-1">
         <LedgerWatchBody />

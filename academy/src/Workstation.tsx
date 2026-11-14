@@ -33,7 +33,9 @@ export function WorkstationLab({
   onDone: (key: string) => void;
   onBack: () => void;
 }) {
-  const [at, setAt] = useState(() => Math.min(labStatus(lab, progress).next, lab.steps.length - 1));
+  const [savedAt,saveAt]=useLocal<number>(`academy.workstation-position.${lab.id}`,Math.min(labStatus(lab,progress).next,lab.steps.length-1));
+  const [at,setAtState]=useState(()=>Number.isInteger(savedAt)?Math.max(0,Math.min(savedAt,lab.steps.length-1)):0);
+  const setAt=(i:number)=>{setAtState(i);saveAt(i);};
   const step = lab.steps[at];
   const key = stepKey(lab.id, step.id);
   const [stored, store] = useLocal<unknown>("academy.workstation", null);
@@ -288,7 +290,7 @@ function ResultsSheet({
         </table>
         <p className="mt-3 text-[11.5px] text-muted-foreground">
           Opening a screen and reading a value count when the workstation does them on the live ledger. Answers count when they are right, and they also
-          count towards your certificate.
+          record lab practice separately; existing certificate eligibility remains the lesson checks and final check.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button ref={close} onClick={onClose}>

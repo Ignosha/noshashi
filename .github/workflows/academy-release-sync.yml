@@ -1,0 +1,88 @@
+name: Academy release sync
+on:
+  release:
+    types: [published, edited]
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Release, Academy]
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: academy-release-sync
+  cancel-in-progress: false
+jobs:
+  candidate:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Discover stable release changes (all pages, monotonic versions)
+        id: sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/academy-release-sync.mjs
+      - name: Install only when metadata changed
+        if: steps.sync.outputs.changed == 'true'
+        run: npm ci --no-audit --no-fund
+      - name: Validate candidate before promotion
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          npx tsc -p academy --noEmit
+          npx vitest run src/lib/academy tests/academy-release-sync.test.js
+          npm run site:academy
+          node --input-type=module - <<'JS'
+          import {buildAcademy} from './scripts/build-academy.mjs';
+          import {writeFile} from 'node:fs/promises';
+          import {externalizeSite} from './scripts/inline-scripts.mjs';
+          await buildAcademy((path,body)=>writeFile('site/'+path,body));
+          await externalizeSite('site');
+          JS
+          npm run site:noshx
+          npx vitest run tests/csp.test.js tests/site-render.test.js
+      - name: Keep validated candidate available to owner
+        if: steps.sync.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-release-candidate
+          path: |
+            academy/release-catalog.json
+            site/academy/
+          retention-days: 14
+      # Owner opts in to automated REVIEW PRs; this never merges or deploys.
+      # Merge through the existing validated main/Vercel path after owner review.
+      - name: Propose metadata update for owner review
+        if: steps.sync.outputs.changed == 'true' && vars.ACADEMY_RELEASE_REVIEW_PRS == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B academy-release-sync
+          git add academy/release-catalog.json site/academy site/assets/noshx site/assets/inline
+          git diff --cached --quiet && exit 0
+          git commit -m "Refresh validated Academy release metadata"
+          task_branch_sha=$(git ls-remote origin refs/heads/academy-release-sync | cut -f1)
+          git push --force-with-lease="refs/heads/academy-release-sync:$task_branch_sha" origin academy-release-sync
+          cat > /tmp/academy-sync-body.md <<'BODY'
+          Release metadata candidate validated against Academy schemas, tests and builds.
+          Release notes remain display data; unmapped lesson impacts need editorial review.
+          No teaching claims, grading, native installs or credentials are changed.
+          Owner approval and normal main deployment checks are required before publication.
+          BODY
+          gh pr list --head academy-release-sync --state open --json number --jq '.[0].number' > /tmp/academy-pr-number
+          if [ -z "$(cat /tmp/academy-pr-number)" ]; then
+            gh pr create --head academy-release-sync --base main --title "Refresh Academy release metadata" --body-file /tmp/academy-sync-body.md
+          fi

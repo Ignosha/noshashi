@@ -1,0 +1,1 @@
+Synthetic local Chromium fixtures, not customer accounts or production access. Pro screenshot selects an organization to demonstrate the Institutional lock. Institutional screenshots show a licensed team workspace. No factual ledger report or real paid account is depicted.

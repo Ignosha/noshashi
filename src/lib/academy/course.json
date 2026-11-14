@@ -73,7 +73,7 @@
         }
       ],
       "words": ["Ledger", "Ledger index", "Validator", "Consensus", "Validated ledger", "UNL"],
-      "keyIdea": "Validated means final. A ledger index is a timestamp nobody can argue with.",
+      "keyIdea": "A ledger index is a sequence number, not a timestamp. Close time is separate. A node reporting validated is evidence to inspect, not independent consensus verification.",
       "labs": ["network"],
       "quiz": [
         {

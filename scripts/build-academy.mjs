@@ -25,8 +25,9 @@ const LABS = (readFileSync(new URL("../src/lib/learn/labs.ts", import.meta.url),
  * browser version and says the installers are coming, rather than linking
  * to a release that does not exist.
  */
-const DESKTOP_RELEASED = true;
-const RELEASE_URL = `https://github.com/Ignosha/noshashi/releases/tag/academy-v${VERSION}`;
+const RELEASE_CATALOG = JSON.parse(readFileSync(new URL("../academy/release-catalog.json", import.meta.url), "utf8"));
+const DESKTOP_RELEASED = !!RELEASE_CATALOG.academy;
+const RELEASE_URL = RELEASE_CATALOG.academy?.url ?? "https://github.com/Ignosha/noshashi/releases";
 const ARROW = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3h10v10M3 13 13 3" stroke="currentColor" stroke-width="1.2"/></svg>';
 
 export async function buildAcademy(write) {
@@ -45,7 +46,7 @@ export async function buildAcademy(write) {
     .join("\n");
 
   const download = DESKTOP_RELEASED
-    ? `<a class="btn ghost" href="${RELEASE_URL}" rel="noopener">Download for Mac, Windows or Linux</a>`
+    ? `<a class="btn ghost" href="${RELEASE_URL}" rel="noopener">Review published Academy downloads</a>`
     : `<span class="ac-soon">Desktop installers for Mac, Windows and Linux come with the first Academy release.</span>`;
 
   const body = `<div class="ac-wrap">
@@ -55,8 +56,8 @@ export async function buildAcademy(write) {
     <p class="ac-brand-name">Noshashi <em>Academy</em></p>
     <h1>Learn the ledger.<br><em>Read the evidence.</em></h1>
     <p class="ac-lead">Understand issuer controls, delivered payments and funded order-book depth. Build the judgement to ask better questions of public XRPL evidence.</p>
-    <p class="cta"><a class="btn" href="/academy/app/">Start learning ${ARROW}</a> ${download}</p>
-    <p class="ac-fine">No account. No wallet keys. Your progress stays on your device.</p>
+    <p class="cta"><a class="btn" href="/academy/app/?lesson=a1">Start the 5-minute lesson ${ARROW}</a> ${download}</p><p class="cta"><a class="btn ghost" href="/academy/app/?case=invoice">Try one payment lab ${ARROW}</a><a href="/academy/app/">Continue where you left off</a></p>
+    <p class="ac-fine">No account. No wallet keys. Your progress stays on your device. Short spaced reviews, explicit answer checks and a separate 25-question practice test.</p>
   </div>
   <aside class="ac-fieldnotes" aria-label="From a lesson to an investigation">
     <p class="eyebrow">FIELD GUIDE / HOW IT WORKS</p>
@@ -65,7 +66,7 @@ export async function buildAcademy(write) {
       <li><span>02</span><div><h2>Examine the evidence.</h2><p>Put the concept to work in the NOSHASHI lab workstation.</p></div></li>
       <li><span>03</span><div><h2>Check your understanding.</h2><p>Retry a short check, then move on at your own pace.</p></div></li>
     </ol>
-    <p class="ac-fieldnotes-end">No timers. No rush. A record of what you learn.</p>
+    <p class="ac-fieldnotes-end">Short recall sessions. Optional timers. No streak penalties. Your place stays saved.</p>
   </aside>
 </section>
 
@@ -94,10 +95,10 @@ export async function buildAcademy(write) {
 
 <section class="ac-reading" aria-labelledby="ac-reading-title">
   <div><p class="eyebrow">A COURSE THAT WORKS FOR YOU</p><h2 id="ac-reading-title">Your pace.<br><em>Your way of learning.</em></h2></div>
-  <div><p>Choose watch, listen, read or do. Captions, transcripts, read-aloud, larger text, Atkinson Hyperlegible, high contrast, reduced movement and break reminders are available in the course.</p><p>${LABS} labs run the NOSHASHI training console beside their instructions, with recorded mainnet examples and ${TESTNET.cases.length} testnet payment cases. No separate NOSHASHI installation is needed.</p><p>After a first browser visit, lessons and checks work offline; videos and fresh ledger readings need a connection. The desktop app bundles the videos. <strong>On iPhone or iPad:</strong> open the Academy in Safari, then Share → Add to Home Screen.</p></div>
+  <div><p>Choose watch, listen, read or do. Captions, transcripts, read-aloud, larger text, Atkinson Hyperlegible, high contrast, reduced movement and break reminders are available in the course.</p><p>${LABS} workstation labs and four versioned analyst cases: recorded training evidence stays usable during live-node outages. The workstation labs run the NOSHASHI training console beside their instructions, with recorded mainnet examples and ${TESTNET.cases.length} testnet payment cases. No separate NOSHASHI installation is needed.</p><p>Course content: academy-retention/1. Published desktop downloads are separate and may use earlier course content. Signing and physical OS compatibility are not established by download availability.</p><p>After a first browser visit, lessons and checks work offline; videos and fresh ledger readings need a connection. The desktop app bundles the videos. <strong>On iPhone or iPad:</strong> open the Academy in Safari, then Share → Add to Home Screen.</p></div>
 </section>
 
-<div class="ac-next"><div><p class="eyebrow">THE NEXT STEP IS A SMALL ONE</p><h2>Open your learning desk.</h2></div><a class="btn" href="/academy/app/">Start the free course ${ARROW}</a></div>
+<div class="ac-next"><div><p class="eyebrow">THE NEXT STEP IS A SMALL ONE</p><h2>Open your learning desk.</h2></div><a class="btn" href="/academy/app/?lesson=a1">Start the 5-minute lesson ${ARROW}</a></div>
 <p class="ac-fine">The certificate records completion of a self-paced course; it is not a professional licence, accreditation or regulatory qualification. Its check code is a hash of the stated information, not a digital signature or independent proof of completion. The full written course is also on the <a href="/learn/">Learn</a> page.</p>
 </div>`;
 

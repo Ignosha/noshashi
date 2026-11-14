@@ -160,13 +160,13 @@ export function StatCell({
   className?: string;
 }) {
   return (
-    <Panel bodyClassName="p-3.5" className={className}>
-      <p className="stencil text-[10px] tracking-[0.14em] text-muted-foreground">
+    <Panel bodyClassName="p-3.5" className={cn("desk-stat-cell", className)}>
+      <p className="desk-figure-label">
         {label}
       </p>
       <p
         className={cn(
-          "data-font mt-1.5 truncate text-[22px] font-[600] leading-none tabular-nums",
+          "desk-figure-value mt-1.5 truncate",
           tone === "no-go" && "text-no-go",
           tone === "hold" && "text-hold",
           (!tone || tone === "default") && "text-foreground"

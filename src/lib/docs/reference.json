@@ -865,6 +865,7 @@
     "noshashi-policy-activate",
     "noshashi-stripe-webhook",
     "noshashi-support-notify",
+    "noshashi-terminal",
     "noshashi-verify",
     "noshashi-xrpl-watch"
   ],

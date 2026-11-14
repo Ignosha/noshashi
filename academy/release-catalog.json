@@ -1,0 +1,1490 @@
+{
+  "schema": "academy.releases.v1",
+  "product": {
+    "id": 433451105,
+    "tag": "v1.0.27",
+    "at": "2026-11-04T02:41:45Z",
+    "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.27",
+    "kind": "product",
+    "title": "NOSHASHI v1.0.27",
+    "summary": "The desktop identity update brings the circular NOSHASHI seal to the app icon, with transparency outside the emblem instead of a rounded-square backing.  Academy's matching Ledger Desk redesign is available separately as [Academy 0.2.1](https://github.com/Ignosha/noshashi/releases/tag/academy-v0.2.1). It includes graph",
+    "assets": [
+      {
+        "name": "NOSHASHI_1.0.27_aarch64.dmg",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_aarch64.dmg"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.AppImage",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_amd64.deb",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64-setup.exe",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64.dmg",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64.dmg"
+      },
+      {
+        "name": "NOSHASHI_1.0.27_x64_en-US.msi",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi"
+      }
+    ],
+    "lessons": [
+      "a1",
+      "a5",
+      "a9",
+      "a11",
+      "a12",
+      "a14",
+      "a15"
+    ],
+    "labs": [
+      "invoice",
+      "authority",
+      "book"
+    ],
+    "review": "UNMAPPED — editorial review required",
+    "signing": "UNKNOWN — not established by release metadata",
+    "compatibility": "UNKNOWN — not established by artifact presence"
+  },
+  "academy": {
+    "id": 433450248,
+    "tag": "academy-v0.2.1",
+    "at": "2026-11-04T02:40:17Z",
+    "url": "https://github.com/Ignosha/noshashi/releases/tag/academy-v0.2.1",
+    "kind": "academy",
+    "title": "NOSHASHI Academy 0.2.1",
+    "summary": "NOSHASHI Academy now follows the Ledger Desk design: graphite surfaces, editorial typography, ruled layouts and clearer course navigation.  - Dedicated Noshashi Academy wordmark and circular launcher icon. - Long Academy screens scroll independently of the console layout. - Local video captions work under the Academy's",
+    "assets": [
+      {
+        "name": "NOSHASHI-Academy_0.2.1_amd64.AppImage",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_amd64.AppImage"
+      },
+      {
+        "name": "NOSHASHI-Academy_0.2.1_amd64.deb",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_amd64.deb"
+      },
+      {
+        "name": "NOSHASHI-Academy_0.2.1_universal.dmg",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_universal.dmg"
+      },
+      {
+        "name": "NOSHASHI-Academy_0.2.1_x64-setup.exe",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_x64-setup.exe"
+      },
+      {
+        "name": "NOSHASHI-Academy_0.2.1_x64_en-US.msi",
+        "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_x64_en-US.msi"
+      }
+    ],
+    "lessons": [],
+    "labs": [],
+    "review": "UNMAPPED — editorial review required",
+    "signing": "UNKNOWN — not established by release metadata",
+    "compatibility": "UNKNOWN — not established by artifact presence"
+  },
+  "events": [
+    {
+      "id": 433451105,
+      "tag": "v1.0.27",
+      "at": "2026-11-04T02:41:45Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.27",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.27",
+      "summary": "The desktop identity update brings the circular NOSHASHI seal to the app icon, with transparency outside the emblem instead of a rounded-square backing.  Academy's matching Ledger Desk redesign is available separately as [Academy 0.2.1](https://github.com/Ignosha/noshashi/releases/tag/academy-v0.2.1). It includes graph",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.27_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.27_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.27_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.27_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.27_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.27_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.27/NOSHASHI_1.0.27_x64_en-US.msi"
+        }
+      ],
+      "lessons": [
+        "a1",
+        "a5",
+        "a9",
+        "a11",
+        "a12",
+        "a14",
+        "a15"
+      ],
+      "labs": [
+        "invoice",
+        "authority",
+        "book"
+      ],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 433450248,
+      "tag": "academy-v0.2.1",
+      "at": "2026-11-04T02:40:17Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/academy-v0.2.1",
+      "kind": "academy",
+      "title": "NOSHASHI Academy 0.2.1",
+      "summary": "NOSHASHI Academy now follows the Ledger Desk design: graphite surfaces, editorial typography, ruled layouts and clearer course navigation.  - Dedicated Noshashi Academy wordmark and circular launcher icon. - Long Academy screens scroll independently of the console layout. - Local video captions work under the Academy's",
+      "assets": [
+        {
+          "name": "NOSHASHI-Academy_0.2.1_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.2.1_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.2.1_universal.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_universal.dmg"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.2.1_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.2.1_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.1/NOSHASHI-Academy_0.2.1_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 430721639,
+      "tag": "v1.0.26",
+      "at": "2026-11-01T16:56:39Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.26",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.26",
+      "summary": "## The Ledger Desk  NOSHASHI now shares a graphite and warm-paper design across the desktop app and website, with editorial typography, precise evidence tables and interactive dimensional layers.  - Redesigned welcome, overview, navigation, panels, controls and status rail. - A direct settlement check, authority/liquid",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.26_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.26/NOSHASHI_1.0.26_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.26_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.26/NOSHASHI_1.0.26_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.26_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.26/NOSHASHI_1.0.26_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.26_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.26/NOSHASHI_1.0.26_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.26_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.26/NOSHASHI_1.0.26_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.26_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.26/NOSHASHI_1.0.26_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 429116984,
+      "tag": "v1.0.25",
+      "at": "2026-10-30T14:16:57Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.25",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.25",
+      "summary": "Built from f8da3a146bd8c22b32d81920007c38add1b79110 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.25_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.25/NOSHASHI_1.0.25_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.25_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.25/NOSHASHI_1.0.25_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.25_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.25/NOSHASHI_1.0.25_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.25_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.25/NOSHASHI_1.0.25_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.25_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.25/NOSHASHI_1.0.25_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.25_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.25/NOSHASHI_1.0.25_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 426472259,
+      "tag": "academy-v0.2.0",
+      "at": "2026-10-28T09:33:05Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/academy-v0.2.0",
+      "kind": "academy",
+      "title": "NOSHASHI Academy 0.2.0",
+      "summary": "NOSHASHI Academy, the free course for NOSHASHI and the XRP Ledger. These builds are not code-signed: macOS and Windows will warn about an unidentified developer.",
+      "assets": [
+        {
+          "name": "NOSHASHI-Academy_0.2.0_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.0/NOSHASHI-Academy_0.2.0_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.2.0_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.0/NOSHASHI-Academy_0.2.0_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.2.0_universal.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.0/NOSHASHI-Academy_0.2.0_universal.dmg"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.2.0_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.0/NOSHASHI-Academy_0.2.0_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.2.0_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.2.0/NOSHASHI-Academy_0.2.0_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 426236511,
+      "tag": "academy-v0.1.0",
+      "at": "2026-10-28T03:38:18Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/academy-v0.1.0",
+      "kind": "academy",
+      "title": "NOSHASHI Academy 0.1.0",
+      "summary": "NOSHASHI Academy, the free course for NOSHASHI and the XRP Ledger. These builds are not code-signed: macOS and Windows will warn about an unidentified developer.",
+      "assets": [
+        {
+          "name": "NOSHASHI-Academy_0.1.0_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.1.0/NOSHASHI-Academy_0.1.0_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.1.0_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.1.0/NOSHASHI-Academy_0.1.0_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.1.0_universal.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.1.0/NOSHASHI-Academy_0.1.0_universal.dmg"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.1.0_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.1.0/NOSHASHI-Academy_0.1.0_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI-Academy_0.1.0_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/academy-v0.1.0/NOSHASHI-Academy_0.1.0_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 425523280,
+      "tag": "v1.0.24",
+      "at": "2026-10-27T13:49:05Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.24",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.24",
+      "summary": "Built from 35b0fa62ef4198c2cc2fe51a2dc26e82ae771ffe on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.24_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.24/NOSHASHI_1.0.24_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.24_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.24/NOSHASHI_1.0.24_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.24_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.24/NOSHASHI_1.0.24_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.24_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.24/NOSHASHI_1.0.24_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.24_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.24/NOSHASHI_1.0.24_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.24_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.24/NOSHASHI_1.0.24_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 425440212,
+      "tag": "v1.0.23",
+      "at": "2026-10-27T12:37:45Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.23",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.23",
+      "summary": "Built from 2d62cde0a026590261d4b1e041a869b7827401df on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.23_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.23_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.23_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.23_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.23_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.23_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.23/NOSHASHI_1.0.23_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 421899774,
+      "tag": "v1.0.22",
+      "at": "2026-10-23T13:50:53Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.22",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.22",
+      "summary": "Built from 18c67cd65c5422980b46b4b7a027dcbec3a05daf on ubuntu-22.04.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.22_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.22/NOSHASHI_1.0.22_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.22_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.22/NOSHASHI_1.0.22_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.22_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.22/NOSHASHI_1.0.22_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.22_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.22/NOSHASHI_1.0.22_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.22_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.22/NOSHASHI_1.0.22_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.22_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.22/NOSHASHI_1.0.22_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 418585244,
+      "tag": "v1.0.21",
+      "at": "2026-10-20T15:52:20Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.21",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.21",
+      "summary": "Built from 3e94236fdf2322e6015ba6181a5c090d06057db8 on ubuntu-22.04.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.21_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.21/NOSHASHI_1.0.21_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.21_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.21/NOSHASHI_1.0.21_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.21_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.21/NOSHASHI_1.0.21_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.21_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.21/NOSHASHI_1.0.21_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.21_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.21/NOSHASHI_1.0.21_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.21_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.21/NOSHASHI_1.0.21_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 400283668,
+      "tag": "v1.0.20",
+      "at": "2026-09-30T17:33:58Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.20",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.20",
+      "summary": "Built from c310861dcc77d9c81b7d31482b9e52410df3b7a0 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.20_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.20/NOSHASHI_1.0.20_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.20_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.20/NOSHASHI_1.0.20_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.20_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.20/NOSHASHI_1.0.20_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.20_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.20/NOSHASHI_1.0.20_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.20_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.20/NOSHASHI_1.0.20_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.20_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.20/NOSHASHI_1.0.20_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 400200839,
+      "tag": "v1.0.19",
+      "at": "2026-09-30T15:45:51Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.19",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.19",
+      "summary": "Built from 10c43706994495324049249727adb1c0c48872cc on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.19_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.19/NOSHASHI_1.0.19_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.19_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.19/NOSHASHI_1.0.19_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.19_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.19/NOSHASHI_1.0.19_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.19_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.19/NOSHASHI_1.0.19_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.19_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.19/NOSHASHI_1.0.19_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.19_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.19/NOSHASHI_1.0.19_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 399308803,
+      "tag": "v1.0.18",
+      "at": "2026-09-29T15:59:44Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.18",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.18",
+      "summary": "Built from 0e8ff5050fc19a40ceff02c34c68446c1416990d on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.18_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.18/NOSHASHI_1.0.18_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.18_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.18/NOSHASHI_1.0.18_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.18_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.18/NOSHASHI_1.0.18_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.18_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.18/NOSHASHI_1.0.18_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.18_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.18/NOSHASHI_1.0.18_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.18_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.18/NOSHASHI_1.0.18_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 399069323,
+      "tag": "v1.0.17",
+      "at": "2026-09-29T11:15:38Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.17",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.17",
+      "summary": "Built from 2fad8055b3a5fecc0b741caec8bfe8223e8db20b on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.17_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.17/NOSHASHI_1.0.17_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.17_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.17/NOSHASHI_1.0.17_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.17_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.17/NOSHASHI_1.0.17_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.17_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.17/NOSHASHI_1.0.17_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.17_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.17/NOSHASHI_1.0.17_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.17_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.17/NOSHASHI_1.0.17_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 399028149,
+      "tag": "v1.0.16",
+      "at": "2026-09-29T10:14:51Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.16",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.16",
+      "summary": "Built from b8c9b2c80cb5bad57249c22633f00d858c01cb44 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.16_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.16/NOSHASHI_1.0.16_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.16_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.16/NOSHASHI_1.0.16_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.16_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.16/NOSHASHI_1.0.16_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.16_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.16/NOSHASHI_1.0.16_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.16_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.16/NOSHASHI_1.0.16_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.16_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.16/NOSHASHI_1.0.16_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 398782759,
+      "tag": "v1.0.15",
+      "at": "2026-09-29T02:44:07Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.15",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.15",
+      "summary": "Built from 4245efc05397192e48435102570c90daf546163d on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.15_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.15/NOSHASHI_1.0.15_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.15_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.15/NOSHASHI_1.0.15_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.15_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.15/NOSHASHI_1.0.15_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.15_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.15/NOSHASHI_1.0.15_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.15_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.15/NOSHASHI_1.0.15_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.15_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.15/NOSHASHI_1.0.15_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 398673419,
+      "tag": "v1.0.14",
+      "at": "2026-09-28T22:23:41Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.14",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.14",
+      "summary": "Built from 79f75e4fc6b12ddbcc39790859de478db5b00a84 on ubuntu-22.04.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.14_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.14/NOSHASHI_1.0.14_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.14_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.14/NOSHASHI_1.0.14_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.14_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.14/NOSHASHI_1.0.14_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.14_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.14/NOSHASHI_1.0.14_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.14_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.14/NOSHASHI_1.0.14_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.14_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.14/NOSHASHI_1.0.14_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 397912762,
+      "tag": "v1.0.13",
+      "at": "2026-09-28T02:40:50Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.13",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.13",
+      "summary": "Built from 3ee9fc2dd9d27182da9122c8ff2173b7bf63a6e4 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.13_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.13/NOSHASHI_1.0.13_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.13_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.13/NOSHASHI_1.0.13_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.13_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.13/NOSHASHI_1.0.13_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.13_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.13/NOSHASHI_1.0.13_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.13_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.13/NOSHASHI_1.0.13_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.13_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.13/NOSHASHI_1.0.13_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 397710151,
+      "tag": "v1.0.12",
+      "at": "2026-09-27T15:51:51Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.12",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.12",
+      "summary": "Built from 9cdbcf8a0932ffdb30be600c3eab01e5883ed270 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.12_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.12/NOSHASHI_1.0.12_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.12_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.12/NOSHASHI_1.0.12_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.12_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.12/NOSHASHI_1.0.12_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.12_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.12/NOSHASHI_1.0.12_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.12_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.12/NOSHASHI_1.0.12_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.12_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.12/NOSHASHI_1.0.12_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 397652456,
+      "tag": "v1.0.11",
+      "at": "2026-09-27T13:03:31Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.11",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.11",
+      "summary": "Built from fef00a167997a88cc1ed631987f9f622574b2121 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.11_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.11/NOSHASHI_1.0.11_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.11_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.11/NOSHASHI_1.0.11_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.11_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.11/NOSHASHI_1.0.11_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.11_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.11/NOSHASHI_1.0.11_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.11_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.11/NOSHASHI_1.0.11_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.11_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.11/NOSHASHI_1.0.11_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 397368854,
+      "tag": "v1.0.10",
+      "at": "2026-09-26T19:35:06Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.10",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.10",
+      "summary": "Built from abe741577f8e25dabfafe86183f23dd8f1811920 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.10_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.10/NOSHASHI_1.0.10_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.10_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.10/NOSHASHI_1.0.10_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.10_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.10/NOSHASHI_1.0.10_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.10_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.10/NOSHASHI_1.0.10_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.10_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.10/NOSHASHI_1.0.10_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.10_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.10/NOSHASHI_1.0.10_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 395849040,
+      "tag": "v1.0.9",
+      "at": "2026-09-24T15:59:34Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.9",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.9",
+      "summary": "Built from 919ade73d75cc0449cd919bb3392bcf45171c655 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.9_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.9/NOSHASHI_1.0.9_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.9_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.9/NOSHASHI_1.0.9_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.9_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.9/NOSHASHI_1.0.9_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.9_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.9/NOSHASHI_1.0.9_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.9_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.9/NOSHASHI_1.0.9_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.9_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.9/NOSHASHI_1.0.9_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 395591844,
+      "tag": "v1.0.8",
+      "at": "2026-09-24T11:09:56Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.8",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.8",
+      "summary": "",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.8_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.8/NOSHASHI_1.0.8_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.8_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.8/NOSHASHI_1.0.8_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.8_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.8/NOSHASHI_1.0.8_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.8_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.8/NOSHASHI_1.0.8_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.8_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.8/NOSHASHI_1.0.8_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.8_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.8/NOSHASHI_1.0.8_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 394631908,
+      "tag": "v1.0.7",
+      "at": "2026-09-23T12:21:06Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.7",
+      "kind": "product",
+      "title": "v1.0.7",
+      "summary": "",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.7_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.7/NOSHASHI_1.0.7_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.7_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.7/NOSHASHI_1.0.7_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.7_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.7/NOSHASHI_1.0.7_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.7_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.7/NOSHASHI_1.0.7_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.7_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.7/NOSHASHI_1.0.7_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.7_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.7/NOSHASHI_1.0.7_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 393827086,
+      "tag": "v1.0.6",
+      "at": "2026-09-22T14:40:56Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.6",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.6",
+      "summary": "Built from 5042553f8da3c940d8d72d366be5c8576a965d03 on ubuntu-22.04.    Verify your download before running it:        shasum -a 256           # macOS / Linux      certutil -hashfile  SHA256   # Windows    The app also hashes its own running binary — Settings ›  Binary integrity — so you can confirm nothing changed bet",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.6_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.6/NOSHASHI_1.0.6_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.6_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.6/NOSHASHI_1.0.6_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.6_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.6/NOSHASHI_1.0.6_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.6_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.6/NOSHASHI_1.0.6_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.6_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.6/NOSHASHI_1.0.6_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.6_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.6/NOSHASHI_1.0.6_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 393479099,
+      "tag": "v1.0.5",
+      "at": "2026-09-22T05:41:26Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.5",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.5",
+      "summary": "Built from b4f3d145f17a1bb4a294c158b29415a2b8e47ffa on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.3_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.5/NOSHASHI_1.0.3_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.5/NOSHASHI_1.0.3_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.5/NOSHASHI_1.0.3_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.5/NOSHASHI_1.0.3_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.5/NOSHASHI_1.0.3_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.5/NOSHASHI_1.0.3_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 393431558,
+      "tag": "v1.0.4",
+      "at": "2026-09-22T03:14:27Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.4",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.4",
+      "summary": "Built from 420cf97280de79e7c7497f7cdf44435a5af7bfbe on macos-latest.    Verify your download before running it:        shasum -a 256           # macOS / Linux      certutil -hashfile  SHA256   # Windows    The app also hashes its own running binary — Settings ›  Binary integrity — so you can confirm nothing changed bet",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.3_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.4/NOSHASHI_1.0.3_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.4/NOSHASHI_1.0.3_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.4/NOSHASHI_1.0.3_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.4/NOSHASHI_1.0.3_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.4/NOSHASHI_1.0.3_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.4/NOSHASHI_1.0.3_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 393403498,
+      "tag": "v1.0.3",
+      "at": "2026-09-22T01:52:34Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.3",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.3",
+      "summary": "Built from c2c816aa4e9bf66ebc9cb2a0551b0092c4572cf6 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_1.0.3_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.3/NOSHASHI_1.0.3_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.3/NOSHASHI_1.0.3_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.3/NOSHASHI_1.0.3_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.3/NOSHASHI_1.0.3_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.3/NOSHASHI_1.0.3_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_1.0.3_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.3/NOSHASHI_1.0.3_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 393389818,
+      "tag": "v1.0.2",
+      "at": "2026-09-22T01:08:19Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v1.0.2",
+      "kind": "product",
+      "title": "NOSHASHI v1.0.2",
+      "summary": "Built from f3c8b424e33240d7343f2875c0bdb2bfd6190616 on macos-latest.  Verify your download before running it:      shasum -a 256           # macOS / Linux     certutil -hashfile  SHA256   # Windows  The app also hashes its own running binary — Settings › Binary integrity — so you can confirm nothing changed between thi",
+      "assets": [
+        {
+          "name": "NOSHASHI_0.4.3_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.2/NOSHASHI_0.4.3_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.2/NOSHASHI_0.4.3_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.2/NOSHASHI_0.4.3_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.2/NOSHASHI_0.4.3_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.2/NOSHASHI_0.4.3_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v1.0.2/NOSHASHI_0.4.3_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 393127861,
+      "tag": "v0.4.3",
+      "at": "2026-09-21T16:51:51Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v0.4.3",
+      "kind": "product",
+      "title": "NOSHASHI v0.4.3",
+      "summary": "Built from 4474bb5371526a0df3553b060bc5aa346c879dc2 on macos-latest.    Verify your download before running it:        shasum -a 256           # macOS / Linux      certutil -hashfile  SHA256   # Windows    The app also hashes its own running binary — Settings ›  Binary integrity — so you can confirm nothing changed bet",
+      "assets": [
+        {
+          "name": "NOSHASHI_0.4.3_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.3/NOSHASHI_0.4.3_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.3/NOSHASHI_0.4.3_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.3/NOSHASHI_0.4.3_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.3/NOSHASHI_0.4.3_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.3/NOSHASHI_0.4.3_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.4.3_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.3/NOSHASHI_0.4.3_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 393061171,
+      "tag": "v0.4.2",
+      "at": "2026-09-21T15:47:44Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v0.4.2",
+      "kind": "product",
+      "title": "NOSHASHI v0.4.2",
+      "summary": "Built from 76602f457af44b5fce42d41f7a8b79f204948121 on macos-latest.    Verify your download before running it:        shasum -a 256           # macOS / Linux      certutil -hashfile  SHA256   # Windows    The app also hashes its own running binary — Settings ›  Binary integrity — so you can confirm nothing changed bet",
+      "assets": [
+        {
+          "name": "NOSHASHI_0.4.2_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.2/NOSHASHI_0.4.2_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.4.2_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.2/NOSHASHI_0.4.2_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_0.4.2_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.2/NOSHASHI_0.4.2_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_0.4.2_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.2/NOSHASHI_0.4.2_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_0.4.2_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.2/NOSHASHI_0.4.2_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.4.2_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.4.2/NOSHASHI_0.4.2_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 389339339,
+      "tag": "v0.3.1",
+      "at": "2026-09-15T17:32:32Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v0.3.1",
+      "kind": "product",
+      "title": "NOSHASHI v0.3.1",
+      "summary": "Built from 01f6d043e5681cea4443a7bf58ddfa8bda82bc00 on macos-latest.    Verify your download before running it:        shasum -a 256           # macOS / Linux      certutil -hashfile  SHA256   # Windows    The app also hashes its own running binary — Settings ›  Binary integrity — so you can confirm nothing changed bet",
+      "assets": [
+        {
+          "name": "NOSHASHI_0.3.1_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.1/NOSHASHI_0.3.1_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.3.1_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.1/NOSHASHI_0.3.1_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_0.3.1_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.1/NOSHASHI_0.3.1_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_0.3.1_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.1/NOSHASHI_0.3.1_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_0.3.1_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.1/NOSHASHI_0.3.1_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.3.1_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.1/NOSHASHI_0.3.1_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 389308279,
+      "tag": "v0.3.0",
+      "at": "2026-09-15T16:46:33Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v0.3.0",
+      "kind": "product",
+      "title": "NOSHASHI v0.3.0",
+      "summary": "Built from d2df012ff9397db2e77304fef90a2303b0e5bbd6 on macos-latest.    Verify your download before running it:        shasum -a 256           # macOS / Linux      certutil -hashfile  SHA256   # Windows    The app also hashes its own running binary — Settings ›  Binary integrity — so you can confirm nothing changed bet",
+      "assets": [
+        {
+          "name": "NOSHASHI_0.3.0_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.0/NOSHASHI_0.3.0_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.3.0_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.0/NOSHASHI_0.3.0_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_0.3.0_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.0/NOSHASHI_0.3.0_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_0.3.0_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.0/NOSHASHI_0.3.0_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_0.3.0_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.0/NOSHASHI_0.3.0_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.3.0_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.3.0/NOSHASHI_0.3.0_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    },
+    {
+      "id": 379267577,
+      "tag": "v0.2.2",
+      "at": "2026-08-30T12:04:47Z",
+      "url": "https://github.com/Ignosha/noshashi/releases/tag/v0.2.2",
+      "kind": "product",
+      "title": "NOSHASHI v0.2.2",
+      "summary": "Built from 53b0ce89fb37d4f0a26db59bbe533013f97bd404 on macos-latest.    Verify your download before running it:        shasum -a 256           # macOS / Linux      certutil -hashfile  SHA256   # Windows    The app also hashes its own running binary — Settings ›  Binary integrity — so you can confirm nothing changed bet",
+      "assets": [
+        {
+          "name": "NOSHASHI_0.2.2_aarch64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_aarch64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.2.2_amd64.AppImage",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_amd64.AppImage"
+        },
+        {
+          "name": "NOSHASHI_0.2.2_amd64.deb",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_amd64.deb"
+        },
+        {
+          "name": "NOSHASHI_0.2.2_x64-setup.exe",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_x64-setup.exe"
+        },
+        {
+          "name": "NOSHASHI_0.2.2_x64.dmg",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_x64.dmg"
+        },
+        {
+          "name": "NOSHASHI_0.2.2_x64_en-US.msi",
+          "url": "https://github.com/Ignosha/noshashi/releases/download/v0.2.2/NOSHASHI_0.2.2_x64_en-US.msi"
+        }
+      ],
+      "lessons": [],
+      "labs": [],
+      "review": "UNMAPPED — editorial review required",
+      "signing": "UNKNOWN — not established by release metadata",
+      "compatibility": "UNKNOWN — not established by artifact presence"
+    }
+  ],
+  "processedIds": [
+    379267577,
+    389308279,
+    389339339,
+    393061171,
+    393127861,
+    393389818,
+    393403498,
+    393431558,
+    393479099,
+    393827086,
+    394631908,
+    395591844,
+    395849040,
+    397368854,
+    397652456,
+    397710151,
+    397912762,
+    398673419,
+    398782759,
+    399028149,
+    399069323,
+    399308803,
+    400200839,
+    400283668,
+    418585244,
+    421899774,
+    425440212,
+    425523280,
+    426236511,
+    426472259,
+    429116984,
+    430721639,
+    433450248,
+    433451105
+  ],
+  "checkedAt": "2026-11-14T05:02:05.232Z"
+}

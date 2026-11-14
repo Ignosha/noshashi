@@ -26,6 +26,7 @@ import {
 } from "@/lib/security/incident";
 import type { LedgerEntry } from "@/lib/desk/ledger";
 import { cn } from "@/lib/utils";
+import { sentenceCase } from "@/lib/format";
 import { useClaimedSubject } from "@/lib/nav/handoff";
 import { ClusterTab, DepositHelpTab, DomainTab, ExposureTab, PersonalGuardian, PreSignTab, RecoverTab } from "./SecurityTools";
 import { AttributionTab, EmergencyTab, ProtectionTab, RegistryTab, SurveillanceTab, WithdrawalTab } from "./InstitutionalTools";
@@ -110,7 +111,7 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
         status="go"
         statusLabel="FREE CHECKS"
       />
-      <div className="flex flex-wrap gap-1.5" role="tablist">
+      <div className="desk-tab-index flex flex-wrap gap-x-1 gap-y-0" role="tablist">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -118,11 +119,11 @@ export function SecurityScene({ onUpgrade, onSignIn }: { onUpgrade: () => void; 
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "stencil border px-2 py-1 text-[10.5px] tracking-[0.14em]",
-              tab === t.id ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground"
+              "px-2 py-1.5 text-[12.5px]",
+              tab === t.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            {t.label}
+            {sentenceCase(t.label)}
           </button>
         ))}
       </div>

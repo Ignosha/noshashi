@@ -44,7 +44,7 @@ export function firstRunSteps(f: FirstRunFacts): FirstRunStep[] {
   const onWorkstation = (label: string, tab: "evidence" | "policy"): Pick<FirstRunStep, "action" | "requiresPlan"> =>
     f.workstation
       ? { action: { label, scene: "workstation", tab } }
-      : { action: { label: "SEE PRO", scene: "plans" }, requiresPlan: "Pro" };
+      : { action: { label: "See Pro", scene: "plans" }, requiresPlan: "Pro" };
   return [
     {
       id: "view",

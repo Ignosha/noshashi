@@ -853,8 +853,8 @@ export function AgentScene({ data }: { data: XrplState }) {
                   <NovaLogo size={40} tone="color" />
                 </motion.div>
                 <div className="max-w-[420px]">
-                  <p className="display text-[13px] font-[700] tracking-[0.1em] text-foreground">
-                    {mode === "compliance" ? "ASK NOSHX" : "ASK THE GRID"}
+                  <p className="desk-empty-title text-foreground">
+                    {mode === "compliance" ? "Ask NOSHX" : "Ask the grid"}
                   </p>
                   <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
                     {mode === "compliance"

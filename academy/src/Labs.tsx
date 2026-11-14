@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {CaseList,AnalystCaseView} from "./AnalystCases";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Lab, LabStep } from "@/lib/learn/labs";
@@ -60,19 +61,21 @@ export function useLabProgress() {
   return [sanitizeProgress(stored), store] as const;
 }
 
-export function Labs({ openId, onClose }: { openId: string | null; onClose: () => void }) {
+export function Labs({ openId, caseId, onOpenCase, onClose }: { openId: string | null; caseId?:string; onOpenCase:(id:string)=>void; onClose: () => void }) {
   const [progress, setProgress] = useLabProgress();
   const [labId, setLabId] = useState<string | null>(openId);
   const lab = labId ? labById(labId) : undefined;
 
+  if(caseId)return <AnalystCaseView key={caseId} id={caseId} onBack={onClose}/>;
   if (!lab) {
     return (
       <div className="flex flex-col gap-3">
+        <CaseList open={onOpenCase}/>
+        <h2>Full workstation lab library</h2>
         <p className="max-w-[70ch] text-[12.5px] text-muted-foreground">
-          {ALL_LABS.length} labs, one for every NOSHASHI feature, on real XRP Ledger addresses and transactions. Each opens the lab workstation: the real
+          {ALL_LABS.length} existing workstation labs using public XRP Ledger addresses and transactions. Each opens the lab workstation: the real
           NOSHASHI console inside the Academy, with the instructions beside it and CHECK RESULTS to see what you have done. You do not need NOSHASHI
-          installed. Like NOSHASHI, the workstation reads the public XRP Ledger and NOSHASHI's public sanctions and phishing lists; nothing about you
-          is sent.
+          installed. Like NOSHASHI, the workstation reads the public XRP Ledger and NOSHASHI's public sanctions and phishing lists; public lookups may be visible to providers and infrastructure logs. Recorded exercises stay usable without them.
         </p>
         <ul className="flex flex-col gap-1.5">
           {ALL_LABS.map((l) => {
@@ -296,6 +299,7 @@ export function Bench({ lab, step }: { lab: Lab; step: LabStep }) {
 export function Checkpoint({ step, seed, done, onRight }: { step: LabStep; seed: string; done: boolean; onRight: () => void }) {
   const q = shuffled(step.check.options, step.check.answer, seed);
   const [picked, setPicked] = useState<number | null>(null);
+  const [checked,setChecked]=useState(false);
   return (
     <fieldset className="flex flex-col gap-1.5">
       <legend className="text-[13px] font-semibold text-foreground">
@@ -306,9 +310,9 @@ export function Checkpoint({ step, seed, done, onRight }: { step: LabStep; seed:
           key={o}
           className={cn(
             "flex cursor-pointer items-start gap-2.5 rounded-[4px] border px-3 py-2 text-[12.5px]",
-            picked !== null && i === q.answer && "border-go/60 bg-go/10",
-            picked === i && i !== q.answer && "border-no-go/60 bg-no-go/10",
-            picked === null && "border-border/70 hover:border-brand/40"
+            checked && picked !== null && i === q.answer && "border-go/60 bg-go/10",
+            checked && picked === i && i !== q.answer && "border-no-go/60 bg-no-go/10",
+            !checked && "border-border/70 hover:border-brand/40"
           )}
         >
           <input
@@ -318,14 +322,15 @@ export function Checkpoint({ step, seed, done, onRight }: { step: LabStep; seed:
             checked={picked === i}
             onChange={() => {
               setPicked(i);
-              if (i === q.answer) onRight();
+              setChecked(false);
             }}
           />
           <span>{o}</span>
         </label>
       ))}
+      <Button size="sm" disabled={picked===null||checked} onClick={()=>{setChecked(true);if(picked===q.answer)onRight();}}>CHECK ANSWER</Button>
       <div aria-live="polite">
-        {picked !== null && (
+        {checked && picked !== null && (
           <p className="rounded-[4px] bg-elevated px-3 py-2 text-[12.5px] text-foreground">
             <strong>{picked === q.answer ? "Right. " : "Not quite. "}</strong>
             {step.check.why}

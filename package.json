@@ -12,7 +12,7 @@
     "vite": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "site:build": "npm run site:portal && node scripts/build-site.mjs",
+    "site:build": "npm run site:portal && npm run site:terminal-account && node scripts/build-site.mjs",
     "site:noshx": "vite build --config vite.noshx-web.config.mts",
     "site:dev": "node scripts/build-site.mjs && node scripts/dev-site.mjs",
     "email:preview": "node scripts/send-update.mjs --headline \"Preview\" || true",
@@ -31,7 +31,7 @@
     "academy:build": "tsc -p academy --noEmit && vite build --config academy/vite.config.mts && vite build --config academy/vite.workstation.config.mts --mode desktop && node scripts/academy-videos.mjs",
     "academy:tauri": "cd academy && tauri",
     "academy:smoke": "node scripts/academy/design-smoke.cjs",
-    "site:academy": "vite build --config academy/vite.web.config.mts && vite build --config academy/vite.workstation.config.mts --mode web",
+    "site:academy": "vite build --config academy/vite.web.config.mts && vite build --config academy/vite.workstation.config.mts --mode web && node scripts/academy-finalize-web.mjs",
     "test": "vitest run",
     "test:sql": "scripts/test-sql.sh",
     "test:watch": "vitest",
@@ -48,7 +48,8 @@
     "editorial:review": "node scripts/editorial/cli.mjs review",
     "intelligence:build": "node scripts/build-newsroom.mjs",
     "intelligence:smoke": "node scripts/newsroom-smoke.mjs",
-    "intelligence:film": "node scripts/build-desk-film.mjs"
+    "intelligence:film": "node scripts/build-desk-film.mjs",
+    "site:terminal-account": "vite build --config vite.terminal-account.config.mts"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.2.6",
