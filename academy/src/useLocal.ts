@@ -1,30 +1,55 @@
-import { useCallback, useState } from "react";
-
-/**
- * State kept in this computer's browser storage. The Academy stores only
- * the learner's own progress and settings, and nothing leaves the device.
- * Storage can be refused (a locked-down machine), so every read and write
- * is guarded and the app still works for the session.
- */
+import { useCallback, useEffect, useState } from "react";
+const EVENT = "academy-local-change";
+const session = new Map<string, unknown>();
+/** Versioned local records. Refused storage degrades to session memory; no account sync. */
 export function useLocal<T>(key: string, fallback: T): [T, (next: T) => void] {
   const [value, setValue] = useState<T>(() => {
     try {
       const raw = localStorage.getItem(key);
-      return raw === null ? fallback : (JSON.parse(raw) as T);
+      return raw === null
+        ? ((session.get(key) as T) ?? fallback)
+        : (JSON.parse(raw) as T);
     } catch {
-      return fallback;
+      return (session.get(key) as T) ?? fallback;
     }
   });
+  useEffect(() => {
+    const local = (event: Event) => {
+      const e = event as CustomEvent<{ key: string; value: T }>;
+      if (e.detail.key === key) setValue(e.detail.value);
+    };
+    const other = (event: StorageEvent) => {
+      if (event.key === key) {
+        try {
+          setValue(
+            event.newValue === null ? fallback : JSON.parse(event.newValue),
+          );
+        } catch {
+          /* Retain a valid in-memory record. */
+        }
+      }
+    };
+    window.addEventListener(EVENT, local);
+    window.addEventListener("storage", other);
+    return () => {
+      window.removeEventListener(EVENT, local);
+      window.removeEventListener("storage", other);
+    };
+  }, [key, fallback]);
   const set = useCallback(
     (next: T) => {
+      session.set(key, next);
       setValue(next);
       try {
         localStorage.setItem(key, JSON.stringify(next));
       } catch {
-        // Storage refused: progress lasts for this session only.
+        window.dispatchEvent(new Event("academy-save-unavailable"));
       }
+      window.dispatchEvent(
+        new CustomEvent(EVENT, { detail: { key, value: next } }),
+      );
     },
-    [key]
+    [key],
   );
   return [value, set];
 }

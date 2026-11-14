@@ -138,9 +138,7 @@ async function benchLab(page, title, report) {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await page.goto(url);
-  // Past the first-run setup.
-  await page.getByRole("radio", { name: /A bit of everything/ }).check();
-  await page.getByRole("button", { name: /START LEARNING/ }).click();
+  // Direct course home: settings are optional inside a lesson.
   await page.getByRole("button", { name: "Labs", exact: true }).click();
   const titles = await page.locator("main ul li button span.block.text-\\[12\\.5px\\]").allInnerTexts();
   const report = [];

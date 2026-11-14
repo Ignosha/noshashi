@@ -1,0 +1,1297 @@
+{
+  "version": "academy-retention/1",
+  "concepts": [
+    {
+      "id": "ledger-sequence",
+      "lesson": "a1",
+      "title": "One shared record",
+      "topic": "ledger",
+      "lab": null
+    },
+    {
+      "id": "account-keys",
+      "lesson": "a2",
+      "title": "Accounts, keys and reserves",
+      "topic": "authority",
+      "lab": null
+    },
+    {
+      "id": "transaction-status",
+      "lesson": "a3",
+      "title": "Transactions and what results mean",
+      "topic": "ledger",
+      "lab": null
+    },
+    {
+      "id": "issued-assets",
+      "lesson": "a4",
+      "title": "Tokens, issuers and trust lines",
+      "topic": "issuer",
+      "lab": "issuer"
+    },
+    {
+      "id": "issuer-controls",
+      "lesson": "a5",
+      "title": "What an issuer can still do",
+      "topic": "issuer",
+      "lab": "issuer"
+    },
+    {
+      "id": "account-authority",
+      "lesson": "a6",
+      "title": "Who really controls an account",
+      "topic": "authority",
+      "lab": null
+    },
+    {
+      "id": "nft-rights",
+      "lesson": "a7",
+      "title": "NFTs and the rights issuers keep",
+      "topic": "issuer",
+      "lab": "issuer"
+    },
+    {
+      "id": "amendments",
+      "lesson": "a8",
+      "title": "How the rules change",
+      "topic": "ledger",
+      "lab": null
+    },
+    {
+      "id": "funded-depth",
+      "lesson": "a9",
+      "title": "Order books: listed versus funded",
+      "topic": "liquidity",
+      "lab": "liquidity"
+    },
+    {
+      "id": "amm-limits",
+      "lesson": "a10",
+      "title": "AMM pools",
+      "topic": "liquidity",
+      "lab": "liquidity"
+    },
+    {
+      "id": "delivered-amount",
+      "lesson": "a11",
+      "title": "Payments: credit what arrived",
+      "topic": "payment",
+      "lab": "invoice"
+    },
+    {
+      "id": "invoice-evidence",
+      "lesson": "a12",
+      "title": "Did this payment pay this invoice?",
+      "topic": "payment",
+      "lab": "invoice"
+    },
+    {
+      "id": "compliance-scope",
+      "lesson": "a13",
+      "title": "Compliance words, made simple",
+      "topic": "policy",
+      "lab": "verdict"
+    },
+    {
+      "id": "source-provenance",
+      "lesson": "a14",
+      "title": "What NOSHASHI is, and how it reads",
+      "topic": "ledger",
+      "lab": null
+    },
+    {
+      "id": "policy-evidence",
+      "lesson": "a15",
+      "title": "Verdicts, checks and receipts",
+      "topic": "policy",
+      "lab": "verdict"
+    },
+    {
+      "id": "workstation-navigation",
+      "lesson": "a16",
+      "title": "A tour of the app",
+      "topic": "policy",
+      "lab": "verdict"
+    },
+    {
+      "id": "team-approvals",
+      "lesson": "a17",
+      "title": "Teams, policies and the Agent",
+      "topic": "policy",
+      "lab": "verdict"
+    },
+    {
+      "id": "account-hardening",
+      "lesson": "a18",
+      "title": "Making an account hard to take over",
+      "topic": "authority",
+      "lab": null
+    },
+    {
+      "id": "incident-response",
+      "lesson": "a19",
+      "title": "When an account is emptied",
+      "topic": "authority",
+      "lab": null
+    },
+    {
+      "id": "safe-recovery",
+      "lesson": "a20",
+      "title": "Getting XRP back, and signing safely",
+      "topic": "authority",
+      "lab": null
+    },
+    {
+      "id": "customer-protection",
+      "lesson": "a21",
+      "title": "Protecting customers' XRP",
+      "topic": "authority",
+      "lab": null
+    }
+  ],
+  "questions": [
+    {
+      "id": "account-keys/v1",
+      "concept": "account-keys",
+      "topic": "authority",
+      "lesson": "a2",
+      "question": "Which of these is an XRPL address?",
+      "options": [
+        "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+        "107587014",
+        "F3B8B18E6AEFDCEA3388D0B0932820C4F10F4849847E7989876FA9CD19687A70"
+      ],
+      "answer": 0,
+      "why": "Addresses start with r. The second is a ledger index, and the third is a 64-character transaction hash. All three are real, from lessons in this course.",
+      "wrongWhy": [
+        null,
+        "“107587014” does not follow from this evidence. Addresses start with r. The second is a ledger index, and the third is a 64-character transaction hash. All three are real, from lessons in this course.",
+        "“F3B8B18E6AEFDCEA3388D0B0932820C4F10F4849847E7989876FA9CD19687A70” does not follow from this evidence. Addresses start with r. The second is a ledger index, and the third is a 64-character transaction hash. All three are real, from lessons in this course."
+      ]
+    },
+    {
+      "id": "account-keys/v2",
+      "concept": "account-keys",
+      "topic": "authority",
+      "lesson": "a2",
+      "question": "An account has 10 XRP and owns 5 objects. About how much can it spend?",
+      "options": [
+        "8 XRP",
+        "10 XRP",
+        "5 XRP"
+      ],
+      "answer": 0,
+      "why": "1 XRP base reserve plus 5 × 0.2 XRP owner reserve locks 2 XRP, leaving 8.",
+      "wrongWhy": [
+        null,
+        "“10 XRP” does not follow from this evidence. 1 XRP base reserve plus 5 × 0.2 XRP owner reserve locks 2 XRP, leaving 8.",
+        "“5 XRP” does not follow from this evidence. 1 XRP base reserve plus 5 × 0.2 XRP owner reserve locks 2 XRP, leaving 8."
+      ]
+    },
+    {
+      "id": "transaction-status/v1",
+      "concept": "transaction-status",
+      "topic": "ledger",
+      "lesson": "a3",
+      "question": "A result starts with tec. What happened?",
+      "options": [
+        "It failed but was recorded, and the fee was charged",
+        "It succeeded",
+        "It was never sent"
+      ],
+      "answer": 0,
+      "why": "tec codes are recorded failures: nothing moved except the fee.",
+      "wrongWhy": [
+        null,
+        "“It succeeded” does not follow from this evidence. tec codes are recorded failures: nothing moved except the fee.",
+        "“It was never sent” does not follow from this evidence. tec codes are recorded failures: nothing moved except the fee."
+      ]
+    },
+    {
+      "id": "transaction-status/v2",
+      "concept": "transaction-status",
+      "topic": "ledger",
+      "lesson": "a3",
+      "question": "Where is a transaction's final result stored?",
+      "options": [
+        "In its metadata, in a validated ledger",
+        "In the sender's email",
+        "In the Amount field"
+      ],
+      "answer": 0,
+      "why": "Metadata records what actually happened once the ledger is validated.",
+      "wrongWhy": [
+        null,
+        "“In the sender's email” does not follow from this evidence. Metadata records what actually happened once the ledger is validated.",
+        "“In the Amount field” does not follow from this evidence. Metadata records what actually happened once the ledger is validated."
+      ]
+    },
+    {
+      "id": "issued-assets/v1",
+      "concept": "issued-assets",
+      "topic": "issuer",
+      "lesson": "a4",
+      "question": "What identifies a token on the XRPL?",
+      "options": [
+        "Its currency code and its issuer address together",
+        "Its currency code alone",
+        "Its price"
+      ],
+      "answer": 0,
+      "why": "Anyone can use the code USD. The issuer address is what makes it a specific token.",
+      "wrongWhy": [
+        null,
+        "“Its currency code alone” does not follow from this evidence. Anyone can use the code USD. The issuer address is what makes it a specific token.",
+        "“Its price” does not follow from this evidence. Anyone can use the code USD. The issuer address is what makes it a specific token."
+      ]
+    },
+    {
+      "id": "issued-assets/v2",
+      "concept": "issued-assets",
+      "topic": "issuer",
+      "lesson": "a4",
+      "question": "What must you open before you can hold a token?",
+      "options": [
+        "A trust line to its issuer",
+        "A bank account",
+        "A payment channel"
+      ],
+      "answer": 0,
+      "why": "A TrustSet transaction opens the trust line that records your limit and balance.",
+      "wrongWhy": [
+        null,
+        "“A bank account” does not follow from this evidence. A TrustSet transaction opens the trust line that records your limit and balance.",
+        "“A payment channel” does not follow from this evidence. A TrustSet transaction opens the trust line that records your limit and balance."
+      ]
+    },
+    {
+      "id": "account-authority/v1",
+      "concept": "account-authority",
+      "topic": "authority",
+      "lesson": "a6",
+      "question": "Weights: Alice 3, Bob 2, Carol 2. Quorum 5. What is the fewest people who can sign?",
+      "options": [
+        "2",
+        "3",
+        "1"
+      ],
+      "answer": 0,
+      "why": "Alice (3) plus Bob or Carol (2) reaches 5.",
+      "wrongWhy": [
+        null,
+        "“3” does not follow from this evidence. Alice (3) plus Bob or Carol (2) reaches 5.",
+        "“1” does not follow from this evidence. Alice (3) plus Bob or Carol (2) reaches 5."
+      ]
+    },
+    {
+      "id": "account-authority/v2",
+      "concept": "account-authority",
+      "topic": "authority",
+      "lesson": "a6",
+      "question": "A treasury has a signer list, but its master key is still enabled. What is the risk?",
+      "options": [
+        "One person with the master key can bypass the list",
+        "None, the list always wins",
+        "The account is blackholed"
+      ],
+      "answer": 0,
+      "why": "An enabled master key can sign alone, skipping the signer list.",
+      "wrongWhy": [
+        null,
+        "“None, the list always wins” does not follow from this evidence. An enabled master key can sign alone, skipping the signer list.",
+        "“The account is blackholed” does not follow from this evidence. An enabled master key can sign alone, skipping the signer list."
+      ]
+    },
+    {
+      "id": "nft-rights/v1",
+      "concept": "nft-rights",
+      "topic": "issuer",
+      "lesson": "a7",
+      "question": "Where are an NFT's rules stored?",
+      "options": [
+        "Inside its NFTokenID",
+        "In a PDF from the seller",
+        "Nowhere, they are secret"
+      ],
+      "answer": 0,
+      "why": "The ID encodes the flags and the transfer fee the issuer set at minting.",
+      "wrongWhy": [
+        null,
+        "“In a PDF from the seller” does not follow from this evidence. The ID encodes the flags and the transfer fee the issuer set at minting.",
+        "“Nowhere, they are secret” does not follow from this evidence. The ID encodes the flags and the transfer fee the issuer set at minting."
+      ]
+    },
+    {
+      "id": "nft-rights/v2",
+      "concept": "nft-rights",
+      "topic": "issuer",
+      "lesson": "a7",
+      "question": "What does mutable mean for an NFT?",
+      "options": [
+        "The issuer can change what it points to after you buy it",
+        "It can be split into pieces",
+        "It is free"
+      ],
+      "answer": 0,
+      "why": "A mutable NFT's URI can change, so the picture or document can change.",
+      "wrongWhy": [
+        null,
+        "“It can be split into pieces” does not follow from this evidence. A mutable NFT's URI can change, so the picture or document can change.",
+        "“It is free” does not follow from this evidence. A mutable NFT's URI can change, so the picture or document can change."
+      ]
+    },
+    {
+      "id": "amendments/v1",
+      "concept": "amendments",
+      "topic": "ledger",
+      "lesson": "a8",
+      "question": "How does an amendment switch on?",
+      "options": [
+        "80% of validators support it for two weeks in a row",
+        "Ripple decides",
+        "The first person to vote wins"
+      ],
+      "answer": 0,
+      "why": "It needs a supermajority that holds for two weeks.",
+      "wrongWhy": [
+        null,
+        "“Ripple decides” does not follow from this evidence. It needs a supermajority that holds for two weeks.",
+        "“The first person to vote wins” does not follow from this evidence. It needs a supermajority that holds for two weeks."
+      ]
+    },
+    {
+      "id": "amendments/v2",
+      "concept": "amendments",
+      "topic": "ledger",
+      "lesson": "a8",
+      "question": "What is an XLS number?",
+      "options": [
+        "The public proposal behind a feature",
+        "A ledger index",
+        "A type of fee"
+      ],
+      "answer": 0,
+      "why": "For example, XLS-30 is the proposal for AMM pools.",
+      "wrongWhy": [
+        null,
+        "“A ledger index” does not follow from this evidence. For example, XLS-30 is the proposal for AMM pools.",
+        "“A type of fee” does not follow from this evidence. For example, XLS-30 is the proposal for AMM pools."
+      ]
+    },
+    {
+      "id": "amm-limits/v1",
+      "concept": "amm-limits",
+      "topic": "liquidity",
+      "lesson": "a10",
+      "question": "What sets an AMM pool's price?",
+      "options": [
+        "The ratio of the two balances in the pool",
+        "Ripple",
+        "The last trade on another blockchain"
+      ],
+      "answer": 0,
+      "why": "The pool prices trades from the ratio of what it holds.",
+      "wrongWhy": [
+        null,
+        "“Ripple” does not follow from this evidence. The pool prices trades from the ratio of what it holds.",
+        "“The last trade on another blockchain” does not follow from this evidence. The pool prices trades from the ratio of what it holds."
+      ]
+    },
+    {
+      "id": "amm-limits/v2",
+      "concept": "amm-limits",
+      "topic": "liquidity",
+      "lesson": "a10",
+      "question": "Who votes on a pool's trading fee?",
+      "options": [
+        "LP token holders, weighted by their LP tokens",
+        "Validators",
+        "The first depositor only"
+      ],
+      "answer": 0,
+      "why": "Voting power follows LP token holdings.",
+      "wrongWhy": [
+        null,
+        "“Validators” does not follow from this evidence. Voting power follows LP token holdings.",
+        "“The first depositor only” does not follow from this evidence. Voting power follows LP token holdings."
+      ]
+    },
+    {
+      "id": "compliance-scope/v1",
+      "concept": "compliance-scope",
+      "topic": "policy",
+      "lesson": "a13",
+      "question": "What does KYC mean?",
+      "options": [
+        "Know Your Customer: checking who a customer is",
+        "Keep Your Coins",
+        "A type of token"
+      ],
+      "answer": 0,
+      "why": "KYC is identity verification.",
+      "wrongWhy": [
+        null,
+        "“Keep Your Coins” does not follow from this evidence. KYC is identity verification.",
+        "“A type of token” does not follow from this evidence. KYC is identity verification."
+      ]
+    },
+    {
+      "id": "compliance-scope/v2",
+      "concept": "compliance-scope",
+      "topic": "policy",
+      "lesson": "a13",
+      "question": "What can behaviour screening NOT see?",
+      "options": [
+        "What a token's issuer can still do",
+        "Who sent a payment",
+        "Sanctions lists"
+      ],
+      "answer": 0,
+      "why": "Issuer powers are a property of the asset, stored in the issuer's flags.",
+      "wrongWhy": [
+        null,
+        "“Who sent a payment” does not follow from this evidence. Issuer powers are a property of the asset, stored in the issuer's flags.",
+        "“Sanctions lists” does not follow from this evidence. Issuer powers are a property of the asset, stored in the issuer's flags."
+      ]
+    },
+    {
+      "id": "source-provenance/v1",
+      "concept": "source-provenance",
+      "topic": "ledger",
+      "lesson": "a14",
+      "question": "What are NOSHASHI's two questions?",
+      "options": [
+        "Am I allowed to move this? Could I actually get out of it?",
+        "What is the price? Should I buy?",
+        "Who is the CEO? Where is the office?"
+      ],
+      "answer": 0,
+      "why": "Law and policy on one side, market reality on the other.",
+      "wrongWhy": [
+        null,
+        "“What is the price? Should I buy?” does not follow from this evidence. Law and policy on one side, market reality on the other.",
+        "“Who is the CEO? Where is the office?” does not follow from this evidence. Law and policy on one side, market reality on the other."
+      ]
+    },
+    {
+      "id": "source-provenance/v2",
+      "concept": "source-provenance",
+      "topic": "ledger",
+      "lesson": "a14",
+      "question": "What does NOSHASHI do when the ledger does not give enough to decide?",
+      "options": [
+        "Says so, instead of guessing or showing zero",
+        "Shows zero",
+        "Guesses"
+      ],
+      "answer": 0,
+      "why": "It withholds the figure and explains why.",
+      "wrongWhy": [
+        null,
+        "“Shows zero” does not follow from this evidence. It withholds the figure and explains why.",
+        "“Guesses” does not follow from this evidence. It withholds the figure and explains why."
+      ]
+    },
+    {
+      "id": "workstation-navigation/v1",
+      "concept": "workstation-navigation",
+      "topic": "policy",
+      "lesson": "a16",
+      "question": "Which screen should you glance at first to confirm you are connected?",
+      "options": [
+        "Mission Control",
+        "Pricing",
+        "Settings"
+      ],
+      "answer": 0,
+      "why": "A climbing ledger number means a live, current connection.",
+      "wrongWhy": [
+        null,
+        "“Pricing” does not follow from this evidence. A climbing ledger number means a live, current connection.",
+        "“Settings” does not follow from this evidence. A climbing ledger number means a live, current connection."
+      ]
+    },
+    {
+      "id": "workstation-navigation/v2",
+      "concept": "workstation-navigation",
+      "topic": "policy",
+      "lesson": "a16",
+      "question": "Which screen tells you how old a counterparty is and who funded it?",
+      "options": [
+        "Provenance",
+        "Order Book",
+        "Token Rights"
+      ],
+      "answer": 0,
+      "why": "Provenance traces an account's real age and first funder.",
+      "wrongWhy": [
+        null,
+        "“Order Book” does not follow from this evidence. Provenance traces an account's real age and first funder.",
+        "“Token Rights” does not follow from this evidence. Provenance traces an account's real age and first funder."
+      ]
+    },
+    {
+      "id": "team-approvals/v1",
+      "concept": "team-approvals",
+      "topic": "policy",
+      "lesson": "a17",
+      "question": "What is four-eyes approval?",
+      "options": [
+        "A second person must approve a policy change",
+        "Two screens at once",
+        "A type of freeze"
+      ],
+      "answer": 0,
+      "why": "One person drafts, another approves; both are logged.",
+      "wrongWhy": [
+        null,
+        "“Two screens at once” does not follow from this evidence. One person drafts, another approves; both are logged.",
+        "“A type of freeze” does not follow from this evidence. One person drafts, another approves; both are logged."
+      ]
+    },
+    {
+      "id": "team-approvals/v2",
+      "concept": "team-approvals",
+      "topic": "policy",
+      "lesson": "a17",
+      "question": "Why is an investigation's log hash-chained?",
+      "options": [
+        "So entries cannot be quietly edited or removed",
+        "To make it faster",
+        "To hide it from auditors"
+      ],
+      "answer": 0,
+      "why": "Each entry includes the fingerprint of the one before.",
+      "wrongWhy": [
+        null,
+        "“To make it faster” does not follow from this evidence. Each entry includes the fingerprint of the one before.",
+        "“To hide it from auditors” does not follow from this evidence. Each entry includes the fingerprint of the one before."
+      ]
+    },
+    {
+      "id": "account-hardening/v1",
+      "concept": "account-hardening",
+      "topic": "authority",
+      "lesson": "a18",
+      "question": "How are most XRPL accounts emptied?",
+      "options": [
+        "The secret was exposed",
+        "The ledger was hacked",
+        "A validator stole it"
+      ],
+      "answer": 0,
+      "why": "Fake sites, cloud notes, screenshots and malware expose secrets.",
+      "wrongWhy": [
+        null,
+        "“The ledger was hacked” does not follow from this evidence. Fake sites, cloud notes, screenshots and malware expose secrets.",
+        "“A validator stole it” does not follow from this evidence. Fake sites, cloud notes, screenshots and malware expose secrets."
+      ]
+    },
+    {
+      "id": "account-hardening/v2",
+      "concept": "account-hardening",
+      "topic": "authority",
+      "lesson": "a18",
+      "question": "What is address poisoning?",
+      "options": [
+        "Sending you a tiny payment from a look-alike address so you copy it later",
+        "A virus in the ledger",
+        "A freeze by the issuer"
+      ],
+      "answer": 0,
+      "why": "The fake sits next to the real address in your history.",
+      "wrongWhy": [
+        null,
+        "“A virus in the ledger” does not follow from this evidence. The fake sits next to the real address in your history.",
+        "“A freeze by the issuer” does not follow from this evidence. The fake sits next to the real address in your history."
+      ]
+    },
+    {
+      "id": "incident-response/v1",
+      "concept": "incident-response",
+      "topic": "authority",
+      "lesson": "a19",
+      "question": "Someone offers to reverse your stolen XRP for a fee. What is it?",
+      "options": [
+        "A scam",
+        "A real service",
+        "Ripple support"
+      ],
+      "answer": 0,
+      "why": "Validated payments cannot be reversed by anyone.",
+      "wrongWhy": [
+        null,
+        "“A real service” does not follow from this evidence. Validated payments cannot be reversed by anyone.",
+        "“Ripple support” does not follow from this evidence. Validated payments cannot be reversed by anyone."
+      ]
+    },
+    {
+      "id": "incident-response/v2",
+      "concept": "incident-response",
+      "topic": "authority",
+      "lesson": "a19",
+      "question": "What should you do first?",
+      "options": [
+        "Move what is left to a new account made on a clean device",
+        "Wait a week",
+        "Post your seed online for help"
+      ],
+      "answer": 0,
+      "why": "Whoever has the old key can take the rest at any moment.",
+      "wrongWhy": [
+        null,
+        "“Wait a week” does not follow from this evidence. Whoever has the old key can take the rest at any moment.",
+        "“Post your seed online for help” does not follow from this evidence. Whoever has the old key can take the rest at any moment."
+      ]
+    },
+    {
+      "id": "safe-recovery/v1",
+      "concept": "safe-recovery",
+      "topic": "authority",
+      "lesson": "a20",
+      "question": "An escrow has matured. Does the XRP move by itself?",
+      "options": [
+        "No, someone must submit EscrowFinish",
+        "Yes, automatically"
+      ],
+      "answer": 0,
+      "why": "Escrows wait for a finishing transaction.",
+      "wrongWhy": [
+        null,
+        "“Yes, automatically” does not follow from this evidence. Escrows wait for a finishing transaction."
+      ]
+    },
+    {
+      "id": "safe-recovery/v2",
+      "concept": "safe-recovery",
+      "topic": "authority",
+      "lesson": "a20",
+      "question": "Which signature can hand control of your account to someone else?",
+      "options": [
+        "SetRegularKey",
+        "Payment of 1 XRP to a friend",
+        "TrustSet"
+      ],
+      "answer": 0,
+      "why": "SetRegularKey and SignerListSet give signing power away.",
+      "wrongWhy": [
+        null,
+        "“Payment of 1 XRP to a friend” does not follow from this evidence. SetRegularKey and SignerListSet give signing power away.",
+        "“TrustSet” does not follow from this evidence. SetRegularKey and SignerListSet give signing power away."
+      ]
+    },
+    {
+      "id": "customer-protection/v1",
+      "concept": "customer-protection",
+      "topic": "authority",
+      "lesson": "a21",
+      "question": "Why are reserves alone not enough?",
+      "options": [
+        "The business might owe customers more than it holds",
+        "Reserves are always fake",
+        "The ledger hides them"
+      ],
+      "answer": 0,
+      "why": "You need liabilities too, to work out coverage.",
+      "wrongWhy": [
+        null,
+        "“Reserves are always fake” does not follow from this evidence. You need liabilities too, to work out coverage.",
+        "“The ledger hides them” does not follow from this evidence. You need liabilities too, to work out coverage."
+      ]
+    },
+    {
+      "id": "customer-protection/v2",
+      "concept": "customer-protection",
+      "topic": "authority",
+      "lesson": "a21",
+      "question": "A protection fund sits behind one key. How much does it count for?",
+      "options": [
+        "Nothing, whoever holds the key can take it",
+        "Everything",
+        "Half"
+      ],
+      "answer": 0,
+      "why": "Only escrow or a real signer list makes a fund hard to take.",
+      "wrongWhy": [
+        null,
+        "“Everything” does not follow from this evidence. Only escrow or a real signer list makes a fund hard to take.",
+        "“Half” does not follow from this evidence. Only escrow or a real signer list makes a fund hard to take."
+      ]
+    },
+    {
+      "id": "ledger-sequence/v1",
+      "concept": "ledger-sequence",
+      "topic": "ledger",
+      "lesson": "a1",
+      "question": "Does ledger 108316232 tell you its close time?",
+      "options": [
+        "Yes, convert the index into seconds.",
+        "No. Read the close-time field separately.",
+        "Only when the ledger has a payment."
+      ],
+      "answer": 1,
+      "why": "The index is a sequence number. Close time is a separate reported ledger field.",
+      "evidence": [
+        [
+          "Ledger index",
+          "108316232"
+        ],
+        [
+          "Close time",
+          "Not supplied"
+        ],
+        [
+          "Source",
+          "Simulated training receipt"
+        ]
+      ],
+      "wrongWhy": [
+        "The index counts ledgers, not seconds.",
+        null,
+        "Payment contents do not turn a sequence number into a timestamp."
+      ]
+    },
+    {
+      "id": "ledger-sequence/v2",
+      "concept": "ledger-sequence",
+      "topic": "ledger",
+      "lesson": "a1",
+      "question": "Which evidence would you inspect before treating a payment as finalized?",
+      "options": [
+        "A higher ledger index alone.",
+        "A submitted response alone.",
+        "The node’s validated status, transaction result and ledger reference."
+      ],
+      "answer": 2,
+      "why": "Current accepts changes; closed is awaiting validation; validated is the node-reported finalized ledger. A node reply is still a trusted source, not independent consensus verification.",
+      "evidence": [
+        [
+          "Ledger state",
+          "CLOSED"
+        ],
+        [
+          "Validated",
+          "Not yet reported"
+        ],
+        [
+          "Source",
+          "Simulated training snapshot"
+        ]
+      ],
+      "wrongWhy": [
+        "A sequence number alone does not establish validation.",
+        "Submitted does not mean validated.",
+        null
+      ]
+    },
+    {
+      "id": "delivered-amount/v1",
+      "concept": "delivered-amount",
+      "topic": "payment",
+      "lesson": "a11",
+      "question": "What should you do first with this payment evidence?",
+      "options": [
+        "Credit the requested amount immediately.",
+        "Inspect destination/tag and validation, then reconcile the delivered amount.",
+        "A successful engine result proves the invoice was fully paid."
+      ],
+      "answer": 1,
+      "why": "Reconcile only what metadata reports as delivered, after validation and destination/tag checks. A successful transaction can deliver less than requested.",
+      "evidence": [
+        [
+          "Requested amount",
+          "100 USD"
+        ],
+        [
+          "Delivered amount",
+          "40 USD"
+        ],
+        [
+          "Node validated",
+          "true"
+        ],
+        [
+          "Engine result",
+          "tesSUCCESS"
+        ],
+        [
+          "Destination / tag",
+          "Not supplied"
+        ],
+        [
+          "Source",
+          "Simulated training metadata"
+        ]
+      ],
+      "wrongWhy": [
+        "Requested amount is not evidence of actual delivery.",
+        null,
+        "tesSUCCESS does not establish invoice amount, destination or tag agreement."
+      ]
+    },
+    {
+      "id": "delivered-amount/v2",
+      "concept": "delivered-amount",
+      "topic": "payment",
+      "lesson": "a11",
+      "question": "What should you do first with this payment evidence?",
+      "options": [
+        "Credit the requested amount immediately.",
+        "Inspect destination/tag and validation, then reconcile the delivered amount.",
+        "A successful engine result proves the invoice was fully paid."
+      ],
+      "answer": 1,
+      "why": "Reconcile only what metadata reports as delivered, after validation and destination/tag checks. A successful transaction can deliver less than requested.",
+      "evidence": [
+        [
+          "Requested amount",
+          "250 USD"
+        ],
+        [
+          "Delivered amount",
+          "249 USD"
+        ],
+        [
+          "Node validated",
+          "true"
+        ],
+        [
+          "Engine result",
+          "tesSUCCESS"
+        ],
+        [
+          "Destination / tag",
+          "Not supplied"
+        ],
+        [
+          "Source",
+          "Simulated training metadata"
+        ]
+      ],
+      "wrongWhy": [
+        "Requested amount is not evidence of actual delivery.",
+        null,
+        "tesSUCCESS does not establish invoice amount, destination or tag agreement."
+      ]
+    },
+    {
+      "id": "delivered-amount/v3",
+      "concept": "delivered-amount",
+      "topic": "payment",
+      "lesson": "a11",
+      "question": "What should you do first with this payment evidence?",
+      "options": [
+        "Credit the requested amount immediately.",
+        "Inspect destination/tag and validation, then reconcile the delivered amount.",
+        "A successful engine result proves the invoice was fully paid."
+      ],
+      "answer": 1,
+      "why": "Reconcile only what metadata reports as delivered, after validation and destination/tag checks. A successful transaction can deliver less than requested.",
+      "evidence": [
+        [
+          "Requested amount",
+          "80 USD"
+        ],
+        [
+          "Delivered amount",
+          "80 USD"
+        ],
+        [
+          "Node validated",
+          "true"
+        ],
+        [
+          "Engine result",
+          "tesSUCCESS"
+        ],
+        [
+          "Destination / tag",
+          "Not supplied"
+        ],
+        [
+          "Source",
+          "Simulated training metadata"
+        ]
+      ],
+      "wrongWhy": [
+        "Requested amount is not evidence of actual delivery.",
+        null,
+        "tesSUCCESS does not establish invoice amount, destination or tag agreement."
+      ]
+    },
+    {
+      "id": "invoice-evidence/v1",
+      "concept": "invoice-evidence",
+      "topic": "payment",
+      "lesson": "a12",
+      "question": "The invoice expects 100 USD at destination A, tag 44. What can you conclude?",
+      "options": [
+        "Fully paid because tesSUCCESS.",
+        "Hold reconciliation until destination and tag evidence is available.",
+        "Credit 100 USD to destination A now."
+      ],
+      "answer": 1,
+      "why": "Incomplete destination/tag evidence prevents invoice matching even when delivery and validation are known.",
+      "evidence": [
+        [
+          "Delivered",
+          "100 USD"
+        ],
+        [
+          "Validated",
+          "true"
+        ],
+        [
+          "Result",
+          "tesSUCCESS"
+        ],
+        [
+          "Destination / tag",
+          "Missing"
+        ],
+        [
+          "Source",
+          "Simulated training case"
+        ]
+      ],
+      "wrongWhy": [
+        "Engine success is not invoice matching.",
+        null,
+        "You cannot infer destination or tag from the amount."
+      ]
+    },
+    {
+      "id": "invoice-evidence/v2",
+      "concept": "invoice-evidence",
+      "topic": "payment",
+      "lesson": "a12",
+      "question": "How much may you credit under this explicit training policy?",
+      "options": [
+        "500 USD.",
+        "125 USD, with a 375 USD shortfall.",
+        "Nothing, because partial delivery always means failure."
+      ],
+      "answer": 1,
+      "why": "The training policy permits partial credit of the actual delivery after all matching checks. Keep the remaining shortfall visible.",
+      "evidence": [
+        [
+          "Invoice",
+          "500 USD"
+        ],
+        [
+          "Delivered",
+          "125 USD"
+        ],
+        [
+          "Validated / result",
+          "true / tesSUCCESS"
+        ],
+        [
+          "Destination / tag",
+          "Match"
+        ],
+        [
+          "Training policy",
+          "Partial credit permitted"
+        ],
+        [
+          "Source",
+          "Simulated training case"
+        ]
+      ],
+      "wrongWhy": [
+        "Requested 500 is not actual delivery.",
+        null,
+        "This policy explicitly allows partial credit; protocols and business policies are different."
+      ]
+    },
+    {
+      "id": "issuer-controls/v1",
+      "concept": "issuer-controls",
+      "topic": "issuer",
+      "lesson": "a5",
+      "question": "What does NoFreeze not set establish?",
+      "options": [
+        "The issuer may retain freeze authority under protocol rules.",
+        "The issuer has stolen funds.",
+        "The token is fully backed."
+      ],
+      "answer": 0,
+      "why": "A control flag establishes a permission, not an event, solvency or wrongdoing.",
+      "evidence": [
+        [
+          "NoFreeze",
+          "Not set"
+        ],
+        [
+          "GlobalFreeze",
+          "Not set"
+        ],
+        [
+          "Source",
+          "Simulated AccountRoot exercise"
+        ]
+      ],
+      "wrongWhy": [
+        null,
+        "Permission is not evidence an action occurred.",
+        "Flags do not establish off-ledger reserves."
+      ]
+    },
+    {
+      "id": "issuer-controls/v2",
+      "concept": "issuer-controls",
+      "topic": "issuer",
+      "lesson": "a5",
+      "question": "Which question needs off-ledger evidence?",
+      "options": [
+        "Is RequireAuth set?",
+        "What is the GlobalFreeze flag?",
+        "Does the issuer have legal redemption obligations?"
+      ],
+      "answer": 2,
+      "why": "On-ledger flags can show authorization, freeze and clawback controls. Legal rights and reserves require separate evidence.",
+      "evidence": [
+        [
+          "RequireAuth",
+          "Set"
+        ],
+        [
+          "AllowTrustLineClawback",
+          "Set"
+        ],
+        [
+          "Source",
+          "Simulated issuer exercise"
+        ]
+      ],
+      "wrongWhy": [
+        "Read the flag to establish whether it is set.",
+        "Read the flag; it does not describe a legal contract.",
+        null
+      ]
+    },
+    {
+      "id": "issuer-controls/v3",
+      "concept": "issuer-controls",
+      "topic": "issuer",
+      "lesson": "a5",
+      "question": "Which statement correctly distinguishes these controls?",
+      "options": [
+        "Freeze, clawback and authorization are the same setting.",
+        "Freeze can restrict token movement; clawback may reclaim eligible issued balances; authorization controls eligible holders.",
+        "Clawback retrieves native XRP."
+      ],
+      "answer": 1,
+      "why": "Each control has separate protocol constraints. None establishes reserves or legal rights.",
+      "evidence": [
+        [
+          "Freeze / clawback / authorization",
+          "Distinct issuer controls"
+        ],
+        [
+          "Source",
+          "Simulated permission comparison"
+        ]
+      ],
+      "wrongWhy": [
+        "The flags and their effects differ.",
+        null,
+        "Issued-token clawback is not native-XRP recovery."
+      ]
+    },
+    {
+      "id": "funded-depth/v1",
+      "concept": "funded-depth",
+      "topic": "liquidity",
+      "lesson": "a9",
+      "question": "What is supported by this sell-side snapshot?",
+      "options": [
+        "Funded depth is below the trade size; investigate before relying on an exit.",
+        "Funded depth covers this size in this snapshot; check fees, price impact and freshness before execution.",
+        "Quoted depth guarantees the exit."
+      ],
+      "answer": 0,
+      "why": "Compare funded quantity, direction and the stated band to the trade size. A snapshot is not an execution guarantee.",
+      "evidence": [
+        [
+          "Trade size",
+          "10000 TOKEN to sell"
+        ],
+        [
+          "Quoted bids",
+          "20000 TOKEN"
+        ],
+        [
+          "Funded bids",
+          "4000 TOKEN"
+        ],
+        [
+          "Reference / band",
+          "1.00 USD/TOKEN; within 1%"
+        ],
+        [
+          "Source",
+          "Simulated same-time snapshot"
+        ]
+      ],
+      "wrongWhy": [
+        null,
+        "Funded quantity is below the stated size.",
+        "Quotes may be unfunded and conditions may change."
+      ]
+    },
+    {
+      "id": "funded-depth/v2",
+      "concept": "funded-depth",
+      "topic": "liquidity",
+      "lesson": "a9",
+      "question": "What is supported by this sell-side snapshot?",
+      "options": [
+        "Funded depth is below the trade size; investigate before relying on an exit.",
+        "Funded depth covers this size in this snapshot; check fees, price impact and freshness before execution.",
+        "Quoted depth guarantees the exit."
+      ],
+      "answer": 1,
+      "why": "Compare funded quantity, direction and the stated band to the trade size. A snapshot is not an execution guarantee.",
+      "evidence": [
+        [
+          "Trade size",
+          "5000 TOKEN to sell"
+        ],
+        [
+          "Quoted bids",
+          "9000 TOKEN"
+        ],
+        [
+          "Funded bids",
+          "8000 TOKEN"
+        ],
+        [
+          "Reference / band",
+          "1.00 USD/TOKEN; within 1%"
+        ],
+        [
+          "Source",
+          "Simulated same-time snapshot"
+        ]
+      ],
+      "wrongWhy": [
+        "Funded quantity exceeds the stated size in this example.",
+        null,
+        "Quotes may be unfunded and conditions may change."
+      ]
+    },
+    {
+      "id": "funded-depth/v3",
+      "concept": "funded-depth",
+      "topic": "liquidity",
+      "lesson": "a9",
+      "question": "What is supported by this sell-side snapshot?",
+      "options": [
+        "Funded depth is below the trade size; investigate before relying on an exit.",
+        "Funded depth covers this size in this snapshot; check fees, price impact and freshness before execution.",
+        "Quoted depth guarantees the exit."
+      ],
+      "answer": 0,
+      "why": "Compare funded quantity, direction and the stated band to the trade size. A snapshot is not an execution guarantee.",
+      "evidence": [
+        [
+          "Trade size",
+          "12000 TOKEN to sell"
+        ],
+        [
+          "Quoted bids",
+          "18000 TOKEN"
+        ],
+        [
+          "Funded bids",
+          "2000 TOKEN"
+        ],
+        [
+          "Reference / band",
+          "1.00 USD/TOKEN; within 1%"
+        ],
+        [
+          "Source",
+          "Simulated same-time snapshot"
+        ]
+      ],
+      "wrongWhy": [
+        null,
+        "Funded quantity is below the stated size.",
+        "Quotes may be unfunded and conditions may change."
+      ]
+    },
+    {
+      "id": "policy-evidence/v1",
+      "concept": "policy-evidence",
+      "topic": "policy",
+      "lesson": "a15",
+      "question": "What should a reviewer receive for this training verdict?",
+      "options": [
+        "HOLD, the failed rule, its evidence and the missing information.",
+        "A claim that HOLD means illegal.",
+        "A guarantee that a passed hash proves compliance."
+      ],
+      "answer": 0,
+      "why": "A policy result is a rule outcome within its evidence scope. Explain the rule, source, unknowns and proposed next step.",
+      "evidence": [
+        [
+          "Verdict",
+          "HOLD"
+        ],
+        [
+          "Rule",
+          "destination_tag_required"
+        ],
+        [
+          "Evidence",
+          "No destination tag supplied"
+        ],
+        [
+          "Source",
+          "Simulated training receipt"
+        ]
+      ],
+      "wrongWhy": [
+        null,
+        "A training policy is not a legal finding.",
+        "A hash is not a legal or compliance certification."
+      ]
+    },
+    {
+      "id": "policy-evidence/v2",
+      "concept": "policy-evidence",
+      "topic": "policy",
+      "lesson": "a15",
+      "question": "What does this SHA-256 receipt establish?",
+      "options": [
+        "Its author’s identity and approval.",
+        "Whether its contents match that digest, if recomputed.",
+        "That the organization is solvent."
+      ],
+      "answer": 1,
+      "why": "A digest checks consistency with contents. A party able to replace both contents and digest can replace both. It is not a digital signature.",
+      "evidence": [
+        [
+          "Receipt",
+          "ledger_index: 108316232; verdict: GO"
+        ],
+        [
+          "Hash",
+          "SHA-256 of canonical record"
+        ],
+        [
+          "Source",
+          "Simulated policy evidence"
+        ]
+      ],
+      "wrongWhy": [
+        "A digest does not authenticate an author.",
+        null,
+        "Neither policy verdict nor hash proves reserves."
+      ]
+    }
+  ]
+}
