@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-src 'none'; object-src 'none'">
+  <meta name="color-scheme" content="dark">
+  <title>NOSHASHI Operator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail" aria-label="Operator navigation">
+      <div class="brand">
+        <svg class="emblem" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.6" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="16" cy="16" r="10.6" fill="none" stroke="currentColor" stroke-width=".7" opacity=".45"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="currentColor"/></svg>
+        <span>NOSHASHI<span class="brand-sub">Operator desk</span></span>
+      </div>
+      <nav><a class="nav-item active" href="#overview"><span>01</span> Overview</a><a class="nav-item" href="#reviews"><span>02</span> Review queue</a><a class="nav-item" href="#sources"><span>03</span> Source readings</a><a class="nav-item" href="#report"><span>04</span> Founder report</a></nav>
+      <div class="rail-foot"><p class="eyebrow">Private workspace</p><p>Research continues on your hosted operator when this app is closed.</p><span class="connection-indicator" id="connection-label">Checking connection</span><button id="disconnect" class="text-button" disabled>Disconnect this Mac</button></div>
+    </aside>
+    <main id="overview">
+      <header class="masthead"><p class="eyebrow">Business development / Evidence before outreach</p><span class="edition">NOSHASHI · Desktop</span></header>
+      <section class="intro"><div><h1>The opportunity desk.</h1><p class="lede">Turn public developments into considered conversations. Inspect the source, evaluate the fit, and choose the next useful step.</p></div><div class="folio" aria-hidden="true"><span>Research</span><i></i><span>Review</span><i></i><span>Conversation</span></div></section>
+      <div id="notice" class="notice" role="status" aria-live="polite" aria-atomic="true"><span class="notice-dot" aria-hidden="true"></span><span id="notice-text">Checking the connection saved on this Mac…</span><button id="retry" class="text-button" hidden>Retry</button></div>
+      <section id="connection-panel" class="connection-panel panel" aria-labelledby="connection-title" hidden>
+        <div><p class="eyebrow">Connect once</p><h2 id="connection-title">Your private desk, on this Mac.</h2><p class="muted">Use your operator access token. macOS Keychain keeps it on this Mac; your Stripe secret key belongs in the hosted operator’s secure settings.</p></div>
+        <form id="connection-form"><label for="admin-token">Operator access token</label><input id="admin-token" type="password" required minlength="32" maxlength="1024" autocomplete="off" spellcheck="false" autocapitalize="none" aria-describedby="token-help"><p id="token-help" class="fine">The same token used to open your private operator desk.</p><button id="connect" class="button primary" type="submit">Connect securely <span aria-hidden="true">↗</span></button></form>
+      </section>
+      <div id="desk" hidden>
+        <div class="toolbar" aria-label="Operator actions"><button class="button primary" id="run" disabled>Check a research source <span aria-hidden="true">↗</span></button><button class="button" id="refresh" disabled>Refresh desk</button><button class="button" id="billing" disabled>Refresh Stripe reading</button><button class="button" id="send-report" disabled>Check founder report</button></div>
+        <section class="metrics" aria-label="Current review and revenue information">
+          <article class="metric"><p class="eyebrow">Review queue</p><p class="metric-value" id="task-count">—</p><p class="fine">Open tasks shown, up to twenty</p></article>
+          <article class="metric"><p class="eyebrow">Founder approval</p><p class="metric-value" id="approval-count">—</p><p class="fine">Pending approval records</p></article>
+          <article class="metric revenue"><p class="eyebrow">Stripe monthly run rate</p><p class="metric-value" id="revenue-value">Unknown</p><p class="fine">Whole ignosha account · active fixed-price subscriptions</p></article>
+        </section>
+        <section class="billing-note" aria-labelledby="billing-title"><div><h2 id="billing-title">A reading with a date.</h2><p id="billing-state">No Stripe reading available.</p><p class="fine" id="billing-observed">Observed: unknown</p><p class="fine">Subscription run rate is not collected cash, profit or NOSHASHI-only sales. Annual subscriptions are divided by twelve.</p></div><button class="button small" id="secure-setup">Secure Stripe setup <span aria-hidden="true">↗</span></button></section>
+        <section id="reviews" class="panel" aria-labelledby="reviews-title"><div class="section-top"><div><p class="eyebrow">01 / Examine the fit</p><h2 id="reviews-title">Open review queue</h2></div><span class="pill">Founder review required</span></div><p class="section-note">Research signals and due-date reminders need source, buyer and contact-history checks. A review item does not authorize outreach.</p><div id="task-list" class="task-list"></div><p class="empty" id="tasks-empty">No open tasks were returned. This does not establish the status of the full pipeline.</p></section>
+        <section class="two-column">
+          <article class="panel" aria-labelledby="pipeline-title"><div class="section-top"><div><p class="eyebrow">02 / Current records</p><h2 id="pipeline-title">Pipeline snapshot</h2></div></div><div id="stage-list" class="stage-list"></div><p id="pipeline-empty" class="empty">Pipeline counts are unavailable.</p><p class="fine">Recorded stages require current evidence; they do not prove new customers or independent buyer interest.</p></article>
+          <article class="panel boundary" aria-labelledby="workflow-title"><p class="eyebrow">Operating boundaries</p><h2 id="workflow-title">A deliberate next step.</h2><ol><li>Verify the actual development.</li><li>Find a current, appropriate evaluator.</li><li>Score the opportunity and check history.</li><li>Review the message before first contact.</li></ol><p class="fine">This operator queues research and follow-up reviews. It sends no prospect messages. The $100,000/month goal is a planning target; sales and revenue are never guaranteed.</p></article>
+        </section>
+        <section id="sources" class="panel" aria-labelledby="sources-title"><div class="section-top"><div><p class="eyebrow">03 / Read the evidence</p><h2 id="sources-title">Source readings</h2></div><span id="source-summary" class="fine">No readings returned</span></div><p class="section-note">A responding service is separate from a completed research scan. These are limited primary feeds; article and buyer verification still matter.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Source readings"><table><thead><tr><th scope="col">Primary source</th><th scope="col">Reading</th><th scope="col">Last successful check</th></tr></thead><tbody id="source-list"></tbody></table></div><p id="sources-empty" class="empty">No source readings are available yet.</p></section>
+        <section id="report" class="panel" aria-labelledby="report-title"><div class="section-top"><div><p class="eyebrow">04 / Keep the record</p><h2 id="report-title">Founder report</h2></div><span id="report-state" class="pill">No report returned</span></div><pre id="report-text">No report is available.</pre></section>
+        <footer class="desk-foot"><p>Last desk reading <time id="desk-observed">unknown</time></p><p>Built for macOS Monterey 12.7.6+ · hosted research schedule</p></footer>
+      </div>
+      <noscript>This desktop desk needs JavaScript enabled to communicate with the native app.</noscript>
+    </main>
+  </div>
+</body>
+</html>
