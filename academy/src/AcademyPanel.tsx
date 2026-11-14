@@ -5,6 +5,10 @@ import { Panel } from "@/components/nova/Panel";
 import { Button } from "@/components/ui/button";
 import { useLocal } from "./useLocal";
 import { AcademyIntro } from "./AcademyIntro";
+import {SpacedReview,useRetention,useIntroduceLesson} from "./Retention";
+import {CONCEPTS,scheduleMiss,dueConcepts} from "@/lib/academy/retention";
+import {LearningVisual} from "./LearningVisual";
+import {ANALYST_CASES,CASE_VERSION} from "@/lib/academy/analystCases";
 import { isTauri } from "@/lib/env";
 import { saveTextFile } from "@/lib/export";
 import { cn } from "@/lib/utils";
@@ -80,7 +84,7 @@ type View =
   | { kind: "words" }
   | { kind: "review" };
 
-let remembered: View = { kind: "home" };
+
 
 const KIND_LABEL: Record<Card["kind"], string> = {
   idea: "THE IDEA",
@@ -114,17 +118,16 @@ function accessStyle(a: Access): React.CSSProperties {
   };
 }
 
-export function AcademyPanel({ onOpenLab }: { onOpenLab: (labId: string) => void }) {
+export function AcademyPanel({ onOpenLab,initialLesson,onNavigate,onReview,onPractice,onCases }: { onOpenLab: (labId: string) => void; initialLesson?:string; onNavigate:(id:string|null)=>void;onReview:()=>void;onPractice:()=>void;onCases:()=>void }) {
   const [progress, setProgress] = useAcademy();
   const [labStored] = useLocal<unknown>("academy.labs", null);
   const labProgress = useMemo(() => sanitizeProgress(labStored), [labStored]);
   const labsDone = LABS.filter((l) => labStatus(l, labProgress).complete).length;
-  // A first visit opens on setup and stays there until START is pressed,
-  // so choosing a style does not whisk the learner past the reading settings.
-  const [view, setViewState] = useState<View>(progress.style ? remembered : { kind: "setup" });
+  // Direct lesson links bypass setup. Reading settings remain available inside the lesson.
+  const [view, setViewState] = useState<View>(initialLesson&&lessonById(initialLesson)?{kind:"lesson",id:initialLesson}:{kind:"home"});
   const setView = (next: View) => {
     stopSpeaking();
-    remembered = next;
+    if(next.kind==="lesson"){try{localStorage.setItem("academy.last-lesson",JSON.stringify(next.id));}catch{}onNavigate(next.id);}else if(next.kind==="home")onNavigate(null);
     setViewState(next);
   };
   const a = progress.access;
@@ -134,7 +137,7 @@ export function AcademyPanel({ onOpenLab }: { onOpenLab: (labId: string) => void
 
   return (
     <>
-    {(effective.kind === "setup" || effective.kind === "home") && <AcademyIntro continuing={effective.kind === "home"} />}
+    {effective.kind === "setup" && <AcademyIntro continuing={false} />}
     <Panel
       id="academy-course"
       label={
@@ -166,8 +169,8 @@ export function AcademyPanel({ onOpenLab }: { onOpenLab: (labId: string) => void
         data-reduce-motion={a.reduceMotion || undefined}
       >
         <BreakReminder minutes={a.breakMinutes} />
-        {effective.kind === "setup" && <Setup progress={progress} setProgress={setProgress} onDone={() => setView({ kind: "home" })} />}
-        {effective.kind === "home" && <Home progress={progress} labsDone={labsDone} setView={setView} />}
+        {effective.kind === "setup" && <Setup progress={progress} setProgress={setProgress} onDone={() => setView(initialLesson?{kind:"lesson",id:initialLesson}:{kind:"home"})} />}
+        {effective.kind === "home" && <Home progress={progress} labsDone={labsDone} setView={setView} onReview={onReview} onPractice={onPractice} onCases={onCases}/>}
         {effective.kind === "lesson" && (
           <LessonPlayer
             key={effective.id}
@@ -296,7 +299,7 @@ function Setup({ progress, setProgress, onDone }: { progress: Progress; setProgr
       </div>
 
       <fieldset>
-        <legend className="text-[13px] font-semibold text-foreground">How do you learn best?</legend>
+        <legend className="text-[13px] font-semibold text-foreground">How would you like to study?</legend>
         <p className="text-[11px] text-muted-foreground">Each lesson will start with this. You still get everything else, and you can change it any time.</p>
         <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {STUDY_STYLES.map((s) => (
@@ -311,7 +314,7 @@ function Setup({ progress, setProgress, onDone }: { progress: Progress; setProgr
                 type="radio"
                 name="study-style"
                 className="mt-0.5 h-4 w-4 accent-[hsl(var(--brand))]"
-                checked={progress.style === s.id}
+                checked={(progress.style??"read") === s.id}
                 onChange={() => setProgress({ ...progress, style: s.id as StudyStyle, access: s.id === "listen" ? { ...a, autoRead: true } : a })}
               />
               <span>
@@ -375,8 +378,8 @@ function Setup({ progress, setProgress, onDone }: { progress: Progress; setProgr
       </fieldset>
 
       <div>
-        <Button onClick={onDone} disabled={!progress.style}>
-          {progress.style ? "START LEARNING →" : "PICK HOW YOU LEARN TO START"}
+        <Button onClick={()=>{if(!progress.style)setProgress({...progress,style:"read"});onDone();}}>
+          BACK TO LEARNING →
         </Button>
       </div>
     </div>
@@ -387,9 +390,13 @@ function Setup({ progress, setProgress, onDone }: { progress: Progress; setProgr
 /* Course map                                                          */
 /* ------------------------------------------------------------------ */
 
-function Home({ progress, labsDone, setView }: { progress: Progress; labsDone: number; setView: (v: View) => void }) {
+function Home({ progress, labsDone, setView,onReview,onPractice,onCases }: { progress: Progress; labsDone: number; setView: (v: View) => void;onReview:()=>void;onPractice:()=>void;onCases:()=>void }) {
+  const [retention]=useRetention();const due=dueConcepts(retention,Date.now()).length;
+  const [caseRecords]=useLocal<Record<string,{version?:string;completedAt?:number}>>("academy.analyst-cases.v1",{});
+  const casesDone=ANALYST_CASES.filter(c=>caseRecords?.[c.id]?.version===CASE_VERSION&&Number.isFinite(caseRecords[c.id].completedAt)).length;
   const all = overall(progress);
-  const next = nextLesson(progress);
+  const [lastLesson]=useLocal<string|null>("academy.last-lesson",null);
+  const next = (lastLesson?lessonById(lastLesson):null)??nextLesson(progress);
   const ready = eligible(progress);
   return (
     <div className="academy-course-map flex flex-col gap-4">
@@ -397,14 +404,14 @@ function Home({ progress, labsDone, setView }: { progress: Progress; labsDone: n
         <div className="flex items-baseline gap-2">
           <h2 className="academy-section-title text-foreground">Your next chapter.</h2>
           <span className="ml-auto font-mono text-[11px] text-muted-foreground">
-            {all.passed}/{all.total} LESSONS · {labsDone}/{LABS.length} LABS · FINAL CHECK {progress.exam.passedAt ? `PASSED ${progress.exam.best}%` : progress.exam.tries ? `BEST ${progress.exam.best}%` : "NOT YET"}
+            {all.passed}/{all.total} LESSONS · {labsDone}/{LABS.length} WORKSTATION LABS · {casesDone}/{ANALYST_CASES.length} CASES · FINAL CHECK {progress.exam.passedAt ? `PASSED ${progress.exam.best}%` : progress.exam.tries ? `BEST ${progress.exam.best}%` : "NOT YET"}
           </span>
         </div>
         <Bar value={all.passed} max={all.total} label="Lessons passed" />
         <div className="mt-1 flex flex-wrap gap-2">
-          {next ? (
+          {due>0?<Button onClick={onReview}>REVIEW DUE: {due} CONCEPTS · ABOUT 3 MINUTES</Button>:next ? (
             <Button onClick={() => setView({ kind: "lesson", id: next.id })}>
-              {all.passed ? "CONTINUE" : "START"}: {next.title} →
+              {all.passed||Object.keys(progress.lessons).length ? "CONTINUE WHERE YOU LEFT OFF" : "START THE 5-MINUTE LESSON"}: {next.title} →
             </Button>
           ) : (
             !progress.exam.passedAt && <Button onClick={() => setView({ kind: "exam" })}>TAKE THE FINAL CHECK →</Button>
@@ -425,6 +432,9 @@ function Home({ progress, labsDone, setView }: { progress: Progress; labsDone: n
         </div>
       </div>
 
+      <div className="learning-actions"><Button variant="outline" onClick={onReview}>REVIEW DUE ({due})</Button><Button variant="outline" onClick={onCases}>LABS &amp; ANALYST CASES</Button><Button variant="outline" onClick={onPractice}>PRACTICE TEST · 25 QUESTIONS</Button></div>
+      <details className="learning-details"><summary>NOSHASHI in one minute: what the whole project does</summary><p>NOSHASHI helps you inspect public XRPL evidence and explain a decision. It does not hold your keys or guarantee that a token is safe.</p><dl className="learning-project"><div><dt>VERIFY</dt><dd>Check validation and what a payment actually delivered. Start with the invoice case; use the public delivered-payment tool for exploration.</dd></div><div><dt>INVESTIGATE</dt><dd>Inspect issuer permissions and funded liquidity. Flags do not prove reserves; a depth snapshot does not guarantee a fill.</dd></div><div><dt>DECIDE</dt><dd>Apply a stated training policy and explain GO, HOLD or NO-GO. A setting is not a legal compliance determination.</dd></div><div><dt>PROVE</dt><dd>Keep source, ledger, close time, rules and limitations with the finding. A SHA-256 receipt is a hash, not a digital signature.</dd></div></dl><p>Academy is the free learning environment. Its workstation is a restricted training copy, not an enterprise account. Browser demos and desktop software have different access and release limitations; check the release panel below.</p><p><a href="https://www.noshashi.app/delivered/">Payment tool</a> · <a href="https://www.noshashi.app/certificate/">Issuer controls</a> · <a href="https://www.noshashi.app/book-health/">Book health</a> · <a href="https://www.noshashi.app/trust/">Trust &amp; limitations</a></p></details>
+      <section className="learning-paths"><h3>Choose one path</h3><div><h4>Beginner / one small step</h4><p>Start with ledger basics, then accounts, issuers, payments, liquidity and policy. The complete 21-lesson course map stays below.</p><button onClick={()=>setView({kind:"lesson",id:"a1"})}>BEGIN WITH ONE SHARED RECORD →</button></div><div><h4>Institutional tester / three evidence questions</h4><p>Payment verification → issuer controls → funded liquidity. End with a policy handoff. No installation or wallet required.</p><a href="?case=invoice">1. Did the invoice get paid?</a> · <a href="?case=issuer">2. Issuer controls</a> · <a href="?case=liquidity">3. Funded exit depth</a> · <a href="?case=verdict">4. Explain a verdict</a></div><p className="learning-note">Learning loop: try to recall → check evidence → explain in your words → return after 1, 3, 7 and 21 days. No streak penalties or forced countdown. You can stop after one question.</p></section>
       {LEVELS.map((level) => {
         const s = levelSummary(progress, level.id);
         return (
@@ -505,9 +515,12 @@ function LessonPlayer({
   onHome: () => void;
   onNext: (id: string | null) => void;
 }) {
-  const style = progress.style ?? "mix";
+  useIntroduceLesson(lesson.id);
+  const style = progress.style ?? "read";
   const sections = sectionOrder(style, lesson);
-  const [at, setAt] = useState(0);
+  const [position,setPosition]=useLocal<{section:Section}>(`academy.lesson.${lesson.id}`,{section:"cards"});
+  const [at,setAtState]=useState(()=>Math.max(0,sections.indexOf(position.section)));
+  const setAt=(n:number)=>{const index=Math.max(0,Math.min(n,sections.length-1));setAtState(index);setPosition({section:sections[index]});};
   const section = sections[at];
   const level = LEVELS.find((l) => l.id === lesson.level)!;
   const index = LESSONS.findIndex((l) => l.id === lesson.id);
@@ -521,7 +534,7 @@ function LessonPlayer({
 
   return (
     <div className="flex flex-col gap-3">
-      <Back onClick={onHome} />
+      <Back onClick={onHome} label="PAUSE / COURSE MAP"/>
       <div>
         <p className="font-mono text-[10.5px] tracking-[0.1em] text-faint">
           LEVEL {level.n} · LESSON {index + 1} OF {LESSONS.length} · ABOUT {lesson.minutes} MIN
@@ -560,6 +573,7 @@ function LessonPlayer({
       </h3>
 
       {section === "video" && lesson.video && <LessonVideo id={lesson.video} />}
+      {section === "cards" && <LearningVisual lesson={lesson.id}/>}
       {section === "cards" && (
         <Cards
           lesson={lesson}
@@ -600,7 +614,9 @@ function LessonPlayer({
 }
 
 function Cards({ lesson, access, onSeen, onDone }: { lesson: Lesson; access: Access; onSeen: (n: number) => void; onDone: () => void }) {
-  const [i, setI] = useState(0);
+  const [savedCard,saveCard]=useLocal<number>(`academy.card.${lesson.id}`,0);
+  const [i,setIState]=useState(()=>Number.isInteger(savedCard)?Math.max(0,Math.min(savedCard,lesson.cards.length-1)):0);
+  const setI=(next:number)=>{setIState(next);saveCard(next);};
   const card = lesson.cards[i];
   const last = i === lesson.cards.length - 1;
   useEffect(() => {
@@ -800,12 +816,17 @@ function QuestionCard({
 }
 
 function LessonQuiz({ lesson, progress, onScore }: { lesson: Lesson; progress: Progress; onScore: (picked: number[]) => void }) {
+  const [retention,saveRetention]=useRetention();
   const tries = progress.lessons[lesson.id]?.tries ?? 0;
-  const [attempt, setAttempt] = useState(tries);
+  type Session={v:1;attempt:number;picked:number[];at:number;finished:boolean;checked:number[]};
+  const [raw,save]=useLocal<Session>(`academy.lesson-quiz.${lesson.id}`,{v:1,attempt:tries,picked:[],at:0,finished:false,checked:[]});
+  const session:Session=raw?.v===1&&Number.isSafeInteger(raw.attempt)&&raw.attempt>=0&&Number.isInteger(raw.at)&&raw.at>=0&&raw.at<lesson.quiz.length&&Array.isArray(raw.picked)&&raw.picked.length<=lesson.quiz.length&&Array.isArray(raw.checked)&&raw.checked.every(i=>Number.isInteger(i)&&i>=0&&i<lesson.quiz.length)&&typeof raw.finished==='boolean'?raw:{v:1,attempt:tries,picked:[],at:0,finished:false,checked:[]};
+  const {attempt,picked,at,finished,checked}=session;
+  const setPicked=(picked:number[])=>save({...session,picked});
+  const setAt=(at:number)=>save({...session,at});
+  const setChecked=(checked:number[])=>save({...session,checked});
+  const setFinished=(finished:boolean)=>save({...session,finished});
   const questions = useMemo(() => lesson.quiz.map((q, i) => shuffleQuestion(q, seedOf(`${lesson.id}/${i}/${attempt}`))), [lesson, attempt]);
-  const [picked, setPicked] = useState<number[]>([]);
-  const [at, setAt] = useState(0);
-  const [finished, setFinished] = useState(false);
   const correct = questions.filter((q, i) => picked[i] === q.answer).length;
   const passed = correct >= EXAM.lessonPassCorrect;
 
@@ -826,10 +847,7 @@ function LessonQuiz({ lesson, progress, onScore }: { lesson: Lesson; progress: P
           <Button
             variant={passed ? "outline" : "default"}
             onClick={() => {
-              setAttempt(attempt + 1);
-              setPicked([]);
-              setAt(0);
-              setFinished(false);
+              save({v:1,attempt:attempt+1,picked:[],checked:[],at:0,finished:false});
             }}
           >
             TRY AGAIN
@@ -843,14 +861,15 @@ function LessonQuiz({ lesson, progress, onScore }: { lesson: Lesson; progress: P
   return (
     <div className="flex flex-col gap-3">
       <Bar value={at + (picked[at] !== undefined ? 1 : 0)} max={questions.length} label="Questions answered" />
-      <QuestionCard q={q} n={at + 1} of={questions.length} picked={picked[at]} onPick={(i) => setPicked(Object.assign([...picked], { [at]: i }))} reveal />
+      <QuestionCard q={q} n={at + 1} of={questions.length} picked={picked[at]} onPick={(i) => setPicked(Object.assign([...picked], { [at]: i }))} reveal={checked.includes(at)} />
+      {!checked.includes(at)&&<Button disabled={picked[at]===undefined} onClick={()=>{setChecked([...checked,at]);if(picked[at]!==q.answer){const concept=CONCEPTS.find(c=>c.lesson===lesson.id);if(concept)saveRetention(scheduleMiss(retention,concept.id,Date.now()));}}}>CHECK ANSWER</Button>}
       <div className="flex gap-2">
         {at < questions.length - 1 ? (
-          <Button disabled={picked[at] === undefined} onClick={() => setAt(at + 1)}>
+          <Button disabled={!checked.includes(at)} onClick={() => setAt(at + 1)}>
             NEXT QUESTION →
           </Button>
         ) : (
-          <Button disabled={picked[at] === undefined} onClick={finish}>
+          <Button disabled={!checked.includes(at)} onClick={finish}>
             SEE MY SCORE
           </Button>
         )}
@@ -895,45 +914,8 @@ function LessonLabs({ lesson, labProgress, onOpenLab }: { lesson: Lesson; labPro
 /* Review, final check, certificate, word list                         */
 /* ------------------------------------------------------------------ */
 
-function Review({ progress, setProgress, onHome }: { progress: Progress; setProgress: (p: Progress) => void; onHome: () => void }) {
-  const items = progress.missed
-    .map((key) => {
-      const [id, n] = key.split("/");
-      const lesson = lessonById(id);
-      return lesson ? { key, lesson, q: shuffleQuestion(lesson.quiz[Number(n)], seedOf(key)) } : null;
-    })
-    .filter(Boolean) as Array<{ key: string; lesson: Lesson; q: Question }>;
-  const [picked, setPicked] = useState<Record<string, number>>({});
-  if (!items.length) {
-    return (
-      <div>
-        <Back onClick={onHome} />
-        <p className="text-[13px] text-foreground">Nothing to review. Every question you missed, you have since got right.</p>
-      </div>
-    );
-  }
-  return (
-    <div className="flex flex-col gap-4">
-      <Back onClick={onHome} />
-      <p className="text-[12.5px] text-muted-foreground">Questions you missed, asked again. Get one right and it leaves this list.</p>
-      {items.map(({ key, lesson, q }, i) => (
-        <div key={key}>
-          <p className="mb-1 font-mono text-[10px] tracking-[0.1em] text-faint">FROM: {lesson.title.toUpperCase()}</p>
-          <QuestionCard
-            q={q}
-            n={i + 1}
-            of={items.length}
-            picked={picked[key]}
-            reveal
-            onPick={(choice) => {
-              setPicked({ ...picked, [key]: choice });
-              if (choice === q.answer) setProgress({ ...progress, missed: progress.missed.filter((k) => k !== key) });
-            }}
-          />
-        </div>
-      ))}
-    </div>
-  );
+function Review({onHome}:{progress:Progress;setProgress:(p:Progress)=>void;onHome:()=>void}) {
+ return <><Back onClick={onHome}/><SpacedReview/></>;
 }
 
 function Exam({ progress, setProgress, onHome }: { progress: Progress; setProgress: (p: Progress) => void; onHome: () => void }) {

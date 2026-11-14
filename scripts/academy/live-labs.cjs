@@ -53,7 +53,7 @@ async function workstationLab(page, title, report) {
   const steps = await page.locator('nav[aria-label="Steps"] button').count();
   for (let n = 1; n <= steps; n += 1) {
     await page.locator('nav[aria-label="Steps"] button').nth(n - 1).click();
-    const open = page.getByRole("button", { name: /ON THE WORKSTATION$/i });
+    const open = page.getByRole("button", { name: /ON THE WORKSTATION$/ });
     await open.waitFor({ state: "visible" });
     await waitFor(page, () => open.isEnabled(), 60000);
     await open.click();
@@ -108,13 +108,13 @@ async function workstationLab(page, title, report) {
     console.log(`${entry.ok ? "LIVE" : "FAIL"}  ${title} · step ${n}: ${o.map((x) => `${x.met ? "✓" : "○"} ${x.label}`).join(" · ")}${pressed ? ` (pressed ${pressed})` : ""}`);
     if (!entry.ok) console.log(`      ${entry.blocked ? `refused: ${entry.blocked} · ` : ""}screen: ${entry.screen}`);
   }
-  await page.getByRole("button", { name: /^EXIT\ LAB$/i }).click();
+  await page.getByRole("button", { name: "EXIT LAB" }).click();
 }
 
 async function benchLab(page, title, report) {
   const steps = Number((await page.getByText(/^STEP 1 OF \d+$/).innerText()).match(/OF (\d+)/)[1]);
   for (let n = 1; n <= steps; n += 1) {
-    const run = page.getByRole("button", { name: /^RUN IT HERE/i });
+    const run = page.getByRole("button", { name: /^RUN IT HERE/ });
     if (await run.count()) {
       let entry;
       for (let attempt = 1; attempt <= 2; attempt += 1) {
@@ -128,9 +128,9 @@ async function benchLab(page, title, report) {
       report.push(entry);
       console.log(`${entry.ok ? "LIVE" : "FAIL"}  ${title} · step ${n}: ${entry.headline}`);
     }
-    if (n < steps) await page.getByRole("button", { name: /NEXT STEP/i }).click();
+    if (n < steps) await page.getByRole("button", { name: /NEXT STEP/ }).click();
   }
-  await page.getByRole("button", { name: /ALL LABS/i }).click();
+  await page.getByRole("button", { name: /ALL LABS/ }).click();
 }
 
 (async () => {
@@ -138,9 +138,7 @@ async function benchLab(page, title, report) {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await page.goto(url);
-  // Past the first-run setup.
-  await page.getByRole("radio", { name: /A bit of everything/i }).check();
-  await page.getByRole("button", { name: /START LEARNING/i }).click();
+  // Direct course home: settings are optional inside a lesson.
   await page.getByRole("button", { name: "Labs", exact: true }).click();
   const titles = await page.locator("main ul li button span.block.text-\\[12\\.5px\\]").allInnerTexts();
   const report = [];
