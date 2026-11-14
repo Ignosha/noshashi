@@ -9,7 +9,7 @@ if (root) {
   const history = [];
   let historyIndex = 0;
   let draft = '';
-  const windows = {console: $('ws-console-window'), evidence: $('ws-evidence-window')};
+  const windows = {console: $('ws-console-window'), evidence: $('ws-evidence-window'), account: $('ws-account-window')};
   const tabs = [...root.querySelectorAll('[data-ws-tab]')];
 
   function print(text, style = 'ws-output') {
@@ -33,7 +33,7 @@ if (root) {
     $('ws-empty').hidden = Object.values(windows).some(panel => !panel.hidden);
     for (const button of root.querySelectorAll('.ws-rail [data-ws-open]')) {
       const name = button.dataset.wsOpen;
-      const selected = name === 'evidence' ? !windows.evidence.hidden : !windows.console.hidden && $('ws-tab-' + name)?.getAttribute('aria-selected') === 'true';
+      const selected = name === 'account' ? !windows.account.hidden : name === 'evidence' ? !windows.evidence.hidden : !windows.console.hidden && $('ws-tab-' + name)?.getAttribute('aria-selected') === 'true';
       button.setAttribute('aria-pressed', String(!!selected));
     }
   }
@@ -43,9 +43,13 @@ if (root) {
   }
 
   function open(target, focus = true) {
-    const name = target === 'evidence' ? 'evidence' : 'console';
+    const name = target === 'account' ? 'account' : target === 'evidence' ? 'evidence' : 'console';
+    if(name !== 'account') windows.account.hidden=true;
+    else restoreSizes();
     if (!windows[name].classList.contains('ws-maximized')) restoreSizes();
     windows[name].hidden = false;
+    if(name === 'account') windows.account.classList.add('ws-maximized');
+    if (['issuer','payment'].includes(target)) root.dataset.readingMode=target;
     if (name === 'console') {
       for (const tab of tabs) {
         const selected = tab.dataset.wsTab === target;
@@ -56,8 +60,8 @@ if (root) {
     }
     updateWindows(name);
     if (focus) {
-      const destination = {console: command, issuer: $('ct-account'), payment: $('ct-hash'), help: $('ws-panel-help'), evidence: $('ct-result-title')}[target];
-      if (destination) { if (target === 'evidence') destination.tabIndex = -1; destination.focus(); }
+      const destination = {console: command, issuer: $('ct-account'), payment: $('ct-hash'), help: $('ws-panel-help'), evidence: $('ct-result-title'), account: $('terminal-account')}[target];
+      if (destination) { if (['evidence','account'].includes(target)) destination.tabIndex = -1; destination.focus(); }
     }
   }
 
@@ -107,14 +111,15 @@ if (root) {
     try {action = parseCommand(text);} catch (error) {print(error.message, 'ws-error'); return;}
     switch (action.command) {
       case 'help':
-        print('issuer <address> <currency>   Read issuer controls\npayment <hash>              Inspect delivered metadata\nexample issuer | payment    Fill a public command; no fetch\nopen <tool>                 console / issuer / payment / evidence / help\nevidence show | copy | download\nstatus · history · clear · help\n\nRead-only NOSHASHI commands. No shell, script or arbitrary RPC execution.');
+        print('issuer <address> <currency>   Read issuer controls\npayment <hash>              Inspect delivered metadata\nexample issuer | payment    Fill a public command; no fetch\nopen <tool>                 console / issuer / payment / evidence / help\nevidence show | copy | download\naccount                     Sign in / licensed archive\nstatus · history · clear · help\n\nRead-only NOSHASHI commands. No shell, script or arbitrary RPC execution.');
         break;
       case 'status':
-        print(`XRPL Mainnet · read-only public beta\nEvidence: ${$('ct-state').textContent}\n${$('ws-ledger').textContent}\nNo account, saved filesystem or background monitor connected.\nSession history: memory only. Public requests may appear in platform logs.`);
+        print(`XRPL Mainnet · read-only public beta\nEvidence: ${$('ct-state').textContent}\n${$('ws-ledger').textContent}\nAccount: ${$('ws-account-label').textContent} · Open Account for verified access.\nNo general filesystem or background monitor connected.\nSession history: memory only. Public requests may appear in platform logs.`);
         break;
       case 'history': print(history.map((line, index) => `${String(index + 1).padStart(2, '0')}  ${line}`).join('\n')); break;
       case 'clear': log.replaceChildren(); print('Console cleared. Current evidence and session command history remain available.'); break;
       case 'open': open(action.target); break;
+      case 'account': open('account'); break;
       case 'example':
         command.value = PUBLIC_EXAMPLES[action.target];
         print('Public example placed in the prompt. Press Run to fetch evidence. No request sent.', 'ws-output ws-muted');
@@ -167,6 +172,7 @@ if (root) {
     if (name === 'READING') open('evidence', false);
   });
   root.addEventListener('ct:evidence', event => {$('ws-ledger').textContent = 'LEDGER ' + (event.detail.ledger_index ?? '—');});
+  root.addEventListener('ct:account-changed', () => {history.length=0;historyIndex=0;draft='';command.value='';log.replaceChildren();print('Account changed. Session command history and public evidence cleared.');});
   command.disabled = false;
   $('ws-command-form').querySelector('button').disabled = false;
   updateWindows('console');
