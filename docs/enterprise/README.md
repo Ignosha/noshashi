@@ -5,6 +5,7 @@ Engineering audit and draft hardening, 2026-11-15. This is not certification, a 
 | Document | Purpose |
 |---|---|
 | [Implementation summary](IMPLEMENTATION_SUMMARY.md) | Exact changes, integration order and required reviewers |
+| [Billing integrity follow-up](BILLING_HARDENING.md) | Durable fulfillment, current-state reconciliation and test evidence |
 | [Readiness baseline](READINESS_BASELINE.md) | Evidence-linked capability inventory and PR history |
 | [Security overview](SECURITY_OVERVIEW.md) | Real boundaries and assurance limits |
 | [Access control](ACCESS_CONTROL.md) | Roles, service boundaries and offboarding |

@@ -1,6 +1,10 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { TIERS, type Tier, schedule } from "../_shared/evidenceReport.ts";
+import { privilegedFetch } from "../_shared/privilegedRequest.ts";
+import { boundedText, PayloadError } from "../_shared/httpLimits.ts";
+import { stripeSignature } from "../_shared/stripeWebhookSafety.ts";
+import { applyCreditCheckout, reconcileSubscription } from "../_shared/stripeBilling.ts";
 import { reviewBillingRisk } from "../_shared/paymentReviewBillingEvents.ts";
 
 /**
@@ -15,7 +19,6 @@ import { reviewBillingRisk } from "../_shared/paymentReviewBillingEvents.ts";
 
 const WEBHOOK_SECRET = Deno.env.get("STRIPE_WEBHOOK_SECRET") ?? "";
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY") ?? "";
-const TOLERANCE_SECONDS = 300;
 
 /**
  * Which features each tier turns on. Read by the console's gating.
@@ -127,39 +130,6 @@ function resolvePeriodEnd(subscription: Record<string, unknown>): string | null 
   return null;
 }
 
-async function verifySignature(payload: string, header: string): Promise<boolean> {
-  const parts = Object.fromEntries(
-    header.split(",").map((piece) => {
-      const [key, ...rest] = piece.trim().split("=");
-      return [key, rest.join("=")];
-    }),
-  );
-
-  const timestamp = Number(parts.t);
-  const signature = String(parts.v1 ?? "");
-  if (!timestamp || !signature) return false;
-
-  // Reject replays of an old, legitimately-signed request.
-  if (Math.abs(Math.floor(Date.now() / 1000) - timestamp) > TOLERANCE_SECONDS) return false;
-
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(WEBHOOK_SECRET),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const mac = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(`${timestamp}.${payload}`),
-  );
-  const expected = Array.from(new Uint8Array(mac))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-
-  return timingSafeEqual(expected, signature);
-}
 
 Deno.serve(async (request: Request) => {
   if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -168,15 +138,22 @@ Deno.serve(async (request: Request) => {
   const signature = request.headers.get("Stripe-Signature");
   if (!signature) return new Response("Missing signature", { status: 400 });
 
-  const raw = await request.text();
-  if (!(await verifySignature(raw, signature))) {
+  let raw: string;
+  try { raw = await boundedText(request, 1024 * 1024); }
+  catch(error) { return new Response("Invalid webhook body",{status:error instanceof PayloadError?error.status:400}); }
+  if (!(await stripeSignature(raw, signature, WEBHOOK_SECRET))) {
     return new Response("Invalid signature", { status: 400 });
   }
 
-  const event = JSON.parse(raw);
+  let event;
+  try { event=JSON.parse(raw);if(!event || typeof event.id!=="string" || typeof event.type!=="string" || !event.data?.object)throw new Error(); }
+  catch { return new Response("Invalid webhook event",{status:400}); }
+  const hash=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(raw))),v=>v.toString(16).padStart(2,"0")).join("");
+  const catalog=Object.fromEntries(Object.entries(TIER_FEATURES).map(([tier,features])=>[tier,{features,verification_quota:TIER_QUOTA[tier]??0}]));
   const admin = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    {global:{fetch:privilegedFetch},auth:{persistSession:false,autoRefreshToken:false}},
   );
   const db = admin.schema("noshashi");
 
@@ -203,8 +180,7 @@ Deno.serve(async (request: Request) => {
     for (let page = 1; page <= 20; page += 1) {
       const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
       if (error) {
-        console.error("listUsers failed while resolving a purchase", error);
-        return null;
+        throw new Error("Billing account lookup unavailable.");
       }
       const match = data.users.find((user) => (user.email ?? "").toLowerCase() === address);
       if (match) return match.id;
@@ -216,8 +192,7 @@ Deno.serve(async (request: Request) => {
       // The payment is real and we could not attach it to anybody. This
       // has to be loud: it is the one failure here that costs a customer
       // money and gives them nothing.
-      console.error("PAID BUT UNPROVISIONED — no account for", address, inviteError);
-      return null;
+      throw new Error("Paid account provisioning unavailable.");
     }
     return invited.user.id;
   };
@@ -228,43 +203,14 @@ Deno.serve(async (request: Request) => {
    * normal way instead of repeating the lookup above.
    */
   const stampSubscription = async (subscriptionId: string, accountId: string, tier: string) => {
-    if (!STRIPE_SECRET_KEY || !subscriptionId) return;
-    try {
-      await fetch(`https://api.stripe.com/v1/subscriptions/${subscriptionId}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          "metadata[account_id]": accountId,
-          "metadata[tier]": tier,
-        }),
-      });
-    } catch (error) {
-      console.error("could not stamp account_id onto subscription", subscriptionId, error);
-    }
+    if (!STRIPE_SECRET_KEY || !/^sub_[A-Za-z0-9]+$/.test(subscriptionId))throw new Error("Subscription reconciliation unavailable.");
+    const response=await fetch(`https://api.stripe.com/v1/subscriptions/${encodeURIComponent(subscriptionId)}`,{
+      method:"POST",headers:{Authorization:`Bearer ${STRIPE_SECRET_KEY}`,"Content-Type":"application/x-www-form-urlencoded"},
+      body:new URLSearchParams({"metadata[account_id]":accountId,"metadata[tier]":tier}),signal:AbortSignal.timeout(10000),
+    });
+    if(!response.ok)throw new Error("Subscription metadata reconciliation failed.");
   };
 
-  const applyEntitlement = async (
-    accountId: string,
-    tier: string,
-    seats: number,
-    validUntil: string | null,
-  ) => {
-    await db.from("entitlements").upsert(
-      {
-        account_id: accountId,
-        tier,
-        seats,
-        features: TIER_FEATURES[tier] ?? TIER_FEATURES.operator,
-        verification_quota: TIER_QUOTA[tier] ?? 0,
-        valid_until: validUntil,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "account_id" },
-    );
-  };
 
   /**
    * A paid Ledger Evidence Report: the order, the deliveries its tier buys,
@@ -277,11 +223,11 @@ Deno.serve(async (request: Request) => {
     const tier = String(meta.tier ?? "standard") as Tier;
     const email = String(session.customer_details?.email ?? "").trim();
     if (!(tier in TIERS) || session.payment_status !== "paid" || !email) {
-      console.error("EVIDENCE REPORT NOT RECORDED", { session: session.id, tier, payment_status: session.payment_status, hasEmail: Boolean(email) });
+      console.error(JSON.stringify({event:"evidence_order_invalid"}));
       return;
     }
     if (Number(session.amount_total) < TIERS[tier].cents) {
-      console.error("EVIDENCE REPORT UNDERPAID", { session: session.id, tier, amount_total: session.amount_total });
+      console.error(JSON.stringify({event:"evidence_order_underpaid"}));
       return;
     }
     const split = (v: unknown) => String(v ?? "").split(",").map((x) => x.trim()).filter(Boolean);
@@ -321,7 +267,8 @@ Deno.serve(async (request: Request) => {
       .from("evidence_report_deliveries")
       .upsert(rows, { onConflict: "order_id,seq", ignoreDuplicates: true });
     if (scheduleError) throw scheduleError;
-    await db.rpc("evidence_reports_kick");
+    const {error:kickError}=await db.rpc("evidence_reports_kick");
+    if(kickError)throw new Error("Evidence scheduling unavailable.");
   };
 
   try {
@@ -334,7 +281,8 @@ Deno.serve(async (request: Request) => {
       return await response.json();
     })) return new Response('ok',{status:200});
     switch (event.type) {
-      case "checkout.session.completed": {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded": {
         const session = event.data.object;
         // A Ledger Evidence Report grants nothing in the app: it is built
         // and emailed by noshashi-evidence-report. Resolving its buyer
@@ -344,6 +292,7 @@ Deno.serve(async (request: Request) => {
           await recordEvidenceOrder(session);
           break;
         }
+        if(session.mode==="payment" && session.payment_status!=="paid")break;
         let accountId = session.metadata?.account_id ?? session.client_reference_id;
 
         // A purchase made from the marketing site carries an email and
@@ -352,23 +301,10 @@ Deno.serve(async (request: Request) => {
         if (!accountId) {
           accountId = await resolveAccountByEmail(session.customer_details?.email);
         }
-        if (!accountId) break;
+        if (!accountId) throw new Error("Paid checkout account unavailable.");
 
         if (session.mode === "payment") {
-          // Prepaid verification credits: add to the existing quota.
-          const { data: current } = await db
-            .from("entitlements")
-            .select("verification_quota")
-            .eq("account_id", accountId)
-            .maybeSingle();
-          const purchased = Number(session.metadata?.verifications ?? 0);
-          await db
-            .from("entitlements")
-            .update({
-              verification_quota: Number(current?.verification_quota ?? 0) + purchased,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("account_id", accountId);
+          await applyCreditCheckout(db,event,hash,accountId);
         }
 
         if (session.mode === "subscription" && session.subscription) {
@@ -376,6 +312,7 @@ Deno.serve(async (request: Request) => {
           // follow take the ordinary metadata path.
           const tier = String(session.metadata?.tier ?? "desk");
           await stampSubscription(String(session.subscription), accountId, tier);
+          await reconcileSubscription(db,event,hash,String(session.subscription),STRIPE_SECRET_KEY,catalog,fetch,accountId);
         }
         break;
       }
@@ -383,40 +320,8 @@ Deno.serve(async (request: Request) => {
       case "customer.subscription.created":
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
-        const subscription = event.data.object;
-        const accountId = subscription.metadata?.account_id;
-        if (!accountId) break;
-
-        const item = subscription.items?.data?.[0];
-        const tier = subscription.metadata?.tier ?? "operator";
-        const seats = Number(item?.quantity ?? 1);
-        const status = String(subscription.status);
-        const periodEnd = resolvePeriodEnd(subscription);
-
-        await db.from("subscriptions").upsert(
-          {
-            account_id: accountId,
-            stripe_customer_id: subscription.customer,
-            stripe_subscription_id: subscription.id,
-            price_id: item?.price?.id ?? null,
-            tier,
-            status,
-            seats,
-            current_period_end: periodEnd,
-            cancel_at_period_end: Boolean(subscription.cancel_at_period_end),
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "stripe_subscription_id" },
-        );
-
-        // Only a paying, current subscription grants the paid tier.
-        const entitled = status === "active" || status === "trialing";
-        await applyEntitlement(
-          accountId,
-          entitled ? tier : "operator",
-          entitled ? seats : 1,
-          entitled ? periodEnd : null,
-        );
+        const subscription=event.data.object;
+        await reconcileSubscription(db,event,hash,String(subscription.id),STRIPE_SECRET_KEY,catalog,fetch,subscription.metadata?.account_id);
         break;
       }
 
@@ -424,19 +329,7 @@ Deno.serve(async (request: Request) => {
       case "invoice.payment_failed": {
         const invoice = event.data.object;
         const subscriptionId=invoice.parent?.subscription_details?.subscription ?? invoice.subscription;
-        if (typeof subscriptionId==='string') {
-          if(!STRIPE_SECRET_KEY)throw new Error('Cannot reconcile invoice subscription.');
-          const response=await fetch(`https://api.stripe.com/v1/subscriptions/${encodeURIComponent(subscriptionId)}`,{
-            headers:{Authorization:`Bearer ${STRIPE_SECRET_KEY}`},signal:AbortSignal.timeout(10000),
-          });
-          if(!response.ok)throw new Error('Could not reconcile current subscription.');
-          const subscription=await response.json();
-          const {error}=await db.from('subscriptions').update({
-            status:subscription.status,current_period_end:resolvePeriodEnd(subscription),
-            updated_at:new Date().toISOString(),
-          }).eq('stripe_subscription_id',subscriptionId);
-          if(error)throw error;
-        }
+        if(typeof subscriptionId==='string')await reconcileSubscription(db,event,hash,subscriptionId,STRIPE_SECRET_KEY,catalog);
         break;
       }
 
@@ -444,7 +337,7 @@ Deno.serve(async (request: Request) => {
         break;
     }
   } catch (error) {
-    console.error("webhook handling failed", event.type, error);
+    console.error(JSON.stringify({event:"billing_fulfillment_failed",request_id:crypto.randomUUID()}));
     // 500 asks Stripe to retry rather than silently dropping the event.
     return new Response("Handler error", { status: 500 });
   }

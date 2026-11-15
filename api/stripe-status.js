@@ -1,3 +1,4 @@
+import { stripeKeyLivemode } from "./_lib/stripe-key-mode.js";
 /*
  * GET /api/stripe-status — is checkout actually wired up?
  *
@@ -24,8 +25,9 @@ export default async function handler(req, res) {
 
   const secretKey = process.env.STRIPE_SECRET_KEY || "";
   const priceId = process.env.STRIPE_PRO_PRICE_ID || DEFAULT_PRO_PRICE_ID;
-  const configured = Boolean(secretKey) && !secretKey.includes("placeholder") && /^sk_(test|live)_/.test(secretKey);
-  const keyMode = /^sk_live_/.test(secretKey) ? "live" : /^sk_test_/.test(secretKey) ? "test" : null;
+  const configured = stripeKeyLivemode(secretKey) !== null && !secretKey.includes("placeholder");
+  const mode = stripeKeyLivemode(secretKey);
+  const keyMode = mode === null ? null : mode ? "live" : "test";
 
   const report = {
     checkoutReady: false,
@@ -41,7 +43,7 @@ export default async function handler(req, res) {
 
   if (!configured) {
     report.problem = secretKey
-      ? "STRIPE_SECRET_KEY is set but is a placeholder or not in sk_test_/sk_live_ form."
+      ? "STRIPE_SECRET_KEY is set but is a placeholder or not a recognized Stripe server-key form."
       : "STRIPE_SECRET_KEY is not set on this deployment.";
     return res.status(200).json(report);
   }
@@ -49,6 +51,7 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(priceId)}`, {
       headers: { Authorization: `Bearer ${secretKey}` },
+      signal: AbortSignal.timeout(10000),
     });
     const payload = await response.json().catch(() => ({}));
 
@@ -56,7 +59,7 @@ export default async function handler(req, res) {
       report.problem =
         payload?.error?.code === "resource_missing"
           ? `Price ${priceId} does not exist on this ${keyMode} account. A price ID is mode-specific: a test price is invisible to a live key and vice versa.`
-          : payload?.error?.message || `Stripe responded ${response.status}.`;
+          : `Stripe price lookup failed (${response.status}).`;
       return res.status(200).json(report);
     }
 
@@ -68,7 +71,8 @@ export default async function handler(req, res) {
       livemode: Boolean(payload.livemode),
     };
 
-    if (!payload.active) report.problem = "The price exists but is archived in Stripe.";
+    if (payload.livemode !== mode) report.problem = "Configured key and price environments do not match.";
+    else if (!payload.active) report.problem = "The price exists but is archived in Stripe.";
     else if (!payload.recurring) report.problem = "The price is one-off, but checkout is created in subscription mode.";
     else report.checkoutReady = true;
 
