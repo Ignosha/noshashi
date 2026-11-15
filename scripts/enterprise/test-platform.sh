@@ -33,7 +33,14 @@ docker network create --internal "$network" >/dev/null
 if ! supabase start --network-id "$network" -x studio,pgadmin,postgres-meta,realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor,inbucket > "$tmp/start.log" 2>&1; then
  echo 'FAILED: isolated Supabase startup; review CLI/runtime compatibility'
  # Only service startup errors, never status output containing local keys.
- grep -E 'Error response|Error:|failed to|unhealthy|Invalid' "$tmp/start.log" | head -8 || true
+ python3 - "$tmp/start.log" <<'PYLOG'
+import pathlib,re,sys
+for line in pathlib.Path(sys.argv[1]).read_text(errors='replace').splitlines()[-35:]:
+ if re.search(r'secret|token|password|key|database.url|api.url',line,re.I): continue
+ line=re.sub(r'eyJ[A-Za-z0-9_.-]+','[redacted]',line)
+ line=re.sub(r'(postgres(?:ql)?://)[^@\s]+@',r'\1[redacted]@',line)
+ print(line[:500])
+PYLOG
  exit 1
 fi
 [ "$(docker network inspect -f '{{.Internal}}' "$network")" = true ]
@@ -60,10 +67,19 @@ for file in "$root"/supabase/migrations/*.sql; do
 done
 echo "STRICT PLATFORM MIGRATIONS PASSED ($count; no skipped migrations)"
 for test in "$root"/tests/sql/*.test.sql; do apply "$test"; echo "PASS $(basename "$test")"; done
+pg -c "notify pgrst, 'reload schema'" > "$tmp/reload.log" 2>&1
 # Exercise actual Auth and PostgREST, not mocks. Never print generated keys.
 supabase status -o json > "$tmp/status.json" 2> "$tmp/status.err"
 python3 "$root/scripts/enterprise/platform-http.py" "$tmp/status.json" "$root/artifacts/platform-validation"
 bash "$root/scripts/enterprise/test-platform-recovery.sh" "$container"
 # Service startup readiness is checked by the HTTP verifier before new sign-ins.
 python3 "$root/scripts/enterprise/platform-http.py" "$tmp/status.json" "$root/artifacts/platform-validation/restored"
+for test in "$root"/tests/sql/*.test.sql; do apply "$test"; echo "RESTORED PASS $(basename "$test")"; done
+# Store only aggregate resource evidence; never container environment or keys.
+docker stats --no-stream --format '{{json .}}' "$container" | python3 -c '
+import json,pathlib,sys
+x=json.load(sys.stdin)
+p=pathlib.Path(sys.argv[1]);p.parent.mkdir(parents=True,exist_ok=True)
+p.write_text(json.dumps({"scope":"single synthetic database observation; not peak usage","cpu_percent":x["CPUPerc"],"memory":x["MemUsage"]},indent=2)+"\n")
+' "$root/artifacts/platform-validation/resources.json"
 echo 'PLATFORM VALIDATION PASSED (synthetic; no production recovery or capacity claim)'

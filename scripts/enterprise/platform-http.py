@@ -45,6 +45,7 @@ def run(status_path, output_dir):
     for _ in range(30):
         try:
             request('GET', '/auth/v1/health', anon)
+            request('GET', '/rest/v1/organizations?select=id&limit=0', service)
             ready = True
             break
         except (RuntimeError, urllib.error.URLError, TimeoutError):
