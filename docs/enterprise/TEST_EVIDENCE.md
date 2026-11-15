@@ -4,7 +4,7 @@ Environment: Linux x64; Node v24.19.0; Chromium 154.0.8037.57; disposable Postgr
 
 | Exact command / flow | Exit / actual result | Scope and limitations |
 |---|---|---|
-| `npm test` | 0; 1,744 passed, 4 skipped, 138 files (137 pass / 1 live-only skip) | Deterministic existing/new unit and local HTTP tests. Live production governance tests remain skipped. |
+| `npm test` (local, before the recovered return source was tracked) | 0; 1,744 passed, 4 skipped, 138 files (137 pass / 1 live-only skip) | Deterministic existing/new unit and local HTTP tests. Live production governance tests remain skipped. |
 | `tsc --noEmit` | 0 | Main app TypeScript |
 | `tsc -p academy --noEmit` | 0 | Academy TypeScript |
 | `tsc -p noshrepair --noEmit` | 0 | Support console TypeScript |
@@ -47,3 +47,9 @@ No live signed-in production governance mutation, real-card checkout, tax/refund
 ## Approved prior change
 
 PR #176 was explicitly approved, merged at `62a7e63`, and its payment-review function deployed as version 2 with gateway JWT verification enabled. Only that function version changed; OPTIONS returned 204 and missing/forged JWT requests returned 401. Vercel reported successful deployment. The new enterprise draft changes are not deployed.
+
+## Remote CI and environment interruption
+
+The first remote PR run (43740524329) passed SQL security/concurrency, all type checks, loopback HTTP checks, focused credential scanning and generated-bundle checks. Unit tests reported 1,743 passed / 1 failed / 4 skipped because the recovered billing-return source contained a retired emblem. The existing tracked-file brand test correctly exposed a gap in the pre-staging local check; no test was removed or relaxed. The return page now imports the canonical emblem and keeps its layout, adds a static-page CSP, and avoids claiming paid/active status from a return URL. A new actual-handler test checks those properties. Final remote CI must pass before review acceptance.
+
+The managed workspace became unavailable before the separate billing follow-on command could start. Additional billing fulfillment/replay, native-release and restore-workflow implementation remains unfinished. Changes after this interruption are being verified by remote CI, not claimed as locally retested. No new hardening deployment is authorized.

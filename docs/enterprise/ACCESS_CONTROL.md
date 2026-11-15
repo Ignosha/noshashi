@@ -32,7 +32,7 @@ Protected/special entry-point inventory:
 | `noshashi-support-notify` | Authenticated caller and support-record scope; operational delivery requires separate validation |
 | `noshashi-xrpl-watch` | Scoped organization key or scheduler-token RPC, bounded work |
 | `noshashi-ledger-registry`, `noshashi-issuer-alerts`, `noshashi-evidence-report` | Public read/verify routes where defined; scheduled mutation uses private token/RPC, not email instructions |
-| `noshashi-return` | Static billing-return information; grants nothing; recovered byte-for-byte source |
+| `noshashi-return` | Static billing-return information; grants nothing; recovered source; canonical emblem and truthful return-state wording |
 | Public `api/*.js` | Read-only research or explicitly public contact/subscription/checkout paths; input/rate controls, not organization-admin APIs |
 | Native Tauri bridge | Bundled-window IPC, CSP, target/path checks and native keyring; physical platform verification outstanding |
 

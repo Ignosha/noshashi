@@ -57,7 +57,7 @@ documents it.
 account monitoring), `noshashi-ledger-registry` (credential and domain
 directory). Shared code is in `supabase/functions/_shared`.
 
-`noshashi-terminal` and `noshashi-payment-review` provide signed-in terminal access and payment-list review. This review branch restores the previously unversioned deployed `noshashi-portal` (Stripe billing portal) and `noshashi-return` (static return page) source. The return page is unchanged; portal hardening remains draft-only until owner approval. Function deployment and gateway settings must be verified separately.
+`noshashi-terminal` and `noshashi-payment-review` provide signed-in terminal access and payment-list review. This review branch restores the previously unversioned deployed `noshashi-portal` (Stripe billing portal) and `noshashi-return` (static return page) source. The return page keeps its layout; its canonical emblem, CSP and truthful billing-state wording are corrected. Both billing functions' hardening remains draft-only until owner approval. Function deployment and gateway settings must be verified separately.
 
 ## Scheduled work (pg_cron)
 

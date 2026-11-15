@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { MARK as EMBLEM } from "../../../api/_lib/brand-mark.js";
 
 /**
  * noshashi-return — the page Stripe sends the browser back to.
@@ -22,32 +23,26 @@ type View = { title: string; blurb: string; note: string; tone: string };
 
 const VIEWS: Record<string, View> = {
   success: {
-    title: "PAYMENT COMPLETE",
-    blurb: "Your plan is active. Switch back to NOSHASHI — it picks up the new entitlement automatically when the window regains focus.",
-    note: "A receipt is on its way to your email from Stripe.",
+    title: "CHECKOUT RETURNED",
+    blurb: "Return to NOSHASHI to check your current plan. Access changes only after verified billing events are saved.",
+    note: "Returning to this page does not confirm payment or activate a plan.",
     tone: "#2ED684",
   },
   cancelled: {
     title: "CHECKOUT CANCELLED",
-    blurb: "Nothing was charged and no plan was started. You can close this tab and carry on — the free Operator tier is unaffected.",
+    blurb: "Checkout was closed. Check your Stripe receipt or signed-in billing portal for payment and subscription status.",
     note: "Changed your mind? Reopen Pricing in the app.",
     tone: "#FFB020",
   },
   billing: {
-    title: "BILLING UPDATED",
-    blurb: "Any change you made has been saved with Stripe. Switch back to NOSHASHI and it will re-read your subscription.",
-    note: "Cancellations take effect at the end of the period you have already paid for.",
+    title: "BILLING RETURN",
+    blurb: "Return to NOSHASHI or the signed-in billing portal to review your current subscription. This page does not confirm a change.",
+    note: "The effective date of a subscription change is shown in your billing records.",
     tone: "#F5F5F7",
   },
 };
 
-const MARK = `<svg viewBox="0 0 64 64" width="56" height="56" fill="none" aria-hidden="true">
-  <path fill="#F5F5F7" fill-rule="evenodd" clip-rule="evenodd" d="M32 1.5c8.4 8.6 13.1 20.6 13.1 32.2V45.6H18.9V33.7C18.9 22.1 23.6 10.1 32 1.5Zm0 13.4-5.1 3v6l5.1 3 5.1-3v-6l-5.1-3Z"/>
-  <path fill="#F5F5F7" d="M18.9 30.4v17.4H7.4c-1.2 0-1.8-1.4-1-2.3l12.5-15.1Z"/>
-  <path fill="#F5F5F7" d="M45.1 30.4v17.4h11.5c1.2 0 1.8-1.4 1-2.3L45.1 30.4Z"/>
-  <path fill="#F5F5F7" d="M22.9 45.6h18.2l-2.7 6.8c-.35 1-1.2 1.6-2.2 1.6h-8.4c-1 0-1.85-.6-2.2-1.6l-2.7-6.8Z"/>
-  <path fill="#F5F5F7" d="M32 55.4c2.9 3.2 4.3 5.9 4.3 8.2 0 1-1.1 1.4-1.8.8-1.6-1.4-3.4-1.4-5 0-.7.6-1.8.2-1.8-.8 0-2.3 1.4-5 4.3-8.2Z"/>
-</svg>`;
+const MARK = EMBLEM.replace('width="26" height="26"', 'width="56" height="56"');
 
 function page(view: View): string {
   return `<!doctype html>
@@ -59,6 +54,7 @@ function page(view: View): string {
 <meta name="color-scheme" content="dark">
 <title>NOSHASHI &middot; ${view.title}</title>
 <style>
+  :root{--ground:#000}
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
@@ -124,6 +120,7 @@ Deno.serve((request: Request) => {
     status: 200,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
       "Cache-Control": "no-store",
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "no-referrer",

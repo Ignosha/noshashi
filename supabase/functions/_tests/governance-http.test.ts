@@ -125,6 +125,7 @@ Deno.test("policy and exception HTTP boundaries (synthetic Auth/RPC)", async (t)
     await import("../noshashi-exception-decide/index.ts");
     await import("../noshashi-password/index.ts");
     await import("../noshashi-portal/index.ts");
+    await import("../noshashi-return/index.ts");
   } finally {
     Deno.serve = serve;
   }
@@ -242,6 +243,18 @@ Deno.test("policy and exception HTTP boundaries (synthetic Auth/RPC)", async (t)
         equal(calls().length, 0);
       },
     );
+    await t.step("billing return renders the canonical emblem without claiming fulfillment or echoing session data", async () => {
+      for (const path of ["success", "cancel", "billing"]) {
+        const r = await handlers[4](new Request("https://example.invalid/" + path + "?session_id=private-test-marker"));
+        equal(r.status, 200);
+        equal(r.headers.get("Cache-Control"), "no-store");
+        if (!r.headers.get("Content-Security-Policy")?.includes("default-src 'none'")) throw new Error("Missing static-page CSP");
+        const html = await r.text();
+        equal(html.includes('class="brand-mark"'), true);
+        equal(html.includes("private-test-marker"), false);
+        equal(html.includes("Your plan is active."), false);
+      }
+    });
     if (errors.join("\n").includes("sensitive-database-detail")) {
       throw new Error("Provider detail leaked into logs");
     }
