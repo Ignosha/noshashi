@@ -34,3 +34,11 @@ grant all on all sequences in schema graphql to postgres, anon, authenticated, s
 alter default privileges in schema graphql grant all on tables to postgres, anon, authenticated, service_role;
 alter default privileges in schema graphql grant all on functions to postgres, anon, authenticated, service_role;
 alter default privileges in schema graphql grant all on sequences to postgres, anon, authenticated, service_role;
+-- The same upstream initial schema grants these before the wrapper exists.
+-- pg_dump's extension-initial ACL assumptions require the target bootstrap
+-- to supply them too; later archived ACL differences remain authoritative.
+grant usage on schema graphql_public to postgres, anon, authenticated, service_role;
+grant execute on function graphql_public.graphql(text,text,jsonb,jsonb) to postgres, anon, authenticated, service_role;
+alter default privileges in schema graphql_public grant all on tables to postgres, anon, authenticated, service_role;
+alter default privileges in schema graphql_public grant all on functions to postgres, anon, authenticated, service_role;
+alter default privileges in schema graphql_public grant all on sequences to postgres, anon, authenticated, service_role;
