@@ -28,6 +28,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: enterprise-platform-metrics
-          path: artifacts/platform-validation/*.json
+          path: artifacts/platform-validation/**/*.json
           if-no-files-found: ignore
           retention-days: 7

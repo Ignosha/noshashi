@@ -40,6 +40,18 @@ def run(status_path, output_dir):
             raise RuntimeError('unexpected_http_status_' + str(code))
         return code, json.loads(body) if body else None
 
+    # A restarted local service must become healthy within a bounded window.
+    ready = False
+    for _ in range(30):
+        try:
+            request('GET', '/auth/v1/health', anon)
+            ready = True
+            break
+        except (RuntimeError, urllib.error.URLError, TimeoutError):
+            time.sleep(1)
+    if not ready:
+        raise RuntimeError('auth_readiness_timeout')
+
     # Service creation confirms test emails without dispatching email.
     users = []
     for _ in range(2):

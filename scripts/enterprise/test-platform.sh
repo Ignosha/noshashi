@@ -63,4 +63,7 @@ for test in "$root"/tests/sql/*.test.sql; do apply "$test"; echo "PASS $(basenam
 # Exercise actual Auth and PostgREST, not mocks. Never print generated keys.
 supabase status -o json > "$tmp/status.json" 2> "$tmp/status.err"
 python3 "$root/scripts/enterprise/platform-http.py" "$tmp/status.json" "$root/artifacts/platform-validation"
+bash "$root/scripts/enterprise/test-platform-recovery.sh" "$container"
+# Service startup readiness is checked by the HTTP verifier before new sign-ins.
+python3 "$root/scripts/enterprise/platform-http.py" "$tmp/status.json" "$root/artifacts/platform-validation/restored"
 echo 'PLATFORM VALIDATION PASSED (synthetic; no production recovery or capacity claim)'
