@@ -1,3 +1,4 @@
+import { stripeKeyLivemode } from "./_lib/stripe-key-mode.js";
 /*
  * POST /api/create-checkout-session — start a Pro subscription, or, with
  * product=evidence-report, pay for a Ledger Evidence Report (by tier).
@@ -64,7 +65,7 @@ const MIN_SEATS = 1;
 const MAX_SEATS = 500;
 
 function isConfigured(key) {
-  return Boolean(key) && !key.includes("placeholder") && /^sk_(test|live)_/.test(key);
+  return stripeKeyLivemode(key) !== null && !key.includes("placeholder");
 }
 
 /**

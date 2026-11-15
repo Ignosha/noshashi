@@ -94,7 +94,7 @@ jobs:
       # would leave the site running the old field.
       - name: Governance HTTP safety checks (loopback fixtures only)
         working-directory: supabase/functions
-        run: deno test --allow-env --allow-net=127.0.0.1 _tests/governance-http.test.ts
+        run: deno test --allow-env --allow-net=127.0.0.1 _tests/governance-http.test.ts _tests/billing-http.test.ts
 
       - name: Focused credential scan
         run: |
