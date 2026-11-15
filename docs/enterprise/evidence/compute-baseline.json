@@ -1,0 +1,50 @@
+{
+  "schema": "noshashi.enterprise.compute-baseline/1",
+  "recorded_at": "2026-11-15T16:57:34.028Z",
+  "environment": {
+    "node": "v24.19.0",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "logical_cpus": 3
+  },
+  "scope": "Single process, sequential synthetic compute; excludes API/network/database latency, real concurrent users, ingestion, UI and desktop startup. No SLA or customer workload claim.",
+  "results": [
+    {
+      "name": "policy_measure_and_judge_1000_transactions",
+      "iterations": 1000,
+      "p50_ms": 0.7358410000000504,
+      "p95_ms": 1.3665770000000066,
+      "p99_ms": 2.6160980000000222,
+      "throughput_per_second": 1122.9624399585953,
+      "error_count": 0,
+      "cpu_ms": 942.989,
+      "rss_bytes_after": 58519552,
+      "heap_delta_bytes": 1074624
+    },
+    {
+      "name": "funded_depth_1000_offers",
+      "iterations": 1000,
+      "p50_ms": 0.1033270000000357,
+      "p95_ms": 0.28549400000019887,
+      "p99_ms": 0.5708090000000539,
+      "throughput_per_second": 7230.7538248138935,
+      "error_count": 0,
+      "cpu_ms": 152.13,
+      "rss_bytes_after": 58503168,
+      "heap_delta_bytes": 656840
+    },
+    {
+      "name": "canonical_evidence_export_10000_records",
+      "iterations": 50,
+      "p50_ms": 34.39483199999995,
+      "p95_ms": 97.38728800000035,
+      "p99_ms": 169.09362199999987,
+      "throughput_per_second": 24.17005611782843,
+      "error_count": 0,
+      "cpu_ms": 2089.351,
+      "rss_bytes_after": 195432448,
+      "heap_delta_bytes": 4226840
+    }
+  ]
+}

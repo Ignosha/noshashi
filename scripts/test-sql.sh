@@ -54,5 +54,13 @@ for test in "$root"/tests/sql/*.test.sql; do
     status=1
   fi
 done
+# Multi-connection tests run against the same throwaway database, never a
+# production URL. Each script must independently enforce the local/db guards.
+for test in "$root"/tests/sql/*.test.sh; do
+  [ -e "$test" ] || continue
+  if ! bash "$test" "$url" "$db"; then
+    echo "FAIL $(basename "$test")"; status=1
+  fi
+done
 rm -f "$root/.sqltest.err"
 exit $status
