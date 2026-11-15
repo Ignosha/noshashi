@@ -30,13 +30,14 @@ The HTTP check uses real local Auth-issued JWTs and PostgREST:
 
 The recovery rehearsal uses the disposable platform administrator for backup/restore
 operations, while application migrations and assertions use the application role. It stops
-Auth/PostgREST writers, dumps the synthetic database,
-encrypts the dump, removes the plaintext, decrypts it, removes the application schema,
-clears the disposable target's preinitialized Realtime partitions (whose inherited
-constraints cannot be individually dropped by pg_restore --clean), and restores the
-full archive into the same disposable cluster with original ownership and grants retained and
-first-error failure. This is a logical recovery rehearsal, not replacement of a physical
-server or recovery of externally held Vault/encryption keys and cluster-global roles. It compares
+Auth/PostgREST writers, dumps and encrypts the synthetic database, deletes the plaintext,
+and decrypts the archive. It creates a new template0 database, takes the old source offline,
+and switches the test services' database name to the empty target. The full archive is
+restored without stripping owners or grants and with first-error failure. This avoids
+pg_restore --clean conflicts with preinitialized managed partitions and GraphQL objects.
+It is a logical recovery into a fresh database in the same disposable cluster, not
+replacement of a physical server or recovery of externally held Vault/encryption keys
+and cluster-global roles. It compares
 per-table counts and content digests for application/auth data before restarting services
 and repeating the HTTP and SQL checks. No dump or raw service logs are uploaded. Only
 aggregate synthetic benchmark JSON is retained for seven days.

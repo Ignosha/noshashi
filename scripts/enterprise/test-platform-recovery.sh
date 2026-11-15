@@ -37,13 +37,33 @@ gpg --batch --yes --quiet --no-symkey-cache --pinentry-mode loopback --passphras
 rm "$tmp/plain.dump"
 gpg --batch --yes --quiet --no-symkey-cache --pinentry-mode loopback --passphrase-fd 3 \
  --output "$tmp/restore.dump" --decrypt "$tmp/snapshot.gpg" 3<"$tmp/key" 2>"$tmp/gpg.err"
-# Prove recovery rather than simply counting unchanged source rows.
-# A preinitialized Supabase target has realtime message partitions. pg_restore
-# --clean cannot drop inherited child constraints individually; clear that
-# managed schema first in this disposable target, then restore its full archive.
-pg psql -h 127.0.0.1 -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 \
- -c 'drop schema noshashi cascade; drop schema if exists realtime cascade' > "$tmp/remove.out" 2> "$tmp/remove.err"
-if ! pg pg_restore -h 127.0.0.1 -U supabase_admin -d postgres --clean --if-exists --exit-on-error \
+# Restore into a fresh database, not over Supabase's preinitialized objects.
+# Keep the old source offline for comparison; no owner/global roles change.
+pg psql -h 127.0.0.1 -U supabase_admin -d template1 -X -q -v ON_ERROR_STOP=1 \
+ > "$tmp/switch.out" 2> "$tmp/switch.err" <<'SQL'
+create database noshashi_restore_target with template template0 owner postgres;
+alter database postgres allow_connections false;
+select pg_terminate_backend(pid) from pg_stat_activity where datname='postgres';
+SQL
+for _ in $(seq 1 30); do
+ active="$(pg psql -h 127.0.0.1 -U supabase_admin -d template1 -X -qAt -v ON_ERROR_STOP=1 -c "select count(*) from pg_stat_activity where datname='postgres'")"
+ [ "$active" = 0 ] && break
+ sleep .2
+done
+[ "$active" = 0 ] || { echo 'FAILED: source database writers did not stop'; exit 1; }
+pg psql -h 127.0.0.1 -U supabase_admin -d template1 -X -q -v ON_ERROR_STOP=1 \
+ >> "$tmp/switch.out" 2>> "$tmp/switch.err" <<'SQL'
+alter database postgres rename to noshashi_restore_source;
+alter database noshashi_restore_target rename to postgres;
+SQL
+# Public is the one schema supplied even by template0. Match the archive's
+# own pre-data instructions rather than assuming whether it recreates it.
+pg pg_restore --section=pre-data --file=- < "$tmp/restore.dump" > "$tmp/predata.sql" 2> "$tmp/predata.err"
+if grep -Eq '^CREATE SCHEMA public;' "$tmp/predata.sql"; then
+ pg psql -h 127.0.0.1 -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 \
+  -c 'drop schema public' >> "$tmp/switch.out" 2>> "$tmp/switch.err"
+fi
+if ! pg pg_restore -h 127.0.0.1 -U supabase_admin -d postgres --exit-on-error \
  < "$tmp/restore.dump" > "$tmp/restore.out" 2> "$tmp/restore.err"; then
  echo 'FAILED: full synthetic Supabase archive restore'
  grep -m1 'error:' "$tmp/restore.err" | cut -c1-350 || true
