@@ -72,10 +72,13 @@ docker exec "$container" bash -ec 'command -v timeout >/dev/null; if timeout 3 b
 echo 'Runtime egress denial verified'
 pg() { docker exec -i "$container" psql -U postgres -d postgres -X -q -v ON_ERROR_STOP=1 "$@"; }
 # Avoid scheduled network jobs even though runtime egress is already blocked.
-if ! pg -c "alter system set cron.launch_active_jobs=off" > "$tmp/cron.log" 2>&1; then
- echo 'FAILED: could not disable scheduled test jobs'; exit 1
+# Supabase's application postgres role is intentionally not the platform
+# superuser. Use the local platform role only for disposable server settings.
+admin() { docker exec -i "$container" psql -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 "$@"; }
+if ! admin -c 'create extension if not exists pg_cron' > "$tmp/cron.log" 2>&1 || ! admin -c "alter system set cron.launch_active_jobs=off" >> "$tmp/cron.log" 2>&1; then
+ echo 'FAILED: could not disable scheduled test jobs'; grep -m1 'ERROR:' "$tmp/cron.log" | cut -c1-350 || true; exit 1
 fi
-pg -c 'select pg_reload_conf()' >> "$tmp/cron.log" 2>&1
+admin -c 'select pg_reload_conf()' >> "$tmp/cron.log" 2>&1
 apply() {
  local file="$1"
  if ! pg < "$file" > "$tmp/sql.out" 2> "$tmp/sql.err"; then

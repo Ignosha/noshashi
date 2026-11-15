@@ -37,7 +37,7 @@ def run(status_path, output_dir):
             code, body = error.code, error.read(1_000_001)
         if code not in expected or len(body) > 1_000_000:
             # Bodies can contain JWTs. Never include them in diagnostics.
-            raise RuntimeError('unexpected_http_status_' + str(code))
+            raise RuntimeError('unexpected_http_status_' + str(code) + '_' + path.split('?')[0])
         return code, json.loads(body) if body else None
 
     # A restarted local service must become healthy within a bounded window.
