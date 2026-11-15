@@ -42,6 +42,7 @@ Deno.serve(async (request) => {
         .from("organization_members")
         .select("organization_id,role,organizations(name)")
         .eq("account_id", account)
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .limit(100),
     readEvidence,
   });
