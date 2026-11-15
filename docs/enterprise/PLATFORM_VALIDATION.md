@@ -28,9 +28,11 @@ The HTTP check uses real local Auth-issued JWTs and PostgREST:
 - 240 bounded read requests with eight workers and response-content checks. Reports p50,
   p95, p99, throughput and errors. Two user identities are used, not eight distinct users.
 
-The recovery rehearsal stops Auth/PostgREST writers, dumps the synthetic database,
+The recovery rehearsal uses the disposable platform administrator for backup/restore
+operations, while application migrations and assertions use the application role. It stops
+Auth/PostgREST writers, dumps the synthetic database,
 encrypts the dump, removes the plaintext, decrypts it, removes the application schema,
-and restores the full archive into the same disposable cluster with grants retained and
+and restores the full archive into the same disposable cluster with original ownership and grants retained and
 first-error failure. This is a logical recovery rehearsal, not replacement of a physical
 server or recovery of externally held Vault/encryption keys and cluster-global roles. It compares
 per-table counts and content digests for application/auth data before restarting services

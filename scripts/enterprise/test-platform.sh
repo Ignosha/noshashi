@@ -74,9 +74,9 @@ pg() { docker exec -i "$container" psql -U postgres -d postgres -X -q -v ON_ERRO
 # Avoid scheduled network jobs even though runtime egress is already blocked.
 # Supabase's application postgres role is intentionally not the platform
 # superuser. Use the local platform role only for disposable server settings.
-admin() { docker exec -i "$container" psql -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 "$@"; }
+admin() { docker exec -i "$container" bash -ec 'export PGPASSWORD="${POSTGRES_PASSWORD:?missing_test_database_password}"; exec psql -h 127.0.0.1 -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 "$@"' _ "$@"; }
 if ! admin -c 'create extension if not exists pg_cron' > "$tmp/cron.log" 2>&1 || ! admin -c "alter system set cron.launch_active_jobs=off" >> "$tmp/cron.log" 2>&1; then
- echo 'FAILED: could not disable scheduled test jobs'; grep -m1 'ERROR:' "$tmp/cron.log" | cut -c1-350 || true; exit 1
+ echo 'FAILED: could not disable scheduled test jobs'; grep -m1 -E 'ERROR:|FATAL:|psql: error:|missing_test_database_password' "$tmp/cron.log" | cut -c1-350 || true; exit 1
 fi
 admin -c 'select pg_reload_conf()' >> "$tmp/cron.log" 2>&1
 apply() {

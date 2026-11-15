@@ -15,7 +15,7 @@ export GNUPGHOME="$tmp/gnupg"
 mkdir -m 700 "$GNUPGHOME"
 cleanup() { gpgconf --homedir "$GNUPGHOME" --kill all >/dev/null 2>&1 || true; rm -rf "$tmp"; }
 trap cleanup EXIT
-pg() { docker exec -i "$container" "$@"; }
+pg() { docker exec -i "$container" bash -ec 'export PGPASSWORD="${POSTGRES_PASSWORD:?missing_test_database_password}"; exec "$@"' _ "$@"; }
 # Stop writers before snapshot comparison; cron is disabled by the parent.
 docker stop -t 2 supabase_auth_noshashi-enterprise-ci supabase_rest_noshashi-enterprise-ci >/dev/null
 cat > "$tmp/manifest.sql" <<'SQL'
@@ -27,7 +27,7 @@ where table_type='BASE TABLE' and table_schema in ('noshashi','auth') order by t
 SQL
 manifest() { pg psql -U postgres -d postgres -X -qAt -v ON_ERROR_STOP=1 < "$tmp/manifest.sql"; }
 manifest > "$tmp/before.txt"
-pg pg_dump -U postgres -d postgres --format=custom > "$tmp/plain.dump" 2> "$tmp/dump.err"
+pg pg_dump -h 127.0.0.1 -U supabase_admin -d postgres --format=custom > "$tmp/plain.dump" 2> "$tmp/dump.err"
 python3 - "$tmp/key" <<'PY'
 import pathlib,secrets,sys
 pathlib.Path(sys.argv[1]).write_text(secrets.token_urlsafe(40))
@@ -38,9 +38,9 @@ rm "$tmp/plain.dump"
 gpg --batch --yes --quiet --no-symkey-cache --pinentry-mode loopback --passphrase-fd 3 \
  --output "$tmp/restore.dump" --decrypt "$tmp/snapshot.gpg" 3<"$tmp/key" 2>"$tmp/gpg.err"
 # Prove recovery rather than simply counting unchanged source rows.
-pg psql -U postgres -d postgres -X -q -v ON_ERROR_STOP=1 \
+pg psql -h 127.0.0.1 -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 \
  -c 'drop schema noshashi cascade' > "$tmp/remove.out" 2> "$tmp/remove.err"
-if ! pg pg_restore -U postgres -d postgres --clean --if-exists --exit-on-error --no-owner \
+if ! pg pg_restore -h 127.0.0.1 -U supabase_admin -d postgres --clean --if-exists --exit-on-error \
  < "$tmp/restore.dump" > "$tmp/restore.out" 2> "$tmp/restore.err"; then
  echo 'FAILED: full synthetic Supabase archive restore'
  grep -m1 'error:' "$tmp/restore.err" | cut -c1-350 || true
