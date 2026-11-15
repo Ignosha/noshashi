@@ -37,7 +37,20 @@ def run(status_path, output_dir):
             code, body = error.code, error.read(1_000_001)
         if code not in expected or len(body) > 1_000_000:
             # Bodies can contain JWTs. Never include them in diagnostics.
-            raise RuntimeError('unexpected_http_status_' + str(code) + '_' + path.split('?')[0])
+            detail = ''
+            try:
+                diagnostic = json.loads(body)
+                import re
+                code_value = diagnostic.get('code', '')
+                if isinstance(code_value, str) and re.fullmatch(r'[A-Za-z0-9_]+', code_value):
+                    detail += '_' + code_value
+                match = re.fullmatch(r'permission denied for (schema|function|table) ([A-Za-z0-9_.]+)',
+                                     diagnostic.get('message', ''))
+                if match:
+                    detail += '_' + match.group(1) + '_' + match.group(2)
+            except (ValueError, AttributeError, TypeError):
+                pass
+            raise RuntimeError('unexpected_http_status_' + str(code) + '_' + path.split('?')[0] + detail)
         return code, json.loads(body) if body else None
 
     # A restarted local service must become healthy within a bounded window.

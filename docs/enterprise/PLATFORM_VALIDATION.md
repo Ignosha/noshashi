@@ -35,7 +35,7 @@ and decrypts the archive. It creates a new template0 database, takes the old sou
 and switches the test services' database name to the empty target. The full archive is
 restored without stripping owners or grants and with first-error failure. Object/data
 entries are restored first; Supabase's provider-generated GraphQL wrapper is reconstructed
-only if missing, using the versioned official definition in
+only if missing, using the versioned official definition and initial provider permissions in
 `scripts/enterprise/supabase-graphql-restore.sql`. Every archived ACL, default ACL, comment
 and security label is then restored; no failed metadata statement is skipped. The GraphQL
 wrapper is exercised through its actual HTTP endpoint before and after recovery. This avoids

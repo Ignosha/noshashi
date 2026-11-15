@@ -24,3 +24,13 @@ begin
  end if;
 end;
 $restore$;
+-- Match the same pinned provider hook's initial extension permissions. These
+-- normally run during CREATE EXTENSION, before archived ACL differences apply.
+-- Keep them before metadata restoration so stricter archived changes still win.
+grant usage on schema graphql to postgres, anon, authenticated, service_role;
+grant select on all tables in schema graphql to postgres, anon, authenticated, service_role;
+grant execute on all functions in schema graphql to postgres, anon, authenticated, service_role;
+grant all on all sequences in schema graphql to postgres, anon, authenticated, service_role;
+alter default privileges in schema graphql grant all on tables to postgres, anon, authenticated, service_role;
+alter default privileges in schema graphql grant all on functions to postgres, anon, authenticated, service_role;
+alter default privileges in schema graphql grant all on sequences to postgres, anon, authenticated, service_role;
