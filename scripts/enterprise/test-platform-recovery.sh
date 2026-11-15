@@ -38,8 +38,11 @@ rm "$tmp/plain.dump"
 gpg --batch --yes --quiet --no-symkey-cache --pinentry-mode loopback --passphrase-fd 3 \
  --output "$tmp/restore.dump" --decrypt "$tmp/snapshot.gpg" 3<"$tmp/key" 2>"$tmp/gpg.err"
 # Prove recovery rather than simply counting unchanged source rows.
+# A preinitialized Supabase target has realtime message partitions. pg_restore
+# --clean cannot drop inherited child constraints individually; clear that
+# managed schema first in this disposable target, then restore its full archive.
 pg psql -h 127.0.0.1 -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 \
- -c 'drop schema noshashi cascade' > "$tmp/remove.out" 2> "$tmp/remove.err"
+ -c 'drop schema noshashi cascade; drop schema if exists realtime cascade' > "$tmp/remove.out" 2> "$tmp/remove.err"
 if ! pg pg_restore -h 127.0.0.1 -U supabase_admin -d postgres --clean --if-exists --exit-on-error \
  < "$tmp/restore.dump" > "$tmp/restore.out" 2> "$tmp/restore.err"; then
  echo 'FAILED: full synthetic Supabase archive restore'
