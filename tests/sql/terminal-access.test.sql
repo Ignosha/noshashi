@@ -1,4 +1,4 @@
--- needs: 20261103193000_payment_review_portal.sql 20261114150000_terminal_account_access.sql
+-- needs: 20261103193000_payment_review_portal.sql 20261114150000_terminal_account_access.sql 20261115090000_terminal_membership_expiry.sql
 begin;
 do $$
 declare a uuid:='b0000000-0000-0000-0000-000000000001'; b uuid:='b0000000-0000-0000-0000-000000000002'; org uuid:='b0000000-0000-0000-0000-000000000003'; req uuid:='b0000000-0000-0000-0000-000000000004'; cid uuid; r jsonb; report jsonb;
@@ -52,6 +52,13 @@ begin
  r:=noshashi.terminal_workspace(b,'get',org,cid);if r->>'historical'<>'true' then raise exception 'FAILED: assigned reader';end if;
  begin perform noshashi.terminal_workspace(b,'save',org,null,gen_random_uuid(),repeat('d',64),report,repeat('b',64));raise exception 'FAILED: viewer write';exception when insufficient_privilege then null;end;
  begin perform noshashi.terminal_workspace(b,'delete',org,cid);raise exception 'FAILED: viewer delete';exception when insufficient_privilege then null;end;
+ -- Temporary licensed regulator seats must not outlive their membership.
+ update noshashi.organization_members set role='regulator',expires_at=now()+interval '1 hour' where account_id=b and organization_id=org;
+ if (noshashi.terminal_access(b,org)->>'valid_until')::timestamptz>now()+interval '1 hour' then raise exception 'FAILED: team grant outlives membership';end if;
+ if (noshashi.terminal_access(b)->>'valid_until')::timestamptz>now()+interval '1 hour' then raise exception 'FAILED: inherited personal grant outlives membership';end if;
+ update noshashi.organization_members set expires_at=now()-interval '1 second' where account_id=b and organization_id=org;
+ begin perform noshashi.terminal_workspace(b,'get',org,cid);raise exception 'FAILED: expired licensed membership';exception when insufficient_privilege then null;end;
+ if noshashi.terminal_access(b)->>'tier'<>'desk' then raise exception 'FAILED: expired team membership granted personal Institutional';end if;
  delete from noshashi.organization_members where account_id=b;
  begin perform noshashi.terminal_workspace(b,'get',org,cid);raise exception 'FAILED: removed membership';exception when insufficient_privilege then null;end;
  for i in 1..6 loop perform noshashi.terminal_workspace(a,'lookup',null,null,gen_random_uuid(),repeat('d',64));end loop;
