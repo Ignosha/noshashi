@@ -33,7 +33,12 @@ operations, while application migrations and assertions use the application role
 Auth/PostgREST writers, dumps and encrypts the synthetic database, deletes the plaintext,
 and decrypts the archive. It creates a new template0 database, takes the old source offline,
 and switches the test services' database name to the empty target. The full archive is
-restored without stripping owners or grants and with first-error failure. This avoids
+restored without stripping owners or grants and with first-error failure. Object/data
+entries are restored first; Supabase's provider-generated GraphQL wrapper is reconstructed
+only if missing, using the versioned official definition in
+`scripts/enterprise/supabase-graphql-restore.sql`. Every archived ACL, default ACL, comment
+and security label is then restored; no failed metadata statement is skipped. The GraphQL
+wrapper is exercised through its actual HTTP endpoint before and after recovery. This avoids
 pg_restore --clean conflicts with preinitialized managed partitions and GraphQL objects.
 It is a logical recovery into a fresh database in the same disposable cluster, not
 replacement of a physical server or recovery of externally held Vault/encryption keys

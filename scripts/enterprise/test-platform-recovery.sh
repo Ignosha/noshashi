@@ -63,12 +63,36 @@ if grep -Eq '^CREATE SCHEMA public;' "$tmp/predata.sql"; then
  pg psql -h 127.0.0.1 -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 \
   -c 'drop schema public' >> "$tmp/switch.out" 2>> "$tmp/switch.err"
 fi
-if ! pg pg_restore -h 127.0.0.1 -U supabase_admin -d postgres --exit-on-error \
- < "$tmp/restore.dump" > "$tmp/restore.out" 2> "$tmp/restore.err"; then
- echo 'FAILED: full synthetic Supabase archive restore'
- grep -m1 'error:' "$tmp/restore.err" | cut -c1-350 || true
- exit 1
-fi
+# Supabase generates the public GraphQL wrapper in an extension event hook.
+# Restore all object/data definitions first, supply the versioned real wrapper,
+# then restore every ACL/comment. No failing ACL is ignored or discarded.
+pg pg_restore --list < "$tmp/restore.dump" > "$tmp/archive.list"
+python3 - "$tmp" <<'PYTOC'
+import pathlib,re,sys
+p=pathlib.Path(sys.argv[1]); objects=[];metadata=[]
+for line in (p/'archive.list').read_text().splitlines(True):
+ if re.match(r'^\d+; \d+ \d+ (ACL|DEFAULT ACL|COMMENT|SECURITY LABEL) ',line): metadata.append(line)
+ else: objects.append(line)
+(p/'objects.list').write_text(''.join(objects))
+(p/'metadata.list').write_text(''.join(metadata))
+assert metadata, 'archive metadata must not be discarded'
+PYTOC
+docker cp "$tmp/objects.list" "$container:/tmp/noshashi-restore-objects.list" >/dev/null
+docker cp "$tmp/metadata.list" "$container:/tmp/noshashi-restore-metadata.list" >/dev/null
+restore_part() {
+ if ! pg pg_restore -h 127.0.0.1 -U supabase_admin -d postgres --exit-on-error \
+ --use-list="/tmp/noshashi-restore-$1.list" < "$tmp/restore.dump" > "$tmp/restore.out" 2> "$tmp/restore.err"; then
+  echo "FAILED: full synthetic Supabase archive restore ($1)"
+  grep -m1 'error:' "$tmp/restore.err" | cut -c1-350 || true
+  grep -m1 -E '^Command was: (DROP|ALTER|CREATE|GRANT|REVOKE|COMMENT)' "$tmp/restore.err" | cut -c1-500 || true
+  exit 1
+ fi
+}
+restore_part objects
+pg psql -h 127.0.0.1 -U supabase_admin -d postgres -X -q -v ON_ERROR_STOP=1 \
+ < "$(dirname "$0")/supabase-graphql-restore.sql" > "$tmp/compat.out" 2> "$tmp/compat.err"
+restore_part metadata
+pg rm -f /tmp/noshashi-restore-objects.list /tmp/noshashi-restore-metadata.list
 rm "$tmp/restore.dump"
 manifest > "$tmp/after.txt"
 if ! cmp -s "$tmp/before.txt" "$tmp/after.txt"; then

@@ -53,6 +53,10 @@ def run(status_path, output_dir):
     if not ready:
         raise RuntimeError('auth_readiness_timeout')
 
+    # The provider-generated wrapper must remain callable after archive recovery.
+    _, graphql = request('POST', '/graphql/v1', anon, data={'query': '{ __typename }'})
+    assert graphql.get('data', {}).get('__typename') == 'Query', 'graphql_wrapper_failed'
+
     # Service creation confirms test emails without dispatching email.
     users = []
     for _ in range(2):
@@ -118,7 +122,7 @@ def run(status_path, output_dir):
                'requests_per_second': round(samples/elapsed, 3), 'errors': 0,
                'checks': ['real_auth_signin', 'tenant_read_isolation', 'tenant_write_isolation',
                           'anonymous_denial', 'invalid_jwt_denial', 'privileged_rpc_denial',
-                          'refresh_revocation']}
+                          'refresh_revocation', 'provider_graphql_wrapper']}
     (output / 'http-benchmark.json').write_text(json.dumps(metrics, indent=2) + '\n')
     print(json.dumps(metrics))
 
