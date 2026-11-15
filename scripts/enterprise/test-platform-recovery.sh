@@ -4,7 +4,10 @@ set -euo pipefail
 container="${1:?test container required}"
 [ "$container" = supabase_db_noshashi-enterprise-ci ] || exit 2
 network=noshashi-enterprise-isolated
-[ "$(docker network inspect -f '{{.Internal}}' "$network")" = true ] || exit 2
+[ "${GITHUB_ACTIONS:-}" = true ] || exit 2
+[ "$(docker network inspect -f '{{index .Labels "noshashi.test-only"}}' "$network")" = true ] || exit 2
+sudo -n iptables -C DOCKER-USER -s 172.30.241.0/24 -j NOSHASHI_TEST
+sudo -n iptables -C INPUT -s 172.30.241.0/24 -m conntrack --ctstate NEW -j REJECT || exit 2
 [ "$(docker inspect -f '{{range $name, $value := .NetworkSettings.Networks}}{{$name}}{{end}}' "$container")" = "$network" ] || exit 2
 umask 077
 tmp="$(mktemp -d)"

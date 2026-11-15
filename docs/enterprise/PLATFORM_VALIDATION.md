@@ -8,9 +8,9 @@ production load tests. Desktop signing is excluded.
 
 `bash scripts/enterprise/test-platform.sh` creates a new temporary project using the
 pinned official Supabase CLI 2.58.5. It starts real database, Auth and PostgREST services
-on an internal-only Docker network. Repository environment files are not copied. No
+on a dedicated Docker subnet with scoped firewall rules blocking new outbound connections. Repository environment files are not copied. No
 owner credentials are required. Namespace collisions are refused before cleanup is armed.
-Scheduled jobs are disabled before repository SQL is applied; internal-only networking
+Scheduled jobs are disabled before repository SQL is applied; runtime egress blocking
 also prevents the stored production URLs in historical migrations from reaching a service.
 
 The September 14 introspected baseline and every subsequent repository migration must
@@ -37,11 +37,14 @@ aggregate synthetic benchmark JSON is retained for seven days.
 
 ## Running and failure handling
 
-Requirements: Linux, Docker with sufficient disk for the Supabase images, the pinned CLI,
-Python 3 and GnuPG. CI is `.github/workflows/enterprise-platform-validation.yml` and runs
+Requirements: a disposable Linux GitHub runner, Docker with sufficient disk for the Supabase images,
+passwordless sudo for scoped iptables rules, the pinned CLI, Python 3 and GnuPG. CI is `.github/workflows/enterprise-platform-validation.yml` and runs
 on relevant pull requests or manual invocation. It does not use repository secrets.
 An existing stack in the reserved namespace causes refusal; do not remove someone else's
-containers to make it run. The parent cleanup removes only its disposable stack and network.
+containers to make it run. The parent cleanup removes only its disposable stack, network and scoped firewall rules.
+The original internal Docker network prevented CLI loopback health checks; the dedicated
+subnet now allows those established connections while denying new runtime egress. An actual
+outbound TCP probe must fail before repository migrations run.
 
 A schema error fails the gate with the migration name. It must be investigated rather
 than marked as a platform skip. Raw startup logs and local generated keys remain temporary

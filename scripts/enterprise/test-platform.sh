@@ -7,14 +7,23 @@ umask 077
 tmp="$(mktemp -d)"
 project=noshashi-enterprise-ci
 network=noshashi-enterprise-isolated
+subnet=172.30.241.0/24
+chain=NOSHASHI_TEST
+# Scoped firewall rules are permitted only on a disposable CI runner.
+[ "${GITHUB_ACTIONS:-}" = true ] || { echo 'BLOCKED: requires a disposable GitHub runner'; exit 2; }
+sudo -n true
 container=supabase_db_$project
 cleanup() {
  (cd "$tmp" && supabase stop --no-backup) > /dev/null 2>&1 || true
  docker network rm "$network" > /dev/null 2>&1 || true
+ sudo -n iptables -D DOCKER-USER -s "$subnet" -j "$chain" >/dev/null 2>&1 || true
+ sudo -n iptables -D INPUT -s "$subnet" -m conntrack --ctstate NEW -j REJECT >/dev/null 2>&1 || true
+ sudo -n iptables -F "$chain" >/dev/null 2>&1 || true
+ sudo -n iptables -X "$chain" >/dev/null 2>&1 || true
  rm -rf "$tmp"
 }
 # Refuse collisions before installing a cleanup trap that could remove them.
-if docker network inspect "$network" >/dev/null 2>&1 || docker inspect "$container" >/dev/null 2>&1; then
+if docker network inspect "$network" >/dev/null 2>&1 || docker inspect "$container" >/dev/null 2>&1 || sudo -n iptables -S "$chain" >/dev/null 2>&1; then
  echo 'BLOCKED: disposable platform namespace is already in use'; exit 2
 fi
 trap cleanup EXIT
@@ -27,9 +36,17 @@ s=re.sub(r'^project_id = .*$', 'project_id = "'+sys.argv[2]+'"',s,flags=re.M)
 s=s.replace('schemas = ["public", "graphql_public"]','schemas = ["public", "graphql_public", "noshashi"]')
 p.write_text(s)
 PY
-docker network create --internal "$network" >/dev/null
-# CLI downloads official pinned images on the host. Runtime containers have no
-# outbound route. Do not use --ignore-health-check or copy owner env files.
+# Docker --internal also blocks CLI loopback health ports. Use a dedicated
+# bridge with scoped NEW-egress denial; established host health probes still work.
+docker network create --subnet "$subnet" --label noshashi.test-only=true "$network" >/dev/null
+sudo -n iptables -N "$chain"
+sudo -n iptables -A "$chain" -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN
+sudo -n iptables -A "$chain" -d "$subnet" -j RETURN
+sudo -n iptables -A "$chain" -j REJECT
+sudo -n iptables -I DOCKER-USER 1 -s "$subnet" -j "$chain"
+sudo -n iptables -I INPUT 1 -s "$subnet" -m conntrack --ctstate NEW -j REJECT
+# CLI downloads official pinned images on the host. Runtime containers cannot initiate
+# connections outside their test subnet. Do not use --ignore-health-check or copy owner env files.
 if ! supabase start --network-id "$network" -x studio,pgadmin,postgres-meta,realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor,inbucket > "$tmp/start.log" 2>&1; then
  echo 'FAILED: isolated Supabase startup; review CLI/runtime compatibility'
  # Only service startup errors, never status output containing local keys.
@@ -43,7 +60,11 @@ for line in pathlib.Path(sys.argv[1]).read_text(errors='replace').splitlines()[-
 PYLOG
  exit 1
 fi
-[ "$(docker network inspect -f '{{.Internal}}' "$network")" = true ]
+sudo -n iptables -C DOCKER-USER -s "$subnet" -j "$chain"
+sudo -n iptables -C INPUT -s "$subnet" -m conntrack --ctstate NEW -j REJECT
+# Verify actual TCP egress refusal, not only firewall text.
+docker exec "$container" bash -c 'command -v timeout >/dev/null; if timeout 3 bash -c "exec 3<>/dev/tcp/1.1.1.1/443" 2>/dev/null; then exit 1; fi'
+echo 'Runtime egress denial verified' 
 pg() { docker exec -i "$container" psql -U postgres -d postgres -X -q -v ON_ERROR_STOP=1 "$@"; }
 # Avoid scheduled network jobs even though runtime egress is already blocked.
 pg -c "alter system set cron.launch_active_jobs=off" > "$tmp/cron.log" 2>&1
