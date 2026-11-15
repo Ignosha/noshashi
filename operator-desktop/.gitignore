@@ -1,0 +1,5 @@
+dist/
+.DS_Store
+*.key
+.access.json
+PRIVATE-ACCESS.md

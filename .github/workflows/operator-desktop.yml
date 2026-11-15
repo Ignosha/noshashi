@@ -1,0 +1,41 @@
+name: NOSHASHI Operator for Mac
+
+on:
+  pull_request:
+    paths:
+      - 'operator-desktop/**'
+      - '.github/workflows/operator-desktop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: operator-mac-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-mac:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: macos-14
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify local interface
+        run: node operator-desktop/ui/ui.test.mjs
+      - name: Build universal macOS12 app and verify deployment targets
+        run: bash operator-desktop/build-mac.sh
+      - name: Upload installable app and compatibility evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: NOSHASHI-Operator-macOS12-universal
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            operator-desktop/dist/NOSHASHI-Operator-*.dmg
+            operator-desktop/dist/NOSHASHI-Operator-*.zip
+            operator-desktop/dist/compatibility.json
+            operator-desktop/dist/SHA256SUMS.txt
