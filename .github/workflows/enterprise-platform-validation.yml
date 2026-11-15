@@ -1,0 +1,33 @@
+name: Enterprise platform validation
+on:
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - 'tests/sql/**'
+      - 'scripts/enterprise/**'
+      - '.github/workflows/enterprise-platform-validation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: enterprise-platform-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  platform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.58.5
+      - name: Full platform migrations, recovery and bounded API workload
+        run: bash scripts/enterprise/test-platform.sh
+      - name: Save aggregate synthetic benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: enterprise-platform-metrics
+          path: artifacts/platform-validation/**/*.json
+          if-no-files-found: ignore
+          retention-days: 7
