@@ -863,6 +863,8 @@
     "noshashi-password",
     "noshashi-payment-review",
     "noshashi-policy-activate",
+    "noshashi-portal",
+    "noshashi-return",
     "noshashi-stripe-webhook",
     "noshashi-support-notify",
     "noshashi-terminal",

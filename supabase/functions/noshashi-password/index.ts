@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { boundedText, PayloadError } from "../_shared/httpLimits.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 /**
@@ -66,7 +67,13 @@ Deno.serve(async (request: Request) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !serviceKey) return json(request, { ok: false, code: "SCREENING_UNAVAILABLE" }, 503);
 
-  const body = await request.json().catch(() => ({}));
+  let body;
+  try {
+    body = JSON.parse(await boundedText(request, 8192));
+    if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error();
+  } catch (error) {
+    return json(request, { ok: false, code: error instanceof PayloadError ? error.code : "BAD_REQUEST" }, error instanceof PayloadError ? error.status : 400);
+  }
   const email = typeof body.email === "string" ? body.email.trim() : "";
   const password = typeof body.password === "string" ? body.password : "";
   if (!email || email.length > 320 || !password || password.length > 1024) {
@@ -78,6 +85,7 @@ Deno.serve(async (request: Request) => {
   try {
     const response = await fetch(`${RANGE}${hash.slice(0, 5)}`, {
       headers: { "Add-Padding": "true", "User-Agent": "noshashi-password-screening" },
+      signal: AbortSignal.timeout(10000),
     });
     if (!response.ok) return json(request, { ok: false, code: "SCREENING_UNAVAILABLE" }, 503);
     count = countInRange(await response.text(), hash.slice(5));
@@ -91,7 +99,7 @@ Deno.serve(async (request: Request) => {
     const { error } = await service.rpc("attest_password", { p_email: email, p_password: password });
     if (error) throw error;
   } catch (error) {
-    console.error("noshashi-password: attestation failed", error instanceof Error ? error.message : "unknown");
+    console.error(JSON.stringify({ event: "password_attestation_failed" }));
     return json(request, { ok: false, code: "SCREENING_UNAVAILABLE" }, 503);
   }
   return json(request, { ok: true });

@@ -37,3 +37,13 @@ create or replace function auth.uid() returns uuid language sql stable as
 $$ select nullif(auth.jwt() ->> 'sub', '')::uuid $$;
 create or replace function auth.role() returns text language sql stable as
 $$ select auth.jwt() ->> 'role' $$;
+
+-- The real platform records sign-ins on auth.sessions. This minimal test-only
+-- shape lets that migration and its trigger compile; it does not emulate Auth.
+create table if not exists auth.sessions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id),
+  aal text default 'aal1',
+  ip inet,
+  user_agent text
+);

@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { privilegedIdentity, privilegedObject, privilegedFetch, PrivilegedRequestError } from "../_shared/privilegedRequest.ts";
 
 /**
  * noshashi-exception-decide — the only way a policy exception is approved,
@@ -30,6 +31,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 function createServiceClient(url: string, serviceRoleKey: string) {
   return createClient(url, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: privilegedFetch },
   });
 }
 
@@ -44,10 +46,17 @@ function corsHeaders(request: Request): Record<string, string> {
   };
 }
 
+const traces = new WeakMap<Request, string>();
+function traceId(request: Request) {
+  let id = traces.get(request);
+  if (!id) { id = crypto.randomUUID(); traces.set(request, id); }
+  return id;
+}
+
 function json(request: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders(request), "Content-Type": "application/json" },
+    headers: { ...corsHeaders(request), "Content-Type": "application/json", "Cache-Control": "no-store", "X-Request-ID": traceId(request) },
   });
 }
 
@@ -83,13 +92,12 @@ Deno.serve(async (request: Request) => {
 
   try {
     const asCaller = createClient(url, anonKey, {
-      global: { headers: { Authorization: request.headers.get("Authorization") ?? "" } },
+      global: { headers: { Authorization: request.headers.get("Authorization") ?? "" }, fetch: privilegedFetch },
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: userData, error: userError } = await asCaller.auth.getUser();
-    if (userError || !userData.user) return fail("NOT_AUTHENTICATED");
+    const actor = await privilegedIdentity(asCaller.auth, request);
 
-    const body = await request.json().catch(() => ({}));
+    const body = await privilegedObject(request);
     const exceptionId = String(body.exceptionId ?? "");
     const decision = String(body.decision ?? "");
     const note = typeof body.note === "string" ? body.note.slice(0, 4000) : null;
@@ -104,10 +112,10 @@ Deno.serve(async (request: Request) => {
     const service = createServiceClient(url, serviceKey).schema("noshashi");
     const { data: result, error } =
       decision === "request_evidence"
-        ? await service.rpc("request_exception_evidence", { p_exception: exceptionId, p_actor: userData.user.id, p_note: note })
+        ? await service.rpc("request_exception_evidence", { p_exception: exceptionId, p_actor: actor, p_note: note })
         : await service.rpc("decide_policy_exception", {
             p_exception: exceptionId,
-            p_actor: userData.user.id,
+            p_actor: actor,
             p_approve: decision === "approve",
             p_note: note,
             p_expires_in_days: decision === "approve" ? expiresInDays : 30,
@@ -121,7 +129,10 @@ Deno.serve(async (request: Request) => {
     }
     return json(request, { ok: true, ...result });
   } catch (error) {
-    console.error("noshashi-exception-decide", error instanceof Error ? error.message : error);
+    if (error instanceof PrivilegedRequestError) {
+      return json(request, { ok: false, code: error.code, title: "AUTHORIZATION / REQUEST CHECK", message: error.message }, error.status);
+    }
+    console.error(JSON.stringify({ event: "exception_decision_failed", request_id: traceId(request) }));
     return fail("DECISION_FAILED");
   }
 });
