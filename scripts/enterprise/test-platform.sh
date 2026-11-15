@@ -38,6 +38,11 @@ p.write_text(s)
 PY
 # Docker --internal also blocks CLI loopback health ports. Use a dedicated
 # bridge with scoped NEW-egress denial; established host health probes still work.
+# PostgREST requires every exposed schema to exist before its health check.
+# Only the empty API schema is bootstrapped here; application migrations run
+# later after scheduled work and runtime egress have been disabled.
+mkdir -p "$tmp/supabase/migrations"
+printf '%s\n' 'create schema if not exists noshashi;' > "$tmp/supabase/migrations/20260913000000_api_schema.sql"
 docker network create --subnet "$subnet" --label noshashi.test-only=true "$network" >/dev/null
 sudo -n iptables -N "$chain"
 sudo -n iptables -A "$chain" -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN
@@ -63,11 +68,13 @@ fi
 sudo -n iptables -C DOCKER-USER -s "$subnet" -j "$chain"
 sudo -n iptables -C INPUT -s "$subnet" -m conntrack --ctstate NEW -j REJECT
 # Verify actual TCP egress refusal, not only firewall text.
-docker exec "$container" bash -c 'command -v timeout >/dev/null; if timeout 3 bash -c "exec 3<>/dev/tcp/1.1.1.1/443" 2>/dev/null; then exit 1; fi'
-echo 'Runtime egress denial verified' 
+docker exec "$container" bash -ec 'command -v timeout >/dev/null; if timeout 3 bash -c "exec 3<>/dev/tcp/1.1.1.1/443" 2>/dev/null; then exit 1; fi'
+echo 'Runtime egress denial verified'
 pg() { docker exec -i "$container" psql -U postgres -d postgres -X -q -v ON_ERROR_STOP=1 "$@"; }
 # Avoid scheduled network jobs even though runtime egress is already blocked.
-pg -c "alter system set cron.launch_active_jobs=off" > "$tmp/cron.log" 2>&1
+if ! pg -c "alter system set cron.launch_active_jobs=off" > "$tmp/cron.log" 2>&1; then
+ echo 'FAILED: could not disable scheduled test jobs'; exit 1
+fi
 pg -c 'select pg_reload_conf()' >> "$tmp/cron.log" 2>&1
 apply() {
  local file="$1"

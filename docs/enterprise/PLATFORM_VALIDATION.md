@@ -30,7 +30,9 @@ The HTTP check uses real local Auth-issued JWTs and PostgREST:
 
 The recovery rehearsal stops Auth/PostgREST writers, dumps the synthetic database,
 encrypts the dump, removes the plaintext, decrypts it, removes the application schema,
-and restores the full archive with grants retained and first-error failure. It compares
+and restores the full archive into the same disposable cluster with grants retained and
+first-error failure. This is a logical recovery rehearsal, not replacement of a physical
+server or recovery of externally held Vault/encryption keys and cluster-global roles. It compares
 per-table counts and content digests for application/auth data before restarting services
 and repeating the HTTP and SQL checks. No dump or raw service logs are uploaded. Only
 aggregate synthetic benchmark JSON is retained for seven days.
