@@ -1,5 +1,6 @@
 import Stripe from "npm:stripe@23";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { stripeKeyLivemode } from "./stripeKeyMode.ts";
 import { ReviewError } from "../_shared/paymentReview.ts";
 
 // Existing Pro prices; no new products, amounts or institutional card sales.
@@ -14,7 +15,8 @@ export async function billingAction(
   cadence: string,
 ) {
   const secret = Deno.env.get("STRIPE_SECRET_KEY") ?? "";
-  if (!/^(sk|rk)_(test|live)_/.test(secret))
+  const livemode = stripeKeyLivemode(secret);
+  if (livemode === null)
     throw new ReviewError(
       503,
       "Stripe billing is not configured. No charge was made.",
@@ -75,7 +77,7 @@ export async function billingAction(
     price.unit_amount !== amount ||
     price.recurring?.interval !== interval ||
     price.recurring.interval_count !== 1 ||
-    price.livemode !== secret.includes("_live_")
+    price.livemode !== livemode
   )
     throw new ReviewError(
       503,
