@@ -8,6 +8,7 @@
  *   /api/treasury      -> api/_lib/routes/treasury.js
  *   /api/book-health   -> api/_lib/routes/book-health.js
  *   /api/v1/asset-risk -> api/_lib/routes/asset-risk.js
+ *   /api/stellar/authority -> api/_lib/routes/stellar-authority.js
  *
  * They share one function, not six, because the Hobby plan deploys at most
  * twelve and the site already used eleven (a deployment over the limit
@@ -26,15 +27,16 @@ import issuerState from "./_lib/routes/issuer-state.js";
 import treasury from "./_lib/routes/treasury.js";
 import bookHealth from "./_lib/routes/book-health.js";
 import assetRisk from "./_lib/routes/asset-risk.js";
+import stellarAuthority from "./_lib/routes/stellar-authority.js";
 import { queryOf } from "./_lib/query.js";
 
-const ROUTES = { terminal, rlusd, "settlement-check": settlementCheck, badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth, "asset-risk": assetRisk, "v1/asset-risk": assetRisk };
+const ROUTES = { terminal, rlusd, "settlement-check": settlementCheck, badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth, "asset-risk": assetRisk, "v1/asset-risk": assetRisk, "stellar-authority": stellarAuthority, "stellar/authority": stellarAuthority };
 
 export default function handler(req, res) {
   // vercel.json adds ?tool=; the public path (/api/book) names it too, in
   // case the rewritten query is not what reaches the function.
   const q = queryOf(req);
   const route = ROUTES[String(q.tool ?? "")] ?? ROUTES[String(q.__path ?? "").replace(/^\/api\//, "").replace(/\/$/, "")];
-  if (!route) return res.status(404).json({ error: "Not found", routes: Object.keys(ROUTES).filter((r) => r !== "asset-risk").map((r) => `/api/${r}`) });
+  if (!route) return res.status(404).json({ error: "Not found", routes: Object.keys(ROUTES).filter((r) => r !== "asset-risk" && r !== "stellar-authority").map((r) => `/api/${r}`) });
   return route(req, res);
 }

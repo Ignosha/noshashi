@@ -1,0 +1,37 @@
+{
+  "_note": "Live Horizon replies for Circle's USDC issuer on the Stellar public network, read 2026-11-16 through horizon.stellar.org. Trimmed to the fields the certificate reads; values unchanged.",
+  "account": {
+    "id": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+    "account_id": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+    "home_domain": "circle.com",
+    "last_modified_ledger": 65287496,
+    "thresholds": { "low_threshold": 2, "med_threshold": 2, "high_threshold": 2 },
+    "flags": { "auth_required": false, "auth_revocable": true, "auth_immutable": false, "auth_clawback_enabled": false },
+    "signers": [
+      { "weight": 1, "key": "GAUKFO2NIYEFO773KJZKLPSPYNQ6M7INPEAIQIJCIH7EEVP2KSVQWGH4", "type": "ed25519_public_key" },
+      { "weight": 1, "key": "GAXFRO4MH6FSBJMNECVZJ6R3ZXANI7CFCMVN47IDNRQDHII3J5HTOZGB", "type": "ed25519_public_key" },
+      { "weight": 1, "key": "GB73YPMX5R5673G35HHAXYUNRS4R4QZEUHCRT3OUAMSH2NUM6KT4N3KO", "type": "ed25519_public_key" },
+      { "weight": 1, "key": "GC6ANHZDMCPKU55BUQIJKI3VOYEMETF7Z46HXQRCNONQXPEXQHCVIAFP", "type": "ed25519_public_key" },
+      { "weight": 0, "key": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN", "type": "ed25519_public_key" }
+    ]
+  },
+  "assets": {
+    "_embedded": {
+      "records": [
+        {
+          "asset_type": "credit_alphanum4",
+          "asset_code": "USDC",
+          "asset_issuer": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+          "accounts": { "authorized": 2550362, "authorized_to_maintain_liabilities": 1, "unauthorized": 0 },
+          "balances": { "authorized": "236668620.7417194", "authorized_to_maintain_liabilities": "979527.0363342", "unauthorized": "0.0000000" },
+          "liquidity_pools_amount": "2362012.4138343",
+          "contracts_amount": "102909950.0937776",
+          "flags": { "auth_required": false, "auth_revocable": true, "auth_immutable": false, "auth_clawback_enabled": false }
+        }
+      ]
+    }
+  },
+  "ledger": {
+    "_embedded": { "records": [{ "sequence": 65504184, "closed_at": "2026-11-16T05:29:22Z" }] }
+  }
+}

@@ -192,6 +192,10 @@
     {
       "source": "/api/v1/asset-risk",
       "destination": "/api/tools?tool=asset-risk"
+    },
+    {
+      "source": "/api/stellar/authority",
+      "destination": "/api/tools?tool=stellar-authority"
     }
   ]
 }
