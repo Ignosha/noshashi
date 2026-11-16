@@ -922,6 +922,216 @@ async function buildCertificate() {
   }));
 }
 
+/* ── /stellar/ ────────────────────────────────────────────────────── */
+/*
+ * The authority certificate for Stellar issuers: the same question as
+ * /certificate/, asked of the network where tokenized funds and
+ * stablecoins such as Circle's USDC are issued. Reads Horizon through
+ * /api/stellar/authority. Same verdict wording, same CLEAR / FINDING
+ * marks, same rule that an unknown verdict renders as "not established",
+ * never as an allegation.
+ */
+async function buildStellarCertificate() {
+  const body = `<div class="page-head">
+  <p class="eyebrow">Free · no account · Stellar</p>
+  <h1>What can a Stellar issuer still do to it?</h1>
+  <p>Enter a Stellar issuing account. NOSHASHI reads it from Horizon, the Stellar network's
+     public API, and reports the authority that issuer has kept: whether it can freeze a
+     holder, whether it can claw balances back, whether it decides who may hold, and whether
+     one key can act alone.</p>
+</div>
+
+<section>
+  <form class="cert-form" id="cert-form" novalidate>
+    <div class="form-field">
+      <label for="issuer">Issuing account</label>
+      <input id="issuer" name="issuer" type="text" spellcheck="false" autocomplete="off"
+             placeholder="G…" maxlength="56" required>
+    </div>
+    <div class="form-field">
+      <label for="asset">Asset code <em style="font-style:normal;color:var(--faint)">optional</em></label>
+      <input id="asset" name="asset" type="text" spellcheck="false" autocomplete="off"
+             placeholder="USDC" maxlength="12">
+    </div>
+    <div class="cert-actions">
+      <button class="btn" type="submit" id="cert-run">Read the network</button>
+    </div>
+    <p class="form-status" id="cert-status" role="status" aria-live="polite"></p>
+  </form>
+
+  <div id="cert-out" hidden></div>
+
+  <div class="grid g2" style="margin-top:34px">
+    <div class="panel">
+      <p class="num">HOW STELLAR DIFFERS</p>
+      <p>On Stellar an issuer's powers are account flags. <strong>AUTH_REVOCABLE</strong> lets it
+         freeze a holder, <strong>AUTH_CLAWBACK_ENABLED</strong> lets it take balances back, and
+         <strong>AUTH_REQUIRED</strong> makes it approve every holder. Only
+         <strong>AUTH_IMMUTABLE</strong> locks them for good. While it is clear, signers who reach the
+         high threshold can switch a power back on, so a flag that is clear today is not reported
+         as surrendered.</p>
+    </div>
+    <div class="panel">
+      <p class="num">WHAT THIS IS NOT</p>
+      <p><strong>It is not a score</strong> and <strong>it is not a legal finding.</strong> It reports
+         ledger facts at the stated ledger. Whether an asset is decentralised, or is a security, is
+         for regulators applying statutory criteria. Holder counts are Horizon's count of
+         authorized trust lines, which includes lines with a zero balance.</p>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <p class="num">THE DIGEST</p>
+    <p>Every certificate carries a SHA-256 digest over the verdict, the issuer, the network, the
+       asset it was scoped to, <strong>the ledger sequence</strong>, the source and <strong>the
+       rule-set version</strong>, with every check and its result, computed exactly as on the
+       <a href="/certificate/">XRP Ledger certificate</a>. The same issuer at a later ledger is a
+       different assertion and does not share the digest.</p>
+  </div>
+</section>`;
+
+  const head = `<style>
+.cert-form{display:grid;gap:14px;max-width:620px;margin-bottom:26px}
+.cert-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.cert-verdict{border:1px solid var(--rule);border-radius:var(--r);padding:22px 24px;margin-bottom:14px}
+.cert-verdict .tag{font:10px "IBM Plex Mono",monospace;letter-spacing:.2em;text-transform:uppercase}
+.cert-verdict h2{font-size:18px;margin:8px 0 8px;letter-spacing:-.02em;
+  font-family:"IBM Plex Mono",monospace;overflow-wrap:anywhere}
+.cert-verdict p{color:var(--muted);font-size:13.5px;line-height:1.62;max-width:72ch}
+.cert-verdict.go{border-left:3px solid var(--go)} .cert-verdict.go .tag{color:var(--go)}
+.cert-verdict.hold{border-left:3px solid var(--hold)} .cert-verdict.hold .tag{color:var(--hold)}
+.cert-verdict.unknown{border-left:3px solid var(--muted)} .cert-verdict.unknown .tag{color:var(--muted)}
+.cert-verdict.nogo{border-left:3px solid var(--nogo)} .cert-verdict.nogo .tag{color:var(--nogo)}
+.cert-meta{font:10.5px "IBM Plex Mono",monospace;color:var(--faint);
+  font-variant-numeric:tabular-nums;margin-top:12px;word-break:break-all;line-height:1.7}
+.cert-checks{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:var(--r);overflow:hidden}
+.cert-check{background:var(--surface);padding:16px 20px;display:grid;
+  grid-template-columns:72px 1fr;gap:4px 14px;align-items:start}
+.cert-check .mark{font:10px "IBM Plex Mono",monospace;letter-spacing:.14em;padding-top:2px}
+.cert-check .mark.pass{color:var(--go)} .cert-check .mark.warn{color:var(--hold)}
+.cert-check .mark.block{color:var(--nogo)}
+.cert-check h3{font-size:13.5px;margin:0;letter-spacing:-.01em}
+.cert-check p{grid-column:2;color:var(--muted);font-size:12.5px;line-height:1.6;margin:0;max-width:78ch}
+.cert-check code{grid-column:2;font-size:10px;color:var(--faint);letter-spacing:.1em}
+@media(max-width:560px){.cert-check{grid-template-columns:1fr}
+  .cert-check p,.cert-check code{grid-column:1}}
+</style>`;
+
+  const script = `<script>
+(function(){
+  var form=document.getElementById("cert-form");
+  if(!form)return;
+  var status=document.getElementById("cert-status");
+  var out=document.getElementById("cert-out");
+  var button=document.getElementById("cert-run");
+  var input=document.getElementById("issuer");
+  var assetInput=document.getElementById("asset");
+
+  function say(text,tone){status.textContent=text;status.setAttribute("data-tone",tone||"");}
+  function esc(v){return String(v).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function data(text){
+    return esc(text).replace(/(^|[^A-Z0-9])(G[A-Z2-7]{55})(?![A-Z0-9])/g,
+      function(m,pre,a){return pre+'<span translate="no">'+a+'</span>';});
+  }
+
+  /* Same wording as the XRP Ledger certificate (and
+     AUTHORITY_VERDICT_COPY in src/lib/desk/authority.ts). */
+  var COPY={
+    "go":{cls:"go",tag:"No unilateral authority found",
+      text:"On the checks run, no single party was found able to freeze, claw back, gate or unilaterally sign for this issuance at this ledger. This describes the authority observed, not the conduct of whoever holds it."},
+    "hold":{cls:"hold",tag:"Authority retained, constrained",
+      text:"No single party can act alone, but the issuer has kept powers that bear on a holder: a freeze or clawback it can use or switch back on, or approval over who may hold."},
+    "no-go":{cls:"nogo",tag:"Unilateral authority present",
+      text:"A single party can act on this issuance without anyone's agreement, or the issuer could not be read well enough to say otherwise. Either way a holder's balance is not solely in the holder's control."},
+    "insufficient-data":{cls:"unknown",tag:"Not established",
+      text:"A source needed to reach a conclusion could not be read at this ledger, and no blocking finding was established without it. This is a statement about the reading, not about the issuer: it is not a clearance, and it is not an allegation."}
+  };
+
+  function render(cert){
+    var copy=COPY[cert.verdict]||COPY["insufficient-data"];
+    var a=cert.asset;
+    var html='<div class="cert-verdict '+copy.cls+'">'+
+      '<p class="tag">'+esc(copy.tag)+'</p>'+
+      '<h2 translate="no">'+esc(cert.issuer)+'</h2>'+
+      '<p>'+esc(copy.text)+'</p>'+
+      '<p class="cert-meta">STELLAR LEDGER '+esc(String(cert.ledgerIndex))+
+        (a?' · <span translate="no">'+esc(a.code)+'</span> · '+esc(Number(a.trustLinesAuthorized).toLocaleString())+' AUTHORIZED TRUST LINES':'')+
+        (cert.homeDomain?' · <span translate="no">'+esc(cert.homeDomain)+'</span>':'')+
+        ' · READ <span translate="no">'+esc(new Date(cert.evaluatedAt).toLocaleString())+'</span>'+
+        ' · SOURCE HORIZON'+
+        (cert.rulesVersion?' · RULES v'+esc(String(cert.rulesVersion)):'')+
+        '<br>DIGEST <span translate="no">'+esc(cert.digest)+'</span></p>'+
+      '</div><div class="cert-checks">';
+    for(var i=0;i<cert.checks.length;i++){
+      var c=cert.checks[i];
+      var mark=c.passed?"pass":(c.severity==="block"?"block":"warn");
+      html+='<div class="cert-check">'+
+        '<span class="mark '+mark+'">'+(c.passed?"CLEAR":"FINDING")+'</span>'+
+        '<h3>'+data(c.label)+'</h3>'+
+        '<p>'+data(c.detail)+'</p>'+
+        '<code>'+esc(c.id)+'</code>'+
+      '</div>';
+    }
+    out.innerHTML=html+'</div>';
+    out.hidden=false;
+  }
+
+  form.addEventListener("submit",function(event){
+    event.preventDefault();
+    var issuer=(input.value||"").trim().toUpperCase();
+    var asset=(assetInput.value||"").trim();
+    if(!issuer){say("Enter an issuing account.","bad");return;}
+    if(!/^G[A-Z2-7]{55}$/.test(issuer)){
+      say("That is not a Stellar account ID. They are 56 characters and begin with G.","bad");return;
+    }
+    if(asset&&!/^[A-Za-z0-9]{1,12}$/.test(asset)){say("An asset code is 1 to 12 letters or digits.","bad");return;}
+    button.disabled=true;
+    out.hidden=true;
+    say("Reading the Stellar network…","busy");
+    fetch("/api/stellar/authority?issuer="+encodeURIComponent(issuer)+(asset?"&asset="+encodeURIComponent(asset):""))
+      .then(function(r){return r.json().then(function(b){return {ok:r.ok,body:b};});})
+      .then(function(result){
+        if(!result.ok){say(result.body.error||"That could not be read.","bad");return;}
+        say("");
+        render(result.body);
+      })
+      .catch(function(){say("Could not reach the server. Try again shortly.","bad");})
+      .finally(function(){button.disabled=false;});
+  });
+
+  /* Deep link: /stellar/?issuer=G…&asset=CODE runs on load. */
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.get("asset"))assetInput.value=q.get("asset");
+    if(q.get("issuer")){input.value=q.get("issuer");form.requestSubmit?form.requestSubmit():form.dispatchEvent(new Event("submit",{cancelable:true}));}
+  }catch(e){}
+})();
+</script>`;
+
+  await write("stellar/index.html", renderPage({
+    title: "Stellar authority certificate — what a Stellar issuer can still do to your asset",
+    description:
+      "Free, no account. Read from the Stellar network whether an issuer can freeze holders, "
+      + "claw balances back, decide who may hold, or act with a single key. Not a score, not a legal finding.",
+    path: "/stellar/",
+    body,
+    head,
+    structured: [
+      breadcrumb("Stellar authority certificate", "/stellar/"),
+      {
+        "@type": "WebApplication",
+        name: "NOSHASHI Stellar authority certificate",
+        applicationCategory: "FinanceApplication",
+        url: `${ORIGIN}/stellar/`,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      },
+    ],
+    scripts: script,
+  }));
+}
+
 /* ── /protection/ ─────────────────────────────────────────────────── */
 /*
  * Customer Asset Protection: an institution's public page. What a deposit
@@ -1644,6 +1854,7 @@ async function buildSitemap(docs = [], tokenPages = [], intelligencePages = []) 
     // argued from, and the only one that answers a question for
     // somebody who will never install anything.
     ["/certificate/", "weekly", "0.9"],
+    ["/stellar/", "weekly", "0.8"],
     ...TOOL_PAGES,
     ...TOKEN_INDEX_PAGES,
     ...PARTNER_PAGES,
@@ -1748,6 +1959,7 @@ async function main() {
   await buildProgress({ feed, release, releases });
   await buildContact();
   await buildCertificate();
+  await buildStellarCertificate();
   await buildTools(write);
   const tokenPages = await buildTokens(write);
   await buildPartners(write);
