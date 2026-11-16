@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+      - name: Check hosted staging SQL projection
+        run: python3 scripts/enterprise/hosted/test_projection.py
       - uses: supabase/setup-cli@v1
         with:
           version: 2.58.5

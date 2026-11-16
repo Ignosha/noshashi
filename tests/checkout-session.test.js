@@ -328,3 +328,13 @@ describe("the Ledger Evidence Report", () => {
     expect(sent).toBeUndefined();
   });
 });
+
+describe('restricted runtime keys', () => {
+  it.each(['rk', 'rkcs'])('accepts %s test keys without changing prices', async prefix => {
+    process.env.STRIPE_SECRET_KEY = [prefix, 'test', '0'.repeat(24)].join('_');
+    const result = mockRes();
+    await handler(post({cadence:'monthly'}),result);
+    expect(result.statusCode).toBe(200);
+    expect(sent).toContain(MONTHLY);
+  });
+});

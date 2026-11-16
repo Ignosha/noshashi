@@ -92,6 +92,15 @@ jobs:
       # site/assets/garden-field.js is the bundled hero field, committed
       # like every site asset. A source change pushed without its bundle
       # would leave the site running the old field.
+      - name: Governance HTTP safety checks (loopback fixtures only)
+        working-directory: supabase/functions
+        run: deno test --allow-env --allow-net=127.0.0.1 _tests/governance-http.test.ts _tests/billing-http.test.ts
+
+      - name: Focused credential scan
+        run: |
+          python3 -m unittest discover -s tests/enterprise -p 'test_*.py'
+          python3 scripts/enterprise/secret_scan.py
+
       - name: Garden field is rebuilt
         run: npm run check:garden
 

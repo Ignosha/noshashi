@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { privilegedIdentity, privilegedObject, privilegedFetch, PrivilegedRequestError } from "../_shared/privilegedRequest.ts";
 import { policyHash, validateParams } from "./policy.ts";
 
 /**
@@ -27,6 +28,7 @@ import { policyHash, validateParams } from "./policy.ts";
 function createServiceClient(url: string, serviceRoleKey: string) {
   return createClient(url, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: privilegedFetch },
   });
 }
 
@@ -41,10 +43,17 @@ function corsHeaders(request: Request): Record<string, string> {
   };
 }
 
+const traces = new WeakMap<Request, string>();
+function traceId(request: Request) {
+  let id = traces.get(request);
+  if (!id) { id = crypto.randomUUID(); traces.set(request, id); }
+  return id;
+}
+
 function json(request: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders(request), "Content-Type": "application/json" },
+    headers: { ...corsHeaders(request), "Content-Type": "application/json", "Cache-Control": "no-store", "X-Request-ID": traceId(request) },
   });
 }
 
@@ -88,14 +97,12 @@ Deno.serve(async (request: Request) => {
   try {
     // 1. Who is asking — from the JWT only.
     const asCaller = createClient(url, anonKey, {
-      global: { headers: { Authorization: request.headers.get("Authorization") ?? "" } },
+      global: { headers: { Authorization: request.headers.get("Authorization") ?? "" }, fetch: privilegedFetch },
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: userData, error: userError } = await asCaller.auth.getUser();
-    if (userError || !userData.user) return fail("NOT_AUTHENTICATED");
-    const actor = userData.user.id;
+    const actor = await privilegedIdentity(asCaller.auth, request);
 
-    const body = await request.json().catch(() => ({}));
+    const body = await privilegedObject(request);
     const organizationId = String(body.organizationId ?? "");
     const policyId = String(body.policyId ?? "");
     const version = Number(body.version);
@@ -145,7 +152,10 @@ Deno.serve(async (request: Request) => {
     if (!result?.ok) return fail(String(result?.code ?? "ACTIVATION_FAILED"));
     return json(request, { ok: true, ...result });
   } catch (error) {
-    console.error("noshashi-policy-activate", error instanceof Error ? error.message : error);
+    if (error instanceof PrivilegedRequestError) {
+      return json(request, { ok: false, code: error.code, title: "AUTHORIZATION / REQUEST CHECK", message: error.message }, error.status);
+    }
+    console.error(JSON.stringify({ event: "policy_activation_failed", request_id: traceId(request) }));
     return fail("ACTIVATION_FAILED");
   }
 });

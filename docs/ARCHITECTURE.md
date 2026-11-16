@@ -1,7 +1,6 @@
 # Architecture
 
-Last reviewed 2026-09-29 against `main` (1.0.17). Paths are the source of
-truth; this page says how they fit together.
+Reviewed against `main` commit `62a7e63` on 2026-11-15 (source version 1.0.27). Paths are the source of truth. See [enterprise evidence](enterprise/READINESS_BASELINE.md) for verification limits.
 
 ## One sentence
 
@@ -26,7 +25,7 @@ documents it.
                 └──────────────┬─────────────────────────────────────────┘
                                │ HTTPS + user JWT
                 ┌──────────────▼───── Supabase (schema noshashi) ────────┐
-                │ Postgres + RLS · 11 Edge Functions · pg_cron · pg_net  │
+                │ Postgres + RLS · 15 Edge Functions · pg_cron · pg_net  │
                 └──────────────┬─────────────────────────────────────────┘
                                │
                 ┌──────────────▼───── Website (Vercel) ──────────────────┐
@@ -58,10 +57,7 @@ documents it.
 account monitoring), `noshashi-ledger-registry` (credential and domain
 directory). Shared code is in `supabase/functions/_shared`.
 
-Two more are deployed whose source is **not in this repository**:
-`noshashi-portal` (Stripe billing portal) and `noshashi-return` (checkout
-return page). Their code should be pulled into `supabase/functions` so it
-is reviewed and versioned like the rest.
+`noshashi-terminal` and `noshashi-payment-review` provide signed-in terminal access and payment-list review. This review branch restores the previously unversioned deployed `noshashi-portal` (Stripe billing portal) and `noshashi-return` (static return page) source. The return page keeps its layout; its canonical emblem, CSP and truthful billing-state wording are corrected. Both billing functions' hardening remains draft-only until owner approval. Function deployment and gateway settings must be verified separately.
 
 ## Scheduled work (pg_cron)
 
@@ -94,7 +90,7 @@ The database reaches XRPL through `pg_net` from SQL.
 ## Build and release
 
 CI (`.github/workflows/ci.yml`): type check, unit and invariant tests, Deno
-check of the Edge Functions, website-bundle drift check, Rust compile.
+check of the Edge Functions, website-bundle drift checks and disposable PostgreSQL security tests. Native compilation is handled separately by platform/release workflows; a normal TypeScript CI pass is not a native build.
 Release (`release.yml`): macOS arm64/x64, Windows MSI/NSIS, Linux
 deb/rpm/AppImage, updater signatures and `latest.json`. See
 [RELEASE_SIGNING.md](RELEASE_SIGNING.md).
