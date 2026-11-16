@@ -114,7 +114,7 @@ const HHI_CONCENTRATED = 2500;
  * digests, and the version is inside the digest scope, so a mismatch
  * fails there immediately.
  */
-export const AUTHORITY_RULES_VERSION = 2;
+export const AUTHORITY_RULES_VERSION = 3;
 
 const LSF_REQUIRE_AUTH = 0x00040000;
 const LSF_GLOBAL_FREEZE = 0x00400000;
@@ -607,14 +607,30 @@ export function authorityChecks(surface) {
     return checks;
   }
 
+  /*
+   * A freeze is a transaction the issuer signs. An account that can
+   * never sign again cannot freeze, whatever its flags say. Without
+   * this, every blackholed issuer that never set lsfNoFreeze (most XRPL
+   * meme and community tokens) was told it "can exercise it at any
+   * time", contradicting the signer check two rows below. A signer list
+   * that could not be read rules this out: an unknown is not a lock.
+   */
+  const cannotSign =
+    !control.masterKeyEnabled &&
+    !regularKeyCanSign(control.regularKey) &&
+    !control.signers.present &&
+    !control.signers.unreadable;
+
   checks.push({
     id: "FREEZE_SURRENDERED",
     label: "Freeze permanently surrendered",
     severity: "warn",
-    passed: posture.noFreeze,
+    passed: posture.noFreeze || cannotSign,
     detail: posture.noFreeze
       ? "lsfNoFreeze is set. The issuer has irrevocably given up the ability to freeze any line of this issuance."
-      : "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder.",
+      : cannotSign
+        ? "lsfNoFreeze is not set, but the issuer can never sign another transaction: the master key is disabled, no signer list is present and no usable regular key is set. Freezing a line takes a signed transaction, so the power can never be used."
+        : "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder.",
   });
 
   checks.push({

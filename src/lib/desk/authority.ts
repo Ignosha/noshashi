@@ -170,7 +170,7 @@ const HHI_CONCENTRATED = 2500;
  * does not — so a changed rule cannot reach main wearing an old
  * version.
  */
-export const AUTHORITY_RULES_VERSION = 2;
+export const AUTHORITY_RULES_VERSION = 3;
 
 export async function readAuthoritySurface(
   issuer: string,
@@ -296,14 +296,30 @@ export function authorityChecks(surface: AuthoritySurface): PolicyCheck[] {
   // lsfNoFreeze is the only irrevocable surrender on the ledger: once
   // set it cannot be cleared, which is why it is the single strongest
   // signal available and is checked first.
+  /*
+   * A freeze is a transaction the issuer signs. An account that can
+   * never sign again cannot freeze, whatever its flags say. Without
+   * this, every blackholed issuer that never set lsfNoFreeze (most XRPL
+   * meme and community tokens) was told it "can exercise it at any
+   * time", contradicting the signer check two rows below. A signer list
+   * that could not be read rules this out: an unknown is not a lock.
+   */
+  const cannotSign =
+    !control.masterKeyEnabled &&
+    !regularKeyCanSign(control.regularKey) &&
+    !control.signers.present &&
+    !control.signers.unreadable;
+
   checks.push({
     id: "FREEZE_SURRENDERED",
     label: "Freeze permanently surrendered",
     severity: "warn",
-    passed: posture.noFreeze,
+    passed: posture.noFreeze || cannotSign,
     detail: posture.noFreeze
       ? "lsfNoFreeze is set. The issuer has irrevocably given up the ability to freeze any line of this issuance."
-      : "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder.",
+      : cannotSign
+        ? "lsfNoFreeze is not set, but the issuer can never sign another transaction: the master key is disabled, no signer list is present and no usable regular key is set. Freezing a line takes a signed transaction, so the power can never be used."
+        : "lsfNoFreeze is not set. The issuer retains the ability to freeze holders' lines, and can exercise it at any time without notice to the holder.",
   });
 
   checks.push({
