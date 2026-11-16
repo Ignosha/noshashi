@@ -129,6 +129,34 @@ const BATTERY: Array<[string, AuthoritySurface]> = [
     }),
   ],
   ["freeze retained", surface({ posture: posture({ noFreeze: false }) })],
+  [
+    "freeze retained, blackholed",
+    surface({
+      posture: posture({ noFreeze: false }),
+      control: control({
+        regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji",
+        signers: { present: false, quorum: 0, signers: [], totalWeight: 0, minimumSigners: 0, unilateralSigners: [] },
+      }),
+    }),
+  ],
+  [
+    "freeze retained, blackholed, signer list unreadable",
+    surface({
+      posture: posture({ noFreeze: false }),
+      control: control({
+        regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji",
+        signers: {
+          present: false,
+          quorum: 0,
+          signers: [],
+          totalWeight: 0,
+          minimumSigners: 0,
+          unilateralSigners: [],
+          unreadable: "the server did not return signer_lists",
+        },
+      }),
+    }),
+  ],
   ["globally frozen", surface({ posture: posture({ globalFreeze: true }) })],
   ["authorisation required", surface({ posture: posture({ requireAuth: true }) })],
   ["transfer fee set", surface({ posture: posture({ transferRateBps: 25 }) })],
@@ -173,9 +201,13 @@ async function fingerprint(): Promise<string> {
 // v2: five-state results. Concentration abstentions are INSUFFICIENT_DATA,
 // and an issuer with no outstanding obligations is NOT_APPLICABLE (passed)
 // rather than a failed advisory check that held the certificate at HOLD.
-const EXPECTED_VERSION = 2;
+// v3: an issuer that can never sign again (master key disabled, no
+// usable regular key, a readable and absent signer list) passes
+// FREEZE_SURRENDERED even without lsfNoFreeze, because a freeze is a
+// signed transaction. Blackholed community tokens stop showing HOLD.
+const EXPECTED_VERSION = 3;
 const EXPECTED_FINGERPRINT =
-  "0011256FC99EA13B435109ED298453FD93EDD5C99B0A00E7516ADC49CE310026";
+  "2402D8A9B850CC23800A5C00DE823825449CE284554E5A97A648C0C3D08EEAE5";
 
 describe("authority rule set version", () => {
   it("has not changed behaviour without a version bump", async () => {

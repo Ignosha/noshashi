@@ -47,7 +47,7 @@ describe("public issuer authority source snapshot", () => {
     expect(surface.issuance).toBeNull();
     const certificate = await certificateFrom(surface);
     expect(certificate.ledgerIndex).toBe(108049990);
-    expect(certificate.rulesVersion).toBe(2);
+    expect(certificate.rulesVersion).toBe(3);
     expect(certificate.checks.find(c => c.id === "NOT_GLOBALLY_FROZEN").passed).toBe(false);
     expect(certificate.checks.find(c => c.id === "SUPPLY_CONCENTRATION").state).toBe("INSUFFICIENT_DATA");
   });

@@ -183,6 +183,40 @@ describe("seizure and admission", () => {
     expect(verdictFor(authorityChecks(s))).toBe("hold");
   });
 
+  const noSigners = { present: false, quorum: 0, signers: [], totalWeight: 0, minimumSigners: 0, unilateralSigners: [] };
+
+  it("a blackholed issuer cannot freeze, so a missing lsfNoFreeze does not hold it", () => {
+    // Live shape of Calorie, XRG, XDawgs and GZX at ledger 108,360,400.
+    const s = surface({
+      posture: posture({ noFreeze: false }),
+      control: control({ regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji", signers: noSigners }),
+    });
+    expect(byId(s, "FREEZE_SURRENDERED").passed).toBe(true);
+    expect(byId(s, "FREEZE_SURRENDERED").detail).toContain("can never sign another transaction");
+    expect(verdictFor(authorityChecks(s))).toBe("go");
+  });
+
+  it("a signer list keeps the freeze live even with both single keys gone", () => {
+    const s = surface({ posture: posture({ noFreeze: false }), control: control({ regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji" }) });
+    expect(byId(s, "FREEZE_SURRENDERED").passed).toBe(false);
+  });
+
+  it("an unreadable signer list is not a lock", () => {
+    const s = surface({
+      posture: posture({ noFreeze: false }),
+      control: control({ regularKey: "rrrrrrrrrrrrrrrrrrrrBZbvji", signers: { ...noSigners, unreadable: "timeout" } }),
+    });
+    expect(byId(s, "FREEZE_SURRENDERED").passed).toBe(false);
+  });
+
+  it("a usable regular key keeps the freeze live", () => {
+    const s = surface({
+      posture: posture({ noFreeze: false }),
+      control: control({ regularKey: "rSomeRealKeyThatCouldSign11111", signers: noSigners }),
+    });
+    expect(byId(s, "FREEZE_SURRENDERED").passed).toBe(false);
+  });
+
   it("requireAuth means the issuer chooses who may hold", () => {
     const s = surface({ posture: posture({ requireAuth: true }) });
     expect(byId(s, "OPEN_HOLDING").passed).toBe(false);
