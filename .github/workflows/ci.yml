@@ -167,11 +167,24 @@ jobs:
       - name: Start a scratch Postgres
         run: |
           set -euo pipefail
-          docker run -d --name scratch -p 5432:5432 -e POSTGRES_PASSWORD=sql-test postgres:17 -c log_min_messages=fatal > /dev/null
+          docker run -d --name scratch --label noshashi.test-only=true -p 5432:5432 -e POSTGRES_PASSWORD=sql-test postgres:17 -c log_min_messages=fatal > /dev/null
           for _ in $(seq 1 60); do docker exec scratch pg_isready -U postgres -q && exit 0; sleep 1; done
           exit 1
       - name: Database tests
         run: scripts/test-sql.sh postgresql://postgres:sql-test@localhost:5432/postgres
+      - name: Synthetic encrypted restore and tenant-access recovery
+        run: |
+          set -euo pipefail
+          docker run -d --name recovery-scratch --network none --label noshashi.test-only=true \
+            -e POSTGRES_PASSWORD=synthetic-only postgres:17 \
+            -c log_min_messages=fatal -c log_min_error_statement=panic > /dev/null
+          ready=false
+          for _ in $(seq 1 60); do
+            if docker exec recovery-scratch pg_isready -U postgres -q; then ready=true; break; fi
+            sleep 1
+          done
+          [ "$ready" = true ]
+          bash scripts/enterprise/test-encrypted-restore.sh recovery-scratch
       - name: Remove the scratch Postgres
         if: always()
-        run: docker rm -f scratch > /dev/null 2>&1 || true
+        run: docker rm -f scratch recovery-scratch > /dev/null 2>&1 || true
