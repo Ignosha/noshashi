@@ -324,6 +324,49 @@ Deno.serve(async (request: Request) => {
     await db.rpc("evidence_reports_kick");
   };
 
+  /**
+   * One month of a Verified Issuer subscription: each paid invoice is one
+   * order of the "verified" tier, built and emailed like any other report.
+   * Idempotent on the invoice id, which takes the place of a session id.
+   */
+  // deno-lint-ignore no-explicit-any
+  const recordVerifiedInvoice = async (invoice: any, subscription: any) => {
+    const meta = subscription?.metadata ?? {};
+    const email = String(invoice.customer_email ?? "").trim();
+    if (!email || Number(invoice.amount_paid) < TIERS.verified.cents) {
+      console.error("VERIFIED ISSUER INVOICE NOT RECORDED", { invoice: invoice.id, amount_paid: invoice.amount_paid, hasEmail: Boolean(email) });
+      return;
+    }
+    const split = (v: unknown) => String(v ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+    const created = new Date(Number(invoice.created) * 1000 || Date.now());
+    const reference = `NVI-${created.toISOString().slice(0, 10).replaceAll("-", "")}-${String(invoice.id).slice(-6).toUpperCase()}`;
+    const { error } = await db
+      .from("evidence_report_orders")
+      .upsert(
+        {
+          reference,
+          stripe_session_id: invoice.id,
+          tier: "verified",
+          email,
+          organization: String(meta.organization ?? "").trim() || null,
+          issuers: split(meta.issuers).slice(0, 1),
+          wallets: split(meta.wallets).slice(0, TIERS.verified.limits.wallets),
+          books: split(meta.books).slice(0, TIERS.verified.limits.books),
+          period_end: null,
+          amount_cents: Number(invoice.amount_paid),
+          currency: String(invoice.currency ?? "usd"),
+        },
+        { onConflict: "stripe_session_id", ignoreDuplicates: true },
+      );
+    if (error) throw error;
+    const orderId = (await db.from("evidence_report_orders").select("id").eq("stripe_session_id", invoice.id).maybeSingle()).data?.id;
+    if (!orderId) throw new Error(`verified issuer order for ${invoice.id} was not written`);
+    const rows = schedule("verified", created, null).map((d, i) => ({ order_id: orderId, seq: i + 1, period_end: d.period_end, due_on: d.due_on }));
+    const { error: scheduleError } = await db.from("evidence_report_deliveries").upsert(rows, { onConflict: "order_id,seq", ignoreDuplicates: true });
+    if (scheduleError) throw scheduleError;
+    await db.rpc("evidence_reports_kick");
+  };
+
   try {
     if (await reviewBillingRisk(db, event, async (chargeId) => {
       if (!/^ch_[A-Za-z0-9]+$/.test(chargeId) || !STRIPE_SECRET_KEY) throw new Error('Cannot reconcile billing risk event.');
@@ -344,6 +387,9 @@ Deno.serve(async (request: Request) => {
           await recordEvidenceOrder(session);
           break;
         }
+        // A Verified Issuer subscription grants nothing in the app either.
+        // Its reports come from invoice.paid below, one per month.
+        if (session.metadata?.product === "verified_issuer") break;
         let accountId = session.metadata?.account_id ?? session.client_reference_id;
 
         // A purchase made from the marketing site carries an email and
@@ -431,6 +477,10 @@ Deno.serve(async (request: Request) => {
           });
           if(!response.ok)throw new Error('Could not reconcile current subscription.');
           const subscription=await response.json();
+          if (subscription.metadata?.product === "verified_issuer") {
+            if (event.type === "invoice.paid") await recordVerifiedInvoice(invoice, subscription);
+            break;
+          }
           const {error}=await db.from('subscriptions').update({
             status:subscription.status,current_period_end:resolvePeriodEnd(subscription),
             updated_at:new Date().toISOString(),

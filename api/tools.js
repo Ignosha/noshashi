@@ -9,6 +9,7 @@
  *   /api/book-health   -> api/_lib/routes/book-health.js
  *   /api/v1/asset-risk -> api/_lib/routes/asset-risk.js
  *   /api/stellar/authority -> api/_lib/routes/stellar-authority.js
+ *   /api/issuer-history -> api/_lib/routes/issuer-history.js
  *
  * They share one function, not six, because the Hobby plan deploys at most
  * twelve and the site already used eleven (a deployment over the limit
@@ -28,9 +29,10 @@ import treasury from "./_lib/routes/treasury.js";
 import bookHealth from "./_lib/routes/book-health.js";
 import assetRisk from "./_lib/routes/asset-risk.js";
 import stellarAuthority from "./_lib/routes/stellar-authority.js";
+import issuerHistory from "./_lib/routes/issuer-history.js";
 import { queryOf } from "./_lib/query.js";
 
-const ROUTES = { terminal, rlusd, "settlement-check": settlementCheck, badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth, "asset-risk": assetRisk, "v1/asset-risk": assetRisk, "stellar-authority": stellarAuthority, "stellar/authority": stellarAuthority };
+const ROUTES = { terminal, rlusd, "settlement-check": settlementCheck, badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth, "asset-risk": assetRisk, "v1/asset-risk": assetRisk, "stellar-authority": stellarAuthority, "stellar/authority": stellarAuthority, "issuer-history": issuerHistory };
 
 export default function handler(req, res) {
   // vercel.json adds ?tool=; the public path (/api/book) names it too, in

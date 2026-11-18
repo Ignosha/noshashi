@@ -37,6 +37,35 @@ export const EVIDENCE_TIERS = {
     limits: { issuers: 6, wallets: 10, books: 6 },
     summary: "A report now, then one at each of the next twelve month-ends, with a larger scope.",
   },
+  // The Verified Issuer subscription, $49 a month. Never sold as a
+  // one-off: readReportScope refuses it, and only the subscription
+  // checkout (product=verified-issuer) creates it. Each paid invoice
+  // becomes one order of this tier, so every month is one report.
+  verified: {
+    name: "Verified Issuer",
+    cents: 4_900,
+    cadence: "once",
+    limits: { issuers: 1, wallets: 3, books: 1 },
+    summary: "Your issuer's live badge, a fresh report every month, and a verified mark, for one token.",
+    subscriptionOnly: true,
+  },
+  // For an exchange or launchpad deciding whether to list a token: the
+  // Issuer check plus everything the issuer has done with its powers.
+  listing: {
+    name: "Listing review",
+    cents: 75_000,
+    cadence: "once",
+    limits: { issuers: 1, wallets: 3, books: 1 },
+    summary: "One token reviewed for listing: issuer controls and their full history, up to three team or treasury wallets, and its order book.",
+  },
+  // The history on its own: every freeze, clawback and key change.
+  history: {
+    name: "Issuer history",
+    cents: 25_000,
+    cadence: "once",
+    limits: { issuers: 1, wallets: 0, books: 0 },
+    summary: "Every freeze, clawback, key change and change of powers one issuer has made, with its current controls.",
+  },
   // Not sold. A Standard report for testing a real card payment end to end.
   // The checkout offers it only when EVIDENCE_TEST_EMAIL is set, and the
   // report always goes to that address, so the URL is worth nothing to
@@ -57,6 +86,9 @@ export const EVIDENCE_TIERS = {
 };
 
 export const DEFAULT_TIER = "standard";
+
+/** The Verified Issuer subscription's price, billed monthly. */
+export const VERIFIED_MONTHLY_CENTS = EVIDENCE_TIERS.verified.cents;
 
 export function tierOf(value) {
   const key = String(value ?? "").trim().toLowerCase();

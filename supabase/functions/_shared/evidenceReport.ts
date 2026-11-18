@@ -12,13 +12,18 @@
  * finding, and a fact that could not be read is never shown as a pass.
  */
 
-export type Tier = "issuer" | "standard" | "quarterly" | "audit" | "test";
+export type Tier = "issuer" | "standard" | "quarterly" | "audit" | "verified" | "listing" | "history" | "test";
 
 export const TIERS: Record<Tier, { name: string; cents: number; cadence: "once" | "quarterly" | "monthly"; limits: { issuers: number; wallets: number; books: number } }> = {
   issuer: { name: "Issuer check", cents: 95_000, cadence: "once", limits: { issuers: 1, wallets: 3, books: 1 } },
   standard: { name: "Standard", cents: 250_000, cadence: "once", limits: { issuers: 3, wallets: 10, books: 3 } },
   quarterly: { name: "Quarterly", cents: 750_000, cadence: "quarterly", limits: { issuers: 3, wallets: 10, books: 3 } },
   audit: { name: "Audit support", cents: 1_500_000, cadence: "monthly", limits: { issuers: 6, wallets: 10, books: 6 } },
+  // Sold as a $49 monthly subscription, never as a one-off: each paid
+  // invoice is one order of this tier, so a month's report is one delivery.
+  verified: { name: "Verified Issuer", cents: 4_900, cadence: "once", limits: { issuers: 1, wallets: 3, books: 1 } },
+  listing: { name: "Listing review", cents: 75_000, cadence: "once", limits: { issuers: 1, wallets: 3, books: 1 } },
+  history: { name: "Issuer history", cents: 25_000, cadence: "once", limits: { issuers: 1, wallets: 0, books: 0 } },
   // Not sold: a Standard report at Stripe's minimum charge, so the owner can
   // test a real card payment end to end. The checkout only offers it when
   // EVIDENCE_TEST_EMAIL is set, and locks the receipt to that address.
@@ -26,6 +31,9 @@ export const TIERS: Record<Tier, { name: string; cents: number; cadence: "once" 
 };
 
 export const SITE = "https://www.noshashi.app";
+
+/** Tiers whose report includes the issuer's authority history. */
+export const HISTORY_TIERS: ReadonlySet<Tier> = new Set<Tier>(["listing", "history"]);
 
 const DAY = 86_400_000;
 const isoDay = (t: number) => new Date(t).toISOString().slice(0, 10);
@@ -89,10 +97,15 @@ export function currencyLabel(code: string): string {
 
 export type Scope = { issuers: string[]; wallets: string[]; books: string[] };
 
+export type Kind = "issuer" | "history" | "treasury" | "book";
+
 /** The public requests a report is built from, relative to SITE. */
-export function requestsFor(scope: Scope, periodEnd: string | null): { kind: "issuer" | "treasury" | "book"; subject: string; path: string }[] {
-  const out: { kind: "issuer" | "treasury" | "book"; subject: string; path: string }[] = [];
+export function requestsFor(scope: Scope, periodEnd: string | null, tier?: Tier): { kind: Kind; subject: string; path: string }[] {
+  const out: { kind: Kind; subject: string; path: string }[] = [];
   for (const issuer of scope.issuers) out.push({ kind: "issuer", subject: issuer, path: `/api/authority?issuer=${encodeURIComponent(issuer)}&walk=1` });
+  if (tier && HISTORY_TIERS.has(tier)) {
+    for (const issuer of scope.issuers) out.push({ kind: "history", subject: issuer, path: `/api/issuer-history?issuer=${encodeURIComponent(issuer)}` });
+  }
   if (scope.wallets.length) {
     out.push({
       kind: "treasury",
@@ -109,7 +122,7 @@ export function requestsFor(scope: Scope, periodEnd: string | null): { kind: "is
 
 // deno-lint-ignore no-explicit-any
 type Any = any;
-export type Source = { kind: "issuer" | "treasury" | "book"; subject: string; request: string; reply?: Any; error?: string };
+export type Source = { kind: Kind; subject: string; request: string; reply?: Any; error?: string };
 
 const pct = (r: unknown) => (typeof r === "number" && Number.isFinite(r) ? `${(r * 100).toLocaleString("en-US", { maximumFractionDigits: 1 })}%` : "—");
 const num = (v: unknown, d = 2) => {
@@ -161,7 +174,7 @@ export function findings(sources: Source[]): string[] {
   const out: string[] = [];
   for (const s of sources) {
     if (s.error) {
-      const what = s.kind === "issuer" ? `the issuing account ${short(s.subject)}` : s.kind === "book" ? `the ${s.subject.split(".")[0]} order book` : "the treasury wallets";
+      const what = s.kind === "issuer" ? `the issuing account ${short(s.subject)}` : s.kind === "history" ? `the history of issuer ${short(s.subject)}` : s.kind === "book" ? `the ${s.subject.split(".")[0]} order book` : "the treasury wallets";
       out.push(`We could not read ${what} from the XRP Ledger, so this report makes no statement about it.`);
       continue;
     }
@@ -171,6 +184,11 @@ export function findings(sources: Source[]): string[] {
         if (c.state === "INSUFFICIENT_DATA" || c.passed) continue;
         out.push(`${CHECK_WORDS[c.id]?.fails ?? `${c.label}: does not hold. ${c.detail}`} (Issuer ${short(s.subject)}, ledger ${num(r.ledgerIndex, 0)}.)`);
       }
+    } else if (s.kind === "history") {
+      const t = r.tally ?? {};
+      if (t.freezes) out.push(`Issuer ${short(s.subject)} has frozen a holder's balance ${t.freezes} time${t.freezes === 1 ? "" : "s"}.`);
+      if (t.clawbacks) out.push(`Issuer ${short(s.subject)} has clawed back holders' tokens ${t.clawbacks} time${t.clawbacks === 1 ? "" : "s"}.`);
+      if (r.coverage && r.coverage.complete === false) out.push(`Issuer ${short(s.subject)} has a long transaction history; not all of it was read, so its history section may be incomplete.`);
     } else if (s.kind === "treasury") {
       for (const w of r.wallets ?? []) {
         if (!w.found) out.push(`Wallet ${short(w.address)} does not exist on the ledger at ledger ${num(r.ledger?.index, 0)}.`);
@@ -227,9 +245,10 @@ export type ReportInput = {
 export function reportModel(input: ReportInput): ReportModel {
   const { scope, periodEnd, sources } = input;
   const issuers = sources.filter((s) => s.kind === "issuer");
+  const histories = sources.filter((s) => s.kind === "history");
   const treasury = sources.find((s) => s.kind === "treasury");
   const books = sources.filter((s) => s.kind === "book");
-  const ledgers = sources.map((s) => s.reply?.ledgerIndex ?? s.reply?.ledger?.index ?? s.reply?.ledger_index).filter((v) => typeof v === "number");
+  const ledgers = sources.filter((s) => s.kind !== "history").map((s) => s.reply?.ledgerIndex ?? s.reply?.ledger?.index ?? s.reply?.ledger_index).filter((v) => typeof v === "number");
   const counted = [
     scope.issuers.length && `${scope.issuers.length} issuing account${scope.issuers.length > 1 ? "s" : ""}`,
     scope.wallets.length && `${scope.wallets.length} treasury wallet${scope.wallets.length > 1 ? "s" : ""}`,
@@ -280,6 +299,40 @@ export function reportModel(input: ReportInput): ReportModel {
       });
       blocks.push({ type: "para", small: true, text: `Full address ${s.subject}. Read at ledger ${num(r.ledgerIndex, 0)}.` });
     }
+  }
+
+  for (const s of histories) {
+    if (s === histories[0]) {
+      blocks.push({ type: "heading", text: `${++n}. What the issuer has done` });
+      blocks.push({ type: "para", text: "Every time the issuer itself froze or unfroze a holder, took tokens back, changed its keys or signers, or changed its own powers. Read from validated ledgers; only transactions the issuer sent and that succeeded are listed." });
+    }
+    blocks.push({ type: "subheading", text: `Issuer ${short(s.subject)}` });
+    if (s.error) {
+      blocks.push({ type: "para", text: `This history could not be read (${s.error}). No statement is made about what the issuer has done.` });
+      continue;
+    }
+    const r = s.reply;
+    const t = r.tally ?? {};
+    blocks.push({ type: "facts", rows: [["Holders frozen", num(t.freezes, 0)], ["Clawbacks", num(t.clawbacks, 0)], ["Key or signer changes", num(t.key_changes, 0)], ["Changes to its powers", num(t.power_changes, 0)]] });
+    const events = (r.events ?? []) as Any[];
+    if (events.length) {
+      blocks.push({
+        type: "table",
+        columns: [
+          { label: "Date (UTC)", width: 0.18 },
+          { label: "What happened", width: 0.62 },
+          { label: "Ledger", width: 0.2, align: "right" },
+        ],
+        rows: events.slice(-40).map((e) => ({
+          cells: [e.date ? String(e.date).slice(0, 10) : "—", String(e.summary), num(e.ledger_index, 0)],
+          tones: [null, e.severity === "power_used" ? "bad" : e.severity === "key_change" ? "warn" : null, null],
+        })),
+      });
+      if (events.length > 40) blocks.push({ type: "para", small: true, text: `The ${events.length - 40} earlier events are in the evidence file.` });
+    } else {
+      blocks.push({ type: "para", text: "No authority change by the issuer was found in the transactions read." });
+    }
+    blocks.push({ type: "para", small: true, text: `${r.coverage?.note ?? ""} ${r.coverage?.transactions_read ? `${num(r.coverage.transactions_read, 0)} transactions read.` : ""}`.trim() });
   }
 
   if (treasury) {

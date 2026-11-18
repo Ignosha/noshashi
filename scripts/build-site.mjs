@@ -62,6 +62,7 @@ import { buildReport, REPORT_PAGES } from "./build-report.mjs";
 import { buildBrief, BRIEF_PAGES } from "./build-brief.mjs";
 import { buildTokens, TOKEN_INDEX_PAGES, loadTokens } from "./build-tokens.mjs";
 import { buildPartners, PARTNER_PAGES } from "./build-partners.mjs";
+import { buildProducts, PRODUCT_SALES_PAGES } from "./build-products.mjs";
 import { buildSettlementDesk, SETTLEMENT_PAGES } from "./build-settlement-desk.mjs";
 import { buildPaymentPortal, PORTAL_PAGES } from "./build-payment-portal.mjs";
 
@@ -1858,6 +1859,7 @@ async function buildSitemap(docs = [], tokenPages = [], intelligencePages = []) 
     ...TOOL_PAGES,
     ...TOKEN_INDEX_PAGES,
     ...PARTNER_PAGES,
+    ...PRODUCT_SALES_PAGES,
     ...PORTAL_PAGES,
     ...SETTLEMENT_PAGES,
     ...tokenPages,
@@ -1963,6 +1965,7 @@ async function main() {
   await buildTools(write);
   const tokenPages = await buildTokens(write);
   await buildPartners(write);
+  await buildProducts(write);
   await buildReport(write);
   await buildBrief(write);
   await buildProtection();
