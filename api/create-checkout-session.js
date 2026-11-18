@@ -47,7 +47,7 @@
  */
 
 import { clientKey, take } from "./_lib/rate-limit.js";
-import { EVIDENCE_TIERS, DEFAULT_TIER, tierOf } from "./_lib/evidence-tiers.js";
+import { EVIDENCE_TIERS, DEFAULT_TIER, tierOf, VERIFIED_MONTHLY_CENTS } from "./_lib/evidence-tiers.js";
 
 /**
  * Pro, by billing period. Both are overridable by environment because a
@@ -125,7 +125,7 @@ function list(value) {
  */
 export function readReportScope(body) {
   const tier = tierOf(body.tier ?? DEFAULT_TIER);
-  if (!tier) return { error: "Choose Standard, Quarterly or Audit support." };
+  if (!tier || EVIDENCE_TIERS[tier].subscriptionOnly) return { error: "Choose Standard, Quarterly or Audit support." };
   const testEmail = String(process.env.EVIDENCE_TEST_EMAIL ?? "").trim();
   if (tier === "test" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail)) return { error: "Choose Standard, Quarterly or Audit support." };
   const limits = EVIDENCE_TIERS[tier].limits;
@@ -201,6 +201,59 @@ export function reportForm(scope, origin) {
   return form;
 }
 
+/**
+ * The Verified Issuer subscription: $49 a month for one issuer. The
+ * issuer is checked here because it rides in subscription metadata and
+ * every month's report is built from it (the webhook turns each paid
+ * invoice into one order of the "verified" tier).
+ */
+export function readVerifiedScope(body) {
+  const issuer = String(body.issuer ?? "").trim();
+  if (!ADDRESS.test(issuer)) return { error: "Enter your token's issuing account. It is an XRP Ledger address that begins with r." };
+  const wallets = list(body.wallets);
+  if (wallets.length > EVIDENCE_TIERS.verified.limits.wallets) return { error: `At most ${EVIDENCE_TIERS.verified.limits.wallets} team or treasury wallets.` };
+  const bad = wallets.find((a) => !ADDRESS.test(a));
+  if (bad) return { error: `${bad.slice(0, 40)} is not an XRP Ledger classic address. They begin with r.` };
+  const currency = String(body.currency ?? "").trim();
+  if (currency && (!CURRENCY.test(currency) || currency.toUpperCase() === "XRP")) return { error: "Write the token's currency code, for example SOLO." };
+  const organization = String(body.organization ?? "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 120);
+  return { issuer, wallets, books: currency ? [`${currency}.${issuer}`] : [], organization };
+}
+
+export function verifiedForm(scope, origin) {
+  const metadata = {
+    product: "verified_issuer",
+    tier: "verified",
+    issuers: scope.issuer,
+    wallets: scope.wallets.join(","),
+    books: scope.books.join(","),
+    organization: scope.organization,
+    source: "noshashi.app",
+  };
+  const form = new URLSearchParams({
+    mode: "subscription",
+    "line_items[0][quantity]": "1",
+    "line_items[0][price_data][currency]": "usd",
+    "line_items[0][price_data][unit_amount]": String(VERIFIED_MONTHLY_CENTS),
+    "line_items[0][price_data][recurring][interval]": "month",
+    "line_items[0][price_data][product_data][name]": "NOSHASHI Verified Issuer",
+    success_url: `${origin}/verified/subscribed/?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/verified/`,
+    billing_address_collection: "auto",
+    allow_promotion_codes: process.env.STRIPE_ALLOW_PROMOTION_CODES === "true" ? "true" : "false",
+    "custom_text[submit][message]":
+      "Cancel any time. Each month you receive a report read from the XRP Ledger. It is a record of public ledger facts, not an audit opinion, endorsement or advice. Terms: noshashi.app/legal/report-terms.",
+  });
+  for (const [key, value] of Object.entries(metadata)) {
+    if (!value) continue;
+    form.set(`metadata[${key}]`, value);
+    // On the subscription, so every invoice it raises can be traced back
+    // to the issuer and turned into that month's report.
+    form.set(`subscription_data[metadata][${key}]`, value);
+  }
+  return form;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -244,6 +297,12 @@ export default async function handler(req, res) {
     const scope = readReportScope(body);
     if (scope.error) return fail(400, scope.error, { reason: "bad_scope" });
     return startCheckout(reportForm(scope, origin), { product: "evidence-report" });
+  }
+
+  if (String(body.product ?? "") === "verified-issuer") {
+    const scope = readVerifiedScope(body);
+    if (scope.error) return fail(400, scope.error, { reason: "bad_scope" });
+    return startCheckout(verifiedForm(scope, origin), { product: "verified-issuer" });
   }
 
   const cadence = readCadence(body);

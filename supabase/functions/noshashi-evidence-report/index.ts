@@ -94,9 +94,9 @@ async function read(path: string): Promise<{ reply?: unknown; error?: string }> 
 }
 
 /** Every reading for one report. Supply is walked when the reading allows it, and read without when it does not. */
-async function gather(scope: { issuers: string[]; wallets: string[]; books: string[] }, periodEnd: string | null): Promise<Source[]> {
+async function gather(scope: { issuers: string[]; wallets: string[]; books: string[] }, periodEnd: string | null, tier?: Tier): Promise<Source[]> {
   return await Promise.all(
-    requestsFor(scope, periodEnd).map(async (r) => {
+    requestsFor(scope, periodEnd, tier).map(async (r) => {
       let request = r.path;
       let got = await read(request);
       if (got.error && r.kind === "issuer") {
@@ -168,7 +168,7 @@ async function deliver(db: Db, delivery: Delivery): Promise<string> {
   if (!order) return "order_missing";
   const inbox = Deno.env.get("SUPPORT_INBOX") || "support@noshashi.app";
   const reference = `${order.reference}-${String(delivery.seq).padStart(2, "0")}`;
-  const sources = await gather(order, delivery.period_end);
+  const sources = await gather(order, delivery.period_end, order.tier as Tier);
   const failed = sources.filter((s) => s.error);
 
   if (failed.length) {

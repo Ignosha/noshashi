@@ -24,7 +24,7 @@ import { EVIDENCE_TIERS, DEFAULT_TIER } from "../api/_lib/evidence-tiers.js";
 
 const FUNCTIONS = "https://xiurbiwuwcfowqnpmwki.supabase.co/functions/v1";
 const usd = (cents) => `$${(cents / 100).toLocaleString("en-US")}`;
-const FROM = usd(Math.min(...Object.values(EVIDENCE_TIERS).filter((t) => !t.hidden).map((t) => t.cents)));
+const FROM = usd(Math.min(...Object.values(EVIDENCE_TIERS).filter((t) => !t.hidden && !t.subscriptionOnly).map((t) => t.cents)));
 /** The builder previews the largest scope any tier allows. */
 const REPORT_LIMITS = Object.values(EVIDENCE_TIERS).reduce(
   (m, t) => ({ issuers: Math.max(m.issuers, t.limits.issuers), wallets: Math.max(m.wallets, t.limits.wallets), books: Math.max(m.books, t.limits.books) }),
@@ -64,12 +64,14 @@ const TIER_COPY = {
   standard: "One report, at your period end or today. Up to 3 issuers, 10 wallets and 3 order books.",
   quarterly: "A report now, then one the day after each of the next four quarter-ends. Same scope as Standard.",
   audit: "A report now, then one the day after each of the next twelve month-ends. Up to 6 issuers, 10 wallets and 6 order books.",
+  listing: "For an exchange or launchpad deciding whether to list a token: the Issuer check plus every freeze, clawback and key change the issuer has made. 1 issuer, up to 3 wallets and its order book.",
+  history: "Every freeze, clawback, key change and change of powers one issuer has made, with its current controls. 1 issuer.",
 };
 
 /* ── /evidence-report/ ────────────────────────────────────────────── */
 async function buildSales(write) {
   const tiers = Object.entries(EVIDENCE_TIERS)
-    .filter(([, t]) => !t.hidden)
+    .filter(([, t]) => !t.hidden && !t.subscriptionOnly)
     .map(([key, t]) => `<label class="er-tier"><p class="num"><input type="radio" name="tier" value="${key}"${key === DEFAULT_TIER ? " checked" : ""}>${t.name.toUpperCase()}</p>
       <strong>${usd(t.cents)}</strong><p>${TIER_COPY[key]}</p></label>`)
     .join("\n      ");

@@ -1,0 +1,295 @@
+/*
+ * The pages for three products added on 2026-11-18:
+ *
+ *   /verified/            Verified Issuer: the live badge, free, and the
+ *                         $49/month subscription (a report every month).
+ *   /verified/subscribed/ Where Stripe returns a new subscriber.
+ *   /listing-review/      The $750 Listing review, for exchanges and
+ *                         launchpads deciding whether to list a token.
+ *   /history/             The free issuer history reader, and the $250
+ *                         Issuer history report.
+ *
+ * Every figure the pages show is read live by the visitor's browser from
+ * NOSHASHI's public endpoints (/api/badge, /api/issuer-history); nothing
+ * on them is sample data. Prices come from api/_lib/evidence-tiers.js,
+ * the same table the checkout charges from.
+ */
+
+import { renderPage, breadcrumb, ORIGIN } from "../api/_lib/shell.js";
+import { EVIDENCE_TIERS } from "../api/_lib/evidence-tiers.js";
+
+const usd = (cents) => `$${(cents / 100).toLocaleString("en-US")}`;
+const VERIFIED = usd(EVIDENCE_TIERS.verified.cents);
+const LISTING = usd(EVIDENCE_TIERS.listing.cents);
+const HISTORY = usd(EVIDENCE_TIERS.history.cents);
+
+export const PRODUCT_SALES_PAGES = [
+  ["/verified/", "weekly", "0.8"],
+  ["/listing-review/", "monthly", "0.7"],
+  ["/history/", "weekly", "0.7"],
+];
+
+const CSS = `<style>
+.pv-form{display:grid;gap:14px;max-width:640px}
+.pv-form textarea{min-height:56px;font:12px "IBM Plex Mono",monospace}
+.pv-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
+.pv-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.pv-price{font:600 30px/1.1 "Space Grotesk",sans-serif;margin:6px 0 4px}
+.pv-badge{min-height:40px;margin:12px 0}
+.pv-badge img{max-width:100%;height:auto}
+.pv-code{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.55 "IBM Plex Mono",monospace;
+  border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;margin:8px 0}
+.pv-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.pv-table th,.pv-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.pv-table td.mono{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.pv-tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.pv-tally div{border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px}
+.pv-tally strong{display:block;font:600 24px/1.1 "Space Grotesk",sans-serif}
+[data-sev="power_used"]{color:var(--bad,#e5484d)}
+[data-sev="key_change"]{color:var(--warn,#f5a524)}
+</style>`;
+
+const COMMON = `
+  function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function say(el,text,tone){el.textContent=text;el.setAttribute("data-tone",tone||"");}
+  function items(v){return String(v||"").split(/[\\s,]+/).map(function(s){return s.trim();}).filter(Boolean);}
+  var ADDRESS=/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+`;
+
+/* ── /verified/ ─────────────────────────────────────────────────── */
+async function buildVerified(write) {
+  const body = `<div class="page-head">
+  <p class="eyebrow">For token projects · badge free · Verified ${VERIFIED}/month</p>
+  <h1>Show your holders what your issuer can't do.</h1>
+  <p>Your holders want to know whether you can freeze their tokens, take them back, or decide who may hold.
+     The ledger already answers that. The NOSHASHI badge reads it live and shows it on your own site,
+     with the ledger it was read at, so holders don't have to take your word for it.</p>
+</div>
+<section>
+  <h2>1. Get your badge (free)</h2>
+  <form class="pv-form" id="pv-badge-form" novalidate>
+    <div class="form-field"><label for="pv-issuer">Your token's issuing account</label>
+      <input id="pv-issuer" name="issuer" type="text" spellcheck="false" autocomplete="off" placeholder="r…" maxlength="35"></div>
+    <div class="pv-actions"><button class="btn" type="submit">Show my badge</button></div>
+    <p class="form-status" id="pv-badge-status" role="status" aria-live="polite"></p>
+  </form>
+  <div id="pv-badge-out" hidden>
+    <div class="pv-badge" id="pv-badge-img"></div>
+    <p class="pv-note">Paste this where you want it to appear. The image re-reads the ledger every five minutes, and clicking it opens the full certificate.</p>
+    <code class="pv-code" id="pv-badge-html"></code>
+    <p class="pv-note">Markdown, for a README or a forum post:</p>
+    <code class="pv-code" id="pv-badge-md"></code>
+  </div>
+
+  <h2 style="margin-top:36px">2. Verified Issuer</h2>
+  <div class="grid g2">
+    <div class="panel"><p class="num">VERIFIED ISSUER</p>
+      <p class="pv-price">${VERIFIED}<span style="font-size:14px;font-weight:500"> / month</span></p>
+      <p>For one token. Cancel any time.</p>
+      <ul class="pv-note" style="padding-left:18px">
+        <li>A report every month, emailed to you, read from the XRP Ledger: your issuer's controls, up to three team or treasury wallets and your order book, with a fingerprint anyone can check.</li>
+        <li>Something to show holders, exchanges and partners that is new each month, not a screenshot from launch day.</li>
+        <li>Keep the free badge on your site; the monthly report is the record behind it.</li>
+      </ul>
+    </div>
+    <div class="panel"><p class="num">WHAT IT IS NOT</p>
+      <p>It is not an endorsement, an audit or a rating, and NOSHASHI does not vouch for your project. Every
+         report states ledger facts at a ledger number, including the ones you might rather it didn't. A
+         power you have kept is reported as kept.</p>
+      <p>NOSHASHI never asks for keys, seeds or access to your accounts: everything is public ledger state.</p>
+    </div>
+  </div>
+
+  <form class="pv-form" id="pv-sub-form" novalidate style="margin-top:20px">
+    <div class="form-field"><label for="pv-sub-issuer">Issuing account</label>
+      <input id="pv-sub-issuer" name="issuer" type="text" spellcheck="false" autocomplete="off" placeholder="r…" maxlength="35"></div>
+    <div class="form-field"><label for="pv-sub-currency">Currency code (optional, adds your order book)</label>
+      <input id="pv-sub-currency" name="currency" type="text" spellcheck="false" autocomplete="off" placeholder="SOLO" maxlength="40"></div>
+    <div class="form-field"><label for="pv-sub-wallets">Team or treasury wallets (optional, up to 3)</label>
+      <textarea id="pv-sub-wallets" name="wallets" spellcheck="false" placeholder="r…, one per line"></textarea></div>
+    <div class="form-field"><label for="pv-sub-org">Project name</label>
+      <input id="pv-sub-org" name="organization" type="text" maxlength="120" placeholder="As it should appear on the report"></div>
+    <div class="pv-actions"><button class="btn" type="submit" id="pv-sub-pay">Subscribe for ${VERIFIED} a month</button></div>
+    <p class="form-status" id="pv-sub-status" role="status" aria-live="polite"></p>
+    <p class="pv-note">The first report is emailed to the address you pay with, usually within minutes. Subject to the
+       <a href="/legal/report-terms/">Terms of Sale</a>. Questions: <a href="mailto:support@noshashi.app">support@noshashi.app</a>.</p>
+  </form>
+</section>`;
+
+  const script = `<script>
+(function(){${COMMON}
+  var bf=document.getElementById("pv-badge-form"), bs=document.getElementById("pv-badge-status"), out=document.getElementById("pv-badge-out");
+  bf.addEventListener("submit",function(e){
+    e.preventDefault();
+    var a=bf.issuer.value.trim();
+    if(!ADDRESS.test(a)){say(bs,"Enter an XRP Ledger address. It begins with r.","bad");return;}
+    var src="${ORIGIN}/api/badge?issuer="+encodeURIComponent(a)+"&style=card";
+    var link="${ORIGIN}/certificate/?issuer="+encodeURIComponent(a);
+    var html='<a href="'+link+'"><img src="'+src+'" alt="Issuer facts by NOSHASHI, read live from the XRP Ledger" width="360"></a>';
+    document.getElementById("pv-badge-img").innerHTML=html;
+    document.getElementById("pv-badge-html").textContent=html;
+    document.getElementById("pv-badge-md").textContent="[![Issuer facts by NOSHASHI]("+src+")]("+link+")";
+    document.getElementById("pv-sub-issuer").value=a;
+    out.hidden=false; say(bs,"Read live from the ledger. It can take a few seconds to load.","");
+  });
+  var sf=document.getElementById("pv-sub-form"), ss=document.getElementById("pv-sub-status"), pay=document.getElementById("pv-sub-pay");
+  sf.addEventListener("submit",function(e){
+    e.preventDefault();
+    var issuer=sf.issuer.value.trim(), wallets=items(sf.wallets.value);
+    if(!ADDRESS.test(issuer)){say(ss,"Enter your token's issuing account. It begins with r.","bad");return;}
+    if(wallets.length>3){say(ss,"Up to three team or treasury wallets.","bad");return;}
+    pay.disabled=true; say(ss,"Opening secure checkout…","");
+    fetch("/api/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
+      body:JSON.stringify({product:"verified-issuer",issuer:issuer,currency:sf.currency.value.trim(),wallets:wallets.join(","),organization:sf.organization.value.trim()})})
+      .then(function(r){return r.json().then(function(b){if(!r.ok||!b.url)throw new Error(b.error||"Checkout could not start.");return b;});})
+      .then(function(b){location.href=b.url;})
+      .catch(function(err){pay.disabled=false;say(ss,err.message+" You can also email support@noshashi.app.","bad");});
+  });
+})();
+</script>`;
+
+  await write("verified/index.html", renderPage({
+    title: `Verified Issuer — show holders what your XRPL issuer can't do (badge free, ${VERIFIED}/month)`,
+    description: `A free live badge for your token's site showing what your XRP Ledger issuer can and cannot do, read from the ledger. Verified Issuer, ${VERIFIED} a month: a fresh ledger report every month.`,
+    path: "/verified/",
+    head: CSS,
+    body,
+    scripts: script,
+    structured: [breadcrumb("Verified Issuer", "/verified/")],
+  }));
+
+  await write("verified/subscribed/index.html", renderPage({
+    title: "You're subscribed — Verified Issuer",
+    description: "Your Verified Issuer subscription is active. Your first report is on its way.",
+    path: "/verified/subscribed/",
+    head: `<meta name="robots" content="noindex">`,
+    body: `<div class="page-head"><p class="eyebrow">Verified Issuer</p><h1>You're subscribed.</h1>
+  <p>Your first report is being read from the XRP Ledger now and will arrive at the email you paid with, usually within
+     minutes. A new one follows every month while the subscription is active.</p></div>
+<section><p>Add the badge to your site from <a href="/verified/">the Verified page</a> if you haven't yet. To change or cancel,
+  use the link in your Stripe receipt or email <a href="mailto:support@noshashi.app">support@noshashi.app</a>.</p></section>`,
+  }));
+}
+
+/* ── /listing-review/ ───────────────────────────────────────────── */
+async function buildListing(write) {
+  const body = `<div class="page-head">
+  <p class="eyebrow">For exchanges and launchpads · ${LISTING} per token</p>
+  <h1>Listing review: what a token's issuer can do, and what it has done.</h1>
+  <p>Before you list a token on the XRP Ledger, your listing team has to answer the same questions every time.
+     Can the issuer freeze your users' balances? Claw them back? Has it ever? Who controls the team wallets?
+     How much of the order book can actually fill? The Listing review answers each one from the ledger, in one
+     document your team can file.</p>
+</div>
+<section>
+  <div class="grid g2">
+    <div class="panel"><p class="num">ISSUER CONTROLS</p>
+      <p>Freeze, global freeze, clawback, approval to hold, transfer fee, and how many keys it takes to act for the issuer.</p></div>
+    <div class="panel"><p class="num">WHAT THE ISSUER HAS DONE</p>
+      <p>Every freeze, unfreeze, clawback, key change, signer-list change and change of powers the issuer has made, with dates and ledger numbers. If the history is too long to read in full, the report says so.</p></div>
+    <div class="panel"><p class="num">TEAM AND TREASURY WALLETS</p>
+      <p>Up to three wallets: what each holds, what is free to move, and how many keys it takes to move it.</p></div>
+    <div class="panel"><p class="num">REAL DEPTH</p>
+      <p>Advertised against funded depth on the token's XRP order book, within 10% of the market price. AMM pools are shown separately.</p></div>
+  </div>
+  <div class="panel" style="margin-top:14px"><p class="num">FORMAT</p>
+    <p>A PDF and a print copy, emailed within minutes of payment, with the raw ledger replies it was built from and a SHA-256
+       fingerprint anyone can check at <a href="/evidence-report/verify/">noshashi.app/evidence-report/verify</a>. A record of
+       ledger facts at a stated ledger, not a listing recommendation, an audit opinion or legal advice.</p></div>
+  <div class="pv-actions" style="margin-top:20px">
+    <a class="btn" href="/evidence-report/?tier=listing#order">Order a Listing review (${LISTING})</a>
+    <a class="btn btn-quiet" href="/history/">See an issuer's history free</a>
+  </div>
+  <p class="pv-note" style="margin-top:14px">Reviewing several tokens a month? Volume pricing and invoicing are agreed in writing:
+     <a href="/contact/?topic=institutions">get in touch</a>.</p>
+</section>`;
+
+  await write("listing-review/index.html", renderPage({
+    title: `Listing review — XRPL token due diligence for exchanges and launchpads (${LISTING})`,
+    description: `One document per token, read from the XRP Ledger: issuer controls and their full history, team wallets and who can move them, and real order-book depth. ${LISTING}, emailed in minutes.`,
+    path: "/listing-review/",
+    head: CSS.replace("</style>", ".btn-quiet{background:transparent;color:var(--ink);border:1px solid var(--rule)}</style>"),
+    body,
+    structured: [breadcrumb("Listing review", "/listing-review/")],
+  }));
+}
+
+/* ── /history/ ──────────────────────────────────────────────────── */
+async function buildHistory(write) {
+  const body = `<div class="page-head">
+  <p class="eyebrow">Free · no account</p>
+  <h1>What has this issuer done with its powers?</h1>
+  <p>The certificate tells you what an XRP Ledger issuer can do today. This tells you what it has done: every time it
+     froze or unfroze a holder, took tokens back, changed its keys or signers, or changed its own powers.
+     Read live from validated ledgers.</p>
+</div>
+<section>
+  <form class="pv-form" id="hi-form" novalidate>
+    <div class="form-field"><label for="hi-issuer">Issuing account</label>
+      <input id="hi-issuer" name="issuer" type="text" spellcheck="false" autocomplete="off" placeholder="r…" maxlength="35"></div>
+    <div class="pv-actions"><button class="btn" type="submit" id="hi-run">Read the history</button></div>
+    <p class="form-status" id="hi-status" role="status" aria-live="polite"></p>
+  </form>
+  <div id="hi-out" hidden></div>
+  <div class="panel" style="margin-top:28px"><p class="num">NEED IT ON FILE?</p>
+    <p>The <a href="/evidence-report/?tier=history#order">Issuer history report</a> (${HISTORY}) puts this history and the
+       issuer's current controls in a PDF with the raw ledger replies and a fingerprint anyone can check. Exchanges and
+       launchpads usually want the <a href="/listing-review/">Listing review</a> (${LISTING}), which adds team wallets and
+       order-book depth.</p></div>
+  <p class="pv-note" style="margin-top:14px">Only transactions the issuer itself sent and that succeeded are listed. An account
+     with a long history is read from its first 200 and last 800 transactions, and the page says when anything in between was
+     not read. Developers: <code>${ORIGIN}/api/issuer-history?issuer=r…</code> returns the same reading as JSON.</p>
+</section>`;
+
+  const script = `<script>
+(function(){${COMMON}
+  var f=document.getElementById("hi-form"), st=document.getElementById("hi-status"), out=document.getElementById("hi-out"), run=document.getElementById("hi-run");
+  function render(h){
+    var t=h.tally||{}, ev=h.events||[];
+    var html='<div class="pv-tally">'+
+      '<div><strong>'+(t.freezes||0)+'</strong>holders frozen</div>'+
+      '<div><strong>'+(t.clawbacks||0)+'</strong>clawbacks</div>'+
+      '<div><strong>'+(t.key_changes||0)+'</strong>key or signer changes</div>'+
+      '<div><strong>'+(t.power_changes||0)+'</strong>changes to its powers</div></div>';
+    if(!ev.length){html+='<p>No authority change by this issuer was found in the transactions read.</p>';}
+    else{
+      html+='<table class="pv-table"><thead><tr><th>Date (UTC)</th><th>What happened</th><th>Ledger</th></tr></thead><tbody>';
+      ev.slice().reverse().forEach(function(e){
+        html+='<tr><td class="mono">'+esc(String(e.date||"").slice(0,10))+'</td><td data-sev="'+esc(e.severity)+'">'+esc(e.summary)+
+          '</td><td class="mono"><a href="https://livenet.xrpl.org/transactions/'+encodeURIComponent(e.hash||"")+'">'+esc(e.ledger_index)+'</a></td></tr>';
+      });
+      html+='</tbody></table>';
+    }
+    html+='<p class="pv-note" style="margin-top:12px">'+esc((h.coverage&&h.coverage.note)||"")+' Read '+esc(h.read_at||"")+'.</p>';
+    out.innerHTML=html; out.hidden=false;
+  }
+  function go(a){
+    run.disabled=true; out.hidden=true; say(st,"Reading the ledger… a long history can take ten seconds.","");
+    fetch("/api/issuer-history?issuer="+encodeURIComponent(a),{headers:{Accept:"application/json"}})
+      .then(function(r){return r.json().then(function(b){if(!r.ok)throw new Error(b.error||"The ledger could not be read.");return b;});})
+      .then(function(h){render(h);say(st,"","");try{history.replaceState(null,"","?issuer="+encodeURIComponent(a));}catch(e){}})
+      .catch(function(err){say(st,err.message,"bad");})
+      .then(function(){run.disabled=false;});
+  }
+  f.addEventListener("submit",function(e){e.preventDefault();var a=f.issuer.value.trim();
+    if(!ADDRESS.test(a)){say(st,"Enter an XRP Ledger address. It begins with r.","bad");return;} go(a);});
+  try{var q=new URLSearchParams(location.search).get("issuer");if(q&&ADDRESS.test(q)){f.issuer.value=q;go(q);}}catch(e){}
+})();
+</script>`;
+
+  await write("history/index.html", renderPage({
+    title: "Issuer history — every freeze, clawback and key change an XRPL issuer has made",
+    description: "Free: see what an XRP Ledger token issuer has done with its powers. Every freeze, unfreeze, clawback, key change and signer change, read live from validated ledgers.",
+    path: "/history/",
+    head: CSS,
+    body,
+    scripts: script,
+    structured: [breadcrumb("Issuer history", "/history/")],
+  }));
+}
+
+export async function buildProducts(write) {
+  await buildVerified(write);
+  await buildListing(write);
+  await buildHistory(write);
+}

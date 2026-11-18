@@ -1,0 +1,291 @@
+{
+ "source": "account_tx forward=true limit=200 api_version=2 via xrplcluster.com, 2026-11-18; Payments/Offers dropped, meta reduced to TransactionResult; holder TrustSets trimmed to 3 (kept to test that only the issuer's own transactions count)",
+ "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+ "marker": true,
+ "count": 200,
+ "transactions": [
+  {
+   "hash": "2CEB3E3F3B886851E3A55A7EEB0CDDD8D84F899CC681E216C74564AA0EA6518F",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "12",
+    "ctid": "C317A74B003E0000",
+    "date": 628992661,
+    "Flags": 2147483648,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "66316430326635352D303336352D346532312D616232312D663530626533333834316136"
+      }
+     }
+    ],
+    "Domain": "736F6C6F67656E69632E636F6D",
+    "Account": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+    "Sequence": 3,
+    "EmailHash": "7AC3878BF42A5329698F468A6AAA03B9",
+    "TransferRate": 1000100000,
+    "TxnSignature": "304402207C4CB0A962EA49ECECFF24BC2DF3D09206E77516709051810DFF0679CA1F2DAA02207F7D2B85B9338A34181BCBC09AB221BCEFFE5FAA20483CED11D5AB19A58D7B34",
+    "ledger_index": 51881803,
+    "SigningPubKey": "03D181C85A8776D95DB0A870B3F313805ACCD7F73DCAFD3991A57D0C86C8675613",
+    "TransactionType": "AccountSet",
+    "LastLedgerSequence": 51881804
+   },
+   "validated": true,
+   "ledger_index": 51881803,
+   "close_time_iso": "2019-12-07T00:11:01Z"
+  },
+  {
+   "hash": "216A07CCEC164BB42A8DFA2D9118DB89D6CCD4BBE09F6CF30855C11DC976D7B6",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "12",
+    "ctid": "C317A74E00000000",
+    "date": 628992672,
+    "Flags": 2147483648,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "34666434616166392D393366302D343464332D383932332D616631373366336265306465"
+      }
+     }
+    ],
+    "Account": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+    "SetFlag": 3,
+    "Sequence": 4,
+    "TxnSignature": "30450221008000479A5F507E057ECCC099FD6C06541C83EA6674005D9BE402D4028931AF7802204A326F3FE410D5C43A84633C853B6A3583B7E0FA766224D12B5D747B03D5DC4A",
+    "ledger_index": 51881806,
+    "SigningPubKey": "03D181C85A8776D95DB0A870B3F313805ACCD7F73DCAFD3991A57D0C86C8675613",
+    "TransactionType": "AccountSet",
+    "LastLedgerSequence": 51881807
+   },
+   "validated": true,
+   "ledger_index": 51881806,
+   "close_time_iso": "2019-12-07T00:11:12Z"
+  },
+  {
+   "hash": "AD7DDED00CA11267B4A229D6CFCA3D9DB24C3ADD9E5DE4F81333679A8A889607",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "12",
+    "ctid": "C317A751000D0000",
+    "date": 628992690,
+    "Flags": 2147483648,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "36643131303937362D616236372D343739332D393763302D613064326233666635373033"
+      }
+     }
+    ],
+    "Account": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+    "SetFlag": 6,
+    "Sequence": 5,
+    "TxnSignature": "3045022100E9E5C9DA7DA587AF6BDE64244ACD1F99D229FCE159886D0D0285E578A317C4F80220541AE6D3C79FF87972BC05A6BCC7C0A2146AFECC494B9A72AEFA133F5F1CF41D",
+    "ledger_index": 51881809,
+    "SigningPubKey": "03D181C85A8776D95DB0A870B3F313805ACCD7F73DCAFD3991A57D0C86C8675613",
+    "TransactionType": "AccountSet",
+    "LastLedgerSequence": 51881810
+   },
+   "validated": true,
+   "ledger_index": 51881809,
+   "close_time_iso": "2019-12-07T00:11:30Z"
+  },
+  {
+   "hash": "39A325617CE4615940F57F38365E00008630B4540E83459270BBC909368021A7",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "12",
+    "ctid": "C317A75400090000",
+    "date": 628992700,
+    "Flags": 2147483648,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "32653266353564332D356631392D343833312D616131302D333962616533306233373863"
+      }
+     }
+    ],
+    "Account": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+    "SetFlag": 8,
+    "Sequence": 6,
+    "TxnSignature": "30440220503D02CE4D803A84A06FEDAADA3E990996D0EAE71252DE67E8BBFE021ACBD48802201766737631E8EC653777CA851C237681B62F32CA430B4910942E11261098BCA1",
+    "ledger_index": 51881812,
+    "SigningPubKey": "03D181C85A8776D95DB0A870B3F313805ACCD7F73DCAFD3991A57D0C86C8675613",
+    "TransactionType": "AccountSet",
+    "LastLedgerSequence": 51881813
+   },
+   "validated": true,
+   "ledger_index": 51881812,
+   "close_time_iso": "2019-12-07T00:11:40Z"
+  },
+  {
+   "hash": "33D051DD7A22699D85526A728613054449D4F4B3C38B755D4DE30949A2D1DF27",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "6098",
+    "ctid": "C317A757001B0000",
+    "date": 628992711,
+    "Flags": 131072,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "62306535656535342D343332622D343238632D626132352D306661343465623037383862"
+      }
+     }
+    ],
+    "Account": "r3fjrDzroduss2R6A9XSUDNuvM9yg2zkBA",
+    "Sequence": 1,
+    "LimitAmount": {
+     "value": "400000000",
+     "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+     "currency": "534F4C4F00000000000000000000000000000000"
+    },
+    "TxnSignature": "3045022100ED6A9BE8B74658FF7E45CE73C7B3465472F5FF2FC5906D63DA26B63B46F970EA02207D886C44DBBAEC2F3FCF760267266EC26C242F52C4C78DC3569B313761E96FC4",
+    "ledger_index": 51881815,
+    "SigningPubKey": "0342EB8A0FF16009F32046FDB9784F470C23DC3D9E5173DECC86031600D83E13F3",
+    "TransactionType": "TrustSet",
+    "LastLedgerSequence": 51881816
+   },
+   "validated": true,
+   "ledger_index": 51881815,
+   "close_time_iso": "2019-12-07T00:11:51Z"
+  },
+  {
+   "hash": "67450BBEE696A7B05552402A799053924510050A0DFD3DB6B2159F80C96F59B4",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "12",
+    "ctid": "C317A75D00290000",
+    "date": 628992732,
+    "Flags": 131072,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "62643737353064612D353737302D343935372D616261302D326230326135323638396564"
+      }
+     }
+    ],
+    "Account": "rHvLixrhhpr11tA64F7J7BVv3WHpgoB3rh",
+    "Sequence": 1,
+    "LimitAmount": {
+     "value": "400000000",
+     "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+     "currency": "534F4C4F00000000000000000000000000000000"
+    },
+    "TxnSignature": "304402205C2F5E7BBB6E76F69401AAA64421E31742A6D309425B15A47D1FAE7668BFD5ED022061ED42C731EA24D94B5D62BF4524B750EA0EC25F26CF730B376C120A76543B8C",
+    "ledger_index": 51881821,
+    "SigningPubKey": "026CE0C58E12BAD44245DFFBBA9709E90AB6940F238A5D19C66021FAD92C5A4B52",
+    "TransactionType": "TrustSet",
+    "LastLedgerSequence": 51881822
+   },
+   "validated": true,
+   "ledger_index": 51881821,
+   "close_time_iso": "2019-12-07T00:12:12Z"
+  },
+  {
+   "hash": "EADDE58DF754268A3ABA9FB5EC6617DB8A11E33FD4721D3A5E5A46ECC533616C",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "12",
+    "ctid": "C317A76300290000",
+    "date": 628992760,
+    "Flags": 131072,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "30663637326439652D363566332D343535662D393335342D343739643239616639626331"
+      }
+     }
+    ],
+    "Account": "rGPzTs3NNw2MfFCZaCWxYMugFyMCVByRJm",
+    "Sequence": 1,
+    "LimitAmount": {
+     "value": "400000000",
+     "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+     "currency": "534F4C4F00000000000000000000000000000000"
+    },
+    "TxnSignature": "304402202AFBC1F646D1DD70A5CC2432A8AE0CED0E980A4EF89B90E1BBA4B20A0F9D93EC0220435D7EC15C39B479D8DEE5BB5495116D56BDF4B99E0297F4EACCEFEEC30B41B9",
+    "ledger_index": 51881827,
+    "SigningPubKey": "0232B5EC9B29B079E426A4104590935821D838EFBACB1C474E32CE8F86030AA582",
+    "TransactionType": "TrustSet",
+    "LastLedgerSequence": 51881828
+   },
+   "validated": true,
+   "ledger_index": 51881827,
+   "close_time_iso": "2019-12-07T00:12:40Z"
+  },
+  {
+   "hash": "B0FFBBEACBA737B57A7D38FD263F3CAFC183E11A00A8490AAA1D83AF7E39057D",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "12",
+    "ctid": "C317A77800100000",
+    "date": 628992841,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "35633961346263642D343731362D343838352D623861612D353163326636626364343563"
+      }
+     }
+    ],
+    "Account": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+    "Sequence": 12,
+    "RegularKey": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "TxnSignature": "3044022060429EFE97B30E8781209A6A52894BFDC0F147B2AD0B079D9E0E3A58DD49D3770220013A1D469265E5520546AA040856E2DE8D11348D2FEA62145E6F2F084CBC9337",
+    "ledger_index": 51881848,
+    "SigningPubKey": "03D181C85A8776D95DB0A870B3F313805ACCD7F73DCAFD3991A57D0C86C8675613",
+    "TransactionType": "SetRegularKey",
+    "LastLedgerSequence": 51881849
+   },
+   "validated": true,
+   "ledger_index": 51881848,
+   "close_time_iso": "2019-12-07T00:14:01Z"
+  },
+  {
+   "hash": "DE22EB7BD3BAC01F71859A88A1CBC3F74C8DF04F13ABBB33552E7469123CD7EF",
+   "meta": {
+    "TransactionResult": "tesSUCCESS"
+   },
+   "tx_json": {
+    "Fee": "12",
+    "ctid": "C317A77B00010000",
+    "date": 628992852,
+    "Flags": 2147483648,
+    "Memos": [
+     {
+      "Memo": {
+       "MemoData": "31376461636561622D343533392D343837302D613332352D646434636338346361336231"
+      }
+     }
+    ],
+    "Account": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+    "SetFlag": 4,
+    "Sequence": 13,
+    "TxnSignature": "304502210093459BF474A72EB5DB229114B0AA123EBBE53B3E05A5ED1424C67096374D06C0022062C753F0512916B2488EBB75E11333C01D56C3849C4C25B9F4F04EFC64B31536",
+    "ledger_index": 51881851,
+    "SigningPubKey": "03D181C85A8776D95DB0A870B3F313805ACCD7F73DCAFD3991A57D0C86C8675613",
+    "TransactionType": "AccountSet",
+    "LastLedgerSequence": 51881852
+   },
+   "validated": true,
+   "ledger_index": 51881851,
+   "close_time_iso": "2019-12-07T00:14:12Z"
+  }
+ ]
+}

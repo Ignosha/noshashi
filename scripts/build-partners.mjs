@@ -31,8 +31,22 @@ export async function buildPartners(write) {
          image. Both are cached at the edge for five minutes and open to any origin. We ask for a visible
          "Issuer facts by NOSHASHI" link where they appear.</p>
       <p>Launchpads can offer the <a href="/evidence-report/?tier=issuer">Issuer check</a> to projects at
-         listing, so holders see the same facts the platform did.</p>
+         listing, so holders see the same facts the platform did, and use the
+         <a href="/listing-review/">Listing review</a> for their own listing decisions. Projects can keep the facts on their
+         own site with <a href="/verified/">Verified Issuer</a>.</p>
       <p><a class="btn" href="${CONTACT}">Talk about an integration</a></p>
+    </div>
+    <div class="panel" id="api">
+      <p class="num">PARTNER API · PAY PER CHECK</p>
+      <h3>Our checks inside your product, at volume</h3>
+      <p>For trackers, DEXes and wallets that show issuer facts on every token: the certificate, the badge, the issuer's
+         history (<code>${ORIGIN}/api/issuer-history?issuer=r…</code>) and the
+         <a href="/developers/">Compliance API</a>'s asset-risk report. The public endpoints are free within fair use; at
+         volume, checks are billed from prepaid packs starting at about $0.04 a check, with a key, higher limits and
+         invoicing.</p>
+      <p>Embedded widgets carry a visible "Issuer facts by NOSHASHI" link. Volume pricing and any revenue share are agreed
+         in writing per partner.</p>
+      <p><a class="btn" href="${CONTACT}">Ask for a partner key</a></p>
     </div>
     <div class="panel" id="auditors">
       <p class="num">AUDITORS · ACCOUNTANTS · LAW FIRMS</p>
