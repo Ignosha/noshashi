@@ -14,6 +14,8 @@
  *   /continuity/          Continuity: one issued-token deposit checked against
  *                         its posted credits. Built from the operator copy in
  *                         tools/continuity/ so the two never drift.
+ *   /presign-guard/       Pre-Sign Guard: the Fireblocks Co-signer Callback
+ *                         Handler in tools/presign-guard/ (added 2026-11-19).
  *
  * Every figure the pages show is read live by the visitor's browser from
  * NOSHASHI's public endpoints (/api/badge, /api/issuer-history); nothing
@@ -39,6 +41,7 @@ export const PRODUCT_SALES_PAGES = [
   ["/listing-review/", "monthly", "0.7"],
   ["/history/", "weekly", "0.7"],
   ["/continuity/", "monthly", "0.6"],
+  ["/presign-guard/", "monthly", "0.6"],
 ];
 
 const CSS = `<style>
@@ -426,7 +429,72 @@ async function buildContinuity(write) {
   }));
 }
 
+/* ── /presign-guard/ ────────────────────────────────────────────── */
+/*
+ * The page for tools/presign-guard/, the Fireblocks API Co-signer Callback
+ * Handler. It describes what the code does and nothing it has not done:
+ * no prices, no pilots, no customers. Everything on it is checked in
+ * tests/presign-guard.test.js against Fireblocks' published examples and
+ * captured XRP Ledger replies.
+ */
+async function buildPresignGuard(write) {
+  const SRC = "https://github.com/Ignosha/noshashi/tree/main/tools/presign-guard";
+  const body = `<div class="page-head">
+  <p class="eyebrow">Pre-Sign Guard · for Fireblocks users on the XRP Ledger</p>
+  <h1>Check every XRPL transaction before your Co-signer signs it.</h1>
+  <p>Pre-Sign Guard is a Callback Handler for the Fireblocks API Co-signer. The Co-signer asks it before each signature and
+     signs only when it answers APPROVE. You host it next to your Co-signer: NOSHASHI never sees a request, a key or a decision,
+     and the guard itself cannot sign anything.</p>
+</div>
+<section>
+  <table class="pv-table">
+    <thead><tr><th>Before a signature it checks</th><th>And refuses</th></tr></thead>
+    <tbody>
+      <tr><td>That the bytes being signed are the transaction Fireblocks shows: the signing hash is recomputed, and the destination, tag and amount compared</td>
+          <td>A transaction whose destination, tag or amount was swapped</td></tr>
+      <tr><td>Who controls the account afterwards</td>
+          <td>A new regular key, a new signer list, account deletion or disabling the master key, unless your policy allows it</td></tr>
+      <tr><td>The destination</td>
+          <td>OFAC-listed and reported addresses up to three funding hops back, lookalikes of your known destinations, a missing required tag</td></tr>
+      <tr><td>Every token amount, by issuer address</td>
+          <td>A ticker from an issuer you don't accept (a counterfeit RLUSD), or a token whose issuer has frozen it</td></tr>
+      <tr><td>The ledger's own answer: the transaction is simulated on two servers run by different operators</td>
+          <td>Anything the ledger would refuse, before the fee is spent</td></tr>
+    </tbody>
+  </table>
+  <p class="pv-note" style="margin-top:14px">A fact it cannot read (a server, the sanctions list, an issuer) is answered RETRY, never a pass.
+     Every answer gets a SHA-256 receipt in an audit log where each line's hash covers the one before.</p>
+
+  <div class="grid g2" style="margin-top:20px">
+    <div class="panel"><p class="num">ALONGSIDE WHAT YOU RUN</p>
+      <p>Keep Fireblocks Policy for who may move what, and your KYT or AML provider for risk scores. Pre-Sign Guard adds the
+         XRP Ledger checks those don't make: the signed bytes, key changes, issuers by address, freeze state and the
+         ledger's own verdict.</p></div>
+    <div class="panel"><p class="num">ROLL IT OUT SAFELY</p>
+      <p>Start in observe mode: it approves everything and logs what it would have refused. Read a week of decisions, tune the
+         policy, then switch to enforce. Ask Fireblocks Support to enable <code>rawTx</code> so plain XRP transfers carry
+         their exact bytes.</p></div>
+  </div>
+
+  <p style="margin-top:20px"><a class="btn" href="${SRC}">Read the code and setup guide</a>
+     <a class="btn ghost" href="mailto:institutions@noshashi.app?subject=Pre-Sign%20Guard">Talk to us about deploying it</a></p>
+  <p class="pv-note">Open source, Node 22 or later, no new dependencies. XRP Ledger transactions only; other assets get the answer
+     your policy sets. It reads ledger facts at signing time and is not legal or compliance advice. Fireblocks is a trademark
+     of its owner; NOSHASHI is not affiliated with or endorsed by Fireblocks.</p>
+</section>`;
+
+  await write("presign-guard/index.html", renderPage({
+    title: "Pre-Sign Guard — XRPL checks before your Fireblocks Co-signer signs",
+    description: "A Fireblocks API Co-signer Callback Handler for the XRP Ledger: verifies the signed bytes match what Fireblocks shows, refuses key changes, counterfeit tokens and sanctioned destinations, and simulates each transaction on two servers. Self-hosted and open source.",
+    path: "/presign-guard/",
+    head: CSS,
+    body,
+    structured: [breadcrumb("Pre-Sign Guard", "/presign-guard/")],
+  }));
+}
+
 export async function buildProducts(write) {
+  await buildPresignGuard(write);
   await buildContinuity(write);
   await buildWatch(write);
   await buildVerified(write);
