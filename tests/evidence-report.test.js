@@ -91,6 +91,7 @@ describe("currencies", () => {
     const r = requestsFor({ issuers: [ISSUER], wallets: [WALLET, ISSUER], books: [`RLUSD.${ISSUER}`] }, "2026-09-30");
     expect(r.map((x) => x.path)).toEqual([
       `/api/authority?issuer=${ISSUER}&walk=1`,
+      `/api/mpt-authority?issuer=${ISSUER}`,
       `/api/treasury?wallets=${WALLET},${ISSUER}&at=2026-09-30`,
       `/api/book?currency=524C555344000000000000000000000000000000&issuer=${ISSUER}`,
     ]);
