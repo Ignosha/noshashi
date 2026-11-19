@@ -70,7 +70,7 @@ uses only `ripple-binary-codec`, which is already a dependency.
    ```
    Fireblocks requires HTTPS with a CA-signed certificate. You can leave out
    `tls` and terminate TLS in front of the guard instead.
-   Without `servers`, the guard uses s1.ripple.com and xrplcluster.com. In
+   Without `servers`, the guard uses s1.ripple.com and xrplcluster.com, both on port 443. In
    production, use your own nodes.
 4. **Start it.**
    ```bash
@@ -81,6 +81,64 @@ uses only `ripple-binary-codec`, which is already a dependency.
 5. **Roll out in observe mode first.** With `"mode": "observe"` the guard
    approves everything and records what enforce mode would have answered.
    Read the log for a week, tune the policy, then switch to `"enforce"`.
+
+## Without Fireblocks: `POST /v1/check` and the command line
+
+The same checks work with any signing setup: your own HSM or wallet
+service, a custodian with no approval hook, or a script. Call the guard
+just before you sign, and sign only on `APPROVE`.
+
+```bash
+curl -s https://guard.internal:8443/v1/check \
+  -H "Authorization: Bearer $GUARD_TOKEN" -H 'content-type: application/json' \
+  -d '{"tx_json": {...the unsigned transaction...}, "signingHash": "optional: the hash you are about to sign", "requestId": "your reference"}'
+```
+
+`tx_blob` (unsigned, hex, with or without the `53545800` prefix) works in
+place of `tx_json`. Fields a ledger reply adds (`hash`, `ctid`, `date`,
+`DeliverMax` and so on) are dropped before hashing, so a transaction copied
+from an API reply hashes the same way it is signed. An already-signed
+transaction is refused.
+
+The answer includes:
+
+- `action`, and `enforced` (what enforce mode decided);
+- `reason`;
+- `signingHash`;
+- `ledgerIndex`;
+- every finding;
+- the receipt and its `receiptHash`.
+
+The endpoint is off by default. Turn it on in the config:
+
+```json
+"check": { "enabled": true, "tokenEnv": "GUARD_TOKEN" }
+```
+
+`tokenEnv` names an environment variable that holds a bearer token of at
+least 32 characters. The guard refuses to serve `/v1/check` beyond loopback
+without one. A deployment that only uses `/v1/check` can leave out both
+Fireblocks key paths.
+
+From the command line, against live ledgers:
+
+```bash
+node --experimental-strip-types tools/presign-guard/check.ts policy.json tx.json
+```
+
+It prints the same answer and exits with 0 for APPROVE, 1 for REJECT and 2 for RETRY.
+
+**Under load.** A transaction whose fee is below the network's current
+fee is refused before the ledger evaluates it (`telCAN_NOT_QUEUE`). The
+guard then simulates a copy at the open-ledger fee, so it still learns
+whether the transaction itself would succeed, and records that the signed
+fee is low. The signed transaction and its hash are not changed.
+
+On 19 November 2026, at ledger 108439461, a 1 XRP payment to Bitstamp
+behaved like this:
+
+- **Without its tag:** refused, with `tecDST_TAG_NEEDED` on both servers.
+- **With its tag:** approved, with `tesSUCCESS` at 5,041 drops after a first `telCAN_NOT_QUEUE` at 12.
 
 ## Ask Fireblocks Support to enable rawTx
 

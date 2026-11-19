@@ -106,8 +106,53 @@ export type Seen = {
   /** SHA-512Half of the signing serialisation: what the Co-signer signs. Null when only Fireblocks' fields were available. */
   signingHash: string | null;
   /** Where the transaction came from. */
-  source: "rawTx" | "unhashedTxPayload" | "fields";
+  source: "rawTx" | "unhashedTxPayload" | "fields" | "tx_json" | "tx_blob";
 };
+
+/** Fields rippled and clio add to a transaction in their replies, which are not part of what is signed. */
+const API_ONLY = ["hash", "ctid", "date", "ledger_index", "inLedger", "validated", "meta", "metaData", "close_time_iso", "ledger_hash"];
+
+/** A transaction as signed: API-only fields dropped, and API v2's DeliverMax read as Amount. */
+export function withoutApiFields(tx: Json): Json {
+  const out: Json = {};
+  for (const [k, v] of Object.entries(tx)) if (!API_ONLY.includes(k) && k !== "DeliverMax") out[k] = v;
+  if (tx.DeliverMax !== undefined && tx.Amount === undefined) out.Amount = tx.DeliverMax;
+  return out;
+}
+
+/**
+ * A transaction handed to POST /v1/check, from any signing system: the
+ * decoded tx_json, or the unsigned tx_blob (with or without the signing
+ * prefix). When the caller says which hash it is about to sign, that hash
+ * must be this transaction's.
+ */
+export function extractDirect(body: Json): { seen: Seen | null; findings: Finding[] } {
+  const findings: Finding[] = [];
+  let seen: Seen | null = null;
+  try {
+    if (body.tx_json && typeof body.tx_json === "object") {
+      const tx = withoutApiFields(body.tx_json as Json);
+      seen = { tx, signingHash: signingHash(tx), source: "tx_json" };
+    } else if (typeof body.tx_blob === "string") {
+      const tx = decodeBlob(body.tx_blob);
+      seen = { tx, signingHash: signingHash(tx), source: "tx_blob" };
+    } else {
+      findings.push({ id: "no_transaction", severity: "critical", title: "No transaction to check", detail: "Send tx_json (an object) or tx_blob (hex)." });
+    }
+  } catch (e) {
+    findings.push({ id: "transaction_unreadable", severity: "critical", title: "The transaction cannot be read", detail: (e as Error).message });
+  }
+  if (seen && body.signingHash !== undefined) {
+    const claimed = String(body.signingHash).replace(/^0x/i, "").toUpperCase();
+    if (claimed !== seen.signingHash) {
+      findings.push({ id: "hash_mismatch", severity: "critical", title: "The hash to be signed is not this transaction's", detail: `The transaction hashes to ${seen.signingHash}; the caller is about to sign ${claimed}.` });
+    }
+  }
+  if (seen && (seen.tx.TxnSignature || seen.tx.Signers)) {
+    findings.push({ id: "already_signed", severity: "critical", title: "The transaction is already signed", detail: "A pre-signing check is for unsigned transactions; this one carries a signature." });
+  }
+  return { seen, findings };
+}
 
 const sha512Half = (hex: string) => createHash("sha512").update(Buffer.from(hex, "hex")).digest().subarray(0, 32).toString("hex").toUpperCase();
 /** The hash an XRPL single signature covers. */
@@ -233,7 +278,15 @@ export type Facts = {
   /** account_info of each issuer named in the transaction; null when unread. */
   issuers: Record<string, Json | null>;
   /** simulate on each server. */
-  simulations: Array<{ server: string; engineResult?: string; message?: string; ledgerIndex?: number; error?: string }>;
+  simulations: Array<{
+    server: string;
+    engineResult?: string;
+    message?: string;
+    ledgerIndex?: number;
+    error?: string;
+    /** Set when the first answer was about the fee alone and the copy was simulated again at the open-ledger fee. */
+    feeRaised?: { from: string; to: string; firstAnswer: string };
+  }>;
 };
 
 const KEY_CHANGES = new Set(["SetRegularKey", "SignerListSet", "AccountDelete"]);
@@ -331,6 +384,14 @@ export function checks(tx: Json, facts: Facts, policy: Policy): Finding[] {
  * transactions are in flight, a full queue), so they are noted, not refused.
  */
 export function simulationFindings(sims: Facts["simulations"]): Finding[] {
+  const raised = sims.find((s) => s.feeRaised)?.feeRaised;
+  const feeNote: Finding[] = raised
+    ? [{ id: "fee_below_open_ledger", severity: "info", title: "The fee is below what the network charges right now", detail: `At ${raised.from} drops the ledger answered ${raised.firstAnswer}; the outcome was simulated at the open-ledger fee of ${raised.to} drops instead. The signed transaction keeps its own fee and may wait or expire until load falls.` }]
+    : [];
+  return [...feeNote, ...simulationOutcome(sims)];
+}
+
+function simulationOutcome(sims: Facts["simulations"]): Finding[] {
   const answered = sims.filter((s) => s.engineResult);
   if (answered.length < 2) {
     return [{ id: "simulation_unavailable", severity: "retry", title: "The transaction could not be simulated on two servers", detail: sims.map((s) => `${s.server}: ${s.engineResult ?? s.error ?? "no answer"}`).join("; ") }];
