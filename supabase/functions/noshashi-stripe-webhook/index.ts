@@ -367,6 +367,31 @@ Deno.serve(async (request: Request) => {
     await db.rpc("evidence_reports_kick");
   };
 
+  /**
+   * Issuer Watch: a paid subscription to the issuer alerts, delivered by
+   * email. The checkout carries the issuer on the subscription's metadata;
+   * the buyer's email comes from the completed session. Only an active (or
+   * trialing) subscription keeps the alert switched on.
+   */
+  const WATCH_MONTHLY_CENTS = 1_900;
+  const ISSUER_RE = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+  // deno-lint-ignore no-explicit-any
+  const recordWatch = async (session: any) => {
+    const meta = session.metadata ?? {};
+    const issuer = String(meta.issuer ?? "");
+    const email = String(session.customer_details?.email ?? "").trim().toLowerCase();
+    const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
+    if (!ISSUER_RE.test(issuer) || !email || !subscriptionId || Number(session.amount_total ?? WATCH_MONTHLY_CENTS) < WATCH_MONTHLY_CENTS) {
+      console.error("ISSUER WATCH NOT RECORDED", { session: session.id, issuerOk: ISSUER_RE.test(issuer), hasEmail: Boolean(email) });
+      return;
+    }
+    const { error } = await db.from("issuer_alert_subscriptions").upsert(
+      { issuer, channel: "email", target: email, active: true, failures: 0, stripe_subscription_id: subscriptionId, label: String(meta.label ?? "").slice(0, 60) || null },
+      { onConflict: "issuer,channel,target" },
+    );
+    if (error) throw error;
+  };
+
   try {
     if (await reviewBillingRisk(db, event, async (chargeId) => {
       if (!/^ch_[A-Za-z0-9]+$/.test(chargeId) || !STRIPE_SECRET_KEY) throw new Error('Cannot reconcile billing risk event.');
@@ -390,6 +415,10 @@ Deno.serve(async (request: Request) => {
         // A Verified Issuer subscription grants nothing in the app either.
         // Its reports come from invoice.paid below, one per month.
         if (session.metadata?.product === "verified_issuer") break;
+        if (session.metadata?.product === "issuer_watch") {
+          await recordWatch(session);
+          break;
+        }
         let accountId = session.metadata?.account_id ?? session.client_reference_id;
 
         // A purchase made from the marketing site carries an email and
@@ -430,6 +459,12 @@ Deno.serve(async (request: Request) => {
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
         const subscription = event.data.object;
+        if (subscription.metadata?.product === "issuer_watch") {
+          const live = subscription.status === "active" || subscription.status === "trialing";
+          const { error } = await db.from("issuer_alert_subscriptions").update({ active: live }).eq("stripe_subscription_id", subscription.id);
+          if (error) throw error;
+          break;
+        }
         const accountId = subscription.metadata?.account_id;
         if (!accountId) break;
 
@@ -477,6 +512,7 @@ Deno.serve(async (request: Request) => {
           });
           if(!response.ok)throw new Error('Could not reconcile current subscription.');
           const subscription=await response.json();
+          if (subscription.metadata?.product === "issuer_watch") break;
           if (subscription.metadata?.product === "verified_issuer") {
             if (event.type === "invoice.paid") await recordVerifiedInvoice(invoice, subscription);
             break;

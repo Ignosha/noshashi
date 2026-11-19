@@ -44,6 +44,10 @@
  *                            and posts any change to every subscriber.
  *                            Auth: the random token kept in Vault.
  *
+ * Issuer Watch ($19 a month, noshashi.app/watch/) adds email delivery for
+ * one issuer per paid subscription, outside the free limits; those rows are
+ * written by noshashi-stripe-webhook.
+ *
  * Free, within limits: FREE_ISSUERS_PER_TARGET issuers per Discord channel
  * or Telegram chat. The rules for what counts as a change are in
  * ../_shared/issuerPowers.ts. Every reading is live from the public XRPL
@@ -192,8 +196,41 @@ async function sendTelegram(chatId: string, text: string): Promise<boolean | nul
   }
 }
 
+/**
+ * Issuer Watch, the paid subscription, is delivered by email through
+ * Resend (RESEND_API_KEY, the same key the evidence reports use). Email
+ * subscriptions are written only by noshashi-stripe-webhook for a paid
+ * subscription; the public /subscribe route never accepts an address.
+ */
+async function sendEmail(to: string, text: string): Promise<boolean | null> {
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  if (!apiKey || !/^[^@\s]{1,64}@[^@\s]{1,255}$/.test(to)) return null;
+  const inbox = Deno.env.get("SUPPORT_INBOX") || "support@noshashi.app";
+  const [head = "", issuerLine = ""] = text.split("\n");
+  const first = `${head}: ${issuerLine.split(" ")[0]}`.slice(0, 140);
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: Deno.env.get("WATCH_FROM") || "NOSHASHI Issuer Watch <reports@mail.noshashi.app>",
+        to: [to],
+        reply_to: inbox,
+        subject: first || "Issuer Watch alert",
+        text: `${text}\n\nStopping these emails with the link above does not cancel billing. To cancel Issuer Watch, reply to this email.`,
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    // 422: Resend refused the address itself.
+    if (response.status === 422) return false;
+    return response.ok ? true : null;
+  } catch {
+    return null;
+  }
+}
+
 const deliver = (channel: string, target: string, text: string) =>
-  channel === "discord" ? sendDiscord(target, text) : sendTelegram(target, text);
+  channel === "discord" ? sendDiscord(target, text) : channel === "email" ? sendEmail(target, text) : sendTelegram(target, text);
 
 // ── Subscriptions ────────────────────────────────────────────────────
 
