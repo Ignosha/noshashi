@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOSHASHI Continuity</title><style>body{max-width:54rem;margin:auto;padding:2rem 1rem;font:16px/1.55 system-ui;color:#202824;background:#faf9f5}small,label,button{font:14px monospace}textarea,pre{box-sizing:border-box;width:100%;padding:1rem;background:white;border:1px solid #9caaa2;overflow:auto}button{padding:.65rem;margin:.3rem .3rem .3rem 0;cursor:pointer}pre{white-space:pre-wrap}</style><main><small>NOSHASHI LABS / LEDGER DESK</small><h1>Continuity</h1><p>Rehearse one issued-token deposit against a sanitized payment record and its matching customer credits. Local checks stay on this device. Live verification sends only the transaction hash to the two listed public Mainnet servers. Use decimal strings and list every credit matched to this deposit.</p><label for="data">Scenario or exported report</label><textarea id="data" rows="18"></textarea><label for="hash">Mainnet transaction hash (64 hexadecimal characters)</label><input id="hash" size="66"><p><button id="verify">Verify with two servers</button> <label><input id="watch" type="checkbox"> Recheck every minute while open</label></p><p>For live reconciliation, supply credits with txHash, amount, issuer and currency, plus creditExportComplete (true only for a complete export). Optional workflows may contain a name and a dependencies list.</p><button id="run">Run checks</button><button id="replay">Try corrected sample</button><button id="save" disabled>Export evidence</button><pre id="result" aria-live="polite">Ready to rehearse.</pre></main><script>
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOSHASHI Continuity</title><style>body{max-width:54rem;margin:auto;padding:2rem 1rem;font:16px/1.55 system-ui;color:#202824;background:#faf9f5}small,label,button{font:14px monospace}textarea,pre{box-sizing:border-box;width:100%;padding:1rem;background:white;border:1px solid #9caaa2;overflow:auto}button{padding:.65rem;margin:.3rem .3rem .3rem 0;cursor:pointer}pre{white-space:pre-wrap}</style><main><small>NOSHASHI LABS / LEDGER DESK</small><h1>Continuity</h1><p>Rehearse one issued-token deposit against a sanitized payment record and its matching customer credits. Local checks stay on this device. Live verification sends the transaction hash to two public Mainnet servers and, when selected, the local read-only accounting adapter. Use decimal strings and list every credit matched to this deposit.</p><label for="data">Scenario or exported report</label><textarea id="data" rows="18"></textarea><label for="hash">Mainnet transaction hash (64 hexadecimal characters)</label><input id="hash" size="66"><p><label><input type="checkbox" id="connected"> Read fresh credits from the local accounting adapter</label></p><p><button id="verify">Verify with two servers</button> <label><input id="watch" type="checkbox"> Recheck every minute while open</label></p><p>For live reconciliation, supply credits with txHash, amount, issuer and currency, plus creditExportComplete (true only for a complete export). Optional workflows may contain a name and a dependencies list.</p><button id="run">Run checks</button><button id="replay">Try corrected sample</button><button id="save" disabled>Export evidence</button><pre id="result" aria-live="polite">Ready to rehearse.</pre></main><script>
 const sample={requirement:{destination:"demo-wallet",issuer:"demo-issuer",currency:"EUR",amount:"25"},payment:{validated:true,result:"tesSUCCESS",destination:"demo-wallet",issuer:"demo-issuer",currency:"EUR",delivered:"25"},credits:[{amount:"25",issuer:"demo-issuer",currency:"EUR"},{amount:"25",issuer:"demo-issuer",currency:"EUR"}]};
 function decimal(value){
  if(typeof value!=="string"||!/^\d+(\.\d+)?$/.test(value))return null;
@@ -60,22 +60,31 @@ function lookup(url,hash){
   }catch{finish(null)}};
  });
 }
+async function readCredits(hash){
+ const response=await fetch("/credits/"+hash,{cache:"no-store",redirect:"error",signal:AbortSignal.timeout(9000)});
+ if(!response.ok)throw Error("Accounting source unavailable.");
+ const source=await response.json();
+ if(source.transactionHash!==hash || source.creditExportComplete!==true || !Array.isArray(source.credits) || source.credits.some(row=>row?.txHash!==hash))throw Error("Incomplete or mismatched accounting response.");
+ return source;
+}
 async function verify(){
  invalidate();const current=revision;
  try{
   const input=scenario(),hash=el("hash").value.trim().toUpperCase();
   if(!/^[0-9A-F]{64}$/.test(hash))throw Error("Enter a valid transaction hash.");
   out.textContent="Checking both Mainnet servers…";
-  const [a,b]=await Promise.all(endpoints.map(url=>lookup(url,hash)));
+  const connected=el("connected").checked;
+  if(connected && location.origin!=="http://127.0.0.1:8765")throw Error("Open Continuity from the local accounting adapter at http://127.0.0.1:8765.");
+  const [a,b,source]=await Promise.all([...endpoints.map(url=>lookup(url,hash)),connected?readCredits(hash):input]);
   if(current!==revision)return;
   if(pretty(a)!==pretty(b))throw Error("Servers returned different settlement evidence.");
-  const rows=input.credits;
-  const complete=input.creditExportComplete===true&&Array.isArray(rows)&&rows.every(x=>typeof x?.txHash==="string"&&/^[0-9a-f]{64}$/i.test(x.txHash));
+  const rows=source.credits;
+  const complete=source.creditExportComplete===true&&Array.isArray(rows)&&rows.every(x=>typeof x?.txHash==="string"&&/^[0-9a-f]{64}$/i.test(x.txHash));
   const matched=complete?rows.filter(x=>x.txHash.toUpperCase()===hash):undefined;
-  show({...input,payment:a.payment,credits:matched},"Two Mainnet RPC responses; credit export completeness is operator-declared.",{hash,endpoints,ledgerHash:a.ledgerHash,ledgerIndex:a.ledgerIndex,matchedExportComplete:complete});
+  show({...input,payment:a.payment,creditExportComplete:complete,credits:matched},connected?"Two Mainnet RPC responses and a fresh query of the configured accounting view.":"Two Mainnet RPC responses; credit export completeness is operator-declared.",{hash,endpoints,ledgerHash:a.ledgerHash,ledgerIndex:a.ledgerIndex,matchedExportComplete:complete});
  }catch(e){if(current===revision)out.textContent="UNKNOWN — "+e.message}
 }
-box.value=pretty(sample);box.oninput=el("hash").oninput=invalidate;
+box.value=pretty(sample);box.oninput=el("connected").onchange=el("hash").oninput=invalidate;
 el("run").onclick=()=>{invalidate();try{show(scenario(),"Local rehearsal from supplied records")}catch(e){out.textContent=e.message}};
 el("verify").onclick=verify;
 el("watch").onchange=()=>{clearInterval(timer);if(el("watch").checked){verify();timer=setInterval(verify,60000)}};
