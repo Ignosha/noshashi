@@ -72,7 +72,8 @@ function nameOf(meta) {
   if (!meta) return null;
   const ticker = meta.ticker ?? meta.t;
   const name = meta.name ?? meta.n;
-  return [ticker, name].filter((v) => typeof v === "string" && v.trim()).join(" · ") || null;
+  const parts = [ticker, name].filter((v) => typeof v === "string" && v.trim()).map((v) => v.trim());
+  return [...new Set(parts)].join(" · ") || null;
 }
 
 /** A raw integer amount (a string on the ledger) at the issuance's asset scale. */
@@ -145,6 +146,8 @@ export function issuanceFacts(entry) {
     retained_powers: powers.filter((p) => p.retained && p.id !== "TRANSFERABLE").map((p) => p.id),
     metadata: meta,
     flags,
+    // The ledger entry exactly as the server returned it, for the evidence file.
+    ledger_entry: entry,
   };
 }
 
