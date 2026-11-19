@@ -63,9 +63,9 @@ describe("Verified Issuer checkout", () => {
 describe("history in the report", () => {
   it("Listing and History read the history; the Issuer check does not", () => {
     const scope = { issuers: [SOLO], wallets: [], books: [] };
-    expect(requestsFor(scope, null, "listing").map((r) => r.kind)).toEqual(["issuer", "history"]);
-    expect(requestsFor(scope, null, "history").map((r) => r.kind)).toEqual(["issuer", "history"]);
-    expect(requestsFor(scope, null, "issuer").map((r) => r.kind)).toEqual(["issuer"]);
+    expect(requestsFor(scope, null, "listing").map((r) => r.kind)).toEqual(["issuer", "mpt", "history"]);
+    expect(requestsFor(scope, null, "history").map((r) => r.kind)).toEqual(["issuer", "mpt", "history"]);
+    expect(requestsFor(scope, null, "issuer").map((r) => r.kind)).toEqual(["issuer", "mpt"]);
   });
 
   it("lists what the issuer did and says when the reading was partial", () => {

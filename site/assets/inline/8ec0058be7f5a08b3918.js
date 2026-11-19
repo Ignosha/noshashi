@@ -102,6 +102,31 @@
     out.hidden=false;
   }
 
+  /* Multi-Purpose Tokens (XLS-33) carry their powers on each issuance,
+     not on the issuer's account, so they are read separately
+     (/api/mpt-authority) and listed after the certificate. An issuer
+     with no MPTs shows nothing here. */
+  function renderMpt(reply){
+    var list=(reply&&reply.issuances)||[];
+    if(!list.length)return;
+    var html='<div class="cert-verdict unknown" style="margin-top:14px"><p class="tag">Multi-Purpose Tokens · '+list.length+'</p>'+
+      '<p>MPTs this account has issued. Each MPT carries its own powers, fixed when it was created. '+esc(reply.key_control&&reply.key_control.summary||"")+'</p>'+
+      '<p class="cert-meta">LEDGER '+esc(String(reply.ledger_index))+'</p></div><div class="cert-checks">';
+    for(var i=0;i<list.length;i++){
+      var m=list[i];
+      var kept=m.retained_powers||[];
+      html+='<div class="cert-check"><span class="mark '+(kept.length?"warn":"pass")+'">'+(kept.length?"FINDING":"CLEAR")+'</span>'+
+        '<h3 translate="no">'+esc(m.name||m.mpt_issuance_id)+'</h3><p>';
+      for(var j=0;j<m.powers.length;j++)html+=esc(m.powers[j].means)+' ';
+      html+=(m.locked_now?'Holders are locked right now. ':'')+
+        'Issued '+esc(m.outstanding)+(m.maximum?' of a maximum '+esc(m.maximum):'')+
+        (m.transfer_fee_percent?'; transfer fee '+esc(String(m.transfer_fee_percent))+'%':'')+'.</p>'+
+        '<code translate="no">'+esc(m.mpt_issuance_id)+'</code></div>';
+    }
+    out.insertAdjacentHTML("beforeend",html+'</div>');
+    out.hidden=false;
+  }
+
   form.addEventListener("submit",function(event){
     event.preventDefault();
     var issuer=(input.value||"").trim();
@@ -122,6 +147,12 @@
         render(result.body);
       })
       .catch(function(){say("Could not reach the server. Try again shortly.","bad");})
+      .then(function(){
+        return fetch("/api/mpt-authority?issuer="+encodeURIComponent(issuer))
+          .then(function(r){return r.ok?r.json():null;})
+          .then(renderMpt)
+          .catch(function(){});
+      })
       .finally(function(){button.disabled=false;});
   });
 

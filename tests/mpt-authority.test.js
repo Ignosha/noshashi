@@ -6,6 +6,35 @@
 import { describe, it, expect } from "vitest";
 import { issuanceFacts, issuanceIdOf, accountIdHex, decodeMetadata, keyControl, readMptAuthority, MPT_FLAGS } from "../api/_lib/mpt-authority.js";
 import handler from "../api/_lib/routes/mpt-authority.js";
+import { readFileSync } from "node:fs";
+import { findings, reportModel } from "../supabase/functions/_shared/evidenceReport.ts";
+
+const live = JSON.parse(readFileSync(new URL("./fixtures/mpt-authority-2026-11-19.json", import.meta.url), "utf8"));
+
+describe("live mainnet issuances (XRPTokenizer, ledger 108423383)", () => {
+  const [x40am, datec] = live.issuances.map(issuanceFacts);
+
+  it("computes the same issuance IDs the ledger reports", () => {
+    for (const e of live.issuances) expect(issuanceIdOf(e.Sequence, e.Issuer)).toBe(e.mpt_issuance_id);
+  });
+
+  it("X40AM: no powers kept, 40 billion issued, 38 billion of it in escrow", () => {
+    expect(x40am.name).toBe("X40AM · X40AM Utility Token");
+    expect(x40am.retained_powers).toEqual([]);
+    expect(x40am.outstanding).toBe("40000000000");
+    expect(x40am.maximum).toBe("40000000000");
+    expect(x40am.locked_amount).toBe("38000000000");
+    expect(x40am.can_escrow).toBe(true);
+  });
+
+  it("DateC: the issuer kept the power to lock holders, and it can trade", () => {
+    expect(datec.name).toBe("DATEC · DateC");
+    expect(datec.retained_powers).toEqual(["CAN_LOCK"]);
+    expect(datec.can_trade).toBe(true);
+    expect(datec.locked_now).toBe(false);
+    expect(datec.outstanding).toBe("2000000000");
+  });
+});
 
 const ISSUER = "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De";
 const hex = (s) => [...new TextEncoder().encode(s)].map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
@@ -121,5 +150,27 @@ describe("GET /api/mpt-authority", () => {
     expect(res.body.issuances[0].mpt_issuance_id).toBe(id);
     expect(res.body.issuances[0].retained_powers).toEqual(["CAN_LOCK"]);
     expect(res.headers["cache-control"]).toContain("s-maxage=300");
+  });
+});
+
+describe("in the Ledger Evidence Report", () => {
+  const reply = { issuer: live.issuer, ledger_index: live.ledger_index, key_control: { summary: "2 of 10 signers must agree to act for this issuer." }, issuances: live.issuances.map(issuanceFacts) };
+  const sources = [{ kind: "mpt", subject: live.issuer, request: "/api/mpt-authority", reply }];
+
+  it("names the MPT whose issuer can still freeze holders", () => {
+    expect(findings(sources)).toEqual(["The issuer of the MPT DATEC · DateC can still freeze holders."]);
+  });
+
+  it("lists every MPT with its powers and the amount in escrow", () => {
+    const model = reportModel({ reference: "NER-TEST", tier: "issuer", organization: null, scope: { issuers: [live.issuer], wallets: [], books: [] }, periodEnd: null, generatedAt: "2026-11-19T02:40:36Z", sources, digest: "0".repeat(64) });
+    const text = JSON.stringify(model.blocks);
+    expect(text).toContain("Multi-Purpose Tokens");
+    expect(text).toContain("40000000000 of 40000000000 (38000000000 in escrow)");
+    expect(text).toContain("060B0AEA9FE7F2B50E46A1E9127A580EB575FA6850C683F7");
+  });
+
+  it("an issuer with no MPTs adds no section", () => {
+    const model = reportModel({ reference: "NER-TEST", tier: "issuer", organization: null, scope: { issuers: [live.issuer], wallets: [], books: [] }, periodEnd: null, generatedAt: "2026-11-19T02:40:36Z", sources: [{ ...sources[0], reply: { ...reply, issuances: [] } }], digest: "0".repeat(64) });
+    expect(JSON.stringify(model.blocks)).not.toContain("Multi-Purpose Tokens");
   });
 });

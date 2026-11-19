@@ -142,6 +142,8 @@ export function issuanceFacts(entry) {
     asset_scale: Number(entry.AssetScale ?? 0),
     outstanding: scaled(entry.OutstandingAmount ?? "0", entry.AssetScale),
     maximum: entry.MaximumAmount !== undefined ? scaled(entry.MaximumAmount, entry.AssetScale) : null,
+    // Held in escrow (or otherwise locked by the ledger) out of what is outstanding.
+    locked_amount: entry.LockedAmount !== undefined ? scaled(entry.LockedAmount, entry.AssetScale) : null,
     powers,
     retained_powers: powers.filter((p) => p.retained && p.id !== "TRANSFERABLE").map((p) => p.id),
     metadata: meta,

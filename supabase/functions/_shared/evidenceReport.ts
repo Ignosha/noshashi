@@ -97,12 +97,15 @@ export function currencyLabel(code: string): string {
 
 export type Scope = { issuers: string[]; wallets: string[]; books: string[] };
 
-export type Kind = "issuer" | "history" | "treasury" | "book";
+export type Kind = "issuer" | "mpt" | "history" | "treasury" | "book";
 
 /** The public requests a report is built from, relative to SITE. */
 export function requestsFor(scope: Scope, periodEnd: string | null, tier?: Tier): { kind: Kind; subject: string; path: string }[] {
   const out: { kind: Kind; subject: string; path: string }[] = [];
   for (const issuer of scope.issuers) out.push({ kind: "issuer", subject: issuer, path: `/api/authority?issuer=${encodeURIComponent(issuer)}&walk=1` });
+  // Multi-Purpose Tokens carry their own powers on each issuance; an
+  // issuer with none returns an empty list and the report says nothing.
+  for (const issuer of scope.issuers) out.push({ kind: "mpt", subject: issuer, path: `/api/mpt-authority?issuer=${encodeURIComponent(issuer)}` });
   if (tier && HISTORY_TIERS.has(tier)) {
     for (const issuer of scope.issuers) out.push({ kind: "history", subject: issuer, path: `/api/issuer-history?issuer=${encodeURIComponent(issuer)}` });
   }
@@ -174,7 +177,7 @@ export function findings(sources: Source[]): string[] {
   const out: string[] = [];
   for (const s of sources) {
     if (s.error) {
-      const what = s.kind === "issuer" ? `the issuing account ${short(s.subject)}` : s.kind === "history" ? `the history of issuer ${short(s.subject)}` : s.kind === "book" ? `the ${s.subject.split(".")[0]} order book` : "the treasury wallets";
+      const what = s.kind === "issuer" ? `the issuing account ${short(s.subject)}` : s.kind === "mpt" ? `the Multi-Purpose Tokens of ${short(s.subject)}` : s.kind === "history" ? `the history of issuer ${short(s.subject)}` : s.kind === "book" ? `the ${s.subject.split(".")[0]} order book` : "the treasury wallets";
       out.push(`We could not read ${what} from the XRP Ledger, so this report makes no statement about it.`);
       continue;
     }
@@ -183,6 +186,14 @@ export function findings(sources: Source[]): string[] {
       for (const c of r.checks ?? []) {
         if (c.state === "INSUFFICIENT_DATA" || c.passed) continue;
         out.push(`${CHECK_WORDS[c.id]?.fails ?? `${c.label}: does not hold. ${c.detail}`} (Issuer ${short(s.subject)}, ledger ${num(r.ledgerIndex, 0)}.)`);
+      }
+    } else if (s.kind === "mpt") {
+      const words: Record<string, string> = { CAN_CLAWBACK: "take tokens back from holders", CAN_LOCK: "freeze holders", REQUIRE_AUTH: "decide who may hold it" };
+      for (const m of r.issuances ?? []) {
+        const name = m.name ?? short(String(m.mpt_issuance_id ?? ""));
+        const kept = (m.retained_powers ?? []).map((p: string) => words[p]).filter(Boolean);
+        if (m.locked_now) out.push(`Holders of the MPT ${name} are locked right now (issuer ${short(s.subject)}).`);
+        if (kept.length) out.push(`The issuer of the MPT ${name} can still ${kept.length > 1 ? `${kept.slice(0, -1).join(", ")} and ${kept[kept.length - 1]}` : kept[0]}.`);
       }
     } else if (s.kind === "history") {
       const t = r.tally ?? {};
@@ -246,9 +257,10 @@ export function reportModel(input: ReportInput): ReportModel {
   const { scope, periodEnd, sources } = input;
   const issuers = sources.filter((s) => s.kind === "issuer");
   const histories = sources.filter((s) => s.kind === "history");
+  const mpts = sources.filter((s) => s.kind === "mpt" && (s.error || (s.reply?.issuances ?? []).length));
   const treasury = sources.find((s) => s.kind === "treasury");
   const books = sources.filter((s) => s.kind === "book");
-  const ledgers = sources.filter((s) => s.kind !== "history").map((s) => s.reply?.ledgerIndex ?? s.reply?.ledger?.index ?? s.reply?.ledger_index).filter((v) => typeof v === "number");
+  const ledgers = sources.filter((s) => s.kind !== "history" && s.kind !== "mpt").map((s) => s.reply?.ledgerIndex ?? s.reply?.ledger?.index ?? s.reply?.ledger_index).filter((v) => typeof v === "number");
   const counted = [
     scope.issuers.length && `${scope.issuers.length} issuing account${scope.issuers.length > 1 ? "s" : ""}`,
     scope.wallets.length && `${scope.wallets.length} treasury wallet${scope.wallets.length > 1 ? "s" : ""}`,
@@ -299,6 +311,38 @@ export function reportModel(input: ReportInput): ReportModel {
       });
       blocks.push({ type: "para", small: true, text: `Full address ${s.subject}. Read at ledger ${num(r.ledgerIndex, 0)}.` });
     }
+  }
+
+  for (const s of mpts) {
+    if (s === mpts[0]) {
+      blocks.push({ type: "heading", text: `${++n}. Multi-Purpose Tokens` });
+      blocks.push({ type: "para", text: "Multi-Purpose Tokens (MPTs) are the XRP Ledger's newer token type. Each one carries its own powers, fixed when it was created, so each is listed on its own." });
+    }
+    blocks.push({ type: "subheading", text: `Issuer ${short(s.subject)}` });
+    if (s.error) {
+      blocks.push({ type: "para", text: `Its MPTs could not be read (${s.error}). Nothing about them is shown as safe.` });
+      continue;
+    }
+    const r = s.reply;
+    blocks.push({
+      type: "table",
+      columns: [
+        { label: "Token", width: 0.22 },
+        { label: "Take back", width: 0.13 },
+        { label: "Freeze", width: 0.13 },
+        { label: "Approval to hold", width: 0.16 },
+        { label: "Issued", width: 0.36, align: "right" },
+      ],
+      rows: (r.issuances ?? []).map((m: Any) => {
+        const has = (id: string) => (m.retained_powers ?? []).includes(id);
+        const yn = (id: string) => (has(id) ? "Yes" : "No");
+        return {
+          cells: [m.name ?? short(String(m.mpt_issuance_id ?? "")), yn("CAN_CLAWBACK"), yn("CAN_LOCK"), yn("REQUIRE_AUTH"), `${m.maximum ? `${m.outstanding} of ${m.maximum}` : String(m.outstanding)}${m.locked_amount && m.locked_amount !== "0" ? ` (${m.locked_amount} in escrow)` : ""}`],
+          tones: [null, has("CAN_CLAWBACK") ? "warn" : "good", has("CAN_LOCK") ? "warn" : "good", has("REQUIRE_AUTH") ? "warn" : "good", null],
+        };
+      }),
+    });
+    blocks.push({ type: "para", small: true, text: `${r.key_control?.summary ?? ""} MPT IDs: ${(r.issuances ?? []).map((m: Any) => m.mpt_issuance_id).join(", ")}. Read at ledger ${num(r.ledger_index, 0)}.`.trim() });
   }
 
   for (const s of histories) {
