@@ -200,6 +200,10 @@
     {
       "source": "/api/issuer-history",
       "destination": "/api/tools?tool=issuer-history"
+    },
+    {
+      "source": "/api/mpt-authority",
+      "destination": "/api/tools?tool=mpt-authority"
     }
   ]
 }
