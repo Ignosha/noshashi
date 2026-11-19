@@ -1,7 +1,8 @@
 """Serve Continuity on loopback with a read-only SQLite credit source.
 
-Run: python3 credit_source.py /path/to/accounting.sqlite
-Place NOSHASHI-Continuity.html or index.html next to this script.
+Run: python3 tools/continuity/credit_source.py /path/to/accounting.sqlite
+The page (continuity.html) and its script (continuity.js) sit next to this
+file and are served from it; nothing else is read from disk.
 Provide a table or view continuity_credits(tx_hash, amount, issuer, currency).
 Use text columns, decimal strings, and one row per posted credit. The view must
 include all relevant posted credits; duplicates are deliberately preserved.
@@ -44,6 +45,8 @@ class Handler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path == "/":
             data, mime = self.server.page, "text/html; charset=utf-8"
+        elif path == "/continuity.js":
+            data, mime = self.server.script, "text/javascript; charset=utf-8"
         elif re.fullmatch(r"/credits/[A-Fa-f0-9]{64}", path):
             try:
                 data = json.dumps(credits(self.server.database, path.split("/")[-1])).encode()
@@ -58,6 +61,9 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", mime)
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Frame-Options", "DENY")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; "
+                         "connect-src 'self' wss://s1.ripple.com wss://s2.ripple.com; frame-ancestors 'none'")
         self.end_headers()
         self.wfile.write(data)
 
@@ -66,11 +72,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("database", type=Path)
     args = parser.parse_args()
-    page = Path(__file__).with_name("NOSHASHI-Continuity.html")
-    if not page.exists():
-        page = page.with_name("index.html")
+    if not args.database.is_file():
+        parser.error(f"{args.database} is not a file")
+    here = Path(__file__).resolve().parent
+    page = next((here / name for name in ("continuity.html", "NOSHASHI-Continuity.html", "index.html") if (here / name).exists()), None)
+    if page is None or not (here / "continuity.js").exists():
+        parser.error(f"continuity.html and continuity.js must sit next to {Path(__file__).name} in {here}")
     with ThreadingHTTPServer(("127.0.0.1", 8765), Handler) as server:
         server.database = args.database
         server.page = page.read_bytes()
+        server.script = (here / "continuity.js").read_bytes()
         print("Open http://127.0.0.1:8765", flush=True)
         server.serve_forever()
