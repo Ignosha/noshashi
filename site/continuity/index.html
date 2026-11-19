@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOSHASHI Continuity</title><style>body{max-width:54rem;margin:auto;padding:2rem 1rem;font:16px/1.55 system-ui;color:#202824;background:#faf9f5}small,label,button{font:14px monospace}textarea,pre{box-sizing:border-box;width:100%;padding:1rem;background:white;border:1px solid #9caaa2;overflow:auto}button{padding:.65rem;margin:.3rem .3rem .3rem 0;cursor:pointer}pre{white-space:pre-wrap}</style><main><small>NOSHASHI LABS / LEDGER DESK</small><h1>Continuity</h1><p>Rehearse one issued-token deposit against a sanitized payment record and its matching customer credits. Inputs are processed locally. Use decimal strings and list every credit matched to this deposit.</p><label for="data">Scenario or exported report</label><textarea id="data" rows="18"></textarea><button id="run">Run checks</button><button id="replay">Try corrected sample</button><button id="save" disabled>Export evidence</button><pre id="result" aria-live="polite">Ready to rehearse.</pre></main><script>
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOSHASHI Continuity</title><style>body{max-width:54rem;margin:auto;padding:2rem 1rem;font:16px/1.55 system-ui;color:#202824;background:#faf9f5}small,label,button{font:14px monospace}textarea,pre{box-sizing:border-box;width:100%;padding:1rem;background:white;border:1px solid #9caaa2;overflow:auto}button{padding:.65rem;margin:.3rem .3rem .3rem 0;cursor:pointer}pre{white-space:pre-wrap}</style><main><small>NOSHASHI LABS / LEDGER DESK</small><h1>Continuity</h1><p>Rehearse one issued-token deposit against a sanitized payment record and its matching customer credits. Local checks stay on this device. Live verification sends only the transaction hash to the two listed public Mainnet servers. Use decimal strings and list every credit matched to this deposit.</p><label for="data">Scenario or exported report</label><textarea id="data" rows="18"></textarea><label for="hash">Mainnet transaction hash (64 hexadecimal characters)</label><input id="hash" size="66"><p><button id="verify">Verify with two servers</button> <label><input id="watch" type="checkbox"> Recheck every minute while open</label></p><p>For live reconciliation, supply credits with txHash, amount, issuer and currency, plus creditExportComplete (true only for a complete export). Optional workflows may contain a name and a dependencies list.</p><button id="run">Run checks</button><button id="replay">Try corrected sample</button><button id="save" disabled>Export evidence</button><pre id="result" aria-live="polite">Ready to rehearse.</pre></main><script>
 const sample={requirement:{destination:"demo-wallet",issuer:"demo-issuer",currency:"EUR",amount:"25"},payment:{validated:true,result:"tesSUCCESS",destination:"demo-wallet",issuer:"demo-issuer",currency:"EUR",delivered:"25"},credits:[{amount:"25",issuer:"demo-issuer",currency:"EUR"},{amount:"25",issuer:"demo-issuer",currency:"EUR"}]};
 function decimal(value){
  if(typeof value!=="string"||!/^\d+(\.\d+)?$/.test(value))return null;
@@ -16,11 +16,69 @@ function evaluate(input){
  const states=Object.values(checks);
  return {verdict:states.includes("FAIL")?"FAIL":states.includes("UNKNOWN")?"UNKNOWN":"PASS",checks};
 }
-const el=id=>document.getElementById(id),box=el("data"),out=el("result");let report;
+const el=id=>document.getElementById(id),box=el("data"),out=el("result");
 const pretty=x=>JSON.stringify(x,null,2);
-function invalidate(){report=null;el("save").disabled=true;out.textContent="Inputs changed. Run checks again."}
-box.value=pretty(sample);box.oninput=invalidate;
-el("run").onclick=()=>{invalidate();try{const raw=JSON.parse(box.value),input=raw.scenario??raw;const result=evaluate(input);report={version:"continuity-deposit/1",source:"User-supplied local records; ledger provenance and completeness unverified",at:new Date().toISOString(),scenario:input,...result};out.textContent=pretty(result);el("save").disabled=false}catch(e){out.textContent=e.message}};
+const endpoints=["wss://s1.ripple.com","wss://s2.ripple.com"];
+let report,revision=0,timer;
+function invalidate(){
+ revision++;report=null;el("save").disabled=true;
+ out.textContent="Inputs changed. Run checks again.";
+}
+function scenario(){const raw=JSON.parse(box.value);return raw.scenario??raw}
+function dependencies(workflows=[]){
+ const owners=new Map();
+ for(const flow of workflows){
+  for(const dep of new Set(flow.dependencies)){
+   if(!owners.has(dep))owners.set(dep,new Set());
+   owners.get(dep).add(flow.name);
+  }
+ }
+ return Array.from(owners,([dependency,names])=>({dependency,workflows:[...names]})).filter(x=>x.workflows.length>1);
+}
+function show(input,source,extra={}){
+ const result=evaluate(input);
+ const reasons=Object.keys(result.checks).filter(k=>result.checks[k]==="FAIL");
+ const diagnosis=reasons.map(k=>k==="Exactly one matching credit"?
+  (input.credits.length===0?"No matching credit in the supplied export.":"Multiple credits match this deposit."):
+  k+" differs from the requirement.");
+ report={version:"continuity-deposit/2",source,at:new Date().toISOString(),scenario:input,...result,diagnosis,sharedDependencies:dependencies(input.workflows),...extra};
+ out.textContent=pretty(report);el("save").disabled=false;
+}
+function lookup(url,hash){
+ return new Promise((resolve,reject)=>{
+  const ws=new WebSocket(url);
+  const timeout=setTimeout(()=>finish(null),9000);
+  function finish(data){clearTimeout(timeout);ws.onclose=ws.onerror=ws.onmessage=null;ws.close();data?resolve(data):reject(Error("No confirmed response from "+url))}
+  ws.onopen=()=>ws.send(JSON.stringify({id:1,command:"tx",transaction:hash,api_version:2}));
+  ws.onerror=ws.onclose=()=>finish(null);
+  ws.onmessage=e=>{try{
+   const msg=JSON.parse(e.data);if(msg.id!==1)return;
+   const r=msg.result,t=r?.tx_json,d=r?.meta?.delivered_amount;
+   if(msg.status!=="success"||r.validated!==true||r.hash?.toUpperCase()!==hash||!r.ledger_hash||t?.TransactionType!=="Payment")return finish(null);
+   if(r.meta?.TransactionResult==="tesSUCCESS"&&(!d||typeof d!=="object"||!d.issuer||!d.currency||!decimal(d.value)))return finish(null);
+   finish({ledgerHash:r.ledger_hash,ledgerIndex:r.ledger_index,payment:{validated:true,result:r.meta.TransactionResult,destination:t.Destination,issuer:d?.issuer,currency:d?.currency,delivered:d?.value}});
+  }catch{finish(null)}};
+ });
+}
+async function verify(){
+ invalidate();const current=revision;
+ try{
+  const input=scenario(),hash=el("hash").value.trim().toUpperCase();
+  if(!/^[0-9A-F]{64}$/.test(hash))throw Error("Enter a valid transaction hash.");
+  out.textContent="Checking both Mainnet servers…";
+  const [a,b]=await Promise.all(endpoints.map(url=>lookup(url,hash)));
+  if(current!==revision)return;
+  if(pretty(a)!==pretty(b))throw Error("Servers returned different settlement evidence.");
+  const rows=input.credits;
+  const complete=input.creditExportComplete===true&&Array.isArray(rows)&&rows.every(x=>typeof x?.txHash==="string"&&/^[0-9a-f]{64}$/i.test(x.txHash));
+  const matched=complete?rows.filter(x=>x.txHash.toUpperCase()===hash):undefined;
+  show({...input,payment:a.payment,credits:matched},"Two Mainnet RPC responses; credit export completeness is operator-declared.",{hash,endpoints,ledgerHash:a.ledgerHash,ledgerIndex:a.ledgerIndex,matchedExportComplete:complete});
+ }catch(e){if(current===revision)out.textContent="UNKNOWN — "+e.message}
+}
+box.value=pretty(sample);box.oninput=el("hash").oninput=invalidate;
+el("run").onclick=()=>{invalidate();try{show(scenario(),"Local rehearsal from supplied records")}catch(e){out.textContent=e.message}};
+el("verify").onclick=verify;
+el("watch").onchange=()=>{clearInterval(timer);if(el("watch").checked){verify();timer=setInterval(verify,60000)}};
 el("replay").onclick=()=>{const corrected=structuredClone(sample);corrected.credits.pop();box.value=pretty(corrected);el("run").click()};
 el("save").onclick=()=>{if(!report)return;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([pretty(report)],{type:"application/json"}));a.download="continuity-evidence.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 </script></html>
