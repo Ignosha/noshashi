@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOSHASHI Continuity</title><style>body{max-width:54rem;margin:auto;padding:2rem 1rem;font:16px/1.55 system-ui;color:#202824;background:#faf9f5}small,label,button{font:14px monospace}textarea,pre{box-sizing:border-box;width:100%;padding:1rem;background:white;border:1px solid #9caaa2;overflow:auto}button{padding:.65rem;margin:.3rem .3rem .3rem 0;cursor:pointer}pre{white-space:pre-wrap}</style><main><small>NOSHASHI LABS / LEDGER DESK</small><h1>Continuity</h1><p>Rehearse one issued-token deposit against a sanitized payment record and its matching customer credits. Inputs are processed locally. Use decimal strings and list every credit matched to this deposit.</p><label for="data">Scenario or exported report</label><textarea id="data" rows="18"></textarea><button id="run">Run checks</button><button id="replay">Try corrected sample</button><button id="save" disabled>Export evidence</button><pre id="result" aria-live="polite">Ready to rehearse.</pre></main><script>
+const sample={requirement:{destination:"demo-wallet",issuer:"demo-issuer",currency:"EUR",amount:"25"},payment:{validated:true,result:"tesSUCCESS",destination:"demo-wallet",issuer:"demo-issuer",currency:"EUR",delivered:"25"},credits:[{amount:"25",issuer:"demo-issuer",currency:"EUR"},{amount:"25",issuer:"demo-issuer",currency:"EUR"}]};
+function decimal(value){
+ if(typeof value!=="string"||!/^\d+(\.\d+)?$/.test(value))return null;
+ const [whole,fraction=""]=value.split(".");
+ return (whole.replace(/^0+(?=\d)/,"")||"0")+(fraction.replace(/0+$/,"")?"."+fraction.replace(/0+$/,""):"");
+}
+function evaluate(input){
+ const {requirement:r,payment:p,credits}=input;
+ if(!r||!p||!["issuer","currency","destination"].every(k=>typeof r[k]==="string"&&r[k].trim())||!decimal(r.amount)||decimal(r.amount)==="0")throw Error("Supply a complete requirement and payment record.");
+ const match=(v,w)=>typeof v!=="string"||!v.trim()?"UNKNOWN":v===w?"PASS":"FAIL";
+ const amount=v=>decimal(v)===null?"UNKNOWN":match(decimal(v),decimal(r.amount));
+ const checks={"Validated successful payment":p.validated===true?match(p.result,"tesSUCCESS"):"UNKNOWN","Destination":match(p.destination,r.destination),"Issued currency":match(p.currency,r.currency),"Issuer":match(p.issuer,r.issuer),"Delivered amount":amount(p.delivered),"Exactly one matching credit":Array.isArray(credits)?credits.length===1?"PASS":"FAIL":"UNKNOWN"};
+ const credit=Array.isArray(credits)&&credits.length===1?credits[0]:null;
+ checks["Credited amount"]=amount(credit?.amount);checks["Credited currency"]=match(credit?.currency,r.currency);checks["Credited issuer"]=match(credit?.issuer,r.issuer);
+ const states=Object.values(checks);
+ return {verdict:states.includes("FAIL")?"FAIL":states.includes("UNKNOWN")?"UNKNOWN":"PASS",checks};
+}
+const el=id=>document.getElementById(id),box=el("data"),out=el("result");let report;
+const pretty=x=>JSON.stringify(x,null,2);
+function invalidate(){report=null;el("save").disabled=true;out.textContent="Inputs changed. Run checks again."}
+box.value=pretty(sample);box.oninput=invalidate;
+el("run").onclick=()=>{invalidate();try{const raw=JSON.parse(box.value),input=raw.scenario??raw;const result=evaluate(input);report={version:"continuity-deposit/1",source:"User-supplied local records; ledger provenance and completeness unverified",at:new Date().toISOString(),scenario:input,...result};out.textContent=pretty(result);el("save").disabled=false}catch(e){out.textContent=e.message}};
+el("replay").onclick=()=>{const corrected=structuredClone(sample);corrected.credits.pop();box.value=pretty(corrected);el("run").click()};
+el("save").onclick=()=>{if(!report)return;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([pretty(report)],{type:"application/json"}));a.download="continuity-evidence.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+</script></html>
