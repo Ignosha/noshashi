@@ -138,7 +138,7 @@ async function buildSales(write) {
       <input id="er-at" name="period_end" type="date"></div>
     <p class="er-note">Name at least one issuing account or one wallet. Addresses only: never send keys or seeds. The report goes to the email you enter at checkout.</p>
     <div class="er-actions">
-      <button class="btn" type="submit" id="er-pay">Pay ${FROM} by card</button>
+      <button class="btn" type="submit" id="er-pay">Pay ${usd(EVIDENCE_TIERS[DEFAULT_TIER].cents)} by card</button>
       <a class="btn btn-quiet" id="er-preview" href="/evidence-report/build/">Preview this scope free</a>
     </div>
     <p class="form-status" id="er-status" role="status" aria-live="polite"></p>

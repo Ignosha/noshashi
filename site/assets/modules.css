@@ -515,11 +515,15 @@
  * a tablet and a header running off the side of the screen.
  *
  * Swept 1250→700 in 10px steps on /contact/: the overflow band ends at
- * 910, so 920 is the first width where the links actually fit. If the
+ * 910, so 920 was the first width where the links actually fit. If the
  * nav gains another item, this number moves again — re-run the sweep,
- * do not guess. The paired min-width below must stay at 921.
+ * do not guess. The paired min-width below must stay one above it.
+ *
+ * Re-swept 2026-11-19 after the theme toggle joined the header: /contact/,
+ * /news/ and /presign-guard/ overflowed at every width from 1040 down to
+ * 930 (by 7 to 112px), so the menu now takes over at 1050.
  */
-@media (max-width:920px){
+@media (max-width:1050px){
   .nav-menu-btn{display:inline-flex}
   /* Only once the menu is actually present — see nav.js. */
   .nav-links.has-menu .btn{display:none}
@@ -528,7 +532,7 @@
   header{position:sticky}
   .nav{position:relative}
 }
-@media (min-width:921px){
+@media (min-width:1051px){
   .nav-panel{display:none}
 }
 @media (prefers-reduced-motion:reduce){
