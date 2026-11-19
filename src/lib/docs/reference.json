@@ -171,6 +171,7 @@
     "fee",
     "gateway_balances",
     "ledger",
+    "ledger_data",
     "ledger_entry",
     "nft_buy_offers",
     "nft_sell_offers",
