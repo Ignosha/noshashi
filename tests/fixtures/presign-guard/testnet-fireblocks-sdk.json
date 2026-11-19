@@ -1,0 +1,86 @@
+{
+ "_source": "The extraParameters example in the Fireblocks XRP SDK README (github.com/fireblocks/fireblocks-xrp-sdk, 'Raw content validation support'), and XRPL Testnet replies for it captured 2026-11-19 from s.altnet.rippletest.net.",
+ "extraParameters": {
+  "rawMessageData": {
+   "messages": [
+    {
+     "content": "4147FCCCB874E67DDB05C3D353972EFA21DC0D18F6F0B3768C22AFDAAEEC10E7"
+    }
+   ]
+  },
+  "unhashedTxPayload": {
+   "Fee": "10",
+   "Amount": {
+    "value": "100",
+    "issuer": "rhsMZjNb4ehEHdfLbMCRBnwMr7XAnicnVS",
+    "currency": "FBX"
+   },
+   "Account": "rpbkpPF8PrPuMN8NgEVkCsJDCWwP9KePFq",
+   "Sequence": 7855319,
+   "Destination": "rfSeUdwJC4ejRZ3mNfdH7KMWPyGGx6UTmf",
+   "SigningPubKey": "03077CBD3FC5F7B9FC8364C83900A78659AF60D16C62DB2860C498C3593D29BA2D",
+   "TransactionType": "Payment",
+   "LastLedgerSequence": 8224033
+  }
+ },
+ "simulate": {
+  "applied": false,
+  "engine_result": "telCAN_NOT_QUEUE",
+  "engine_result_code": -392,
+  "engine_result_message": "Can not queue at this time.",
+  "ledger_index": 22453009,
+  "status": "success",
+  "tx_json": {
+   "Account": "rpbkpPF8PrPuMN8NgEVkCsJDCWwP9KePFq",
+   "Amount": {
+    "currency": "FBX",
+    "issuer": "rhsMZjNb4ehEHdfLbMCRBnwMr7XAnicnVS",
+    "value": "100"
+   },
+   "Destination": "rfSeUdwJC4ejRZ3mNfdH7KMWPyGGx6UTmf",
+   "Fee": "10",
+   "LastLedgerSequence": 8224033,
+   "Sequence": 7855319,
+   "SigningPubKey": "03077CBD3FC5F7B9FC8364C83900A78659AF60D16C62DB2860C498C3593D29BA2D",
+   "TransactionType": "Payment",
+   "TxnSignature": "",
+   "hash": "D514193DC5BD25F7FDF58F6F34A2778CE05856F69A86D4F51328C8EE080E2535"
+  }
+ },
+ "account_info_issuer": {
+  "account_data": {
+   "Account": "rhsMZjNb4ehEHdfLbMCRBnwMr7XAnicnVS",
+   "Balance": "7999925",
+   "Domain": "6578616D706C652E636F6D",
+   "Flags": 2155872256,
+   "LedgerEntryType": "AccountRoot",
+   "OwnerCount": 1,
+   "PreviousTxnID": "1F1F1F4DC75D173330F626748D7BDAFDC45083639CAF8B34FD64959C5DFA8021",
+   "PreviousTxnLgrSeq": 8204009,
+   "Sequence": 7952152,
+   "TickSize": 5,
+   "index": "3FA7A891E35761E808CB56708BE8D61233252EC2A0F5A2B1BB5BBCC62E9F364E"
+  },
+  "account_flags": {
+   "allowTrustLineClawback": true,
+   "allowTrustLineLocking": false,
+   "defaultRipple": true,
+   "depositAuth": false,
+   "disableMasterKey": false,
+   "disallowIncomingCheck": false,
+   "disallowIncomingNFTokenOffer": false,
+   "disallowIncomingPayChan": false,
+   "disallowIncomingTrustline": false,
+   "disallowIncomingXRP": false,
+   "globalFreeze": false,
+   "noFreeze": false,
+   "passwordSpent": false,
+   "requireAuthorization": false,
+   "requireDestinationTag": false
+  },
+  "ledger_hash": "8887FC76B8E015A475B9BC69B70CBCD2A74BEE2EC899073683ABD2463E521627",
+  "ledger_index": 22453008,
+  "status": "success",
+  "validated": true
+ }
+}

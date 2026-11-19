@@ -1,0 +1,17 @@
+{
+  "version": "example-2026-11",
+  "mode": "observe",
+  "xrplAssets": ["XRP"],
+  "otherAssets": "reject",
+  "configChanges": "reject",
+  "sourceAccounts": [],
+  "allowedTypes": ["Payment", "OfferCreate", "OfferCancel", "TrustSet", "EscrowCreate", "EscrowFinish", "EscrowCancel", "CheckCreate", "CheckCash", "CheckCancel"],
+  "allowKeyChanges": false,
+  "acceptedIssuers": {
+    "RLUSD": ["rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De"]
+  },
+  "unlistedTokens": "reject",
+  "knownDestinations": [],
+  "onReview": "reject",
+  "requireExactTransaction": true
+}
