@@ -18,10 +18,10 @@ import { join } from "node:path";
 import { createServer } from "node:http";
 import codec from "ripple-binary-codec";
 import { activationOf } from "../supabase/functions/_shared/xrplEvents.ts";
-import { checks, decide, extract, loadPolicy, signingHash, simulationFindings, ticker, xrpToDrops, canonical, sha256 } from "../tools/presign-guard/guard.ts";
+import { checks, decide, extract, extractDirect, loadPolicy, signingHash, simulationFindings, ticker, xrpToDrops, canonical, sha256 } from "../tools/presign-guard/guard.ts";
 import { forSimulation, simulationFrom } from "../tools/presign-guard/ledger.ts";
 import { publicKey, privateKey, signJwt, verifyJwt } from "../tools/presign-guard/jwt.ts";
-import { auditLog, decideRequest, handler, verifyAuditLog } from "../tools/presign-guard/server.ts";
+import { auditLog, checkSettings, decideRequest, handler, verifyAuditLog } from "../tools/presign-guard/server.ts";
 
 const fixture = (name) => readFileSync(new URL(`./fixtures/presign-guard/${name}`, import.meta.url), "utf8");
 const docsKey = publicKey(fixture("fireblocks-docs-public-key.txt"));
@@ -317,5 +317,122 @@ describe("the Callback Handler, end to end over HTTP", () => {
   it("loads the example policy file", () => {
     expect(loadPolicy(examplePolicy).mode).toBe("observe");
     expect(privateKey(handlerKeys.privateKey.export({ type: "pkcs8", format: "pem" })).asymmetricKeyType).toBe("ec");
+  });
+});
+
+describe("POST /v1/check, for signing systems other than Fireblocks", () => {
+  const dir = mkdtempSync(join(tmpdir(), "presign-check-"));
+  afterAll(() => rmSync(dir, { recursive: true, force: true }));
+  const TOKEN = "t".repeat(40);
+
+  const deps = (check, over = {}) => ({
+    policy: policy(),
+    policyHash: "p",
+    cosignerKey: null,
+    handlerKey: null,
+    gather: async (tx) => bitstampFacts(tx.DestinationTag === undefined ? main.simulate_no_tag : main.simulate_with_tag_fee_12),
+    log: auditLog(join(dir, "audit.jsonl")),
+    now: () => new Date("2026-11-19T20:00:00Z"),
+    check,
+    ...over,
+  });
+
+  async function post(d, path, body, headers = {}) {
+    const server = createServer(handler(d));
+    await new Promise((r) => server.listen(0, "127.0.0.1", () => r()));
+    try {
+      const { port } = server.address();
+      const res = await fetch(`http://127.0.0.1:${port}${path}`, { method: "POST", headers: { "content-type": "application/json", ...headers }, body: typeof body === "string" ? body : JSON.stringify(body) });
+      const text = await res.text();
+      return { status: res.status, body: text.startsWith("{") ? JSON.parse(text) : text };
+    } finally {
+      server.close();
+    }
+  }
+
+  it("reads tx_json and tx_blob (with or without the signing prefix) as the same transaction", () => {
+    const tx = payment(1);
+    const blob = codec.encodeForSigning(tx);
+    const fromJson = extractDirect({ tx_json: tx });
+    expect(fromJson.seen).toMatchObject({ source: "tx_json", signingHash: signingHash(tx) });
+    for (const b of [blob, blob.slice(8)]) expect(extractDirect({ tx_blob: b }).seen?.signingHash).toBe(signingHash(tx));
+    expect(extractDirect({ tx_json: tx, signingHash: "00".repeat(32) }).findings.map((f) => f.id)).toContain("hash_mismatch");
+  });
+
+  it("refuses an already-signed transaction (Bitstamp's real activation payment from ledger 244032)", () => {
+    const signed = main.account_tx_first_destination.transactions[0].tx;
+    expect(extractDirect({ tx_json: signed }).findings.map((f) => f.id)).toContain("already_signed");
+  });
+
+  it("answers REJECT for the untagged payment, with the reason, findings and receipt", async () => {
+    const r = await post(deps({ token: null }), "/v1/check", { tx_json: payment(), requestId: "wd-123" });
+    expect(r.status).toBe(200);
+    expect(r.body).toMatchObject({ action: "REJECT", enforced: "REJECT", signingHash: signingHash(payment()), receipt: { requestId: "wd-123", seenFrom: "tx_json" } });
+    expect(r.body.reason).toMatch(/tecDST_TAG_NEEDED/);
+    expect(r.body.receiptHash).toBe(sha256(canonical(r.body.receipt)));
+  });
+
+  it("answers APPROVE for the tagged payment sent as a blob", async () => {
+    const r = await post(deps({ token: null }), "/v1/check", { tx_blob: codec.encodeForSigning(payment(1)) });
+    expect(r.body).toMatchObject({ action: "APPROVE", ledgerIndex: main.ledger.ledger_index, receipt: { seenFrom: "tx_blob" } });
+  });
+
+  it("requires the bearer token when one is set, and answers 400 to a body that is not JSON", async () => {
+    expect((await post(deps({ token: TOKEN }), "/v1/check", { tx_json: payment(1) })).status).toBe(401);
+    expect((await post(deps({ token: TOKEN }), "/v1/check", { tx_json: payment(1) }, { authorization: "Bearer wrong" })).status).toBe(401);
+    expect((await post(deps({ token: TOKEN }), "/v1/check", { tx_json: payment(1) }, { authorization: `Bearer ${TOKEN}` })).body.action).toBe("APPROVE");
+    expect((await post(deps({ token: null }), "/v1/check", "not json")).status).toBe(400);
+  });
+
+  it("is off unless enabled, and the Fireblocks routes are off without their keys", async () => {
+    expect((await post(deps(null), "/v1/check", { tx_json: payment(1) })).status).toBe(404);
+    expect((await post(deps({ token: null }), "/v2/tx_sign_request", "x.y.z")).status).toBe(404);
+  });
+
+  it("never listens beyond loopback without a token", () => {
+    expect(checkSettings({ listen: { host: "0.0.0.0", port: 1 } })).toBeNull();
+    expect(checkSettings({ listen: { host: "127.0.0.1", port: 1 }, check: { enabled: true } })).toEqual({ token: null });
+    expect(() => checkSettings({ listen: { host: "0.0.0.0", port: 1 }, check: { enabled: true } })).toThrow(/beyond loopback/);
+    process.env.PRESIGN_TEST_SHORT = "short";
+    expect(() => checkSettings({ listen: { host: "0.0.0.0", port: 1 }, check: { enabled: true, tokenEnv: "PRESIGN_TEST_SHORT" } })).toThrow(/32 characters/);
+    process.env.PRESIGN_TEST_TOKEN = TOKEN;
+    expect(checkSettings({ listen: { host: "0.0.0.0", port: 1 }, check: { enabled: true, tokenEnv: "PRESIGN_TEST_TOKEN" } })).toEqual({ token: TOKEN });
+  });
+
+  it("an unreadable ledger is RETRY here too", async () => {
+    const r = await post(deps({ token: null }, { gather: async () => { throw new Error("timeout"); } }), "/v1/check", { tx_json: payment(1) });
+    expect(r.body.action).toBe("RETRY");
+  });
+});
+
+describe("transactions copied from a ledger reply", () => {
+  it("drop API-only fields, so Bitstamp's activation payment hashes to its real transaction hash", async () => {
+    const { withoutApiFields } = await import("../tools/presign-guard/guard.ts");
+    const reply = main.account_tx_first_destination.transactions[0].tx;
+    const tx = withoutApiFields(reply);
+    expect(Object.keys(tx)).not.toContain("ctid");
+    expect(tx.Amount).toBe("2000000000");
+    // The ledger's own transaction ID is SHA-512Half of "TXN\0" + the signed blob.
+    const { createHash } = await import("node:crypto");
+    const id = createHash("sha512").update(Buffer.from("54584E00" + codec.encode(tx), "hex")).digest().subarray(0, 32).toString("hex").toUpperCase();
+    expect(id).toBe(reply.hash);
+  });
+});
+
+describe("simulation under load (live run, 2026-11-19, ledger 108439461)", () => {
+  it("a fee-only refusal is simulated again at the open-ledger fee, and the fee is noted", () => {
+    // What check.ts printed for the tagged payment to Bitstamp at a 12-drop fee:
+    // both servers first answered telCAN_NOT_QUEUE, then tesSUCCESS at 5041 drops.
+    const sims = ["https://s1.ripple.com/", "https://xrplcluster.com/"].map((server, i) => ({
+      server, engineResult: "tesSUCCESS", ledgerIndex: 108439462 + i, feeRaised: { from: "12", to: "5041", firstAnswer: "telCAN_NOT_QUEUE" },
+    }));
+    const f = simulationFindings(sims);
+    expect(f.map((x) => x.id)).toEqual(["fee_below_open_ledger", "simulated_ok"]);
+    expect(f[0].detail).toMatch(/12 drops.*telCAN_NOT_QUEUE.*5041 drops/);
+  });
+  it("the fee-only answers are the ones that get a second simulation", async () => {
+    const { FEE_ONLY } = await import("../tools/presign-guard/ledger.ts");
+    expect(FEE_ONLY.has(sdk.simulate.engine_result)).toBe(true); // telCAN_NOT_QUEUE, from Testnet
+    expect(FEE_ONLY.has(main.simulate_no_tag.s1.engine_result)).toBe(false); // tecDST_TAG_NEEDED
   });
 });
