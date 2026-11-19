@@ -440,11 +440,12 @@ async function buildContinuity(write) {
 async function buildPresignGuard(write) {
   const SRC = "https://github.com/Ignosha/noshashi/tree/main/tools/presign-guard";
   const body = `<div class="page-head">
-  <p class="eyebrow">Pre-Sign Guard · for Fireblocks users on the XRP Ledger</p>
-  <h1>Check every XRPL transaction before your Co-signer signs it.</h1>
-  <p>Pre-Sign Guard is a Callback Handler for the Fireblocks API Co-signer. The Co-signer asks it before each signature and
-     signs only when it answers APPROVE. You host it next to your Co-signer: NOSHASHI never sees a request, a key or a decision,
-     and the guard itself cannot sign anything.</p>
+  <p class="eyebrow">Pre-Sign Guard · for institutions signing on the XRP Ledger</p>
+  <h1>Check every XRPL transaction before it is signed.</h1>
+  <p>Pre-Sign Guard runs on your servers and answers APPROVE, REJECT or RETRY before a signature. On Fireblocks it is a
+     Callback Handler the API Co-signer asks before it signs. On anything else (your own HSM or wallet service, a custodian
+     without an approval hook, a script) you ask it yourself, just before signing. NOSHASHI never sees a request, a key or a
+     decision, and the guard itself cannot sign anything.</p>
 </div>
 <section>
   <table class="pv-table">
@@ -476,6 +477,24 @@ async function buildPresignGuard(write) {
          their exact bytes.</p></div>
   </div>
 
+  <h2 style="margin-top:32px">Not on Fireblocks? Ask before you sign.</h2>
+  <p>Send the unsigned transaction to the guard's <code>/v1/check</code> endpoint and sign only on <code>APPROVE</code>. It runs the
+     same checks and returns the findings, the validated ledger it read and a SHA-256 receipt, and logs the decision.</p>
+  <code class="pv-code">curl -s https://guard.internal:8443/v1/check \\
+  -H "Authorization: Bearer $GUARD_TOKEN" -H "content-type: application/json" \\
+  -d '{"tx_json": { …the unsigned transaction… }, "requestId": "withdrawal-1234"}'</code>
+  <p class="pv-note">Or from a terminal: <code>node --experimental-strip-types tools/presign-guard/check.ts policy.json tx.json</code>.
+     The endpoint is off until you enable it, and beyond your own machine it needs a bearer token.</p>
+  <table class="pv-table">
+    <thead><tr><th>Checked live, 19 November 2026 (ledger 108,439,461)</th><th>Answer</th><th>What the ledger said</th></tr></thead>
+    <tbody>
+      <tr><td>1 XRP to Bitstamp, no destination tag</td><td class="mono">REJECT</td>
+          <td><code>tecDST_TAG_NEEDED</code> on s1.ripple.com and xrplcluster.com</td></tr>
+      <tr><td>The same payment with its tag</td><td class="mono">APPROVE</td>
+          <td><code>tesSUCCESS</code> on both, with a note that the 12-drop fee was below the network's 5,041 drops at that moment</td></tr>
+    </tbody>
+  </table>
+
   <p style="margin-top:20px"><a class="btn" href="${SRC}">Read the code and setup guide</a>
      <a class="btn ghost" href="mailto:institutions@noshashi.app?subject=Pre-Sign%20Guard">Talk to us about deploying it</a></p>
   <p class="pv-note">Open source, Node 22 or later, no new dependencies. XRP Ledger transactions only; other assets get the answer
@@ -484,8 +503,8 @@ async function buildPresignGuard(write) {
 </section>`;
 
   await write("presign-guard/index.html", renderPage({
-    title: "Pre-Sign Guard — XRPL checks before your Fireblocks Co-signer signs",
-    description: "A Fireblocks API Co-signer Callback Handler for the XRP Ledger: verifies the signed bytes match what Fireblocks shows, refuses key changes, counterfeit tokens and sanctioned destinations, and simulates each transaction on two servers. Self-hosted and open source.",
+    title: "Pre-Sign Guard — XRPL checks before a transaction is signed",
+    description: "Self-hosted, open-source checks before an XRP Ledger transaction is signed: a Fireblocks API Co-signer Callback Handler, or a /v1/check endpoint for any signing system. Refuses swapped destinations, key changes, counterfeit tokens and sanctioned destinations, and simulates each transaction on two servers.",
     path: "/presign-guard/",
     head: CSS,
     body,
