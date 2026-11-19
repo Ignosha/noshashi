@@ -173,6 +173,22 @@ export function keyControl(info) {
   };
 }
 
+/**
+ * One page of MPT issuances across the whole ledger, for a directory.
+ * ledger_data with a type filter scans state in order, so a page can come
+ * back short with a marker; the marker is returned for the next page.
+ */
+export async function listMptIssuances({ marker, limit = 50 } = {}, { rpc = rippleRpc } = {}) {
+  const reply = await rpc("ledger_data", { type: "mpt_issuance", limit: Math.min(Math.max(1, limit), 200), ledger_index: "validated", ...(marker ? { marker } : {}) }, 20000);
+  return {
+    schema: MPT_SCHEMA,
+    ledger_index: reply.ledger_index ?? null,
+    read_at: new Date().toISOString(),
+    issuances: (reply.state ?? []).map(issuanceFacts),
+    marker: reply.marker ?? null,
+  };
+}
+
 const PAGE = 400;
 const MAX_PAGES = 10;
 
