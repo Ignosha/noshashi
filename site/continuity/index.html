@@ -1,93 +1,104 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOSHASHI Continuity</title><style>body{max-width:54rem;margin:auto;padding:2rem 1rem;font:16px/1.55 system-ui;color:#202824;background:#faf9f5}small,label,button{font:14px monospace}textarea,pre{box-sizing:border-box;width:100%;padding:1rem;background:white;border:1px solid #9caaa2;overflow:auto}button{padding:.65rem;margin:.3rem .3rem .3rem 0;cursor:pointer}pre{white-space:pre-wrap}</style><main><small>NOSHASHI LABS / LEDGER DESK</small><h1>Continuity</h1><p>Rehearse one issued-token deposit against a sanitized payment record and its matching customer credits. Local checks stay on this device. Live verification sends the transaction hash to two public Mainnet servers and, when selected, the local read-only accounting adapter. Use decimal strings and list every credit matched to this deposit.</p><label for="data">Scenario or exported report</label><textarea id="data" rows="18"></textarea><label for="hash">Mainnet transaction hash (64 hexadecimal characters)</label><input id="hash" size="66"><p><label><input type="checkbox" id="connected"> Read fresh credits from the local accounting adapter</label></p><p><button id="verify">Verify with two servers</button> <label><input id="watch" type="checkbox"> Recheck every minute while open</label></p><p>For live reconciliation, supply credits with txHash, amount, issuer and currency, plus creditExportComplete (true only for a complete export). Optional workflows may contain a name and a dependencies list.</p><button id="run">Run checks</button><button id="replay">Try corrected sample</button><button id="save" disabled>Export evidence</button><pre id="result" aria-live="polite">Ready to rehearse.</pre></main><script>
-const sample={requirement:{destination:"demo-wallet",issuer:"demo-issuer",currency:"EUR",amount:"25"},payment:{validated:true,result:"tesSUCCESS",destination:"demo-wallet",issuer:"demo-issuer",currency:"EUR",delivered:"25"},credits:[{amount:"25",issuer:"demo-issuer",currency:"EUR"},{amount:"25",issuer:"demo-issuer",currency:"EUR"}]};
-function decimal(value){
- if(typeof value!=="string"||!/^\d+(\.\d+)?$/.test(value))return null;
- const [whole,fraction=""]=value.split(".");
- return (whole.replace(/^0+(?=\d)/,"")||"0")+(fraction.replace(/0+$/,"")?"."+fraction.replace(/0+$/,""):"");
-}
-function evaluate(input){
- const {requirement:r,payment:p,credits}=input;
- if(!r||!p||!["issuer","currency","destination"].every(k=>typeof r[k]==="string"&&r[k].trim())||!decimal(r.amount)||decimal(r.amount)==="0")throw Error("Supply a complete requirement and payment record.");
- const match=(v,w)=>typeof v!=="string"||!v.trim()?"UNKNOWN":v===w?"PASS":"FAIL";
- const amount=v=>decimal(v)===null?"UNKNOWN":match(decimal(v),decimal(r.amount));
- const checks={"Validated successful payment":p.validated===true?match(p.result,"tesSUCCESS"):"UNKNOWN","Destination":match(p.destination,r.destination),"Issued currency":match(p.currency,r.currency),"Issuer":match(p.issuer,r.issuer),"Delivered amount":amount(p.delivered),"Exactly one matching credit":Array.isArray(credits)?credits.length===1?"PASS":"FAIL":"UNKNOWN"};
- const credit=Array.isArray(credits)&&credits.length===1?credits[0]:null;
- checks["Credited amount"]=amount(credit?.amount);checks["Credited currency"]=match(credit?.currency,r.currency);checks["Credited issuer"]=match(credit?.issuer,r.issuer);
- const states=Object.values(checks);
- return {verdict:states.includes("FAIL")?"FAIL":states.includes("UNKNOWN")?"UNKNOWN":"PASS",checks};
-}
-const el=id=>document.getElementById(id),box=el("data"),out=el("result");
-const pretty=x=>JSON.stringify(x,null,2);
-const endpoints=["wss://s1.ripple.com","wss://s2.ripple.com"];
-let report,revision=0,timer;
-function invalidate(){
- revision++;report=null;el("save").disabled=true;
- out.textContent="Inputs changed. Run checks again.";
-}
-function scenario(){const raw=JSON.parse(box.value);return raw.scenario??raw}
-function dependencies(workflows=[]){
- const owners=new Map();
- for(const flow of workflows){
-  for(const dep of new Set(flow.dependencies)){
-   if(!owners.has(dep))owners.set(dep,new Set());
-   owners.get(dep).add(flow.name);
-  }
- }
- return Array.from(owners,([dependency,names])=>({dependency,workflows:[...names]})).filter(x=>x.workflows.length>1);
-}
-function show(input,source,extra={}){
- const result=evaluate(input);
- const reasons=Object.keys(result.checks).filter(k=>result.checks[k]==="FAIL");
- const diagnosis=reasons.map(k=>k==="Exactly one matching credit"?
-  (input.credits.length===0?"No matching credit in the supplied export.":"Multiple credits match this deposit."):
-  k+" differs from the requirement.");
- report={version:"continuity-deposit/2",source,at:new Date().toISOString(),scenario:input,...result,diagnosis,sharedDependencies:dependencies(input.workflows),...extra};
- out.textContent=pretty(report);el("save").disabled=false;
-}
-function lookup(url,hash){
- return new Promise((resolve,reject)=>{
-  const ws=new WebSocket(url);
-  const timeout=setTimeout(()=>finish(null),9000);
-  function finish(data){clearTimeout(timeout);ws.onclose=ws.onerror=ws.onmessage=null;ws.close();data?resolve(data):reject(Error("No confirmed response from "+url))}
-  ws.onopen=()=>ws.send(JSON.stringify({id:1,command:"tx",transaction:hash,api_version:2}));
-  ws.onerror=ws.onclose=()=>finish(null);
-  ws.onmessage=e=>{try{
-   const msg=JSON.parse(e.data);if(msg.id!==1)return;
-   const r=msg.result,t=r?.tx_json,d=r?.meta?.delivered_amount;
-   if(msg.status!=="success"||r.validated!==true||r.hash?.toUpperCase()!==hash||!r.ledger_hash||t?.TransactionType!=="Payment")return finish(null);
-   if(r.meta?.TransactionResult==="tesSUCCESS"&&(!d||typeof d!=="object"||!d.issuer||!d.currency||!decimal(d.value)))return finish(null);
-   finish({ledgerHash:r.ledger_hash,ledgerIndex:r.ledger_index,payment:{validated:true,result:r.meta.TransactionResult,destination:t.Destination,issuer:d?.issuer,currency:d?.currency,delivered:d?.value}});
-  }catch{finish(null)}};
- });
-}
-async function readCredits(hash){
- const response=await fetch("/credits/"+hash,{cache:"no-store",redirect:"error",signal:AbortSignal.timeout(9000)});
- if(!response.ok)throw Error("Accounting source unavailable.");
- const source=await response.json();
- if(source.transactionHash!==hash || source.creditExportComplete!==true || !Array.isArray(source.credits) || source.credits.some(row=>row?.txHash!==hash))throw Error("Incomplete or mismatched accounting response.");
- return source;
-}
-async function verify(){
- invalidate();const current=revision;
- try{
-  const input=scenario(),hash=el("hash").value.trim().toUpperCase();
-  if(!/^[0-9A-F]{64}$/.test(hash))throw Error("Enter a valid transaction hash.");
-  out.textContent="Checking both Mainnet servers…";
-  const connected=el("connected").checked;
-  if(connected && location.origin!=="http://127.0.0.1:8765")throw Error("Open Continuity from the local accounting adapter at http://127.0.0.1:8765.");
-  const [a,b,source]=await Promise.all([...endpoints.map(url=>lookup(url,hash)),connected?readCredits(hash):input]);
-  if(current!==revision)return;
-  if(pretty(a)!==pretty(b))throw Error("Servers returned different settlement evidence.");
-  const rows=source.credits;
-  const complete=source.creditExportComplete===true&&Array.isArray(rows)&&rows.every(x=>typeof x?.txHash==="string"&&/^[0-9a-f]{64}$/i.test(x.txHash));
-  const matched=complete?rows.filter(x=>x.txHash.toUpperCase()===hash):undefined;
-  show({...input,payment:a.payment,creditExportComplete:complete,credits:matched},connected?"Two Mainnet RPC responses and a fresh query of the configured accounting view.":"Two Mainnet RPC responses; credit export completeness is operator-declared.",{hash,endpoints,ledgerHash:a.ledgerHash,ledgerIndex:a.ledgerIndex,matchedExportComplete:complete});
- }catch(e){if(current===revision)out.textContent="UNKNOWN — "+e.message}
-}
-box.value=pretty(sample);box.oninput=el("connected").onchange=el("hash").oninput=invalidate;
-el("run").onclick=()=>{invalidate();try{show(scenario(),"Local rehearsal from supplied records")}catch(e){out.textContent=e.message}};
-el("verify").onclick=verify;
-el("watch").onchange=()=>{clearInterval(timer);if(el("watch").checked){verify();timer=setInterval(verify,60000)}};
-el("replay").onclick=()=>{const corrected=structuredClone(sample);corrected.credits.pop();box.value=pretty(corrected);el("run").click()};
-el("save").onclick=()=>{if(!report)return;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([pretty(report)],{type:"application/json"}));a.download="continuity-evidence.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-</script></html>
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Continuity — check an XRPL deposit was credited exactly once</title>
+<meta name="description" content="Check one issued-token deposit on the XRP Ledger against the credits your system posted for it: right token, right amount, exactly one credit. Read from two Mainnet servers; your records stay on your device.">
+<link rel="canonical" href="https://www.noshashi.app/continuity/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/continuity/">
+<meta property="og:title" content="Continuity — check an XRPL deposit was credited exactly once">
+<meta property="og:description" content="Check one issued-token deposit on the XRP Ledger against the credits your system posted for it: right token, right amount, exactly one credit. Read from two Mainnet servers; your records stay on your device.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Continuity — check an XRPL deposit was credited exactly once">
+<meta name="twitter:description" content="Check one issued-token deposit on the XRP Ledger against the credits your system posted for it: right token, right amount, exactly one credit. Read from two Mainnet servers; your records stay on your device.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/c5a81e5a06d4616fef91.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/assets/ledger-mark-512.png","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Continuity","item":"https://www.noshashi.app/continuity/"}]}]}</script>
+<style>
+.ct textarea,.ct input[type=text],.ct pre{box-sizing:border-box;width:100%;padding:12px 14px;border:1px solid var(--rule);
+  border-radius:var(--r);background:var(--panel,transparent);color:var(--ink);font:12px/1.55 "IBM Plex Mono",monospace}
+.ct pre{white-space:pre-wrap;overflow:auto;min-height:120px}
+.ct label{display:block;margin:14px 0 6px;font:12px "IBM Plex Mono",monospace;color:var(--muted)}
+.ct p label{display:inline;margin:0}
+.ct button{margin:4px 8px 4px 0}
+.ct-note{color:var(--muted);font-size:13px;line-height:1.6;max-width:72ch}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16" cy="16" r="10.6" fill="none" stroke="currentColor" stroke-width=".9" opacity=".5"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="var(--ground)" stroke="var(--ground)" stroke-width="2.2" stroke-linejoin="round"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/intelligence/">Intelligence</a>
+      <a class="nav-link" href="/platform/"><span data-i18n="nav.platform">Platform</span></a>
+      <a class="nav-link" href="/solutions/"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a class="nav-link" href="/institutional-demo/"><span data-i18n="nav.demo2">Demo</span></a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/resources/"><span data-i18n="nav.resources">Resources</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/"><span data-i18n="nav.about">About</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head"><p class="eyebrow">Ledger Desk · Continuity</p><h1>Continuity</h1></div><section class="ct">
+<p>Check that one issued-token deposit was credited to your customers exactly once, for the right token and amount.
+   Local checks stay on this device. Live verification sends the transaction hash to two public Mainnet servers and,
+   when selected, to the read-only accounting adapter on this computer.</p>
+<p class="ct-note">Issued tokens only (RLUSD, EUR, any IOU); XRP payments are refused with a reason. Currency codes can be
+   written as text (RLUSD) or as the ledger's 40-character hex. Amounts are decimal strings; exponent form (1.5e-7) is accepted.</p>
+<label for="data">Scenario or exported report</label>
+<textarea id="data" rows="18" spellcheck="false"></textarea>
+<label for="hash">Mainnet transaction hash (64 hexadecimal characters)</label>
+<input id="hash" type="text" size="66" spellcheck="false" autocomplete="off">
+<p><label><input type="checkbox" id="connected"> Read fresh credits from the local accounting adapter</label></p>
+<p><button class="btn" id="verify" type="button">Verify with two servers</button>
+   <label><input id="watch" type="checkbox"> Recheck every minute while open</label></p>
+<p class="ct-note">For live reconciliation, supply credits with txHash, amount, issuer and currency, plus creditExportComplete
+   (true only for a complete export). Optional workflows may contain a name and a dependencies list.</p>
+<p><button class="btn ghost" id="run" type="button">Run checks</button><button class="btn ghost" id="replay" type="button">Try corrected sample</button><button class="btn ghost" id="save" type="button" disabled>Export evidence</button></p>
+<pre id="result" aria-live="polite">Ready to rehearse.</pre>
+<p class="ct-note">Run it next to your own accounting database with
+  <a href="https://github.com/Ignosha/noshashi/tree/main/tools/continuity">tools/continuity</a>
+  (Python 3, standard library only, read-only, loopback only).</p>
+</section>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/terminal/">Cloud Terminal · public beta</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/tokens/">XRPL token directory</a><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/intelligence/">Intelligence &amp; briefs</a><a href="/news/">External headlines</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/partners/">Partner programs</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/continuity.js"></script>
+</body>
+</html>

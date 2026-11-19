@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOSHASHI Continuity</title>
+<!--
+  The operator copy, served on loopback by credit_source.py next to the
+  accounting database. noshashi.app/continuity/ is built from the part
+  between the BODY markers (scripts/build-products.mjs), so the two pages
+  never drift. The logic is ./continuity.js.
+-->
+<style>
+body{max-width:54rem;margin:auto;padding:2rem 1rem;font:16px/1.55 system-ui;color:#202824;background:#faf9f5}
+small,label,button{font:14px monospace}
+textarea,pre,input[type=text]{box-sizing:border-box;width:100%;padding:.8rem;background:#fff;border:1px solid #9caaa2;overflow:auto}
+button{padding:.65rem;margin:.3rem .3rem .3rem 0;cursor:pointer}
+pre{white-space:pre-wrap}
+.ct-note{font-size:14px;color:#4b5852}
+</style>
+</head>
+<body>
+<main>
+<small>NOSHASHI LABS / LEDGER DESK</small>
+<!--BODY-->
+<h1>Continuity</h1>
+<p>Check that one issued-token deposit was credited to your customers exactly once, for the right token and amount.
+   Local checks stay on this device. Live verification sends the transaction hash to two public Mainnet servers and,
+   when selected, to the read-only accounting adapter on this computer.</p>
+<p class="ct-note">Issued tokens only (RLUSD, EUR, any IOU); XRP payments are refused with a reason. Currency codes can be
+   written as text (RLUSD) or as the ledger's 40-character hex. Amounts are decimal strings; exponent form (1.5e-7) is accepted.</p>
+<label for="data">Scenario or exported report</label>
+<textarea id="data" rows="18" spellcheck="false"></textarea>
+<label for="hash">Mainnet transaction hash (64 hexadecimal characters)</label>
+<input id="hash" type="text" size="66" spellcheck="false" autocomplete="off">
+<p><label><input type="checkbox" id="connected"> Read fresh credits from the local accounting adapter</label></p>
+<p><button id="verify" type="button">Verify with two servers</button>
+   <label><input id="watch" type="checkbox"> Recheck every minute while open</label></p>
+<p class="ct-note">For live reconciliation, supply credits with txHash, amount, issuer and currency, plus creditExportComplete
+   (true only for a complete export). Optional workflows may contain a name and a dependencies list.</p>
+<p><button id="run" type="button">Run checks</button><button id="replay" type="button">Try corrected sample</button><button id="save" type="button" disabled>Export evidence</button></p>
+<pre id="result" aria-live="polite">Ready to rehearse.</pre>
+<!--/BODY-->
+</main>
+<script src="continuity.js"></script>
+</body>
+</html>

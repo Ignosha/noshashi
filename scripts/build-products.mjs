@@ -11,6 +11,9 @@
  *   /watch/               Issuer Watch, $19 a month: an email the moment a
  *                         token's issuer changes a power (added 2026-11-19).
  *   /watch/subscribed/    Where Stripe returns a new watcher.
+ *   /continuity/          Continuity: one issued-token deposit checked against
+ *                         its posted credits. Built from the operator copy in
+ *                         tools/continuity/ so the two never drift.
  *
  * Every figure the pages show is read live by the visitor's browser from
  * NOSHASHI's public endpoints (/api/badge, /api/issuer-history); nothing
@@ -18,6 +21,7 @@
  * the same table the checkout charges from.
  */
 
+import { readFile } from "node:fs/promises";
 import { renderPage, breadcrumb, ORIGIN } from "../api/_lib/shell.js";
 import { EVIDENCE_TIERS } from "../api/_lib/evidence-tiers.js";
 
@@ -34,6 +38,7 @@ export const PRODUCT_SALES_PAGES = [
   ["/verified/", "weekly", "0.8"],
   ["/listing-review/", "monthly", "0.7"],
   ["/history/", "weekly", "0.7"],
+  ["/continuity/", "monthly", "0.6"],
 ];
 
 const CSS = `<style>
@@ -378,7 +383,51 @@ async function buildWatch(write) {
   }));
 }
 
+/* ── /continuity/ ───────────────────────────────────────────────── */
+const CONTINUITY_DIR = new URL("../tools/continuity/", import.meta.url);
+
+/** The markup between the BODY markers of the operator copy, shared with this page. */
+export async function continuityBody() {
+  const html = await readFile(new URL("continuity.html", CONTINUITY_DIR), "utf8");
+  const m = html.match(/<!--BODY-->([\s\S]*?)<!--\/BODY-->/);
+  if (!m) throw new Error("tools/continuity/continuity.html has no BODY markers");
+  return m[1].trim();
+}
+
+async function buildContinuity(write) {
+  const script = await readFile(new URL("continuity.js", CONTINUITY_DIR), "utf8");
+  await write("assets/continuity.js", script);
+  const css = `<style>
+.ct textarea,.ct input[type=text],.ct pre{box-sizing:border-box;width:100%;padding:12px 14px;border:1px solid var(--rule);
+  border-radius:var(--r);background:var(--panel,transparent);color:var(--ink);font:12px/1.55 "IBM Plex Mono",monospace}
+.ct pre{white-space:pre-wrap;overflow:auto;min-height:120px}
+.ct label{display:block;margin:14px 0 6px;font:12px "IBM Plex Mono",monospace;color:var(--muted)}
+.ct p label{display:inline;margin:0}
+.ct button{margin:4px 8px 4px 0}
+.ct-note{color:var(--muted);font-size:13px;line-height:1.6;max-width:72ch}
+</style>`;
+  const body = (await continuityBody())
+    .replace(/<h1>/, `<div class="page-head"><p class="eyebrow">Ledger Desk · Continuity</p><h1>`)
+    .replace(/<\/h1>/, "</h1></div><section class=\"ct\">")
+    .replace(/<button /g, '<button class="btn ghost" ')
+    .replace(/<button class="btn ghost" id="verify"/, '<button class="btn" id="verify"');
+  await write("continuity/index.html", renderPage({
+    title: "Continuity — check an XRPL deposit was credited exactly once",
+    description: "Check one issued-token deposit on the XRP Ledger against the credits your system posted for it: right token, right amount, exactly one credit. Read from two Mainnet servers; your records stay on your device.",
+    path: "/continuity/",
+    head: css,
+    body: `${body}
+<p class="ct-note">Run it next to your own accounting database with
+  <a href="https://github.com/Ignosha/noshashi/tree/main/tools/continuity">tools/continuity</a>
+  (Python 3, standard library only, read-only, loopback only).</p>
+</section>`,
+    scripts: `<script src="/assets/continuity.js"></script>`,
+    structured: [breadcrumb("Continuity", "/continuity/")],
+  }));
+}
+
 export async function buildProducts(write) {
+  await buildContinuity(write);
   await buildWatch(write);
   await buildVerified(write);
   await buildListing(write);
