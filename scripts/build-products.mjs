@@ -8,6 +8,9 @@
  *                         launchpads deciding whether to list a token.
  *   /history/             The free issuer history reader, and the $250
  *                         Issuer history report.
+ *   /watch/               Issuer Watch, $19 a month: an email the moment a
+ *                         token's issuer changes a power (added 2026-11-19).
+ *   /watch/subscribed/    Where Stripe returns a new watcher.
  *
  * Every figure the pages show is read live by the visitor's browser from
  * NOSHASHI's public endpoints (/api/badge, /api/issuer-history); nothing
@@ -23,7 +26,11 @@ const VERIFIED = usd(EVIDENCE_TIERS.verified.cents);
 const LISTING = usd(EVIDENCE_TIERS.listing.cents);
 const HISTORY = usd(EVIDENCE_TIERS.history.cents);
 
+/** Issuer Watch, $19 a month; the checkout charges WATCH_MONTHLY_CENTS in api/create-checkout-session.js. */
+const WATCH = "$19";
+
 export const PRODUCT_SALES_PAGES = [
+  ["/watch/", "weekly", "0.8"],
   ["/verified/", "weekly", "0.8"],
   ["/listing-review/", "monthly", "0.7"],
   ["/history/", "weekly", "0.7"],
@@ -288,7 +295,91 @@ async function buildHistory(write) {
   }));
 }
 
+/* ── /watch/ ────────────────────────────────────────────────────── */
+async function buildWatch(write) {
+  const body = `<div class="page-head">
+  <p class="eyebrow">Issuer Watch · ${WATCH} a month per token</p>
+  <h1>Know the moment a token's issuer changes the rules.</h1>
+  <p>An XRP Ledger issuer can switch on a freeze, enable clawback, start requiring approval to hold, hand its keys to someone
+     else or raise its transfer fee, at any time and without telling anyone. Issuer Watch checks the issuer every five minutes
+     and emails you as soon as one of those changes lands on the ledger.</p>
+</div>
+<section>
+  <div class="grid g2">
+    <div class="panel"><p class="num">WHAT YOU ARE TOLD ABOUT</p>
+      <ul class="pv-note" style="padding-left:18px">
+        <li>A freeze on every holder (global freeze) switched on or off</li>
+        <li>Clawback enabled: the issuer can take tokens back</li>
+        <li>Approval now required to hold the token</li>
+        <li>A new key, a removed key or a new signer list</li>
+        <li>A changed transfer fee</li>
+        <li>Freeze given up for good, or the issuer's domain changed</li>
+      </ul></div>
+    <div class="panel"><p class="num">HOW IT WORKS</p>
+      <p>Pay ${WATCH} a month by card. The issuer is read from validated ledgers every five minutes. When a power changes you
+         get one email saying what changed, at which ledger, with a link to the full reading. A reading that fails is retried,
+         never reported as a change.</p>
+      <p class="pv-note">Read-only: NOSHASHI never asks for keys or access. Facts from the ledger, not advice. Cancel any time.</p></div>
+  </div>
+
+  <form class="pv-form" id="pw-form" novalidate style="margin-top:20px">
+    <div class="form-field"><label for="pw-issuer">The token's issuing account</label>
+      <input id="pw-issuer" name="issuer" type="text" spellcheck="false" autocomplete="off" placeholder="r…" maxlength="35"></div>
+    <div class="form-field"><label for="pw-label">A name for it (optional, shown in your emails)</label>
+      <input id="pw-label" name="label" type="text" maxlength="60" placeholder="SOLO"></div>
+    <div class="pv-actions"><button class="btn" type="submit" id="pw-pay">Watch it for ${WATCH} a month</button>
+      <a class="btn ghost" id="pw-check" href="/certificate/">See its powers now, free</a></div>
+    <p class="form-status" id="pw-status" role="status" aria-live="polite"></p>
+    <p class="pv-note">Alerts go to the email address you pay with. One token per subscription; subscribe again to watch another.
+       Prefer Discord or Telegram? Free alerts for up to three tokens are on <a href="/alerts/">the alerts page</a>.
+       Questions: <a href="mailto:support@noshashi.app">support@noshashi.app</a>.</p>
+  </form>
+</section>`;
+
+  const script = `<script>
+(function(){${COMMON}
+  var f=document.getElementById("pw-form"), st=document.getElementById("pw-status"), pay=document.getElementById("pw-pay"), check=document.getElementById("pw-check");
+  f.issuer.addEventListener("input",function(){var a=f.issuer.value.trim();check.href="/certificate/"+(ADDRESS.test(a)?"?issuer="+encodeURIComponent(a):"");});
+  f.addEventListener("submit",function(e){
+    e.preventDefault();
+    var issuer=f.issuer.value.trim();
+    if(!ADDRESS.test(issuer)){say(st,"Enter the token's issuing account. It begins with r.","bad");return;}
+    pay.disabled=true; say(st,"Opening secure checkout…","");
+    fetch("/api/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
+      body:JSON.stringify({product:"issuer-watch",issuer:issuer,label:f.label.value.trim()})})
+      .then(function(r){return r.json().then(function(b){if(!r.ok||!b.url)throw new Error(b.error||"Checkout could not start.");return b;});})
+      .then(function(b){location.href=b.url;})
+      .catch(function(err){pay.disabled=false;say(st,err.message+" You can also email support@noshashi.app.","bad");});
+  });
+  try{var q=new URLSearchParams(location.search).get("issuer");if(q&&ADDRESS.test(q)){f.issuer.value=q;check.href="/certificate/?issuer="+encodeURIComponent(q);}}catch(e){}
+})();
+</script>`;
+
+  await write("watch/index.html", renderPage({
+    title: `Issuer Watch — an email when an XRPL issuer changes its powers (${WATCH}/month)`,
+    description: `Get an email the moment an XRP Ledger token's issuer switches on a freeze, enables clawback, requires approval, changes its keys or its fee. Checked every five minutes. ${WATCH} a month.`,
+    path: "/watch/",
+    head: CSS,
+    body,
+    scripts: script,
+    structured: [breadcrumb("Issuer Watch", "/watch/")],
+  }));
+
+  await write("watch/subscribed/index.html", renderPage({
+    title: "You're watching — Issuer Watch",
+    description: "Your Issuer Watch subscription is active.",
+    path: "/watch/subscribed/",
+    head: `<meta name="robots" content="noindex">`,
+    body: `<div class="page-head"><p class="eyebrow">Issuer Watch</p><h1>You're watching.</h1>
+  <p>The issuer is checked every five minutes from now on. You'll get an email at the address you paid with the moment one of its
+     powers changes. No email means nothing has changed.</p></div>
+<section><p>See the issuer's powers right now on <a href="/certificate/">the certificate page</a>. To cancel, reply to any
+  alert or email <a href="mailto:support@noshashi.app">support@noshashi.app</a>.</p></section>`,
+  }));
+}
+
 export async function buildProducts(write) {
+  await buildWatch(write);
   await buildVerified(write);
   await buildListing(write);
   await buildHistory(write);

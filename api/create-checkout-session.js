@@ -254,6 +254,40 @@ export function verifiedForm(scope, origin) {
   return form;
 }
 
+/** Issuer Watch: $19 a month to be emailed the moment one issuer's powers change. */
+export const WATCH_MONTHLY_CENTS = 1_900;
+
+export function readWatchScope(body) {
+  const issuer = String(body.issuer ?? "").trim();
+  if (!ADDRESS.test(issuer)) return { error: "Enter the token's issuing account. It is an XRP Ledger address that begins with r." };
+  const label = String(body.label ?? "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 60);
+  return { issuer, label };
+}
+
+export function watchForm(scope, origin) {
+  const metadata = { product: "issuer_watch", issuer: scope.issuer, label: scope.label, source: "noshashi.app" };
+  const form = new URLSearchParams({
+    mode: "subscription",
+    "line_items[0][quantity]": "1",
+    "line_items[0][price_data][currency]": "usd",
+    "line_items[0][price_data][unit_amount]": String(WATCH_MONTHLY_CENTS),
+    "line_items[0][price_data][recurring][interval]": "month",
+    "line_items[0][price_data][product_data][name]": "NOSHASHI Issuer Watch",
+    success_url: `${origin}/watch/subscribed/?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/watch/`,
+    billing_address_collection: "auto",
+    allow_promotion_codes: process.env.STRIPE_ALLOW_PROMOTION_CODES === "true" ? "true" : "false",
+    "custom_text[submit][message]":
+      "Cancel any time. You are emailed when this issuer changes a power on the XRP Ledger: freeze, clawback, approval, keys or fees. Facts read from the ledger, not advice.",
+  });
+  for (const [key, value] of Object.entries(metadata)) {
+    if (!value) continue;
+    form.set(`metadata[${key}]`, value);
+    form.set(`subscription_data[metadata][${key}]`, value);
+  }
+  return form;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -303,6 +337,12 @@ export default async function handler(req, res) {
     const scope = readVerifiedScope(body);
     if (scope.error) return fail(400, scope.error, { reason: "bad_scope" });
     return startCheckout(verifiedForm(scope, origin), { product: "verified-issuer" });
+  }
+
+  if (String(body.product ?? "") === "issuer-watch") {
+    const scope = readWatchScope(body);
+    if (scope.error) return fail(400, scope.error, { reason: "bad_scope" });
+    return startCheckout(watchForm(scope, origin), { product: "issuer-watch" });
   }
 
   const cadence = readCadence(body);
