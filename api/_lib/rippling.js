@@ -115,6 +115,9 @@ export function analyseRippling({ account, accountInfo, lines, truncated = false
       // A third party can move at most this much at par, in one or more
       // payments, before every receiving line is full.
       movable_at_par: fmt(Math.min(movable, totalRoom)),
+      // QualityIn/QualityOut other than par (0 or 1e9) change the rate a
+      // rippling path pays through these lines; the amount above is at par.
+      quality_settings: open.some((l) => [l.quality_in, l.quality_out].some((q) => q && q !== 1e9)),
       lines_at_risk: atRisk,
       lines: open.map((l) => ({
         peer: l.account,

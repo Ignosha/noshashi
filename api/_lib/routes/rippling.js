@@ -7,8 +7,9 @@
  * be rippled at par, how much can move, and unsigned TrustSet / AccountSet
  * templates that close it. Read-only: nothing is signed or submitted.
  *
- * Free, unauthenticated, one account per request, rate limited per caller.
- * See api/_lib/rippling.js for the rules.
+ * Free, one account per request, 12 a minute per caller; a paid key
+ * (../rippling-keys.js) raises the limit. Batch and issuer scans are in
+ * rippling-pro.js. See api/_lib/rippling.js for the rules.
  */
 
 import { createHash } from "node:crypto";
@@ -17,6 +18,7 @@ import { isValidClassicAddress } from "../classic-address.js";
 import { clientKey, take } from "../rate-limit.js";
 import { queryOf } from "../query.js";
 import { analyseRippling } from "../rippling.js";
+import { planFor, RIPPLING_PLANS } from "../rippling-keys.js";
 
 const PAGE = 400;
 const MAX_PAGES = 5;
@@ -64,7 +66,9 @@ export default async function handler(req, res) {
   if (!isValidClassicAddress(account)) {
     return res.status(400).json({ error: "Pass ?account= a valid XRPL classic address (it begins with r and has a valid checksum)." });
   }
-  const limit = take(`rippling:${clientKey(req)}`, { limit: 12 });
+  const plan = planFor(req);
+  if (plan === null) return res.status(401).json({ error: "That API key is not valid." });
+  const limit = take(`rippling:${plan}:${clientKey(req)}`, { limit: RIPPLING_PLANS[plan].per_minute });
   if (!limit.ok) {
     res.setHeader("Retry-After", String(limit.retryAfter));
     return res.status(429).json({ error: "Please wait before checking again." });

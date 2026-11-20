@@ -28,6 +28,7 @@
 import { readFile } from "node:fs/promises";
 import { renderPage, breadcrumb, ORIGIN } from "../api/_lib/shell.js";
 import { EVIDENCE_TIERS } from "../api/_lib/evidence-tiers.js";
+import { RIPPLING_PLANS } from "../api/_lib/rippling-keys.js";
 
 const usd = (cents) => `$${(cents / 100).toLocaleString("en-US")}`;
 const VERIFIED = usd(EVIDENCE_TIERS.verified.cents);
@@ -61,6 +62,7 @@ const CSS = `<style>
 .pv-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
 .pv-table th,.pv-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
 .pv-table td.mono{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.pv-scroll{overflow-x:auto;max-width:100%}
 .pv-tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
 .pv-tally div{border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px}
 .pv-tally strong{display:block;font:600 24px/1.1 "Space Grotesk",sans-serif}
@@ -546,9 +548,15 @@ async function buildPresignGuard(write) {
  * research note quotes the sample read on 2026-11-20 as counts only, with
  * no account named.
  */
+const money = (n) => (n ? `$${n.toLocaleString("en-US")} a month` : "Free");
+const PLAN_ROWS = Object.values(RIPPLING_PLANS).map((p) => `
+      <tr><td><b>${p.label}</b></td><td class="mono">${money(p.monthly_usd)}</td><td>${p.per_minute} a minute</td>
+        <td>${p.batch ? `Up to ${p.batch} accounts a call` : "—"}</td>
+        <td>${p.issuer_holders ? `Up to ${p.issuer_holders.toLocaleString("en-US")} holders per issuer` : "—"}</td></tr>`).join("");
+
 async function buildRippling(write) {
   const body = `<div class="page-head">
-  <p class="eyebrow">Rippling Exposure API · new · free to try</p>
+  <p class="eyebrow">Rippling Exposure API · free check · plans from $299 a month</p>
   <h1>Can someone swap your tokens without your signature?</h1>
   <p>On the XRP Ledger, an account that holds one currency on two trust lines (USD from two issuers, say) can have value moved
      from one line to the other by anyone's payment, at par, unless it has set NoRipple. Nothing is stolen outright: the account
@@ -594,9 +602,31 @@ async function buildRippling(write) {
   <h2 style="margin-top:32px">The API</h2>
   <code class="pv-code">curl -s "https://www.noshashi.app/api/v1/rippling?account=rYourAccount…"</code>
   <p class="pv-note">Returns <code>verdict</code> (EXPOSED, CLEAR, INCOMPLETE or UNRESOLVED), <code>exposures</code> per currency with
-     <code>movable_at_par</code> and the lines at risk, <code>findings</code> about DefaultRipple, unsigned <code>fixes</code>,
-     the validated <code>ledger_index</code> and server, and a SHA-256 <code>receipt</code>. Free and rate limited per caller.
-     Monitoring many accounts, or an alert when a new open line appears: <a href="/contact/?topic=institutions">talk to us</a>.</p>
+     <code>movable_at_par</code>, the lines at risk and whether quality settings change the rate, <code>findings</code> about
+     DefaultRipple, unsigned <code>fixes</code>, the validated <code>ledger_index</code> and server, and a SHA-256 <code>receipt</code>.</p>
+
+  <h3 style="margin-top:22px">Fleet scan (Starter and up)</h3>
+  <p>Every wallet you run, in one call, with totals per currency across the fleet: hot, warm, deposit and treasury accounts.</p>
+  <code class="pv-code">curl -s https://www.noshashi.app/api/v1/rippling/batch \\
+  -H "Authorization: Bearer \$NOSHASHI_RIPPLING_KEY" -H "content-type: application/json" \\
+  -d '{"accounts": ["rHot…", "rWarm…", "rDeposit…"]}'</code>
+
+  <h3 style="margin-top:22px">Issuer holder scan (Desk and Institution)</h3>
+  <p>For a token issuer: of your largest holders, which can have your token swapped out of their account by anyone's payment,
+     and how much of it in total. Up to 200 holders per call; page on with <code>offset</code>.</p>
+  <code class="pv-code">curl -s "https://www.noshashi.app/api/v1/rippling/issuer?issuer=rYourIssuer…&amp;currency=USD&amp;offset=0" \\
+  -H "Authorization: Bearer \$NOSHASHI_RIPPLING_KEY"</code>
+
+  <h2 style="margin-top:32px" id="plans">Plans</h2>
+  <div class="pv-scroll" role="region" aria-label="Plans" tabindex="0"><table class="pv-table">
+    <thead><tr><th>Plan</th><th>Price</th><th>Single-account checks</th><th>Fleet scan</th><th>Issuer holder scan</th></tr></thead>
+    <tbody>${PLAN_ROWS}</tbody>
+  </table></div>
+  <p class="pv-note">Billed monthly by invoice or card; annual prepayment is 10% less. Keys are issued once the first invoice is paid.
+     Per-minute limits apply to each key; monthly volume is fair use, agreed in the order. Every plan is read-only: no keys, no
+     signing, no custody.</p>
+  <p><a class="btn" href="mailto:institutions@noshashi.app?subject=Rippling%20Exposure%20API%20plan">Order a plan</a>
+     <a class="btn ghost" href="/contact/?topic=institutions">Ask a question first</a></p>
 
   <h2 style="margin-top:32px" id="research">Research note: how common is it?</h2>
   <p>On 20 November 2026 we read the trust lines of twelve accounts drawn from the largest holders on the first page of
@@ -604,6 +634,9 @@ async function buildRippling(write) {
      not: several held the same currency on many open lines, but none of those lines had room left under its limit, so nothing
      could ripple in. Holding a currency on several open lines is not, on its own, exposure; room to receive is what makes it so.
      No account is named here; anyone can repeat the reading with the check above.</p>
+  <p>The same day an issuer holder scan of Bitstamp's USD read 279 holders on its first trust-line pages and checked the 60
+     largest. Eight could have their Bitstamp USD swapped out for another issuer's USD by a third party's payment: 71.94 USD in
+     all, 0.25% of the 28,686.77 USD those 60 held. Small today, and invisible to the issuer without reading each holder's lines.</p>
   <p class="pv-note">A reading of ledger facts at one ledger index. Not a security audit, legal opinion or guarantee. NOSHASHI is
      independent and not affiliated with Ripple, Bitstamp or the XRPL Foundation.</p>
 </section>`;
@@ -665,7 +698,7 @@ async function buildRippling(write) {
 export const PRODUCTS = [
   { href: "/continuity/", name: "Continuity", tag: "Featured build · deposit reconciliation", price: "Free rehearsal · operator adapter open source",
     text: "Check that one issued-token deposit was credited to your customers exactly once, for the right token and amount, read from two Mainnet servers against your own posted credits." },
-  { href: "/rippling/", name: "Rippling Exposure API", tag: "New · API", price: "Free, rate limited",
+  { href: "/rippling/", name: "Rippling Exposure API", tag: "New · API", price: "Free check · plans from $299 to $3,500 a month",
     text: "Find the currencies anyone's payment can swap between an account's own trust lines, how much can move, and the unsigned NoRipple fixes." },
   { href: "/presign-guard/", name: "Pre-Sign Guard", tag: "Self-hosted · institutions", price: "Open source",
     text: "APPROVE, REJECT or RETRY before an XRPL transaction is signed: a Fireblocks Co-signer Callback Handler, or /v1/check for any signer." },
