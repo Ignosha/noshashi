@@ -1,0 +1,58 @@
+{
+  "i1-noshashi-in-two-minutes": {
+    "id": "i1-noshashi-in-two-minutes",
+    "seconds": 71,
+    "recorded_at": "2026-11-20T17:42:57.034Z",
+    "voiced": true,
+    "live_note": null,
+    "bytes": 2167001
+  },
+  "i3-rippling-exposure": {
+    "id": "i3-rippling-exposure",
+    "seconds": 71,
+    "recorded_at": "2026-11-20T17:44:36.130Z",
+    "voiced": true,
+    "live_note": null,
+    "bytes": 2170676
+  },
+  "i4-api-console": {
+    "id": "i4-api-console",
+    "seconds": 64,
+    "recorded_at": "2026-11-20T17:45:47.460Z",
+    "voiced": true,
+    "live_note": null,
+    "bytes": 1571301
+  },
+  "i5-issuer-due-diligence": {
+    "id": "i5-issuer-due-diligence",
+    "seconds": 65,
+    "recorded_at": "2026-11-20T17:47:00.151Z",
+    "voiced": true,
+    "live_note": null,
+    "bytes": 1667187
+  },
+  "i6-evidence-and-presign": {
+    "id": "i6-evidence-and-presign",
+    "seconds": 54,
+    "recorded_at": "2026-11-20T17:48:00.806Z",
+    "voiced": true,
+    "live_note": null,
+    "bytes": 1958764
+  },
+  "d1-first-api-call": {
+    "id": "d1-first-api-call",
+    "seconds": 63,
+    "recorded_at": "2026-11-20T17:49:11.635Z",
+    "voiced": true,
+    "live_note": null,
+    "bytes": 2007209
+  },
+  "d2-rippling-api": {
+    "id": "d2-rippling-api",
+    "seconds": 64,
+    "recorded_at": "2026-11-20T17:50:23.636Z",
+    "voiced": true,
+    "live_note": null,
+    "bytes": 2242605
+  }
+}

@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:01.306 --> 00:00:07.921
+The Ledger Evidence Report is a dated record of ledger facts, for auditors, boards and regulators.
+
+2
+00:00:09.324 --> 00:00:16.174
+It covers the issuers, wallets and order books you choose, at a ledger you choose, with every reading reproducible.
+
+3
+00:00:17.182 --> 00:00:24.032
+Pick a tier, list what should be covered, and order. Each tier shows exactly what it includes and what it costs.
+
+4
+00:00:25.298 --> 00:00:35.220
+Pre-Sign Guard checks an XRPL transaction before it is signed. It refuses swapped destinations, key changes and counterfeit tokens.
+
+5
+00:00:36.624 --> 00:00:46.802
+It runs as a Fireblocks co-signer callback, or as a check endpoint for any signing system. It is open source, so your security team can read every rule.
+
+6
+00:00:46.810 --> 00:00:51.740
+Questions about any product? Write to institutions@noshashi.app.

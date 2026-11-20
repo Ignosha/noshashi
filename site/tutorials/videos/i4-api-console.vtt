@@ -1,0 +1,37 @@
+WEBVTT
+
+1
+00:00:01.304 --> 00:00:05.765
+The API Console is for teams who want the answers without the code.
+
+2
+00:00:05.768 --> 00:00:12.618
+On the left, questions grouped by what you are responsible for. Start with an issuer: what can it do to holders?
+
+3
+00:00:13.186 --> 00:00:17.455
+Use an example loads a well-known public issuer. Then run it.
+
+4
+00:00:19.912 --> 00:00:27.423
+A verdict first, then the key facts: can it freeze holders, must holders ask permission, and does a single key control it.
+
+5
+00:00:27.430 --> 00:00:31.635
+Underneath, what it means in plain words, and a receipt for the reading.
+
+6
+00:00:32.342 --> 00:00:37.571
+Markets: how much of an order book could actually fill, not just what it advertises.
+
+7
+00:00:41.340 --> 00:00:46.035
+Advertised depth against fillable depth, at one validated ledger.
+
+8
+00:00:46.742 --> 00:00:51.907
+Treasury: who can sign for an account, and whether one key alone can move its funds.
+
+9
+00:00:56.171 --> 00:01:02.146
+Every answer works the same way, so a compliance officer and an engineer read the same facts.

@@ -1,0 +1,33 @@
+WEBVTT
+
+1
+00:00:01.290 --> 00:00:11.425
+On the XRP Ledger, if an account holds the same currency on two trust lines without the NoRipple flag, anyone's payment can move value between them.
+
+2
+00:00:11.433 --> 00:00:17.600
+No signature from the account is needed. Most teams never check. This page does it for free.
+
+3
+00:00:18.723 --> 00:00:23.909
+Enter any public account. Here, a token issuer that published its own address.
+
+4
+00:00:31.152 --> 00:00:36.466
+The verdict, the account's role, the ledger it was read at, and how many trust lines were read.
+
+5
+00:00:37.872 --> 00:00:49.031
+Per currency: what is held, how much room other lines have, and what could move. When something is exposed, the unsigned fix appears below, ready for your own signing process.
+
+6
+00:00:50.037 --> 00:00:57.292
+The check is free. Paid plans add fleet scans of every wallet you run, and holder scans for token issuers.
+
+7
+00:00:57.298 --> 00:01:03.487
+Plans run from two hundred and ninety-nine to three thousand five hundred dollars a month, all read-only.
+
+8
+00:01:04.495 --> 00:01:09.404
+The research note shows how common this is on Mainnet, without naming any account.

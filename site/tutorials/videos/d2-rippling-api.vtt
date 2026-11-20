@@ -1,0 +1,33 @@
+WEBVTT
+
+1
+00:00:03.684 --> 00:00:06.737
+The Rippling Exposure API has three endpoints.
+
+2
+00:00:06.737 --> 00:00:11.582
+GET v1 rippling, with an account, checks one account. Free, rate limited.
+
+3
+00:00:11.585 --> 00:00:18.627
+POST v1 rippling batch takes a list of accounts and returns totals per currency across your whole fleet.
+
+4
+00:00:18.629 --> 00:00:27.164
+GET v1 rippling issuer scans an issuer's holders, two hundred per call. Page on with offset until next offset is empty.
+
+5
+00:00:28.425 --> 00:00:36.235
+Fleet and issuer scans need a key, sent as a Bearer token. The console accepts one and keeps it in this tab only.
+
+6
+00:00:39.229 --> 00:00:46.762
+Without a key, the API answers four oh two, and says which plan unlocks the call. Your code can show that to the user.
+
+7
+00:00:48.023 --> 00:00:53.977
+Each plan sets the per-minute limit, the batch size and how many holders an issuer scan reads.
+
+8
+00:00:53.980 --> 00:01:02.110
+Keys are issued when the first invoice is paid. Every plan is read-only: no keys of yours, no signing, no custody.
