@@ -515,6 +515,10 @@ async function buildPresignGuard(write) {
 export async function buildProducts(write) {
   await buildPresignGuard(write);
   await buildContinuity(write);
+  for (const file of ["index.html", "review.css", "review.js", "desk.js", "browser.js"]) {
+    const contents = await readFile(new URL("../src/continuity/" + file, import.meta.url), "utf8");
+    await write("continuity-preview/" + file, contents);
+  }
   await buildWatch(write);
   await buildVerified(write);
   await buildListing(write);
