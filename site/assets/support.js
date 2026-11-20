@@ -165,6 +165,9 @@
   }
 
   launcher.addEventListener("click", open);
+  // Lets other scripts (the plan picker in upgrade.js) open the assistant
+  // with a question already asked. Opening is still the visitor's click.
+  window.noshashiSupportAsk = function (question) { open(); if (question) ask(String(question).slice(0, 400)); };
   closeButton.addEventListener("click", close);
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && !panel.hidden) close();

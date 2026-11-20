@@ -83,6 +83,8 @@ describe("POST /api/v1/rippling/batch", () => {
     const r = res();
     await batch(req([exposed.account], {}), r);
     expect(r.code).toBe(402);
+    expect(r.body.code).toBe("PAID_PLAN");
+    expect(r.body.upgrade.plans.map((p) => p.id)).toEqual(["starter", "desk", "institution"]);
     expect(rippleRpcWithSource).not.toHaveBeenCalled();
   });
 
@@ -140,6 +142,8 @@ describe("GET /api/v1/rippling/issuer", () => {
     const r = res();
     await issuerScan(req({ offset: String(RIPPLING_PLANS.desk.issuer_holders) }), r);
     expect(r.code).toBe(402);
+    expect(r.body.code).toBe("PLAN_LIMIT");
+    expect(r.body.upgrade.plans.map((p) => p.id)).toEqual(["institution"]);
   });
 
   it("rejects a bad issuer or currency before any ledger read", async () => {
