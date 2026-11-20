@@ -39,6 +39,9 @@
 .ct-steps li{border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;font-size:13.5px;line-height:1.6;color:var(--muted)}
 .ct-steps .num{display:block;font:11px "IBM Plex Mono",monospace;letter-spacing:.06em;margin-bottom:6px}
 .ct-steps b{display:block;color:var(--ink);font:600 16px/1.3 "Space Grotesk",sans-serif;margin-bottom:4px}
+.ct-dl{margin-top:40px;border-top:1px solid var(--rule);padding-top:28px}
+.ct-dl .ct-steps{margin:18px 0}
+.ct-sum{overflow-wrap:anywhere;font-size:11.5px}
 </style>
 </head>
 <body>
@@ -92,9 +95,23 @@
    (true only for a complete export). Optional workflows may contain a name and a dependencies list.</p>
 <p><button class="btn ghost" id="run" type="button">Run checks</button><button class="btn ghost" id="replay" type="button">Try corrected sample</button><button class="btn ghost" id="save" type="button" disabled>Export evidence</button></p>
 <pre id="result" aria-live="polite">Ready to rehearse.</pre>
-<p class="ct-note">Run it next to your own accounting database with
-  <a href="https://github.com/Ignosha/noshashi/tree/main/tools/continuity">tools/continuity</a>
-  (Python 3, standard library only, read-only, loopback only).</p>
+</section>
+<section class="ct-dl" id="download">
+  <h2>Run it on your own books</h2>
+  <p>The rehearsal above checks the ledger side. To check real deposits against what your system actually posted, download
+     Continuity and run it next to your accounting database. It reads your credits read-only, listens on 127.0.0.1 only,
+     and sends nothing to NOSHASHI.</p>
+  <p><a class="btn" href="/downloads/noshashi-continuity.zip" download>Download Continuity (zip, 11.6 KB)</a>
+     <a class="btn ghost" href="https://github.com/Ignosha/noshashi/tree/main/tools/continuity">Read the source</a></p>
+  <ol class="ct-steps">
+    <li><span class="num">01 / NEEDS</span><b>Python 3.8+ and a browser</b>macOS, Linux or Windows. Standard library only: nothing else to install, no account, no key.</li>
+    <li><span class="num">02 / CONNECT</span><b>One view in your SQLite books</b><code>continuity_credits(tx_hash, amount, issuer, currency)</code>, one row per posted credit. <code>example-view.sql</code> in the zip shows how.</li>
+    <li><span class="num">03 / RUN</span><b><code>./start.sh books.sqlite</code></b>Or <code>start.bat</code> on Windows. Open http://127.0.0.1:8765, paste a deposit hash, tick the adapter box, verify.</li>
+  </ol>
+  <p class="ct-note">SHA-256 <code class="ct-sum">6bf248f5472068a250c8f2d6df2c6a8dfc9a305c32496d659b4cb4654a32bb26</code> (<a href="/downloads/noshashi-continuity.zip.sha256">checksum file</a>).
+     The zip is reproducible: <code>node scripts/package-continuity.mjs</code> in the public repository rebuilds the same bytes.
+     MIT licence. Read-only; not legal, compliance, audit or accounting advice.
+     Need it on Postgres or another database, or run for you? <a href="/contact/?topic=institutions">Talk to us</a>.</p>
 </section>
 </main>
 <footer>

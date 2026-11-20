@@ -30,6 +30,7 @@ import { readFile } from "node:fs/promises";
 import { renderPage, breadcrumb, ORIGIN } from "../api/_lib/shell.js";
 import { EVIDENCE_TIERS } from "../api/_lib/evidence-tiers.js";
 import { RIPPLING_PLANS } from "../api/_lib/rippling-keys.js";
+import { writeContinuityPackage, CONTINUITY_ZIP } from "./package-continuity.mjs";
 
 const usd = (cents) => `$${(cents / 100).toLocaleString("en-US")}`;
 const VERIFIED = usd(EVIDENCE_TIERS.verified.cents);
@@ -438,7 +439,29 @@ async function buildContinuity(write) {
 .ct-steps li{border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;font-size:13.5px;line-height:1.6;color:var(--muted)}
 .ct-steps .num{display:block;font:11px "IBM Plex Mono",monospace;letter-spacing:.06em;margin-bottom:6px}
 .ct-steps b{display:block;color:var(--ink);font:600 16px/1.3 "Space Grotesk",sans-serif;margin-bottom:4px}
+.ct-dl{margin-top:40px;border-top:1px solid var(--rule);padding-top:28px}
+.ct-dl .ct-steps{margin:18px 0}
+.ct-sum{overflow-wrap:anywhere;font-size:11.5px}
 </style>`;
+  const pkg = await writeContinuityPackage();
+  const kb = (pkg.size / 1024).toFixed(1);
+  const download = `<section class="ct-dl" id="download">
+  <h2>Run it on your own books</h2>
+  <p>The rehearsal above checks the ledger side. To check real deposits against what your system actually posted, download
+     Continuity and run it next to your accounting database. It reads your credits read-only, listens on 127.0.0.1 only,
+     and sends nothing to NOSHASHI.</p>
+  <p><a class="btn" href="/${CONTINUITY_ZIP}" download>Download Continuity (zip, ${kb} KB)</a>
+     <a class="btn ghost" href="https://github.com/Ignosha/noshashi/tree/main/tools/continuity">Read the source</a></p>
+  <ol class="ct-steps">
+    <li><span class="num">01 / NEEDS</span><b>Python 3.8+ and a browser</b>macOS, Linux or Windows. Standard library only: nothing else to install, no account, no key.</li>
+    <li><span class="num">02 / CONNECT</span><b>One view in your SQLite books</b><code>continuity_credits(tx_hash, amount, issuer, currency)</code>, one row per posted credit. <code>example-view.sql</code> in the zip shows how.</li>
+    <li><span class="num">03 / RUN</span><b><code>./start.sh books.sqlite</code></b>Or <code>start.bat</code> on Windows. Open http://127.0.0.1:8765, paste a deposit hash, tick the adapter box, verify.</li>
+  </ol>
+  <p class="ct-note">SHA-256 <code class="ct-sum">${pkg.sha256}</code> (<a href="/${CONTINUITY_ZIP}.sha256">checksum file</a>).
+     The zip is reproducible: <code>node scripts/package-continuity.mjs</code> in the public repository rebuilds the same bytes.
+     MIT licence. Read-only; not legal, compliance, audit or accounting advice.
+     Need it on Postgres or another database, or run for you? <a href="/contact/?topic=institutions">Talk to us</a>.</p>
+</section>`;
   const body = (await continuityBody())
     .replace(/<h1>/, `<div class="page-head"><p class="eyebrow">Ledger Desk · Continuity</p><h1>`)
     // The intro paragraph joins the page head; the steps follow it, then the rehearsal.
@@ -451,10 +474,8 @@ async function buildContinuity(write) {
     path: "/continuity/",
     head: css,
     body: `${body}
-<p class="ct-note">Run it next to your own accounting database with
-  <a href="https://github.com/Ignosha/noshashi/tree/main/tools/continuity">tools/continuity</a>
-  (Python 3, standard library only, read-only, loopback only).</p>
-</section>`,
+</section>
+${download}`,
     scripts: `<script src="/assets/continuity.js"></script>`,
     structured: [breadcrumb("Continuity", "/continuity/")],
   }));
@@ -698,7 +719,7 @@ async function buildRippling(write) {
  * promised that is not built.
  */
 export const PRODUCTS = [
-  { href: "/continuity/", name: "Continuity", tag: "Featured build · deposit reconciliation", price: "Free rehearsal · operator adapter open source",
+  { href: "/continuity/", name: "Continuity", tag: "Featured build · deposit reconciliation", price: "Free · download it for your own books",
     text: "Check that one issued-token deposit was credited to your customers exactly once, for the right token and amount, read from two Mainnet servers against your own posted credits." },
   { href: "/rippling/", name: "Rippling Exposure API", tag: "New · API", price: "Free check · plans from $299 to $3,500 a month",
     text: "Find the currencies anyone's payment can swap between an account's own trust lines, how much can move, and the unsigned NoRipple fixes." },
