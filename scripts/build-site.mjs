@@ -1512,7 +1512,12 @@ async function buildPricingEnhancement() {
     @media(max-width:900px){.price{grid-template-columns:1fr;overflow-x:visible}.price .tier{min-width:0}}
     @media(max-width:760px){.tier-compare{margin-right:calc((100vw - var(--shell))/2 * -1);margin-left:calc((100vw - var(--shell))/2 * -1);padding-left:4vw;padding-right:4vw}.tier-compare th,.tier-compare td{padding:12px 10px}}
   </style>`;
-  if (!html.includes("id=\"noshashi-tier-comparison\"")) html = html.replace("</style>", `${css}</style>`);
+  // The block used to be injected before the first </style>, which nested it inside the page's
+  // own stylesheet. Close that stylesheet first and keep the block, unchanged, in the same place,
+  // so the cascade (and the page's look) stays as it was.
+  const nested = html.match(/(<style id="noshashi-tier-comparison">[\s\S]*?<\/style>)<\/style>/);
+  if (nested) html = html.replace(nested[0], `</style>\n${nested[1]}`);
+  else if (!html.includes('id="noshashi-tier-comparison"')) html = html.replace("</head>", `${css}\n</head>`);
   // Rules added after the committed page first received the block above.
   const soonRule = '.tier-compare .soon{color:var(--hold);font-family:"IBM Plex Mono",monospace;font-size:12px}';
   if (!html.includes(".tier-compare .soon{")) html = html.replace(".tier-compare .no{color:var(--faint)}", `.tier-compare .no{color:var(--faint)}\n    ${soonRule}`);
@@ -1673,7 +1678,7 @@ async function buildPricingEnhancement() {
   // Same six destinations and the same footer map as every other page.
   // The page keeps its own header styles, so only the links are swapped.
   const navLinks = NAV.map((item) =>
-    `<a href="${item.href}"${item.optional ? ' class="optional"' : ""}${item.href === "/pricing/" ? ' aria-current="page"' : ""}>${item.label}</a>`
+    `<a href="${item.href}"${item.optional || item.wide ? ` class="${[item.optional && "optional", item.wide && "wide"].filter(Boolean).join(" ")}"` : ""}${item.href === "/pricing/" ? ' aria-current="page"' : ""}>${item.label}</a>`
   ).join("\n        ");
   html = html.replace(/<nav class="nav-links" aria-label="Primary">[\s\S]*?<\/nav>\n    <\/nav>/,
     `<nav class="nav-links" aria-label="Primary">\n        ${navLinks}\n        <a class="btn ghost" href="/contact/?topic=institutions">Request a demo</a>\n        <a class="btn" href="/app/">Open workspace</a>\n      </nav>\n    </nav>`);

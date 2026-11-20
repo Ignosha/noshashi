@@ -137,7 +137,7 @@ main code{overflow-wrap:anywhere}
   main{padding:40px 0 16px}
 }
 /* Must match the menu breakpoint in modules.css — see the note there. */
-@media (max-width:920px){ .nav-links a:not(.btn){display:none} }
+@media (max-width:1050px){ .nav-links a:not(.btn){display:none} }
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
 
 /* ── Shared page components (platform, solutions, resources, about,

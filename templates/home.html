@@ -565,6 +565,11 @@
   @media (max-width:1100px){
     .nav-links a.optional{display:none}
   }
+  /* Measured 2026-11-19: with About shown the row overflowed from 1220 down
+     to 1110 (by up to 56px), so About goes first, as on every other page. */
+  @media (max-width:1240px){
+    .nav-links a.wide{display:none}
+  }
   @media (max-width:1010px){
     .nav-links{gap:2px}
     .nav-links a{font-size:10px}
@@ -575,7 +580,7 @@
   /* Must match the menu breakpoint in site/assets/modules.css. If these
      two disagree, the band between them has the links hidden and no menu
      button to replace them — no navigation at all. */
-  @media (max-width:760px){
+  @media (max-width:1050px){
     .nav-links a:not(.btn){display:none}
   }
 
