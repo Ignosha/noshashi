@@ -149,7 +149,7 @@ export const TUTORIALS = [
       ["type", "#hi-issuer", BITSTAMP],
       ["say", "Enter the issuer's address. Here, Bitstamp's USD issuer, an address Bitstamp published."],
       ["click", "#hi-run"],
-      ["wait", "#hi-out:not(:empty)"],
+      ["wait", "#hi-out:not([hidden])"],
       ["scroll", "#hi-out"],
       ["say", "Freezes, clawbacks, key changes and changes to its powers, each linked to the ledger transaction."],
       ["go", "/watch/"],
