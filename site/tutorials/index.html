@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Video tutorials — every NOSHASHI product, recorded live on the XRP Ledger | NOSHASHI</title>
+<meta name="description" content="Narrated walkthroughs of Continuity, the Rippling Exposure API, the API Console, issuer due diligence, the Evidence Report and Pre-Sign Guard, recorded live on XRPL Mainnet. For institutions and developers.">
+<link rel="canonical" href="https://www.noshashi.app/tutorials/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/tutorials/">
+<meta property="og:title" content="Video tutorials — every NOSHASHI product, recorded live on the XRP Ledger | NOSHASHI">
+<meta property="og:description" content="Narrated walkthroughs of Continuity, the Rippling Exposure API, the API Console, issuer due diligence, the Evidence Report and Pre-Sign Guard, recorded live on XRPL Mainnet. For institutions and developers.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Video tutorials — every NOSHASHI product, recorded live on the XRP Ledger | NOSHASHI">
+<meta name="twitter:description" content="Narrated walkthroughs of Continuity, the Rippling Exposure API, the API Console, issuer due diligence, the Evidence Report and Pre-Sign Guard, recorded live on XRPL Mainnet. For institutions and developers.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/c5a81e5a06d4616fef91.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/assets/ledger-mark-512.png","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Video tutorials","item":"https://www.noshashi.app/tutorials/"}]}]}</script>
+<style>
+.pv-form{display:grid;gap:14px;max-width:640px}
+.pv-form textarea{min-height:56px;font:12px "IBM Plex Mono",monospace}
+.pv-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
+.pv-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.pv-price{font:600 30px/1.1 "Space Grotesk",sans-serif;margin:6px 0 4px}
+.pv-badge{min-height:40px;margin:12px 0}
+.pv-badge img{max-width:100%;height:auto}
+.pv-code{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.55 "IBM Plex Mono",monospace;
+  border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;margin:8px 0}
+.pv-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.pv-table th,.pv-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.pv-table td.mono{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.pv-scroll{overflow-x:auto;max-width:100%}
+.pv-tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.pv-tally div{border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px}
+.pv-tally strong{display:block;font:600 24px/1.1 "Space Grotesk",sans-serif}
+[data-sev="power_used"]{color:var(--bad,#e5484d)}
+[data-sev="key_change"]{color:var(--warn,#f5a524)}
+</style><style>
+.tu-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 6px}
+.tu-group{margin-top:34px}
+.tu-group>p{color:var(--muted);margin:4px 0 0}
+.tu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:22px;margin-top:16px}
+.tu-card{border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.tu-card video{display:block;width:100%;aspect-ratio:16/9;background:#0b0f0b}
+.tu-body{padding:14px 18px 18px}
+.tu-body h3{margin:4px 0 6px;font-size:20px}
+.tu-body p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+.tu-body details{margin-top:10px;font-size:13.5px}
+.tu-body details ol{padding-left:18px;color:var(--muted);line-height:1.55}
+.tu-kick{font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tu-links{margin-top:10px;font-size:13.5px}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16" cy="16" r="10.6" fill="none" stroke="currentColor" stroke-width=".9" opacity=".5"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="var(--ground)" stroke="var(--ground)" stroke-width="2.2" stroke-linejoin="round"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/products/">Products</a>
+      <a class="nav-link" href="/research/">Research</a>
+      <a class="nav-link" href="/console/">Console</a>
+      <a class="nav-link optional" href="/developers/">Developers</a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/">Company</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head">
+  <p class="eyebrow">Video tutorials · recorded live on XRPL Mainnet</p>
+  <h1>See every product working, in a few minutes each.</h1>
+  <p>Each video is a recording of this site reading the real XRP Ledger: no sample data, no mock screens. Results you see were read
+     from a validated Mainnet ledger while the video was made, so the same check today may show newer figures. Every video has
+     captions and a transcript.</p>
+  <nav class="tu-tabs" aria-label="Tutorial groups"><a class="btn" href="#institutions">For institutions</a><a class="btn ghost" href="#developers">For developers</a></nav>
+</div>
+<section class="tu-group" id="institutions">
+    <h2>For institutions</h2><p>Compliance, treasury, operations and listing teams. No code needed.</p>
+    <div class="tu-grid"><article class="tu-card" id="i1-noshashi-in-two-minutes">
+      <video controls playsinline preload="none" poster="/tutorials/videos/i1-noshashi-in-two-minutes.jpg" aria-label="NOSHASHI in two minutes">
+        <source src="/tutorials/videos/i1-noshashi-in-two-minutes.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/i1-noshashi-in-two-minutes.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">For institutions · 1</span>
+        <h3>NOSHASHI in two minutes</h3>
+        <p>What NOSHASHI is, where each product lives, and how to get a plain answer from the ledger without writing code.</p>
+        <details><summary>Transcript</summary><ol><li>NOSHASHI reads the XRP Ledger and turns what it finds into plain answers for institutions.</li><li>Everything you see in this video is read live from XRPL Mainnet. Nothing is sample data.</li><li>The home page leads with two things: products that read the ledger, and research that shows why they matter.</li><li>Products lists everything we sell, with the price and who each one is for.</li><li>Continuity reconciles deposits. Rippling Exposure finds tokens that can be moved without your signature.</li><li>Issuer Watch, Verified Issuer, Issuer history and the Ledger Evidence Report cover the token issuers you deal with.</li><li>The API Console puts every API behind a simple form. Pick a question, enter a public address, read the answer.</li><li>Every answer carries the ledger index it was read at, so anyone can check it again later.</li><li>Read-only throughout: NOSHASHI never asks for a key and can never sign or move funds.</li><li>The next videos walk through each product in turn.</li></ol></details>
+        <p class="tu-links"><a href="/products/">All products</a> · <a href="/console/">API Console</a></p>
+      </div>
+    </article><article class="tu-card" id="i2-continuity">
+      <video controls playsinline preload="none" poster="/tutorials/videos/i2-continuity.jpg" aria-label="Continuity: was each deposit credited exactly once?">
+        <source src="/tutorials/videos/i2-continuity.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/i2-continuity.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">For institutions · 2</span>
+        <h3>Continuity: was each deposit credited exactly once?</h3>
+        <p>Check one real Mainnet deposit against your own posted credits: right token, right issuer, right amount, credited once.</p>
+        <details><summary>Transcript</summary><ol><li>Continuity answers one question for an exchange, custodian or payments firm: was this deposit credited to the customer exactly once?</li><li>It reads the payment from two Mainnet servers and compares it with the credits your own books posted.</li><li>Here is a real issued-token payment read from Mainnet a moment ago, and one posted credit for it.</li><li>In production, that credit comes straight from your accounting database through the read-only adapter.</li><li>The transaction hash goes here. Press Verify, and both servers are asked for the same payment.</li><li>Both servers agree. Every check is listed: validated, destination, issuer, currency, delivered amount, and exactly one matching credit.</li><li>The report keeps the ledger index and hash, so an auditor can repeat the reading.</li><li>Now suppose your books posted the same deposit twice: a double credit.</li><li>Continuity fails it and says why: more than one credit matches this deposit. That is money paid out twice, caught before it leaves.</li><li>Export evidence saves the full report as a file for your records.</li></ol></details>
+        <p class="tu-links"><a href="/continuity/">Open Continuity</a></p>
+      </div>
+    </article><article class="tu-card" id="i3-rippling-exposure">
+      <video controls playsinline preload="none" poster="/tutorials/videos/i3-rippling-exposure.jpg" aria-label="Rippling exposure: can someone move your tokens?">
+        <source src="/tutorials/videos/i3-rippling-exposure.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/i3-rippling-exposure.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">For institutions · 3</span>
+        <h3>Rippling exposure: can someone move your tokens?</h3>
+        <p>Find balances that a stranger's payment can swap between your trust lines, and get the unsigned fix.</p>
+        <details><summary>Transcript</summary><ol><li>On the XRP Ledger, if an account holds the same currency on two trust lines without the NoRipple flag, anyone's payment can move value between them.</li><li>No signature from the account is needed. Most teams never check. This page does it for free.</li><li>Enter any public account. Here, a token issuer that published its own address.</li><li>The verdict, the account's role, the ledger it was read at, and how many trust lines were read.</li><li>Per currency: what is held, how much room other lines have, and what could move. When something is exposed, the unsigned fix appears below, ready for your own signing process.</li><li>The check is free. Paid plans add fleet scans of every wallet you run, and holder scans for token issuers.</li><li>Plans run from two hundred and ninety-nine to three thousand five hundred dollars a month, all read-only.</li><li>The research note shows how common this is on Mainnet, without naming any account.</li></ol></details>
+        <p class="tu-links"><a href="/rippling/">Run the free check</a> · <a href="/rippling/#plans">Plans</a></p>
+      </div>
+    </article><article class="tu-card" id="i4-api-console">
+      <video controls playsinline preload="none" poster="/tutorials/videos/i4-api-console.jpg" aria-label="The API Console: ask the ledger, get a plain answer">
+        <source src="/tutorials/videos/i4-api-console.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/i4-api-console.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">For institutions · 4</span>
+        <h3>The API Console: ask the ledger, get a plain answer</h3>
+        <p>Issuer controls, real market depth and treasury control, each as a form with a verdict, the facts and what they mean.</p>
+        <details><summary>Transcript</summary><ol><li>The API Console is for teams who want the answers without the code.</li><li>On the left, questions grouped by what you are responsible for. Start with an issuer: what can it do to holders?</li><li>Use an example loads a well-known public issuer. Then run it.</li><li>A verdict first, then the key facts: can it freeze holders, must holders ask permission, and does a single key control it.</li><li>Underneath, what it means in plain words, and a receipt for the reading.</li><li>Markets: how much of an order book could actually fill, not just what it advertises.</li><li>Advertised depth against fillable depth, at one validated ledger.</li><li>Treasury: who can sign for an account, and whether one key alone can move its funds.</li><li>Every answer works the same way, so a compliance officer and an engineer read the same facts.</li></ol></details>
+        <p class="tu-links"><a href="/console/">Open the console</a></p>
+      </div>
+    </article><article class="tu-card" id="i5-issuer-due-diligence">
+      <video controls playsinline preload="none" poster="/tutorials/videos/i5-issuer-due-diligence.jpg" aria-label="Issuer due diligence: history, watch and badge">
+        <source src="/tutorials/videos/i5-issuer-due-diligence.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/i5-issuer-due-diligence.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">For institutions · 5</span>
+        <h3>Issuer due diligence: history, watch and badge</h3>
+        <p>What an issuer has done with its powers, how to be told when it changes them, and how issuers prove their limits.</p>
+        <details><summary>Transcript</summary><ol><li>Before you list or hold a token, ask what its issuer has actually done with its powers.</li><li>Enter the issuer's address. Here, Bitstamp's USD issuer, an address Bitstamp published.</li><li>Freezes, clawbacks, key changes and changes to its powers, each linked to the ledger transaction.</li><li>Issuer Watch tells you the moment an issuer changes those rules, so you are not the last to know.</li><li>It checks the issuer continuously and emails you when a control changes. Nineteen dollars a month per issuer.</li><li>For issuers: show your holders what you cannot do. The badge is free and reads the ledger every time it loads.</li><li>Here is the live badge for Ripple's RLUSD issuer, with the HTML and Markdown to paste on your own site.</li></ol></details>
+        <p class="tu-links"><a href="/history/">Issuer history</a> · <a href="/watch/">Issuer Watch</a> · <a href="/verified/">Verified Issuer</a></p>
+      </div>
+    </article><article class="tu-card" id="i6-evidence-and-presign">
+      <video controls playsinline preload="none" poster="/tutorials/videos/i6-evidence-and-presign.jpg" aria-label="Evidence Report and Pre-Sign Guard">
+        <source src="/tutorials/videos/i6-evidence-and-presign.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/i6-evidence-and-presign.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">For institutions · 6</span>
+        <h3>Evidence Report and Pre-Sign Guard</h3>
+        <p>A signed-off record of ledger facts for auditors, and a check on every transaction before your team signs it.</p>
+        <details><summary>Transcript</summary><ol><li>The Ledger Evidence Report is a dated record of ledger facts, for auditors, boards and regulators.</li><li>It covers the issuers, wallets and order books you choose, at a ledger you choose, with every reading reproducible.</li><li>Pick a tier, list what should be covered, and order. Each tier shows exactly what it includes and what it costs.</li><li>Pre-Sign Guard checks an XRPL transaction before it is signed. It refuses swapped destinations, key changes and counterfeit tokens.</li><li>It runs as a Fireblocks co-signer callback, or as a check endpoint for any signing system. It is open source, so your security team can read every rule.</li><li>Questions about any product? Write to institutions@noshashi.app.</li></ol></details>
+        <p class="tu-links"><a href="/evidence-report/">Evidence Report</a> · <a href="/presign-guard/">Pre-Sign Guard</a></p>
+      </div>
+    </article></div>
+  </section><section class="tu-group" id="developers">
+    <h2>For developers</h2><p>Endpoints, requests, responses and keys.</p>
+    <div class="tu-grid"><article class="tu-card" id="d1-first-api-call">
+      <video controls playsinline preload="none" poster="/tutorials/videos/d1-first-api-call.jpg" aria-label="Developers: your first API call">
+        <source src="/tutorials/videos/d1-first-api-call.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/d1-first-api-call.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">For developers · 1</span>
+        <h3>Developers: your first API call</h3>
+        <p>From the console to curl: the exact command, the JSON it returns, and the receipt that lets you verify it.</p>
+        <details><summary>Transcript</summary><ol><li>For developers: every NOSHASHI API is a plain HTTPS GET or POST that returns JSON.</li><li>This page documents the Asset Risk API and the Compliance API, with request and response examples.</li><li>The fastest way to learn an endpoint is the console. Run any question once.</li><li>For your engineers: the exact curl command that produced this answer. Copy it straight into a terminal.</li><li>And the full JSON response, field for field.</li><li>Every response names the ledger index, the server it read, and a SHA-256 receipt of the report.</li><li>This is the same endpoint called directly. No key and no sign-up for the free tier; just a rate limit per minute.</li></ol></details>
+        <p class="tu-links"><a href="/developers/">API docs</a> · <a href="/console/">Console</a></p>
+      </div>
+    </article><article class="tu-card" id="d2-rippling-api">
+      <video controls playsinline preload="none" poster="/tutorials/videos/d2-rippling-api.jpg" aria-label="Developers: the Rippling Exposure API">
+        <source src="/tutorials/videos/d2-rippling-api.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/d2-rippling-api.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">For developers · 2</span>
+        <h3>Developers: the Rippling Exposure API</h3>
+        <p>Single-account checks, fleet scans of every wallet you run, and paged issuer holder scans, with API keys.</p>
+        <details><summary>Transcript</summary><ol><li>The Rippling Exposure API has three endpoints.</li><li>GET v1 rippling, with an account, checks one account. Free, rate limited.</li><li>POST v1 rippling batch takes a list of accounts and returns totals per currency across your whole fleet.</li><li>GET v1 rippling issuer scans an issuer's holders, two hundred per call. Page on with offset until next offset is empty.</li><li>Fleet and issuer scans need a key, sent as a Bearer token. The console accepts one and keeps it in this tab only.</li><li>Without a key, the API answers four oh two, and says which plan unlocks the call. Your code can show that to the user.</li><li>Each plan sets the per-minute limit, the batch size and how many holders an issuer scan reads.</li><li>Keys are issued when the first invoice is paid. Every plan is read-only: no keys of yours, no signing, no custody.</li></ol></details>
+        <p class="tu-links"><a href="/rippling/">Rippling API docs</a> · <a href="/rippling/#plans">Plans and keys</a></p>
+      </div>
+    </article></div>
+  </section>
+<p class="pv-note" style="margin-top:28px">Want a walkthrough for your own team, on your own wallets? <a href="/contact/?topic=institutions">Talk to us</a>.</p>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Products</p><a href="/products/">All products</a><a href="/console/">API Console</a><a href="/tutorials/">Video tutorials</a><a href="/continuity/">Continuity · deposit reconciliation</a><a href="/rippling/">Rippling Exposure API</a><a href="/presign-guard/">Pre-Sign Guard</a><a href="/watch/">Issuer Watch</a><a href="/verified/">Verified Issuer</a><a href="/listing-review/">Listing review</a><a href="/history/">Issuer history</a><a href="/evidence-report/">Ledger Evidence Report</a></div>
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/terminal/">Cloud Terminal · public beta</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/tokens/">XRPL token directory</a><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a><a href="/rippling/">Rippling exposure check</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/intelligence/">Intelligence &amp; briefs</a><a href="/news/">External headlines</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/partners/">Partner programs</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+
+</body>
+</html>

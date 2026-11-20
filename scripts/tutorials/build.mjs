@@ -161,7 +161,7 @@ async function record(browser, t) {
       else if (op === "click") { await page.locator(a).first().click(); await page.waitForTimeout(500); }
       else if (op === "wait") { await page.waitForSelector(a, { state: "visible", timeout: 45000 }); await page.waitForTimeout(900); }
       else if (op === "waitText") { await page.waitForFunction(([s, re]) => { const e = document.querySelector(s); return e && new RegExp(re).test(e.textContent); }, [a, b], { timeout: 45000 }); await page.waitForTimeout(900); }
-      else if (op === "scroll") { await page.evaluate((s) => { const e = document.querySelector(s); if (e) e.scrollIntoView({ behavior: "smooth", block: "start" }); }, a); await page.waitForTimeout(1000); }
+      else if (op === "scroll") { await page.evaluate((s) => { const e = document.querySelector(s); if (e) window.scrollTo({ top: Math.max(0, e.getBoundingClientRect().top + scrollY - 110), behavior: "smooth" }); }, a); await page.waitForTimeout(1000); }
       else if (op === "wheel") { for (let i = 0; i < 6; i++) { await page.mouse.wheel(0, a / 6); await page.waitForTimeout(220); } }
       else if (op === "pause") await page.waitForTimeout(a);
       else if (op === "live") { await LIVE[a](page, state); await page.waitForTimeout(600); await recap(); }
