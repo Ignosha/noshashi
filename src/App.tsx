@@ -240,7 +240,7 @@ const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
 const EXECUTIVE_SCENES = new Set<SceneId>(["home", "continuity", "verify", "risk", "history", "workstation", "agent", "safeshop", "learn"]);
 
 const SCENES: SceneDef[] = [
-  { id: "continuity", label: "CONTINUITY", title: "CONTINUITY", hint: "Issuer offboarding sample review", icon: <NovaGrid size={15} />, digit: "", group: "primary" },
+  { id: "continuity", label: "CONTINUITY", title: "CONTINUITY", hint: "Change rehearsal, issuer, bridge and lending reviews", icon: <NovaGrid size={15} />, digit: "", group: "primary" },
   {
     id: "home",
     label: "OVERVIEW",

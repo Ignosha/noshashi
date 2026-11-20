@@ -515,10 +515,14 @@ async function buildPresignGuard(write) {
 export async function buildProducts(write) {
   await buildPresignGuard(write);
   await buildContinuity(write);
-  for (const file of ["index.html", "review.css", "review.js", "desk.js", "browser.js"]) {
-    const contents = await readFile(new URL("../src/continuity/" + file, import.meta.url), "utf8");
-    await write("continuity-preview/" + file, contents);
-  }
+  await write("continuity-preview/index.html", `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOSHASHI Continuity · Desktop workspace preview</title>
+<link rel="stylesheet" href="/assets/continuity/main.css">
+<style>html,body,#continuity-root{height:100%;margin:0}body{overflow:hidden}</style>
+</head><body class="ledger-desktop"><div id="continuity-root"></div>
+<noscript>Continuity requires JavaScript. <a href="/">Return to research</a></noscript>
+<script type="module" src="/assets/continuity/continuity.js"></script></body></html>`);
   await buildWatch(write);
   await buildVerified(write);
   await buildListing(write);

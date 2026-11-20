@@ -10,6 +10,10 @@ An analyst supplies a permissioned domain and up to 20 accounts. The access tool
 
 The forecast assumes the observed credentials and rules persist. Issuer revocation, renewal, domain deletion, network changes and unrelated transaction restrictions can change the outcome. Admission to a domain is only one condition of completing a transaction. The interface labels fictional samples explicitly. Domain owners retain owner access. Reviewer assignment in the issuer sample lasts while the Continuity workspace is open.
 
+## Current suite
+
+The desktop now includes change rehearsal, issuer offboarding, bridge-record reconciliation and borrower concentration. Issuer offboarding uses a validated Mainnet reader. Bridge and lending records remain operator-supplied. See [the suite guide](SUITE.md) and [the concise meeting brief](CYRILLE_BRIEF.md).
+
 ## Change rehearsal
 
 The desktop now links access forecasts to operator-declared activities and deadlines. It distinguishes access problems caused by proposed rule removals from baseline expiry, preserves missing evidence and exports review owners and next actions. Trades, payments, bridge transfers, loans and offboarding are activity labels. The rehearsal evaluates declared domain-access prerequisites. See [the evolution brief](EVOLUTION.md) for examples and remaining integrations.
@@ -75,7 +79,7 @@ Sources
 
 ### What is still missing before institutional rollout?
 
-“Offboarding still uses a fictional fixture. It needs approved customer-to-wallet mappings, a production source for issuer balances and agreed policy inputs. Shared review assignments, authenticated hosted API access, retention controls, deployment review and native release verification need completion for contracted use. We will agree those requirements with the pilot buyer.”
+“Offboarding now reads issuer and holder state at a validated Mainnet ledger. It needs customer validation of wallet mappings and policy inputs. Shared review assignments, authenticated hosted API access, retention controls, deployment review and native release verification need completion for contracted use. We will agree those requirements with the pilot buyer.”
 
 ### Are the findings legally binding or a guarantee of access?
 

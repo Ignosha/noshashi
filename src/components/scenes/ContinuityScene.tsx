@@ -1,31 +1,56 @@
-import { useEffect, useRef, useState } from "react";
-import { mountDesk } from "@/continuity/desk.js";
-import "@/continuity/review.css";
-import { saveTextFile } from "@/lib/export";
+import { useState } from "react";
 import { ContinuityAccess } from "./ContinuityAccess";
-import { Button } from "@/components/ui/button";
+import { ContinuityIssuer } from "./ContinuityIssuer";
+import { ContinuityRecords } from "./ContinuityRecords";
+import "./continuity.css";
 
-function IssuerReview() {
-  const root = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const element = root.current;
-    if (!element) return;
-    mountDesk(element, (name, body) => saveTextFile(name, body, "application/json"));
-    return () => element.replaceChildren();
-  }, []);
-  return <div className="continuity-review" ref={root} />;
-}
+const workspaces = [
+  { id: "change", label: "Change rehearsal" },
+  { id: "issuer", label: "Issuer offboarding" },
+  { id: "bridge", label: "Bridge records" },
+  { id: "lending", label: "Lending exposure" },
+] as const;
 
 export default function ContinuityScene() {
-  const [tool, setTool] = useState("issuer");
-  return <div className="h-full flex flex-col">
-    <nav aria-label="Continuity workspaces" className="flex flex-wrap gap-2 border-b p-3">
-      <Button variant={tool === "issuer" ? "default" : "outline"} aria-pressed={tool === "issuer"} onClick={() => setTool("issuer")}>Issuer review sample</Button>
-      <Button variant={tool === "access" ? "default" : "outline"} aria-pressed={tool === "access"} onClick={() => setTool("access")}>Change rehearsal</Button>
-    </nav>
-    <div className="min-h-0 flex-1">
-      <div hidden={tool !== "issuer"} className="h-full"><IssuerReview /></div>
-      <div hidden={tool !== "access"} className="h-full"><ContinuityAccess /></div>
+  const [tool, setTool] = useState<string>("change");
+  return (
+    <div className="ct-app">
+      <header className="ct-masthead">
+        <div>
+          <h1>NOSHASHI Continuity</h1>
+          <p>Review changes, exceptions and follow-up work</p>
+        </div>
+        <span className="text-xs text-muted-foreground">
+          Development preview
+        </span>
+      </header>
+      <div className="ct-shell">
+        <nav className="ct-nav" aria-label="Continuity workspaces">
+          {workspaces.map((workspace) => (
+            <button
+              key={workspace.id}
+              aria-current={tool === workspace.id ? "page" : undefined}
+              onClick={() => setTool(workspace.id)}
+            >
+              {workspace.label}
+            </button>
+          ))}
+        </nav>
+        <div className="ct-main">
+          <div hidden={tool !== "change"}>
+            <ContinuityAccess />
+          </div>
+          <div hidden={tool !== "issuer"}>
+            <ContinuityIssuer />
+          </div>
+          <div hidden={tool !== "bridge"}>
+            <ContinuityRecords mode="bridge" />
+          </div>
+          <div hidden={tool !== "lending"}>
+            <ContinuityRecords mode="lending" />
+          </div>
+        </div>
+      </div>
     </div>
-  </div>;
+  );
 }
