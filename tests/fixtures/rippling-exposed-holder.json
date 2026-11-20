@@ -1,0 +1,96 @@
+{
+ "source": "https://xrplcluster.com",
+ "ledger_index": 108456726,
+ "read_on": "2026-11-20",
+ "account": "rn964ijXjqm59m3qCPhJjBJzBg7q5161We",
+ "account_info": {
+  "account_data": {
+   "Account": "rn964ijXjqm59m3qCPhJjBJzBg7q5161We",
+   "Balance": "18700000969",
+   "Flags": 0,
+   "LedgerEntryType": "AccountRoot",
+   "OwnerCount": 4,
+   "PreviousTxnID": "AFAFD80533DD928733E51DD3DF8FC5EDC2A244C59A69C845EC7D1B638B4B128A",
+   "PreviousTxnLgrSeq": 106635702,
+   "Sequence": 18,
+   "index": "D26D6167064D7C339447B1B68309B5F47613ED3F1373F96878ACA60AF2E15695"
+  },
+  "account_flags": {
+   "allowTrustLineClawback": false,
+   "allowTrustLineLocking": false,
+   "defaultRipple": false,
+   "depositAuth": false,
+   "disableMasterKey": false,
+   "disallowIncomingCheck": false,
+   "disallowIncomingNFTokenOffer": false,
+   "disallowIncomingPayChan": false,
+   "disallowIncomingTrustline": false,
+   "disallowIncomingXRP": false,
+   "globalFreeze": false,
+   "noFreeze": false,
+   "passwordSpent": false,
+   "requireAuthorization": false,
+   "requireDestinationTag": false
+  },
+  "ledger_hash": "6F2D174C2305252B61FF960FC829219D69627DB575FAEB986AC864F39E0D3B0C",
+  "ledger_index": 108456726,
+  "validated": true,
+  "status": "success"
+ },
+ "lines": [
+  {
+   "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+   "balance": "20",
+   "currency": "USD",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rhMcGkfZ3ezB3wmhT1haTHeUGoYG3WwFoj",
+   "balance": "0",
+   "currency": "USD",
+   "limit": "0",
+   "limit_peer": "100",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rhA9rSoPyaZiPDX1avcHyGj4poMz8hpY6u",
+   "balance": "0",
+   "currency": "USD",
+   "limit": "100",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rhA9rSoPyaZiPDX1avcHyGj4poMz8hpY6u",
+   "balance": "1",
+   "currency": "CAU",
+   "limit": "20000000",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rhA9rSoPyaZiPDX1avcHyGj4poMz8hpY6u",
+   "balance": "1000",
+   "currency": "CGD",
+   "limit": "20000000",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rhMcGkfZ3ezB3wmhT1haTHeUGoYG3WwFoj",
+   "balance": "0",
+   "currency": "BTC",
+   "limit": "0",
+   "limit_peer": "1",
+   "quality_in": 0,
+   "quality_out": 0
+  }
+ ]
+}

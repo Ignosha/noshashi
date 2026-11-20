@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Rippling Exposure API — can your XRPL tokens be swapped without your signature?</title>
+<meta name="description" content="Free check and API: reads every trust line of an XRP Ledger account at one validated ledger and shows which currencies anyone&#39;s payment can move between its own lines at par, how much, and the unsigned NoRipple transactions that close it.">
+<link rel="canonical" href="https://www.noshashi.app/rippling/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/rippling/">
+<meta property="og:title" content="Rippling Exposure API — can your XRPL tokens be swapped without your signature?">
+<meta property="og:description" content="Free check and API: reads every trust line of an XRP Ledger account at one validated ledger and shows which currencies anyone&#39;s payment can move between its own lines at par, how much, and the unsigned NoRipple transactions that close it.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rippling Exposure API — can your XRPL tokens be swapped without your signature?">
+<meta name="twitter:description" content="Free check and API: reads every trust line of an XRP Ledger account at one validated ledger and shows which currencies anyone&#39;s payment can move between its own lines at par, how much, and the unsigned NoRipple transactions that close it.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/c5a81e5a06d4616fef91.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/assets/ledger-mark-512.png","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"Rippling Exposure API","item":"https://www.noshashi.app/rippling/"}]}]}</script>
+<style>
+.pv-form{display:grid;gap:14px;max-width:640px}
+.pv-form textarea{min-height:56px;font:12px "IBM Plex Mono",monospace}
+.pv-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
+.pv-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.pv-price{font:600 30px/1.1 "Space Grotesk",sans-serif;margin:6px 0 4px}
+.pv-badge{min-height:40px;margin:12px 0}
+.pv-badge img{max-width:100%;height:auto}
+.pv-code{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.55 "IBM Plex Mono",monospace;
+  border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;margin:8px 0}
+.pv-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.pv-table th,.pv-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.pv-table td.mono{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.pv-tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.pv-tally div{border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px}
+.pv-tally strong{display:block;font:600 24px/1.1 "Space Grotesk",sans-serif}
+[data-sev="power_used"]{color:var(--bad,#e5484d)}
+[data-sev="key_change"]{color:var(--warn,#f5a524)}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16" cy="16" r="10.6" fill="none" stroke="currentColor" stroke-width=".9" opacity=".5"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="var(--ground)" stroke="var(--ground)" stroke-width="2.2" stroke-linejoin="round"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/products/">Products</a>
+      <a class="nav-link" href="/research/">Research</a>
+      <a class="nav-link" href="/developers/">Developers</a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/">Company</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head">
+  <p class="eyebrow">Rippling Exposure API · new · free to try</p>
+  <h1>Can someone swap your tokens without your signature?</h1>
+  <p>On the XRP Ledger, an account that holds one currency on two trust lines (USD from two issuers, say) can have value moved
+     from one line to the other by anyone's payment, at par, unless it has set NoRipple. Nothing is stolen outright: the account
+     simply ends up holding a different issuer's token than the one it chose. This check reads every trust line at one validated
+     ledger and tells you which currencies can be moved, how much, and the exact unsigned transactions that close it.</p>
+</div>
+<section>
+  <form class="pv-form" id="rp-form" novalidate>
+    <label for="rp-account">Public XRPL account address</label>
+    <input id="rp-account" name="account" type="text" autocomplete="off" spellcheck="false" placeholder="r…" required>
+    <div class="pv-actions"><button class="btn" id="rp-go" type="submit">Check rippling exposure</button>
+      <span class="pv-note">A public address only. Never enter a secret, seed or recovery phrase.</span></div>
+  </form>
+  <p id="rp-status" role="status" class="pv-note" style="margin-top:12px">Enter an address to read it from the ledger.</p>
+  <div id="rp-out" hidden>
+    <div class="pv-tally">
+      <div><span class="pv-note">Verdict</span><strong id="rp-verdict">—</strong></div>
+      <div><span class="pv-note">Role</span><strong id="rp-role">—</strong></div>
+      <div><span class="pv-note">Validated ledger</span><strong id="rp-ledger">—</strong></div>
+      <div><span class="pv-note">Lines read</span><strong id="rp-lines">—</strong></div>
+    </div>
+    <p id="rp-summary"></p>
+    <table class="pv-table"><thead><tr><th>Currency</th><th>Lines open to rippling</th><th>Held on them</th><th>Room to receive</th><th>Can move at par</th></tr></thead>
+      <tbody id="rp-rows"></tbody></table>
+    <ul id="rp-findings" class="pv-note" style="padding-left:18px"></ul>
+    <h2 style="margin-top:24px">Unsigned fix templates</h2>
+    <p class="pv-note">Review, then sign with your own wallet or signing service. NOSHASHI never signs or submits anything.</p>
+    <code class="pv-code" id="rp-fixes">—</code>
+    <p class="pv-note">SHA-256 receipt over the report: <code id="rp-digest">—</code></p>
+  </div>
+
+  <div class="grid g2" style="margin-top:32px">
+    <div class="panel"><p class="num">WHO NEEDS IT</p>
+      <p>Exchanges and custodians whose hot or cold wallets hold the same currency from several issuers; treasuries that
+         hold stablecoins from more than one issuer; wallets that want to warn users before an unwanted swap; and issuers,
+         whose own accounts must ripple (the check flags an issuer with DefaultRipple off, which stops holders paying each other).</p></div>
+    <div class="panel"><p class="num">WHAT IT CHECKS</p>
+      <p>NoRipple on this account's side of each line, the value held on each open line, and the room left under each line's
+         limit, because rippling can only move value into a line that has room. Quality settings are returned with every line.
+         Pages of up to 2,000 lines are read at the same ledger as the account itself.</p></div>
+  </div>
+
+  <h2 style="margin-top:32px">The API</h2>
+  <code class="pv-code">curl -s "https://www.noshashi.app/api/v1/rippling?account=rYourAccount…"</code>
+  <p class="pv-note">Returns <code>verdict</code> (EXPOSED, CLEAR, INCOMPLETE or UNRESOLVED), <code>exposures</code> per currency with
+     <code>movable_at_par</code> and the lines at risk, <code>findings</code> about DefaultRipple, unsigned <code>fixes</code>,
+     the validated <code>ledger_index</code> and server, and a SHA-256 <code>receipt</code>. Free and rate limited per caller.
+     Monitoring many accounts, or an alert when a new open line appears: <a href="/contact/?topic=institutions">talk to us</a>.</p>
+
+  <h2 style="margin-top:32px" id="research">Research note: how common is it?</h2>
+  <p>On 20 November 2026 we read the trust lines of twelve accounts drawn from the largest holders on the first page of
+     Bitstamp's USD issuer. Five could have a currency moved between their own lines at par, from 2 to 102 units each. Seven could
+     not: several held the same currency on many open lines, but none of those lines had room left under its limit, so nothing
+     could ripple in. Holding a currency on several open lines is not, on its own, exposure; room to receive is what makes it so.
+     No account is named here; anyone can repeat the reading with the check above.</p>
+  <p class="pv-note">A reading of ledger facts at one ledger index. Not a security audit, legal opinion or guarantee. NOSHASHI is
+     independent and not affiliated with Ripple, Bitstamp or the XRPL Foundation.</p>
+</section>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Products</p><a href="/products/">All products</a><a href="/continuity/">Continuity · deposit reconciliation</a><a href="/rippling/">Rippling Exposure API</a><a href="/presign-guard/">Pre-Sign Guard</a><a href="/watch/">Issuer Watch</a><a href="/verified/">Verified Issuer</a><a href="/listing-review/">Listing review</a><a href="/history/">Issuer history</a><a href="/evidence-report/">Ledger Evidence Report</a></div>
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/terminal/">Cloud Terminal · public beta</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/tokens/">XRPL token directory</a><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a><a href="/rippling/">Rippling exposure check</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/intelligence/">Intelligence &amp; briefs</a><a href="/news/">External headlines</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/partners/">Partner programs</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/inline/bcc3def980433d959e62.js"></script>
+</body>
+</html>

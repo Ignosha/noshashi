@@ -38,20 +38,29 @@ export { MARK };
 // of them (see FOOTER_GROUPS), so a visitor never has to scan a dozen
 // links to find where to start.
 export const NAV = [
-  { href: "/intelligence/", label: "Intelligence", key: "intelligence" },
-  { href: "/platform/", label: "Platform", key: "platform", i18n: "nav.platform" },
-  { href: "/solutions/", label: "Solutions", key: "solutions", i18n: "nav.solutions" },
-  { href: "/institutional-demo/", label: "Demo", key: "demo", i18n: "nav.demo2" },
+  { href: "/products/", label: "Products", key: "products" },
+  { href: "/research/", label: "Research", key: "research" },
+  { href: "/developers/", label: "Developers", key: "developers" },
   { href: "/#public", label: "Free tools", i18n: "nav.tools", optional: true },
-  { href: "/resources/", label: "Resources", key: "resources", i18n: "nav.resources" },
   { href: "/pricing/", label: "Pricing", i18n: "nav.pricing" },
-  { href: "/about/", label: "About", key: "about", i18n: "nav.about", optional: true, wide: true },
+  { href: "/about/", label: "Company", key: "about", optional: true, wide: true },
 ];
 
 // The footer is the full map of the site, grouped by the same six
 // destinations so a technical page is always findable without crowding
 // the header.
 export const FOOTER_GROUPS = [
+  { title: "Products", links: [
+    { href: "/products/", label: "All products" },
+    { href: "/continuity/", label: "Continuity · deposit reconciliation" },
+    { href: "/rippling/", label: "Rippling Exposure API" },
+    { href: "/presign-guard/", label: "Pre-Sign Guard" },
+    { href: "/watch/", label: "Issuer Watch" },
+    { href: "/verified/", label: "Verified Issuer" },
+    { href: "/listing-review/", label: "Listing review" },
+    { href: "/history/", label: "Issuer history" },
+    { href: "/evidence-report/", label: "Ledger Evidence Report" },
+  ] },
   { title: "Platform", links: [
     { href: "/platform/", label: "Platform overview" },
     { href: "/terminal/", label: "Cloud Terminal · public beta" },
@@ -81,6 +90,7 @@ export const FOOTER_GROUPS = [
     { href: "/delivered/", label: "Delivered-amount export" },
     { href: "/treasury/", label: "Treasury report" },
     { href: "/book-health/", label: "Book health" },
+    { href: "/rippling/", label: "Rippling exposure check" },
   ] },
   { title: "Resources", links: [
     { href: "/resources/", label: "All resources" },

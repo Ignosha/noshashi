@@ -1,0 +1,322 @@
+{
+ "source": "https://xrplcluster.com",
+ "ledger_index": 108456726,
+ "read_on": "2026-11-20",
+ "account": "rMZKeAt1vMjhuNCWDiB4SdzJRiymdpERw4",
+ "account_info": {
+  "account_data": {
+   "Account": "rMZKeAt1vMjhuNCWDiB4SdzJRiymdpERw4",
+   "Balance": "10742957088",
+   "Flags": 0,
+   "LedgerEntryType": "AccountRoot",
+   "OwnerCount": 43,
+   "PreviousTxnID": "714B817BF23AC6EB3E2894D5FA986A4A089CF2252180C96B779096D8D70F3AD0",
+   "PreviousTxnLgrSeq": 106559713,
+   "Sequence": 5674,
+   "index": "546688891447A84C1E96132571DBFD8A51EAC401ECD5BA2C0345AE9E9C4C75FB"
+  },
+  "account_flags": {
+   "allowTrustLineClawback": false,
+   "allowTrustLineLocking": false,
+   "defaultRipple": false,
+   "depositAuth": false,
+   "disableMasterKey": false,
+   "disallowIncomingCheck": false,
+   "disallowIncomingNFTokenOffer": false,
+   "disallowIncomingPayChan": false,
+   "disallowIncomingTrustline": false,
+   "disallowIncomingXRP": false,
+   "globalFreeze": false,
+   "noFreeze": false,
+   "passwordSpent": false,
+   "requireAuthorization": false,
+   "requireDestinationTag": false
+  },
+  "ledger_hash": "6F2D174C2305252B61FF960FC829219D69627DB575FAEB986AC864F39E0D3B0C",
+  "ledger_index": 108456726,
+  "validated": true,
+  "status": "success"
+ },
+ "lines": [
+  {
+   "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+   "balance": "17651.09704977037",
+   "currency": "USD",
+   "limit": "1000",
+   "limit_peer": "0",
+   "quality_in": 980000000,
+   "quality_out": 1010000000
+  },
+  {
+   "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+   "balance": "0",
+   "currency": "BTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 950000000,
+   "quality_out": 0
+  },
+  {
+   "account": "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+   "balance": "2.372163114117756",
+   "currency": "BTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 1010000000
+  },
+  {
+   "account": "rGwUWgN5BEg3QGNY3RX2HfYowjUTZdid3E",
+   "balance": "0",
+   "currency": "DYM",
+   "limit": "2",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+   "balance": "57.56239285551401",
+   "currency": "TRC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+   "balance": "0",
+   "currency": "LTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+   "balance": "0",
+   "currency": "NMC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun",
+   "balance": "0",
+   "currency": "EUR",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun",
+   "balance": "0",
+   "currency": "USD",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rnuF96W4SZoCJmbHYBFoJZpR8eCaxNvekK",
+   "balance": "0",
+   "currency": "CNY",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rnuF96W4SZoCJmbHYBFoJZpR8eCaxNvekK",
+   "balance": "0",
+   "currency": "BTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 950000000,
+   "quality_out": 0
+  },
+  {
+   "account": "rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun",
+   "balance": "0",
+   "currency": "BTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 950000000,
+   "quality_out": 0
+  },
+  {
+   "account": "rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun",
+   "balance": "0",
+   "currency": "LTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rnuF96W4SZoCJmbHYBFoJZpR8eCaxNvekK",
+   "balance": "0",
+   "currency": "LTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rJHygWcTLVpSXkowott6kzgZU6viQSVYM1",
+   "balance": "0",
+   "currency": "LTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rNPRNzBB92BVpAhhZr4iXDTveCgV5Pofm9",
+   "balance": "0",
+   "currency": "BTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rNPRNzBB92BVpAhhZr4iXDTveCgV5Pofm9",
+   "balance": "0",
+   "currency": "ILS",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "razqQKzJRdB4UxFPWf5NEpEG3WMkmwgcXA",
+   "balance": "0",
+   "currency": "CNY",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rNPRNzBB92BVpAhhZr4iXDTveCgV5Pofm9",
+   "balance": "0",
+   "currency": "LTC",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+   "balance": "0",
+   "currency": "USD",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "ra9eZxMbJrUcgV8ui7aPc161FgrqWScQxV",
+   "balance": "0.02891485714285715",
+   "currency": "USD",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rE7CNMbxwvTQrqSEjbcXCrqeN6EZga1ApU",
+   "balance": "0",
+   "currency": "CNY",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rNF5qUPCcge7uSStj6oKuoQs38BaM8362s",
+   "balance": "0.000013773",
+   "currency": "TBL",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rPDXxSZcuVL3ZWoyU82bcde3zwvmShkRyF",
+   "balance": "14.92593087085096",
+   "currency": "USD",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH",
+   "balance": "0",
+   "currency": "XAG",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH",
+   "balance": "0",
+   "currency": "XPT",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH",
+   "balance": "0",
+   "currency": "XAU",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "r3ADD8kXSUKHd6zTCKfnKT3zV9EZHjzp1S",
+   "balance": "0",
+   "currency": "CAD",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH",
+   "balance": "0",
+   "currency": "USD",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rsP3mgGb2tcYUrxiLFiHJiQXhsziegtwBc",
+   "balance": "4.316650440987551",
+   "currency": "NZD",
+   "limit": "0",
+   "limit_peer": "0",
+   "quality_in": 0,
+   "quality_out": 0
+  },
+  {
+   "account": "rDUX18X1ivc2E7eL31Kp7tfiyNgykuRZt3",
+   "balance": "0",
+   "currency": "USD",
+   "limit": "0",
+   "limit_peer": "0",
+   "no_ripple": true,
+   "quality_in": 0,
+   "quality_out": 0
+  }
+ ]
+}

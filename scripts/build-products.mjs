@@ -16,6 +16,8 @@
  *                         tools/continuity/ so the two never drift.
  *   /presign-guard/       Pre-Sign Guard: the Fireblocks Co-signer Callback
  *                         Handler in tools/presign-guard/ (added 2026-11-19).
+ *   /products/            The catalogue of everything above (2026-11-20).
+ *   /rippling/            The Rippling Exposure check and API (2026-11-20).
  *
  * Every figure the pages show is read live by the visitor's browser from
  * NOSHASHI's public endpoints (/api/badge, /api/issuer-history); nothing
@@ -42,6 +44,8 @@ export const PRODUCT_SALES_PAGES = [
   ["/history/", "weekly", "0.7"],
   ["/continuity/", "monthly", "0.6"],
   ["/presign-guard/", "monthly", "0.6"],
+  ["/products/", "weekly", "0.9"],
+  ["/rippling/", "weekly", "0.8"],
 ];
 
 const CSS = `<style>
@@ -397,6 +401,23 @@ export async function continuityBody() {
   return m[1].trim();
 }
 
+/** How Continuity works, shown above the rehearsal. Describes only what tools/continuity does. */
+const CONTINUITY_SHOWCASE = `<section class="ct-show" aria-labelledby="ct-show-t">
+  <h2 id="ct-show-t" class="sr-only">How Continuity works</h2>
+  <ol class="ct-steps">
+    <li><span class="num">01 / THE LEDGER</span><b>Read the deposit twice.</b>
+      The transaction is fetched from two public Mainnet servers, s1 and s2.ripple.com, and their replies must match: validated,
+      successful, and the same delivered amount, token and issuer.</li>
+    <li><span class="num">02 / YOUR BOOKS</span><b>Read what you credited.</b>
+      Posted credits come from your export or, with the open-source adapter, from a read-only SQLite view on your own
+      machine, over loopback. They never leave the device.</li>
+    <li><span class="num">03 / THE ANSWER</span><b>Exactly once, or why not.</b>
+      Right token from the right issuer, the amount actually delivered, one credit. A short delivery, a token from another
+      issuer, a duplicate credit or a missing one is named, and the evidence can be exported.</li>
+  </ol>
+  <p class="ct-note">Built for exchanges, payment firms and custodians crediting RLUSD, EUR or any issued token. XRP payments are refused with a reason.</p>
+</section>`;
+
 async function buildContinuity(write) {
   const script = await readFile(new URL("continuity.js", CONTINUITY_DIR), "utf8");
   await write("assets/continuity.js", script);
@@ -408,10 +429,16 @@ async function buildContinuity(write) {
 .ct p label{display:inline;margin:0}
 .ct button{margin:4px 8px 4px 0}
 .ct-note{color:var(--muted);font-size:13px;line-height:1.6;max-width:72ch}
+.ct-show{margin:8px 0 28px}
+.ct-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.ct-steps li{border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.ct-steps .num{display:block;font:11px "IBM Plex Mono",monospace;letter-spacing:.06em;margin-bottom:6px}
+.ct-steps b{display:block;color:var(--ink);font:600 16px/1.3 "Space Grotesk",sans-serif;margin-bottom:4px}
 </style>`;
   const body = (await continuityBody())
     .replace(/<h1>/, `<div class="page-head"><p class="eyebrow">Ledger Desk · Continuity</p><h1>`)
-    .replace(/<\/h1>/, "</h1></div><section class=\"ct\">")
+    // The intro paragraph joins the page head; the steps follow it, then the rehearsal.
+    .replace(/<\/h1>\s*(<p>[\s\S]*?<\/p>)/, (_, intro) => `</h1>${intro}</div>${CONTINUITY_SHOWCASE}<section class="ct">`)
     .replace(/<button /g, '<button class="btn ghost" ')
     .replace(/<button class="btn ghost" id="verify"/, '<button class="btn" id="verify"');
   await write("continuity/index.html", renderPage({
@@ -512,7 +539,202 @@ async function buildPresignGuard(write) {
   }));
 }
 
+/* ── /rippling/ ─────────────────────────────────────────────────── */
+/*
+ * The Rippling Exposure check: api/_lib/routes/rippling.js, served at
+ * /api/v1/rippling. The page reads the visitor's own address live; the
+ * research note quotes the sample read on 2026-11-20 as counts only, with
+ * no account named.
+ */
+async function buildRippling(write) {
+  const body = `<div class="page-head">
+  <p class="eyebrow">Rippling Exposure API · new · free to try</p>
+  <h1>Can someone swap your tokens without your signature?</h1>
+  <p>On the XRP Ledger, an account that holds one currency on two trust lines (USD from two issuers, say) can have value moved
+     from one line to the other by anyone's payment, at par, unless it has set NoRipple. Nothing is stolen outright: the account
+     simply ends up holding a different issuer's token than the one it chose. This check reads every trust line at one validated
+     ledger and tells you which currencies can be moved, how much, and the exact unsigned transactions that close it.</p>
+</div>
+<section>
+  <form class="pv-form" id="rp-form" novalidate>
+    <label for="rp-account">Public XRPL account address</label>
+    <input id="rp-account" name="account" type="text" autocomplete="off" spellcheck="false" placeholder="r…" required>
+    <div class="pv-actions"><button class="btn" id="rp-go" type="submit">Check rippling exposure</button>
+      <span class="pv-note">A public address only. Never enter a secret, seed or recovery phrase.</span></div>
+  </form>
+  <p id="rp-status" role="status" class="pv-note" style="margin-top:12px">Enter an address to read it from the ledger.</p>
+  <div id="rp-out" hidden>
+    <div class="pv-tally">
+      <div><span class="pv-note">Verdict</span><strong id="rp-verdict">—</strong></div>
+      <div><span class="pv-note">Role</span><strong id="rp-role">—</strong></div>
+      <div><span class="pv-note">Validated ledger</span><strong id="rp-ledger">—</strong></div>
+      <div><span class="pv-note">Lines read</span><strong id="rp-lines">—</strong></div>
+    </div>
+    <p id="rp-summary"></p>
+    <table class="pv-table"><thead><tr><th>Currency</th><th>Lines open to rippling</th><th>Held on them</th><th>Room to receive</th><th>Can move at par</th></tr></thead>
+      <tbody id="rp-rows"></tbody></table>
+    <ul id="rp-findings" class="pv-note" style="padding-left:18px"></ul>
+    <h2 style="margin-top:24px">Unsigned fix templates</h2>
+    <p class="pv-note">Review, then sign with your own wallet or signing service. NOSHASHI never signs or submits anything.</p>
+    <code class="pv-code" id="rp-fixes">—</code>
+    <p class="pv-note">SHA-256 receipt over the report: <code id="rp-digest">—</code></p>
+  </div>
+
+  <div class="grid g2" style="margin-top:32px">
+    <div class="panel"><p class="num">WHO NEEDS IT</p>
+      <p>Exchanges and custodians whose hot or cold wallets hold the same currency from several issuers; treasuries that
+         hold stablecoins from more than one issuer; wallets that want to warn users before an unwanted swap; and issuers,
+         whose own accounts must ripple (the check flags an issuer with DefaultRipple off, which stops holders paying each other).</p></div>
+    <div class="panel"><p class="num">WHAT IT CHECKS</p>
+      <p>NoRipple on this account's side of each line, the value held on each open line, and the room left under each line's
+         limit, because rippling can only move value into a line that has room. Quality settings are returned with every line.
+         Pages of up to 2,000 lines are read at the same ledger as the account itself.</p></div>
+  </div>
+
+  <h2 style="margin-top:32px">The API</h2>
+  <code class="pv-code">curl -s "https://www.noshashi.app/api/v1/rippling?account=rYourAccount…"</code>
+  <p class="pv-note">Returns <code>verdict</code> (EXPOSED, CLEAR, INCOMPLETE or UNRESOLVED), <code>exposures</code> per currency with
+     <code>movable_at_par</code> and the lines at risk, <code>findings</code> about DefaultRipple, unsigned <code>fixes</code>,
+     the validated <code>ledger_index</code> and server, and a SHA-256 <code>receipt</code>. Free and rate limited per caller.
+     Monitoring many accounts, or an alert when a new open line appears: <a href="/contact/?topic=institutions">talk to us</a>.</p>
+
+  <h2 style="margin-top:32px" id="research">Research note: how common is it?</h2>
+  <p>On 20 November 2026 we read the trust lines of twelve accounts drawn from the largest holders on the first page of
+     Bitstamp's USD issuer. Five could have a currency moved between their own lines at par, from 2 to 102 units each. Seven could
+     not: several held the same currency on many open lines, but none of those lines had room left under its limit, so nothing
+     could ripple in. Holding a currency on several open lines is not, on its own, exposure; room to receive is what makes it so.
+     No account is named here; anyone can repeat the reading with the check above.</p>
+  <p class="pv-note">A reading of ledger facts at one ledger index. Not a security audit, legal opinion or guarantee. NOSHASHI is
+     independent and not affiliated with Ripple, Bitstamp or the XRPL Foundation.</p>
+</section>`;
+
+  const script = `<script>
+(function(){${COMMON}
+  var f=document.getElementById("rp-form"), st=document.getElementById("rp-status"), out=document.getElementById("rp-out"), go=document.getElementById("rp-go");
+  function cell(t){var td=document.createElement("td");td.textContent=t;return td;}
+  function show(b){
+    out.hidden=false;
+    document.getElementById("rp-verdict").textContent=b.verdict;
+    document.getElementById("rp-role").textContent=b.role;
+    document.getElementById("rp-ledger").textContent=Number(b.ledger_index).toLocaleString("en-US");
+    document.getElementById("rp-lines").textContent=b.coverage.lines_read+(b.coverage.truncated?"+":"");
+    document.getElementById("rp-summary").textContent=b.summary;
+    var rows=document.getElementById("rp-rows"); rows.textContent="";
+    (b.exposures||[]).forEach(function(e){var tr=document.createElement("tr");
+      [e.currency_display,String(e.open_lines),e.held_on_open_lines,e.receiving_room,e.exposed?e.movable_at_par:"0 (no room)"].forEach(function(v){tr.appendChild(cell(v));});
+      rows.appendChild(tr);});
+    if(!rows.children.length){var tr=document.createElement("tr");var td=cell("No currency is held on two or more lines open to rippling.");td.colSpan=5;tr.appendChild(td);rows.appendChild(tr);}
+    var fl=document.getElementById("rp-findings"); fl.textContent="";
+    (b.findings||[]).forEach(function(x){var li=document.createElement("li");li.textContent=x.detail;fl.appendChild(li);});
+    document.getElementById("rp-fixes").textContent=(b.fixes&&b.fixes.length)?JSON.stringify(b.fixes,null,2):"Nothing to fix.";
+    document.getElementById("rp-digest").textContent=b.receipt?b.receipt.digest:"—";
+  }
+  f.addEventListener("submit",function(e){
+    e.preventDefault();
+    var a=f.account.value.trim();
+    if(!ADDRESS.test(a)){say(st,"Enter a public XRPL address. It begins with r.","bad");return;}
+    go.disabled=true; say(st,"Reading every trust line at one validated ledger…","");
+    fetch("/api/v1/rippling?account="+encodeURIComponent(a),{headers:{Accept:"application/json"}})
+      .then(function(r){return r.json().then(function(b){if(!r.ok)throw new Error(b.error||"The ledger could not be read.");return b;});})
+      .then(function(b){show(b);say(st,"Read from "+b.source+" at "+b.observed_at+".","");
+        try{history.replaceState(null,"","?account="+encodeURIComponent(a));}catch(_){}})
+      .catch(function(err){say(st,err.message,"bad");})
+      .then(function(){go.disabled=false;});
+  });
+  try{var q=new URLSearchParams(location.search).get("account");if(q&&ADDRESS.test(q)){f.account.value=q;f.requestSubmit?f.requestSubmit():null;}}catch(e){}
+})();
+</script>`;
+
+  await write("rippling/index.html", renderPage({
+    title: "Rippling Exposure API — can your XRPL tokens be swapped without your signature?",
+    description: "Free check and API: reads every trust line of an XRP Ledger account at one validated ledger and shows which currencies anyone's payment can move between its own lines at par, how much, and the unsigned NoRipple transactions that close it.",
+    path: "/rippling/",
+    head: CSS,
+    body,
+    scripts: script,
+    structured: [breadcrumb("Rippling Exposure API", "/rippling/")],
+  }));
+}
+
+/* ── /products/ ─────────────────────────────────────────────────── */
+/*
+ * The catalogue. Each entry names only what exists in this repository,
+ * with the price the checkout charges or the word "free"; nothing is
+ * promised that is not built.
+ */
+export const PRODUCTS = [
+  { href: "/continuity/", name: "Continuity", tag: "Featured build · deposit reconciliation", price: "Free rehearsal · operator adapter open source",
+    text: "Check that one issued-token deposit was credited to your customers exactly once, for the right token and amount, read from two Mainnet servers against your own posted credits." },
+  { href: "/rippling/", name: "Rippling Exposure API", tag: "New · API", price: "Free, rate limited",
+    text: "Find the currencies anyone's payment can swap between an account's own trust lines, how much can move, and the unsigned NoRipple fixes." },
+  { href: "/presign-guard/", name: "Pre-Sign Guard", tag: "Self-hosted · institutions", price: "Open source",
+    text: "APPROVE, REJECT or RETRY before an XRPL transaction is signed: a Fireblocks Co-signer Callback Handler, or /v1/check for any signer." },
+  { href: "/watch/", name: "Issuer Watch", tag: "Alerts", price: `${WATCH} a month per token`,
+    text: "An email the moment a token's issuer switches on a freeze, enables clawback, changes its keys or its fee." },
+  { href: "/verified/", name: "Verified Issuer", tag: "For token issuers", price: `${VERIFIED} a month`,
+    text: "A live badge that reads the issuer's powers from the ledger, and a report every month." },
+  { href: "/listing-review/", name: "Listing review", tag: "For exchanges and launchpads", price: LISTING,
+    text: "A review of a token's issuer, supply and liquidity before you list it." },
+  { href: "/history/", name: "Issuer history", tag: "Reader and report", price: `Free reader · ${HISTORY} report`,
+    text: "Every change an issuer has made to its powers, from the ledger's own history." },
+  { href: "/evidence-report/", name: "Ledger Evidence Report", tag: "Evidence for audits and partners", price: "From $250",
+    text: "A PDF of issuer controls, treasury holdings and real versus advertised depth, with an evidence file and a fingerprint anyone can verify." },
+  { href: "/developers/", name: "Compliance & Asset Risk APIs", tag: "Developers", price: "Prepaid checks from about $0.04",
+    text: "Screening, issuer authority, settlement checks and asset risk as JSON, each answer with its ledger index and a SHA-256 receipt." },
+];
+
+async function buildProductsHub(write) {
+  const cards = PRODUCTS.map((p, i) => `
+    <a class="panel vx-card${i === 0 ? " vx-featured" : ""}" href="${p.href}">
+      <p class="num">${String(i + 1).padStart(2, "0")} / ${p.tag.toUpperCase()}</p>
+      <h2>${p.name}</h2>
+      <p>${p.text}</p>
+      <p class="pv-note"><b>${p.price}</b> <span aria-hidden="true">→</span></p>
+    </a>`).join("");
+  const body = `<div class="page-head">
+  <p class="eyebrow">NOSHASHI · products for the XRP Ledger</p>
+  <h1>Products that read the ledger, not the label.</h1>
+  <p>Every product reads validated XRP Ledger state, returns the ledger index it read and a SHA-256 receipt, and never holds keys,
+     signs or moves funds. The research behind them is published under <a href="/research/">Research</a>, and each product page says
+     what it costs and what it does not do.</p>
+</div>
+<section>
+  <div class="vx-grid">${cards}
+  </div>
+  <h2 style="margin-top:36px">Buying from NOSHASHI</h2>
+  <div class="grid g2">
+    <div class="panel"><p class="num">FOR PROCUREMENT</p>
+      <p>Read-only by design: no custody, no keys, no signing. Source code is public. Security practices, data handling and
+         sub-processors are on <a href="/trust/">Trust &amp; security</a>; terms on <a href="/legal/">Legal</a>.
+         Invoices and bank transfer on request.</p></div>
+    <div class="panel"><p class="num">WHAT WE DO NOT CLAIM</p>
+      <p>No SOC 2 report yet, no customer logos, no audit opinions. A NOSHASHI record is a reading of ledger facts at a stated
+         ledger index, not legal, compliance or investment advice.</p></div>
+  </div>
+  <p style="margin-top:20px"><a class="btn" href="/contact/?topic=institutions">Talk to us</a> <a class="btn ghost" href="/research/">Read the research</a></p>
+</section>`;
+  const css = `${CSS}<style>
+.vx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.vx-card{display:block;color:inherit;text-decoration:none;transition:border-color .2s}
+.vx-card:hover,.vx-card:focus-visible{border-color:var(--ink)}
+.vx-card h2{font-size:20px;margin:6px 0 8px}
+.vx-featured{grid-column:1/-1;border-color:var(--ink)}
+.vx-featured h2{font-size:26px}
+</style>`;
+  await write("products/index.html", renderPage({
+    title: "Products — XRP Ledger compliance, reconciliation and evidence | NOSHASHI",
+    description: "NOSHASHI's products for the XRP Ledger: Continuity deposit reconciliation, the Rippling Exposure API, Pre-Sign Guard, Issuer Watch, Verified Issuer, listing reviews, issuer history and Ledger Evidence Reports. Read-only, with a receipt for every answer.",
+    path: "/products/",
+    current: "products",
+    head: css,
+    body,
+    structured: [breadcrumb("Products", "/products/")],
+  }));
+}
+
 export async function buildProducts(write) {
+  await buildProductsHub(write);
+  await buildRippling(write);
   await buildPresignGuard(write);
   await buildContinuity(write);
   await buildWatch(write);
