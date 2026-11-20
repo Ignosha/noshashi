@@ -161,7 +161,7 @@ export const TUTORIALS = [
       ["type", "#pv-issuer", RLUSD],
       ["click", "#pv-badge-form button[type=submit]"],
       ["wait", "#pv-badge-out:not([hidden])"],
-      ["pause", 2500],
+      ["live", "badge-local"],
       ["scroll", "#pv-badge-out"],
       ["say", "Here is the live badge for Ripple's RLUSD issuer, with the HTML and Markdown to paste on your own site."],
     ],

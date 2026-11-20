@@ -127,6 +127,16 @@ const LIVE = {
     s.credits.push({ ...s.credits[0] });
     await page.fill("#data", JSON.stringify(s, null, 2));
   },
+  // On noshashi.app the badge image is same-origin. The local preview's CSP
+  // (img-src 'self') blocks the absolute production URL, so the same live
+  // endpoint is loaded from the preview instead.
+  async "badge-local"(page) {
+    await page.evaluate((base) => {
+      const img = document.querySelector("#pv-badge-img img");
+      if (img) { const u = new URL(img.src); img.src = base + u.pathname + u.search; }
+    }, BASE);
+    await page.waitForFunction(() => { const i = document.querySelector("#pv-badge-img img"); return i && i.complete && i.naturalWidth > 0; }, null, { timeout: 45000 });
+  },
   async "api-raw"(page) {
     await page.goto(BASE + "/api/v1/rippling?account=rPvuCxw1m8u2SWTqtRN6ZEcb1xPbU4cPFR", { waitUntil: "load" });
     await page.waitForFunction(() => /"verdict"/.test(document.body.innerText), null, { timeout: 45000 });
