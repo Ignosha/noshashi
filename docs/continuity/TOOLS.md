@@ -21,7 +21,7 @@ Partial reads, missing domains and network failures stop the portfolio result. T
 
 ## Verification
 
-Run npm run build for the desktop frontend and npm test -- tests/continuity-rehearsal.test.js tests/continuity-access.test.js tests/continuity-registry-read.test.js tests/continuity.test.js src/lib/compliance/__tests__/registry.test.ts for related policy tests. Native macOS signing, notarization and physical Intel Mac testing remain separate release checks. The sample issuer review still needs a production balance reader and durable team workflow before contracted use.
+Run npm run build for the desktop frontend and npm test -- tests/continuity-decision-pack.test.js tests/continuity-rehearsal.test.js tests/continuity-access.test.js tests/continuity-registry-read.test.js tests/continuity.test.js src/lib/compliance/__tests__/registry.test.ts for related policy tests. Native macOS signing, notarization and physical Intel Mac testing remain separate release checks. The sample issuer review still needs a production balance reader and durable team workflow before contracted use.
 
 ## Protocol references
 
@@ -30,3 +30,9 @@ Run npm run build for the desktop frontend and npm test -- tests/continuity-rehe
 - [Permissioned DEX behavior after credential and rule changes](https://xrpl.org/docs/concepts/tokens/decentralized-exchange/permissioned-dexes)
 
 See [the product evolution and demonstration](EVOLUTION.md) for the combined workflow and scope.
+
+## Decision package
+
+Export decision report saves a printable HTML report and its companion evidence JSON using the same captured inputs. Reopen saved rehearsal accepts a version 1 rehearsal file up to 2 MB, verifies its SHA-256 digest, validates its input schema and recomputes findings. Import failures preserve the open review. Reopened observations are labeled as imported and require independent source verification. Review owners, next actions, activities, proposed rules and the horizon are restored.
+
+The report and interface show coverage of declared prerequisites, baseline access gaps, missing evidence and unassigned follow-up work. See [quality and pricing](QUALITY_AND_PRICING.md) for delivery scope.

@@ -87,7 +87,7 @@ Sources
 
 ### What is the business model?
 
-“An analyst can use Pro for recurring reviews. Institutional would cover a team workflow and agreed scope. Enterprise would cover multiple entities and integrations. I propose a $5,000 pilot to establish fit, followed by a subscription only if we show value. The pricing requires buyer validation.”
+“An analyst can use Pro for recurring reviews. Institutional would cover a team workflow and agreed scope. Enterprise would cover multiple entities and integrations. I propose a $10,000 enhanced pilot to establish fit, followed by a subscription only if we show value. The pricing requires buyer validation.”
 
 ### Why start with XRP Ledger?
 
@@ -103,7 +103,7 @@ Sources
 
 ## A pilot with a decision at the end
 
-Proposed scope is one institution, one issuer asset for an offboarding replay, one permissioned domain and up to 20 accounts for access analysis. Offboarding production data collection must be implemented and reviewed before processing customer records. Use anonymized case references wherever practical.
+The enhanced pilot scope is one institution, one permissioned domain, up to 20 accounts and three review cycles over four weeks. It includes two training sessions, printable decision reports, saved rehearsal verification and an outcome report. A sample offboarding demonstration can introduce future workflows. Production offboarding collection requires separate implementation and scope. Use anonymized case references wherever practical.
 
 Agree the baseline, test cases and acceptance criteria before the pilot begins. Candidate thresholds below are proposals.
 

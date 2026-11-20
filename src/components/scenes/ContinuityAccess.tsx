@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Panel } from "@/components/nova/Panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import {
   validatedLedger, type CredentialEntry, type DomainEntry, type LedgerAt,
 } from "@/lib/compliance/registry";
 import { compareDomainRules, forecastAccess } from "@/lib/continuity/access";
+import { renderDecisionReport, verifyDecisionPack } from "@/lib/continuity/decisionPack";
 import { ContinuityWork } from "./ContinuityWork";
 import { sampleAccounts, sampleDomain, sampleTime } from "@/lib/continuity/sample";
 
@@ -23,6 +24,10 @@ const sample: Portfolio = {
 };
 
 export function ContinuityAccess() {
+  const [restored, setRestored] = useState<Awaited<ReturnType<typeof verifyDecisionPack>> | null>(null);
+  const [revision, setRevision] = useState(0);
+  const restoreInput = useRef<HTMLInputElement>(null);
+  const [restoring, setRestoring] = useState(false);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(sample);
   const [domainId, setDomainId] = useState("");
   const [accounts, setAccounts] = useState("");
@@ -37,17 +42,20 @@ export function ContinuityAccess() {
     const proposed = portfolio.domain.accepted.filter((_, index) => !removed.includes(index));
     return {
       source: portfolio.source, ledger: portfolio.ledger, closeTime: portfolio.closeTime,
+      provenance: restored ? "Imported observations. File integrity and calculation replay checked. Source authenticity requires a fresh ledger read."
+        : portfolio.source === "fictional sample" ? "Fictional sample observations." : "Read from Mainnet in this workspace at the stated ledger index.",
       domain: portfolio.domain, proposedRules: proposed, horizonDays: horizon,
       accounts: portfolio.accounts.map(item => {
         const input = { ...item, domain: portfolio.domain, closeTime: portfolio.closeTime, horizonDays: horizon };
         return { ...item, forecast: forecastAccess(input), ruleImpact: proposed.length ? compareDomainRules(input, proposed) : null };
       }),
     };
-  }, [portfolio, removed, horizon, validHorizon]);
+  }, [portfolio, removed, horizon, validHorizon, restored]);
 
   async function read() {
     setMessage("");
     setPortfolio(null);
+    setRestored(null);
     const list = [...new Set(accounts.split(/[\s,]+/).filter(Boolean))];
     if (!isDomainId(domainId) || !list.length || list.length > 20 || list.some(account => !isAddress(account))) {
       setMessage("Enter a domain ID and 1–20 distinct classic account addresses.");
@@ -67,11 +75,29 @@ export function ContinuityAccess() {
     } finally { setBusy(false); }
   }
 
+  async function restoreFile(file?: File) {
+    if (!file) return;
+    setRestoring(true);
+    try {
+      if (file.size > 2000000) throw new Error("Maximum saved review size is 2 MB.");
+      const verified = await verifyDecisionPack(JSON.parse(await file.text()));
+      setPortfolio({ ...verified.snapshot, source: verified.source, ledger: verified.ledger });
+      setDomainId(verified.snapshot.domain.domainId);
+      setAccounts(verified.snapshot.accounts.map(item => item.account).join("\n"));
+      setHorizon(verified.horizonDays);
+      setRemoved(verified.snapshot.domain.accepted.flatMap((rule, index) => verified.proposedRules.some(candidate => candidate.issuer === rule.issuer && candidate.typeHex === rule.typeHex) ? [] : [index]));
+      setRestored(verified);
+      setRevision(value => value + 1);
+      setMessage("Saved review reopened. Digest and replay match. Source observations need independent verification.");
+    } catch (error) { setMessage(error instanceof Error ? error.message : "Unable to reopen review."); }
+    finally { setRestoring(false); }
+  }
+
   async function exportReport() {
     if (!report) return;
     setExporting(true);
     try {
-      const evidence = { version: 1, ...report };
+      const evidence = { version: 1 as const, ...report };
       const digest = await sha256Hex(canonical(evidence));
       await saveTextFile("continuity-access-review.json", JSON.stringify({ evidence, sha256: digest }, null, 2), "application/json");
       setMessage("Saved access review and SHA-256 digest.");
@@ -84,17 +110,20 @@ export function ContinuityAccess() {
       <h2 className="text-xl mb-2">Rehearse a change before your team acts</h2>
       <p className="text-sm text-muted-foreground">Forecast credential expiry and test a proposed removal of credential rules. Select a domain and accounts to read from XRPL Mainnet.</p>
       <form className="mt-4 space-y-3" onSubmit={event => { event.preventDefault(); void read(); }}>
-        <label className="block text-sm">Permissioned domain ID<Input value={domainId} onChange={event => { setDomainId(event.target.value); setPortfolio(null); }} disabled={busy} /></label>
-        <label className="block text-sm">Accounts, separated by spaces or commas<textarea className="block w-full rounded border bg-background p-2 mt-1" rows={3} value={accounts} disabled={busy} onChange={event => { setAccounts(event.target.value); setPortfolio(null); }} /></label>
+        <label className="block text-sm">Permissioned domain ID<Input value={domainId} onChange={event => { setDomainId(event.target.value); setPortfolio(null); }} disabled={busy || restoring} /></label>
+        <label className="block text-sm">Accounts, separated by spaces or commas<textarea className="block w-full rounded border bg-background p-2 mt-1" rows={3} value={accounts} disabled={busy || restoring} onChange={event => { setAccounts(event.target.value); setPortfolio(null); }} /></label>
         <div className="flex flex-wrap gap-3">
-          <Button disabled={busy} type="submit">{busy ? "Reading…" : "Read validated ledger"}</Button>
-          <Button disabled={busy} variant="outline" type="button" onClick={() => { setPortfolio(sample); setRemoved([]); setMessage(""); }}>Load sample</Button>
+          <Button disabled={busy || restoring} type="submit">{busy ? "Reading…" : "Read validated ledger"}</Button>
+          <Button disabled={busy || restoring} variant="outline" type="button" onClick={() => { setPortfolio(sample); setRemoved([]); setRestored(null); setRevision(value => value + 1); setMessage(""); }}>Load sample</Button>
+          <Button disabled={busy || restoring} variant="outline" type="button" onClick={() => restoreInput.current?.click()}>{restoring ? "Verifying…" : "Reopen saved rehearsal"}</Button>
+          <input hidden type="file" accept=".json" ref={restoreInput} aria-label="Saved rehearsal JSON" onChange={event => { void restoreFile(event.target.files?.[0]); event.target.value = ""; }} />
         </div>
       </form>
       <p className="text-sm mt-3" role="status">{message}</p>
     </Panel>
     {portfolio && <>
       <Panel label="EVIDENCE SOURCE">
+        {restored && <p className="mb-2 font-medium">Imported snapshot · source authenticity unverified</p>}
         <p>{portfolio.source === "fictional sample" ? "Fictional sample portfolio" : `Mainnet ledger ${portfolio.ledger?.index} · ${portfolio.ledger?.closeIso}`}</p>
         <p className="text-sm text-muted-foreground mt-2">The projection assumes credentials and domain rules stay as observed. Renewal, revocation and rule changes affect eligibility. Domain owners retain owner access.</p>
         <label className="block text-sm mt-3">Forecast days<Input type="number" min={1} max={365} value={Number.isNaN(horizon) ? "" : horizon} onChange={event => setHorizon(event.target.valueAsNumber)} /></label>
@@ -113,14 +142,20 @@ export function ContinuityAccess() {
         <p className="text-sm mt-2">Rule removal scenario · {row.ruleImpact?.outcome ?? "Select at least one rule"}</p>
       </Panel>)}
       {report && <ContinuityWork
-        key={portfolio.source + (portfolio.ledger?.index ?? "sample")}
+        key={portfolio.source + (portfolio.ledger?.index ?? "sample") + revision}
         snapshot={portfolio}
         proposed={report.proposedRules}
         sample={portfolio.source === "fictional sample"}
-        save={async work => {
-          const evidence = { version: 1, ...report, rehearsal: work };
+        initialReview={restored?.rehearsal}
+        save={async (work, format) => {
+          const evidence = { version: 1 as const, ...report, rehearsal: work };
           const digest = await sha256Hex(canonical(evidence));
-          await saveTextFile("continuity-change-rehearsal.json", JSON.stringify({ evidence, sha256: digest }, null, 2), "application/json");
+          if (format === "html") {
+            await saveTextFile("continuity-change-rehearsal.json", JSON.stringify({ evidence, sha256: digest }, null, 2), "application/json");
+            await saveTextFile("continuity-decision-report.html", renderDecisionReport(evidence, digest), "text/html");
+          } else {
+            await saveTextFile("continuity-change-rehearsal.json", JSON.stringify({ evidence, sha256: digest }, null, 2), "application/json");
+          }
           setMessage("Saved change rehearsal and evidence digest.");
         }}
       />}

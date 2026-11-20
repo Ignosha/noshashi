@@ -34,6 +34,8 @@ The reusable rehearseWork function in src/lib/continuity/rehearsal.ts accepts an
 
 ## Buyer and tier fit
 
-A Pro analyst could rehearse its own work. An Institutional team would need durable assignments, review governance and agreed portfolio capacity. Enterprise would require multiple entities and integrations. The existing proposed $5,000 pilot can test a single domain and up to 20 accounts against one real change review. Measure reviewer time, incorrect alerts, missing dependencies and whether the team requests another cycle.
+A Pro analyst could rehearse its own work. An Institutional team would need durable assignments, review governance and agreed portfolio capacity. Enterprise would require multiple entities and integrations. The proposed $10,000 enhanced pilot can test a single domain and up to 20 accounts across three review cycles with agreed acceptance criteria. Measure reviewer time, incorrect alerts, missing dependencies and whether the team requests another cycle.
 
 The research site can teach the underlying XRPL behavior and show a fictional case. Continuity is the desktop workspace for a customer's own review. Preflight remains the separate destination compatibility API prototype.
+
+See [the decision package and proposed pricing](QUALITY_AND_PRICING.md) for the expanded report, evidence reopening and commercial scope.

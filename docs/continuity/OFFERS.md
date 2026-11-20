@@ -4,14 +4,14 @@ Change rehearsal is the core Continuity workflow. Sell defined reviews and onboa
 
 | Offer | Price | Buyer | Deliverable |
 | --- | --- | --- | --- |
-| Change Review | Proposed $1,500 once | Domain owner or operations lead considering a specific rule removal | One domain, up to 20 accounts, one current-rule baseline, one proposed rule-removal scenario, up to 50 declared activities, evidence export and one 45-minute review |
+| Operational Change Assessment | Proposed $3,500 once | Domain owner or operations lead considering a specific rule removal | One domain, up to 20 accounts, one current-rule baseline, two proposed rule-removal options reviewed separately, up to 50 declared activities, printable decision reports, replayable evidence and one 45-minute review |
 | Ledger Evidence Report | Published $950 Issuer Check or $2,500 Standard | Issuer, treasury or listing team that needs a dated ledger evidence file | Existing report scope, quoted separately from Continuity |
-| Continuity Pilot | Proposed $5,000 for four weeks | A team considering repeated operational reviews | One domain, up to 20 accounts, two change-review cycles, sample activity preparation, one onboarding session and an outcome report |
+| Continuity Pilot | Proposed $10,000 for four weeks | A team considering repeated operational reviews | One domain, up to 20 accounts, three change-review cycles, sample activity preparation, two onboarding sessions and an outcome report |
 | Workflow Setup | Proposed from $2,500 once, after scoping | A buyer with an agreed recurring Continuity use case | Prepare and validate an activity-file format, document operator-declared account/domain dependencies, configure one agreed workflow and train the reviewers |
 
 ## Deliver the first sale
 
-The $1,500 Change Review is the narrowest Continuity engagement to test. Ask the operator to identify one real domain-rule change and the accounts and scheduled activities it affects. Confirm each declared dependency with that operator. Demonstrate the read and export against the agreed portfolio before accepting the delivery scope. Match the findings with the team's existing process and record review time and discrepancies.
+The $3,500 Operational Change Assessment is the narrowest Continuity engagement to test. Ask the operator to identify one real domain-rule change and the accounts and scheduled activities it affects. Confirm each declared dependency with that operator. Demonstrate the read and export against the agreed portfolio before accepting the delivery scope. Match the findings with the team's existing process and record review time and discrepancies.
 
 The findings cover domain access under observed credentials and proposed rules. Bridge settlement, amounts, accounting credits, repayment terms and loan credit risk require additional evidence and integrations. Retain these boundaries in the scope and report.
 
@@ -27,13 +27,13 @@ The site also lists recurring report schedules. Offer a recurring schedule when 
 
 ## Recurring path
 
-A customer with one change buys a Change Review. A customer evaluating a repeated process buys the pilot. A team that demonstrates continuing value can agree an Institutional subscription. An issuer with a periodic public-ledger reporting need can buy the existing evidence report schedule. This keeps the offering understandable while using the same underlying NOSHASHI research and evidence capabilities.
+A customer with one change buys a Operational Change Assessment. A customer evaluating a repeated process buys the pilot. A team that demonstrates continuing value can agree an Institutional subscription. An issuer with a periodic public-ledger reporting need can buy the existing evidence report schedule. This keeps the offering understandable while using the same underlying NOSHASHI research and evidence capabilities.
 
-At the proposed $1,500 Change Review price, eight hours valued at $50 per hour and $100 in direct expenses would leave $1,000 before overhead and taxes. At 28 hours plus the same expenses, it would break even before overhead and taxes. These are assumptions to test during delivery.
+Record sales, scoping, validation, review and delivery hours before determining the margin. These prices are proposals to test against buyer value and actual delivery cost. See [the enhanced scope and quality requirements](QUALITY_AND_PRICING.md).
 
 ## A pitch for Cyrille
 
-“We're building around one operations workflow. An institution can buy a $1,500 change review to see who loses required access under one proposed rule removal. We compare the output with its current process, then test repeated use through a $5,000 pilot. Existing issuer evidence reports give us a second defined service to offer. We'll use paid delivery and repeat demand to decide which integrations to build next.”
+“We're building around one operations workflow. An institution can buy a $3,500 change review to see who loses required access under one proposed rule removal. We compare the output with its current process, then test repeated use through a $10,000 pilot. Existing issuer evidence reports give us a second defined service to offer. We'll use paid delivery and repeat demand to decide which integrations to build next.”
 
 ## Sources
 
