@@ -18,6 +18,7 @@
  *                         Handler in tools/presign-guard/ (added 2026-11-19).
  *   /products/            The catalogue of everything above (2026-11-20).
  *   /rippling/            The Rippling Exposure check and API (2026-11-20).
+ *   /console/             The API Console: every API as a plain-language form.
  *
  * Every figure the pages show is read live by the visitor's browser from
  * NOSHASHI's public endpoints (/api/badge, /api/issuer-history); nothing
@@ -47,6 +48,7 @@ export const PRODUCT_SALES_PAGES = [
   ["/presign-guard/", "monthly", "0.6"],
   ["/products/", "weekly", "0.9"],
   ["/rippling/", "weekly", "0.8"],
+  ["/console/", "weekly", "0.9"],
 ];
 
 const CSS = `<style>
@@ -744,7 +746,7 @@ async function buildProductsHub(write) {
       <p>No SOC 2 report yet, no customer logos, no audit opinions. A NOSHASHI record is a reading of ledger facts at a stated
          ledger index, not legal, compliance or investment advice.</p></div>
   </div>
-  <p style="margin-top:20px"><a class="btn" href="/contact/?topic=institutions">Talk to us</a> <a class="btn ghost" href="/research/">Read the research</a></p>
+  <p style="margin-top:20px"><a class="btn" href="/console/">Try every API in the console</a> <a class="btn ghost" href="/contact/?topic=institutions">Talk to us</a> <a class="btn ghost" href="/research/">Read the research</a></p>
 </section>`;
   const css = `${CSS}<style>
 .vx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
@@ -765,8 +767,119 @@ async function buildProductsHub(write) {
   }));
 }
 
+/* ── /console/ ──────────────────────────────────────────────────── */
+/*
+ * The API Console: every public NOSHASHI API as a plain-language form,
+ * driven by site/assets/console.js. Answers are read live from the
+ * visitor's browser; nothing is pre-filled except public example
+ * addresses the visitor chooses to load.
+ */
+async function buildConsole(write) {
+  const css = `<style>
+.cx{display:grid;grid-template-columns:minmax(260px,330px) 1fr;gap:0;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;margin-top:8px}
+.cx-side{border-right:1px solid var(--rule);padding:14px 0;max-height:none}
+.cx-group{margin:14px 18px 6px;font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint,var(--muted))}
+.cx-tool{display:block;width:100%;text-align:left;background:none;border:0;border-left:2px solid transparent;padding:10px 18px;color:var(--muted);cursor:pointer;font:inherit}
+.cx-tool:hover,.cx-tool:focus-visible{color:var(--ink);background:var(--panel,rgba(255,255,255,.03))}
+.cx-tool[aria-current="true"]{color:var(--ink);border-left-color:var(--ink);background:var(--panel,rgba(255,255,255,.04))}
+.cx-tool-q{display:block;font-size:14px;line-height:1.35}
+.cx-tool-p{display:block;font:11px "IBM Plex Mono",monospace;margin-top:3px;color:var(--faint,var(--muted))}
+.cx-main{padding:22px clamp(16px,3vw,32px);min-width:0}
+.cx-main h2{font-size:clamp(24px,3vw,32px);margin:4px 0 6px}
+.cx-label{font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.cx-form{display:grid;gap:8px;max-width:640px;margin-top:16px}
+.cx-form label{font:12px "IBM Plex Mono",monospace;color:var(--muted);margin-top:6px}
+.cx-form input,.cx-form textarea,.cx-keybar input{box-sizing:border-box;width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink);font:12.5px/1.5 "IBM Plex Mono",monospace}
+.cx-form textarea{min-height:70px}
+.cx-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+[data-tone="bad"]{color:var(--bad,#e5484d)}
+.cx-card{margin-top:22px;border:1px solid var(--rule);border-radius:var(--r);padding:18px 20px}
+.cx-pill{display:inline-block;font:600 12px "IBM Plex Mono",monospace;letter-spacing:.08em;padding:5px 10px;border:1px solid currentColor;border-radius:999px}
+.cx-pill[data-tone="good"]{color:var(--good,#3fb950)}.cx-pill[data-tone="warn"]{color:var(--warn,#f5a524)}.cx-pill[data-tone="bad"]{color:var(--bad,#e5484d)}
+.cx-headline{font:400 clamp(18px,2.2vw,22px)/1.35 "Instrument Serif",Georgia,serif;margin:12px 0}
+.cx-facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;margin:0;border-top:1px solid var(--rule)}
+.cx-facts div{padding:10px 12px 10px 0;border-bottom:1px solid var(--rule)}
+.cx-facts dt{font:11px "IBM Plex Mono",monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.cx-facts dd{margin:4px 0 0;font-size:14px;overflow-wrap:anywhere}
+.cx-meaning{color:var(--muted);font-size:14px;line-height:1.6;max-width:72ch}
+.cx-pre{white-space:pre-wrap;overflow:auto;max-height:360px;font:12px/1.55 "IBM Plex Mono",monospace;border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;margin:8px 0}
+.cx-keybar{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin:18px 0 6px;max-width:720px}
+.cx-steps{list-style:none;padding:0;margin:18px 0 0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--rule)}
+.cx-steps li{padding:14px 18px 6px 0;color:var(--muted);font-size:13.5px;line-height:1.55}
+.cx-steps li+li{padding-left:18px;border-left:1px solid var(--rule)}
+.cx-steps b{display:block;color:var(--ink);font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:20px;margin-bottom:4px}
+@media (max-width:860px){.cx{grid-template-columns:1fr}.cx-side{border-right:0;border-bottom:1px solid var(--rule)}
+  .cx-steps{grid-template-columns:1fr}.cx-steps li+li{padding-left:0;border-left:0;border-top:1px solid var(--rule)}}
+</style>`;
+  const body = `<div class="page-head">
+  <p class="eyebrow">NOSHASHI API Console · XRPL Mainnet · read-only</p>
+  <h1>Ask the ledger a question. Get a plain answer.</h1>
+  <p>Every NOSHASHI API in one place, without writing code. Pick a question, enter a public address, and read the answer in plain
+     language. The exact JSON and the one-line command your engineers need are underneath. Nothing here can sign, move funds or
+     see a private key.</p>
+  <ol class="cx-steps">
+    <li><b>1 · Pick a question</b>Grouped by what you are responsible for: your holdings, your token, markets, treasury, payments.</li>
+    <li><b>2 · Enter a public address</b>Or press “Use an example” to load a well-known public account.</li>
+    <li><b>3 · Read the answer</b>A verdict, the key facts, what it means, and a receipt you can keep.</li>
+  </ol>
+</div>
+<section>
+  <div class="cx-keybar">
+    <div><label class="cx-label" for="cx-key">Paid Rippling key (optional, only for fleet and issuer scans)</label>
+      <input id="cx-key" type="password" autocomplete="off" spellcheck="false" placeholder="nsh_rip_…"></div>
+    <button class="btn ghost" type="button" id="cx-forget">Forget key</button>
+  </div>
+  <p class="pv-note">The key stays in this browser tab only and is sent only to noshashi.app's own API. Free tools need no key and no account.</p>
+
+  <div class="cx">
+    <nav class="cx-side" id="cx-nav" aria-label="Questions you can ask"></nav>
+    <div class="cx-main" id="cx-main">
+      <p class="cx-label" id="cx-name">—</p>
+      <h2 id="cx-q">Loading the console…</h2>
+      <p id="cx-explain"></p>
+      <p class="pv-note"><b>Who uses it:</b> <span id="cx-who"></span></p>
+      <p class="pv-note" id="cx-keynote" hidden>Needs a paid plan. <a href="/rippling/#plans">See the plans</a>.</p>
+      <form class="cx-form" id="cx-form" novalidate>
+        <div id="cx-fields" class="cx-form" style="margin:0"></div>
+        <div class="cx-actions"><button class="btn" id="cx-run" type="submit">Run it</button>
+          <button class="btn ghost" type="button" id="cx-example">Use an example</button></div>
+      </form>
+      <p id="cx-status" role="status" class="pv-note" style="margin-top:10px"></p>
+      <noscript><p class="pv-note">The console needs JavaScript. Every endpoint is also documented on <a href="/developers/">Developers</a>.</p></noscript>
+
+      <div id="cx-out" hidden>
+        <div class="cx-card" aria-live="polite">
+          <span class="cx-pill" id="cx-verdict">—</span>
+          <p class="cx-headline" id="cx-headline"></p>
+          <dl class="cx-facts" id="cx-facts"></dl>
+          <p class="cx-meaning" id="cx-meaning"></p>
+          <p class="pv-note"><code id="cx-receipt"></code></p>
+        </div>
+        <details style="margin-top:16px"><summary>For your engineers: the command</summary>
+          <pre class="cx-pre" id="cx-curl"></pre><button class="btn ghost" type="button" id="cx-copy">Copy command</button></details>
+        <details style="margin-top:10px"><summary>The full answer (JSON)</summary><pre class="cx-pre" id="cx-json" tabindex="0"></pre></details>
+      </div>
+    </div>
+  </div>
+  <p class="pv-note" style="margin-top:18px">Facts read from validated XRP Ledger state at the ledger index shown, not legal, compliance or investment
+     advice. Public tools are rate limited per visitor. Want this for your team, with your own wallets saved and checked on a schedule?
+     <a href="/contact/?topic=institutions">Talk to us</a>.</p>
+</section>`;
+  await write("console/index.html", renderPage({
+    title: "API Console — ask the XRP Ledger a question, get a plain answer | NOSHASHI",
+    description: "Every NOSHASHI API in one visual console: rippling exposure, fleet and issuer scans, issuer controls and history, asset risk, real market depth, treasury control and delivered payment amounts. Plain-language answers, the JSON, and the command to reproduce it. Read-only.",
+    path: "/console/",
+    current: "console",
+    head: CSS + css,
+    body,
+    scripts: `<script src="/assets/console.js"></script>`,
+    structured: [breadcrumb("API Console", "/console/")],
+  }));
+}
+
 export async function buildProducts(write) {
   await buildProductsHub(write);
+  await buildConsole(write);
   await buildRippling(write);
   await buildPresignGuard(write);
   await buildContinuity(write);

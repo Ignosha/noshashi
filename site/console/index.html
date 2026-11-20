@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>API Console — ask the XRP Ledger a question, get a plain answer | NOSHASHI</title>
+<meta name="description" content="Every NOSHASHI API in one visual console: rippling exposure, fleet and issuer scans, issuer controls and history, asset risk, real market depth, treasury control and delivered payment amounts. Plain-language answers, the JSON, and the command to reproduce it. Read-only.">
+<link rel="canonical" href="https://www.noshashi.app/console/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NOSHASHI">
+<meta property="og:url" content="https://www.noshashi.app/console/">
+<meta property="og:title" content="API Console — ask the XRP Ledger a question, get a plain answer | NOSHASHI">
+<meta property="og:description" content="Every NOSHASHI API in one visual console: rippling exposure, fleet and issuer scans, issuer controls and history, asset risk, real market depth, treasury control and delivered payment amounts. Plain-language answers, the JSON, and the command to reproduce it. Read-only.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="API Console — ask the XRP Ledger a question, get a plain answer | NOSHASHI">
+<meta name="twitter:description" content="Every NOSHASHI API in one visual console: rippling exposure, fleet and issuer scans, issuer controls and history, asset risk, real market depth, treasury control and delivered payment amounts. Plain-language answers, the JSON, and the command to reproduce it. Read-only.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/ledger-mark-180.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-500-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-mono-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/modules.css">
+<link rel="stylesheet" href="/assets/accent.css">
+<script src="/assets/accent.js"></script>
+<script src="/assets/inline/c5a81e5a06d4616fef91.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Organization","name":"NOSHASHI Labs","url":"https://www.noshashi.app/","logo":"https://www.noshashi.app/assets/ledger-mark-512.png","description":"Compliance and market-intelligence tooling for the XRP Ledger. Reads validated ledger state and returns a GO, HOLD or NO-GO verdict with the evidence attached.","sameAs":["https://github.com/Ignosha/noshashi"],"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"support@noshashi.app"},{"@type":"ContactPoint","contactType":"sales","email":"institutions@noshashi.app"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.noshashi.app/"},{"@type":"ListItem","position":2,"name":"API Console","item":"https://www.noshashi.app/console/"}]}]}</script>
+<style>
+.pv-form{display:grid;gap:14px;max-width:640px}
+.pv-form textarea{min-height:56px;font:12px "IBM Plex Mono",monospace}
+.pv-note{color:var(--muted);font-size:12.5px;line-height:1.6;max-width:72ch}
+.pv-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.pv-price{font:600 30px/1.1 "Space Grotesk",sans-serif;margin:6px 0 4px}
+.pv-badge{min-height:40px;margin:12px 0}
+.pv-badge img{max-width:100%;height:auto}
+.pv-code{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.55 "IBM Plex Mono",monospace;
+  border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;margin:8px 0}
+.pv-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.pv-table th,.pv-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.pv-table td.mono{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.pv-scroll{overflow-x:auto;max-width:100%}
+.pv-tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.pv-tally div{border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px}
+.pv-tally strong{display:block;font:600 24px/1.1 "Space Grotesk",sans-serif}
+[data-sev="power_used"]{color:var(--bad,#e5484d)}
+[data-sev="key_change"]{color:var(--warn,#f5a524)}
+</style><style>
+.cx{display:grid;grid-template-columns:minmax(260px,330px) 1fr;gap:0;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;margin-top:8px}
+.cx-side{border-right:1px solid var(--rule);padding:14px 0;max-height:none}
+.cx-group{margin:14px 18px 6px;font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint,var(--muted))}
+.cx-tool{display:block;width:100%;text-align:left;background:none;border:0;border-left:2px solid transparent;padding:10px 18px;color:var(--muted);cursor:pointer;font:inherit}
+.cx-tool:hover,.cx-tool:focus-visible{color:var(--ink);background:var(--panel,rgba(255,255,255,.03))}
+.cx-tool[aria-current="true"]{color:var(--ink);border-left-color:var(--ink);background:var(--panel,rgba(255,255,255,.04))}
+.cx-tool-q{display:block;font-size:14px;line-height:1.35}
+.cx-tool-p{display:block;font:11px "IBM Plex Mono",monospace;margin-top:3px;color:var(--faint,var(--muted))}
+.cx-main{padding:22px clamp(16px,3vw,32px);min-width:0}
+.cx-main h2{font-size:clamp(24px,3vw,32px);margin:4px 0 6px}
+.cx-label{font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.cx-form{display:grid;gap:8px;max-width:640px;margin-top:16px}
+.cx-form label{font:12px "IBM Plex Mono",monospace;color:var(--muted);margin-top:6px}
+.cx-form input,.cx-form textarea,.cx-keybar input{box-sizing:border-box;width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:var(--r);background:transparent;color:var(--ink);font:12.5px/1.5 "IBM Plex Mono",monospace}
+.cx-form textarea{min-height:70px}
+.cx-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+[data-tone="bad"]{color:var(--bad,#e5484d)}
+.cx-card{margin-top:22px;border:1px solid var(--rule);border-radius:var(--r);padding:18px 20px}
+.cx-pill{display:inline-block;font:600 12px "IBM Plex Mono",monospace;letter-spacing:.08em;padding:5px 10px;border:1px solid currentColor;border-radius:999px}
+.cx-pill[data-tone="good"]{color:var(--good,#3fb950)}.cx-pill[data-tone="warn"]{color:var(--warn,#f5a524)}.cx-pill[data-tone="bad"]{color:var(--bad,#e5484d)}
+.cx-headline{font:400 clamp(18px,2.2vw,22px)/1.35 "Instrument Serif",Georgia,serif;margin:12px 0}
+.cx-facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;margin:0;border-top:1px solid var(--rule)}
+.cx-facts div{padding:10px 12px 10px 0;border-bottom:1px solid var(--rule)}
+.cx-facts dt{font:11px "IBM Plex Mono",monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.cx-facts dd{margin:4px 0 0;font-size:14px;overflow-wrap:anywhere}
+.cx-meaning{color:var(--muted);font-size:14px;line-height:1.6;max-width:72ch}
+.cx-pre{white-space:pre-wrap;overflow:auto;max-height:360px;font:12px/1.55 "IBM Plex Mono",monospace;border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;margin:8px 0}
+.cx-keybar{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin:18px 0 6px;max-width:720px}
+.cx-steps{list-style:none;padding:0;margin:18px 0 0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--rule)}
+.cx-steps li{padding:14px 18px 6px 0;color:var(--muted);font-size:13.5px;line-height:1.55}
+.cx-steps li+li{padding-left:18px;border-left:1px solid var(--rule)}
+.cx-steps b{display:block;color:var(--ink);font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:20px;margin-bottom:4px}
+@media (max-width:860px){.cx{grid-template-columns:1fr}.cx-side{border-right:0;border-bottom:1px solid var(--rule)}
+  .cx-steps{grid-template-columns:1fr}.cx-steps li+li{padding-left:0;border-left:0;border-top:1px solid var(--rule)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/" style="color:var(--ink)"><svg class="brand-mark" viewBox="0 0 32 32" width="26" height="26" fill="none" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16" cy="16" r="10.6" fill="none" stroke="currentColor" stroke-width=".9" opacity=".5"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="var(--ground)" stroke="var(--ground)" stroke-width="2.2" stroke-linejoin="round"/><path d="M19.02 22.77Q18.72 22.77 18.51 22.32L13.36 11.14Q13.3 11.01 13.22 11.03Q13.13 11.05 13.13 11.2V20.97Q13.13 21.5 13.31 21.77Q13.49 22.05 13.97 22.12L14.21 22.16Q14.46 22.18 14.46 22.39Q14.46 22.6 14.18 22.6H11.46Q11.17 22.6 11.17 22.39Q11.17 22.18 11.42 22.16L11.67 22.12Q12.16 22.05 12.35 21.77Q12.54 21.5 12.54 20.97V10.17Q12.54 9.78 12.42 9.64Q12.3 9.51 11.86 9.43L11.42 9.36Q11.17 9.3 11.17 9.13Q11.17 8.92 11.46 8.92H13.49Q13.97 8.92 14.16 9.34L18.64 19.2Q18.7 19.31 18.78 19.29Q18.87 19.28 18.87 19.16V10.55Q18.87 9.95 18.66 9.71Q18.45 9.47 18.13 9.41L17.79 9.36Q17.54 9.3 17.54 9.13Q17.54 8.92 17.82 8.92H20.54Q20.83 8.92 20.83 9.13Q20.83 9.34 20.58 9.36L20.33 9.4Q19.84 9.47 19.65 9.71Q19.46 9.95 19.46 10.55V22.16Q19.46 22.51 19.33 22.64Q19.21 22.77 19.02 22.77Z" fill="currentColor"/></svg><span>NOSHASHI</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a class="nav-link" href="/products/">Products</a>
+      <a class="nav-link" href="/research/">Research</a>
+      <a class="nav-link" href="/console/" aria-current="page">Console</a>
+      <a class="nav-link optional" href="/developers/">Developers</a>
+      <a class="nav-link optional" href="/#public"><span data-i18n="nav.tools">Free tools</span></a>
+      <a class="nav-link" href="/pricing/"><span data-i18n="nav.pricing">Pricing</span></a>
+      <a class="nav-link optional wide" href="/about/">Company</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+        <span aria-hidden="true">◐</span><span id="themeLabel" data-i18n="theme.light">LIGHT</span>
+      </button>
+      <a class="btn ghost" href="/contact/?topic=institutions"><span data-i18n="nav.demo">Request a demo</span></a>
+      <a class="btn" href="/app/"><span data-i18n="nav.workspace">Open workspace</span></a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+<div class="page-head">
+  <p class="eyebrow">NOSHASHI API Console · XRPL Mainnet · read-only</p>
+  <h1>Ask the ledger a question. Get a plain answer.</h1>
+  <p>Every NOSHASHI API in one place, without writing code. Pick a question, enter a public address, and read the answer in plain
+     language. The exact JSON and the one-line command your engineers need are underneath. Nothing here can sign, move funds or
+     see a private key.</p>
+  <ol class="cx-steps">
+    <li><b>1 · Pick a question</b>Grouped by what you are responsible for: your holdings, your token, markets, treasury, payments.</li>
+    <li><b>2 · Enter a public address</b>Or press “Use an example” to load a well-known public account.</li>
+    <li><b>3 · Read the answer</b>A verdict, the key facts, what it means, and a receipt you can keep.</li>
+  </ol>
+</div>
+<section>
+  <div class="cx-keybar">
+    <div><label class="cx-label" for="cx-key">Paid Rippling key (optional, only for fleet and issuer scans)</label>
+      <input id="cx-key" type="password" autocomplete="off" spellcheck="false" placeholder="nsh_rip_…"></div>
+    <button class="btn ghost" type="button" id="cx-forget">Forget key</button>
+  </div>
+  <p class="pv-note">The key stays in this browser tab only and is sent only to noshashi.app's own API. Free tools need no key and no account.</p>
+
+  <div class="cx">
+    <nav class="cx-side" id="cx-nav" aria-label="Questions you can ask"></nav>
+    <div class="cx-main" id="cx-main">
+      <p class="cx-label" id="cx-name">—</p>
+      <h2 id="cx-q">Loading the console…</h2>
+      <p id="cx-explain"></p>
+      <p class="pv-note"><b>Who uses it:</b> <span id="cx-who"></span></p>
+      <p class="pv-note" id="cx-keynote" hidden>Needs a paid plan. <a href="/rippling/#plans">See the plans</a>.</p>
+      <form class="cx-form" id="cx-form" novalidate>
+        <div id="cx-fields" class="cx-form" style="margin:0"></div>
+        <div class="cx-actions"><button class="btn" id="cx-run" type="submit">Run it</button>
+          <button class="btn ghost" type="button" id="cx-example">Use an example</button></div>
+      </form>
+      <p id="cx-status" role="status" class="pv-note" style="margin-top:10px"></p>
+      <noscript><p class="pv-note">The console needs JavaScript. Every endpoint is also documented on <a href="/developers/">Developers</a>.</p></noscript>
+
+      <div id="cx-out" hidden>
+        <div class="cx-card" aria-live="polite">
+          <span class="cx-pill" id="cx-verdict">—</span>
+          <p class="cx-headline" id="cx-headline"></p>
+          <dl class="cx-facts" id="cx-facts"></dl>
+          <p class="cx-meaning" id="cx-meaning"></p>
+          <p class="pv-note"><code id="cx-receipt"></code></p>
+        </div>
+        <details style="margin-top:16px"><summary>For your engineers: the command</summary>
+          <pre class="cx-pre" id="cx-curl"></pre><button class="btn ghost" type="button" id="cx-copy">Copy command</button></details>
+        <details style="margin-top:10px"><summary>The full answer (JSON)</summary><pre class="cx-pre" id="cx-json" tabindex="0"></pre></details>
+      </div>
+    </div>
+  </div>
+  <p class="pv-note" style="margin-top:18px">Facts read from validated XRP Ledger state at the ledger index shown, not legal, compliance or investment
+     advice. Public tools are rate limited per visitor. Want this for your team, with your own wallets saved and checked on a schedule?
+     <a href="/contact/?topic=institutions">Talk to us</a>.</p>
+</section>
+</main>
+<footer>
+  <div class="shell foot">
+    <nav class="foot-map" aria-label="Site map">
+      <div class="foot-group"><p class="foot-h">Products</p><a href="/products/">All products</a><a href="/console/">API Console</a><a href="/continuity/">Continuity · deposit reconciliation</a><a href="/rippling/">Rippling Exposure API</a><a href="/presign-guard/">Pre-Sign Guard</a><a href="/watch/">Issuer Watch</a><a href="/verified/">Verified Issuer</a><a href="/listing-review/">Listing review</a><a href="/history/">Issuer history</a><a href="/evidence-report/">Ledger Evidence Report</a></div>
+      <div class="foot-group"><p class="foot-h">Platform</p><a href="/platform/">Platform overview</a><a href="/terminal/">Cloud Terminal · public beta</a><a href="/app/">Workspace</a><a href="/tutorial/">Desktop app tutorial</a><a href="/institutional-demo/">Interactive demo</a><a href="/#public">Free tools</a><a href="/#download">Download</a><a href="/pricing/">Pricing</a><a href="/developers/">Developers &amp; API</a><a href="/docs/">Documentation</a></div>
+      <div class="foot-group"><p class="foot-h">Solutions</p><a href="/solutions/#exchanges">Exchanges &amp; payments</a><a href="/solutions/#trading">Trading &amp; liquidity</a><a href="/solutions/#issuers">Issuers &amp; treasury</a><a href="/solutions/#compliance">Compliance &amp; risk</a><a href="/enterprise/">Enterprise</a><a href="/strategic-infrastructure/">Strategic infrastructure</a></div>
+      <div class="foot-group"><p class="foot-h">Free tools</p><a href="/tokens/">XRPL token directory</a><a href="/xapp/">Check an address</a><a href="/certificate/">Authority certificate</a><a href="/badge/">Issuer badge</a><a href="/alerts/">Issuer alerts</a><a href="/delivered/">Delivered-amount export</a><a href="/treasury/">Treasury report</a><a href="/book-health/">Book health</a><a href="/rippling/">Rippling exposure check</a></div>
+      <div class="foot-group"><p class="foot-h">Resources</p><a href="/resources/">All resources</a><a href="/research/">Research findings</a><a href="/misread/">The ledger can be misread</a><a href="/learn/">Learn NOSHASHI (course)</a><a href="/guide/">Plain-language guide</a><a href="/intelligence/">Intelligence &amp; briefs</a><a href="/news/">External headlines</a><a href="/progress/">Progress &amp; releases</a><a href="/status/">Status</a></div>
+      <div class="foot-group"><p class="foot-h">Company</p><a href="/about/">About</a><a href="/design-partners/">Design partners</a><a href="/partners/">Partner programs</a><a href="/contact/">Contact</a><a href="/brief/">Product brief</a><a href="/trust/">Trust &amp; security</a><a href="/legal/">Legal &amp; accessibility</a><a href="https://github.com/Ignosha/noshashi" rel="noopener">GitHub</a></div>
+    </nav>
+    <p class="mono foot-legal">© 2026 NOSHASHI Labs · Read-only XRPL intelligence · No custody, no keys, no signing · Independent: not affiliated with Ripple or the XRPL Foundation. "XRP" names the asset only.</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/nav.js" defer></script>
+<script src="/assets/subscribe.js?v=20261101-first-use" defer></script>
+<script src="/assets/chart.js" defer></script>
+<script src="/assets/support.js" defer></script>
+<script src="/assets/garden-field.js" defer></script>
+<script src="/assets/inline/399cd11cd933868f64af.js"></script>
+<script src="/assets/console.js"></script>
+</body>
+</html>

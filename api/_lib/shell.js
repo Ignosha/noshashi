@@ -40,7 +40,8 @@ export { MARK };
 export const NAV = [
   { href: "/products/", label: "Products", key: "products" },
   { href: "/research/", label: "Research", key: "research" },
-  { href: "/developers/", label: "Developers", key: "developers" },
+  { href: "/console/", label: "Console", key: "console" },
+  { href: "/developers/", label: "Developers", key: "developers", optional: true },
   { href: "/#public", label: "Free tools", i18n: "nav.tools", optional: true },
   { href: "/pricing/", label: "Pricing", i18n: "nav.pricing" },
   { href: "/about/", label: "Company", key: "about", optional: true, wide: true },
@@ -52,6 +53,7 @@ export const NAV = [
 export const FOOTER_GROUPS = [
   { title: "Products", links: [
     { href: "/products/", label: "All products" },
+    { href: "/console/", label: "API Console" },
     { href: "/continuity/", label: "Continuity · deposit reconciliation" },
     { href: "/rippling/", label: "Rippling Exposure API" },
     { href: "/presign-guard/", label: "Pre-Sign Guard" },
