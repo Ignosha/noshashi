@@ -6,7 +6,7 @@ Open the desktop app and select Continuity, then Access forecast & rule impact. 
 
 | Tool | Input | Output |
 | --- | --- | --- |
-| Issuer sample review | Sample closure list JSON, fixed fictional balances | Queue, session reviewer assignment and JSON export |
+| Issuer sample review | Sample closure list JSON, fixed fictional balances | Queue, reviewer assignment while the workspace is open and JSON export |
 | Access forecast | Mainnet domain ID, 1–20 distinct account addresses, horizon of 1–365 days | Current admission and projected admission, final qualifying expiry within the horizon |
 | Rule removal scenario | Current domain rules with at least one retained rule | Current admission and hypothetical admission at the same ledger close time |
 

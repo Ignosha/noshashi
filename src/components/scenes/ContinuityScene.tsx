@@ -23,6 +23,9 @@ export default function ContinuityScene() {
       <Button variant={tool === "issuer" ? "default" : "outline"} aria-pressed={tool === "issuer"} onClick={() => setTool("issuer")}>Issuer review sample</Button>
       <Button variant={tool === "access" ? "default" : "outline"} aria-pressed={tool === "access"} onClick={() => setTool("access")}>Access forecast & rule impact</Button>
     </nav>
-    <div className="min-h-0 flex-1">{tool === "issuer" ? <IssuerReview /> : <ContinuityAccess />}</div>
+    <div className="min-h-0 flex-1">
+      <div hidden={tool !== "issuer"} className="h-full"><IssuerReview /></div>
+      <div hidden={tool !== "access"} className="h-full"><ContinuityAccess /></div>
+    </div>
   </div>;
 }

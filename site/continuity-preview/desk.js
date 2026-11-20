@@ -4,7 +4,7 @@ export function mountDesk(root, save) {
   let rows = evaluate(example);
   const owners = new Map();
   root.innerHTML = `<article><header><small>Ledger Desk v2 · Sample workspace</small><h1>NOSHASHI Continuity</h1>
-  <p>Issuer offboarding review</p></header><p>Fictional portfolio as of 20 November 2026. The sample policy requires review of outstanding balances after 30 days. Reviewer assignments last for this session.</p>
+  <p>Issuer offboarding review</p></header><p>Fictional portfolio as of 20 November 2026. The sample policy requires review of outstanding balances after 30 days. Reviewer assignments stay in this open review.</p>
   <div class="actions"><label>Import sample closure list <input type="file" accept=".json"></label>
   <button data-example>Save example list</button><button data-report>Export review</button></div>
   <p role="status"></p><section aria-label="Review queue"></section>

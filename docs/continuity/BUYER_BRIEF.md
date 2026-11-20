@@ -8,7 +8,7 @@ NOSHASHI Continuity helps issuer and operations teams review whether their custo
 
 An analyst supplies a permissioned domain and up to 20 accounts. The access tools read the domain and each account's credentials at one validated Mainnet ledger index. A read failure prevents a portfolio finding. An incomplete paginated read raises an error. The analyst can project 1–365 days forward and remove accepted credential rules hypothetically. The export includes observed inputs, ledger index and close time, proposed rules, findings, assumptions and a digest.
 
-The forecast assumes the observed credentials and rules persist. Issuer revocation, renewal, domain deletion, network changes and unrelated transaction restrictions can change the outcome. Admission to a domain is only one condition of completing a transaction. The interface labels fictional samples explicitly. Domain owners retain owner access. Reviewer assignment in the issuer sample lasts for the session.
+The forecast assumes the observed credentials and rules persist. Issuer revocation, renewal, domain deletion, network changes and unrelated transaction restrictions can change the outcome. Admission to a domain is only one condition of completing a transaction. The interface labels fictional samples explicitly. Domain owners retain owner access. Reviewer assignment in the issuer sample lasts while the Continuity workspace is open.
 
 ## Why a buyer might care
 
