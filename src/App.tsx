@@ -161,7 +161,10 @@ import { StressScheduleRunner } from "@/lib/desk/stressSchedule";
 import { PersonalGuardianRunner } from "@/lib/security/guardian";
 import { OrgContextSync, useWorkstationOrg } from "@/lib/org/workstationContext";
 
+const ContinuityScene = lazy(() => import("@/components/scenes/ContinuityScene"));
+
 export type SceneId =
+  | "continuity"
   | "home"
   | "control"
   | "verify"
@@ -218,7 +221,7 @@ type SceneDef = {
  * inventing a destination that has nothing behind it.
  */
 const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
-  { id: "overview", label: "OVERVIEW", scenes: ["home", "control"] },
+  { id: "overview", label: "OVERVIEW", scenes: ["home", "control", "continuity"] },
   // The three questions the product answers, in the order an institution
   // asks them: can this move, can we exit, can we prove why.
   { id: "compliance", label: "COMPLIANCE", scenes: ["verify", "ledgerwatch", "credentials", "domains", "provenance", "authority", "security"] },
@@ -234,9 +237,10 @@ const NAV_SECTIONS: Array<{ id: string; label: string; scenes: SceneId[] }> = [
  * needing to know what a trust line or a signer list is. Everything else
  * stays one switch (or one search) away; nothing is removed.
  */
-const EXECUTIVE_SCENES = new Set<SceneId>(["home", "verify", "risk", "history", "workstation", "agent", "safeshop", "learn"]);
+const EXECUTIVE_SCENES = new Set<SceneId>(["home", "continuity", "verify", "risk", "history", "workstation", "agent", "safeshop", "learn"]);
 
 const SCENES: SceneDef[] = [
+  { id: "continuity", label: "CONTINUITY", title: "CONTINUITY", hint: "Change rehearsal, issuer, bridge and lending reviews", icon: <NovaGrid size={15} />, digit: "", group: "primary" },
   {
     id: "home",
     label: "OVERVIEW",
@@ -1235,6 +1239,8 @@ function ConsoleApp() {
                     <Suspense fallback={<SceneLoading />}>
                     {scene === "home" ? (
                       <HomeScene data={data} onNavigate={goTo} mode={consoleMode} modeChosen={modeChosen} onChooseMode={chooseMode} />
+                    ) : scene === "continuity" ? (
+                      <ContinuityScene />
                     ) : scene === "control" ? (
                       <MissionControlScene
                         data={data}

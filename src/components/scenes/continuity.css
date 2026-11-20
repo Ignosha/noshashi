@@ -1,0 +1,276 @@
+.ct-app {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+}
+.ct-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 22px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+.ct-masthead h1 {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 25px;
+  line-height: 1.1;
+}
+.ct-masthead p {
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+  margin-top: 4px;
+}
+.ct-shell {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+.ct-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 10px;
+  border-right: 1px solid hsl(var(--border));
+}
+.ct-nav button {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 12px;
+  border-left: 2px solid transparent;
+}
+.ct-nav button[aria-current="page"] {
+  background: hsl(var(--muted));
+  border-left-color: hsl(var(--primary));
+  font-weight: 600;
+}
+.ct-main {
+  min-width: 0;
+  min-height: 0;
+}
+.ct-main > div {
+  height: 100%;
+}
+.ct-studio {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+}
+.ct-controls {
+  padding: 20px;
+  border-right: 1px solid hsl(var(--border));
+  overflow: auto;
+  min-width: 0;
+}
+.ct-results {
+  padding: 20px;
+  overflow: auto;
+  min-width: 0;
+}
+.ct-app h2 {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 19px;
+  margin-bottom: 12px;
+}
+.ct-app p,
+.ct-app label,
+.ct-app summary {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.ct-controls > p {
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 16px;
+}
+.ct-controls label {
+  display: block;
+  margin: 14px 0;
+}
+.ct-controls input:not([type="checkbox"]),
+.ct-controls textarea,
+.ct-inspector input,
+.ct-inspector textarea {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  border-radius: 0;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.ct-controls textarea {
+  font-family: var(--font-mono, monospace);
+  resize: vertical;
+}
+.ct-controls button,
+.ct-controls input,
+.ct-controls textarea {
+  max-width: 100%;
+}
+.ct-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+.ct-source {
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+  color: hsl(var(--muted-foreground));
+  overflow-wrap: anywhere;
+}
+.ct-result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.ct-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+.ct-metrics dt {
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+}
+.ct-metrics dd {
+  font-size: 24px;
+  overflow-wrap: anywhere;
+}
+.ct-table-wrap {
+  overflow-x: auto;
+}
+.ct-app table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+.ct-app th,
+.ct-app td {
+  padding: 11px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid hsl(var(--border));
+}
+.ct-app thead th {
+  color: hsl(var(--muted-foreground));
+  font-weight: 500;
+  font-size: 11px;
+}
+.ct-app tbody th {
+  font-weight: 500;
+}
+.ct-app th small {
+  display: block;
+  font-weight: 400;
+  color: hsl(var(--muted-foreground));
+  overflow-wrap: anywhere;
+  margin-top: 3px;
+}
+.ct-app td {
+  overflow-wrap: anywhere;
+}
+.ct-app tbody tr:has(button[aria-pressed="true"]) {
+  background: hsl(var(--muted));
+}
+.ct-app th button {
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.ct-app button:focus-visible,
+.ct-app input:focus-visible,
+.ct-app textarea:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+.ct-footnote {
+  color: hsl(var(--muted-foreground));
+  margin-top: 20px;
+}
+.ct-empty {
+  padding: 30px 0;
+  color: hsl(var(--muted-foreground));
+}
+.ct-findings {
+  list-style: disc;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.ct-app details {
+  margin-top: 20px;
+}
+.ct-app pre {
+  overflow: auto;
+  max-height: 380px;
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid hsl(var(--border));
+  font-size: 11px;
+}
+.ct-inspector {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid hsl(var(--border));
+}
+.ct-inspector label {
+  display: block;
+  margin: 12px 0;
+}
+@media (max-width: 1150px) {
+  .ct-shell {
+    grid-template-columns: 130px minmax(0, 1fr);
+  }
+  .ct-studio {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+  .ct-results,
+  .ct-controls {
+    padding: 16px;
+  }
+}
+@media (max-width: 850px) {
+  .ct-shell {
+    display: flex;
+    flex-direction: column;
+  }
+  .ct-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: 0;
+    border-bottom: 1px solid hsl(var(--border));
+    padding: 8px;
+  }
+  .ct-main {
+    flex: 1;
+  }
+  .ct-studio {
+    display: block;
+    overflow: auto;
+  }
+  .ct-controls,
+  .ct-results {
+    overflow: visible;
+    border-right: 0;
+  }
+  .ct-controls {
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .ct-controls textarea {
+    max-height: 220px;
+  }
+  .ct-metrics dd {
+    font-size: 19px;
+  }
+}

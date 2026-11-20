@@ -149,6 +149,7 @@ async function ownedObjects(account: string, type: "permissioned_domain" | "cred
       throw e;
     }
   }
+  if (marker) throw new Error("Credential or domain read exceeded 4,000 objects. Narrow the review before continuing.");
   return out;
 }
 
