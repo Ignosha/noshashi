@@ -22,7 +22,7 @@ import { clientKey, take } from "../rate-limit.js";
 import { queryOf } from "../query.js";
 import { analyseRippling, fmt } from "../rippling.js";
 import { readLines, LIMITATION } from "./rippling.js";
-import { planFor, RIPPLING_PLANS, BUY } from "../rippling-keys.js";
+import { planFor, upgradeOffer, RIPPLING_PLANS, BUY } from "../rippling-keys.js";
 
 const BUDGET_MS = 45_000;
 const CONCURRENCY = 6;
@@ -62,7 +62,7 @@ function gate(req, res, need) {
   const plan = planFor(req);
   if (plan === null) { res.status(401).json({ error: "That API key is not valid." }); return null; }
   const p = RIPPLING_PLANS[plan];
-  if (!p[need]) { res.status(402).json({ error: BUY, plan }); return null; }
+  if (!p[need]) { res.status(402).json({ code: "PAID_PLAN", error: BUY, plan, upgrade: upgradeOffer(plan) }); return null; }
   const limit = take(`rippling-pro:${plan}:${String(req.headers.authorization ?? "").slice(-12)}:${clientKey(req)}`, { limit: p.per_minute });
   if (!limit.ok) { res.setHeader("Retry-After", String(limit.retryAfter)); res.status(429).json({ error: "Rate limit for your plan reached; retry shortly." }); return null; }
   return { plan, p };
@@ -145,7 +145,7 @@ export async function issuerScan(req, res) {
   // limit; larger scans page with ?offset=. The plan caps offset + holders.
   const offset = Math.max(0, Math.floor(Number(q.offset) || 0));
   const want = Math.min(PAGE_HOLDERS, Math.max(1, Math.floor(Number(q.holders) || PAGE_HOLDERS)));
-  if (offset >= g.p.issuer_holders) return res.status(402).json({ error: `Your ${g.p.label} plan scans up to ${g.p.issuer_holders} holders per issuer. ${BUY}` });
+  if (offset >= g.p.issuer_holders) return res.status(402).json({ code: "PLAN_LIMIT", error: `Your ${g.p.label} plan scans up to ${g.p.issuer_holders} holders per issuer. ${BUY}`, upgrade: upgradeOffer(g.plan) });
   const count = Math.min(want, g.p.issuer_holders - offset);
 
   let read;

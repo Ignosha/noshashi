@@ -133,6 +133,36 @@ describe("GET /api/v1/rippling", () => {
     expect(rippleRpcWithSource).not.toHaveBeenCalled();
   });
 
+  it("offers the paid plans when the free per-minute limit is reached", async () => {
+    take.mockReturnValue({ ok: false, retryAfter: 9 });
+    const r = res();
+    await handler(req(exposed.account), r);
+    expect(r.body.code).toBe("RATE_LIMIT");
+    expect(r.body.upgrade.plans.map((p) => p.id)).toEqual(["starter", "desk", "institution"]);
+    expect(r.body.upgrade.plans[0]).toMatchObject({ label: "Starter", monthly_usd: 299 });
+    expect(r.body.upgrade.compare_url).toBe("https://www.noshashi.app/rippling/#plans");
+  });
+
+  it("stops the free check at the daily allowance, before any ledger read, and offers the plans", async () => {
+    take.mockImplementation((key) => (key.startsWith("rippling-day:") ? { ok: false, retryAfter: 3600 } : { ok: true }));
+    const r = res();
+    await handler(req(exposed.account), r);
+    expect(r.code).toBe(429);
+    expect(r.body.code).toBe("FREE_LIMIT");
+    expect(r.body.error).toMatch(/20 free rippling checks/);
+    expect(r.body.upgrade.plans).toHaveLength(3);
+    expect(take).toHaveBeenCalledWith("rippling-day:test", { limit: 20, windowMs: 86_400_000 });
+    expect(rippleRpcWithSource).not.toHaveBeenCalled();
+  });
+
+  it("tells a free caller how many checks are left today", async () => {
+    take.mockImplementation((key) => (key.startsWith("rippling-day:") ? { ok: true, remaining: 7 } : { ok: true }));
+    const r = res();
+    await handler(req(exposed.account), r);
+    expect(r.code).toBe(200);
+    expect(r.headers["X-Free-Checks-Remaining"]).toBe("7");
+  });
+
   it("fails closed without upstream detail", async () => {
     rippleRpcWithSource.mockRejectedValue(new Error("upstream secret detail"));
     const r = res();

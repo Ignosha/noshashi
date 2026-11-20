@@ -575,7 +575,7 @@ async function buildPresignGuard(write) {
  */
 const money = (n) => (n ? `$${n.toLocaleString("en-US")} a month` : "Free");
 const PLAN_ROWS = Object.values(RIPPLING_PLANS).map((p) => `
-      <tr><td><b>${p.label}</b></td><td class="mono">${money(p.monthly_usd)}</td><td>${p.per_minute} a minute</td>
+      <tr><td><b>${p.label}</b></td><td class="mono">${money(p.monthly_usd)}</td><td>${p.per_minute} a minute${p.per_day ? `, ${p.per_day} a day` : ", no daily cap"}</td>
         <td>${p.batch ? `Up to ${p.batch} accounts a call` : "—"}</td>
         <td>${p.issuer_holders ? `Up to ${p.issuer_holders.toLocaleString("en-US")} holders per issuer` : "—"}</td></tr>`).join("");
 
@@ -693,8 +693,8 @@ async function buildRippling(write) {
     if(!ADDRESS.test(a)){say(st,"Enter a public XRPL address. It begins with r.","bad");return;}
     go.disabled=true; say(st,"Reading every trust line at one validated ledger…","");
     fetch("/api/v1/rippling?account="+encodeURIComponent(a),{headers:{Accept:"application/json"}})
-      .then(function(r){return r.json().then(function(b){if(!r.ok)throw new Error(b.error||"The ledger could not be read.");return b;});})
-      .then(function(b){show(b);say(st,"Read from "+b.source+" at "+b.observed_at+".","");
+      .then(function(r){var left=r.headers.get("X-Free-Checks-Remaining");return r.json().then(function(b){if(!r.ok){if(b.upgrade&&window.NoshashiUpgrade)window.NoshashiUpgrade.show(b);throw new Error(b.error||"The ledger could not be read.");}b.__left=left;return b;});})
+      .then(function(b){show(b);say(st,"Read from "+b.source+" at "+b.observed_at+"."+(b.__left!=null?" "+b.__left+" free checks left today; plans have no daily cap.":""),"");
         try{history.replaceState(null,"","?account="+encodeURIComponent(a));}catch(_){}})
       .catch(function(err){say(st,err.message,"bad");})
       .then(function(){go.disabled=false;});
@@ -709,7 +709,7 @@ async function buildRippling(write) {
     path: "/rippling/",
     head: CSS,
     body,
-    scripts: script,
+    scripts: `<script src="/assets/upgrade.js"></script>${script}`,
     structured: [breadcrumb("Rippling Exposure API", "/rippling/")],
   }));
 }
@@ -897,7 +897,7 @@ async function buildConsole(write) {
     current: "console",
     head: CSS + css,
     body,
-    scripts: `<script src="/assets/console.js"></script>`,
+    scripts: `<script src="/assets/upgrade.js"></script><script src="/assets/console.js"></script>`,
     structured: [breadcrumb("API Console", "/console/")],
   }));
 }

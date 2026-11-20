@@ -16,7 +16,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 
 /** What each plan unlocks. Prices are what the page and the invoice say. */
 export const RIPPLING_PLANS = {
-  free: { label: "Free", monthly_usd: 0, per_minute: 12, batch: 0, issuer_holders: 0 },
+  free: { label: "Free", monthly_usd: 0, per_minute: 12, per_day: 20, batch: 0, issuer_holders: 0 },
   starter: { label: "Starter", monthly_usd: 299, per_minute: 60, batch: 25, issuer_holders: 0 },
   desk: { label: "Desk", monthly_usd: 1250, per_minute: 120, batch: 100, issuer_holders: 500 },
   institution: { label: "Institution", monthly_usd: 3500, per_minute: 300, batch: 250, issuer_holders: 2000 },
@@ -47,3 +47,23 @@ export function planFor(req, env = process.env) {
 }
 
 export const BUY = "This needs a paid Rippling Exposure plan (Starter, Desk or Institution). See https://www.noshashi.app/rippling/#plans or email institutions@noshashi.app.";
+
+/**
+ * What to offer a caller who has reached a limit: the paid plans, where to
+ * compare them, and how to order. The console and the /rippling/ page
+ * show it as a plan picker; API clients can read it too.
+ */
+export function upgradeOffer(current = "free") {
+  const order = ["free", "starter", "desk", "institution"];
+  const plans = order
+    .filter((id) => id !== "free" && order.indexOf(id) > order.indexOf(current))
+    .map((id) => {
+      const p = RIPPLING_PLANS[id];
+      const unlocks = [`${p.per_minute} checks a minute, no daily cap`];
+      if (p.batch) unlocks.push(`fleet scans of up to ${p.batch} wallets a call`);
+      if (p.issuer_holders) unlocks.push(`issuer holder scans of up to ${p.issuer_holders.toLocaleString("en-US")} holders`);
+      return { id, label: p.label, monthly_usd: p.monthly_usd, unlocks,
+        order_url: `mailto:institutions@noshashi.app?subject=${encodeURIComponent(`Rippling Exposure API: ${p.label} plan`)}` };
+    });
+  return { current, plans, compare_url: "https://www.noshashi.app/rippling/#plans", contact: "institutions@noshashi.app" };
+}

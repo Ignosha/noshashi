@@ -315,7 +315,8 @@ describe("support console figure guard", () => {
   });
 
   it("catches an invented price", () => {
-    expect(ungroundedFigures("Pro costs $299 per month.")).toEqual(["$299"]);
+    // $299 is a real price now (the Rippling Starter plan), so the invented one is $199.
+    expect(ungroundedFigures("Pro costs $199 per month.")).toEqual(["$199"]);
   });
 
   it("catches an invented percentage", () => {

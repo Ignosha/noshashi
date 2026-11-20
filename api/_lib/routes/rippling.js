@@ -18,7 +18,7 @@ import { isValidClassicAddress } from "../classic-address.js";
 import { clientKey, take } from "../rate-limit.js";
 import { queryOf } from "../query.js";
 import { analyseRippling } from "../rippling.js";
-import { planFor, RIPPLING_PLANS } from "../rippling-keys.js";
+import { planFor, upgradeOffer, RIPPLING_PLANS } from "../rippling-keys.js";
 
 const PAGE = 400;
 const MAX_PAGES = 5;
@@ -71,7 +71,24 @@ export default async function handler(req, res) {
   const limit = take(`rippling:${plan}:${clientKey(req)}`, { limit: RIPPLING_PLANS[plan].per_minute });
   if (!limit.ok) {
     res.setHeader("Retry-After", String(limit.retryAfter));
-    return res.status(429).json({ error: "Please wait before checking again." });
+    return res.status(429).json(plan === "free"
+      ? { code: "RATE_LIMIT", error: `The free check allows ${RIPPLING_PLANS.free.per_minute} a minute. Wait ${limit.retryAfter} s, or use a paid plan for more.`, upgrade: upgradeOffer("free") }
+      : { code: "RATE_LIMIT", error: "Please wait before checking again." });
+  }
+  // The free check also has a daily allowance per caller. Like the
+  // per-minute limit it is kept per warm instance (see rate-limit.js), so
+  // it is a fair-use line, not a meter; paid keys have no daily cap.
+  if (plan === "free") {
+    const day = take(`rippling-day:${clientKey(req)}`, { limit: RIPPLING_PLANS.free.per_day, windowMs: 24 * 60 * 60_000 });
+    if (!day.ok) {
+      res.setHeader("Retry-After", String(day.retryAfter));
+      return res.status(429).json({
+        code: "FREE_LIMIT",
+        error: `You've used today's ${RIPPLING_PLANS.free.per_day} free rippling checks. Choose a plan to keep checking now, or come back tomorrow.`,
+        upgrade: upgradeOffer("free"),
+      });
+    }
+    if (typeof day.remaining === "number") res.setHeader("X-Free-Checks-Remaining", String(day.remaining));
   }
   try {
     const { info, lines, truncated, ledgerIndex, endpoint } = await readLines(account);

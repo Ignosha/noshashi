@@ -178,10 +178,10 @@
     var facts = $("cx-facts"); facts.textContent = "";
     var pill = $("cx-verdict");
     if (status >= 400) {
-      pill.textContent = status === 402 ? "PAID PLAN" : status === 429 ? "SLOW DOWN" : "NOT READ";
+      pill.textContent = status === 402 ? "PAID PLAN" : status === 429 ? (body.code === "FREE_LIMIT" ? "FREE LIMIT" : "SLOW DOWN") : "NOT READ";
       pill.setAttribute("data-tone", status === 402 ? "warn" : "bad");
       $("cx-headline").textContent = body.error || "The request was refused.";
-      $("cx-meaning").textContent = status === 402 ? "See the plans on the Rippling page, or email institutions@noshashi.app for a key." : "Nothing was concluded. Check the inputs and try again.";
+      $("cx-meaning").textContent = status === 402 || body.upgrade ? "Pick a plan to keep going: see the plans on the Rippling page, or email institutions@noshashi.app for a key." : "Nothing was concluded. Check the inputs and try again.";
       $("cx-receipt").textContent = "—";
       return;
     }
@@ -213,7 +213,7 @@
     var started = Date.now();
     fetch(r.url, init)
       .then(function (res) { return res.json().catch(function () { return { error: "The answer was not JSON." }; }).then(function (b) { return { s: res.status, b: b }; }); })
-      .then(function (x) { show(r, x.b, x.s); say(x.s < 400 ? "Answered in " + ((Date.now() - started) / 1000).toFixed(1) + " s." : "Refused (" + x.s + ").", x.s < 400 ? "" : "bad"); })
+      .then(function (x) { show(r, x.b, x.s); if ((x.s === 429 || x.s === 402) && window.NoshashiUpgrade) window.NoshashiUpgrade.show(x.b); say(x.s < 400 ? "Answered in " + ((Date.now() - started) / 1000).toFixed(1) + " s." : "Refused (" + x.s + ").", x.s < 400 ? "" : "bad"); })
       .catch(function () { say("The service could not be reached. Nothing was concluded.", "bad"); })
       .then(function () { $("cx-run").disabled = false; });
   }

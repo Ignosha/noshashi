@@ -57,6 +57,13 @@ export const ENTRIES = [
     links: [{ label: "Full pricing", href: "/pricing/" }],
   },
   {
+    id: "rippling-plans",
+    keywords: ["rippling", "noripple", "exposure", "limit", "free limit", "quota", "upgrade", "starter", "desk", "institution", "fleet", "batch", "issuer scan", "key", "api key"],
+    q: "Which Rippling Exposure API plan fits?",
+    a: "The free rippling check allows 12 a minute and 20 a day. Starter is $299 a month: 60 checks a minute with no daily cap, and fleet scans of up to 25 wallets a call, for an exchange or custodian checking its own hot, deposit and treasury wallets. Desk is $1,250 a month: 120 a minute, fleets of up to 100 wallets, and issuer holder scans of up to 500 holders, for a token issuer or a desk watching many accounts. Institution is $3,500 a month: 300 a minute, fleets of up to 250 wallets and scans of up to 2,000 holders per issuer. Every plan is read-only. Keys are issued once the first invoice is paid; annual prepayment is 10% less.",
+    links: [{ label: "Compare the plans", href: "/rippling/#plans" }, { label: "Order a plan", href: "mailto:institutions@noshashi.app?subject=Rippling%20Exposure%20API%20plan" }],
+  },
+  {
     id: "download",
     keywords: ["download", "install", "mac", "macos", "windows", "linux", "dmg", "exe", "deb", "rpm", "appimage", "msi", "platform", "get"],
     q: "How do I download it?",
