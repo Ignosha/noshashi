@@ -86,41 +86,14 @@ async function rpc(method, params) {
 }
 
 /**
- * Live steps. Continuity is shown on a real issued-token payment, RLUSD when
- * one is in the latest ledgers, read from Mainnet as the video is recorded. The posted credit stands in for the operator's books
+ * Live steps. Continuity is shown on a real issued-token payment (findPayment,
+ * below), read from Mainnet just before the video is recorded. The posted credit stands in for the operator's books
  * and is built from that payment's own fields, as the narration says.
  */
 const LIVE = {
   async "continuity-load"(page, state) {
-    // The RLUSD issuer's own history is mostly order-book activity, so the
-    // payment is found by reading the latest validated ledgers instead:
-    // the newest successful, full (not partial) RLUSD payment of at least
-    // one unit. If none is in the last 300 ledgers, the newest such
-    // payment of any issued token is used; the narration does not name it.
-    const usable = (t, rlusd) => {
-      const m = t.metaData || t.meta || {}, d = m.delivered_amount;
-      return t.TransactionType === "Payment" && m.TransactionResult === "tesSUCCESS" && !(Number(t.Flags) & 0x00020000) &&
-        d && typeof d === "object" && Number(d.value) >= 1 && d.issuer !== t.Destination && t.Account !== t.Destination &&
-        (!rlusd || (d.issuer === RLUSD && d.currency === RLUSD_HEX));
-    };
-    const latest = (await rpc("ledger", { ledger_index: "validated" })).ledger_index;
-    let tx = null, fallback = null;
-    for (let i = 0; i < 300 && !tx; i++) {
-      const l = (await rpc("ledger", { ledger_index: latest - i, transactions: true, expand: true })).ledger;
-      for (const t of l.transactions || []) {
-        if (usable(t, true)) { tx = { t, ledger: l.ledger_index }; break; }
-        if (!fallback && usable(t, false)) fallback = { t, ledger: l.ledger_index };
-      }
-    }
-    const pick = tx || fallback;
-    if (!pick) throw new Error("no recent issued-token payment found");
-    const t = pick.t, d = (t.metaData || t.meta).delivered_amount, hash = t.hash;
-    const credit = { txHash: hash, amount: d.value, issuer: d.issuer, currency: d.currency };
-    state.scenario = { requirement: { destination: t.Destination, issuer: d.issuer, currency: d.currency, amount: d.value }, creditExportComplete: true, credits: [credit] };
-    state.hash = hash;
-    state.note = `payment ${hash} in ledger ${pick.ledger}${tx ? " (RLUSD)" : ""}`;
     await page.fill("#data", JSON.stringify(state.scenario, null, 2));
-    await page.fill("#hash", hash);
+    await page.fill("#hash", state.hash);
   },
   async "continuity-double"(page, state) {
     const s = JSON.parse(JSON.stringify(state.scenario));
@@ -144,6 +117,40 @@ const LIVE = {
   },
 };
 
+
+/**
+ * The payment Continuity is shown on, found before recording starts so the
+ * search is never on camera. The RLUSD issuer's own history is mostly
+ * order-book activity, so the latest validated ledgers are read instead:
+ * the newest successful, full (not partial) RLUSD payment of at least one
+ * unit. If none is in the last 300 ledgers, the newest such payment of any
+ * issued token is used; the narration does not name the token.
+ */
+async function findPayment(state) {
+  const usable = (t, rlusd) => {
+    const m = t.metaData || t.meta || {}, d = m.delivered_amount;
+    return t.TransactionType === "Payment" && m.TransactionResult === "tesSUCCESS" && !(Number(t.Flags) & 0x00020000) &&
+      d && typeof d === "object" && Number(d.value) >= 1 && d.issuer !== t.Destination && t.Account !== t.Destination &&
+      (!rlusd || (d.issuer === RLUSD && d.currency === RLUSD_HEX));
+  };
+  const latest = (await rpc("ledger", { ledger_index: "validated" })).ledger_index;
+  let tx = null, fallback = null;
+  for (let i = 0; i < 300 && !tx; i++) {
+    const l = (await rpc("ledger", { ledger_index: latest - i, transactions: true, expand: true })).ledger;
+    for (const t of l.transactions || []) {
+      if (usable(t, true)) { tx = { t, ledger: l.ledger_index }; break; }
+      if (!fallback && usable(t, false)) fallback = { t, ledger: l.ledger_index };
+    }
+  }
+  const pick = tx || fallback;
+  if (!pick) throw new Error("no recent issued-token payment found");
+  const t = pick.t, d = (t.metaData || t.meta).delivered_amount, hash = t.hash;
+  const credit = { txHash: hash, amount: d.value, issuer: d.issuer, currency: d.currency };
+  state.scenario = { requirement: { destination: t.Destination, issuer: d.issuer, currency: d.currency, amount: d.value }, creditExportComplete: true, credits: [credit] };
+  state.hash = hash;
+  state.note = `payment ${hash} in ledger ${pick.ledger}${tx ? " (RLUSD)" : ""}`;
+}
+
 const OVERLAY = () => {
   window.__cap = (t, chip) => {
     let el = document.getElementById("__cap"), c = document.getElementById("__chip");
@@ -163,11 +170,13 @@ const OVERLAY = () => {
 const vttTime = (ms) => new Date(ms).toISOString().slice(11, 23);
 
 async function record(browser, t) {
+  const state = {};
+  if (t.steps.some((st) => st[0] === "live" && st[1] === "continuity-load")) await findPayment(state);
   const tmp = fs.mkdtempSync(path.join(CACHE, "rec-"));
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, colorScheme: "dark", recordVideo: { dir: tmp, size: { width: W, height: H } } });
   await ctx.addInitScript(OVERLAY);
   const page = await ctx.newPage();
-  const t0 = Date.now(), cues = [], state = {};
+  const t0 = Date.now(), cues = [];
   const chip = `NOSHASHI TUTORIAL · ${t.audience === "developers" ? "DEVELOPERS" : "INSTITUTIONS"}`;
   let caption = "";
   const recap = () => page.evaluate(([x, c]) => window.__cap && window.__cap(x, c), [caption, chip]).catch(() => {});
