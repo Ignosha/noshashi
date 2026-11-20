@@ -1,0 +1,29 @@
+WEBVTT
+
+1
+00:00:01.303 --> 00:00:08.452
+For developers: every NOSHASHI API is a plain HTTPS GET or POST that returns JSON.
+
+2
+00:00:09.854 --> 00:00:17.408
+This page documents the Asset Risk API and the Compliance API, with request and response examples.
+
+3
+00:00:18.670 --> 00:00:23.749
+The fastest way to learn an endpoint is the console. Run any question once.
+
+4
+00:00:31.074 --> 00:00:37.433
+For your engineers: the exact curl command that produced this answer. Copy it straight into a terminal.
+
+5
+00:00:38.974 --> 00:00:42.005
+And the full JSON response, field for field.
+
+6
+00:00:42.006 --> 00:00:48.941
+Every response names the ledger index, the server it read, and a SHA-256 receipt of the report.
+
+7
+00:00:53.825 --> 00:01:01.272
+This is the same endpoint called directly. No key and no sign-up for the free tier; just a rate limit per minute.
