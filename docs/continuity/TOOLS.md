@@ -1,6 +1,6 @@
 # Continuity development tools
 
-Open the desktop app and select Continuity, then Access forecast & rule impact. Load sample to exercise both tools without network access. The web page at /continuity-preview/ continues to expose the issuer sample. The access tools are currently part of the desktop frontend.
+Open the desktop app and select Continuity, then Change rehearsal. Load sample to exercise both tools without network access. The web page at /continuity-preview/ continues to expose the issuer sample. The access tools are currently part of the desktop frontend.
 
 ## Implemented in this branch
 
@@ -8,6 +8,7 @@ Open the desktop app and select Continuity, then Access forecast & rule impact. 
 | --- | --- | --- |
 | Issuer sample review | Sample closure list JSON, fixed fictional balances | Queue, reviewer assignment while the workspace is open and JSON export |
 | Access forecast | Mainnet domain ID, 1–20 distinct account addresses, horizon of 1–365 days | Current admission and projected admission, final qualifying expiry within the horizon |
+| Change rehearsal | Operator-declared account/domain prerequisites and activity deadlines | Deadline queue, baseline and proposed access findings, missing evidence, review owner and next action |
 | Rule removal scenario | Current domain rules with at least one retained rule | Current admission and hypothetical admission at the same ledger close time |
 
 The access engine lives in src/lib/continuity/access.ts. It reuses admission from supabase/functions/_shared/ledgerRegistry.ts. Existing registry.ts methods read all observations at one validated ledger index. Both tools can be reused by a future authenticated API, but this change adds desktop tools only. No public HTTP endpoint is introduced.
@@ -20,10 +21,12 @@ Partial reads, missing domains and network failures stop the portfolio result. T
 
 ## Verification
 
-Run npm run build for the desktop frontend and npm test -- tests/continuity-access.test.js tests/continuity-registry-read.test.js tests/continuity.test.js src/lib/compliance/__tests__/registry.test.ts for related policy tests. Native macOS signing, notarization and physical Intel Mac testing remain separate release checks. The sample issuer review still needs a production balance reader and durable team workflow before contracted use.
+Run npm run build for the desktop frontend and npm test -- tests/continuity-rehearsal.test.js tests/continuity-access.test.js tests/continuity-registry-read.test.js tests/continuity.test.js src/lib/compliance/__tests__/registry.test.ts for related policy tests. Native macOS signing, notarization and physical Intel Mac testing remain separate release checks. The sample issuer review still needs a production balance reader and durable team workflow before contracted use.
 
 ## Protocol references
 
 - [Credential fields, acceptance flag and expiration](https://xrpl.org/docs/references/protocol/ledger-data/ledger-entry-types/credential)
 - [Permissioned domain access rules](https://xrpl.org/docs/concepts/tokens/decentralized-exchange/permissioned-domains)
 - [Permissioned DEX behavior after credential and rule changes](https://xrpl.org/docs/concepts/tokens/decentralized-exchange/permissioned-dexes)
+
+See [the product evolution and demonstration](EVOLUTION.md) for the combined workflow and scope.

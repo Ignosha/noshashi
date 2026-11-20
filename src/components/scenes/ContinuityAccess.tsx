@@ -8,6 +8,7 @@ import {
   validatedLedger, type CredentialEntry, type DomainEntry, type LedgerAt,
 } from "@/lib/compliance/registry";
 import { compareDomainRules, forecastAccess } from "@/lib/continuity/access";
+import { ContinuityWork } from "./ContinuityWork";
 import { sampleAccounts, sampleDomain, sampleTime } from "@/lib/continuity/sample";
 
 type Portfolio = {
@@ -80,7 +81,7 @@ export function ContinuityAccess() {
 
   return <div className="h-full overflow-auto p-4 space-y-4">
     <Panel label="ACCESS CONTINUITY">
-      <h2 className="text-xl mb-2">Which desks could lose access?</h2>
+      <h2 className="text-xl mb-2">Rehearse a change before your team acts</h2>
       <p className="text-sm text-muted-foreground">Forecast credential expiry and test a proposed removal of credential rules. Select a domain and accounts to read from XRPL Mainnet.</p>
       <form className="mt-4 space-y-3" onSubmit={event => { event.preventDefault(); void read(); }}>
         <label className="block text-sm">Permissioned domain ID<Input value={domainId} onChange={event => { setDomainId(event.target.value); setPortfolio(null); }} disabled={busy} /></label>
@@ -111,6 +112,18 @@ export function ContinuityAccess() {
         <p className="text-sm mt-1">{row.forecast.lossAt ? `Last qualifying credential expires ${row.forecast.lossAt}` : `Projected through ${row.forecast.horizonAt}`}</p>
         <p className="text-sm mt-2">Rule removal scenario · {row.ruleImpact?.outcome ?? "Select at least one rule"}</p>
       </Panel>)}
+      {report && <ContinuityWork
+        key={portfolio.source + (portfolio.ledger?.index ?? "sample")}
+        snapshot={portfolio}
+        proposed={report.proposedRules}
+        sample={portfolio.source === "fictional sample"}
+        save={async work => {
+          const evidence = { version: 1, ...report, rehearsal: work };
+          const digest = await sha256Hex(canonical(evidence));
+          await saveTextFile("continuity-change-rehearsal.json", JSON.stringify({ evidence, sha256: digest }, null, 2), "application/json");
+          setMessage("Saved change rehearsal and evidence digest.");
+        }}
+      />}
       <Button disabled={!report || exporting} onClick={() => void exportReport()}>{exporting ? "Saving…" : "Export access evidence"}</Button>
     </>}
   </div>;

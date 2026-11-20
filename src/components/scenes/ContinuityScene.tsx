@@ -21,7 +21,7 @@ export default function ContinuityScene() {
   return <div className="h-full flex flex-col">
     <nav aria-label="Continuity workspaces" className="flex flex-wrap gap-2 border-b p-3">
       <Button variant={tool === "issuer" ? "default" : "outline"} aria-pressed={tool === "issuer"} onClick={() => setTool("issuer")}>Issuer review sample</Button>
-      <Button variant={tool === "access" ? "default" : "outline"} aria-pressed={tool === "access"} onClick={() => setTool("access")}>Access forecast & rule impact</Button>
+      <Button variant={tool === "access" ? "default" : "outline"} aria-pressed={tool === "access"} onClick={() => setTool("access")}>Change rehearsal</Button>
     </nav>
     <div className="min-h-0 flex-1">
       <div hidden={tool !== "issuer"} className="h-full"><IssuerReview /></div>

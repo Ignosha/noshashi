@@ -8,7 +8,7 @@ export function mountDesk(root, save) {
   <div class="actions"><label>Import sample closure list <input type="file" accept=".json"></label>
   <button data-example>Save example list</button><button data-report>Export review</button></div>
   <p role="status"></p><section aria-label="Review queue"></section>
-  <details><summary>More Continuity tools</summary><p>The desktop Access forecast &amp; rule impact workspace projects credential expiry and tests proposed rule removals. Payment Reconciliation and Lending Exposure are proposed extensions.</p></details></article>`;
+  <details><summary>More Continuity tools</summary><p>The desktop Change rehearsal workspace links declared access requirements to planned trades, payments, bridge transfers, loans and offboarding reviews. Settlement reconciliation and credit analysis are proposed extensions.</p></details></article>`;
   const status = root.querySelector('[role=status]');
   function render() {
     const cards = rows.map(row => {

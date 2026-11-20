@@ -10,6 +10,10 @@ An analyst supplies a permissioned domain and up to 20 accounts. The access tool
 
 The forecast assumes the observed credentials and rules persist. Issuer revocation, renewal, domain deletion, network changes and unrelated transaction restrictions can change the outcome. Admission to a domain is only one condition of completing a transaction. The interface labels fictional samples explicitly. Domain owners retain owner access. Reviewer assignment in the issuer sample lasts while the Continuity workspace is open.
 
+## Change rehearsal
+
+The desktop now links access forecasts to operator-declared activities and deadlines. It distinguishes access problems caused by proposed rule removals from baseline expiry, preserves missing evidence and exports review owners and next actions. Trades, payments, bridge transfers, loans and offboarding are activity labels. The rehearsal evaluates declared domain-access prerequisites. See [the evolution brief](EVOLUTION.md) for examples and remaining integrations.
+
 ## Why a buyer might care
 
 A credential expiry alert alone can create unnecessary work when another credential keeps a desk eligible. A last-qualifying-credential forecast lets an operator prioritize accounts actually projected to lose domain access. A rule removal scenario lets a domain owner review affected accounts before authorizing a change elsewhere. An offboarding reconciliation can expose unresolved balances and missing customer-to-wallet mappings.
