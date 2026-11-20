@@ -17,7 +17,7 @@ describe("serverless functions", () => {
   it("rewrites every public tool URL to a route that exists", async () => {
     const { rewrites = [] } = JSON.parse(readFileSync("vercel.json", "utf8"));
     const tools = rewrites.filter((r) => r.destination.startsWith("/api/tools?tool="));
-    expect(tools.map((r) => r.source).sort()).toEqual(["/api/badge", "/api/book", "/api/book-health", "/api/delivered", "/api/issuer-history", "/api/issuer-state", "/api/mpt-authority", "/api/rlusd", "/api/settlement-check", "/api/stellar/authority", "/api/terminal", "/api/treasury", "/api/v1/asset-risk"]);
+    expect(tools.map((r) => r.source).sort()).toEqual(["/api/badge", "/api/book", "/api/book-health", "/api/delivered", "/api/issuer-history", "/api/issuer-state", "/api/mpt-authority", "/api/rlusd", "/api/settlement-check", "/api/stellar/authority", "/api/terminal", "/api/treasury", "/api/v1/asset-risk", "/api/v1/rippling", "/api/v1/rippling/batch", "/api/v1/rippling/issuer"]);
     const source = readFileSync("api/tools.js", "utf8");
     for (const r of tools) expect(source).toContain(r.destination.split("=")[1]);
   });

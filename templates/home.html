@@ -1675,6 +1675,20 @@
   @media (min-width:640px){.rh-legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0}}
   .rh-depthc{height:clamp(270px,26vw,350px);cursor:crosshair}
   .rh-dp-sum{margin:10px 0 0;font-size:12.5px;line-height:1.6;color:var(--faint);font-variant-numeric:tabular-nums}
+  /* ── Vendor & research (2026-11-20) ─────────────────────────────── */
+  .vx-flow{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--rule)}
+  .vx-flow li{padding:18px 22px 4px 0;font-size:14px;line-height:1.6;color:var(--muted)}
+  .vx-flow li+li{padding-left:22px;border-left:1px solid var(--rule)}
+  .vx-flow span,.vx-c span,.vx-n span{display:block;font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+  .vx-flow b,.vx-c b,.vx-n b{display:block;font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;color:var(--ink);margin-bottom:6px}
+  .vx-actions{margin:22px 0 0;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+  .vx-cards,.vx-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:18px;border-top:1px solid var(--rule)}
+  .vx-c,.vx-n{display:block;padding:18px 20px 20px 0;color:var(--muted);font-size:13.5px;line-height:1.6;text-decoration:none;border-bottom:1px solid var(--rule)}
+  .vx-c:hover b,.vx-n:hover b,.vx-c:focus-visible b,.vx-n:focus-visible b{text-decoration:underline;text-underline-offset:4px}
+  .vx-cards > a:not(:nth-child(3n+1)),.vx-notes > a:not(:nth-child(3n+1)){padding-left:20px;border-left:1px solid var(--rule)}
+  @media (max-width:900px){.vx-flow,.vx-cards,.vx-notes{grid-template-columns:1fr}
+    .vx-flow li+li{padding-left:0;border-left:0;border-top:1px solid var(--rule)}
+    .vx-cards > a:not(:nth-child(3n+1)),.vx-notes > a:not(:nth-child(3n+1)){padding-left:0;border-left:0}}
 </style>
 <link rel="stylesheet" href="/assets/desk-editorial.css">
 <link rel="stylesheet" href="/assets/desk-experience.css?v=20261101-first-use">
@@ -1700,13 +1714,13 @@
 
     <div class="rh-title lx-hero">
       <div class="rh-title-text">
-        <p class="rh-title-k"><span class="lx-overline-rule" aria-hidden="true"></span>XRPL analysis for treasury, custody &amp; operations</p>
-        <h1 class="lx-headline rf-headline">Intelligence for<br>every ledger<br><em>decision.</em></h1>
-        <p class="rh-title-dek">Verify XRPL payments, investigate asset issuers, assess funded liquidity and review configurable policies — with traceable evidence.</p>
-        <p class="rh-title-cta"><a class="rh-btn lg" href="#research-pillars">Explore Platform <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="rh-btn lg ghost" href="/contact/?topic=institutions">Request Institutional Demo <span aria-hidden="true">→</span></a></p>
+        <p class="rh-title-k"><span class="lx-overline-rule" aria-hidden="true"></span>Products &amp; research for the XRP Ledger</p>
+        <h1 class="lx-headline rf-headline">Products that<br>read the ledger.<br><em>Research that shows why.</em></h1>
+        <p class="rh-title-dek">NOSHASHI builds read-only tools for exchanges, custodians, issuers and treasuries on the XRP Ledger, and publishes the research behind each one. Reconcile deposits, find swappable balances, check a transaction before it is signed, and keep a receipt for every answer.</p>
+        <p class="rh-title-cta"><a class="rh-btn lg" href="/products/">See the products <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="rh-btn lg ghost" href="/research/">Read the research <span aria-hidden="true">→</span></a></p>
         <p class="rh-title-fine">Free public tools · No account or wallet connection · Read-only beta</p>
-        <p class="rf-quiet-links"><a href="/intelligence/">View Research</a><a href="/docs/">Review Documentation</a></p>
-        <div class="lx-hero-bottom"><span>01 / Verify · 02 / Investigate · 03 / Decide · 04 / Prove</span><a href="#lx-investigate" aria-label="Scroll to the live issuer investigation">Scroll to investigate <span aria-hidden="true">↓</span></a></div>
+        <p class="rf-quiet-links"><a href="/console/">API Console</a><a href="/continuity/">Continuity</a><a href="/rippling/">Rippling Exposure API</a><a href="/developers/">Developers &amp; API</a><a href="/contact/?topic=institutions">Talk to us</a></p>
+        <div class="lx-hero-bottom"><span>01 / Products · 02 / Research · 03 / Developers · 04 / Evidence</span><a href="#lx-investigate" aria-label="Scroll to the live issuer investigation">Scroll to investigate <span aria-hidden="true">↓</span></a></div>
       </div>
       <figure class="rh-emblem ed-seal lx-machine" aria-labelledby="rh-em-c">
         <div class="ed-seal-meta"><span>Fig. 01 / Inside the reading</span><span>Exploratory instrument</span></div>
@@ -1729,7 +1743,7 @@
       </figure>
     </div>
 
-    <nav class="ed-index" aria-label="Explore the ledger desk"><span>Inside the desk</span><a href="#lx-investigate">Investigate</a><a href="#rh-t1">Compare issuers</a><a href="#public">Three workflows</a><a href="#research-case">Sample case file</a><a href="#operational-status">Product status</a><a href="#pilot">Evaluate with us →</a></nav>
+    <nav class="ed-index" aria-label="Explore the ledger desk"><span>Inside the desk</span><a href="#vx-featured">Continuity</a><a href="#vx-products">Products</a><a href="#vx-research">Research</a><a href="#lx-investigate">Investigate</a><a href="#rh-t1">Compare issuers</a><a href="#public">Three workflows</a><a href="#research-case">Sample case file</a><a href="#operational-status">Product status</a><a href="#pilot">Evaluate with us →</a></nav>
     <!--SLOT:PILLARS-->
 
     <section class="lx-investigation" id="lx-investigate" aria-labelledby="lx-investigate-title">
@@ -1752,6 +1766,38 @@
         </article>
       </div>
     </section>
+  </section>
+
+  <section class="rh-sec vx-feature" id="vx-featured" aria-labelledby="vx-feature-t">
+    <div class="lx-section-heading"><div><p class="ed-kicker">Featured build / Continuity</p><h2 id="vx-feature-t">Was that deposit<br><em>credited exactly once?</em></h2></div><p>Continuity checks one issued-token deposit against the credits your system posted for it. Two Mainnet servers on one side, your own books on the other, and a plain answer in the middle.</p></div>
+    <ol class="vx-flow">
+      <li><span>01 / The ledger</span><b>Read the deposit twice</b>Fetched from s1 and s2.ripple.com. The replies must match: validated, successful, the same delivered amount, token and issuer.</li>
+      <li><span>02 / Your books</span><b>Read what you credited</b>From your export, or a read-only SQLite view through the open-source adapter on your own machine. Your records never leave it.</li>
+      <li><span>03 / The answer</span><b>Exactly once, or why not</b>Right issuer, the amount actually delivered, one credit. A short delivery, a foreign issuer, a duplicate or a missing credit is named.</li>
+    </ol>
+    <p class="vx-actions"><a class="rh-btn" href="/continuity/">Try the rehearsal <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="lx-inline-link" href="https://github.com/Ignosha/noshashi/tree/main/tools/continuity">Run it next to your database →</a></p>
+  </section>
+
+  <section class="rh-sec" id="vx-products" aria-labelledby="vx-products-t">
+    <p class="ed-kicker">Products / Read-only, with a receipt for every answer</p><h2 class="rh-h2 rh-h2-plain" id="vx-products-t">Built from the research. Sold on what it does.</h2>
+    <div class="vx-cards">
+      <a class="vx-c" href="/rippling/"><span>New · API</span><b>Rippling Exposure</b>Which balances anyone's payment can swap between an account's own trust lines, and the unsigned fixes.</a>
+      <a class="vx-c" href="/presign-guard/"><span>Self-hosted</span><b>Pre-Sign Guard</b>APPROVE, REJECT or RETRY before an XRPL transaction is signed, on Fireblocks or any signer.</a>
+      <a class="vx-c" href="/watch/"><span>Alerts</span><b>Issuer Watch</b>An email the moment an issuer turns on a freeze, enables clawback or changes its keys.</a>
+      <a class="vx-c" href="/evidence-report/"><span>Evidence</span><b>Ledger Evidence Report</b>Issuer controls, treasury and real depth in a PDF anyone can verify by its fingerprint.</a>
+      <a class="vx-c" href="/listing-review/"><span>Exchanges</span><b>Listing review</b>The issuer, supply and liquidity of a token, reviewed before you list it.</a>
+      <a class="vx-c" href="/developers/"><span>Developers</span><b>Compliance &amp; Asset Risk APIs</b>Screening, authority and settlement checks as JSON, each with a ledger index and receipt.</a>
+    </div>
+    <p class="vx-actions"><a class="lx-inline-link" href="/products/">Every product, with prices →</a></p>
+  </section>
+
+  <section class="rh-sec" id="vx-research" aria-labelledby="vx-research-t">
+    <p class="ed-kicker">Research / Measured on Mainnet, dated, repeatable</p><h2 class="rh-h2 rh-h2-plain" id="vx-research-t">The ledger can be misread. We publish where.</h2>
+    <div class="vx-notes">
+      <a class="vx-n" href="/rippling/#research"><span>20 Nov 2026 · Rippling</span><b>Five of twelve sampled USD holders could have a balance swapped between their own lines.</b>Holding a currency on several open lines is not exposure on its own; room to receive is what makes it so.</a>
+      <a class="vx-n" href="/misread/"><span>Field guide</span><b>The ledger can be misread.</b>Partial payments, lookalike tickers and advertised depth: what a quick reading gets wrong.</a>
+      <a class="vx-n" href="/research/"><span>Findings</span><b>Every published finding</b>Each with its ledger index, method and the limits of what it shows.</a>
+    </div>
   </section>
 
   <!--SLOT:RESEARCHCASE-->

@@ -190,6 +190,18 @@
       "destination": "/api/tools?tool=book-health"
     },
     {
+      "source": "/api/v1/rippling",
+      "destination": "/api/tools?tool=rippling"
+    },
+    {
+      "source": "/api/v1/rippling/batch",
+      "destination": "/api/tools?tool=rippling-batch"
+    },
+    {
+      "source": "/api/v1/rippling/issuer",
+      "destination": "/api/tools?tool=rippling-issuer"
+    },
+    {
       "source": "/api/v1/asset-risk",
       "destination": "/api/tools?tool=asset-risk"
     },
