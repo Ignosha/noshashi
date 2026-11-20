@@ -8,7 +8,7 @@ export function mountDesk(root, save) {
   <div class="actions"><label>Import sample closure list <input type="file" accept=".json"></label>
   <button data-example>Save example list</button><button data-report>Export review</button></div>
   <p role="status"></p><section aria-label="Review queue"></section>
-  <details><summary>Other proposed workspaces</summary><p>Access Continuity would identify desks losing their last eligible credential. Payment Reconciliation would track issued checks through collection. Lending Exposure would compare a company’s verified wallets with its credit limit.</p></details></article>`;
+  <details><summary>More Continuity tools</summary><p>The desktop Access forecast &amp; rule impact workspace projects credential expiry and tests proposed rule removals. Payment Reconciliation and Lending Exposure are proposed extensions.</p></details></article>`;
   const status = root.querySelector('[role=status]');
   function render() {
     const cards = rows.map(row => {

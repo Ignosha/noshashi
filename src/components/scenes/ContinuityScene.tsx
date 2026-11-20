@@ -1,9 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { mountDesk } from "@/continuity/desk.js";
 import "@/continuity/review.css";
 import { saveTextFile } from "@/lib/export";
+import { ContinuityAccess } from "./ContinuityAccess";
+import { Button } from "@/components/ui/button";
 
-export default function ContinuityScene() {
+function IssuerReview() {
   const root = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const element = root.current;
@@ -12,4 +14,15 @@ export default function ContinuityScene() {
     return () => element.replaceChildren();
   }, []);
   return <div className="continuity-review" ref={root} />;
+}
+
+export default function ContinuityScene() {
+  const [tool, setTool] = useState("issuer");
+  return <div className="h-full flex flex-col">
+    <nav aria-label="Continuity workspaces" className="flex flex-wrap gap-2 border-b p-3">
+      <Button variant={tool === "issuer" ? "default" : "outline"} aria-pressed={tool === "issuer"} onClick={() => setTool("issuer")}>Issuer review sample</Button>
+      <Button variant={tool === "access" ? "default" : "outline"} aria-pressed={tool === "access"} onClick={() => setTool("access")}>Access forecast & rule impact</Button>
+    </nav>
+    <div className="min-h-0 flex-1">{tool === "issuer" ? <IssuerReview /> : <ContinuityAccess />}</div>
+  </div>;
 }
