@@ -57,10 +57,10 @@
   },
   "i2-continuity": {
     "id": "i2-continuity",
-    "seconds": 160,
-    "recorded_at": "2026-11-20T18:00:38.242Z",
+    "seconds": 81,
+    "recorded_at": "2026-11-20T18:09:19.843Z",
     "voiced": true,
-    "live_note": "payment 41964356531C69A08EEB32F0687E0F93504D630B5C893CA967C9912DD50C364E in ledger 108458631 (RLUSD)",
-    "bytes": 3400266
+    "live_note": "payment F6AF4383B9DB740CAD800C9D6EC927D28AE0826BA42C6E335BCFBBBEAA846623 in ledger 108458807 (RLUSD)",
+    "bytes": 2476792
   }
 }
