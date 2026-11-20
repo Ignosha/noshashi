@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       ids:
-        description: "Tutorial ids to (re)record, space-separated; empty records all"
+        description: "Tutorial ids to (re)record, space-separated; empty records the missing ones"
         required: false
         default: ""
   push:
@@ -55,7 +55,14 @@ jobs:
         env:
           TTS_WORKERS: "4"
           IDS: ${{ inputs.ids }}
-        run: node scripts/tutorials/build.mjs /tmp/kokoro $IDS
+        run: |
+          # A push records only the tutorials whose video is missing; run the
+          # workflow by hand with ids to re-record existing ones.
+          if [ -z "$IDS" ]; then
+            IDS=$(node -e 'import("./scripts/tutorials/tutorials.mjs").then(m => console.log(m.TUTORIALS.map(t => t.id).filter(id => !require("fs").existsSync("site/tutorials/videos/" + id + ".mp4")).join(" ")))')
+          fi
+          echo "Recording: ${IDS:-nothing}"
+          if [ -n "$IDS" ]; then node scripts/tutorials/build.mjs /tmp/kokoro $IDS; fi
       - name: Commit the videos
         if: success() || failure()
         run: |
