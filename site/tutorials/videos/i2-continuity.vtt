@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:01.976 --> 00:00:10.959
+Continuity answers one question for an exchange, custodian or payments firm: was this deposit credited to the customer exactly once?
+
+2
+00:00:11.964 --> 00:00:17.555
+It reads the payment from two Mainnet servers and compares it with the credits your own books posted.
+
+3
+00:00:18.563 --> 00:00:24.794
+Here is a real issued-token payment read from Mainnet a moment ago, and one posted credit for it.
+
+4
+00:00:24.797 --> 00:00:30.644
+In production, that credit comes straight from your accounting database through the read-only adapter.
+
+5
+00:00:31.649 --> 00:00:37.710
+The transaction hash goes here. Press Verify, and both servers are asked for the same payment.
+
+6
+00:00:40.564 --> 00:00:49.825
+Both servers agree. Every check is listed: validated, destination, issuer, currency, delivered amount, and exactly one matching credit.
+
+7
+00:00:51.230 --> 00:00:56.139
+The report keeps the ledger index and hash, so an auditor can repeat the reading.
+
+8
+00:00:57.764 --> 00:01:02.459
+Now suppose your books posted the same deposit twice: a double credit.
+
+9
+00:01:06.547 --> 00:01:15.168
+Continuity fails it and says why: more than one credit matches this deposit. That is money paid out twice, caught before it leaves.
+
+10
+00:01:15.175 --> 00:01:19.657
+Export evidence saves the full report as a file for your records.

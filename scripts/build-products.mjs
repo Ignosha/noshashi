@@ -31,6 +31,7 @@ import { renderPage, breadcrumb, ORIGIN } from "../api/_lib/shell.js";
 import { EVIDENCE_TIERS } from "../api/_lib/evidence-tiers.js";
 import { RIPPLING_PLANS } from "../api/_lib/rippling-keys.js";
 import { writeContinuityPackage, CONTINUITY_ZIP } from "./package-continuity.mjs";
+import { TUTORIALS, AUDIENCES } from "./tutorials/tutorials.mjs";
 
 const usd = (cents) => `$${(cents / 100).toLocaleString("en-US")}`;
 const VERIFIED = usd(EVIDENCE_TIERS.verified.cents);
@@ -50,6 +51,7 @@ export const PRODUCT_SALES_PAGES = [
   ["/products/", "weekly", "0.9"],
   ["/rippling/", "weekly", "0.8"],
   ["/console/", "weekly", "0.9"],
+  ["/tutorials/", "weekly", "0.8"],
 ];
 
 const CSS = `<style>
@@ -753,6 +755,7 @@ async function buildProductsHub(write) {
   <p>Every product reads validated XRP Ledger state, returns the ledger index it read and a SHA-256 receipt, and never holds keys,
      signs or moves funds. The research behind them is published under <a href="/research/">Research</a>, and each product page says
      what it costs and what it does not do.</p>
+  <p><a href="/tutorials/">Watch the video tutorials</a>: every product, recorded live on Mainnet.</p>
 </div>
 <section>
   <div class="vx-grid">${cards}
@@ -838,6 +841,7 @@ async function buildConsole(write) {
   <p>Every NOSHASHI API in one place, without writing code. Pick a question, enter a public address, and read the answer in plain
      language. The exact JSON and the one-line command your engineers need are underneath. Nothing here can sign, move funds or
      see a private key.</p>
+  <p class="pv-note">New here? <a href="/tutorials/#i4-api-console">Watch the console tutorial</a>.</p>
   <ol class="cx-steps">
     <li><b>1 · Pick a question</b>Grouped by what you are responsible for: your holdings, your token, markets, treasury, payments.</li>
     <li><b>2 · Enter a public address</b>Or press “Use an example” to load a well-known public account.</li>
@@ -898,7 +902,85 @@ async function buildConsole(write) {
   }));
 }
 
+/* ── /tutorials/ ────────────────────────────────────────────────── */
+/*
+ * Narrated screen recordings of the real site reading XRPL Mainnet,
+ * made by scripts/tutorials/build.mjs (.github/workflows/tutorial-videos.yml).
+ * The transcript under each video is its narration, from tutorials.mjs.
+ */
+async function buildTutorials(write) {
+  const css = `<style>
+.tu-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 6px}
+.tu-group{margin-top:34px}
+.tu-group>p{color:var(--muted);margin:4px 0 0}
+.tu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:22px;margin-top:16px}
+.tu-card{border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.tu-card video{display:block;width:100%;aspect-ratio:16/9;background:#0b0f0b}
+.tu-body{padding:14px 18px 18px}
+.tu-body h3{margin:4px 0 6px;font-size:20px}
+.tu-body p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+.tu-body details{margin-top:10px;font-size:13.5px}
+.tu-body details ol{padding-left:18px;color:var(--muted);line-height:1.55}
+.tu-kick{font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tu-links{margin-top:10px;font-size:13.5px}
+</style>`;
+  const LINKS = {
+    "i1-noshashi-in-two-minutes": [["/products/", "All products"], ["/console/", "API Console"]],
+    "i2-continuity": [["/continuity/", "Open Continuity"]],
+    "i3-rippling-exposure": [["/rippling/", "Run the free check"], ["/rippling/#plans", "Plans"]],
+    "i4-api-console": [["/console/", "Open the console"]],
+    "i5-issuer-due-diligence": [["/history/", "Issuer history"], ["/watch/", "Issuer Watch"], ["/verified/", "Verified Issuer"]],
+    "i6-evidence-and-presign": [["/evidence-report/", "Evidence Report"], ["/presign-guard/", "Pre-Sign Guard"]],
+    "d1-first-api-call": [["/developers/", "API docs"], ["/console/", "Console"]],
+    "d2-rippling-api": [["/rippling/", "Rippling API docs"], ["/rippling/#plans", "Plans and keys"]],
+  };
+  const card = (t, n) => {
+    const said = t.steps.filter((s) => s[0] === "say").map((s) => `<li>${s[1].replace(/&/g, "&amp;").replace(/</g, "&lt;")}</li>`).join("");
+    const links = (LINKS[t.id] || []).map(([h, l]) => `<a href="${h}">${l}</a>`).join(" · ");
+    return `<article class="tu-card" id="${t.id}">
+      <video controls playsinline preload="none" poster="/tutorials/videos/${t.id}.jpg" aria-label="${t.title}">
+        <source src="/tutorials/videos/${t.id}.mp4" type="video/mp4">
+        <track kind="captions" src="/tutorials/videos/${t.id}.vtt" srclang="en" label="English" default>
+      </video>
+      <div class="tu-body">
+        <span class="tu-kick">${AUDIENCES[t.audience].label} · ${n}</span>
+        <h3>${t.title}</h3>
+        <p>${t.blurb}</p>
+        <details><summary>Transcript</summary><ol>${said}</ol></details>
+        ${links ? `<p class="tu-links">${links}</p>` : ""}
+      </div>
+    </article>`;
+  };
+  const groups = Object.entries(AUDIENCES).map(([key, a]) => {
+    const list = TUTORIALS.filter((t) => t.audience === key);
+    return `<section class="tu-group" id="${key}">
+    <h2>${a.label}</h2><p>${a.note}</p>
+    <div class="tu-grid">${list.map((t, i) => card(t, i + 1)).join("")}</div>
+  </section>`;
+  }).join("");
+  const body = `<div class="page-head">
+  <p class="eyebrow">Video tutorials · recorded live on XRPL Mainnet</p>
+  <h1>See every product working, in a few minutes each.</h1>
+  <p>Each video is a recording of this site reading the real XRP Ledger: no sample data, no mock screens. Results you see were read
+     from a validated Mainnet ledger while the video was made, so the same check today may show newer figures. Every video has
+     captions and a transcript.</p>
+  <nav class="tu-tabs" aria-label="Tutorial groups"><a class="btn" href="#institutions">For institutions</a><a class="btn ghost" href="#developers">For developers</a></nav>
+</div>
+${groups}
+<p class="pv-note" style="margin-top:28px">Want a walkthrough for your own team, on your own wallets? <a href="/contact/?topic=institutions">Talk to us</a>.</p>`;
+  await write("tutorials/index.html", renderPage({
+    title: "Video tutorials — every NOSHASHI product, recorded live on the XRP Ledger | NOSHASHI",
+    description: "Narrated walkthroughs of Continuity, the Rippling Exposure API, the API Console, issuer due diligence, the Evidence Report and Pre-Sign Guard, recorded live on XRPL Mainnet. For institutions and developers.",
+    path: "/tutorials/",
+    current: "tutorials",
+    head: CSS + css,
+    body,
+    structured: [breadcrumb("Video tutorials", "/tutorials/")],
+  }));
+}
+
 export async function buildProducts(write) {
+  await buildTutorials(write);
   await buildProductsHub(write);
   await buildConsole(write);
   await buildRippling(write);

@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:02.128 --> 00:00:08.402
+NOSHASHI reads the XRP Ledger and turns what it finds into plain answers for institutions.
+
+2
+00:00:08.428 --> 00:00:14.702
+Everything you see in this video is read live from XRPL Mainnet. Nothing is sample data.
+
+3
+00:00:16.254 --> 00:00:22.635
+The home page leads with two things: products that read the ledger, and research that shows why they matter.
+
+4
+00:00:23.947 --> 00:00:28.493
+Products lists everything we sell, with the price and who each one is for.
+
+5
+00:00:29.894 --> 00:00:36.979
+Continuity reconciles deposits. Rippling Exposure finds tokens that can be moved without your signature.
+
+6
+00:00:38.377 --> 00:00:45.931
+Issuer Watch, Verified Issuer, Issuer history and the Ledger Evidence Report cover the token issuers you deal with.
+
+7
+00:00:47.192 --> 00:00:54.917
+The API Console puts every API behind a simple form. Pick a question, enter a public address, read the answer.
+
+8
+00:00:54.919 --> 00:01:00.361
+Every answer carries the ledger index it was read at, so anyone can check it again later.
+
+9
+00:01:00.364 --> 00:01:06.105
+Read-only throughout: NOSHASHI never asks for a key and can never sign or move funds.
+
+10
+00:01:06.107 --> 00:01:09.181
+The next videos walk through each product in turn.

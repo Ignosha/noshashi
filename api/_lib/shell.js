@@ -54,6 +54,7 @@ export const FOOTER_GROUPS = [
   { title: "Products", links: [
     { href: "/products/", label: "All products" },
     { href: "/console/", label: "API Console" },
+    { href: "/tutorials/", label: "Video tutorials" },
     { href: "/continuity/", label: "Continuity · deposit reconciliation" },
     { href: "/rippling/", label: "Rippling Exposure API" },
     { href: "/presign-guard/", label: "Pre-Sign Guard" },
