@@ -4,6 +4,9 @@ name: Continuity macOS validation
 # releases, modify the production website, or merge code.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feat/continuity-presign-gate-v1
 
 permissions:
   contents: read
