@@ -37,11 +37,11 @@ export function ContinuityApp() {
     } finally { setBusy(false); }
   }
   return (
-    <div className="flex h-screen min-h-0 flex-col bg-background text-foreground">
+    <div className="flex h-dvh min-h-[420px] flex-col overflow-hidden bg-background text-foreground">
       <header className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3">
         <label htmlFor="continuity-intent" className="stencil text-xs">Transaction intent (JSON)</label>
         <textarea id="continuity-intent" rows={2} value={raw} onChange={event => setRaw(event.target.value)}
-          className="min-w-[240px] flex-1 border border-border bg-background p-2 font-mono text-xs"
+          className="min-w-0 w-full flex-1 basis-[280px] resize-y border border-border bg-background p-2 font-mono text-xs"
           placeholder="Paste a canonical NOSHASHI Continuity intent. No private keys." />
         <button type="button" disabled={busy || !raw.trim()} onClick={() => { void run(); }}
           className="desk-button border border-border px-4 py-2 text-xs disabled:opacity-50">
@@ -49,7 +49,7 @@ export function ContinuityApp() {
         </button>
         {error && <p role="alert" className="w-full text-xs text-no-go">{error}</p>}
       </header>
-      <div className="min-h-0 flex-1">
+      <div className="min-h-0 flex-1 overflow-auto" aria-label="Continuity review results">
         <ContinuityWorkspace preview={preview} settlement={settlement} />
       </div>
     </div>
