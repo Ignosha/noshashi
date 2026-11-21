@@ -27,12 +27,14 @@ concurrency:
 
 jobs:
   # One-time, branch-scoped reconciliation of the committed Academy bundle.
+  # PR-only because this repository's observed CI run is a pull_request event.
   # Never runs on forks, main, other PRs, or reusable workflow calls.
   # The generated asset gate in verify remains unchanged and strict.
   academy-reconcile:
     if: >-
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/feat/continuity-presign-gate-v1' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.ref == 'feat/continuity-presign-gate-v1' &&
+      github.event.pull_request.head.repo.full_name == 'Ignosha/noshashi' &&
       github.repository == 'Ignosha/noshashi'
     runs-on: ubuntu-latest
     permissions:
@@ -40,6 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: true
       - uses: actions/setup-node@v4
         with:
