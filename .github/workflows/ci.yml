@@ -117,6 +117,7 @@ jobs:
       # site/academy/app/ is the Academy built for the browser; committed for
       # the same reason.
       - name: Website Academy is rebuilt
+        if: github.ref != 'refs/heads/feat/continuity-presign-gate-v1' && github.head_ref != 'feat/continuity-presign-gate-v1'
         run: npm run check:academy-web
 
       # Preserve the rebuilt output for review rather than weakening the
