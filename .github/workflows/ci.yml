@@ -26,40 +26,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # One-time branch-scoped generated-asset reconciliation. This job never
-  # touches main, deploys, publishes, or modifies application source.
-  # Remove this job once its resulting generated assets are reviewed.
-  reconcile_academy_continuity_branch:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/continuity-presign-gate-v1'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - name: Install
-        run: npm install --no-audit --no-fund
-      - name: Rebuild Academy generated assets
-        run: npm run site:academy
-      - name: Commit only generated Academy files if stale
-        run: |
-          set -euo pipefail
-          git add -- site/academy/app
-          if git diff --cached --quiet; then
-            echo "Academy assets already match; no commit needed."
-            exit 0
-          fi
-          git diff --cached --stat
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "build(academy): reconcile generated website assets on Continuity branch"
-          git push origin HEAD:feat/continuity-presign-gate-v1
-
   verify:
     runs-on: ubuntu-latest
     permissions:
