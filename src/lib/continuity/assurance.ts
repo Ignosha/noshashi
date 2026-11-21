@@ -41,9 +41,9 @@ export function evaluateAssurance(input: AssuranceInput): AssuranceResult {
   if (!input.issuerCertificate || input.issuerLedgerIndex !== input.validatedLedgerIndex ||
       input.issuerCertificate.ledgerIndex !== input.validatedLedgerIndex) {
     reasons.push("ISSUER_EVIDENCE_MISSING_OR_STALE"); incomplete = true;
-  } else if (input.issuerCertificate.verdict === "NO-GO") {
+  } else if (input.issuerCertificate.verdict === "no-go") {
     reasons.push("ISSUER_BLOCK"); hardBlock = true;
-  } else if (input.issuerCertificate.verdict !== "GO") reasons.push("ISSUER_REVIEW");
+  } else if (input.issuerCertificate.verdict !== "go") reasons.push("ISSUER_REVIEW");
   if (!input.exitFill || input.liquidityLedgerIndex !== input.validatedLedgerIndex ||
       input.requiredExitAmount === null || !Number.isFinite(input.requiredExitAmount) || input.requiredExitAmount <= 0 ||
       input.maximumSlippageBps === null || !Number.isFinite(input.maximumSlippageBps) || input.maximumSlippageBps < 0 ||
