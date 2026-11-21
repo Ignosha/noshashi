@@ -49,7 +49,11 @@
     "intelligence:build": "node scripts/build-newsroom.mjs",
     "intelligence:smoke": "node scripts/newsroom-smoke.mjs",
     "intelligence:film": "node scripts/build-desk-film.mjs",
-    "site:terminal-account": "vite build --config vite.terminal-account.config.mts"
+    "site:terminal-account": "vite build --config vite.terminal-account.config.mts",
+    "continuity:dev": "vite --config vite.continuity.config.mts --open /continuity/",
+    "continuity:build": "vite build --config vite.continuity.config.mts",
+    "continuity:check": "tsc --noEmit -p tsconfig.continuity.json",
+    "continuity:test": "vitest run src/lib/continuity"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.2.6",
