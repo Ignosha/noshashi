@@ -63,7 +63,7 @@ export async function collectSettlementEvidence(intent: ContinuityIntent): Promi
     return {
       ledgerIndex, validated, sourceAccount: intent.sourceAccount,
       destinationAccount: intent.destinationAccount,
-      sourceExists: source !== null, destinationExists: destination ? true : null,
+      sourceExists: source ? true : null, destinationExists: destination ? true : null,
       sourceSequence: Number(source?.Sequence ?? 0),
       sourceSpendableDrops: spendable,
       estimatedFeeDrops, destinationTagRequired,
