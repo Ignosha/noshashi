@@ -56,8 +56,8 @@
     "continuity:test": "vitest run src/lib/continuity",
     "continuity:site:check": "node scripts/check-continuity-site.mjs",
     "continuity:desktop:check": "node scripts/check-continuity-desktop.mjs",
-    "continuity:tauri:dev": "tauri dev --config continuity/src-tauri/tauri.conf.json --cwd continuity",
-    "continuity:tauri:build": "tauri build --config continuity/src-tauri/tauri.conf.json --cwd continuity"
+    "continuity:tauri:dev": "cd continuity && ../node_modules/.bin/tauri dev",
+    "continuity:tauri:build": "cd continuity && ../node_modules/.bin/tauri build"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.2.6",
