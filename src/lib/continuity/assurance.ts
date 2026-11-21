@@ -43,7 +43,10 @@ export function evaluateAssurance(input: AssuranceInput): AssuranceResult {
     reasons.push("ISSUER_EVIDENCE_MISSING_OR_STALE"); incomplete = true;
   } else if (input.issuerCertificate.verdict === "no-go") {
     reasons.push("ISSUER_BLOCK"); hardBlock = true;
-  } else if (input.issuerCertificate.verdict !== "go") reasons.push("ISSUER_REVIEW");
+  } else if (input.issuerCertificate.verdict !== "go") {
+    reasons.push("ISSUER_REVIEW");
+    if (input.issuerCertificate.verdict === "insufficient-data") incomplete = true;
+  }
   if (!input.exitFill || input.liquidityLedgerIndex !== input.validatedLedgerIndex ||
       input.requiredExitAmount === null || !Number.isFinite(input.requiredExitAmount) || input.requiredExitAmount <= 0 ||
       input.maximumSlippageBps === null || !Number.isFinite(input.maximumSlippageBps) || input.maximumSlippageBps < 0 ||
