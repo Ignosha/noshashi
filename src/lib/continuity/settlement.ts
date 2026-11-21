@@ -6,7 +6,7 @@ export type SettlementEvidence = Readonly<{
   validated: boolean;
   sourceAccount: string;
   destinationAccount: string | null;
-  sourceExists: boolean;
+  sourceExists: boolean | null;
   destinationExists: boolean | null;
   sourceSequence: number;
   sourceSpendableDrops: string | null;
@@ -42,7 +42,8 @@ export function evaluateSettlement(intent: ContinuityIntent, evidence: Settlemen
       evidence.ledgerIndex >= intent.lastLedgerSequence) missing("LEDGER_UNVALIDATED_OR_EXPIRED");
   if (evidence.sourceAccount !== intent.sourceAccount || evidence.destinationAccount !== intent.destinationAccount)
     missing("ACCOUNT_EVIDENCE_MISMATCH");
-  if (!evidence.sourceExists) fail("SOURCE_ACCOUNT_NOT_FOUND");
+  if (evidence.sourceExists === null) missing("SOURCE_ACCOUNT_STATE_UNKNOWN");
+  else if (evidence.sourceExists === false) fail("SOURCE_ACCOUNT_NOT_FOUND");
   if (evidence.destinationExists === null) missing("DESTINATION_STATE_UNKNOWN");
   else if (!evidence.destinationExists) missing("DESTINATION_CREATION_RULES_NOT_EVALUATED");
   if (!Number.isSafeInteger(evidence.sourceSequence) || evidence.sourceSequence <= 0) missing("SOURCE_SEQUENCE_UNKNOWN");
