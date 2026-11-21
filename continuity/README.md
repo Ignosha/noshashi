@@ -75,3 +75,7 @@ Run `npm run continuity:desktop:check` to verify the desktop configuration, then
 The scaffold has a separate application identifier (`app.noshashi.continuity`), no custom native commands, no updater, no custody or signing capabilities, and no access to the original app's privileged plugins. It uses the shared NOSHASHI icon assets as a temporary development measure. It is **not** a signed, notarized, tested, or supported macOS release.
 
 **Before distributing:** verify the dedicated Rust project builds on Intel macOS, ensure the production webview resolves `continuity/index.html`, confirm WebSocket connectivity under the production CSP, test installation and uninstall, replace temporary icon references with a dedicated packaged asset set, perform security review, then sign/notarize/staple and test on a clean Mac. Never treat a passing static config check as evidence of native packaging.
+
+### Intel macOS CI validation
+
+The manual GitHub Actions workflow `.github/workflows/continuity-macos-validation.yml` attempts a native Intel macOS compile **without bundling or distributing** the application. A maintainer must run it using Actions → Continuity macOS validation → Run workflow, selecting this feature branch. Inspect its complete logs before treating compilation as verified. This is distinct from the ordinary Linux Continuity checks and cannot establish physical-device installation, notarization, signing, runtime network connectivity or production security readiness.
