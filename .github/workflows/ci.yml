@@ -128,15 +128,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Typecheck Continuity
-        run: npm run continuity:check
-
-      - name: Test Continuity
-        run: npm run continuity:test
-
-      - name: Build Continuity
-        run: npm run continuity:build
-
       - name: Build public website
         run: npm run site:build
 
@@ -152,6 +143,27 @@ jobs:
         # transitive dependency is triaged, not allowed to wedge every PR.
         continue-on-error: true
         run: npm audit --omit=dev --audit-level=high
+
+  # Independent gate: the Academy generated-asset check can fail before the
+  # monolithic verify job reaches Continuity. Do not skip or weaken Academy.
+  continuity:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Typecheck Continuity
+        run: npm run continuity:check
+      - name: Test Continuity
+        run: npm run continuity:test
+      - name: Build Continuity
+        run: npm run continuity:build
 
   # Row level security and the database functions are the security boundary
   # for NOSHREPAIR (and for much else). tests/sql plays each role against
