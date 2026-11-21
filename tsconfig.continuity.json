@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src", "continuity", "vite.continuity.config.mts"],
+  "exclude": ["node_modules", "dist", "dist-continuity"]
+}
