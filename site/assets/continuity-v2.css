@@ -19,3 +19,7 @@
 .cv2-ticker span{white-space:nowrap}.cv2-ticker i{width:18px;height:1px;background:var(--rule);flex:none}
 @media (prefers-reduced-motion:no-preference){.cv2.cv2-ready .cv2-head span{opacity:0;transform:translateY(.38em);transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .9s ease}.cv2.cv2-ready.cv2-visible .cv2-head span{opacity:1;transform:none}.cv2.cv2-ready .cv2-head span:nth-child(2){transition-delay:110ms}.cv2.cv2-ready .cv2-head span:nth-child(3){transition-delay:220ms}}
 @media(max-width:700px){.cv2-bottom{grid-template-columns:1fr}.cv2-head{font-size:clamp(47px,12vw,78px)}.cv2-top{align-items:flex-start}.cv2-state{max-width:150px;text-align:center}}
+
+/* Small phones: keep the editorial headline within the available column. */
+@media(max-width:420px){.cv2-head{font-size:clamp(32px,9vw,47px);letter-spacing:-.07em}.cv2-top{flex-wrap:wrap}.cv2-state{max-width:none}.cv2-links a{width:100%;justify-content:center}.cv2{overflow-wrap:anywhere}}
+@media(prefers-reduced-motion:reduce){.cv2-head span{opacity:1!important;transform:none!important;transition:none!important}.cv2-links a{transition:none}}
