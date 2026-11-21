@@ -22,6 +22,7 @@ describe("Continuity settlement checks", () => {
   });
   it("holds on absent or unvalidated evidence", () => {
     expect(evaluateSettlement(intent, null).verdict).toBe("HOLD");
+    expect(evaluateSettlement(intent, { ...evidence, sourceExists: null }).verdict).toBe("HOLD");
     expect(evaluateSettlement(intent, { ...evidence, validated: false }).verdict).toBe("HOLD");
     expect(evaluateSettlement(intent, { ...evidence, destinationExists: null }).verdict).toBe("HOLD");
   });
