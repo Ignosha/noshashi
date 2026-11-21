@@ -18,4 +18,11 @@ assert.match(css, /max-width:420px/);
 assert.match(css, /prefers-reduced-motion:reduce/);
 assert.match(js, /IntersectionObserver/);
 assert.match(js, /cv2-visible/);
-console.log("Continuity V2 homepage integration: static checks passed.");
+// Guard the standalone UI's narrow-window behavior as well as the homepage.
+const app = readFileSync("continuity/ContinuityApp.tsx", "utf8");
+assert.match(app, /h-dvh/);
+assert.match(app, /min-w-0 w-full/);
+assert.match(app, /overflow-auto/);
+assert.match(app, /aria-label="Continuity review results"/);
+assert.match(app, /No private keys/);
+console.log("Continuity V2 homepage and narrow-window static checks passed.");
