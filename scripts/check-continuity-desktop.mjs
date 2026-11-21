@@ -7,7 +7,7 @@ const cargo = readFileSync(root + "Cargo.toml", "utf8");
 const rust = readFileSync(root + "src/main.rs", "utf8");
 assert.equal(config.identifier, "app.noshashi.continuity");
 assert.equal(config.build.frontendDist, "../../dist-continuity");
-assert.equal(config.build.beforeBuildCommand, "npm run continuity:build");
+assert.equal(config.build.beforeBuildCommand, "npm --prefix .. run continuity:build");
 assert.equal(config.app.windows.length, 1);
 assert.equal(config.app.windows[0].url, "continuity/index.html");
 assert.equal(config.app.withGlobalTauri, false);
