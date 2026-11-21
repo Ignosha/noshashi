@@ -190,6 +190,33 @@ jobs:
       - name: Verify isolated desktop configuration
         run: npm run continuity:desktop:check
 
+  # Native Intel macOS compilation is a separate gate from Linux unit tests.
+  # No signing, notarization, bundling, deployment or release upload.
+  continuity_macos_intel:
+    if: github.ref == 'refs/heads/feat/continuity-presign-gate-v1' || github.head_ref == 'feat/continuity-presign-gate-v1'
+    runs-on: macos-15-intel
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: continuity/src-tauri
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Native Intel macOS compile (no bundle)
+        run: npm run continuity:tauri:build -- --no-bundle
+      - name: Verify executable
+        run: |
+          test -f continuity/src-tauri/target/release/noshashi-continuity
+          file continuity/src-tauri/target/release/noshashi-continuity
+
   # Row level security and the database functions are the security boundary
   # for NOSHREPAIR (and for much else). tests/sql plays each role against
   # the real migrations on a throwaway Postgres that exists only on this
