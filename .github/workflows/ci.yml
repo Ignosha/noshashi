@@ -119,6 +119,26 @@ jobs:
       - name: Website Academy is rebuilt
         run: npm run check:academy-web
 
+      # Preserve the rebuilt output for review rather than weakening the
+      # generated-assets gate or automatically overwriting shipped files.
+      - name: Record Academy generated-assets discrepancy
+        if: failure()
+        run: |
+          mkdir -p academy-ci-diagnostic
+          git status --short -- site/academy/app > academy-ci-diagnostic/status.txt
+          git diff --stat -- site/academy/app > academy-ci-diagnostic/diff-stat.txt
+          git diff -- site/academy/app/index.html site/academy/app/build-version.json site/academy/app/sw.js > academy-ci-diagnostic/entrypoints.patch
+          cp -R site/academy/app academy-ci-diagnostic/rebuilt-app
+
+      - name: Upload Academy rebuild evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-rebuild-diagnostic
+          path: academy-ci-diagnostic/
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: Terminal account bundle is rebuilt
         run: npm run site:terminal-account && git diff --exit-code -- site/assets/terminal-account
 
@@ -143,6 +163,29 @@ jobs:
         # transitive dependency is triaged, not allowed to wedge every PR.
         continue-on-error: true
         run: npm audit --omit=dev --audit-level=high
+
+  # Independent gate: the Academy generated-asset check can fail before the
+  # monolithic verify job reaches Continuity. Do not skip or weaken Academy.
+  continuity:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Typecheck Continuity
+        run: npm run continuity:check
+      - name: Test Continuity
+        run: npm run continuity:test
+      - name: Build Continuity
+        run: npm run continuity:build
+      - name: Verify Continuity homepage integration
+        run: npm run continuity:site:check
 
   # Row level security and the database functions are the security boundary
   # for NOSHREPAIR (and for much else). tests/sql plays each role against
