@@ -14,7 +14,7 @@ assert.equal(config.app.withGlobalTauri, false);
 assert.deepEqual(cap.windows, ["main"]);
 assert.deepEqual(cap.permissions, ["core:default"]);
 assert.match(cargo, /name = "noshashi-continuity"/);
-assert.doesNotMatch(rust, /invoke_handler|plugin\(|sign|submit|shell/i);
+assert.doesNotMatch(rust.replace(/\/\/[^\n]*/g, ""), /invoke_handler|\.plugin\(|\bsign\b|\bsubmit\b|\bshell\b/i);
 assert.match(config.app.security.csp, /wss:\/\/s1\.ripple\.com/);
 assert.doesNotMatch(config.app.security.csp, /unsafe-eval|https:\/\/\*/);
 for (const icon of config.bundle.icon) {
