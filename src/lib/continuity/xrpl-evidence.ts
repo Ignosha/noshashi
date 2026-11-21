@@ -24,6 +24,11 @@ export async function collectSettlementEvidence(intent: ContinuityIntent): Promi
     const accountAtLedger = async (account: string) => {
       try {
         const response = await rpc("account_info", { account, ledger_index: validatedIndex });
+        // Reject replies that explicitly identify a different ledger or an unvalidated state.
+        // Some XRPL servers omit these optional metadata fields for indexed reads.
+        const returnedIndex = response.ledger_index;
+        if (returnedIndex !== undefined && Number(returnedIndex) !== validatedIndex) return null;
+        if (response.validated === false) return null;
         const data = response.account_data;
         return data && typeof data === "object" ? data as Record<string, unknown> : null;
       } catch {
