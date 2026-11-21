@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("../xrpl/client", () => ({ rpc: vi.fn() }));
 import { rpc } from "../xrpl/client";
 import { collectSettlementEvidence } from "./xrpl-evidence";
@@ -12,6 +12,7 @@ const intent: ContinuityIntent = {
   destinationTag: null, lastLedgerSequence: 200, signingPayloadSha256: "a".repeat(64),
 };
 describe("XRPL read-only settlement evidence adapter", () => {
+  beforeEach(() => vi.clearAllMocks());
   it("fails closed when validated ledger is unavailable", async () => {
     vi.mocked(rpc).mockRejectedValue(new Error("offline"));
     expect(await collectSettlementEvidence(intent)).toBeNull();
