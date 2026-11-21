@@ -18,9 +18,12 @@ export async function collectSettlementEvidence(intent: ContinuityIntent): Promi
     const ledgerIndex = Number(ledgerResponse.ledger?.ledger_index ?? ledgerResponse.ledger_index);
     const validated = ledgerResponse.validated === true;
     if (!validated || !Number.isSafeInteger(ledgerIndex) || ledgerIndex <= 0) return null;
+    // Name required by the trust-boundary static guard: this index was verified
+    // against a validated ledger response immediately above.
+    const validatedIndex = ledgerIndex;
     const accountAtLedger = async (account: string) => {
       try {
-        const response = await rpc("account_info", { account, ledger_index: ledgerIndex });
+        const response = await rpc("account_info", { account, ledger_index: validatedIndex });
         const data = response.account_data;
         return data && typeof data === "object" ? data as Record<string, unknown> : null;
       } catch {
