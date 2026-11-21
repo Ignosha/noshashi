@@ -16,6 +16,11 @@ describe("Continuity assurance composition", () => {
     expect(evaluateAssurance({ ...base, liquidityLedgerIndex: 99 }).verdict).toBe("HOLD");
     expect(evaluateAssurance({ ...base, policyChecks: [] }).verdict).toBe("HOLD");
   });
+  it("does not treat insufficient issuer data as complete", () => {
+    const result = evaluateAssurance({ ...base, issuerCertificate: { verdict: "insufficient-data", ledgerIndex: 100 } as never });
+    expect(result.verdict).toBe("HOLD");
+    expect(result.evidenceComplete).toBe(false);
+  });
   it("blocks hard policy and issuer failures", () => {
     expect(evaluateAssurance({ ...base, policyChecks: [{ id: "BLOCK", label: "Block", severity: "block", passed: false, detail: "" }] }).verdict).toBe("NO-GO");
     expect(evaluateAssurance({ ...base, issuerCertificate: { verdict: "no-go", ledgerIndex: 100 } as never }).verdict).toBe("NO-GO");
