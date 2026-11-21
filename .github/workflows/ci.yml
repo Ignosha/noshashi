@@ -186,6 +186,8 @@ jobs:
         run: npm run continuity:build
       - name: Verify Continuity homepage integration
         run: npm run continuity:site:check
+      - name: Verify isolated desktop configuration
+        run: npm run continuity:desktop:check
 
   # Row level security and the database functions are the security boundary
   # for NOSHREPAIR (and for much else). tests/sql plays each role against
