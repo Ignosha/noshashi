@@ -43,3 +43,27 @@ use this build as a production transaction gate.
 
 No signing, merging, deployment, billing, or policy activation is part of
 this development increment.
+
+
+## Release acceptance matrix (do not infer completion from green CI)
+
+| Gate | Verification | Current evidence |
+| --- | --- | --- |
+| Automated Continuity checks | Typecheck, unit tests, build, website integration | Passed CI #1250 |
+| Repository regression checks | Full tests, SQL, public website build, generated assets | Passed CI #1250 |
+| Public website visual QA | Inspect homepage section at 320, 375, 768, 1024 and 1440 CSS pixels; verify overflow, CTAs, keyboard navigation, contrast, reduced motion and no-JS fallback | Not manually verified |
+| Standalone Continuity UI QA | Verify JSON input errors, busy state, HOLD/NO-GO, narrow-window scrolling, keyboard use and screen-reader announcements | Not manually verified |
+| Live XRPL validation | Use documented mainnet test accounts and known transactions; compare validated ledger index and account data against an independent XRPL source; simulate timeout and stale ledger | Not verified |
+| Dedicated macOS package | Create separate Tauri app identity, bundle identifier, icon, permissions and update channel; test Intel macOS installation and launch | Not implemented |
+| macOS distribution | Sign, notarize, staple and independently test on a clean supported Mac | Not verified |
+| Enterprise controls | Tenant authentication, trusted policy versions, independent key registry, replay defense, signed receipts, custody integration and security review | Not implemented |
+
+### Manual website and desktop QA record
+
+For each tested viewport or machine, record date, OS/browser version, screenshot or screen recording, expected behavior, observed behavior, issue link and pass/fail. Test keyboard-only navigation and reduced-motion mode as well as pointer interaction. A passing build alone is not visual or accessibility certification.
+
+For the public website, inspect the existing `#continuity-v2` section and both scoped-pilot and PR links. Do not imply that the Continuity app is publicly downloadable or that it can approve payments. For the separate app, test invalid JSON, missing account evidence, RPC failures and unavailable reserve data; these must never produce GO.
+
+### Release rule
+
+**No production deployment or institutional transaction-gate claim** until all required security, evidence, desktop packaging and QA gates are independently confirmed. This checklist is intentionally separate from the automated CI result.
