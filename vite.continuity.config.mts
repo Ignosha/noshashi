@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { alias: { "@": path.resolve(process.cwd(), "src") } },
   publicDir: "public",
-  build: { target: "es2021", outDir: "dist-continuity", emptyOutDir: true },
+  build: { target: "es2021", outDir: "dist-continuity", emptyOutDir: true, rollupOptions: { input: path.resolve(process.cwd(), "continuity/index.html") } },
   server: { port: 1430, strictPort: true },
   root: ".",
   // Dedicated entry: no changes to the existing NOSHASHI app or website.
