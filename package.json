@@ -54,7 +54,10 @@
     "continuity:build": "vite build --config vite.continuity.config.mts",
     "continuity:check": "tsc --noEmit -p tsconfig.continuity.json",
     "continuity:test": "vitest run src/lib/continuity",
-    "continuity:site:check": "node scripts/check-continuity-site.mjs"
+    "continuity:site:check": "node scripts/check-continuity-site.mjs",
+    "continuity:desktop:check": "node scripts/check-continuity-desktop.mjs",
+    "continuity:tauri:dev": "tauri dev --config continuity/src-tauri/tauri.conf.json --cwd continuity",
+    "continuity:tauri:build": "tauri build --config continuity/src-tauri/tauri.conf.json --cwd continuity"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.2.6",
