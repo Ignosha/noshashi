@@ -16,6 +16,22 @@ describe("XRPL read-only settlement evidence adapter", () => {
     vi.mocked(rpc).mockRejectedValue(new Error("offline"));
     expect(await collectSettlementEvidence(intent)).toBeNull();
   });
+  it("fails closed when the ledger response is not validated", async () => {
+    vi.mocked(rpc).mockImplementation(async (command) => {
+      if (command === "ledger") return { validated: false, ledger: { ledger_index: 190 } };
+      throw new Error("unexpected downstream RPC");
+    });
+    expect(await collectSettlementEvidence(intent)).toBeNull();
+    expect(vi.mocked(rpc)).toHaveBeenCalledTimes(1);
+  });
+  it("fails closed on a missing ledger index", async () => {
+    vi.mocked(rpc).mockImplementation(async (command) => {
+      if (command === "ledger") return { validated: true, ledger: {} };
+      throw new Error("unexpected downstream RPC");
+    });
+    expect(await collectSettlementEvidence(intent)).toBeNull();
+    expect(vi.mocked(rpc)).toHaveBeenCalledTimes(1);
+  });
   it("rejects account data reporting a different ledger", async () => {
     vi.mocked(rpc).mockImplementation(async (command) => {
       if (command === "ledger") return { validated: true, ledger: { ledger_index: 190 } };
