@@ -16,6 +16,33 @@ describe("XRPL read-only settlement evidence adapter", () => {
     vi.mocked(rpc).mockRejectedValue(new Error("offline"));
     expect(await collectSettlementEvidence(intent)).toBeNull();
   });
+  it("rejects account data reporting a different ledger", async () => {
+    vi.mocked(rpc).mockImplementation(async (command) => {
+      if (command === "ledger") return { validated: true, ledger: { ledger_index: 190 } };
+      if (command === "account_info") return {
+        ledger_index: 189, validated: true,
+        account_data: { Balance: "2000000", OwnerCount: 1, Sequence: 1, Flags: 0 },
+      };
+      return {};
+    });
+    const result = await collectSettlementEvidence(intent);
+    expect(result?.sourceExists).toBeNull();
+    expect(result?.destinationExists).toBeNull();
+    expect(result?.destinationTagRequired).toBeNull();
+  });
+  it("rejects account data explicitly marked unvalidated", async () => {
+    vi.mocked(rpc).mockImplementation(async (command) => {
+      if (command === "ledger") return { validated: true, ledger: { ledger_index: 190 } };
+      if (command === "account_info") return {
+        ledger_index: 190, validated: false,
+        account_data: { Balance: "2000000", OwnerCount: 1, Sequence: 1, Flags: 0 },
+      };
+      return {};
+    });
+    const result = await collectSettlementEvidence(intent);
+    expect(result?.sourceExists).toBeNull();
+    expect(result?.destinationExists).toBeNull();
+  });
   it("pins account reads to validated ledger and preserves unknown reserves", async () => {
     vi.mocked(rpc).mockImplementation(async (command, params) => {
       if (command === "ledger") return { validated: true, ledger: { ledger_index: 190 } };
