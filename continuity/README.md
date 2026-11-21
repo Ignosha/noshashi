@@ -16,7 +16,7 @@ npm run continuity:dev
 
 Open http://localhost:1430/continuity/ after starting the dev server.
 The dedicated build outputs to `dist-continuity/continuity/index.html`.
-No deployment or desktop packaging is configured by these commands.
+The Vite commands do not deploy anything. A separate, minimal Tauri desktop scaffold is now present under `continuity/src-tauri/`; its native build has not yet been verified on macOS.
 
 ## Current workflow
 
@@ -67,3 +67,11 @@ For the public website, inspect the existing `#continuity-v2` section and both s
 ### Release rule
 
 **No production deployment or institutional transaction-gate claim** until all required security, evidence, desktop packaging and QA gates are independently confirmed. This checklist is intentionally separate from the automated CI result.
+
+## Separate desktop scaffold (experimental)
+
+Run `npm run continuity:desktop:check` to verify the desktop configuration, then on a Mac with Rust and Tauri system prerequisites installed run `npm run continuity:tauri:dev`. An experimental DMG build can be attempted with `npm run continuity:tauri:build`.
+
+The scaffold has a separate application identifier (`app.noshashi.continuity`), no custom native commands, no updater, no custody or signing capabilities, and no access to the original app's privileged plugins. It uses the shared NOSHASHI icon assets as a temporary development measure. It is **not** a signed, notarized, tested, or supported macOS release.
+
+**Before distributing:** verify the dedicated Rust project builds on Intel macOS, ensure the production webview resolves `continuity/index.html`, confirm WebSocket connectivity under the production CSP, test installation and uninstall, replace temporary icon references with a dedicated packaged asset set, perform security review, then sign/notarize/staple and test on a clean Mac. Never treat a passing static config check as evidence of native packaging.
