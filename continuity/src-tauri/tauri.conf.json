@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "app.noshashi.continuity",
   "build": {
-    "beforeDevCommand": "npm run continuity:dev",
+    "beforeDevCommand": "npm --prefix .. run continuity:dev",
     "devUrl": "http://localhost:1430/continuity/",
-    "beforeBuildCommand": "npm run continuity:build",
+    "beforeBuildCommand": "npm --prefix .. run continuity:build",
     "frontendDist": "../../dist-continuity"
   },
   "app": {
