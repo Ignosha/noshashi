@@ -1,0 +1,38 @@
+name: Continuity macOS validation
+
+# Manual, non-distributing native build. Does not sign, notarize, upload
+# releases, modify the production website, or merge code.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-intel-macos:
+    runs-on: macos-15-intel
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: continuity/src-tauri
+      - name: Install JavaScript dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Validate Continuity frontend and desktop configuration
+        run: |
+          npm run continuity:check
+          npm run continuity:test
+          npm run continuity:desktop:check
+      - name: Compile Intel macOS application without bundling
+        run: npm run continuity:tauri:build -- --no-bundle
+      - name: Report executable presence
+        run: |
+          test -f continuity/src-tauri/target/release/noshashi-continuity
+          file continuity/src-tauri/target/release/noshashi-continuity
+          echo "Intel macOS native compile completed; installation, signing and notarization remain unverified."
