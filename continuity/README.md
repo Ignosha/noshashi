@@ -16,7 +16,7 @@ npm run continuity:dev
 
 Open http://localhost:1430/continuity/ after starting the dev server.
 The dedicated build outputs to `dist-continuity/continuity/index.html`.
-The Vite commands do not deploy anything. A separate, minimal Tauri desktop scaffold is now present under `continuity/src-tauri/`; its native build has not yet been verified on macOS.
+The Vite commands do not deploy anything. A separate, minimal Tauri desktop scaffold is now present under `continuity/src-tauri/`; its native no-bundle compilation passed the Intel macOS CI job in run #1324; packaging and physical-device runtime remain unverified.
 
 ## Current workflow
 
@@ -49,8 +49,8 @@ this development increment.
 
 | Gate | Verification | Current evidence |
 | --- | --- | --- |
-| Automated Continuity checks | Typecheck, unit tests, build, website integration | Passed CI #1250 |
-| Repository regression checks | Full tests, SQL, public website build, generated assets | Passed CI #1250 |
+| Automated Continuity checks | Typecheck, unit tests, build, website integration | Passed CI #1324 |
+| Repository regression checks | Full tests, SQL, public website build, generated assets | Passed CI #1324 |
 | Public website visual QA | Inspect homepage section at 320, 375, 768, 1024 and 1440 CSS pixels; verify overflow, CTAs, keyboard navigation, contrast, reduced motion and no-JS fallback | Not manually verified |
 | Standalone Continuity UI QA | Verify JSON input errors, busy state, HOLD/NO-GO, narrow-window scrolling, keyboard use and screen-reader announcements | Not manually verified |
 | Live XRPL validation | Use documented mainnet test accounts and known transactions; compare validated ledger index and account data against an independent XRPL source; simulate timeout and stale ledger | Not verified |
@@ -74,8 +74,15 @@ Run `npm run continuity:desktop:check` to verify the desktop configuration, then
 
 The scaffold has a separate application identifier (`app.noshashi.continuity`), no custom native commands, no updater, no custody or signing capabilities, and no access to the original app's privileged plugins. It uses the shared NOSHASHI icon assets as a temporary development measure. It is **not** a signed, notarized, tested, or supported macOS release.
 
-**Before distributing:** verify the dedicated Rust project builds on Intel macOS, ensure the production webview resolves `continuity/index.html`, confirm WebSocket connectivity under the production CSP, test installation and uninstall, replace temporary icon references with a dedicated packaged asset set, perform security review, then sign/notarize/staple and test on a clean Mac. Never treat a passing static config check as evidence of native packaging.
+**Before distributing:** confirm physical Intel Mac launch (CI #1324 verified compilation only), ensure the production webview resolves `continuity/index.html`, confirm WebSocket connectivity under the production CSP, test installation and uninstall, replace temporary icon references with a dedicated packaged asset set, perform security review, then sign/notarize/staple and test on a clean Mac. Never treat a passing static config check as evidence of native packaging.
 
 ### Intel macOS CI validation
 
-The manual GitHub Actions workflow `.github/workflows/continuity-macos-validation.yml` attempts a native Intel macOS compile **without bundling or distributing** the application. A maintainer must run it using Actions → Continuity macOS validation → Run workflow, selecting this feature branch. Inspect its complete logs before treating compilation as verified. This is distinct from the ordinary Linux Continuity checks and cannot establish physical-device installation, notarization, signing, runtime network connectivity or production security readiness.
+The standard CI workflow compiled the native Intel macOS Tauri application **without bundling or distributing** it successfully in [run #1324](https://github.com/Ignosha/noshashi/actions/runs/44971180516). The separate manual GitHub Actions workflow `.github/workflows/continuity-macos-validation.yml` can also attempt a native Intel macOS compile. A maintainer must run it using Actions → Continuity macOS validation → Run workflow, selecting this feature branch. Inspect its complete logs before treating compilation as verified. This is distinct from the ordinary Linux Continuity checks and cannot establish physical-device installation, notarization, signing, runtime network connectivity or production security readiness.
+
+## Current verification snapshot — 2026-11-21
+
+- CI #1324: Continuity, SQL, verify and `continuity_macos_intel` jobs passed on the feature branch.
+- Vercel development preview deployed successfully: https://noshashi-13idss1mb-ignoshas-projects.vercel.app/ (not production).
+- The homepage uses the original Ledger Desk hero layout for Continuity V2; visual and accessibility QA remain unverified.
+- No evidence yet of a signed DMG, notarization, physical Intel Mac launch, independent security review or institutional enforcement readiness.
