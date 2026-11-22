@@ -4,6 +4,12 @@ import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 
 const html = readFileSync("site/index.html", "utf8");
+const product = readFileSync("site/continuity-v2/index.html", "utf8");
+assert.match(html, /href="\/continuity-v2\/"/);
+assert.match(product, /href="\/design-partners\/#partner-form"/);
+assert.match(product, /No signing, custody or transaction submission/);
+assert.match(product, /Not yet validated/);
+assert.match(product, /prefers-reduced-motion:reduce/);
 const css = readFileSync("site/assets/continuity-v2.css", "utf8");
 const js = readFileSync("site/assets/continuity-v2.js", "utf8");
 
