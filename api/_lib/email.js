@@ -145,9 +145,11 @@ export function logEntry({ kind, title, body, at, url }, index = 0) {
  * list view. Left unset, clients scrape the first text they find, which
  * is usually a fragment of the header, so it is always set explicitly.
  * `kicker` is the small mono line beside the wordmark ("Product update",
- * "Evidence report").
+ * "Evidence report"). `mark: false` leaves out the hosted logo: Gmail's
+ * API removes any image that is not an inline attachment, which would
+ * leave an empty cell, so mail sent through Gmail uses the wordmark alone.
  */
-export function shell({ title, preheader = "", body, unsubscribeUrl = null, footNote = "", kicker = "" }) {
+export function shell({ title, preheader = "", body, unsubscribeUrl = null, footNote = "", kicker = "", mark = true }) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -170,7 +172,7 @@ ${esc(preheader)}</div>
 
     <tr><td style="padding:0 0 20px;background:${T.ground};">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td width="52" style="width:52px;padding-right:12px;" valign="middle">${MARK}</td>
+        ${mark ? `<td width="52" style="width:52px;padding-right:12px;" valign="middle">${MARK}</td>` : ""}
         <td valign="middle" style="font-family:${SERIF};font-size:22px;font-weight:400;
           letter-spacing:.04em;color:${T.ink};">NOSHASHI</td>
         <td valign="middle" align="right" style="font-family:${MONO};font-size:10px;letter-spacing:.18em;
@@ -293,30 +295,63 @@ export function enquiryEmail(enquiry) {
  * campaign gets read as a campaign. The branding here is the header and
  * the footer; the body is a letter.
  *
- * `paragraphs` is plain text, one string per paragraph. `signoff` is
- * the sender's own name. There is no default, because an outreach email
- * signed by a company rather than a person is the thing this format
- * exists to avoid.
+ * `paragraphs` is plain text, one string per paragraph; a bare
+ * https://www.noshashi.app URL inside one becomes a link. `signoff` is
+ * the sender's own name, `role` their title. There is no default name,
+ * because an outreach email signed by a company rather than a person is
+ * the thing this format exists to avoid.
+ *
+ * `postalAddress` and `optOut` are required by CAN-SPAM (and are what
+ * PECR/GDPR legitimate interest expects): a real postal address and a
+ * way to say no. Both appear in the footer and in the plain-text part.
+ * `mark: false` for mail sent through Gmail (see shell()).
+ *
+ * Returns { subject, html, text }: send both parts, so a client that
+ * shows plain text, or a person who prefers it, reads the same letter.
  */
-export function outreachEmail({ subject, paragraphs, signoff, note = "" }) {
+export function outreachEmail({ subject, paragraphs, signoff, role = "Founder, NOSHASHI", postalAddress = "", optOut = "", note = "", mark = true }) {
+  const paras = (paragraphs || []).map((p) => String(p));
+  const linked = (p) => esc(p).replace(/https:\/\/www\.noshashi\.app(?:\/[A-Za-z0-9\-._~/?=&%#;]*)?/g, (u) => {
+    const url = u.replace(/&amp;/g, "&").replace(/[.,;)]+$/, "");
+    const tail = u.slice(esc(url).length);
+    return `<a href="${attrUrl(url)}" style="color:${T.ink};text-decoration:underline;">${esc(url.replace(/^https:\/\//, ""))}</a>${tail}`;
+  });
   const body = `
-    ${(paragraphs || []).map((p) => para(p, { tone: "ink" })).join("")}
-    <p style="margin:26px 0 0;font-family:${SANS};font-size:15px;color:${T.ink};line-height:1.68;">
+    ${paras.map((p) => `<p style="margin:0 0 16px;font-family:${SANS};font-size:15px;color:${T.ink};line-height:1.68;">${linked(p)}</p>`).join("")}
+    <p style="margin:26px 0 0;font-family:${SERIF};font-size:21px;color:${T.ink};line-height:1.3;">
       ${esc(signoff || "")}</p>
-    <p style="margin:4px 0 0;font-family:${SANS};font-size:13.5px;color:${T.muted};line-height:1.6;">
-      NOSHASHI &nbsp;&middot;&nbsp;
+    <p style="margin:4px 0 0;font-family:${MONO};font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:${T.muted};line-height:1.6;">
+      ${esc(role)} &nbsp;&middot;&nbsp;
       <a href="${SITE}/" style="color:${T.ink};text-decoration:underline;">noshashi.app</a></p>
     ${note ? `<p style="margin:20px 0 0;font-family:${MONO};font-size:10.5px;letter-spacing:.12em;
       color:${T.faint};line-height:1.7;">${esc(note)}</p>` : ""}`;
 
+  const foot = [
+    "Sent individually, not as part of a campaign. Reply and it reaches a person.",
+    optOut,
+    postalAddress ? `NOSHASHI, ${postalAddress}` : "",
+  ].filter(Boolean).join(" ");
+
+  const text = [
+    ...paras.flatMap((p) => [p, ""]),
+    signoff || "",
+    `${role} · https://www.noshashi.app`,
+    ...(note ? ["", note] : []),
+    ...(optOut || postalAddress ? [""] : []),
+    ...(optOut ? [optOut] : []),
+    ...(postalAddress ? [postalAddress] : []),
+  ].join("\n").trim();
+
   return {
     subject,
+    text,
     html: shell({
       title: subject,
       kicker: "Letter",
-      preheader: (paragraphs && paragraphs[0]) ? String(paragraphs[0]).slice(0, 110) : subject,
+      preheader: paras[0] ? paras[0].slice(0, 110) : subject,
       body,
-      footNote: "Sent individually, not as part of a campaign. Reply and it reaches a person.",
+      footNote: foot,
+      mark,
     }),
   };
 }

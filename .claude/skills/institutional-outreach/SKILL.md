@@ -125,6 +125,28 @@ reader can check, not a description of the product.
 - On a new sending domain, ramp slowly: about 20 a day for the first
   weeks, watching bounces and complaints in Resend.
 
+## Sending in the house style
+
+First emails and follow-ups go out in the Ledger Desk style, with a
+plain-text part beside the HTML. Write the letter as plain paragraphs in
+a JSON file, then render it:
+
+```bash
+OUTREACH_POSTAL_ADDRESS="<the business postal address>" node scripts/outreach-email.mjs letter.json   # → { subject, html, text }
+```
+
+Send `html` as Gmail's `htmlBody` and `text` as `body`. The address is
+the one on noshashi.app/legal/report-terms; it is passed in rather than
+kept in the repository. The script adds
+the postal address and the opt-out line to both, so leave them out of
+the paragraphs. It also leaves out the hosted logo, because Gmail's API
+removes hosted images; the serif wordmark carries the header. A bare
+`https://www.noshashi.app/...` URL in a paragraph becomes a link, and no
+other URL does.
+
+Replies inside a conversation stay plain text: a branded template in
+the middle of a back-and-forth reads like marketing.
+
 ## Sender logo
 
 - Yahoo, AOL and Fastmail show `site/bimi/logo.svg` once DNS has a

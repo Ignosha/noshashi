@@ -15,10 +15,21 @@
  * something the site does not already say. Add the entry to
  * site/data/updates.json, deploy, then send.
  *
+ * Automatic mode, for CI (.github/workflows/send-update.yml):
+ *
+ *   node scripts/send-update.mjs --auto --base <sha> [--send]
+ *
+ * sends only the entries added to site/data/updates.json since commit
+ * <sha>: releases, milestones and notes. Maintenance windows and
+ * incidents stay on the status page; they are not news to a subscriber
+ * list. No new entry, no email.
+ *
  * Needs RESEND_API_KEY and RESEND_AUDIENCE_ID in the environment.
  */
 
-import { writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import { readFile, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -27,6 +38,36 @@ import { updateEmail } from "../api/_lib/email.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const API = "https://api.resend.com";
+const SITE = "https://www.noshashi.app";
+/** Entry kinds that become an email. */
+export const NEWS_KINDS = new Set(["release", "milestone", "note"]);
+
+/**
+ * Entries in `now` that are not in `before` (matched on date and title),
+ * news kinds only, newest first, shaped for updateEmail().
+ */
+export function newEntries(before, now) {
+  const seen = new Set((Array.isArray(before) ? before : []).map((e) => `${e?.date}|${e?.title}`));
+  return (Array.isArray(now) ? now : [])
+    .filter((e) => e && !seen.has(`${e.date}|${e.title}`) && NEWS_KINDS.has(e.kind) && Number.isFinite(Date.parse(e.date)) && e.title)
+    .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
+    .map((e) => ({
+      kind: e.kind,
+      title: String(e.title),
+      body: String(e.body || ""),
+      at: new Date(Date.parse(e.date)).toISOString(),
+      url: typeof e.link === "string" && e.link ? (e.link.startsWith("/") ? `${SITE}${e.link}` : e.link) : "",
+    }));
+}
+
+function updatesAt(sha) {
+  if (!/^[0-9a-f]{7,40}$/i.test(sha)) throw new Error(`--base is not a commit: ${sha}`);
+  try {
+    return JSON.parse(execFileSync("git", ["show", `${sha}:site/data/updates.json`], { cwd: ROOT, encoding: "utf8" }));
+  } catch {
+    return []; // the file did not exist at that commit: everything in it is new
+  }
+}
 
 function arg(name, fallback = null) {
   const i = process.argv.indexOf(`--${name}`);
@@ -37,6 +78,7 @@ function arg(name, fallback = null) {
 const FLAG = (name) => process.argv.includes(`--${name}`);
 
 async function main() {
+  if (FLAG("auto")) return send(await autoMail());
   const headline = arg("headline");
   if (!headline) {
     console.error('A headline is required:  --headline "v0.4.0 is out"');
@@ -67,8 +109,33 @@ async function main() {
     // Resend substitutes this per recipient on a broadcast.
     unsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",
   });
+  return send({ mail, entries });
+}
 
-  const preview = "/private/tmp/noshashi-update-preview.html";
+/** The email for the entries added since --base, or null when there are none. */
+async function autoMail() {
+  const base = arg("base");
+  if (!base) throw new Error("--auto needs --base <sha>");
+  const now = JSON.parse(await readFile(path.join(ROOT, "site", "data", "updates.json"), "utf8"));
+  const entries = newEntries(updatesAt(base), now).slice(0, 6);
+  if (!entries.length) return null;
+  const headline = entries.length === 1 ? entries[0].title : `${entries.length} new updates`;
+  const mail = updateEmail({
+    entries,
+    headline,
+    intro: "Everything below is in the public mission log, so this email cannot claim something the site does not.",
+    unsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",
+  });
+  return { mail, entries };
+}
+
+async function send(built) {
+  if (!built) {
+    console.log("No new release, milestone or note in the mission log. Nothing to send.");
+    return;
+  }
+  const { mail, entries } = built;
+  const preview = path.join(os.tmpdir(), "noshashi-update-preview.html");
   await writeFile(preview, mail.html, "utf8");
 
   console.log(`subject:  ${mail.subject}`);
@@ -118,7 +185,9 @@ async function main() {
   console.log(`\nSENT — broadcast ${draft.id}`);
 }
 
-main().catch((error) => {
-  console.error("send-update failed:", error.message);
-  process.exit(1);
-});
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error("send-update failed:", error.message);
+    process.exit(1);
+  });
+}
