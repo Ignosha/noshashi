@@ -1,0 +1,56 @@
+name: Send update email
+
+# When a release, milestone or note is added to the mission log
+# (site/data/updates.json) on main, email it to the update subscribers
+# in the Ledger Desk style (api/_lib/email.js, updateEmail).
+#
+# Only entries added by the push are sent, so editing an old entry or
+# adding a maintenance window sends nothing. The email is built from the
+# same file the site's /status/ page renders, so it cannot announce
+# something the site does not already say.
+#
+# Requires RESEND_API_KEY and RESEND_AUDIENCE_ID in the repository's
+# Actions secrets. Without them the job renders the email and stops
+# without sending, so it is safe to merge before the secrets exist.
+
+on:
+  push:
+    branches: [main]
+    paths: [site/data/updates.json]
+
+concurrency:
+  group: send-update
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Email the new mission-log entries
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID }}
+          CONTACT_FROM: ${{ secrets.CONTACT_FROM }}
+          BASE: ${{ github.event.before }}
+        run: |
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            echo "No previous commit to compare with. Nothing sent."
+            exit 0
+          fi
+          if [ -z "$RESEND_API_KEY" ] || [ -z "$RESEND_AUDIENCE_ID" ]; then
+            echo "RESEND_API_KEY or RESEND_AUDIENCE_ID is not set: rendering only, nothing sent."
+            node scripts/send-update.mjs --auto --base "$BASE"
+            exit 0
+          fi
+          node scripts/send-update.mjs --auto --base "$BASE" --send
