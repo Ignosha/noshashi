@@ -1,17 +1,25 @@
 openapi: 3.1.0
 info:
   title: NOSHASHI Transaction Autopsy API
-  version: 0.1.0-proposal
+  version: 0.2.0-research
   description: |
-    Contract proposal only. No deployed endpoint, authentication service, or SLA.
-    Production service must add scoped authentication, quotas, monitoring and independent evidence verification.
+    Research-only, opt-in, loopback-bound gateway. Not a publicly hosted API or
+    production enterprise service. No signing, funds movement, SLA or guaranteed
+    availability. VERIFIED_FACT means two configured RPC providers agreed on
+    validated ledger index/hash and result; it is not a cryptographic consensus proof.
+    UNKNOWN means the service cannot responsibly determine finality.
 servers: []
+security:
+  - LocalBearerSecret: []
 paths:
   /v1/xrpl/transactions/autopsy:
     post:
       operationId: xrplTransactionAutopsy
-      summary: Normalize a read-only XRPL transaction outcome
-      description: No signing or submission. Unavailable or unvalidated evidence yields UNKNOWN.
+      summary: Read-only, two-source corroboration of validated XRP Ledger transactions
+      description: |
+        Requires local research secret. Uses fixed trusted XRPL RPC providers;
+        cannot accept caller-supplied URLs. Unknown or conflicting data yields
+        status UNKNOWN. Designed to supplement, not replace, institution controls.
       requestBody:
         required: true
         content:
@@ -25,25 +33,28 @@ paths:
                 hash: { type: string, pattern: '^[a-fA-F0-9]{64}$' }
       responses:
         '200':
-          description: Evidence-derived report; UNKNOWN is not a confirmed outcome.
+          description: Two-source report, including explicit unknown outcomes
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AutopsyReport'
-        '400':
-          description: Invalid input
-        '401':
-          description: Authentication required in a future hosted service
-        '429':
-          description: Quota exceeded in a future hosted service
-        '503':
-          description: Service unavailable in a future hosted service
+        '400': { description: Invalid input or malformed JSON }
+        '401': { description: Missing or invalid local bearer secret }
+        '413': { description: Payload too large }
+        '415': { description: Unsupported media type }
+        '429': { description: In-process research rate limit exceeded }
+        '503': { description: Research gateway busy or lookup failure }
 components:
+  securitySchemes:
+    LocalBearerSecret:
+      type: http
+      scheme: bearer
+      description: Locally configured secret of at least 32 characters. NOT tenant-scoped production authentication.
   schemas:
     AutopsyReport:
       type: object
       additionalProperties: false
-      required: [schema, network, hash, status, validated, ledgerIndex, resultCode, disposition, reasonCodes]
+      required: [schema, network, hash, status, validated, ledgerIndex, ledgerHash, resultCode, disposition, reasonCodes, evidenceSources, provenance, simulated]
       properties:
         schema: { type: string, const: noshashi.autopsy.v1 }
         network: { type: string, const: xrpl-mainnet }
@@ -51,8 +62,14 @@ components:
         status: { type: string, enum: [VERIFIED_FACT, UNKNOWN] }
         validated: { type: boolean }
         ledgerIndex: { type: [integer, 'null'], minimum: 1 }
+        ledgerHash: { type: [string, 'null'], pattern: '^[A-F0-9]{64}$' }
         resultCode: { type: [string, 'null'] }
         disposition: { type: string, enum: [SUCCESS, FAILED, UNKNOWN] }
         reasonCodes:
           type: array
           items: { type: string }
+        evidenceSources:
+          type: array
+          items: { type: string }
+        provenance: { type: string, enum: [incomplete, two-rpc-providers] }
+        simulated: { type: boolean, const: false }
