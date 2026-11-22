@@ -6,6 +6,8 @@ import assert from "node:assert/strict";
 const html = readFileSync("site/index.html", "utf8");
 const template = readFileSync("templates/home.html", "utf8");
 assert.match(template, /id="continuity-v2"/);
+assert.ok(template.indexOf('id="continuity-v2"') < template.indexOf('class="rh" data-garden-field'), "Continuity must lead the homepage");
+assert.ok(html.indexOf('id="continuity-v2"') < html.indexOf('class="rh" data-garden-field'), "Built homepage must lead with Continuity");
 assert.match(template, /href="\/continuity-v2\/"/);
 assert.match(template, /href="\/assets\/continuity-v2\.css"/);
 assert.match(template, /src="\/assets\/continuity-v2\.js"/);
