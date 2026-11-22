@@ -149,6 +149,13 @@ jobs:
       - name: Marketplace API integration tests
         run: node --test scripts/marketplace-dev.test.mjs scripts/autopsy-gateway.test.mjs
 
+      # One read-only historical XRPL transaction is checked against two separately
+      # operated public RPC nodes on this research branch. Provider outages may fail
+      # this test; do not weaken the gate or treat an outage as a failed transaction.
+      - name: Live XRPL Autopsy two-source smoke (research branch)
+        if: github.ref == 'refs/heads/feat/infrastructure-marketplace-blueprint' || github.head_ref == 'feat/infrastructure-marketplace-blueprint'
+        run: node scripts/autopsy-live-smoke.mjs
+
       - name: Build
         run: npm run build
 
