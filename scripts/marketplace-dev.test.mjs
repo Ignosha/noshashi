@@ -22,6 +22,9 @@ test("local HTTP route accepts JSON and rejects unsupported paths", async () => 
   try {
     const addr=server.address();
     const base=`http://127.0.0.1:${addr.port}`;
+    const script=await fetch(base+"/marketplace/marketplace.js");
+    assert.equal(script.status,200);
+    assert.match(script.headers.get("content-type"), /javascript/);
     const health=await fetch(base+"/health");
     assert.equal(health.status,200);
     assert.equal((await health.json()).mode,"synthetic-fixtures");
