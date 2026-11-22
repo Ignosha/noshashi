@@ -1,0 +1,10 @@
+{
+  "identifier": "default",
+  "description": "Read-only Continuity main window: no native commands or permissions",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default"
+  ]
+}

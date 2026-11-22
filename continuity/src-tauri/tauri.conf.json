@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "NOSHASHI Continuity",
+  "version": "0.1.0",
+  "identifier": "app.noshashi.continuity",
+  "build": {
+    "beforeDevCommand": "npm --prefix .. run continuity:dev",
+    "devUrl": "http://localhost:1430/continuity/",
+    "beforeBuildCommand": "npm --prefix .. run continuity:build",
+    "frontendDist": "../../dist-continuity"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "NOSHASHI Continuity · Ledger Desk",
+        "url": "continuity/index.html",
+        "width": 1250,
+        "height": 820,
+        "minWidth": 720,
+        "minHeight": 500,
+        "resizable": true,
+        "decorations": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost wss://xrplcluster.com wss://s1.ripple.com wss://s2.ripple.com wss://xrpl.ws; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "dmg"
+    ],
+    "category": "Business",
+    "shortDescription": "Read-only institutional transaction assurance",
+    "icon": [
+      "../../src-tauri/icons/32x32.png",
+      "../../src-tauri/icons/128x128.png",
+      "../../src-tauri/icons/128x128@2x.png",
+      "../../src-tauri/icons/icon.icns"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  }
+}
