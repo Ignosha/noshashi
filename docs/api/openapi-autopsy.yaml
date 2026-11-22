@@ -1,0 +1,58 @@
+openapi: 3.1.0
+info:
+  title: NOSHASHI Transaction Autopsy API
+  version: 0.1.0-proposal
+  description: |
+    Contract proposal only. No deployed endpoint, authentication service, or SLA.
+    Production service must add scoped authentication, quotas, monitoring and independent evidence verification.
+servers: []
+paths:
+  /v1/xrpl/transactions/autopsy:
+    post:
+      operationId: xrplTransactionAutopsy
+      summary: Normalize a read-only XRPL transaction outcome
+      description: No signing or submission. Unavailable or unvalidated evidence yields UNKNOWN.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [network, hash]
+              properties:
+                network: { type: string, const: xrpl-mainnet }
+                hash: { type: string, pattern: '^[a-fA-F0-9]{64}$' }
+      responses:
+        '200':
+          description: Evidence-derived report; UNKNOWN is not a confirmed outcome.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutopsyReport'
+        '400':
+          description: Invalid input
+        '401':
+          description: Authentication required in a future hosted service
+        '429':
+          description: Quota exceeded in a future hosted service
+        '503':
+          description: Service unavailable in a future hosted service
+components:
+  schemas:
+    AutopsyReport:
+      type: object
+      additionalProperties: false
+      required: [schema, network, hash, status, validated, ledgerIndex, resultCode, disposition, reasonCodes]
+      properties:
+        schema: { type: string, const: noshashi.autopsy.v1 }
+        network: { type: string, const: xrpl-mainnet }
+        hash: { type: string, pattern: '^[A-F0-9]{64}$' }
+        status: { type: string, enum: [VERIFIED_FACT, UNKNOWN] }
+        validated: { type: boolean }
+        ledgerIndex: { type: [integer, 'null'], minimum: 1 }
+        resultCode: { type: [string, 'null'] }
+        disposition: { type: string, enum: [SUCCESS, FAILED, UNKNOWN] }
+        reasonCodes:
+          type: array
+          items: { type: string }
