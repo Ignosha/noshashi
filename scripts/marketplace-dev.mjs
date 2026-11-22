@@ -7,6 +7,7 @@ import path from "node:path";
 
 export const SAMPLE_HASH = "A".repeat(64);
 const pagePath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../site/marketplace/index.html");
+const scriptPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../site/marketplace/marketplace.js");
 const maxBytes = 4096;
 export function fixtureAutopsy(body) {
   if (!body || body.network !== "xrpl-mainnet" || typeof body.hash !== "string" || !/^[a-fA-F0-9]{64}$/.test(body.hash) || Object.keys(body).some(k => !["network","hash"].includes(k))) {
@@ -26,7 +27,7 @@ export function createDevServer() {
   return http.createServer(async (req,res) => {
     res.setHeader("Cache-Control","no-store");
     res.setHeader("X-Content-Type-Options","nosniff");
-    res.setHeader("Content-Security-Policy","default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; font-src 'self'");
+    res.setHeader("Content-Security-Policy","default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self'; font-src 'self'");
     if (req.url === "/health" && req.method === "GET") {
       res.writeHead(200,{"Content-Type":"application/json"}); res.end(JSON.stringify({ status:"ok", mode:"synthetic-fixtures" })); return;
     }
@@ -48,6 +49,10 @@ export function createDevServer() {
         res.end(JSON.stringify({error:large ? "PAYLOAD_TOO_LARGE" : "INVALID_JSON"}));
       }
       return;
+    }
+    if (req.url === "/marketplace/marketplace.js" && req.method === "GET") {
+      const js = await readFile(scriptPath,"utf8");
+      res.writeHead(200,{"Content-Type":"text/javascript; charset=utf-8"}); res.end(js); return;
     }
     if ((req.url === "/" || req.url === "/marketplace/" || req.url === "/marketplace/index.html") && req.method === "GET") {
       const html = await readFile(pagePath,"utf8");
