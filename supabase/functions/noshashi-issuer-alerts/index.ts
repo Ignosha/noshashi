@@ -73,6 +73,7 @@ import {
   type Powers,
 } from "../_shared/issuerPowers.ts";
 import { walletAlertText, walletEvents } from "../_shared/walletAlerts.ts";
+import { alertEmailHtml } from "../_shared/alertEmail.ts";
 
 const XRPL_HTTP = ["https://xrplcluster.com/", "https://s2.ripple.com:51234/", "https://s1.ripple.com:51234/"];
 const FREE_ISSUERS_PER_TARGET = 3;
@@ -202,6 +203,8 @@ async function sendTelegram(chatId: string, text: string): Promise<boolean | nul
  * subscriptions are written only by noshashi-stripe-webhook for a paid
  * subscription; the public /subscribe route never accepts an address.
  */
+const BILLING_NOTE = "Stopping these emails with the link above does not cancel billing. To cancel Issuer Watch, reply to this email.";
+
 async function sendEmail(to: string, text: string): Promise<boolean | null> {
   const apiKey = Deno.env.get("RESEND_API_KEY");
   if (!apiKey || !/^[^@\s]{1,64}@[^@\s]{1,255}$/.test(to)) return null;
@@ -217,7 +220,8 @@ async function sendEmail(to: string, text: string): Promise<boolean | null> {
         to: [to],
         reply_to: inbox,
         subject: first || "Issuer Watch alert",
-        text: `${text}\n\nStopping these emails with the link above does not cancel billing. To cancel Issuer Watch, reply to this email.`,
+        text: `${text}\n\n${BILLING_NOTE}`,
+        html: alertEmailHtml(text, BILLING_NOTE),
       }),
       signal: AbortSignal.timeout(10_000),
     });
