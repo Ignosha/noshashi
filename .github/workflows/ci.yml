@@ -146,6 +146,9 @@ jobs:
       - name: Tests
         run: npm test
 
+      - name: Marketplace API integration tests
+        run: node --test scripts/marketplace-dev.test.mjs scripts/autopsy-gateway.test.mjs
+
       - name: Build
         run: npm run build
 
