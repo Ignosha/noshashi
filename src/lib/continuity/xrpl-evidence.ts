@@ -30,7 +30,11 @@ export async function collectSettlementEvidence(intent: ContinuityIntent): Promi
         if (returnedIndex !== undefined && Number(returnedIndex) !== validatedIndex) return null;
         if (response.validated === false) return null;
         const data = response.account_data;
-        return data && typeof data === "object" ? data as Record<string, unknown> : null;
+        if (!data || typeof data !== "object") return null;
+        const accountData = data as Record<string, unknown>;
+        // A server reply must never be attributed to a different requested account.
+        if (accountData.Account !== undefined && accountData.Account !== account) return null;
+        return accountData;
       } catch {
         // Do not guess whether a failed request means unfunded or network failure.
         return null;
