@@ -149,8 +149,12 @@ jobs:
       - name: Case-review browser script syntax
         run: node --check site/case-review/case-review.js
 
+      - name: Live pinned AccountRoot diagnostic (informational only)
+        if: github.ref == 'refs/heads/feat/infrastructure-marketplace-blueprint' || github.head_ref == 'feat/infrastructure-marketplace-blueprint'
+        run: node scripts/xrpl-account-root-live-diagnostic.mjs
+
       - name: Marketplace API integration tests
-        run: node --test scripts/marketplace-dev.test.mjs scripts/autopsy-gateway.test.mjs scripts/approval-drift.test.mjs scripts/evidence-receipt.test.mjs scripts/institutional-case-review.test.mjs scripts/xrpl-account-root-evidence.test.mjs scripts/xrpl-account-root-lookup.test.mjs
+        run: node --test scripts/marketplace-dev.test.mjs scripts/autopsy-gateway.test.mjs scripts/approval-drift.test.mjs scripts/evidence-receipt.test.mjs scripts/institutional-case-review.test.mjs scripts/xrpl-account-root-evidence.test.mjs scripts/xrpl-account-root-lookup.test.mjs scripts/case-ledger-controls.test.mjs
 
       # One read-only historical XRPL transaction is checked against two separately
       # operated public RPC nodes on this research branch. Provider outages may fail
