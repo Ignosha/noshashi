@@ -11,7 +11,7 @@ export async function reviewCaseWithLedgerControls(input,{
     verdict:"HOLD",authorizationGranted:false,controls:null,caseReview:null,
     reasonCodes:[],controlEvidenceAuthenticated:false};
   let caseReview;
-  try{caseReview=await review(input);}catch{
+  try{caseReview=await review({hash:input?.hash,approved:input?.approved,current:input?.current});}catch{
     return {...base,reasonCodes:["CASE_REVIEW_UNAVAILABLE"]};
   }
   if(!caseReview||caseReview.transaction?.status!=="VERIFIED_FACT"||
