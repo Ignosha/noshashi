@@ -3,7 +3,7 @@
  * Fixed upstreams, bounded response, no wallet access, no public endpoint.
  */
 import {UPSTREAMS} from "./autopsy-gateway.mjs";
-import {corroboratePinnedTrustLine} from "./xrpl-trustline-evidence.mjs";
+import {corroboratePinnedTrustLine,parsePinnedTrustLine} from "./xrpl-trustline-evidence.mjs";
 const ADDRESS=/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const HEX64=/^[A-F0-9]{64}$/i;
 const CURRENCY=/^([A-Z0-9]{3}|[A-F0-9]{40})$/i;
@@ -53,8 +53,13 @@ export async function lookupPinnedTrustLine(request,{servers=UPSTREAMS,fetchFn=f
     !servers.every(s=>UPSTREAMS.some(k=>k.name===s.name&&k.url===s.url)))
   return {...base,reasonCodes:["INDEPENDENT_SOURCES_NOT_CONFIGURED"]};
  const responses=await Promise.allSettled(servers.map(s=>fetchPinnedTrustLine(s,request,fetchFn)));
+ const providerDiagnostics=responses.map((r,index)=>{
+  const observation=r.status==="fulfilled"?parsePinnedTrustLine(r.value,request):null;
+  return {provider:servers[index].name,status:observation?.status??"UNKNOWN",
+   reasonCodes:observation?.reasonCodes??["PROVIDER_REQUEST_FAILED"]};
+ });
  if(responses.some(r=>r.status!=="fulfilled"))
-  return {...base,reasonCodes:["TRUSTLINE_EVIDENCE_UNAVAILABLE"]};
+  return {...base,reasonCodes:["TRUSTLINE_EVIDENCE_UNAVAILABLE"],providerDiagnostics};
  return {...corroboratePinnedTrustLine(responses[0].value,responses[1].value,request),
-  evidenceSources:servers.map(s=>s.name)};
+  evidenceSources:servers.map(s=>s.name),providerDiagnostics};
 }
