@@ -45,6 +45,12 @@ export async function reviewCaseWithLedgerControls(input,{
   if(input.current.issuerGlobalFreeze!==controlEvidence.issuerGlobalFreeze)
     codes.push("CLAIMED_ISSUER_FREEZE_CONFLICT");
   if(controlEvidence.status==="CORROBORATED"){
+    if(controlEvidence.issuerAuthorizationConditionMet===false)
+      codes.push("ISSUER_TRUST_LINE_AUTHORIZATION_REQUIRED");
+    if(controlEvidence.trustLineFrozen===true)
+      codes.push("ISSUER_TRUST_LINE_FROZEN");
+    if(controlEvidence.issuerGlobalFreeze===true)
+      codes.push("ISSUER_GLOBAL_FREEZE_ACTIVE");
     if(input.current.trustLineFrozen!==controlEvidence.trustLineFrozen)
       codes.push("CLAIMED_TRUST_LINE_FREEZE_CONFLICT");
     if(input.current.trustLineAuthorized!==controlEvidence.trustLineAuthorized)
