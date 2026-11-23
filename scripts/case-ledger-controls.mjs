@@ -24,23 +24,31 @@ export async function reviewCaseWithLedgerControls(input,{
     return {...base,caseReview,reasonCodes:["TRANSACTION_EVIDENCE_UNVERIFIED"]};
   const destination=input?.current?.destination;
   const issuer=input?.issuer;
+  const currency=input?.currency;
   // Issuer must be explicit; never infer the issuer from a Payment's sender.
   if(typeof issuer!=="string"||typeof destination!=="string")
     return {...base,caseReview,reasonCodes:["ISSUER_OR_DESTINATION_MISSING"]};
   let controlEvidence;
   try{controlEvidence=await controls({issuer,destination,
-    ledgerHash:caseReview.transaction.ledgerHash});}
+    ledgerHash:caseReview.transaction.ledgerHash,currency});}
   catch{return {...base,caseReview,reasonCodes:["CONTROL_LOOKUP_UNAVAILABLE"]};}
-  if(controlEvidence?.status!=="PARTIAL_CORROBORATED"||
+  if(!["PARTIAL_CORROBORATED","CORROBORATED"].includes(controlEvidence?.status)||
      controlEvidence.ledgerHash!==caseReview.transaction.ledgerHash||
      typeof controlEvidence.requireDestinationTag!=="boolean"||
      typeof controlEvidence.issuerGlobalFreeze!=="boolean")
     return {...base,caseReview,controls:controlEvidence??null,
       reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
-  const codes=["TRUST_LINE_EVIDENCE_NOT_IMPLEMENTED","APPROVAL_SNAPSHOT_UNAUTHENTICATED"];
+  const codes=["APPROVAL_SNAPSHOT_UNAUTHENTICATED"];
+  if(controlEvidence.status!=="CORROBORATED")codes.push("TRUST_LINE_EVIDENCE_UNAVAILABLE");
   if(input.current.destinationTagRequired!==controlEvidence.requireDestinationTag)
     codes.push("CLAIMED_DESTINATION_TAG_CONFLICT");
   if(input.current.issuerGlobalFreeze!==controlEvidence.issuerGlobalFreeze)
     codes.push("CLAIMED_ISSUER_FREEZE_CONFLICT");
+  if(controlEvidence.status==="CORROBORATED"){
+    if(input.current.trustLineFrozen!==controlEvidence.trustLineFrozen)
+      codes.push("CLAIMED_TRUST_LINE_FREEZE_CONFLICT");
+    if(input.current.trustLineAuthorized!==controlEvidence.trustLineAuthorized)
+      codes.push("CLAIMED_TRUST_LINE_AUTH_CONFLICT");
+  }
   return {...base,caseReview,controls:controlEvidence,reasonCodes:codes};
 }
