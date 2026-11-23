@@ -5,7 +5,7 @@ const issuer="r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59";
 const holder="rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY";
 const request={issuer,holder,currency:"USD",ledgerHash:"B".repeat(64)};
 const observation=(flags,issuerIsLow=true,hash=request.ledgerHash)=>({
- result:{validated:true,ledger_hash:hash,node:{
+ result:{validated:true,ledger_index:100,ledger_hash:hash,node:{
  LedgerEntryType:"RippleState",Flags:flags,
  LowLimit:{issuer:issuerIsLow?issuer:holder,currency:"USD",value:"100"},
  HighLimit:{issuer:issuerIsLow?holder:issuer,currency:"USD",value:"100"},
