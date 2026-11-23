@@ -64,7 +64,7 @@ test("corroborated trustline evidence flags conflicts but never approves",async(
   review:async()=>({transaction:tx,verdict:"HOLD"}),
   controls:async()=>({status:"CORROBORATED",ledgerHash:L,
    requireDestinationTag:false,issuerGlobalFreeze:false,issuerRequireAuth:false,
-   trustLineFrozen:true,trustLineAuthorized:true})});
+   trustLineFrozen:true,trustLineAuthorized:true,issuerAuthorizationConditionMet:true})});
  assert.equal(r.verdict,"HOLD");
  assert.equal(r.authorizationGranted,false);
  assert.ok(r.reasonCodes.includes("CLAIMED_TRUST_LINE_FREEZE_CONFLICT"));
@@ -111,4 +111,38 @@ test("RequireAuth enabled and unauthorised trustline fails issuer authorization 
  assert.equal(r.issuerRequireAuth,true);
  assert.equal(r.issuerAuthorizationConditionMet,false);
  assert.equal(r.authorizationGranted,false);
+});
+
+const completeControls={status:"CORROBORATED",ledgerHash:L,
+ requireDestinationTag:false,issuerGlobalFreeze:false,issuerRequireAuth:true,
+ trustLineFrozen:false,trustLineAuthorized:false,issuerAuthorizationConditionMet:false};
+test("complete control evidence requires every freeze and authorization flag",async()=>{
+ for(const field of ["issuerRequireAuth","trustLineFrozen","trustLineAuthorized","issuerAuthorizationConditionMet"]){
+  for(const value of [undefined,null,"false",0]){
+   const result=await reviewCaseWithLedgerControls(input,{
+    review:async()=>({transaction:tx}),
+    controls:async()=>({...completeControls,[field]:value})});
+   assert.deepEqual(result.reasonCodes,["CONTROL_EVIDENCE_UNAVAILABLE"],`${field}: ${value}`);
+   assert.equal(result.authorizationGranted,false);
+  }
+ }
+});
+test("inconsistent issuer authorization decisions fail closed",async()=>{
+ for(const issuerRequireAuth of [true,false]){
+  for(const trustLineAuthorized of [true,false]){
+   const expected=!issuerRequireAuth||trustLineAuthorized;
+   const result=await reviewCaseWithLedgerControls(input,{
+    review:async()=>({transaction:tx}),
+    controls:async()=>({...completeControls,issuerRequireAuth,trustLineAuthorized,
+     issuerAuthorizationConditionMet:!expected})});
+   assert.deepEqual(result.reasonCodes,["CONTROL_EVIDENCE_UNAVAILABLE"]);
+  }
+ }
+});
+test("valid unmet issuer authorization is explicitly reported",async()=>{
+ const result=await reviewCaseWithLedgerControls(input,{
+  review:async()=>({transaction:tx}),controls:async()=>completeControls});
+ assert.ok(result.reasonCodes.includes("ISSUER_TRUST_LINE_AUTHORIZATION_REQUIRED"));
+ assert.equal(result.verdict,"HOLD");
+ assert.equal(result.authorizationGranted,false);
 });

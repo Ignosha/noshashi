@@ -29,3 +29,18 @@ node scripts/xrpl-account-root-live-diagnostic.mjs
 5. Integrate a secure backend and Ledger Desk review UI with clear provenance and unknown states; validate security, failure handling, and ROI in a scoped design-partner pilot.
 
 No merge, production deploy, billing or outreach is included.
+
+## Case composition validation update
+
+The case composer now rejects `CORROBORATED` results unless issuer RequireAuth,
+trust-line freeze, trust-line authorization, and the derived authorization
+condition are explicit booleans. It also checks that the derived condition equals
+`!issuerRequireAuth || trustLineAuthorized`. Incomplete or contradictory results
+return `CONTROL_EVIDENCE_UNAVAILABLE`, HOLD, and no authorization. Regression tests
+cover missing, null, string and numeric flags, all contradictory authorization
+combinations, and a valid unmet authorization condition.
+
+Trust-line lookup is implemented in `xrpl-trustline-lookup.mjs` and exercised by
+`xrpl-trustline-lookup.test.mjs`; the earlier remaining-steps list predates that
+increment. Live provider corroboration, authenticated approval snapshots, and
+production release gates still require verification.

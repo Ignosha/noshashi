@@ -38,6 +38,17 @@ export async function reviewCaseWithLedgerControls(input,{
      typeof controlEvidence.issuerGlobalFreeze!=="boolean")
     return {...base,caseReview,controls:controlEvidence??null,
       reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
+  // Complete evidence must include an explicit, internally consistent
+  // authorization decision. Missing flags must never look like cleared controls.
+  if(controlEvidence.status==="CORROBORATED"&&(
+     typeof controlEvidence.issuerRequireAuth!=="boolean"||
+     typeof controlEvidence.trustLineFrozen!=="boolean"||
+     typeof controlEvidence.trustLineAuthorized!=="boolean"||
+     typeof controlEvidence.issuerAuthorizationConditionMet!=="boolean"||
+     controlEvidence.issuerAuthorizationConditionMet!==
+       (!controlEvidence.issuerRequireAuth||controlEvidence.trustLineAuthorized)))
+    return {...base,caseReview,controls:controlEvidence,
+      reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
   const codes=["APPROVAL_SNAPSHOT_UNAUTHENTICATED"];
   if(controlEvidence.status!=="CORROBORATED")codes.push("TRUST_LINE_EVIDENCE_UNAVAILABLE");
   if(input.current.destinationTagRequired!==controlEvidence.requireDestinationTag)
