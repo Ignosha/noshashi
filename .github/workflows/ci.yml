@@ -150,7 +150,7 @@ jobs:
         run: node --check site/case-review/case-review.js
 
       - name: Marketplace API integration tests
-        run: node --test scripts/marketplace-dev.test.mjs scripts/autopsy-gateway.test.mjs scripts/approval-drift.test.mjs scripts/evidence-receipt.test.mjs scripts/institutional-case-review.test.mjs
+        run: node --test scripts/marketplace-dev.test.mjs scripts/autopsy-gateway.test.mjs scripts/approval-drift.test.mjs scripts/evidence-receipt.test.mjs scripts/institutional-case-review.test.mjs scripts/xrpl-account-root-evidence.test.mjs
 
       # One read-only historical XRPL transaction is checked against two separately
       # operated public RPC nodes on this research branch. Provider outages may fail
