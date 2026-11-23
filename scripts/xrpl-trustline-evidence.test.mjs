@@ -50,3 +50,19 @@ test("ledger_entry responses require a valid positive ledger index",()=>{
  const negative=observation(0);negative.result.ledger_index=-1;
  assert.deepEqual(parsePinnedTrustLine(negative,request).reasonCodes,["LEDGER_INDEX_INVALID"]);
 });
+
+test("matching ledger hash with contradictory ledger indices fails closed",()=>{
+ const a=observation(0);
+ const b=observation(0);
+ b.result.ledger_index=101;
+ const result=corroboratePinnedTrustLine(a,b,request);
+ assert.equal(result.status,"UNKNOWN");
+ assert.equal(result.ledgerIndex,null);
+ assert.deepEqual(result.reasonCodes,["TRUSTLINE_LEDGER_INDEX_DISAGREEMENT"]);
+ assert.equal(result.independentlyAuthenticated,false);
+});
+test("matching ledger indices are retained as provenance, not consensus proof",()=>{
+ const result=corroboratePinnedTrustLine(observation(0),observation(0),request);
+ assert.equal(result.ledgerIndex,100);
+ assert.equal(result.independentlyAuthenticated,false);
+});
