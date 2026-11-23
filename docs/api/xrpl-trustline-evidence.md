@@ -9,8 +9,10 @@
 - The authorization flag being unset does **not** by itself mean a payment is prohibited: `lsfRequireAuth` on the issuer's AccountRoot must be checked separately before drawing an authorization-policy conclusion.
 - The issuer's global freeze is a separate AccountRoot control; both checks must be considered. This parser does not check NoRipple, DeepFreeze, trust-line existence, asset transfer restrictions, transaction authorization, or signatures.
 
-**Not yet connected to live RPC**: the next increment is a fixed-provider, bounded, read-only `ledger_entry` adapter that requests a `RippleState` by account pair and currency pinned to a validated ledger hash. Production integration remains blocked.
+**Read-only RPC adapter implemented:** `scripts/xrpl-trustline-lookup.mjs` sends pinned `ledger_entry` requests to two fixed HTTPS providers, caps response size and time, rejects untrusted server overrides, and returns UNKNOWN when the providers fail or disagree. This adapter has mocked tests, **not a confirmed live RippleState integration test**. Production integration remains blocked.
 
-Run: `node --test scripts/xrpl-trustline-evidence.test.mjs`.
+Run: `node --test scripts/xrpl-trustline-evidence.test.mjs scripts/xrpl-trustline-lookup.test.mjs scripts/case-ledger-controls.test.mjs`.
+
+`lookupPinnedPaymentControls` now optionally accepts a currency and queries the destination-holder trust line with the explicit issuer; the composed read-only Case Review flags differences against supplied control claims. Missing trust-line evidence remains UNKNOWN and all case verdicts remain HOLD. This does not determine payment eligibility without issuer RequireAuth, global freeze, transfer restrictions, asset identity and authenticated institutional approval.
 
 This is not a production preflight or evidence of institutional approval.
