@@ -30,3 +30,15 @@ Reference: https://xrpl.org/docs/references/http-websocket-apis/public-api-metho
 
 ## Release gate
 Wire two real read-only providers with response-size/timeouts, validate against documented historical fixtures and current mainnet observations, then bind the resulting control evidence to case review with actor/tenant context. Never treat a missing flag or an unavailable provider as permission to send funds.
+
+## Next increment: read-only pinned RPC adapter (implemented)
+
+`scripts/xrpl-account-root-lookup.mjs` now sends `account_info` with an explicit `ledger_hash` to the two existing fixed HTTPS XRPL RPC providers. Requests reject caller-selected servers, follow no redirects, enforce a 4.5-second timeout and a 1 MiB response limit, and treat an unavailable or disagreeing provider as UNKNOWN. The adapter uses the AccountRoot parser above. Its tests mock both providers; **live historical account_info verification has not been completed**.
+
+```sh
+node --test scripts/xrpl-account-root-evidence.test.mjs scripts/xrpl-account-root-lookup.test.mjs
+```
+
+**Integration remains blocked:** A pinned ledger hash must come from a separately corroborated validated ledger source. Do not use the current ledger without checking the hash and validation. The account flag is not enough to determine payment readiness; trust-line authorization, freeze state, token details, destination existence, and customer approval policy are separate checks.
+
+The official `account_info` documentation marks `strict` as deprecated, so the adapter omits it: https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_info
