@@ -15,7 +15,12 @@ export async function reviewCaseWithLedgerControls(input,{
     return {...base,reasonCodes:["CASE_REVIEW_UNAVAILABLE"]};
   }
   if(!caseReview||caseReview.transaction?.status!=="VERIFIED_FACT"||
-     !caseReview.transaction.ledgerHash||!caseReview.transaction.ledgerIndex)
+     caseReview.transaction.validated!==true||
+     caseReview.transaction.simulated!==false||
+     caseReview.transaction.provenance!=="two-rpc-providers"||
+     !/^[A-F0-9]{64}$/i.test(caseReview.transaction.ledgerHash??"")||
+     !Number.isSafeInteger(caseReview.transaction.ledgerIndex)||
+     caseReview.transaction.ledgerIndex<=0)
     return {...base,caseReview,reasonCodes:["TRANSACTION_EVIDENCE_UNVERIFIED"]};
   const destination=input?.current?.destination;
   const issuer=input?.issuer;
@@ -26,7 +31,10 @@ export async function reviewCaseWithLedgerControls(input,{
   try{controlEvidence=await controls({issuer,destination,
     ledgerHash:caseReview.transaction.ledgerHash});}
   catch{return {...base,caseReview,reasonCodes:["CONTROL_LOOKUP_UNAVAILABLE"]};}
-  if(controlEvidence?.status!=="PARTIAL_CORROBORATED")
+  if(controlEvidence?.status!=="PARTIAL_CORROBORATED"||
+     controlEvidence.ledgerHash!==caseReview.transaction.ledgerHash||
+     typeof controlEvidence.requireDestinationTag!=="boolean"||
+     typeof controlEvidence.issuerGlobalFreeze!=="boolean")
     return {...base,caseReview,controls:controlEvidence??null,
       reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
   const codes=["TRUST_LINE_EVIDENCE_NOT_IMPLEMENTED","APPROVAL_SNAPSHOT_UNAUTHENTICATED"];
