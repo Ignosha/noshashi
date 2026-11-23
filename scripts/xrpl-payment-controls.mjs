@@ -10,6 +10,7 @@ export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash
   const base={schema:"noshashi.xrpl.payment-controls.research.v0",
     status:"UNKNOWN",ledgerHash,requireDestinationTag:null,
     issuerGlobalFreeze:null,issuerRequireAuth:null,trustLineFrozen:null,trustLineAuthorized:null,
+    issuerAuthorizationConditionMet:null,
     reasonCodes:[],authorizationGranted:false,independentlyAuthenticated:false};
   if(typeof destination!=="string"||typeof issuer!=="string"||
      typeof ledgerHash!=="string"||!/^[A-F0-9]{64}$/i.test(ledgerHash))
@@ -46,5 +47,7 @@ export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash
   return {...observed,status:observed.issuerRequireAuth===null?"PARTIAL_CORROBORATED":"CORROBORATED",
     trustLineFrozen:trustLine.trustLineFrozen,
     trustLineAuthorized:trustLine.trustLineAuthorized,
+    issuerAuthorizationConditionMet:observed.issuerRequireAuth===null?null:
+      (!observed.issuerRequireAuth||trustLine.trustLineAuthorized),
     reasonCodes:observed.issuerRequireAuth===null?["ISSUER_REQUIRE_AUTH_UNKNOWN"]:[]};
 }
