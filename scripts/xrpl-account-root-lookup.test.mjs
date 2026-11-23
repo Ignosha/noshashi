@@ -53,3 +53,11 @@ test("rejects oversized upstream bodies",async()=>{
  })});
  assert.deepEqual(r.reasonCodes,["PINNED_ACCOUNT_EVIDENCE_UNAVAILABLE"]);
 });
+
+test("diagnostics distinguish provider failure from invalid ledger evidence",async()=>{
+ const r=await lookupPinnedAccountRoot(request,{
+  fetchFn:async url=>url===UPSTREAMS[0].url?mock(0,"C".repeat(64)):Promise.reject(Error("offline"))});
+ assert.deepEqual(r.providerDiagnostics.map(x=>x.reasonCodes[0]),
+  ["PINNED_LEDGER_UNVERIFIED","PROVIDER_REQUEST_FAILED"]);
+ assert.equal(r.status,"UNKNOWN");
+});
