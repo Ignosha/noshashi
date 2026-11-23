@@ -8,11 +8,12 @@ const HEX64=/^[A-F0-9]{64}$/i;
 const ADDRESS=/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const LSF_REQUIRE_DEST_TAG=0x00020000;
 const LSF_GLOBAL_FREEZE=0x00400000;
+const LSF_REQUIRE_AUTH=0x00040000;
 export function parsePinnedAccountRoot(raw,{account,ledgerHash}={}) {
   const base={schema:"noshashi.xrpl.account-root.research.v0",status:"UNKNOWN",
     account:typeof account==="string"?account:null,
     ledgerHash:typeof ledgerHash==="string"?ledgerHash.toUpperCase():null,
-    requireDestinationTag:null,globalFreeze:null,reasonCodes:[]};
+    requireDestinationTag:null,globalFreeze:null,requireAuth:null,reasonCodes:[]};
   if(typeof account!=="string"||!ADDRESS.test(account)||
      typeof ledgerHash!=="string"||!HEX64.test(ledgerHash))
     return {...base,reasonCodes:["INVALID_PINNED_REQUEST"]};
@@ -32,6 +33,7 @@ export function parsePinnedAccountRoot(raw,{account,ledgerHash}={}) {
   return {...base,status:"OBSERVED",
     requireDestinationTag:(root.Flags&LSF_REQUIRE_DEST_TAG)!==0,
     globalFreeze:(root.Flags&LSF_GLOBAL_FREEZE)!==0,
+    requireAuth:(root.Flags&LSF_REQUIRE_AUTH)!==0,
     reasonCodes:[]};
 }
 export function corroboratePinnedAccountRoot(a,b,request){
@@ -39,12 +41,12 @@ export function corroboratePinnedAccountRoot(a,b,request){
   const base={schema:"noshashi.xrpl.account-root.corroborated.v0",
     status:"UNKNOWN",account:request?.account??null,
     ledgerHash:request?.ledgerHash?.toUpperCase?.()??null,
-    requireDestinationTag:null,globalFreeze:null,reasonCodes:[],
+    requireDestinationTag:null,globalFreeze:null,requireAuth:null,reasonCodes:[],
     sourceCount:2,independentlyAuthenticated:false};
   if(left.status!=="OBSERVED"||right.status!=="OBSERVED")
     return {...base,reasonCodes:["PINNED_ACCOUNT_EVIDENCE_UNAVAILABLE"]};
-  if(left.requireDestinationTag!==right.requireDestinationTag || left.globalFreeze!==right.globalFreeze)
+  if(left.requireDestinationTag!==right.requireDestinationTag || left.globalFreeze!==right.globalFreeze || left.requireAuth!==right.requireAuth)
     return {...base,reasonCodes:["ACCOUNT_ROOT_PROVIDER_DISAGREEMENT"]};
   return {...base,status:"CORROBORATED",
-    requireDestinationTag:left.requireDestinationTag,globalFreeze:left.globalFreeze};
+    requireDestinationTag:left.requireDestinationTag,globalFreeze:left.globalFreeze,requireAuth:left.requireAuth};
 }
