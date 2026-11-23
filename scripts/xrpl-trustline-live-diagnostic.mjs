@@ -13,7 +13,8 @@ if(!issuer||!holder||!currency||!ledgerHash){
  try{
   const evidence=await lookupPinnedTrustLine({issuer,holder,currency,ledgerHash});
   console.log(JSON.stringify({status:evidence.status,ledgerHash:evidence.ledgerHash,
-   issuer,holder,currency,trustLineFrozen:evidence.trustLineFrozen,
+   issuer,holder,currency,ledgerIndex:evidence.ledgerIndex??null,
+   trustLineFrozen:evidence.trustLineFrozen,
    trustLineAuthorized:evidence.trustLineAuthorized,
    reasonCodes:evidence.reasonCodes,providerDiagnostics:evidence.providerDiagnostics??[],
    independentlyAuthenticated:false,
