@@ -21,9 +21,10 @@ export async function fetchPinnedAccountInfo(server,request,fetchFn=fetch){
       api_version:2,
     }]}),
   });
-  if (!response.ok) throw new Error("UPSTREAM_HTTP_FAILURE");
+  if (!response?.ok) throw new Error("UPSTREAM_HTTP_FAILURE");
   const declared=Number(response.headers?.get?.("content-length")??0);
-  if (!Number.isFinite(declared)||declared>MAX_BYTES) throw new Error("UPSTREAM_RESPONSE_TOO_LARGE");
+  if (!Number.isFinite(declared)||declared<0||declared>MAX_BYTES) throw new Error("UPSTREAM_RESPONSE_TOO_LARGE");
+  if (!response.body) throw new Error("UPSTREAM_EMPTY_BODY");
   const chunks=[];let size=0;
   for await(const chunk of response.body){
     size+=chunk.byteLength;
@@ -42,7 +43,7 @@ export async function lookupPinnedAccountRoot(request,{servers=UPSTREAMS,fetchFn
   if(!ADDRESS.test(request?.account??"")||!HEX64.test(request?.ledgerHash??""))
     return {...base,reasonCodes:["INVALID_PINNED_REQUEST"]};
   if(!Array.isArray(servers)||servers.length!==2||
-     servers[0]?.name===servers[1]?.name||
+     servers[0]?.name===servers[1]?.name||servers[0]?.url===servers[1]?.url||
      !servers.every(s=>UPSTREAMS.some(known=>known.url===s.url&&known.name===s.name)))
     return {...base,reasonCodes:["INDEPENDENT_SOURCES_NOT_CONFIGURED"]};
   const results=await Promise.allSettled(servers.map(s=>fetchPinnedAccountInfo(s,request,fetchFn)));
