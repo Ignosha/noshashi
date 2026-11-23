@@ -43,6 +43,8 @@ test("wrong pinned ledger fails closed",async()=>{
  const r=await lookupPinnedTrustLine(request,{fetchFn:fetchMock(reply(0),reply(0,"C".repeat(64)))});
  assert.equal(r.status,"UNKNOWN");
  assert.deepEqual(r.reasonCodes,["TRUSTLINE_EVIDENCE_UNAVAILABLE"]);
+ assert.deepEqual(r.providerDiagnostics.map(x=>x.reasonCodes[0]),
+  [undefined,"PINNED_LEDGER_UNVERIFIED"]);
 });
 test("untrusted servers and malformed requests never fetch",async()=>{
  let called=false;
@@ -60,4 +62,17 @@ test("oversized response is rejected",async()=>{
  const big=async()=>({ok:true,headers:{get:()=>String(1024*1024+1)}});
  await assert.rejects(()=>fetchPinnedTrustLine(UPSTREAMS[0],request,big),
   /UPSTREAM_RESPONSE_TOO_LARGE/);
+});
+
+test("trustline diagnostics distinguish RPC outage from invalid pinned response",async()=>{
+ const r=await lookupPinnedTrustLine(request,{
+  fetchFn:async url=>url===UPSTREAMS[0].url?
+   Promise.reject(Error("offline")):fetchMock(reply())(url,{
+    method:"POST",redirect:"error",
+    body:JSON.stringify({method:"ledger_entry",params:[{
+     ledger_hash:request.ledgerHash,
+     ripple_state:{accounts:[issuer,holder]}}]})})});
+ assert.equal(r.status,"UNKNOWN");
+ assert.equal(r.providerDiagnostics[0].reasonCodes[0],"PROVIDER_REQUEST_FAILED");
+ assert.equal(r.providerDiagnostics[1].status,"OBSERVED");
 });
