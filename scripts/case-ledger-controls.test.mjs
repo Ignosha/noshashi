@@ -7,7 +7,7 @@ const destination="rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY";
 const issuer="r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59";
 const control={destination,issuer,ledgerHash:L};
 const lookup=async({account,ledgerHash})=>({
- status:"CORROBORATED",account,ledgerHash,requireDestinationTag:true,globalFreeze:false});
+ status:"CORROBORATED",account,ledgerHash,requireDestinationTag:true,globalFreeze:false,requireAuth:false});
 test("destination tag and issuer freeze come from distinct pinned AccountRoots",async()=>{
  const seen=[];
  const r=await lookupPinnedPaymentControls(control,{lookup:async request=>{
@@ -33,7 +33,7 @@ test("ledger claims are compared without granting approval",async()=>{
  review:async payload=>{
  assert.deepEqual(Object.keys(payload).sort(),["approved","current","hash"]);
  return {transaction:tx,verdict:"HOLD"};},
- controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,requireDestinationTag:true,issuerGlobalFreeze:false})});
+ controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,requireDestinationTag:true,issuerGlobalFreeze:false,issuerRequireAuth:false})});
  assert.equal(r.verdict,"HOLD");
  assert.equal(r.authorizationGranted,false);
  assert.ok(r.reasonCodes.includes("CLAIMED_DESTINATION_TAG_CONFLICT"));
@@ -63,7 +63,7 @@ test("corroborated trustline evidence flags conflicts but never approves",async(
  const r=await reviewCaseWithLedgerControls(withAsset,{
   review:async()=>({transaction:tx,verdict:"HOLD"}),
   controls:async()=>({status:"CORROBORATED",ledgerHash:L,
-   requireDestinationTag:false,issuerGlobalFreeze:false,
+   requireDestinationTag:false,issuerGlobalFreeze:false,issuerRequireAuth:false,
    trustLineFrozen:true,trustLineAuthorized:true})});
  assert.equal(r.verdict,"HOLD");
  assert.equal(r.authorizationGranted,false);
@@ -89,4 +89,14 @@ test("missing pinned trustline response retains partial evidence and unknown fla
  assert.equal(r.status,"PARTIAL_CORROBORATED");
  assert.equal(r.trustLineFrozen,null);
  assert.deepEqual(r.reasonCodes,["TRUST_LINE_EVIDENCE_UNAVAILABLE"]);
+});
+
+test("missing issuer RequireAuth cannot produce complete control evidence",async()=>{
+ const r=await lookupPinnedPaymentControls({...control,currency:"USD"},{
+  lookup:async q=>({...await lookup(q),requireAuth:undefined}),
+  trustLineLookup:async q=>({status:"CORROBORATED",issuer:q.issuer,holder:q.holder,
+   currency:q.currency,ledgerHash:q.ledgerHash,trustLineFrozen:false,trustLineAuthorized:true})});
+ assert.equal(r.status,"PARTIAL_CORROBORATED");
+ assert.equal(r.issuerRequireAuth,null);
+ assert.deepEqual(r.reasonCodes,["ISSUER_REQUIRE_AUTH_UNKNOWN"]);
 });
