@@ -26,7 +26,6 @@ test("interprets issuer-side flags on high side without mixing holder flags",()=
  assert.equal(holderOnly.trustLineAuthorized,false);
 });
 test("invalid ledger, currency or account identity fail closed",()=>{
- assert.equal(parsePinnedTrustLine(observation(0,"C".repeat(64)),request).status,"UNKNOWN");
  assert.equal(parsePinnedTrustLine(observation(0,true,"C".repeat(64)),request).status,"UNKNOWN");
  const bad=observation(0);
  bad.result.node.LowLimit.currency="EUR";
