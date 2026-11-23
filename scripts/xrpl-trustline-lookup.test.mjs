@@ -76,3 +76,26 @@ test("trustline diagnostics distinguish RPC outage from invalid pinned response"
  assert.equal(r.providerDiagnostics[0].reasonCodes[0],"PROVIDER_REQUEST_FAILED");
  assert.equal(r.providerDiagnostics[1].status,"OBSERVED");
 });
+
+test("missing, malformed, and negative content lengths fail closed",async()=>{
+ for(const declared of ["-1","not-a-number",String(1024*1024+1)]){
+  const mock=async()=>({ok:true,headers:{get:()=>declared},body:(async function*(){yield Buffer.from("{}");})()});
+  await assert.rejects(()=>fetchPinnedTrustLine(UPSTREAMS[0],request,mock),
+   /UPSTREAM_RESPONSE_TOO_LARGE/);
+ }
+});
+test("missing HTTP response is classified as unavailable",async()=>{
+ const r=await lookupPinnedTrustLine(request,{fetchFn:async()=>null});
+ assert.equal(r.status,"UNKNOWN");
+ assert.deepEqual(r.providerDiagnostics.map(x=>x.reasonCodes[0]),
+  ["PROVIDER_REQUEST_FAILED","PROVIDER_REQUEST_FAILED"]);
+ assert.equal(r.ledgerIndex,null);
+});
+test("provider ledger index mismatch cannot be corroborated",async()=>{
+ const first=reply(),second=reply();
+ second.result.ledger_index=101;
+ const r=await lookupPinnedTrustLine(request,{fetchFn:fetchMock(first,second)});
+ assert.equal(r.status,"UNKNOWN");
+ assert.deepEqual(r.reasonCodes,["TRUSTLINE_LEDGER_INDEX_DISAGREEMENT"]);
+ assert.equal(r.independentlyAuthenticated,false);
+});
