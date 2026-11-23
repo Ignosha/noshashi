@@ -61,3 +61,18 @@ test("diagnostics distinguish provider failure from invalid ledger evidence",asy
   ["PINNED_LEDGER_UNVERIFIED","PROVIDER_REQUEST_FAILED"]);
  assert.equal(r.status,"UNKNOWN");
 });
+
+test("malformed AccountRoot upstream metadata and missing body fail closed",async()=>{
+ for(const response of [
+  null,
+  {ok:true,headers:{get:()=>"-1"},body:(async function*(){yield Buffer.from("{}");})()},
+  {ok:true,headers:{get:()=>"invalid"},body:(async function*(){yield Buffer.from("{}");})()},
+  {ok:true,headers:{get:()=>null},body:null},
+ ]){
+  const r=await lookupPinnedAccountRoot(request,{fetchFn:async()=>response});
+  assert.equal(r.status,"UNKNOWN");
+  assert.deepEqual(r.reasonCodes,["PINNED_ACCOUNT_EVIDENCE_UNAVAILABLE"]);
+  assert.deepEqual(r.providerDiagnostics.map(x=>x.reasonCodes[0]),
+   ["PROVIDER_REQUEST_FAILED","PROVIDER_REQUEST_FAILED"]);
+ }
+});
