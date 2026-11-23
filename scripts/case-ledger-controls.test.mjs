@@ -26,14 +26,14 @@ test("one unavailable account keeps all controls UNKNOWN",async()=>{
  assert.equal(r.status,"UNKNOWN");
  assert.equal(r.requireDestinationTag,null);
 });
-const tx={status:"VERIFIED_FACT",ledgerHash:L,ledgerIndex:100};
+const tx={status:"VERIFIED_FACT",validated:true,simulated:false,provenance:"two-rpc-providers",ledgerHash:L,ledgerIndex:100};
 const input={hash:H,issuer,current:{destination,destinationTagRequired:false,issuerGlobalFreeze:false}};
 test("ledger claims are compared without granting approval",async()=>{
  const r=await reviewCaseWithLedgerControls(input,{
  review:async payload=>{
  assert.deepEqual(Object.keys(payload).sort(),["approved","current","hash"]);
  return {transaction:tx,verdict:"HOLD"};},
- controls:async()=>({status:"PARTIAL_CORROBORATED",requireDestinationTag:true,issuerGlobalFreeze:false})});
+ controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,requireDestinationTag:true,issuerGlobalFreeze:false})});
  assert.equal(r.verdict,"HOLD");
  assert.equal(r.authorizationGranted,false);
  assert.ok(r.reasonCodes.includes("CLAIMED_DESTINATION_TAG_CONFLICT"));
@@ -45,4 +45,15 @@ test("missing issuer and missing transaction evidence fail closed",async()=>{
  assert.deepEqual(noIssuer.reasonCodes,["ISSUER_OR_DESTINATION_MISSING"]);
  const noTx=await reviewCaseWithLedgerControls(input,{review:async()=>({transaction:null})});
  assert.deepEqual(noTx.reasonCodes,["TRANSACTION_EVIDENCE_UNVERIFIED"]);
+});
+
+test("rejects forged transaction and mismatched pinned controls",async()=>{
+ const fake=await reviewCaseWithLedgerControls(input,{
+  review:async()=>({transaction:{...tx,simulated:true}})});
+ assert.deepEqual(fake.reasonCodes,["TRANSACTION_EVIDENCE_UNVERIFIED"]);
+ const unpinned=await reviewCaseWithLedgerControls(input,{
+  review:async()=>({transaction:tx}),
+  controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:"C".repeat(64),
+   requireDestinationTag:true,issuerGlobalFreeze:false})});
+ assert.deepEqual(unpinned.reasonCodes,["CONTROL_EVIDENCE_UNAVAILABLE"]);
 });
