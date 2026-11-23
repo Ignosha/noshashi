@@ -1,7 +1,8 @@
 /**
  * Ledger-pinned XRPL controls, deliberately incomplete for token transfers.
  * Destination tag comes from destination AccountRoot; issuer global freeze
- * comes from issuer AccountRoot. Trust-line state remains UNKNOWN.
+ * and RequireAuth come from issuer AccountRoot. Trust-line evidence is
+ * corroborated only when a currency and pinned RippleState are available.
  */
 import { lookupPinnedAccountRoot } from "./xrpl-account-root-lookup.mjs";
 import { lookupPinnedTrustLine } from "./xrpl-trustline-lookup.mjs";
@@ -12,7 +13,9 @@ export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash
     issuerGlobalFreeze:null,issuerRequireAuth:null,trustLineFrozen:null,trustLineAuthorized:null,
     issuerAuthorizationConditionMet:null,
     reasonCodes:[],authorizationGranted:false,independentlyAuthenticated:false};
-  if(typeof destination!=="string"||typeof issuer!=="string"||
+  const address=/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+  if(typeof destination!=="string"||!address.test(destination)||
+     typeof issuer!=="string"||!address.test(issuer)||issuer===destination||
      typeof ledgerHash!=="string"||!/^[A-F0-9]{64}$/i.test(ledgerHash))
     return {...base,reasonCodes:["INVALID_CONTROL_REQUEST"]};
   const [d,i]=await Promise.allSettled([
