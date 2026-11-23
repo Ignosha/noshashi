@@ -3,7 +3,7 @@
  * Research only; no signing, account credentials or public HTTP endpoint.
  */
 import { UPSTREAMS } from "./autopsy-gateway.mjs";
-import { corroboratePinnedAccountRoot } from "./xrpl-account-root-evidence.mjs";
+import { corroboratePinnedAccountRoot, parsePinnedAccountRoot } from "./xrpl-account-root-evidence.mjs";
 const HEX64=/^[A-F0-9]{64}$/i;
 const ADDRESS=/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const MAX_BYTES=1024*1024;
@@ -46,8 +46,14 @@ export async function lookupPinnedAccountRoot(request,{servers=UPSTREAMS,fetchFn
      !servers.every(s=>UPSTREAMS.some(known=>known.url===s.url&&known.name===s.name)))
     return {...base,reasonCodes:["INDEPENDENT_SOURCES_NOT_CONFIGURED"]};
   const results=await Promise.allSettled(servers.map(s=>fetchPinnedAccountInfo(s,request,fetchFn)));
+  const diagnostics=results.map((r,index)=>{
+    const observation=r.status==="fulfilled"?parsePinnedAccountRoot(r.value,request):null;
+    return {provider:servers[index].name,status:observation?.status??"UNKNOWN",
+      reasonCodes:observation?.reasonCodes??["PROVIDER_REQUEST_FAILED"]};
+  });
   if(results.some(r=>r.status!=="fulfilled"))
-    return {...base,reasonCodes:["PINNED_ACCOUNT_EVIDENCE_UNAVAILABLE"]};
+    return {...base,reasonCodes:["PINNED_ACCOUNT_EVIDENCE_UNAVAILABLE"],
+      providerDiagnostics:diagnostics};
   return {...corroboratePinnedAccountRoot(results[0].value,results[1].value,request),
-    evidenceSources:servers.map(s=>s.name)};
+    evidenceSources:servers.map(s=>s.name),providerDiagnostics:diagnostics};
 }
