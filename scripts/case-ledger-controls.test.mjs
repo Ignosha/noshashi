@@ -70,3 +70,23 @@ test("corroborated trustline evidence flags conflicts but never approves",async(
  assert.ok(r.reasonCodes.includes("CLAIMED_TRUST_LINE_FREEZE_CONFLICT"));
  assert.ok(!r.reasonCodes.includes("CLAIMED_TRUST_LINE_AUTH_CONFLICT"));
 });
+
+test("complete pinned payment controls combine AccountRoot and trustline",async()=>{
+ const withCurrency={...control,currency:"USD"};
+ const r=await lookupPinnedPaymentControls(withCurrency,{
+  lookup,
+  trustLineLookup:async request=>({status:"CORROBORATED",
+   issuer:request.issuer,holder:request.holder,currency:request.currency,
+   ledgerHash:request.ledgerHash,trustLineFrozen:true,trustLineAuthorized:false})});
+ assert.equal(r.status,"CORROBORATED");
+ assert.equal(r.trustLineFrozen,true);
+ assert.equal(r.trustLineAuthorized,false);
+ assert.equal(r.authorizationGranted,false);
+});
+test("missing pinned trustline response retains partial evidence and unknown flags",async()=>{
+ const r=await lookupPinnedPaymentControls({...control,currency:"USD"},{
+  lookup,trustLineLookup:async()=>({status:"UNKNOWN"})});
+ assert.equal(r.status,"PARTIAL_CORROBORATED");
+ assert.equal(r.trustLineFrozen,null);
+ assert.deepEqual(r.reasonCodes,["TRUST_LINE_EVIDENCE_UNAVAILABLE"]);
+});
