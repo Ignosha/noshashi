@@ -12,7 +12,7 @@ export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={})
  const base={schema:"noshashi.xrpl.trustline.observation.v0",status:"UNKNOWN",
   issuer:issuer??null,holder:holder??null,currency:currency??null,
   ledgerHash:typeof ledgerHash==="string"?ledgerHash.toUpperCase():null,
-  trustLineFrozen:null,trustLineAuthorized:null,reasonCodes:[]};
+  trustLineFrozen:null,trustLineAuthorized:null,ledgerIndex:null,reasonCodes:[]};
  if(!ADDRESS.test(issuer??"")||!ADDRESS.test(holder??"")||issuer===holder||
     typeof currency!=="string"||!/^([A-Z0-9]{3}|[A-F0-9]{40})$/i.test(currency)||
     !HEX64.test(ledgerHash??""))
@@ -39,7 +39,7 @@ export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={})
  const issuerLow=low.issuer===issuer;
  const freezeFlag=issuerLow?LSF_LOW_FREEZE:LSF_HIGH_FREEZE;
  const authFlag=issuerLow?LSF_LOW_AUTH:LSF_HIGH_AUTH;
- return {...base,status:"OBSERVED",
+ return {...base,status:"OBSERVED",ledgerIndex:r.ledger_index,
    trustLineFrozen:(node.Flags&freezeFlag)!==0,
    trustLineAuthorized:(node.Flags&authFlag)!==0,
    reasonCodes:[]};
@@ -50,14 +50,16 @@ export function corroboratePinnedTrustLine(a,b,request){
    issuer:request?.issuer??null,holder:request?.holder??null,
    currency:request?.currency??null,
    ledgerHash:typeof request?.ledgerHash==="string"?request.ledgerHash.toUpperCase():null,
-   trustLineFrozen:null,trustLineAuthorized:null,
+   trustLineFrozen:null,trustLineAuthorized:null,ledgerIndex:null,
    independentlyAuthenticated:false,reasonCodes:[]};
  if(left.status!=="OBSERVED"||right.status!=="OBSERVED")
   return {...base,reasonCodes:["TRUSTLINE_EVIDENCE_UNAVAILABLE"]};
+ if(left.ledgerIndex!==right.ledgerIndex)
+  return {...base,reasonCodes:["TRUSTLINE_LEDGER_INDEX_DISAGREEMENT"]};
  if(left.trustLineFrozen!==right.trustLineFrozen||
     left.trustLineAuthorized!==right.trustLineAuthorized)
   return {...base,reasonCodes:["TRUSTLINE_PROVIDER_DISAGREEMENT"]};
- return {...base,status:"CORROBORATED",
+ return {...base,status:"CORROBORATED",ledgerIndex:left.ledgerIndex,
   trustLineFrozen:left.trustLineFrozen,
   trustLineAuthorized:left.trustLineAuthorized};
 }
