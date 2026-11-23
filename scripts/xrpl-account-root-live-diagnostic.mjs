@@ -27,6 +27,7 @@ try{
    requireDestinationTag:evidence.requireDestinationTag,
    globalFreeze:evidence.globalFreeze,
    reasonCodes:evidence.reasonCodes??[],
+   providerDiagnostics:evidence.providerDiagnostics??[],
    note:"Two RPC observations; not cryptographic proof of consensus"};
 }catch{
  result={status:"UNKNOWN",account,reasonCodes:["LIVE_LEDGER_DIAGNOSTIC_UNAVAILABLE"]};
