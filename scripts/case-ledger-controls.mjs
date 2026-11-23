@@ -49,11 +49,12 @@ export async function reviewCaseWithLedgerControls(input,{
        (!controlEvidence.issuerRequireAuth||controlEvidence.trustLineAuthorized)))
     return {...base,caseReview,controls:controlEvidence,
       reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
+  const claims=input?.current??{};
   const codes=["APPROVAL_SNAPSHOT_UNAUTHENTICATED"];
   if(controlEvidence.status!=="CORROBORATED")codes.push("TRUST_LINE_EVIDENCE_UNAVAILABLE");
-  if(input.current.destinationTagRequired!==controlEvidence.requireDestinationTag)
+  if(claims.destinationTagRequired!==controlEvidence.requireDestinationTag)
     codes.push("CLAIMED_DESTINATION_TAG_CONFLICT");
-  if(input.current.issuerGlobalFreeze!==controlEvidence.issuerGlobalFreeze)
+  if(claims.issuerGlobalFreeze!==controlEvidence.issuerGlobalFreeze)
     codes.push("CLAIMED_ISSUER_FREEZE_CONFLICT");
   if(controlEvidence.status==="CORROBORATED"){
     if(controlEvidence.issuerAuthorizationConditionMet===false)
@@ -62,9 +63,9 @@ export async function reviewCaseWithLedgerControls(input,{
       codes.push("ISSUER_TRUST_LINE_FROZEN");
     if(controlEvidence.issuerGlobalFreeze===true)
       codes.push("ISSUER_GLOBAL_FREEZE_ACTIVE");
-    if(input.current.trustLineFrozen!==controlEvidence.trustLineFrozen)
+    if(claims.trustLineFrozen!==controlEvidence.trustLineFrozen)
       codes.push("CLAIMED_TRUST_LINE_FREEZE_CONFLICT");
-    if(input.current.trustLineAuthorized!==controlEvidence.trustLineAuthorized)
+    if(claims.trustLineAuthorized!==controlEvidence.trustLineAuthorized)
       codes.push("CLAIMED_TRUST_LINE_AUTH_CONFLICT");
   }
   return {...base,caseReview,controls:controlEvidence,reasonCodes:codes};
