@@ -35,3 +35,13 @@ test("disagreement and missing provider evidence remain UNKNOWN",()=>{
  assert.deepEqual(corroboratePinnedAccountRoot(response(0),response(0x00020000),request).reasonCodes,["ACCOUNT_ROOT_PROVIDER_DISAGREEMENT"]);
  assert.deepEqual(corroboratePinnedAccountRoot(response(),null,request).reasonCodes,["PINNED_ACCOUNT_EVIDENCE_UNAVAILABLE"]);
 });
+
+test("parses issuer global freeze flag and fails closed on provider disagreement",()=>{
+ const frozen=corroboratePinnedAccountRoot(response(0x00400000),response(0x00400000),request);
+ assert.equal(frozen.status,"CORROBORATED");
+ assert.equal(frozen.globalFreeze,true);
+ assert.equal(frozen.requireDestinationTag,false);
+ const disagree=corroboratePinnedAccountRoot(response(0x00400000),response(0),request);
+ assert.equal(disagree.status,"UNKNOWN");
+ assert.deepEqual(disagree.reasonCodes,["ACCOUNT_ROOT_PROVIDER_DISAGREEMENT"]);
+});
