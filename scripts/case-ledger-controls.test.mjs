@@ -146,3 +146,25 @@ test("valid unmet issuer authorization is explicitly reported",async()=>{
  assert.equal(result.verdict,"HOLD");
  assert.equal(result.authorizationGranted,false);
 });
+
+test("invalid issuer or destination never invokes upstream account lookups",async()=>{
+ let called=0;
+ const never=async()=>{called++;throw Error("must not call");};
+ for(const bad of [
+  {...control,issuer:destination},
+  {...control,issuer:"not-an-address"},
+  {...control,destination:"not-an-address"},
+ ]){
+  const r=await lookupPinnedPaymentControls(bad,{lookup:never,trustLineLookup:never});
+  assert.equal(r.status,"UNKNOWN");
+  assert.deepEqual(r.reasonCodes,["INVALID_CONTROL_REQUEST"]);
+ }
+ assert.equal(called,0);
+});
+test("missing case claim snapshot cannot crash read-only review",async()=>{
+ const r=await reviewCaseWithLedgerControls({...input,current:undefined},{
+  review:async()=>({transaction:tx}),
+  controls:async()=>({...completeControls})});
+ assert.deepEqual(r.reasonCodes,["ISSUER_OR_DESTINATION_MISSING"]);
+ assert.equal(r.authorizationGranted,false);
+});
