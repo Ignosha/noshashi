@@ -81,6 +81,7 @@ test("complete pinned payment controls combine AccountRoot and trustline",async(
  assert.equal(r.status,"CORROBORATED");
  assert.equal(r.trustLineFrozen,true);
  assert.equal(r.trustLineAuthorized,false);
+ assert.equal(r.issuerAuthorizationConditionMet,true);
  assert.equal(r.authorizationGranted,false);
 });
 test("missing pinned trustline response retains partial evidence and unknown flags",async()=>{
@@ -99,4 +100,15 @@ test("missing issuer RequireAuth cannot produce complete control evidence",async
  assert.equal(r.status,"PARTIAL_CORROBORATED");
  assert.equal(r.issuerRequireAuth,null);
  assert.deepEqual(r.reasonCodes,["ISSUER_REQUIRE_AUTH_UNKNOWN"]);
+});
+
+test("RequireAuth enabled and unauthorised trustline fails issuer authorization condition",async()=>{
+ const r=await lookupPinnedPaymentControls({...control,currency:"USD"},{
+  lookup:async q=>({...await lookup(q),requireAuth:q.account===issuer}),
+  trustLineLookup:async q=>({status:"CORROBORATED",issuer:q.issuer,holder:q.holder,
+   currency:q.currency,ledgerHash:q.ledgerHash,trustLineFrozen:false,trustLineAuthorized:false})});
+ assert.equal(r.status,"CORROBORATED");
+ assert.equal(r.issuerRequireAuth,true);
+ assert.equal(r.issuerAuthorizationConditionMet,false);
+ assert.equal(r.authorizationGranted,false);
 });
