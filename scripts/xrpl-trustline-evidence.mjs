@@ -23,6 +23,8 @@ export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={})
  if(r.validated!==true||typeof r.ledger_hash!=="string"||
     r.ledger_hash.toUpperCase()!==ledgerHash.toUpperCase())
   return {...base,reasonCodes:["PINNED_LEDGER_UNVERIFIED"]};
+ if(!Number.isSafeInteger(r.ledger_index)||r.ledger_index<=0)
+  return {...base,reasonCodes:["LEDGER_INDEX_INVALID"]};
  const node=r.node??r.ledger_entry;
  if(!node||node.LedgerEntryType!=="RippleState"||
     !Number.isSafeInteger(node.Flags)||node.Flags<0||node.Flags>0xffffffff)
@@ -30,7 +32,6 @@ export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={})
  const low=node.LowLimit,high=node.HighLimit;
  if(!low||!high||typeof low.issuer!=="string"||typeof high.issuer!=="string"||
     low.issuer===high.issuer||
-    !Number.isSafeInteger(r.ledger_index)||r.ledger_index<=0||
     ![issuer,holder].includes(low.issuer)||![issuer,holder].includes(high.issuer)||
     low.currency?.toUpperCase()!==currency.toUpperCase()||
     high.currency?.toUpperCase()!==currency.toUpperCase())
