@@ -45,3 +45,12 @@ test("parses issuer global freeze flag and fails closed on provider disagreement
  assert.equal(disagree.status,"UNKNOWN");
  assert.deepEqual(disagree.reasonCodes,["ACCOUNT_ROOT_PROVIDER_DISAGREEMENT"]);
 });
+
+test("RequireAuth issuer policy flag must match both pinned providers",()=>{
+ const a=corroboratePinnedAccountRoot(response(0x00040000),response(0x00040000),request);
+ assert.equal(a.status,"CORROBORATED");
+ assert.equal(a.requireAuth,true);
+ const b=corroboratePinnedAccountRoot(response(0x00040000),response(0),request);
+ assert.equal(b.status,"UNKNOWN");
+ assert.deepEqual(b.reasonCodes,["ACCOUNT_ROOT_PROVIDER_DISAGREEMENT"]);
+});
