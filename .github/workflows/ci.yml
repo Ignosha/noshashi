@@ -153,6 +153,9 @@ jobs:
         if: github.ref == 'refs/heads/feat/infrastructure-marketplace-blueprint' || github.head_ref == 'feat/infrastructure-marketplace-blueprint'
         run: node scripts/xrpl-account-root-live-diagnostic.mjs
 
+      - name: Trustline diagnostic syntax (fixture required for live run)
+        run: node --check scripts/xrpl-trustline-live-diagnostic.mjs
+
       - name: Marketplace API integration tests
         run: node --test scripts/marketplace-dev.test.mjs scripts/autopsy-gateway.test.mjs scripts/approval-drift.test.mjs scripts/evidence-receipt.test.mjs scripts/institutional-case-review.test.mjs scripts/xrpl-account-root-evidence.test.mjs scripts/xrpl-account-root-lookup.test.mjs scripts/case-ledger-controls.test.mjs scripts/xrpl-trustline-evidence.test.mjs scripts/xrpl-trustline-lookup.test.mjs
 
