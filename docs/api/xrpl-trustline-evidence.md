@@ -16,3 +16,9 @@ Run: `node --test scripts/xrpl-trustline-evidence.test.mjs scripts/xrpl-trustlin
 `lookupPinnedPaymentControls` now optionally accepts a currency and queries the destination-holder trust line with the explicit issuer; the composed read-only Case Review flags differences against supplied control claims. Missing trust-line evidence remains UNKNOWN and all case verdicts remain HOLD. This does not determine payment eligibility without issuer RequireAuth, global freeze, transfer restrictions, asset identity and authenticated institutional approval.
 
 This is not a production preflight or evidence of institutional approval.
+
+## Issuer RequireAuth interpretation
+
+The pinned AccountRoot parser also observes `lsfRequireAuth` (0x00040000). The payment-controls composition exposes `issuerRequireAuth` and `issuerAuthorizationConditionMet`: the latter is only true when the issuer's RequireAuth flag is **known false**, or RequireAuth is **known true** and the issuer-side RippleState authorization bit is set. Missing issuer policy evidence leaves the condition UNKNOWN and prevents full corroboration. This field is **not** a transfer approval or authorization to release funds. Case Review flags active issuer freeze, trust-line freeze, and unmet issuer authorization condition but always remains HOLD.
+
+**Live validation still required:** confirm provider-specific response fields, ledger-hash provenance and the correctness of the ledger_entry API parameters against current XRPL nodes; mocked test success is not proof of live interoperability. Verify whether an independently authenticated ledger header can be established before presenting any observation as cryptographically proven.
