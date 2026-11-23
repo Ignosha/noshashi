@@ -37,7 +37,7 @@ test("ledger claims are compared without granting approval",async()=>{
  assert.equal(r.verdict,"HOLD");
  assert.equal(r.authorizationGranted,false);
  assert.ok(r.reasonCodes.includes("CLAIMED_DESTINATION_TAG_CONFLICT"));
- assert.ok(r.reasonCodes.includes("TRUST_LINE_EVIDENCE_NOT_IMPLEMENTED"));
+ assert.ok(r.reasonCodes.includes("TRUST_LINE_EVIDENCE_UNAVAILABLE"));
 });
 test("missing issuer and missing transaction evidence fail closed",async()=>{
  const noIssuer=await reviewCaseWithLedgerControls({...input,issuer:undefined},{
@@ -56,4 +56,17 @@ test("rejects forged transaction and mismatched pinned controls",async()=>{
   controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:"C".repeat(64),
    requireDestinationTag:true,issuerGlobalFreeze:false})});
  assert.deepEqual(unpinned.reasonCodes,["CONTROL_EVIDENCE_UNAVAILABLE"]);
+});
+
+test("corroborated trustline evidence flags conflicts but never approves",async()=>{
+ const withAsset={...input,currency:"USD",current:{...input.current,trustLineFrozen:false,trustLineAuthorized:true}};
+ const r=await reviewCaseWithLedgerControls(withAsset,{
+  review:async()=>({transaction:tx,verdict:"HOLD"}),
+  controls:async()=>({status:"CORROBORATED",ledgerHash:L,
+   requireDestinationTag:false,issuerGlobalFreeze:false,
+   trustLineFrozen:true,trustLineAuthorized:true})});
+ assert.equal(r.verdict,"HOLD");
+ assert.equal(r.authorizationGranted,false);
+ assert.ok(r.reasonCodes.includes("CLAIMED_TRUST_LINE_FREEZE_CONFLICT"));
+ assert.ok(!r.reasonCodes.includes("CLAIMED_TRUST_LINE_AUTH_CONFLICT"));
 });
