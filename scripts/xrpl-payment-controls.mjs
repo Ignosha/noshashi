@@ -9,7 +9,7 @@ export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash
   {lookup=lookupPinnedAccountRoot,trustLineLookup=lookupPinnedTrustLine}={}){
   const base={schema:"noshashi.xrpl.payment-controls.research.v0",
     status:"UNKNOWN",ledgerHash,requireDestinationTag:null,
-    issuerGlobalFreeze:null,trustLineFrozen:null,trustLineAuthorized:null,
+    issuerGlobalFreeze:null,issuerRequireAuth:null,trustLineFrozen:null,trustLineAuthorized:null,
     reasonCodes:[],authorizationGranted:false,independentlyAuthenticated:false};
   if(typeof destination!=="string"||typeof issuer!=="string"||
      typeof ledgerHash!=="string"||!/^[A-F0-9]{64}$/i.test(ledgerHash))
@@ -29,6 +29,7 @@ export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash
   const observed={...base,status:"PARTIAL_CORROBORATED",
     requireDestinationTag:d.value.requireDestinationTag,
     issuerGlobalFreeze:i.value.globalFreeze,
+    issuerRequireAuth:typeof i.value.requireAuth==="boolean"?i.value.requireAuth:null,
     reasonCodes:["TRUST_LINE_EVIDENCE_NOT_REQUESTED"]};
   if(typeof currency!=="string"||!/^([A-Z0-9]{3}|[A-F0-9]{40})$/i.test(currency))
     return observed;
@@ -42,7 +43,8 @@ export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash
      typeof trustLine.trustLineFrozen!=="boolean"||
      typeof trustLine.trustLineAuthorized!=="boolean")
     return {...observed,reasonCodes:["TRUST_LINE_EVIDENCE_UNAVAILABLE"]};
-  return {...observed,status:"CORROBORATED",
+  return {...observed,status:observed.issuerRequireAuth===null?"PARTIAL_CORROBORATED":"CORROBORATED",
     trustLineFrozen:trustLine.trustLineFrozen,
-    trustLineAuthorized:trustLine.trustLineAuthorized,reasonCodes:[]};
+    trustLineAuthorized:trustLine.trustLineAuthorized,
+    reasonCodes:observed.issuerRequireAuth===null?["ISSUER_REQUIRE_AUTH_UNKNOWN"]:[]};
 }
