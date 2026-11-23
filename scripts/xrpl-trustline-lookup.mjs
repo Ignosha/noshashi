@@ -27,9 +27,9 @@ export async function fetchPinnedTrustLine(server,request,fetchFn=fetch){
    ledger_hash:request.ledgerHash.toUpperCase(),api_version:2,
   }]}),
  });
- if(!response.ok)throw Error("UPSTREAM_HTTP_FAILURE");
+ if(!response?.ok)throw Error("UPSTREAM_HTTP_FAILURE");
  const declared=Number(response.headers?.get?.("content-length")??0);
- if(!Number.isFinite(declared)||declared>MAX_BYTES)
+ if(!Number.isFinite(declared)||declared<0||declared>MAX_BYTES)
   throw Error("UPSTREAM_RESPONSE_TOO_LARGE");
  if(!response.body)throw Error("UPSTREAM_EMPTY_BODY");
  const chunks=[];let size=0;
@@ -46,7 +46,7 @@ export async function lookupPinnedTrustLine(request,{servers=UPSTREAMS,fetchFn=f
   currency:request?.currency??null,
   ledgerHash:typeof request?.ledgerHash==="string"?request.ledgerHash.toUpperCase():null,
   trustLineFrozen:null,trustLineAuthorized:null,reasonCodes:[],
-  independentlyAuthenticated:false,evidenceSources:[]};
+  independentlyAuthenticated:false,evidenceSources:[],providerDiagnostics:[],ledgerIndex:null};
  if(!valid(request))return {...base,reasonCodes:["INVALID_TRUSTLINE_REQUEST"]};
  if(!Array.isArray(servers)||servers.length!==2||
     servers[0]?.name===servers[1]?.name||servers[0]?.url===servers[1]?.url||
