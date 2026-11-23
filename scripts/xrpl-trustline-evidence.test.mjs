@@ -43,3 +43,10 @@ test("two agreeing pinned observations remain non-authorizing",()=>{
  assert.equal(r.trustLineAuthorized,false);
  assert.equal(r.independentlyAuthenticated,false);
 });
+
+test("ledger_entry responses require a valid positive ledger index",()=>{
+ const missing=observation(0);delete missing.result.ledger_index;
+ assert.deepEqual(parsePinnedTrustLine(missing,request).reasonCodes,["LEDGER_INDEX_INVALID"]);
+ const negative=observation(0);negative.result.ledger_index=-1;
+ assert.deepEqual(parsePinnedTrustLine(negative,request).reasonCodes,["LEDGER_INDEX_INVALID"]);
+});
