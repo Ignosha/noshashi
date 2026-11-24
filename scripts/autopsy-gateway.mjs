@@ -46,7 +46,10 @@ export function parseValidatedTx(raw, expectedHash) {
   const code = data.meta?.TransactionResult;
   // Only tesSUCCESS and tec-class outcomes are valid finalized ledger outcomes.
   if (typeof code !== "string" || !/^(tesSUCCESS|tec[A-Za-z0-9_]+)$/.test(code)) return null;
+  const tx = data.tx_json ?? data;
+  const paymentDestination = tx.TransactionType === "Payment" && typeof tx.Destination === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(tx.Destination) ? tx.Destination : null;
   return {
+    paymentDestination,
     ledgerIndex: data.ledger_index,
     ledgerHash: data.ledger_hash.toUpperCase(),
     resultCode: code,
@@ -91,7 +94,8 @@ export async function corroborateAutopsy(hash, { servers = UPSTREAMS, fetchFn = 
   const [a,b] = valid;
   if (a.tx.ledgerIndex !== b.tx.ledgerIndex ||
       a.tx.ledgerHash !== b.tx.ledgerHash ||
-      a.tx.resultCode !== b.tx.resultCode) {
+      a.tx.resultCode !== b.tx.resultCode ||
+      a.tx.paymentDestination !== b.tx.paymentDestination) {
     return unknownReport(normalized, "UPSTREAM_EVIDENCE_DISAGREEMENT", [a.source, b.source]);
   }
   return {
@@ -99,6 +103,7 @@ export async function corroborateAutopsy(hash, { servers = UPSTREAMS, fetchFn = 
     status: "VERIFIED_FACT", validated: true,
     ledgerIndex: a.tx.ledgerIndex, ledgerHash: a.tx.ledgerHash,
     resultCode: a.tx.resultCode,
+    paymentDestination: a.tx.paymentDestination,
     disposition: a.tx.resultCode === "tesSUCCESS" ? "SUCCESS" : "FAILED",
     reasonCodes: a.tx.resultCode === "tesSUCCESS" ? [] : [a.tx.resultCode],
     evidenceSources: [a.source, b.source],
