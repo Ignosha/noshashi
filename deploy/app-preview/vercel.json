@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": { "deploymentEnabled": { "feat/infrastructure-marketplace-blueprint": false } },
   "framework": null,
   "installCommand": "cd ../.. && npm install --no-audit --no-fund",
   "buildCommand": "cd ../.. && npm run build && rm -rf deploy/app-preview/dist && cp -r dist deploy/app-preview/dist",
