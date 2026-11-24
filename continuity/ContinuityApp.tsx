@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
 import { ContinuityWorkspace } from "../src/components/continuity/ContinuityWorkspace";
 import { collectSettlementEvidence } from "../src/lib/continuity/xrpl-evidence";
-import { evaluateSettlement, type SettlementResult } from "../src/lib/continuity/settlement";
+import { evaluateSettlement, type SettlementEvidence, type SettlementResult } from "../src/lib/continuity/settlement";
 import { previewContinuityTransaction, type PreflightPreview } from "../src/lib/continuity/preview";
 import { validateContinuityIntent } from "../src/lib/continuity/intent";
+import { isHolderToHolder, isXrplRlusd } from "../src/lib/continuity/rlusd";
+import { compareRlusdObservations, type RlusdComparison } from "../src/lib/continuity/rlusd-monitor";
 import { xrplLink } from "../src/lib/xrpl/link";
 
 const MAX_INTENT_LENGTH = 32_768;
@@ -25,7 +27,8 @@ const inputErrors: Record<string, string> = {
 type Review = {
   preview: PreflightPreview;
   settlement: SettlementResult;
-  ledgerIndex: number | null;
+  evidence: SettlementEvidence | null;
+  comparison: RlusdComparison | null;
 };
 
 /**
@@ -42,7 +45,8 @@ export function ContinuityApp() {
 
   async function run() {
     if (inFlight.current || !raw.trim()) return;
-    const tryAlternateProvider = review?.ledgerIndex === null;
+    const previousReview = review;
+    const tryAlternateProvider = previousReview !== null && previousReview.evidence === null;
     setError(null);
     setReview(null);
     if (raw.length > MAX_INTENT_LENGTH) {
@@ -72,6 +76,10 @@ export function ContinuityApp() {
       ]);
       if (revision !== inputRevision.current) return;
       const settlement = evaluateSettlement(intent, evidence);
+      const previousEvidence = preflight.intentHash && previousReview?.preview.intentHash === preflight.intentHash
+        ? previousReview.evidence : null;
+      const comparison = intent.transactionType === "Payment" && isXrplRlusd(intent) && isHolderToHolder(intent)
+        ? compareRlusdObservations(intent, previousEvidence, evidence) : null;
       setReview({
         preview: {
           ...preflight,
@@ -83,7 +91,8 @@ export function ContinuityApp() {
           ],
         },
         settlement,
-        ledgerIndex: evidence?.ledgerIndex ?? null,
+        evidence,
+        comparison,
       });
     } catch {
       if (revision === inputRevision.current) setError("Unable to complete the review. Check your connection and retry.");
@@ -111,19 +120,22 @@ export function ContinuityApp() {
           placeholder="Paste a canonical NOSHASHI Continuity intent. No private keys." />
         <button type="button" disabled={busy || !raw.trim()} onClick={() => { void run(); }}
           className="desk-button border border-border px-4 py-2 text-xs disabled:opacity-50">
-          {busy ? "Reading XRPL…" : review?.ledgerIndex === null ? "Retry XRPL review" : "Run read-only review"}
+          {busy ? "Reading XRPL…" : review && !review.evidence ? "Retry XRPL review" : "Run read-only review"}
         </button>
+        <a href="./demo/index.html" className="desk-button border border-border px-4 py-2 text-xs">
+          Continuity demonstration
+        </a>
         <p id="continuity-review-status" role="status" className="w-full text-xs text-muted-foreground">
           {busy ? "Reading XRPL. Editing the input clears this review." : review
-            ? review.ledgerIndex === null
+            ? !review.evidence
               ? "Validated ledger evidence is unavailable. Retry when the XRPL connection is available."
-              : `XRPL Mainnet · validated ledger ${review.ledgerIndex.toLocaleString()}`
+              : `XRPL Mainnet · validated ledger ${review.evidence.ledgerIndex.toLocaleString()}`
             : "Paste one intent to review its payment conditions."}
         </p>
         {error && <p role="alert" className="w-full text-xs text-no-go">{error}</p>}
       </header>
       <div className="min-h-0 flex-1 overflow-auto" aria-label="Continuity review results" aria-busy={busy}>
-        <ContinuityWorkspace preview={review?.preview} settlement={review?.settlement} />
+        <ContinuityWorkspace preview={review?.preview} settlement={review?.settlement} comparison={review?.comparison} />
       </div>
     </div>
   );

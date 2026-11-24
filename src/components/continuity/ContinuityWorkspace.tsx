@@ -3,6 +3,7 @@ import { SceneHeader } from "../scenes/SceneHeader";
 import { Panel, DataRow } from "../nova/Panel";
 import type { PreflightPreview } from "../../lib/continuity/preview";
 import type { SettlementResult } from "../../lib/continuity/settlement";
+import type { RlusdComparison } from "../../lib/continuity/rlusd-monitor";
 
 type Workspace = "preflight" | "policy" | "exposure" | "evidence";
 const sections: { id: Workspace; title: string; description: string }[] = [
@@ -12,6 +13,17 @@ const sections: { id: Workspace; title: string; description: string }[] = [
   { id: "evidence", title: "Evidence Vault", description: "Decision records and verification" },
 ];
 
+const comparisonDetails: Record<NonNullable<RlusdComparison["reason"]>, string> = {
+  RLUSD_MONITOR_EVIDENCE_UNBOUND: "Run the same intent again with validated ledger evidence to establish a comparison.",
+  RLUSD_MONITOR_LEDGER_NOT_NEW: "Run the same intent after a newer validated ledger closes.",
+  RLUSD_MONITOR_CONTROLS_INCOMPLETE: "At least one issuer, account, or trust-line control could not be compared.",
+};
+
+function conditionLabel(condition: string): string {
+  const label = condition.replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 /**
  * Separate Continuity workspace surface, using existing Ledger Desk primitives.
  * No demo data, fake signed approvals, or transaction submission.
@@ -20,10 +32,12 @@ const sections: { id: Workspace; title: string; description: string }[] = [
 export function ContinuityWorkspace({
   preview = null,
   settlement = null,
+  comparison = null,
   onRequestReview,
 }: {
   preview?: PreflightPreview | null;
   settlement?: SettlementResult | null;
+  comparison?: RlusdComparison | null;
   onRequestReview?: () => void;
 }) {
   const [active, setActive] = useState<Workspace>("preflight");
@@ -100,6 +114,27 @@ export function ContinuityWorkspace({
                 ) : <p className="text-xs text-muted-foreground">Validated XRPL settlement evidence has not been supplied.</p>}
               </Panel>
             </div>
+            {comparison && (
+              <Panel label="RLUSD payment-condition changes" right={<span className="mono-font text-xs">{comparison.status}</span>}>
+                <p className="text-xs text-muted-foreground">
+                  {comparison.reason ? comparisonDetails[comparison.reason] : comparison.status === "UNCHANGED"
+                    ? "The observed conditions were unchanged across these two ledgers."
+                    : "A payment condition changed. Review the new evidence before proceeding."}
+                </p>
+                {comparison.previousLedger && comparison.currentLedger && (
+                  <p className="mono-font mt-2 text-xs">Validated ledgers {comparison.previousLedger.index.toLocaleString()} → {comparison.currentLedger.index.toLocaleString()}</p>
+                )}
+                {comparison.changes.length > 0 && (
+                  <ul className="mt-2 space-y-2 text-xs">
+                    {comparison.changes.map(change => (
+                      <li key={change.condition} className="border-t border-border pt-2">
+                        {conditionLabel(change.condition)} · {change.previous ? "Yes" : "No"} → {change.current ? "Yes" : "No"}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Panel>
+            )}
           </>
         ) : (
           <Panel label={selected.title}>
