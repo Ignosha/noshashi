@@ -126,6 +126,10 @@ describe("VALIDATED STATE", () => {
         // ledger, whatever it starts at (a forward trace from an incident).
         // `validatedIndex` is by convention the index of a ledger just read as
         // "validated", so several accounts are read at the same one.
+        // Issuer history reuses both bounds from the validated first page.
+        // Its pagination tests assert that the reverse reads stay in that range.
+        if (file === "api/_lib/issuer-history.js" && m[1] === "account_tx" &&
+            /ledger_index_min:\s*range\.from,\s*ledger_index_max:\s*range\.to/.test(body)) continue;
         if (!/ledger_index:\s*"validated"|ledger_index:\s*validatedIndex\b|ledger_index_min:\s*-1|ledger_index_max:\s*-1/.test(body)) unpinned.push(`${file}: ${m[1]}`);
       }
     }

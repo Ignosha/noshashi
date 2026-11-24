@@ -24,10 +24,8 @@ import { rpc, XrplError } from "@/lib/xrpl/client";
  *      an approximation because it is one.
  *
  *   2. A node with partial history cannot show you the first transaction,
- *      only the first it retains. If the earliest transaction found sits at
- *      the node's earliest retained ledger, the true origin is older and
- *      unknown — reporting that boundary as a creation date would invent an
- *      account age. The report says "at least this old" instead.
+ *      only the first it retains. Without evidence of AccountRoot creation,
+ *      the first retained record establishes only a lower bound on age.
  *
  *   3. `account_tx` returns newest-first by default. Reading the "first"
  *      transaction requires `forward: true`; without it you get the most
@@ -36,8 +34,6 @@ import { rpc, XrplError } from "@/lib/xrpl/client";
 
 /** Ripple epoch: 2000-01-01. */
 const RIPPLE_EPOCH_OFFSET = 946_684_800;
-/** The first ledger any public node retains. */
-const HISTORY_GENESIS = 32_570;
 
 /** A moment when who could sign for this account changed. */
 export type ControlEvent = {
@@ -73,7 +69,7 @@ export type ProvenanceReport = {
    * derived honestly.
    */
   approxSentCount?: number;
-  /** True when the origin may predate what this node retains. */
+  /** True when the first retained record does not establish account creation. */
   historyIncomplete: boolean;
   nodeHistoryFrom?: number;
   ageDays?: number;
@@ -249,29 +245,23 @@ export async function readProvenance(address: string): Promise<ProvenanceReport>
 
   const originType = tx.TransactionType ? String(tx.TransactionType) : undefined;
 
-  // The funding source is whoever sent value in, not merely whoever acted
-  // first — an account's first record can be someone else's TrustSet.
-  const isInboundPayment =
-    originType === "Payment" && tx.Destination === address && tx.Account !== address;
-  const fundedBy = isInboundPayment ? String(tx.Account) : undefined;
-  const fundingRaw = tx.Amount ?? tx.DeliverMax;
-  const fundingAmountXrp =
-    isInboundPayment && typeof fundingRaw === "string"
-      ? Number(fundingRaw) / 1_000_000
-      : undefined;
+  // A first retained payment can be a later transfer. Require explicit
+  // AccountRoot creation and successful delivery before attributing funding.
+  const meta = earliest?.meta;
+  const createdHere = earliest?.validated === true && meta?.TransactionResult === "tesSUCCESS" &&
+    Array.isArray(meta.AffectedNodes) && meta.AffectedNodes.some(
+      (node: Record<string, any>) => node?.CreatedNode?.LedgerEntryType === "AccountRoot" &&
+        node.CreatedNode.NewFields?.Account === address,
+    );
+  const delivered = meta?.delivered_amount;
+  const isFundingPayment = createdHere && originType === "Payment" && tx.Destination === address &&
+    typeof tx.Account === "string" && tx.Account !== address &&
+    typeof delivered === "string" && /^[1-9]\d{0,17}$/.test(delivered);
+  const fundedBy = isFundingPayment ? tx.Account as string : undefined;
+  const fundingAmountXrp = isFundingPayment ? Number(delivered) / 1_000_000 : undefined;
 
-  /*
-   * Sequence correction. An account created after DeletableAccounts starts
-   * its sequence at the creation ledger index, so the count of transactions
-   * it has sent is the distance travelled from there — not the sequence.
-   */
-  const approxSentCount = originLedger === undefined ? undefined : sentSinceCreation(sequence, originLedger);
-
-  const historyIncomplete =
-    originLedger !== undefined &&
-    nodeHistoryFrom !== undefined &&
-    nodeHistoryFrom > HISTORY_GENESIS &&
-    originLedger <= nodeHistoryFrom;
+  const approxSentCount = createdHere && originLedger !== undefined ? sentSinceCreation(sequence, originLedger) : undefined;
+  const historyIncomplete = originLedger !== undefined && !createdHere;
 
   const ageDays = originDate
     ? Math.floor((Date.now() - originDate.getTime()) / 86_400_000)
@@ -319,7 +309,7 @@ export function provenanceFindings(report: ProvenanceReport): ProvenanceFinding[
       id: "history-incomplete",
       severity: "warn",
       title: "This account may be older than it appears",
-      detail: `The earliest transaction found sits at ledger ${report.originLedger?.toLocaleString()}, which is the edge of what this node retains (from ${report.nodeHistoryFrom?.toLocaleString()}). Anything before that is not missing from the ledger, only from this node — so the age below is a floor, not a measurement.`,
+      detail: `The earliest record found is at ledger ${report.originLedger?.toLocaleString()}. It did not establish AccountRoot creation, so its date gives a lower bound on observed history.`,
       action: "Query a full-history node before treating the age as established.",
     });
   } else if (report.originDate && report.ageDays !== undefined) {
@@ -335,7 +325,7 @@ export function provenanceFindings(report: ProvenanceReport): ProvenanceFinding[
       out.push({
         id: "established",
         severity: "ok",
-        title: `Continuously on the ledger for ${(report.ageDays / 365).toFixed(1)} years`,
+        title: `Account creation observed ${(report.ageDays / 365).toFixed(1)} years ago`,
         detail: `First seen ${report.originDate.toISOString().slice(0, 10)} at ledger ${report.originLedger?.toLocaleString()}. A record of this length is difficult to manufacture after the fact.`,
       });
     } else {
@@ -360,9 +350,9 @@ export function provenanceFindings(report: ProvenanceReport): ProvenanceFinding[
     out.push({
       id: "origin-not-payment",
       severity: "info",
-      title: `The earliest record is ${/^[AEIOU]/i.test(report.originType) ? "an" : "a"} ${report.originType}, not a payment in`,
+      title: `The earliest record is ${/^[AEIOU]/i.test(report.originType) ? "an" : "a"} ${report.originType}`,
       detail:
-        "No inbound funding payment appears at the start of this account's history, so no funding counterparty can be named from it. That is an absence of evidence, not evidence of an absence.",
+        "The available record does not establish a successful native XRP payment that created this account.",
     });
   }
 

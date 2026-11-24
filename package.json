@@ -35,7 +35,7 @@
     "test": "vitest run",
     "test:sql": "scripts/test-sql.sh",
     "test:watch": "vitest",
-    "check:functions": "cd supabase/functions && deno check */index.ts",
+    "check:functions": "cd supabase/functions && deno check --frozen */index.ts",
     "check:brand": "node scripts/gen-brand.mjs --check",
     "check:garden": "node scripts/build-garden-field.mjs --check",
     "check:intelligence": "node scripts/build-intelligence.mjs --check",

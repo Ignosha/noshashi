@@ -38,6 +38,8 @@ function services({
   claim = { id: runId, replay: false },
   tables = {},
   rpcError = null,
+  finishError = null,
+  run = null,
 } = {}) {
   const calls = [];
   const db = {
@@ -49,8 +51,8 @@ function services({
             ? claim
             : name === "payment_review_tier"
               ? "operator"
-              : null,
-        error: rpcError,
+              : name === "payment_review_get_run" ? run : null,
+        error: name === "payment_review_finish" ? finishError : rpcError,
       };
     }),
     from(table) {
@@ -232,11 +234,13 @@ describe("Account and API boundary", () => {
   it("uses server ownership when retrieving private runs", async () => {
     const s = services();
     expect((await handle(req(`runs/${runId}`, "GET"), s)).status).toBe(404);
-    const call = s.calls.find((c) => c.table === "payment_review_runs");
-    expect(call.filters).toContainEqual({
-      name: "eq",
-      args: ["account_id", authId],
-    });
+    expect(s.db.rpc).toHaveBeenCalledWith("payment_review_get_run", {p_account:authId, p_id:runId});
+  });
+  it("returns a terminal expiry when polling a recovered run", async () => {
+    const run = {id:runId, status:"failed", result:{code:"reservation_expired"}};
+    const response = await handle(req(`runs/${runId}`, "GET"), services({run}));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(run);
   });
   it("rejects a changed idempotency payload without making a ledger request", async () => {
     const s = services({ claim: { error: "idempotency_conflict" } });
@@ -251,6 +255,21 @@ describe("Account and API boundary", () => {
     s.fetcher = vi.fn();
     expect((await handle(req(), s)).status).toBe(202);
     expect(s.fetcher).not.toHaveBeenCalled();
+  });
+  it("replays expired runs without reading the ledger again", async () => {
+    const s = services({
+      claim: { id: runId, replay: true, status: "failed", result: { code: "reservation_expired" } },
+    });
+    s.fetcher = vi.fn();
+    const response = await handle(req(), s);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({status:"failed", result:{code:"reservation_expired"}});
+    expect(s.fetcher).not.toHaveBeenCalled();
+  });
+  it("withholds a report when a late worker loses its reservation", async () => {
+    const response = await handle(req(), services({finishError:{code:"PR001"}}));
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({error:"Review expired before completion. Start a new request to retry."});
   });
   it("fails closed on private database errors", async () => {
     const s = services({ rpcError: { message: "private details" } });

@@ -31,6 +31,16 @@ create table if not exists auth.users (
   is_anonymous boolean default false
 );
 
+-- Columns consumed by the organization sign-in audit trigger. Session
+-- issuance, verification, and refresh remain outside the SQL fixture.
+create table if not exists auth.sessions (
+  id uuid primary key,
+  user_id uuid not null references auth.users(id),
+  aal text,
+  ip inet,
+  user_agent text
+);
+
 create or replace function auth.jwt() returns jsonb language sql stable as
 $$ select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb $$;
 create or replace function auth.uid() returns uuid language sql stable as

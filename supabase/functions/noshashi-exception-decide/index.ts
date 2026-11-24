@@ -52,6 +52,7 @@ function json(request: Request, body: unknown, status = 200) {
 }
 
 const OUTCOMES: Record<string, { status: number; title: string; message: string }> = {
+  MFA_REQUIRED: { status: 403, title: "SECOND FACTOR REQUIRED", message: "Complete your account’s second-factor check." },
   NOT_AUTHENTICATED: { status: 401, title: "AUTHORIZATION REQUIRED", message: "Sign in to decide an exception." },
   NOT_FOUND: { status: 404, title: "EXCEPTION NOT FOUND", message: "No such exception in an organization you belong to." },
   INSUFFICIENT_PERMISSIONS: { status: 403, title: "AUTHORIZATION REQUIRED", message: "Your role cannot approve exceptions. Owner, admin, compliance or reviewer is required." },
@@ -82,12 +83,18 @@ Deno.serve(async (request: Request) => {
   if (!url || !anonKey || !serviceKey) return fail("SERVER_MISCONFIGURED");
 
   try {
+    const token = /^Bearer (\S+)$/i.exec(request.headers.get("Authorization") ?? "")?.[1];
+    if (!token) return fail("NOT_AUTHENTICATED");
     const asCaller = createClient(url, anonKey, {
-      global: { headers: { Authorization: request.headers.get("Authorization") ?? "" } },
+      global: { headers: { Authorization: `Bearer ${token}` } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: userData, error: userError } = await asCaller.auth.getUser();
+    const { data: userData, error: userError } = await asCaller.auth.getUser(token);
     if (userError || !userData.user) return fail("NOT_AUTHENTICATED");
+
+    const { data: aal, error: aalError } = await asCaller.auth.mfa.getAuthenticatorAssuranceLevel(token);
+    if (aalError || !aal) return fail("NOT_AUTHENTICATED");
+    if (aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") return fail("MFA_REQUIRED");
 
     const body = await request.json().catch(() => ({}));
     const exceptionId = String(body.exceptionId ?? "");

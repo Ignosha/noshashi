@@ -1,12 +1,14 @@
--- needs: 20261103193000_payment_review_portal.sql
+-- needs: 20261103193000_payment_review_portal.sql 20261124052210_payment_review_abandoned_reservations.sql
 begin;
 do $$
 declare acct uuid := 'a0000000-0000-0000-0000-000000009901';
-  r jsonb; rid uuid; used integer;
+  other_acct constant uuid := 'a0000000-0000-0000-0000-000000009902';
+  r jsonb; rid uuid; expired_id uuid; used integer;
+  previous_period date := (date_trunc('month', now() at time zone 'UTC') - interval '1 month')::date;
 begin
   -- The local runner supplies this account; the full baseline uses auth.users.
-  insert into auth.users(id,email) values(acct,'review-test@example.invalid') on conflict do nothing;
-  insert into noshashi.accounts(id,email) values(acct,'review-test@example.invalid') on conflict do nothing;
+  insert into auth.users(id,email) values(acct,'review-test@example.invalid'),(other_acct,'other-review-test@example.invalid') on conflict do nothing;
+  insert into noshashi.accounts(id,email) values(acct,'review-test@example.invalid'),(other_acct,'other-review-test@example.invalid') on conflict do nothing;
   if has_function_privilege('authenticated','noshashi.payment_review_begin(uuid,text,text,integer)','execute') then raise exception 'FAILED: authenticated may reserve quota directly'; end if;
   if has_table_privilege('authenticated','noshashi.payment_review_runs','select') then raise exception 'FAILED: raw private runs exposed'; end if;
   if noshashi.payment_review_tier(acct)<>'operator' then raise exception 'FAILED: free tier'; end if;
@@ -16,6 +18,59 @@ begin
   if not (r->>'replay')::boolean then raise exception 'FAILED: not replay'; end if;
   r:=noshashi.payment_review_begin(acct,'test-batch-001','hash-2',5);
   if r->>'error'<>'idempotency_conflict' then raise exception 'FAILED: changed scope accepted'; end if;
+  r:=noshashi.payment_review_begin(other_acct,'test-batch-001','hash-1',1);
+  if (r->>'replay')::boolean is distinct from false
+     or (r->>'id')::uuid is not distinct from rid
+     or (r->>'used')::integer is distinct from 1
+  then raise exception 'FAILED: another account did not get an independent reservation'; end if;
+  begin
+    perform noshashi.payment_review_finish(other_acct,rid,'{"test":true}',1);
+    raise exception 'FAILED: other account completed a private run';
+  exception when raise_exception then
+    if sqlerrm <> 'Unknown run' then raise; end if;
+  end;
+  expired_id := (r->>'id')::uuid;
+  -- Model a crash in an earlier quota period. The original account's
+  -- similarly keyed run stays processing while the other account recovers.
+  update noshashi.payment_review_runs
+    set created_at=clock_timestamp()-interval '11 minutes', period_start=previous_period
+    where id=expired_id;
+  update noshashi.payment_review_usage set period_start=previous_period where account_id=other_acct;
+  if has_function_privilege('authenticated','noshashi.payment_review_get_run(uuid,uuid)','execute')
+     or has_function_privilege('authenticated','noshashi.payment_review_expire_runs(uuid,uuid,timestamptz)','execute')
+  then raise exception 'FAILED: client can access private recovery RPC'; end if;
+  set local role service_role;
+  if noshashi.payment_review_get_run(acct,expired_id) is not null then
+    raise exception 'FAILED: cross-account polling exposed an expired run';
+  end if;
+  select records into used from noshashi.payment_review_usage where account_id=other_acct and period_start=previous_period;
+  if used is distinct from 1 then raise exception 'FAILED: cross-account polling released quota'; end if;
+  r:=noshashi.payment_review_get_run(other_acct,expired_id);
+  if r->>'status' is distinct from 'failed' or r->'result'->>'code' is distinct from 'reservation_expired'
+  then raise exception 'FAILED: polling did not recover expired reservation'; end if;
+  reset role;
+  r:=noshashi.payment_review_begin(other_acct,'test-batch-001','hash-1',1);
+  if (r->>'id')::uuid is distinct from expired_id or r->>'status' is distinct from 'failed'
+     or r->'result'->>'code' is distinct from 'reservation_expired'
+  then raise exception 'FAILED: expired run did not retain a terminal replay'; end if;
+  r:=noshashi.payment_review_begin(other_acct,'test-batch-001','hash-1',1);
+  if r->>'status' is distinct from 'failed' then raise exception 'FAILED: expired run was restarted'; end if;
+  select records into used from noshashi.payment_review_usage where account_id=other_acct and period_start=previous_period;
+  if used is distinct from 0 then raise exception 'FAILED: expired quota not refunded exactly once'; end if;
+  begin
+    perform noshashi.payment_review_finish(other_acct,expired_id,'{"test":true}',1);
+    raise exception 'FAILED: expired worker published a result';
+  exception when sqlstate 'PR001' then null;
+  end;
+  r:=noshashi.payment_review_begin(other_acct,'recovered-batch','hash-1',5);
+  if (r->>'replay')::boolean is distinct from false or (r->>'used')::integer is distinct from 5
+  then raise exception 'FAILED: fresh batch did not get current-period capacity'; end if;
+  update noshashi.payment_review_runs set created_at=clock_timestamp()-interval '11 minutes'
+    where id=(r->>'id')::uuid;
+  r:=noshashi.payment_review_begin(other_acct,'after-expiry-batch','hash-2',4);
+  if (r->>'used')::integer is distinct from 4 then raise exception 'FAILED: submission did not reclaim current quota'; end if;
+  if noshashi.payment_review_get_run(acct,rid)->>'status' is distinct from 'processing'
+  then raise exception 'FAILED: polling prematurely expired a fresh run'; end if;
   perform noshashi.payment_review_finish(acct,rid,'{"test":true}',2);
   perform noshashi.payment_review_finish(acct,rid,'{"test":true}',2);
   select records into used from noshashi.payment_review_usage where account_id=acct;

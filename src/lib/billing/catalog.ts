@@ -67,9 +67,9 @@ export type Plan = {
   purchase: "free" | "self_serve" | "contact_sales";
 };
 
-/** Two months free — the annual figure every tier is quoted at. */
+/** Annual quote from the commercial catalog, if the plan has one. */
 export function annualFor(plan: Plan): number | undefined {
-  return plan.monthlyUsd > 0 ? plan.monthlyUsd * 10 : undefined;
+  return plan.annualUsd;
 }
 
 export const PLANS: Plan[] = [

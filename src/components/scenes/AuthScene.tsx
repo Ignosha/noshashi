@@ -11,9 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth, passwordProblems, passwordScore } from "@/lib/auth/useAuth";
 import { BRAND, CONTACT, copyrightLine } from "@/lib/brand";
 import { cn } from "@/lib/utils";
+import { openExternal } from "@/lib/external";
 import { SPRING } from "@/lib/motion";
 
-type Mode = "signin" | "signup" | "otp" | "reset" | "mfa";
+type Mode = "signin" | "signup" | "otp" | "mfa";
 
 const MODE_COPY: Record<Mode, { title: string; blurb: string }> = {
   signin: {
@@ -27,10 +28,6 @@ const MODE_COPY: Record<Mode, { title: string; blurb: string }> = {
   otp: {
     title: "ONE-TIME CODE",
     blurb: "We emailed a six-digit code. It expires shortly.",
-  },
-  reset: {
-    title: "RESET PASSWORD",
-    blurb: "We will email a link to set a new password.",
   },
   mfa: {
     title: "SECOND FACTOR",
@@ -68,7 +65,6 @@ export function AuthScene({
     signUp,
     signInWithOtp,
     verifyOtp,
-    resetPassword,
     challengeTotp,
     factors,
     user,
@@ -159,14 +155,6 @@ export function AuthScene({
     if (mode === "otp") {
       void run(async () => {
         await verifyOtp(email.trim(), code);
-      });
-      return;
-    }
-
-    if (mode === "reset") {
-      void run(async () => {
-        await resetPassword(email.trim());
-        setNotice("If that address has an account, a reset link is on its way.");
       });
       return;
     }
@@ -347,9 +335,7 @@ export function AuthScene({
                         ? "CREATE ACCOUNT"
                         : mode === "otp"
                           ? "VERIFY CODE"
-                          : mode === "reset"
-                            ? "SEND RESET LINK"
-                            : "VERIFY"}
+                          : "VERIFY"}
                 </Button>
               </form>
 
@@ -372,11 +358,16 @@ export function AuthScene({
                       Email me a one-time code instead
                     </button>
                     <button
-                      onClick={() => setMode("reset")}
+                      onClick={() =>
+                        void run(async () => {
+                          await openExternal("https://www.noshashi.app/developers/portal/?mode=reset");
+                          setNotice("Request the link and open it in the same browser. Then return here to sign in.");
+                        })
+                      }
                       className="flex w-full items-center gap-2 text-[11.5px] text-muted-foreground transition-colors hover:text-foreground"
                     >
                       <NovaVault size={11} />
-                      Forgot password
+                      Reset password in browser
                     </button>
                     <button
                       onClick={() => setMode("signup")}

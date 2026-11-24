@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { PLANS, planFor, type PlanId } from "../catalog";
+import { annualFor, PLANS, planFor, type PlanId } from "../catalog";
 import { TIERS } from "@/lib/roadmap";
 import { DEMO_LOCKED } from "@/lib/edition";
 
@@ -155,14 +155,15 @@ describe("pricing has one source", () => {
     expect(enterprise.annualUsd).toBe(120_000);
     expect(strategic.annualUsd).toBe(250_000);
     for (const plan of [enterprise, strategic]) {
+      expect(annualFor(plan), plan.id).toBe(plan.annualUsd);
       expect(plan.monthlyUsd, plan.id).toBe(Math.round(plan.annualUsd! / 12));
     }
   });
 
-  it("gives the self-serve tiers two months free a year", () => {
+  it("keeps the annual quotes for Pro and Institutional", () => {
     for (const id of ["desk", "institution"]) {
       const plan = PLANS.find((p) => p.id === id)!;
-      expect(plan.annualUsd, id).toBe(plan.monthlyUsd * 10);
+      expect(annualFor(plan), id).toBe(plan.monthlyUsd * 10);
     }
   });
 
