@@ -55,3 +55,18 @@ test("unrecognized case fields are rejected",async()=>{
  const r=await reviewInstitutionalCase({...input,override:true},{lookup});
  assert.deepEqual(r.reasonCodes,["INVALID_CASE_INPUT"]);
 });
+
+test("malformed snapshot hashes remain HOLD without a receipt",async()=>{
+ for(const value of [123,{},[]]){
+  for(const side of ["approved","current"]){
+   const r=await reviewInstitutionalCase({...input,[side]:{...input[side],transactionHash:value}},{lookup});
+   assert.equal(r.verdict,"HOLD");
+   assert.equal(r.receipt,null);
+   assert.deepEqual(r.reasonCodes,["CASE_TRANSACTION_IDENTITY_MISMATCH"]);
+  }
+  const r=await reviewInstitutionalCase({...input,current:{...current,ledgerHash:value}},{lookup});
+  assert.equal(r.verdict,"HOLD");
+  assert.equal(r.receipt,null);
+  assert.deepEqual(r.reasonCodes,["CASE_LEDGER_EVIDENCE_CONFLICT"]);
+ }
+});
