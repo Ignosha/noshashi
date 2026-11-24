@@ -9,4 +9,5 @@ rust-version = "1.90"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+# Match the minor version of @tauri-apps/api in the shared npm lockfile.
+tauri = { version = "=2.11.5", features = [] }
