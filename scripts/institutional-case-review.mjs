@@ -31,8 +31,10 @@ export async function reviewInstitutionalCase(input, { lookup = corroborateAutop
     return {...base,transaction:transaction ?? null,reasonCodes:["TRANSACTION_EVIDENCE_UNVERIFIED"]};
   }
   const drift = evaluateApprovalDrift(input.approved,input.current);
-  if (input.approved?.transactionHash?.toUpperCase() !== transaction.hash ||
-      input.current?.transactionHash?.toUpperCase() !== transaction.hash) {
+  if (typeof input.approved?.transactionHash !== "string" ||
+      typeof input.current?.transactionHash !== "string" ||
+      input.approved.transactionHash.toUpperCase() !== transaction.hash ||
+      input.current.transactionHash.toUpperCase() !== transaction.hash) {
     return {...base,transaction,drift,reasonCodes:["CASE_TRANSACTION_IDENTITY_MISMATCH"]};
   }
   // The current observation must be pinned to the transaction's validated
@@ -41,7 +43,7 @@ export async function reviewInstitutionalCase(input, { lookup = corroborateAutop
   if (!Number.isSafeInteger(input.current?.ledgerIndex) ||
       input.current.ledgerIndex < transaction.ledgerIndex ||
       (input.current.ledgerIndex === transaction.ledgerIndex &&
-       input.current.ledgerHash?.toUpperCase() !== transaction.ledgerHash)) {
+       (typeof input.current.ledgerHash !== "string" || input.current.ledgerHash.toUpperCase() !== transaction.ledgerHash))) {
     return {...base,transaction,drift,reasonCodes:["CASE_LEDGER_EVIDENCE_CONFLICT"]};
   }
   let receipt;
