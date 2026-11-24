@@ -31,7 +31,8 @@ export function createEvidenceReceipt(report) {
       !HEX64.test(report.ledgerHash) || !Number.isSafeInteger(report.ledgerIndex) ||
       report.ledgerIndex <= 0 || report.provenance !== "two-rpc-providers" ||
       !Array.isArray(report.evidenceSources) || report.evidenceSources.length !== 2 ||
-      report.evidenceSources.some(s=>typeof s !== "string" || !s)) {
+      report.evidenceSources.some(s=>typeof s !== "string" || !s.trim()) ||
+      new Set(report.evidenceSources.map(s=>s.trim().toLowerCase())).size !== 2) {
     throw new Error("INSUFFICIENT_VERIFIED_EVIDENCE");
   }
   const evidence = JSON.parse(canonicalEvidence(report));
@@ -49,7 +50,9 @@ export function verifyEvidenceReceipt(receipt) {
         receipt.digestAlgorithm !== "sha256" || receipt.signed !== false ||
         receipt.independentlyAuthenticated !== false ||
         typeof receipt.evidenceDigest !== "string" || !/^[0-9a-f]{64}$/.test(receipt.evidenceDigest)) return false;
-    const digest = createHash("sha256").update(canonicalEvidence(receipt.evidence)).digest();
+    // Reapply the same evidence eligibility checks used during creation.
+    const validated = createEvidenceReceipt(receipt.evidence);
+    const digest = Buffer.from(validated.evidenceDigest,"hex");
     return timingSafeEqual(digest,Buffer.from(receipt.evidenceDigest,"hex"));
   } catch { return false; }
 }
