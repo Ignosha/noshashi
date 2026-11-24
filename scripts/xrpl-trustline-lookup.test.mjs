@@ -99,3 +99,14 @@ test("provider ledger index mismatch cannot be corroborated",async()=>{
  assert.deepEqual(r.reasonCodes,["TRUSTLINE_LEDGER_INDEX_DISAGREEMENT"]);
  assert.equal(r.independentlyAuthenticated,false);
 });
+
+test("malformed RippleState currency fields fail closed through the lookup",async()=>{
+ for(const side of ["LowLimit","HighLimit"]){
+  const bad=reply();
+  bad.result.node[side].currency=123;
+  const r=await lookupPinnedTrustLine(request,{fetchFn:fetchMock(bad,reply())});
+  assert.equal(r.status,"UNKNOWN");
+  assert.deepEqual(r.reasonCodes,["TRUSTLINE_EVIDENCE_UNAVAILABLE"]);
+  assert.equal(r.providerDiagnostics[0].reasonCodes[0],"TRUSTLINE_IDENTITY_MISMATCH");
+ }
+});
