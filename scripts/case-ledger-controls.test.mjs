@@ -36,6 +36,7 @@ test("ledger claims are compared without granting approval",async()=>{
  controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,requireDestinationTag:true,issuerGlobalFreeze:false,issuerRequireAuth:false})});
  assert.equal(r.verdict,"HOLD");
  assert.equal(r.authorizationGranted,false);
+ assert.ok(r.reasonCodes.includes("CONTROL_TRANSACTION_BINDING_UNVERIFIED"));
  assert.ok(r.reasonCodes.includes("CLAIMED_DESTINATION_TAG_CONFLICT"));
  assert.ok(r.reasonCodes.includes("TRUST_LINE_EVIDENCE_UNAVAILABLE"));
 });
