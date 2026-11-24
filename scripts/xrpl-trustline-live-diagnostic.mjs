@@ -18,6 +18,7 @@ if(!issuer||!holder||!currency||!ledgerHash){
    issuer,holder,currency,ledgerIndex:evidence.ledgerIndex??null,
    trustLineFrozen:evidence.trustLineFrozen,
    trustLineAuthorized:evidence.trustLineAuthorized,
+   issuerDeepFrozen:evidence.issuerDeepFrozen,holderDeepFrozen:evidence.holderDeepFrozen,
    reasonCodes:evidence.reasonCodes,providerDiagnostics:evidence.providerDiagnostics??[],
    independentlyAuthenticated:false,
    note:"RPC corroboration only; not cryptographic proof or transaction authorization."},null,2));

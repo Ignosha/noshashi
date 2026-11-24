@@ -8,13 +8,24 @@ const LSF_LOW_AUTH=0x00010000;
 const LSF_HIGH_AUTH=0x00020000;
 const LSF_LOW_FREEZE=0x00400000;
 const LSF_HIGH_FREEZE=0x00800000;
+const LSF_LOW_DEEP_FREEZE=0x02000000;
+const LSF_HIGH_DEEP_FREEZE=0x04000000;
+// Three-character codes encode literal bytes. Hex letter case has no effect.
+export function normalizeIssuedCurrency(currency) {
+ if(typeof currency!=="string") return null;
+ if(/^[A-Fa-f0-9]{40}$/.test(currency)) return currency.toUpperCase();
+ if(/^[A-Za-z0-9]{3}$/.test(currency)&&currency!=="XRP") return currency;
+ return null;
+}
 export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={}){
+ const currencyIdentity=normalizeIssuedCurrency(currency);
  const base={schema:"noshashi.xrpl.trustline.observation.v0",status:"UNKNOWN",
   issuer:issuer??null,holder:holder??null,currency:currency??null,
   ledgerHash:typeof ledgerHash==="string"?ledgerHash.toUpperCase():null,
-  trustLineFrozen:null,trustLineAuthorized:null,ledgerIndex:null,reasonCodes:[]};
+  trustLineFrozen:null,trustLineAuthorized:null,
+  issuerDeepFrozen:null,holderDeepFrozen:null,ledgerIndex:null,reasonCodes:[]};
  if(!ADDRESS.test(issuer??"")||!ADDRESS.test(holder??"")||issuer===holder||
-    typeof currency!=="string"||!/^([A-Z0-9]{3}|[A-F0-9]{40})$/i.test(currency)||
+    !currencyIdentity||
     !HEX64.test(ledgerHash??""))
   return {...base,reasonCodes:["INVALID_TRUSTLINE_REQUEST"]};
  const r=raw?.result??raw;
@@ -33,9 +44,8 @@ export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={})
  if(!low||!high||typeof low.issuer!=="string"||typeof high.issuer!=="string"||
     low.issuer===high.issuer||
     ![issuer,holder].includes(low.issuer)||![issuer,holder].includes(high.issuer)||
-    typeof low.currency!=="string"||typeof high.currency!=="string"||
-    low.currency.toUpperCase()!==currency.toUpperCase()||
-    high.currency.toUpperCase()!==currency.toUpperCase())
+    normalizeIssuedCurrency(low.currency)!==currencyIdentity||
+    normalizeIssuedCurrency(high.currency)!==currencyIdentity)
   return {...base,reasonCodes:["TRUSTLINE_IDENTITY_MISMATCH"]};
  const issuerLow=low.issuer===issuer;
  const freezeFlag=issuerLow?LSF_LOW_FREEZE:LSF_HIGH_FREEZE;
@@ -43,6 +53,8 @@ export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={})
  return {...base,status:"OBSERVED",ledgerIndex:r.ledger_index,
    trustLineFrozen:(node.Flags&freezeFlag)!==0,
    trustLineAuthorized:(node.Flags&authFlag)!==0,
+   issuerDeepFrozen:(node.Flags&(issuerLow?LSF_LOW_DEEP_FREEZE:LSF_HIGH_DEEP_FREEZE))!==0,
+   holderDeepFrozen:(node.Flags&(issuerLow?LSF_HIGH_DEEP_FREEZE:LSF_LOW_DEEP_FREEZE))!==0,
    reasonCodes:[]};
 }
 export function corroboratePinnedTrustLine(a,b,request){
@@ -51,16 +63,19 @@ export function corroboratePinnedTrustLine(a,b,request){
    issuer:request?.issuer??null,holder:request?.holder??null,
    currency:request?.currency??null,
    ledgerHash:typeof request?.ledgerHash==="string"?request.ledgerHash.toUpperCase():null,
-   trustLineFrozen:null,trustLineAuthorized:null,ledgerIndex:null,
+   trustLineFrozen:null,trustLineAuthorized:null,
+  issuerDeepFrozen:null,holderDeepFrozen:null,ledgerIndex:null,
    independentlyAuthenticated:false,reasonCodes:[]};
  if(left.status!=="OBSERVED"||right.status!=="OBSERVED")
   return {...base,reasonCodes:["TRUSTLINE_EVIDENCE_UNAVAILABLE"]};
  if(left.ledgerIndex!==right.ledgerIndex)
   return {...base,reasonCodes:["TRUSTLINE_LEDGER_INDEX_DISAGREEMENT"]};
  if(left.trustLineFrozen!==right.trustLineFrozen||
-    left.trustLineAuthorized!==right.trustLineAuthorized)
+    left.trustLineAuthorized!==right.trustLineAuthorized||
+    left.issuerDeepFrozen!==right.issuerDeepFrozen||left.holderDeepFrozen!==right.holderDeepFrozen)
   return {...base,reasonCodes:["TRUSTLINE_PROVIDER_DISAGREEMENT"]};
  return {...base,status:"CORROBORATED",ledgerIndex:left.ledgerIndex,
   trustLineFrozen:left.trustLineFrozen,
-  trustLineAuthorized:left.trustLineAuthorized};
+  trustLineAuthorized:left.trustLineAuthorized,
+  issuerDeepFrozen:left.issuerDeepFrozen,holderDeepFrozen:left.holderDeepFrozen};
 }

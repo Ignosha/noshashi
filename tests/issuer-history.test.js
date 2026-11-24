@@ -81,7 +81,7 @@ describe("each kind of event", () => {
 });
 
 describe("coverage", () => {
-  const page = (txs, marker) => ({ transactions: txs, ...(marker ? { marker } : {}), ledger_index_max: 200 });
+  const page = (txs, marker) => ({ account: ISSUER, validated: true, transactions: txs, ...(marker ? { marker } : {}), ledger_index_min: 32570, ledger_index_max: 90000 });
 
   it("a history read in one page is complete", async () => {
     const rpc = async () => page([entry({ TransactionType: "SetRegularKey", RegularKey: "rK" })]);
@@ -99,12 +99,33 @@ describe("coverage", () => {
   });
 
   it("the backward reading meeting the forward one closes the gap", async () => {
-    const shared = entry({ TransactionType: "AccountSet", SetFlag: 6 }, "tesSUCCESS", 5);
+    const shared = {...entry({ TransactionType: "AccountSet", SetFlag: 6 }, "tesSUCCESS", 33000), hash:"A".repeat(64)};
     const rpc = async (_c, params) => (params.forward ? page([shared], "m1") : page([shared], "m2"));
     const h = await readIssuerHistory(ISSUER, { rpc });
     expect(h.coverage.complete).toBe(true);
     expect(h.events).toHaveLength(1);
   });
+  it("keeps a narrowed archive range distinct from complete public history", async () => {
+    const h = await readIssuerHistory(ISSUER, { rpc: async () => ({ ...page([]), ledger_index_min: 80000 }) });
+    expect(h.coverage).toMatchObject({complete:false, range_complete:true, stopped_because:"archive_boundary"});
+  });
+
+  it("does not treat a different provider range as proof that history was exhausted", async () => {
+    const h = await readIssuerHistory(ISSUER, { rpc: async (_command, params) => {
+      if (params.forward) return page([], "forward");
+      expect(params.ledger_index_min).toBe(32570);
+      expect(params.ledger_index_max).toBe(90000);
+      return {...page([entry({TransactionType:"SetRegularKey", RegularKey:"rK"})]), ledger_index_min:80000};
+    }});
+    expect(h.coverage).toMatchObject({complete:false, range_complete:false, stopped_because:"range_mismatch"});
+    expect(h.events).toHaveLength(0);
+  });
+
+  it("stops a repeated cursor without interpreting missing events as absent", async () => {
+    const h = await readIssuerHistory(ISSUER, { rpc: async () => page([], {ledger:80000, seq:1}) });
+    expect(h.coverage).toMatchObject({complete:false, stopped_because:"cursor_repeated"});
+  });
+
 });
 
 describe("GET /api/issuer-history", () => {
@@ -121,7 +142,7 @@ describe("GET /api/issuer-history", () => {
   }
 
   it("answers from the ledger and caches", async () => {
-    const res = await call({ issuer: SOLO }, async () => ({ transactions: fixture.transactions, ledger_index_max: fixture.ledger_index_max }));
+    const res = await call({ issuer: SOLO }, async () => ({ account: SOLO, validated: true, transactions: fixture.transactions, ledger_index_min: 32570, ledger_index_max: 108000000 }));
     expect(res.statusCode).toBe(200);
     expect(res.body.events).toHaveLength(4);
     expect(res.headers["cache-control"]).toContain("s-maxage=900");

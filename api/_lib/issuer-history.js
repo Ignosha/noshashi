@@ -196,55 +196,86 @@ export function tally(events) {
 }
 
 const PAGE = 200;
+const PUBLIC_ARCHIVE_START = 32_570;
 
-/**
- * Read an issuer's authority history from the public XRPL servers.
- *
- * Reads the earliest page (forward) and up to `recentPages` pages back
- * from the latest validated ledger. If the backward reading reaches the
- * transactions the forward one already covered, the history is complete;
- * otherwise `coverage.complete` is false and the gap is stated.
- */
+function pageRange(reply, issuer) {
+  const from = reply?.ledger_index_min;
+  const to = reply?.ledger_index_max;
+  if (reply?.validated !== true || reply.account !== issuer || !Array.isArray(reply.transactions) ||
+      !Number.isSafeInteger(from) || !Number.isSafeInteger(to) || from <= 0 || to < from ||
+      reply.transactions.some((entry) => !entry || typeof entry !== "object" || entry.validated === false)) return null;
+  return { from, to };
+}
+
+function transactionHash(entry) {
+  const hash = entry?.hash ?? entry?.tx_json?.hash ?? entry?.tx?.hash;
+  return typeof hash === "string" && /^[a-f0-9]{64}$/i.test(hash) ? hash.toUpperCase() : null;
+}
+
+/** Read bounded issuer history within one validated range reported by the RPC. */
 export async function readIssuerHistory(issuer, { recentPages = 4, rpc = rippleRpc } = {}) {
   if (!ADDRESS_RE.test(issuer)) throw new Error("Not an XRPL classic address");
-  const params = { account: issuer, ledger_index_min: -1, ledger_index_max: -1, limit: PAGE, api_version: 2 };
-
+  const params = { account: issuer, limit: PAGE, api_version: 2 };
   const first = await rpc("account_tx", { ...params, ledger_index_min: -1, ledger_index_max: -1, forward: true }, 15000);
-  const earliest = first.transactions ?? [];
-  const entries = [...earliest];
-  let complete = !first.marker;
-  let read = earliest.length;
-  let validatedTo = first.ledger_index_max ?? null;
+  const range = pageRange(first, issuer);
+  if (!range) throw new Error("Issuer history source did not return a validated account range.");
 
-  if (!complete) {
-    const earliestHashes = new Set(earliest.map((e) => e.hash ?? e.tx_json?.hash ?? e.tx?.hash));
+  const entries = [...first.transactions];
+  let rangeComplete = !first.marker;
+  let stoppedBecause = rangeComplete ? null : "page_budget";
+  if (!rangeComplete) {
+    const earliestHashes = new Set(entries.map(transactionHash).filter(Boolean));
+    const seenMarkers = new Set();
     let marker;
     for (let page = 0; page < recentPages; page += 1) {
-      const reply = await rpc("account_tx", { ...params, ledger_index_min: -1, ledger_index_max: -1, forward: false, ...(marker ? { marker } : {}) }, 15000);
-      const txs = reply.transactions ?? [];
-      validatedTo ??= reply.ledger_index_max ?? null;
-      read += txs.length;
-      entries.push(...txs);
-      if (txs.some((e) => earliestHashes.has(e.hash ?? e.tx_json?.hash ?? e.tx?.hash)) || !reply.marker) {
-        complete = true;
+      let reply;
+      try {
+        reply = await rpc("account_tx", {
+          ...params, ledger_index_min: range.from, ledger_index_max: range.to,
+          forward: false, ...(marker ? { marker } : {}),
+        }, 15000);
+      } catch {
+        stoppedBecause = "source_unavailable";
+        break;
+      }
+      const nextRange = pageRange(reply, issuer);
+      if (nextRange?.from !== range.from || nextRange?.to !== range.to) {
+        stoppedBecause = "range_mismatch";
+        break;
+      }
+      entries.push(...reply.transactions);
+      if (!reply.marker || reply.transactions.some((entry) => earliestHashes.has(transactionHash(entry)))) {
+        rangeComplete = true;
+        stoppedBecause = null;
         break;
       }
       marker = reply.marker;
+      const markerKey = JSON.stringify(marker);
+      if (seenMarkers.has(markerKey)) {
+        stoppedBecause = "cursor_repeated";
+        break;
+      }
+      seenMarkers.add(markerKey);
     }
   }
 
+  const complete = rangeComplete && range.from <= PUBLIC_ARCHIVE_START;
   const events = eventsFrom(entries, issuer);
   return {
     schema: HISTORY_SCHEMA,
     issuer,
     read_at: new Date().toISOString(),
-    validated_to: validatedTo,
+    validated_to: range.to,
     coverage: {
       complete,
-      transactions_read: read,
-      note: complete
-        ? "Every validated transaction this account has sent or received was read."
-        : `The account's earliest ${PAGE} transactions and its latest ${PAGE * recentPages} were read. Transactions in between were not, so an event there would not appear here.`,
+      range_complete: rangeComplete,
+      ledger_index_min: range.from,
+      ledger_index_max: range.to,
+      stopped_because: stoppedBecause ?? (complete ? null : "archive_boundary"),
+      transactions_read: entries.length,
+      note: rangeComplete
+        ? `The provider-reported range ${range.from}–${range.to} was scanned. Earlier ledgers are outside this observation.`
+        : `The provider-reported range ${range.from}–${range.to} was not fully scanned. Events in unread pages may be missing.`,
     },
     tally: tally(events),
     events,

@@ -4,9 +4,9 @@
  */
 import { corroborateAutopsy } from "./autopsy-gateway.mjs";
 import { evaluateApprovalDrift } from "./approval-drift.mjs";
-import { createEvidenceReceipt } from "./evidence-receipt.mjs";
+import { attestEvidenceReceipt, createEvidenceReceipt } from "./evidence-receipt.mjs";
 
-export async function reviewInstitutionalCase(input, { lookup = corroborateAutopsy } = {}) {
+export async function reviewInstitutionalCase(input, { lookup = corroborateAutopsy, attestationKey } = {}) {
   const base = {
     schema:"noshashi.case-review.research.v0", verdict:"HOLD",
     authorizationGranted:false, transaction:null, drift:null, receipt:null,
@@ -52,11 +52,19 @@ export async function reviewInstitutionalCase(input, { lookup = corroborateAutop
   } catch {
     return {...base,transaction,drift,reasonCodes:["RECEIPT_EVIDENCE_INSUFFICIENT"]};
   }
+  let evidenceAttestation;
+  if (attestationKey !== undefined) {
+    try {
+      evidenceAttestation = attestEvidenceReceipt(receipt, attestationKey);
+    } catch {
+      return {...base,transaction,drift,reasonCodes:["EVIDENCE_ATTESTATION_UNAVAILABLE"]};
+    }
+  }
   const reasonCodes = [...drift.reasonCodes];
   if (transaction.disposition !== "SUCCESS") reasonCodes.push("TRANSACTION_NOT_SUCCESSFUL");
   // The output never grants a GO; external policy snapshots are not verified
   // and approval drift does not establish institutional signing authority.
   if (drift.verdict === "UNCHANGED" && transaction.disposition === "SUCCESS")
     reasonCodes.push("CONTROL_SNAPSHOTS_NOT_AUTHENTICATED");
-  return {...base,transaction,drift,receipt,reasonCodes};
+  return {...base,transaction,drift,receipt,reasonCodes,...(evidenceAttestation ? {evidenceAttestation} : {})};
 }

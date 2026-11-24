@@ -29,6 +29,12 @@ const cors = {
 };
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: cors });
+function assertReviewFinished(error: { code: string } | null) {
+  if (error?.code === "PR001")
+    throw new ReviewError(409, "Review expired before completion. Start a new request to retry.");
+  assertDb(error);
+}
+
 function assertDb(error: unknown) {
   if (error)
     throw new ReviewError(
@@ -224,12 +230,10 @@ export async function handle(request: Request, services: Services) {
     }
     const match = /^runs\/([a-f0-9-]{36})$/.exec(route);
     if (match && request.method === "GET") {
-      const { data, error } = await db
-        .from("payment_review_runs")
-        .select("id,status,result,created_at")
-        .eq("account_id", accountId)
-        .eq("id", match[1])
-        .maybeSingle();
+      const { data, error } = await db.rpc("payment_review_get_run", {
+        p_account: accountId,
+        p_id: match[1],
+      });
       assertDb(error);
       if (!data) throw new ReviewError(404, "Run not found.");
       return json(data, data.status === "processing" ? 202 : 200);
@@ -277,7 +281,7 @@ export async function handle(request: Request, services: Services) {
           p_charge: 0,
           p_failed: true,
         });
-        assertDb(finishError);
+        assertReviewFinished(finishError);
         throw new ReviewError(
           503,
           "Review failed. No result was accepted. Start a new request to retry.",
@@ -295,7 +299,7 @@ export async function handle(request: Request, services: Services) {
         p_result: result,
         p_charge: charged,
       });
-      assertDb(finishError);
+      assertReviewFinished(finishError);
       return json(
         { id: claim.id, status: "completed", result, charged_records: charged },
         201,

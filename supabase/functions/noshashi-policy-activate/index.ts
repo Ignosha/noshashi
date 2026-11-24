@@ -50,6 +50,7 @@ function json(request: Request, body: unknown, status = 200) {
 
 /** Database result code → HTTP status and the message the app shows. */
 const OUTCOMES: Record<string, { status: number; title: string; message: string }> = {
+  MFA_REQUIRED: { status: 403, title: "SECOND FACTOR REQUIRED", message: "Complete your account’s second-factor check." },
   NOT_AUTHENTICATED: { status: 401, title: "AUTHORIZATION REQUIRED", message: "Sign in to activate a policy." },
   NOT_A_MEMBER: { status: 404, title: "POLICY NOT FOUND", message: "No such policy in an organization you belong to." },
   NOT_FOUND: { status: 404, title: "POLICY NOT FOUND", message: "No such policy in an organization you belong to." },
@@ -87,13 +88,19 @@ Deno.serve(async (request: Request) => {
 
   try {
     // 1. Who is asking — from the JWT only.
+    const token = /^Bearer (\S+)$/i.exec(request.headers.get("Authorization") ?? "")?.[1];
+    if (!token) return fail("NOT_AUTHENTICATED");
     const asCaller = createClient(url, anonKey, {
-      global: { headers: { Authorization: request.headers.get("Authorization") ?? "" } },
+      global: { headers: { Authorization: `Bearer ${token}` } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: userData, error: userError } = await asCaller.auth.getUser();
+    const { data: userData, error: userError } = await asCaller.auth.getUser(token);
     if (userError || !userData.user) return fail("NOT_AUTHENTICATED");
     const actor = userData.user.id;
+
+    const { data: aal, error: aalError } = await asCaller.auth.mfa.getAuthenticatorAssuranceLevel(token);
+    if (aalError || !aal) return fail("NOT_AUTHENTICATED");
+    if (aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") return fail("MFA_REQUIRED");
 
     const body = await request.json().catch(() => ({}));
     const organizationId = String(body.organizationId ?? "");

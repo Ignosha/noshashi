@@ -1,7 +1,8 @@
+import { generateKeyPairSync } from "node:crypto";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { reviewInstitutionalCase } from "./institutional-case-review.mjs";
-import { verifyEvidenceReceipt } from "./evidence-receipt.mjs";
+import { attestEvidenceReceipt, createEvidenceReceipt, verifyEvidenceAttestation, verifyEvidenceReceipt } from "./evidence-receipt.mjs";
 const H="A".repeat(64), L="B".repeat(64), L2="C".repeat(64);
 const report={schema:"noshashi.autopsy.v1",network:"xrpl-mainnet",hash:H,
  status:"VERIFIED_FACT",validated:true,ledgerIndex:100,ledgerHash:L,
@@ -69,4 +70,33 @@ test("malformed snapshot hashes remain HOLD without a receipt",async()=>{
   assert.equal(r.receipt,null);
   assert.deepEqual(r.reasonCodes,["CASE_LEDGER_EVIDENCE_CONFLICT"]);
  }
+});
+
+test("opt-in case attestation verifies only against the configured signer and evidence", async () => {
+ const trusted = generateKeyPairSync("ed25519");
+ const other = generateKeyPairSync("ed25519");
+ const unsigned = await reviewInstitutionalCase(input, {lookup});
+ assert.equal(unsigned.evidenceAttestation, undefined);
+ const result = await reviewInstitutionalCase(input, {lookup, attestationKey:trusted.privateKey});
+ const {receipt, evidenceAttestation} = JSON.parse(JSON.stringify(result));
+ assert.equal(result.verdict, "HOLD");
+ assert.equal(result.authorizationGranted, false);
+ assert.equal(result.controlEvidenceAuthenticated, false);
+ assert.equal(verifyEvidenceAttestation(receipt, evidenceAttestation, trusted.publicKey), true);
+ assert.equal(verifyEvidenceAttestation(receipt, evidenceAttestation, other.publicKey), false);
+ assert.equal(verifyEvidenceAttestation(receipt, attestEvidenceReceipt(receipt, other.privateKey), trusted.publicKey), false);
+ const replacement = createEvidenceReceipt({...report, ledgerIndex:101});
+ assert.equal(verifyEvidenceReceipt(replacement), true);
+ assert.equal(verifyEvidenceAttestation(replacement, evidenceAttestation, trusted.publicKey), false);
+ assert.equal(verifyEvidenceAttestation(receipt, {...evidenceAttestation, signature:"A".repeat(86)}, trusted.publicKey), false);
+ assert.equal(verifyEvidenceAttestation(receipt, {...evidenceAttestation, keyId:"0".repeat(64)}, trusted.publicKey), false);
+});
+
+test("invalid attestation configuration fails closed without an unsigned fallback", async () => {
+ const {publicKey} = generateKeyPairSync("ed25519");
+ const result = await reviewInstitutionalCase(input, {lookup, attestationKey:publicKey});
+ assert.equal(result.verdict, "HOLD");
+ assert.equal(result.receipt, null);
+ assert.equal(result.evidenceAttestation, undefined);
+ assert.deepEqual(result.reasonCodes, ["EVIDENCE_ATTESTATION_UNAVAILABLE"]);
 });

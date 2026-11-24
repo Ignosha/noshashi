@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {parsePinnedAccountRoot,corroboratePinnedAccountRoot} from "./xrpl-account-root-evidence.mjs";
 const account="rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY",ledgerHash="B".repeat(64);
 const request={account,ledgerHash};
-const response=(flags=0)=>({result:{validated:true,ledger_hash:ledgerHash,
+const response=(flags=0)=>({result:{validated:true,ledger_index:100,ledger_hash:ledgerHash,
  account_data:{LedgerEntryType:"AccountRoot",Account:account,Flags:flags}}});
 test("extracts RequireDestTag only from pinned validated AccountRoot",()=>{
  assert.equal(parsePinnedAccountRoot(response(0x00020000),request).requireDestinationTag,true);
@@ -53,4 +53,15 @@ test("RequireAuth issuer policy flag must match both pinned providers",()=>{
  const b=corroboratePinnedAccountRoot(response(0x00040000),response(0),request);
  assert.equal(b.status,"UNKNOWN");
  assert.deepEqual(b.reasonCodes,["ACCOUNT_ROOT_PROVIDER_DISAGREEMENT"]);
+});
+
+test("requires an explicit positive ledger index that agrees across providers", () => {
+ const first = response();
+ const other = response();
+ other.result.ledger_index = 101;
+ const conflict = corroboratePinnedAccountRoot(first, other, request);
+ assert.deepEqual(conflict.reasonCodes, ["ACCOUNT_ROOT_LEDGER_INDEX_DISAGREEMENT"]);
+ assert.equal(conflict.ledgerIndex, null);
+ delete other.result.ledger_index;
+ assert.deepEqual(parsePinnedAccountRoot(other, request).reasonCodes, ["LEDGER_INDEX_INVALID"]);
 });

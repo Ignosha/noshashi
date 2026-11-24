@@ -6,7 +6,7 @@ info:
     Research-only, opt-in, loopback-bound gateway. Not a publicly hosted API or
     production enterprise service. No signing, funds movement, SLA or guaranteed
     availability. VERIFIED_FACT means two configured RPC providers agreed on
-    validated ledger index/hash and result; it is not a cryptographic consensus proof.
+    validated ledger index/hash, result and available payment identity; it is not a cryptographic consensus proof.
     UNKNOWN means the service cannot responsibly determine finality.
 servers: []
 security:
@@ -40,6 +40,7 @@ paths:
                 $ref: '#/components/schemas/AutopsyReport'
         '400': { description: Invalid input or malformed JSON }
         '401': { description: Missing or invalid local bearer secret }
+        '408': { description: Request body did not arrive within the local intake deadline }
         '413': { description: Payload too large }
         '415': { description: Unsupported media type }
         '429': { description: In-process research rate limit exceeded }
@@ -63,6 +64,25 @@ components:
         validated: { type: boolean }
         ledgerIndex: { type: [integer, 'null'], minimum: 1 }
         ledgerHash: { type: [string, 'null'], pattern: '^[A-F0-9]{64}$' }
+        paymentDestination:
+          type: [string, 'null']
+          description: Included on corroborated reports. Null when no payment destination was identified.
+        paymentAsset:
+          type: [object, 'null']
+          description: Included on corroborated reports. Null when issued-asset identity is unavailable or inapplicable.
+          additionalProperties: false
+          required: [issuer, currency]
+          properties:
+            issuer: { type: string }
+            currency: { type: string, pattern: '^([A-Za-z0-9]{3}|[A-F0-9]{40})$' }
+        deliveredAmount:
+          type: [object, 'null']
+          description: Exact amount corroborated from successful Payment metadata. Null when unavailable or unsupported. Issued amounts use the issuer and currency in paymentAsset.
+          additionalProperties: false
+          required: [unit, value]
+          properties:
+            unit: { type: string, enum: [drops, issued] }
+            value: { type: string, pattern: '^[0-9]+(\.[0-9]+)?$' }
         resultCode: { type: [string, 'null'] }
         disposition: { type: string, enum: [SUCCESS, FAILED, UNKNOWN] }
         reasonCodes:

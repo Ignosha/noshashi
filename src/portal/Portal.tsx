@@ -210,7 +210,7 @@ export function Portal() {
   const auth = useAuth();
   const [tab, setTab] = useState<Tab>("review");
   const [mode, setMode] = useState<"signin" | "signup" | "reset" | "recovery">(
-    "signin",
+    () => new URLSearchParams(location.search).get("mode") === "reset" ? "reset" : "signin",
   );
   const [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
@@ -228,7 +228,10 @@ export function Portal() {
   const [retry, setRetry] = useState<{ input: string; key: string } | null>(
     null,
   );
-  const signedIn = !!auth.user && !auth.mfaRequired;
+  const [callbackPending, setCallbackPending] = useState(
+    () => new URLSearchParams(location.search).has("code"),
+  );
+  const signedIn = !!auth.user && !auth.mfaRequired && !callbackPending && mode !== "recovery";
   async function act(fn: () => Promise<void>) {
     setBusy(true);
     setError("");
@@ -251,11 +254,15 @@ export function Portal() {
       const recovery = url.searchParams.get("mode") === "recovery";
       historyReplace();
       void act(async () => {
-        const { error } =
-          await supabase().auth.exchangeCodeForSession(callback);
-        if (error) throw error;
-        if (recovery) setMode("recovery");
-        else setNotice("Email confirmed. Sign in to continue.");
+        try {
+          const { error } =
+            await supabase().auth.exchangeCodeForSession(callback);
+          if (error) throw error;
+          if (recovery) setMode("recovery");
+          else setNotice("Email confirmed. Sign in to continue.");
+        } finally {
+          setCallbackPending(false);
+        }
       });
     }
     function historyReplace() {
@@ -264,7 +271,9 @@ export function Portal() {
   }, []);
   useEffect(() => {
     if (signedIn) {
-      void act(refresh);
+      void refresh().catch((cause: unknown) => {
+        setError((previous) => previous || (cause instanceof Error ? cause.message : "Account usage is unavailable."));
+      });
     } else {
       setUsage(null);
       setKeys([]);
@@ -277,6 +286,7 @@ export function Portal() {
   }, [signedIn]);
   async function authenticate(event: FormEvent) {
     event.preventDefault();
+    if (callbackPending) return;
     await act(async () => {
       if (auth.mfaRequired) {
         const factor = auth.factors.find((f) => f.status === "verified");
@@ -463,7 +473,7 @@ export function Portal() {
                 {notice}
               </p>
             )}
-            {(!signedIn || mode === "recovery") && (
+            {!signedIn && (
               <section className="auth-box">
                 <p className="eyebrow">YOUR ACCOUNT</p>
                 <h2>
@@ -545,7 +555,7 @@ export function Portal() {
                             : "Sign in"}
                   </button>
                 </form>
-                {!auth.mfaRequired && (
+                {!auth.mfaRequired && mode !== "recovery" && (
                   <div className="actions">
                     <button
                       disabled={busy}

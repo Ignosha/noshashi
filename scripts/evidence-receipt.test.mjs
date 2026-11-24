@@ -1,7 +1,7 @@
-import {createHash} from "node:crypto";
+import {createHash, generateKeyPairSync} from "node:crypto";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createEvidenceReceipt, verifyEvidenceReceipt, canonicalEvidence } from "./evidence-receipt.mjs";
+import { attestControlEvidence, attestEvidenceReceipt, verifyControlEvidenceAttestation, verifyEvidenceAttestation, createEvidenceReceipt, verifyEvidenceReceipt, canonicalEvidence } from "./evidence-receipt.mjs";
 const report = {
   schema:"noshashi.autopsy.v1", network:"xrpl-mainnet",
   hash:"A".repeat(64), status:"VERIFIED_FACT", validated:true,
@@ -45,4 +45,30 @@ test("recomputed digest cannot make ineligible evidence pass verification",()=>{
   const evidenceDigest=createHash("sha256").update(canonicalEvidence(evidence)).digest("hex");
   assert.equal(verifyEvidenceReceipt({...receipt,evidence,evidenceDigest}),false);
  }
+});
+
+test("control attestation binds the pinned controls to one transaction receipt and signer", () => {
+ const issuer = "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59";
+ const holder = "rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY";
+ const transaction = {...report, paymentDestination:holder, paymentAsset:{issuer,currency:"USD"}};
+ const receipt = createEvidenceReceipt(transaction);
+ const pinned = {status:"CORROBORATED", ledgerHash:report.ledgerHash, ledgerIndex:report.ledgerIndex};
+ const controls = {
+  ...pinned, schema:"noshashi.xrpl.payment-controls.research.v0", authorizationGranted:false,
+  trustLineFrozen:true, evidence:{
+   destination:{...pinned, account:holder}, issuer:{...pinned, account:issuer},
+   trustLine:{...pinned, holder, issuer, currency:"USD"},
+  },
+ };
+ const {publicKey, privateKey} = generateKeyPairSync("ed25519");
+ const attestation = attestControlEvidence(receipt, controls, privateKey);
+ assert.equal(verifyControlEvidenceAttestation(receipt, controls, attestation, publicKey), true);
+ assert.equal(verifyControlEvidenceAttestation(receipt, {...controls, trustLineFrozen:false}, attestation, publicKey), false);
+ assert.equal(verifyControlEvidenceAttestation(createEvidenceReceipt({...transaction, hash:"C".repeat(64)}), controls, attestation, publicKey), false);
+ assert.equal(verifyControlEvidenceAttestation(receipt, controls, attestEvidenceReceipt(receipt, privateKey), publicKey), false);
+ assert.equal(verifyEvidenceAttestation(receipt, attestation, publicKey), false);
+ assert.throws(() => attestControlEvidence(receipt, {...controls, status:"PARTIAL_CORROBORATED"}, privateKey), /UNBOUND_CONTROL_EVIDENCE/);
+ assert.throws(() => attestControlEvidence(receipt, {
+  ...controls, evidence:{...controls.evidence, trustLine:{...controls.evidence.trustLine, currency:"EUR"}},
+ }, privateKey), /UNBOUND_CONTROL_EVIDENCE/);
 });

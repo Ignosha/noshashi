@@ -1,3 +1,5 @@
+import { attestControlEvidence } from "./evidence-receipt.mjs";
+import { normalizeIssuedCurrency } from "./xrpl-trustline-evidence.mjs";
 import { reviewInstitutionalCase } from "./institutional-case-review.mjs";
 import { lookupPinnedPaymentControls } from "./xrpl-payment-controls.mjs";
 /**
@@ -5,13 +7,13 @@ import { lookupPinnedPaymentControls } from "./xrpl-payment-controls.mjs";
  * Does not authenticate customer approval snapshots, trustlines, or sign funds.
  */
 export async function reviewCaseWithLedgerControls(input,{
-  review=reviewInstitutionalCase,controls=lookupPinnedPaymentControls
+  review=reviewInstitutionalCase,controls=lookupPinnedPaymentControls,attestationKey
 }={}){
   const base={schema:"noshashi.case-ledger-controls.research.v0",
     verdict:"HOLD",authorizationGranted:false,controls:null,caseReview:null,
     reasonCodes:[],controlEvidenceAuthenticated:false};
   let caseReview;
-  try{caseReview=await review({hash:input?.hash,approved:input?.approved,current:input?.current});}catch{
+  try{caseReview=await review({hash:input?.hash,approved:input?.approved,current:input?.current}, {attestationKey});}catch{
     return {...base,reasonCodes:["CASE_REVIEW_UNAVAILABLE"]};
   }
   if(!caseReview||caseReview.transaction?.status!=="VERIFIED_FACT"||
@@ -22,6 +24,8 @@ export async function reviewCaseWithLedgerControls(input,{
      !Number.isSafeInteger(caseReview.transaction.ledgerIndex)||
      caseReview.transaction.ledgerIndex<=0)
     return {...base,caseReview,reasonCodes:["TRANSACTION_EVIDENCE_UNVERIFIED"]};
+  if(caseReview.reasonCodes?.includes("EVIDENCE_ATTESTATION_UNAVAILABLE"))
+    return {...base,caseReview,reasonCodes:["EVIDENCE_ATTESTATION_UNAVAILABLE"]};
   const destination=input?.current?.destination;
   const issuer=input?.issuer;
   const currency=input?.currency;
@@ -32,7 +36,7 @@ export async function reviewCaseWithLedgerControls(input,{
   if(typeof verifiedDestination==="string"&&verifiedDestination!==destination)
     return {...base,caseReview,reasonCodes:["PAYMENT_DESTINATION_MISMATCH"]};
   const asset=caseReview.transaction.paymentAsset;
-  if(asset&&(asset.issuer!==issuer||asset.currency!==currency))
+  if(asset&&(asset.issuer!==issuer||!normalizeIssuedCurrency(asset.currency)||normalizeIssuedCurrency(asset.currency)!==normalizeIssuedCurrency(currency)))
     return {...base,caseReview,reasonCodes:["PAYMENT_ASSET_MISMATCH"]};
   let controlEvidence;
   try{controlEvidence=await controls({issuer,destination,
@@ -44,6 +48,8 @@ export async function reviewCaseWithLedgerControls(input,{
      typeof controlEvidence.issuerGlobalFreeze!=="boolean")
     return {...base,caseReview,controls:controlEvidence??null,
       reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
+  if(controlEvidence.ledgerIndex!==caseReview.transaction.ledgerIndex)
+    return {...base,caseReview,controls:controlEvidence,reasonCodes:["CONTROL_LEDGER_INDEX_CONFLICT"]};
   // Complete evidence must include an explicit, internally consistent
   // authorization decision. Missing flags must never look like cleared controls.
   if(controlEvidence.status==="CORROBORATED"&&(
@@ -68,6 +74,8 @@ export async function reviewCaseWithLedgerControls(input,{
     codes.push("CLAIMED_ISSUER_FREEZE_CONFLICT");
   if(controlEvidence.issuerGlobalFreeze===true)
     codes.push("ISSUER_GLOBAL_FREEZE_ACTIVE");
+  if(controlEvidence.issuerDeepFrozen===true)codes.push("ISSUER_TRUST_LINE_DEEP_FROZEN");
+  if(controlEvidence.holderDeepFrozen===true)codes.push("HOLDER_TRUST_LINE_DEEP_FROZEN");
   if(controlEvidence.status==="CORROBORATED"){
     if(controlEvidence.issuerAuthorizationConditionMet===false)
       codes.push("ISSUER_TRUST_LINE_AUTHORIZATION_REQUIRED");
@@ -77,6 +85,14 @@ export async function reviewCaseWithLedgerControls(input,{
       codes.push("CLAIMED_TRUST_LINE_FREEZE_CONFLICT");
     if(claims.trustLineAuthorized!==controlEvidence.trustLineAuthorized)
       codes.push("CLAIMED_TRUST_LINE_AUTH_CONFLICT");
+  }
+  if(attestationKey!==undefined&&controlEvidence.status==="CORROBORATED"&&asset&&verifiedDestination===destination){
+    try {
+      const controlAttestation=attestControlEvidence(caseReview.receipt,controlEvidence,attestationKey);
+      return {...base,caseReview,controls:controlEvidence,reasonCodes:codes,controlAttestation};
+    } catch {
+      codes.push("CONTROL_ATTESTATION_UNAVAILABLE");
+    }
   }
   return {...base,caseReview,controls:controlEvidence,reasonCodes:codes};
 }

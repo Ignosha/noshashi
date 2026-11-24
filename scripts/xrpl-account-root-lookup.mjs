@@ -38,7 +38,7 @@ export async function lookupPinnedAccountRoot(request,{servers=UPSTREAMS,fetchFn
   const base={schema:"noshashi.xrpl.account-root.corroborated.v0",
     status:"UNKNOWN",account:request?.account??null,
     ledgerHash:typeof request?.ledgerHash==="string"?request.ledgerHash.toUpperCase():null,
-    requireDestinationTag:null,globalFreeze:null,requireAuth:null,reasonCodes:[],sourceCount:0,
+    requireDestinationTag:null,globalFreeze:null,requireAuth:null,ledgerIndex:null,reasonCodes:[],sourceCount:0,
     independentlyAuthenticated:false};
   if(!ADDRESS.test(request?.account??"")||!HEX64.test(request?.ledgerHash??""))
     return {...base,reasonCodes:["INVALID_PINNED_REQUEST"]};

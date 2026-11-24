@@ -66,3 +66,17 @@ test("matching ledger indices are retained as provenance, not consensus proof",(
  assert.equal(result.ledgerIndex,100);
  assert.equal(result.independentlyAuthenticated,false);
 });
+
+test("distinguishes issuer and holder deep-freeze flags in both account orientations", () => {
+ for (const issuerIsLow of [true, false]) {
+  const low = parsePinnedTrustLine(observation(0x02000000, issuerIsLow), request);
+  assert.equal(low.issuerDeepFrozen, issuerIsLow);
+  assert.equal(low.holderDeepFrozen, !issuerIsLow);
+  const high = parsePinnedTrustLine(observation(0x04000000, issuerIsLow), request);
+  assert.equal(high.issuerDeepFrozen, !issuerIsLow);
+  assert.equal(high.holderDeepFrozen, issuerIsLow);
+ }
+ const disagreement = corroboratePinnedTrustLine(observation(0x02000000), observation(0), request);
+ assert.deepEqual(disagreement.reasonCodes, ["TRUSTLINE_PROVIDER_DISAGREEMENT"]);
+ assert.equal(disagreement.issuerDeepFrozen, null);
+});

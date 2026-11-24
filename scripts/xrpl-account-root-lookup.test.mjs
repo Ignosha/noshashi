@@ -7,7 +7,7 @@ const request={account,ledgerHash};
 const mock=(flags=0,hash=ledgerHash)=>({
  ok:true,headers:{get:()=>null},
  body:(async function*(){yield Buffer.from(JSON.stringify({result:{
- validated:true,ledger_hash:hash,account_data:{
+ validated:true,ledger_index:100,ledger_hash:hash,account_data:{
  LedgerEntryType:"AccountRoot",Account:account,Flags:flags,
  }}}));})(),
 });

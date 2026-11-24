@@ -7,7 +7,7 @@ const destination="rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY";
 const issuer="r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59";
 const control={destination,issuer,ledgerHash:L};
 const lookup=async({account,ledgerHash})=>({
- status:"CORROBORATED",account,ledgerHash,requireDestinationTag:true,globalFreeze:false,requireAuth:false});
+ status:"CORROBORATED",account,ledgerHash,ledgerIndex:100,requireDestinationTag:true,globalFreeze:false,requireAuth:false});
 test("destination tag and issuer freeze come from distinct pinned AccountRoots",async()=>{
  const seen=[];
  const r=await lookupPinnedPaymentControls(control,{lookup:async request=>{
@@ -33,7 +33,7 @@ test("ledger claims are compared without granting approval",async()=>{
  review:async payload=>{
  assert.deepEqual(Object.keys(payload).sort(),["approved","current","hash"]);
  return {transaction:tx,verdict:"HOLD"};},
- controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,requireDestinationTag:true,issuerGlobalFreeze:false,issuerRequireAuth:false})});
+ controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,ledgerIndex:100,requireDestinationTag:true,issuerGlobalFreeze:false,issuerRequireAuth:false})});
  assert.equal(r.verdict,"HOLD");
  assert.equal(r.authorizationGranted,false);
  assert.ok(r.reasonCodes.includes("CONTROL_TRANSACTION_BINDING_UNVERIFIED"));
@@ -63,7 +63,7 @@ test("corroborated trustline evidence flags conflicts but never approves",async(
  const withAsset={...input,currency:"USD",current:{...input.current,trustLineFrozen:false,trustLineAuthorized:true}};
  const r=await reviewCaseWithLedgerControls(withAsset,{
   review:async()=>({transaction:tx,verdict:"HOLD"}),
-  controls:async()=>({status:"CORROBORATED",ledgerHash:L,
+  controls:async()=>({status:"CORROBORATED",ledgerHash:L,ledgerIndex:100,
    requireDestinationTag:false,issuerGlobalFreeze:false,issuerRequireAuth:false,
    trustLineFrozen:true,trustLineAuthorized:true,issuerAuthorizationConditionMet:true})});
  assert.equal(r.verdict,"HOLD");
@@ -78,7 +78,7 @@ test("complete pinned payment controls combine AccountRoot and trustline",async(
   lookup,
   trustLineLookup:async request=>({status:"CORROBORATED",
    issuer:request.issuer,holder:request.holder,currency:request.currency,
-   ledgerHash:request.ledgerHash,trustLineFrozen:true,trustLineAuthorized:false})});
+   ledgerHash:request.ledgerHash,ledgerIndex:100,trustLineFrozen:true,trustLineAuthorized:false})});
  assert.equal(r.status,"CORROBORATED");
  assert.equal(r.trustLineFrozen,true);
  assert.equal(r.trustLineAuthorized,false);
@@ -96,7 +96,7 @@ test("missing pinned trustline response retains partial evidence and unknown fla
 test("missing issuer RequireAuth cannot produce complete control evidence",async()=>{
  const r=await lookupPinnedPaymentControls({...control,currency:"USD"},{
   lookup:async q=>({...await lookup(q),requireAuth:undefined}),
-  trustLineLookup:async q=>({status:"CORROBORATED",issuer:q.issuer,holder:q.holder,
+  trustLineLookup:async q=>({status:"CORROBORATED",ledgerIndex:100,issuer:q.issuer,holder:q.holder,
    currency:q.currency,ledgerHash:q.ledgerHash,trustLineFrozen:false,trustLineAuthorized:true})});
  assert.equal(r.status,"PARTIAL_CORROBORATED");
  assert.equal(r.issuerRequireAuth,null);
@@ -106,7 +106,7 @@ test("missing issuer RequireAuth cannot produce complete control evidence",async
 test("RequireAuth enabled and unauthorised trustline fails issuer authorization condition",async()=>{
  const r=await lookupPinnedPaymentControls({...control,currency:"USD"},{
   lookup:async q=>({...await lookup(q),requireAuth:q.account===issuer}),
-  trustLineLookup:async q=>({status:"CORROBORATED",issuer:q.issuer,holder:q.holder,
+  trustLineLookup:async q=>({status:"CORROBORATED",ledgerIndex:100,issuer:q.issuer,holder:q.holder,
    currency:q.currency,ledgerHash:q.ledgerHash,trustLineFrozen:false,trustLineAuthorized:false})});
  assert.equal(r.status,"CORROBORATED");
  assert.equal(r.issuerRequireAuth,true);
@@ -114,7 +114,7 @@ test("RequireAuth enabled and unauthorised trustline fails issuer authorization 
  assert.equal(r.authorizationGranted,false);
 });
 
-const completeControls={status:"CORROBORATED",ledgerHash:L,
+const completeControls={status:"CORROBORATED",ledgerHash:L,ledgerIndex:100,
  requireDestinationTag:false,issuerGlobalFreeze:false,issuerRequireAuth:true,
  trustLineFrozen:false,trustLineAuthorized:false,issuerAuthorizationConditionMet:false};
 test("complete control evidence requires every freeze and authorization flag",async()=>{
@@ -173,7 +173,7 @@ test("missing case claim snapshot cannot crash read-only review",async()=>{
 test("known issuer global freeze remains visible with incomplete trustline evidence",async()=>{
  const result=await reviewCaseWithLedgerControls(input,{
   review:async()=>({transaction:tx}),
-  controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,
+  controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,ledgerIndex:100,
    requireDestinationTag:true,issuerGlobalFreeze:true})});
  assert.ok(result.reasonCodes.includes("ISSUER_GLOBAL_FREEZE_ACTIVE"));
  assert.ok(result.reasonCodes.includes("TRUST_LINE_EVIDENCE_UNAVAILABLE"));
@@ -195,7 +195,7 @@ test("synchronous account provider failure returns UNKNOWN",async()=>{
 });
 test("malformed trustline currency evidence retains partial controls",async()=>{
  const r=await lookupPinnedPaymentControls({...control,currency:"USD"},{
-  lookup,trustLineLookup:async q=>({status:"CORROBORATED",issuer:q.issuer,holder:q.holder,
+  lookup,trustLineLookup:async q=>({status:"CORROBORATED",ledgerIndex:100,issuer:q.issuer,holder:q.holder,
    currency:123,ledgerHash:q.ledgerHash,trustLineFrozen:false,trustLineAuthorized:true})});
  assert.equal(r.status,"PARTIAL_CORROBORATED");
  assert.deepEqual(r.reasonCodes,["TRUST_LINE_EVIDENCE_UNAVAILABLE"]);
@@ -221,4 +221,50 @@ test("delivered asset mismatch prevents contextual control lookup",async()=>{
  assert.equal(called,false);
  assert.equal(r.authorizationGranted,false);
  assert.deepEqual(r.reasonCodes,["PAYMENT_ASSET_MISMATCH"]);
+});
+
+test("surfaces deep freezes on each side as pinned observations and keeps the case on HOLD", async () => {
+ for (const issuerDeepFrozen of [true, false]) {
+  const r = await reviewCaseWithLedgerControls({...input, currency:"USD"}, {
+   review:async()=>({transaction:tx}),
+   controls: request => lookupPinnedPaymentControls(request, {
+    lookup,
+    trustLineLookup:async q=>({
+     ...q, status:"CORROBORATED", ledgerIndex:100, trustLineFrozen:issuerDeepFrozen, trustLineAuthorized:true,
+     issuerDeepFrozen, holderDeepFrozen:!issuerDeepFrozen,
+    }),
+   }),
+  });
+  assert.equal(r.controls.issuerDeepFrozen, issuerDeepFrozen);
+  assert.equal(r.controls.holderDeepFrozen, !issuerDeepFrozen);
+  assert.equal(r.reasonCodes.includes("ISSUER_TRUST_LINE_DEEP_FROZEN"), issuerDeepFrozen);
+  assert.equal(r.reasonCodes.includes("HOLDER_TRUST_LINE_DEEP_FROZEN"), !issuerDeepFrozen);
+  assert.equal(r.verdict, "HOLD");
+  assert.equal(r.authorizationGranted, false);
+ }
+});
+
+test("retains separate source evidence and fails closed when control ledger indices disagree", async () => {
+ const r = await lookupPinnedPaymentControls({...control, currency:"USD"}, {
+  lookup,
+  trustLineLookup:async q=>({
+   ...q, status:"CORROBORATED", ledgerIndex:101, trustLineFrozen:true, trustLineAuthorized:true,
+   evidenceSources:["source-a", "source-b"],
+  }),
+ });
+ assert.equal(r.status, "UNKNOWN");
+ assert.equal(r.trustLineFrozen, null);
+ assert.deepEqual(r.reasonCodes, ["CONTROL_LEDGER_INDEX_CONFLICT"]);
+ assert.equal(r.evidence.destination.ledgerIndex, 100);
+ assert.equal(r.evidence.issuer.ledgerIndex, 100);
+ assert.deepEqual(r.evidence.trustLine.evidenceSources, ["source-a", "source-b"]);
+});
+
+test("requires control and transaction ledger indices to agree", async () => {
+ const r = await reviewCaseWithLedgerControls(input, {
+  review:async()=>({transaction:tx}),
+  controls:async()=>({...completeControls, ledgerIndex:101}),
+ });
+ assert.deepEqual(r.reasonCodes, ["CONTROL_LEDGER_INDEX_CONFLICT"]);
+ assert.equal(r.verdict, "HOLD");
 });

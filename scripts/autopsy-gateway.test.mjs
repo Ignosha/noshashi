@@ -116,3 +116,108 @@ test("delivered issued asset identity requires matching provider metadata",async
  const failed=await corroborateAutopsy(HASH,{servers:twoServers,fetchFn:async()=>response(asset,"tecNO_DST")});
  assert.equal(failed.paymentAsset,null);
 });
+
+test("corroborates exact delivered quantities from metadata only", async () => {
+  const issuer = "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59";
+  const issued = value => ({issuer, currency:"USD", value});
+  const read = (left, right = left, code = "tesSUCCESS") =>
+    corroborateAutopsy(HASH, {servers:twoServers, fetchFn: async url =>
+      fakeResponse(raw(code, {
+        tx_json:{TransactionType:"Payment", Destination:"rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY",
+          DeliverMax:issued("999999")},
+        meta:{TransactionResult:code, delivered_amount:url===twoServers[0].url ? left : right},
+      }))});
+  assert.deepEqual((await read(issued("1.50e-2"), issued("0.0150"))).deliveredAmount,
+    {unit:"issued", value:"0.015"});
+  assert.deepEqual((await read("123456789012345678")).deliveredAmount,
+    {unit:"drops", value:"123456789012345678"});
+  assert.equal((await read(issued("1.1"), issued("1.2"))).status, "UNKNOWN");
+  assert.equal((await read("100", "unavailable")).status, "UNKNOWN");
+  assert.equal((await read("unavailable")).deliveredAmount, null);
+  assert.equal((await read(issued("1e999999"))).deliveredAmount, null);
+  assert.equal((await read("100", "100", "tecNO_DST")).deliveredAmount, null);
+});
+
+test("bounds incomplete and oversized bodies and releases lookup capacity", async () => {
+  const {request} = await import("node:http");
+  let lookups = 0;
+  const gateway = createAutopsyGateway({
+    apiKey: SECRET, bodyTimeoutMs: 50,
+    lookup: async hash => { lookups++; return {hash}; },
+  });
+  await new Promise(resolve => gateway.listen(0, "127.0.0.1", resolve));
+  const url = `http://127.0.0.1:${gateway.address().port}/v1/xrpl/transactions/autopsy`;
+  const headers = {authorization:`Bearer ${SECRET}`, "content-type":"application/json"};
+  try {
+    const stalled = () => new Promise((resolve, reject) => {
+      const req = request(url, {method:"POST", headers:{...headers, "content-length":100}}, res => {
+        res.resume();
+        res.once("end", () => resolve(res.statusCode));
+      });
+      req.on("error", reject);
+      req.write("{");
+    });
+    assert.deepEqual(await Promise.all(Array.from({length:4}, stalled)), [408, 408, 408, 408]);
+    assert.equal((await fetch(url, {method:"POST", headers, body:"x".repeat(513)})).status, 413);
+    const oversized = await new Promise((resolve, reject) => {
+      const req = request(url, {method:"POST", headers}, res => {
+        res.resume();
+        res.once("end", () => resolve(res.statusCode));
+      });
+      req.on("error", reject);
+      req.write("x".repeat(513));
+      req.end();
+    });
+    assert.equal(oversized, 413);
+    assert.equal(lookups, 0);
+    const valid = await fetch(url, {
+      method:"POST", headers, body:JSON.stringify({hash:HASH, network:"xrpl-mainnet"}),
+    });
+    assert.equal(valid.status, 200);
+    assert.equal(lookups, 1);
+  } finally {
+    await new Promise(resolve => gateway.close(resolve));
+  }
+});
+
+test("rejects work beyond four active lookups and recovers when they finish", async () => {
+  let started = 0;
+  let enter;
+  let release;
+  const allActive = new Promise(resolve => { enter = resolve; });
+  const gate = new Promise(resolve => { release = resolve; });
+  const gateway = createAutopsyGateway({
+    apiKey: SECRET,
+    lookup: async hash => {
+      if (++started === 4) enter();
+      await gate;
+      return {hash};
+    },
+  });
+  await new Promise(resolve => gateway.listen(0, "127.0.0.1", resolve));
+  const url = `http://127.0.0.1:${gateway.address().port}/v1/xrpl/transactions/autopsy`;
+  const post = () => fetch(url, {
+    method:"POST",
+    headers:{authorization:`Bearer ${SECRET}`, "content-type":"application/json"},
+    body:JSON.stringify({hash:HASH, network:"xrpl-mainnet"}),
+    signal:AbortSignal.timeout(2500),
+  });
+  const occupied = Promise.all(Array.from({length:4}, post));
+  try {
+    await Promise.race([
+      allActive,
+      occupied.then(() => { throw new Error("Expected four pending lookups"); }),
+    ]);
+    const busy = await post();
+    assert.equal(busy.status, 503);
+    assert.deepEqual(await busy.json(), {error:"BUSY"});
+    assert.equal(started, 4);
+    release();
+    assert.deepEqual((await occupied).map(response => response.status), [200, 200, 200, 200]);
+    assert.equal((await post()).status, 200);
+  } finally {
+    release();
+    await occupied.catch(() => {});
+    await new Promise(resolve => gateway.close(resolve));
+  }
+});

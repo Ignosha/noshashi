@@ -44,3 +44,9 @@ Trust-line lookup is implemented in `xrpl-trustline-lookup.mjs` and exercised by
 `xrpl-trustline-lookup.test.mjs`; the earlier remaining-steps list predates that
 increment. Live provider corroboration, authenticated approval snapshots, and
 production release gates still require verification.
+
+## Ledger identity and source evidence
+
+The control adapter requires a positive ledger index from both AccountRoot providers. It cross-checks the agreed index across destination AccountRoot, issuer AccountRoot, and the RippleState when present. The case reviewer also compares it with the corroborated transaction index. A shared requested hash with inconsistent observed indices cannot yield corroborated controls.
+
+The adapter retains the three normalized observations under `evidence.destination`, `evidence.issuer`, and `evidence.trustLine`, including provider diagnostics when available. Observations explain the source of each control. A separate optional control attestation binds these observations to the transaction receipt when the issuer, destination, asset, ledger hash and ledger index agree. See [attestation verification](evidence-receipt-research.md).

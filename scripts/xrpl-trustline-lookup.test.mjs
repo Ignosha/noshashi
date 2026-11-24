@@ -110,3 +110,14 @@ test("malformed RippleState currency fields fail closed through the lookup",asyn
   assert.equal(r.providerDiagnostics[0].reasonCodes[0],"TRUSTLINE_IDENTITY_MISMATCH");
  }
 });
+
+test("pins the exact three-character currency on the wire and in the response", async () => {
+ const fetchFn = async (_url, options) => {
+  assert.equal(JSON.parse(options.body).params[0].ripple_state.currency, "Usd");
+  return new Response(JSON.stringify(reply()));
+ };
+ const result = await lookupPinnedTrustLine({...request, currency:"Usd"}, {fetchFn});
+ assert.equal(result.status, "UNKNOWN");
+ assert.deepEqual(result.providerDiagnostics.map(source=>source.reasonCodes[0]),
+  ["TRUSTLINE_IDENTITY_MISMATCH", "TRUSTLINE_IDENTITY_MISMATCH"]);
+});

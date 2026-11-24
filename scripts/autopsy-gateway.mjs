@@ -7,6 +7,7 @@ import http from "node:http";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { normalizeIssuedCurrency } from "./xrpl-trustline-evidence.mjs";
 
 const HEX64 = /^[0-9A-F]{64}$/;
 export const UPSTREAMS = Object.freeze([
@@ -35,6 +36,19 @@ export function unknownReport(hash, reason, sources = []) {
   };
 }
 
+function positiveDecimal(value) {
+  if (typeof value !== "string" || value.length > 180) return null;
+  const parts = /^(\d+)(?:\.(\d+))?(?:e([+-]?\d{1,3}))?$/i.exec(value);
+  if (!parts) return null;
+  const [, integer, fraction = "", exponent = "0"] = parts;
+  const digits = (integer + fraction).replace(/^0+/, "");
+  if (!digits) return null;
+  const scale = fraction.length - Number(exponent);
+  if (scale <= 0) return digits + "0".repeat(-scale);
+  const padded = digits.padStart(scale + 1, "0");
+  return (padded.slice(0, -scale) + "." + padded.slice(-scale)).replace(/0+$/, "").replace(/\.$/, "");
+}
+
 export function parseValidatedTx(raw, expectedHash) {
   const data = raw && typeof raw === "object" ? (raw.result ?? raw) : null;
   if (!data || data.status === "error" || data.error) return null;
@@ -50,8 +64,22 @@ export function parseValidatedTx(raw, expectedHash) {
   const paymentDestination = tx.TransactionType === "Payment" && typeof tx.Destination === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(tx.Destination) ? tx.Destination : null;
   // Delivered asset, not requested Amount/DeliverMax (partial payments can differ).
   const delivered = data.meta?.delivered_amount;
-  const paymentAsset = paymentDestination && code === "tesSUCCESS" && delivered && typeof delivered === "object" && typeof delivered.issuer === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(delivered.issuer) && typeof delivered.currency === "string" && /^(?:[A-Z0-9]{3}|[A-F0-9]{40})$/i.test(delivered.currency) && delivered.currency.toUpperCase() !== "XRP" ? {issuer:delivered.issuer,currency:delivered.currency} : null;
+  const currency = normalizeIssuedCurrency(delivered?.currency);
+  const issuer = delivered?.issuer;
+  const paymentAsset = paymentDestination && code === "tesSUCCESS" && currency &&
+    typeof issuer === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(issuer)
+    ? {issuer, currency} : null;
+  let deliveredAmount = null;
+  if (paymentDestination && code === "tesSUCCESS") {
+    if (typeof delivered === "string" && /^[1-9]\d{0,17}$/.test(delivered)) {
+      deliveredAmount = { unit: "drops", value: delivered };
+    } else if (paymentAsset) {
+      const value = positiveDecimal(delivered.value);
+      if (value !== null) deliveredAmount = { unit: "issued", value };
+    }
+  }
   return {
+    deliveredAmount,
     paymentAsset,
     paymentDestination,
     ledgerIndex: data.ledger_index,
@@ -100,6 +128,7 @@ export async function corroborateAutopsy(hash, { servers = UPSTREAMS, fetchFn = 
       a.tx.ledgerHash !== b.tx.ledgerHash ||
       a.tx.resultCode !== b.tx.resultCode ||
       a.tx.paymentDestination !== b.tx.paymentDestination ||
+      JSON.stringify(a.tx.deliveredAmount) !== JSON.stringify(b.tx.deliveredAmount) ||
       JSON.stringify(a.tx.paymentAsset) !== JSON.stringify(b.tx.paymentAsset)) {
     return unknownReport(normalized, "UPSTREAM_EVIDENCE_DISAGREEMENT", [a.source, b.source]);
   }
@@ -110,6 +139,7 @@ export async function corroborateAutopsy(hash, { servers = UPSTREAMS, fetchFn = 
     resultCode: a.tx.resultCode,
     paymentDestination: a.tx.paymentDestination,
     paymentAsset: a.tx.paymentAsset,
+    deliveredAmount: a.tx.deliveredAmount,
     disposition: a.tx.resultCode === "tesSUCCESS" ? "SUCCESS" : "FAILED",
     reasonCodes: a.tx.resultCode === "tesSUCCESS" ? [] : [a.tx.resultCode],
     evidenceSources: [a.source, b.source],
@@ -124,15 +154,46 @@ function safeKeyEquals(candidate, secret) {
   return timingSafeEqual(a, b);
 }
 
-export function createAutopsyGateway({ apiKey, lookup = corroborateAutopsy, limit = 30 } = {}) {
+function readRequestBody(req, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let total = 0;
+    const cleanup = () => {
+      clearTimeout(timer);
+      req.off("data", onData).off("end", onEnd).off("error", onError);
+    };
+    const fail = (error) => {
+      cleanup();
+      req.pause();
+      req.once("error", () => {});
+      reject(error);
+    };
+    const onData = (chunk) => {
+      total += chunk.byteLength;
+      if (total > MAX_REQUEST_BYTES) fail(new Error("TOO_LARGE"));
+      else chunks.push(chunk);
+    };
+    const onEnd = () => {
+      cleanup();
+      resolve(Buffer.concat(chunks).toString("utf8"));
+    };
+    const onError = (error) => fail(error);
+    const timer = setTimeout(() => fail(new Error("BODY_TIMEOUT")), timeoutMs);
+    req.on("data", onData).once("end", onEnd).once("error", onError);
+  });
+}
+
+export function createAutopsyGateway({ apiKey, lookup = corroborateAutopsy, limit = 30, bodyTimeoutMs = 2000 } = {}) {
   if (typeof apiKey !== "string" || apiKey.length < 32) throw new Error("A 32+ character local API secret is required.");
   const rates = new Map();
   let active = 0;
-  return http.createServer(async (req, res) => {
+  return http.createServer({
+    headersTimeout: 5000, requestTimeout: 10000, connectionsCheckingInterval: 1000,
+  }, async (req, res) => {
     const json = (code, data, additionalHeaders = {}) => {
       res.writeHead(code, { "content-type": "application/json; charset=utf-8",
         "cache-control": "no-store", "x-content-type-options": "nosniff",
-        "referrer-policy": "no-referrer", ...additionalHeaders });
+        "referrer-policy": "no-referrer", ...(!req.complete ? { connection: "close" } : {}), ...additionalHeaders });
       res.end(JSON.stringify(data));
     };
     if (req.url === "/health" && req.method === "GET") {
@@ -160,25 +221,26 @@ export function createAutopsyGateway({ apiKey, lookup = corroborateAutopsy, limi
     if (!/^application\/json(?:\s*;|$)/i.test(String(req.headers["content-type"] ?? ""))) {
       json(415, { error: "UNSUPPORTED_MEDIA_TYPE" }); return;
     }
+    if (Number(req.headers["content-length"]) > MAX_REQUEST_BYTES) {
+      json(413, { error: "PAYLOAD_TOO_LARGE" }, { connection: "close" }); return;
+    }
     if (active >= MAX_IN_FLIGHT) { json(503, { error: "BUSY" }); return; }
     active++;
     try {
-      const chunks = [];
-      let total = 0;
-      for await (const chunk of req) {
-        total += chunk.byteLength;
-        if (total > MAX_REQUEST_BYTES) throw new Error("TOO_LARGE");
-        chunks.push(chunk);
-      }
+      const body = await readRequestBody(req, bodyTimeoutMs);
       let payload;
-      try { payload = JSON.parse(Buffer.concat(chunks).toString("utf8")); }
+      try { payload = JSON.parse(body); }
       catch { json(400, { error: "INVALID_JSON" }); return; }
       if (!validRequest(payload)) { json(400, { error: "INVALID_REQUEST" }); return; }
       const result = await lookup(payload.hash.toUpperCase());
       json(200, result);
     } catch (error) {
-      json(error?.message === "TOO_LARGE" ? 413 : 503,
-        { error: error?.message === "TOO_LARGE" ? "PAYLOAD_TOO_LARGE" : "LOOKUP_UNAVAILABLE" });
+      if (res.destroyed || req.socket.destroyed) return;
+      if (error?.message === "BODY_TIMEOUT")
+        json(408, { error: "BODY_TIMEOUT" }, { connection: "close" });
+      else if (error?.message === "TOO_LARGE")
+        json(413, { error: "PAYLOAD_TOO_LARGE" }, { connection: "close" });
+      else json(503, { error: "LOOKUP_UNAVAILABLE" });
     } finally { active--; }
   });
 }

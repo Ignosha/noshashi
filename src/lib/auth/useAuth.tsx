@@ -42,7 +42,6 @@ type AuthApi = AuthState & {
   signInWithOtp: (email: string) => Promise<void>;
   verifyOtp: (email: string, token: string) => Promise<void>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
   enrollTotp: () => Promise<{ factorId: string; qrCode: string; secret: string }>;
   confirmTotp: (factorId: string, code: string) => Promise<void>;
@@ -204,11 +203,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase().auth.signOut();
   }, []);
 
-  const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase().auth.resetPasswordForEmail(email);
-    if (error) throw new Error(supabaseErrorMessage(error));
-  }, []);
-
   const updatePassword = useCallback(async (password: string) => {
     const problems = passwordProblems(password);
     if (problems.length > 0) {
@@ -296,7 +290,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithOtp,
       verifyOtp,
       signOut,
-      resetPassword,
       updatePassword,
       enrollTotp,
       confirmTotp,
@@ -315,7 +308,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithOtp,
       verifyOtp,
       signOut,
-      resetPassword,
       updatePassword,
       enrollTotp,
       confirmTotp,

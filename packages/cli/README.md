@@ -40,8 +40,11 @@ Use XRP for native XRP; otherwise supply the exact currency and issuer.
 
 Retries must reuse **both identical input and the same request ID**. A changed
 payload receives 409. A processing run is not restarted. A saved replay is a
-historical result. After a definitively failed run, use a new ID to explicitly
-request another read. Output files are created with mode 0600 and never overwrite
+historical result. A submission or same-ID retry recovers that account’s processing
+reservations aged ten minutes or more. Retrieving an individual expired run
+also recovers that reservation. An expired run returns `failed` with
+`result.code: reservation_expired` and its reserved quota is refunded. After a
+definitively failed run, use a new ID to explicitly request another read. Output files are created with mode 0600 and never overwrite
 an existing file. JSON is printed to stdout unless `--output` is set.
 
 `NOSHASHI_REVIEW_API` can point to a development endpoint. HTTPS is required
