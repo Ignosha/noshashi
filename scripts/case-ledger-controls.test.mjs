@@ -212,3 +212,13 @@ test("corroborated destination mismatch blocks control lookup",async()=>{
  assert.equal(r.authorizationGranted,false);
  assert.deepEqual(r.reasonCodes,["PAYMENT_DESTINATION_MISMATCH"]);
 });
+
+test("delivered asset mismatch prevents contextual control lookup",async()=>{
+ let called=false;
+ const r=await reviewCaseWithLedgerControls({...input,currency:"EUR"},{
+  review:async()=>({transaction:{...tx,paymentDestination:destination,paymentAsset:{issuer,currency:"USD"}}}),
+  controls:async()=>{called=true;throw Error("unexpected");}});
+ assert.equal(called,false);
+ assert.equal(r.authorizationGranted,false);
+ assert.deepEqual(r.reasonCodes,["PAYMENT_ASSET_MISMATCH"]);
+});
