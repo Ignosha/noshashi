@@ -33,8 +33,9 @@ export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={})
  if(!low||!high||typeof low.issuer!=="string"||typeof high.issuer!=="string"||
     low.issuer===high.issuer||
     ![issuer,holder].includes(low.issuer)||![issuer,holder].includes(high.issuer)||
-    low.currency?.toUpperCase()!==currency.toUpperCase()||
-    high.currency?.toUpperCase()!==currency.toUpperCase())
+    typeof low.currency!=="string"||typeof high.currency!=="string"||
+    low.currency.toUpperCase()!==currency.toUpperCase()||
+    high.currency.toUpperCase()!==currency.toUpperCase())
   return {...base,reasonCodes:["TRUSTLINE_IDENTITY_MISMATCH"]};
  const issuerLow=low.issuer===issuer;
  const freezeFlag=issuerLow?LSF_LOW_FREEZE:LSF_HIGH_FREEZE;
