@@ -179,3 +179,24 @@ test("known issuer global freeze remains visible with incomplete trustline evide
  assert.equal(result.verdict,"HOLD");
  assert.equal(result.authorizationGranted,false);
 });
+
+test("absent payment control requests return UNKNOWN without network calls",async()=>{
+ for(const request of [undefined,null]){
+  const r=await lookupPinnedPaymentControls(request,{lookup:()=>{throw Error("unexpected");}});
+  assert.equal(r.status,"UNKNOWN");
+  assert.deepEqual(r.reasonCodes,["INVALID_CONTROL_REQUEST"]);
+ }
+});
+test("synchronous account provider failure returns UNKNOWN",async()=>{
+ const r=await lookupPinnedPaymentControls(control,{lookup:()=>{throw Error("offline");}});
+ assert.equal(r.status,"UNKNOWN");
+ assert.deepEqual(r.reasonCodes,["PINNED_CONTROL_EVIDENCE_UNAVAILABLE"]);
+});
+test("malformed trustline currency evidence retains partial controls",async()=>{
+ const r=await lookupPinnedPaymentControls({...control,currency:"USD"},{
+  lookup,trustLineLookup:async q=>({status:"CORROBORATED",issuer:q.issuer,holder:q.holder,
+   currency:123,ledgerHash:q.ledgerHash,trustLineFrozen:false,trustLineAuthorized:true})});
+ assert.equal(r.status,"PARTIAL_CORROBORATED");
+ assert.deepEqual(r.reasonCodes,["TRUST_LINE_EVIDENCE_UNAVAILABLE"]);
+ assert.equal(r.authorizationGranted,false);
+});
