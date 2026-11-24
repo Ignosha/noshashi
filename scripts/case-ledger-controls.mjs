@@ -50,7 +50,9 @@ export async function reviewCaseWithLedgerControls(input,{
     return {...base,caseReview,controls:controlEvidence,
       reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
   const claims=input?.current??{};
-  const codes=["APPROVAL_SNAPSHOT_UNAUTHENTICATED"];
+  // The transaction report does not establish the asset or destination identity.
+  // Explicit caller-supplied controls are contextual research, not transaction-bound proof.
+  const codes=["APPROVAL_SNAPSHOT_UNAUTHENTICATED","CONTROL_TRANSACTION_BINDING_UNVERIFIED"];
   if(controlEvidence.status!=="CORROBORATED")codes.push("TRUST_LINE_EVIDENCE_UNAVAILABLE");
   if(claims.destinationTagRequired!==controlEvidence.requireDestinationTag)
     codes.push("CLAIMED_DESTINATION_TAG_CONFLICT");
