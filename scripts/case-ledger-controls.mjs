@@ -31,6 +31,9 @@ export async function reviewCaseWithLedgerControls(input,{
   const verifiedDestination=caseReview.transaction.paymentDestination;
   if(typeof verifiedDestination==="string"&&verifiedDestination!==destination)
     return {...base,caseReview,reasonCodes:["PAYMENT_DESTINATION_MISMATCH"]};
+  const asset=caseReview.transaction.paymentAsset;
+  if(asset&&(asset.issuer!==issuer||asset.currency!==currency))
+    return {...base,caseReview,reasonCodes:["PAYMENT_ASSET_MISMATCH"]};
   let controlEvidence;
   try{controlEvidence=await controls({issuer,destination,
     ledgerHash:caseReview.transaction.ledgerHash,currency});}
@@ -53,9 +56,10 @@ export async function reviewCaseWithLedgerControls(input,{
     return {...base,caseReview,controls:controlEvidence,
       reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
   const claims=input?.current??{};
-  // Destination can be corroborated; asset identity is still unverified.
+  // Only matching corroborated destination and delivered asset establish contextual binding.
   // Explicit caller-supplied controls are contextual research, not transaction-bound proof.
-  const codes=["APPROVAL_SNAPSHOT_UNAUTHENTICATED","CONTROL_TRANSACTION_BINDING_UNVERIFIED"];
+  const codes=["APPROVAL_SNAPSHOT_UNAUTHENTICATED"];
+  if(!asset||verifiedDestination!==destination)codes.push("CONTROL_TRANSACTION_BINDING_UNVERIFIED");
   if(verifiedDestination!==destination)codes.push("PAYMENT_DESTINATION_UNVERIFIED");
   if(controlEvidence.status!=="CORROBORATED")codes.push("TRUST_LINE_EVIDENCE_UNAVAILABLE");
   if(claims.destinationTagRequired!==controlEvidence.requireDestinationTag)
