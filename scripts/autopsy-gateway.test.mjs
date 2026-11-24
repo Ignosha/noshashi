@@ -97,3 +97,22 @@ test("payment destination must agree across providers",async()=>{
  assert.equal(bad.status,"UNKNOWN");
  assert.deepEqual(bad.reasonCodes,["UPSTREAM_EVIDENCE_DISAGREEMENT"]);
 });
+
+test("delivered issued asset identity requires matching provider metadata",async()=>{
+ const destination="rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY";
+ const issuer="r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59";
+ const response=(delivered,code="tesSUCCESS")=>fakeResponse(raw(code,{
+  tx_json:{TransactionType:"Payment",Destination:destination,DeliverMax:{issuer,currency:"EUR",value:"100"}},
+  meta:{TransactionResult:code,delivered_amount:delivered}}));
+ const asset={issuer,currency:"USD",value:"10"};
+ const good=await corroborateAutopsy(HASH,{servers:twoServers,fetchFn:async()=>response(asset)});
+ assert.deepEqual(good.paymentAsset,{issuer,currency:"USD"});
+ const bad=await corroborateAutopsy(HASH,{servers:twoServers,fetchFn:async url=>response(url===twoServers[0].url?asset:{...asset,currency:"EUR"})});
+ assert.equal(bad.status,"UNKNOWN");
+ for(const delivered of ["unavailable","1000",undefined,{issuer,currency:123}]){
+  const r=await corroborateAutopsy(HASH,{servers:twoServers,fetchFn:async()=>response(delivered)});
+  assert.equal(r.paymentAsset,null);
+ }
+ const failed=await corroborateAutopsy(HASH,{servers:twoServers,fetchFn:async()=>response(asset,"tecNO_DST")});
+ assert.equal(failed.paymentAsset,null);
+});
