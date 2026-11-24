@@ -28,6 +28,9 @@ export async function reviewCaseWithLedgerControls(input,{
   // Issuer must be explicit; never infer the issuer from a Payment's sender.
   if(typeof issuer!=="string"||typeof destination!=="string")
     return {...base,caseReview,reasonCodes:["ISSUER_OR_DESTINATION_MISSING"]};
+  const verifiedDestination=caseReview.transaction.paymentDestination;
+  if(typeof verifiedDestination==="string"&&verifiedDestination!==destination)
+    return {...base,caseReview,reasonCodes:["PAYMENT_DESTINATION_MISMATCH"]};
   let controlEvidence;
   try{controlEvidence=await controls({issuer,destination,
     ledgerHash:caseReview.transaction.ledgerHash,currency});}
@@ -50,9 +53,10 @@ export async function reviewCaseWithLedgerControls(input,{
     return {...base,caseReview,controls:controlEvidence,
       reasonCodes:["CONTROL_EVIDENCE_UNAVAILABLE"]};
   const claims=input?.current??{};
-  // The transaction report does not establish the asset or destination identity.
+  // Destination can be corroborated; asset identity is still unverified.
   // Explicit caller-supplied controls are contextual research, not transaction-bound proof.
   const codes=["APPROVAL_SNAPSHOT_UNAUTHENTICATED","CONTROL_TRANSACTION_BINDING_UNVERIFIED"];
+  if(verifiedDestination!==destination)codes.push("PAYMENT_DESTINATION_UNVERIFIED");
   if(controlEvidence.status!=="CORROBORATED")codes.push("TRUST_LINE_EVIDENCE_UNAVAILABLE");
   if(claims.destinationTagRequired!==controlEvidence.requireDestinationTag)
     codes.push("CLAIMED_DESTINATION_TAG_CONFLICT");
