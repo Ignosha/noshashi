@@ -201,3 +201,14 @@ test("malformed trustline currency evidence retains partial controls",async()=>{
  assert.deepEqual(r.reasonCodes,["TRUST_LINE_EVIDENCE_UNAVAILABLE"]);
  assert.equal(r.authorizationGranted,false);
 });
+
+test("corroborated destination mismatch blocks control lookup",async()=>{
+ let called=false;
+ const r=await reviewCaseWithLedgerControls(input,{
+  review:async()=>({transaction:{...tx,paymentDestination:issuer}}),
+  controls:async()=>{called=true;throw Error("unexpected");}});
+ assert.equal(called,false);
+ assert.equal(r.verdict,"HOLD");
+ assert.equal(r.authorizationGranted,false);
+ assert.deepEqual(r.reasonCodes,["PAYMENT_DESTINATION_MISMATCH"]);
+});
