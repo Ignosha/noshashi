@@ -6,8 +6,9 @@
  */
 import { lookupPinnedAccountRoot } from "./xrpl-account-root-lookup.mjs";
 import { lookupPinnedTrustLine } from "./xrpl-trustline-lookup.mjs";
-export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash,currency},
+export async function lookupPinnedPaymentControls(request,
   {lookup=lookupPinnedAccountRoot,trustLineLookup=lookupPinnedTrustLine}={}){
+  const {destination,issuer,ledgerHash,currency}=request??{};
   const base={schema:"noshashi.xrpl.payment-controls.research.v0",
     status:"UNKNOWN",ledgerHash,requireDestinationTag:null,
     issuerGlobalFreeze:null,issuerRequireAuth:null,trustLineFrozen:null,trustLineAuthorized:null,
@@ -19,8 +20,8 @@ export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash
      typeof ledgerHash!=="string"||!/^[A-F0-9]{64}$/i.test(ledgerHash))
     return {...base,reasonCodes:["INVALID_CONTROL_REQUEST"]};
   const [d,i]=await Promise.allSettled([
-    lookup({account:destination,ledgerHash}),
-    lookup({account:issuer,ledgerHash}),
+    Promise.resolve().then(()=>lookup({account:destination,ledgerHash})),
+    Promise.resolve().then(()=>lookup({account:issuer,ledgerHash})),
   ]);
   if(d.status!=="fulfilled"||i.status!=="fulfilled"||
      d.value?.status!=="CORROBORATED"||i.value?.status!=="CORROBORATED"||
@@ -42,7 +43,8 @@ export async function lookupPinnedPaymentControls({destination,issuer,ledgerHash
   catch{return {...observed,reasonCodes:["TRUST_LINE_EVIDENCE_UNAVAILABLE"]};}
   if(trustLine?.status!=="CORROBORATED"||
      trustLine.issuer!==issuer||trustLine.holder!==destination||
-     trustLine.currency?.toUpperCase()!==currency.toUpperCase()||
+     typeof trustLine.currency!=="string"||
+     trustLine.currency.toUpperCase()!==currency.toUpperCase()||
      trustLine.ledgerHash!==ledgerHash.toUpperCase()||
      typeof trustLine.trustLineFrozen!=="boolean"||
      typeof trustLine.trustLineAuthorized!=="boolean")
