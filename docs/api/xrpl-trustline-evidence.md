@@ -28,3 +28,7 @@ The pinned AccountRoot parser also observes `lsfRequireAuth` (0x00040000). The p
 The read-only script `node scripts/xrpl-trustline-live-diagnostic.mjs` requires all four explicit environment variables: `NOSHASHI_TRUSTLINE_ISSUER`, `NOSHASHI_TRUSTLINE_HOLDER`, `NOSHASHI_TRUSTLINE_CURRENCY`, and `NOSHASHI_TRUSTLINE_LEDGER_HASH`. Use a **known existing** public trust line and a validated ledger hash that both fixed RPC providers retain. Without all four, it prints `SKIPPED` and makes no request. No private keys, credentials, transaction signing, or provider URL overrides are supported.
 
 The script prints per-provider reason codes and an overall `UNKNOWN` when evidence is missing or conflicting. This diagnostic is intentionally not counted as a live pass by CI until a verified public fixture and observed provider interoperability are established. CI only checks the script syntax. Never interpret an `OBSERVED` or `CORROBORATED` RPC response as a cryptographic proof of ledger consensus.
+
+### Mandatory diagnostic mode
+
+Set `NOSHASHI_REQUIRE_LIVE_TRUSTLINE=1` alongside the four fixture variables to make missing fixture configuration, UNKNOWN evidence, or diagnostic exceptions exit nonzero. This is an opt-in local verification gate, not a configured mandatory CI job. Record the exact fixture source, validated ledger hash, provider diagnostics and exit status. Do not treat a successful exit as proof of consensus or production readiness. The live fixture remains unverified.
