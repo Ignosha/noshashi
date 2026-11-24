@@ -168,3 +168,14 @@ test("missing case claim snapshot cannot crash read-only review",async()=>{
  assert.deepEqual(r.reasonCodes,["ISSUER_OR_DESTINATION_MISSING"]);
  assert.equal(r.authorizationGranted,false);
 });
+
+test("known issuer global freeze remains visible with incomplete trustline evidence",async()=>{
+ const result=await reviewCaseWithLedgerControls(input,{
+  review:async()=>({transaction:tx}),
+  controls:async()=>({status:"PARTIAL_CORROBORATED",ledgerHash:L,
+   requireDestinationTag:true,issuerGlobalFreeze:true})});
+ assert.ok(result.reasonCodes.includes("ISSUER_GLOBAL_FREEZE_ACTIVE"));
+ assert.ok(result.reasonCodes.includes("TRUST_LINE_EVIDENCE_UNAVAILABLE"));
+ assert.equal(result.verdict,"HOLD");
+ assert.equal(result.authorizationGranted,false);
+});
