@@ -38,16 +38,24 @@ export function canonicalJson(value: IntentValue): string {
   }
   return "{" + keys.map(k => JSON.stringify(k) + ":" + canonicalJson(record[k])).join(",") + "}";
 }
-export function validateContinuityIntent(intent: ContinuityIntent): void {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function isAccount(value: unknown): value is string {
+  return typeof value === "string" && xrplAccount.test(value);
+}
+export function validateContinuityIntent(intent: unknown): asserts intent is ContinuityIntent {
+  if (!isRecord(intent)) throw new Error("INVALID_INTENT");
   if (intent.schema !== "noshashi.continuity.intent.v1" || intent.network !== "xrpl-mainnet") throw new Error("UNSUPPORTED_INTENT");
   if (![intent.tenantId, intent.requestId, intent.transactionType].every(v => typeof v === "string" && v.length > 0 && v.length <= 128)) throw new Error("INVALID_IDENTITY");
-  if (!xrplAccount.test(intent.sourceAccount) || (intent.destinationAccount !== null && !xrplAccount.test(intent.destinationAccount))) throw new Error("INVALID_ACCOUNT");
-  if (!intent.asset || !/^[A-Za-z0-9]{3,40}$/.test(intent.asset.currency) || (intent.asset.issuer !== null && !xrplAccount.test(intent.asset.issuer))) throw new Error("INVALID_ASSET");
+  if (!isAccount(intent.sourceAccount) || (intent.destinationAccount !== null && !isAccount(intent.destinationAccount))) throw new Error("INVALID_ACCOUNT");
+  if (!isRecord(intent.asset) || typeof intent.asset.currency !== "string" || !/^[A-Za-z0-9]{3,40}$/.test(intent.asset.currency) || (intent.asset.issuer !== null && !isAccount(intent.asset.issuer))) throw new Error("INVALID_ASSET");
   if (intent.asset.currency === "XRP" ? intent.asset.issuer !== null : intent.asset.issuer === null) throw new Error("INVALID_ISSUER");
-  if (!decimal.test(intent.amount) || intent.amount === "0") throw new Error("INVALID_AMOUNT");
-  if (intent.destinationTag !== null && (!Number.isSafeInteger(intent.destinationTag) || intent.destinationTag < 0 || intent.destinationTag > 4294967295)) throw new Error("INVALID_TAG");
-  if (!Number.isSafeInteger(intent.lastLedgerSequence) || intent.lastLedgerSequence <= 0) throw new Error("INVALID_LEDGER");
-  if (!hex64.test(intent.signingPayloadSha256)) throw new Error("INVALID_SIGNING_PAYLOAD_HASH");
+  if (typeof intent.amount !== "string" || !decimal.test(intent.amount) || intent.amount === "0") throw new Error("INVALID_AMOUNT");
+  const tag = intent.destinationTag;
+  if (tag !== null && (typeof tag !== "number" || !Number.isSafeInteger(tag) || tag < 0 || tag > 4294967295)) throw new Error("INVALID_TAG");
+  if (typeof intent.lastLedgerSequence !== "number" || !Number.isSafeInteger(intent.lastLedgerSequence) || intent.lastLedgerSequence <= 0) throw new Error("INVALID_LEDGER");
+  if (typeof intent.signingPayloadSha256 !== "string" || !hex64.test(intent.signingPayloadSha256)) throw new Error("INVALID_SIGNING_PAYLOAD_HASH");
   const keys = Object.keys(intent).sort();
   const expected = ["amount","asset","destinationAccount","destinationTag","lastLedgerSequence","network","requestId","schema","signingPayloadSha256","sourceAccount","tenantId","transactionType"].sort();
   if (keys.length !== expected.length || keys.some((k,i) => k !== expected[i])) throw new Error("UNKNOWN_INTENT_FIELD");

@@ -1,9 +1,32 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ContinuityWorkspace } from "../src/components/continuity/ContinuityWorkspace";
 import { collectSettlementEvidence } from "../src/lib/continuity/xrpl-evidence";
 import { evaluateSettlement, type SettlementResult } from "../src/lib/continuity/settlement";
 import { previewContinuityTransaction, type PreflightPreview } from "../src/lib/continuity/preview";
-import { validateContinuityIntent, type ContinuityIntent } from "../src/lib/continuity/intent";
+import { validateContinuityIntent } from "../src/lib/continuity/intent";
+import { xrplLink } from "../src/lib/xrpl/link";
+
+const MAX_INTENT_LENGTH = 32_768;
+const inputErrors: Record<string, string> = {
+  INVALID_INTENT: "Paste a JSON object containing a Continuity intent.",
+  UNSUPPORTED_INTENT: "Use the Continuity v1 intent schema and the XRPL Mainnet network.",
+  INVALID_IDENTITY: "The intent needs a tenant ID, request ID, and transaction type.",
+  INVALID_ACCOUNT: "Use classic XRPL addresses for the source and destination.",
+  INVALID_ASSET: "The asset needs a currency and a valid issuer field.",
+  INVALID_ISSUER: "Issued assets need an issuer. XRP uses a null issuer.",
+  INVALID_AMOUNT: "Enter the amount as a positive decimal string using canonical notation.",
+  INVALID_TAG: "Enter a destination tag from 0 to 4,294,967,295 or use null.",
+  INVALID_LEDGER: "Enter a positive integer for the last ledger sequence.",
+  INVALID_SIGNING_PAYLOAD_HASH: "Enter a 64-character hexadecimal signing-payload digest.",
+  UNKNOWN_INTENT_FIELD: "The intent has missing or unrecognized fields.",
+  UNKNOWN_ASSET_FIELD: "Use only the currency and issuer fields in the asset.",
+};
+
+type Review = {
+  preview: PreflightPreview;
+  settlement: SettlementResult;
+  ledgerIndex: number | null;
+};
 
 /**
  * Dedicated, read-only development entry. A transaction intent must be supplied
@@ -11,46 +34,96 @@ import { validateContinuityIntent, type ContinuityIntent } from "../src/lib/cont
  */
 export function ContinuityApp() {
   const [raw, setRaw] = useState("");
-  const [preview, setPreview] = useState<PreflightPreview | null>(null);
-  const [settlement, setSettlement] = useState<SettlementResult | null>(null);
+  const [review, setReview] = useState<Review | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inFlight = useRef(false);
+  const inputRevision = useRef(0);
+
   async function run() {
-    if (busy) return;
-    setBusy(true); setError(null); setPreview(null); setSettlement(null);
+    if (inFlight.current || !raw.trim()) return;
+    const tryAlternateProvider = review?.ledgerIndex === null;
+    setError(null);
+    setReview(null);
+    if (raw.length > MAX_INTENT_LENGTH) {
+      setError("The intent exceeds 32,768 characters. Paste a single transaction intent.");
+      return;
+    }
+    let intent: unknown;
     try {
-      const intent = JSON.parse(raw) as ContinuityIntent;
+      intent = JSON.parse(raw);
       validateContinuityIntent(intent);
-      const evidence = await collectSettlementEvidence(intent);
-      const settlementResult = evaluateSettlement(intent, evidence);
-      // Policy/issuer/liquidity source attestations are not wired yet.
-      // Preview therefore remains HOLD; settlement may independently NO-GO.
-      const preflight = await previewContinuityTransaction(intent, null);
-      setSettlement(settlementResult);
-      setPreview({
-        ...preflight,
-        verdict: settlementResult.verdict === "NO-GO" ? "NO-GO" : "HOLD",
-        reasons: [...preflight.reasons, ...settlementResult.reasons],
-      });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unable to review transaction.");
-    } finally { setBusy(false); }
+      const code = caught instanceof Error ? caught.message : "";
+      setError(inputErrors[code] ?? "Enter valid JSON for a single transaction intent.");
+      return;
+    }
+
+    const revision = inputRevision.current;
+    inFlight.current = true;
+    setBusy(true);
+    try {
+      const evidenceRequest = !navigator.onLine ? Promise.resolve(null)
+        : tryAlternateProvider ? xrplLink.reconnect().then(connected => connected ? collectSettlementEvidence(intent) : null)
+        : collectSettlementEvidence(intent);
+      const [preflight, evidence] = await Promise.all([
+        previewContinuityTransaction(intent, null),
+        evidenceRequest,
+      ]);
+      if (revision !== inputRevision.current) return;
+      const settlement = evaluateSettlement(intent, evidence);
+      setReview({
+        preview: {
+          ...preflight,
+          verdict: settlement.verdict === "NO-GO" ? "NO-GO" : "HOLD",
+          reasons: [
+            ...(!preflight.intentHash ? ["INTENT_FINGERPRINT_UNAVAILABLE"] : []),
+            ...(evidence ? ["INSTITUTIONAL_POLICY_AND_ATTESTATIONS_UNAVAILABLE"] : preflight.reasons),
+            ...settlement.reasons,
+          ],
+        },
+        settlement,
+        ledgerIndex: evidence?.ledgerIndex ?? null,
+      });
+    } catch {
+      if (revision === inputRevision.current) setError("Unable to complete the review. Check your connection and retry.");
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
+    }
   }
+
+  function changeIntent(value: string) {
+    inputRevision.current += 1;
+    setRaw(value);
+    setReview(null);
+    setError(null);
+  }
+
   return (
     <div className="flex h-dvh min-h-[420px] flex-col overflow-hidden bg-background text-foreground">
       <header className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3">
         <label htmlFor="continuity-intent" className="stencil text-xs">Transaction intent (JSON)</label>
-        <textarea id="continuity-intent" rows={2} value={raw} onChange={event => setRaw(event.target.value)}
+        <textarea id="continuity-intent" rows={2} value={raw} onChange={event => changeIntent(event.target.value)}
+          aria-invalid={error ? true : undefined} aria-describedby="continuity-review-status"
+          autoComplete="off" spellCheck={false}
           className="min-w-0 w-full flex-1 basis-[280px] resize-y border border-border bg-background p-2 font-mono text-xs"
           placeholder="Paste a canonical NOSHASHI Continuity intent. No private keys." />
         <button type="button" disabled={busy || !raw.trim()} onClick={() => { void run(); }}
           className="desk-button border border-border px-4 py-2 text-xs disabled:opacity-50">
-          {busy ? "Reading XRPL…" : "Run read-only review"}
+          {busy ? "Reading XRPL…" : review?.ledgerIndex === null ? "Retry XRPL review" : "Run read-only review"}
         </button>
+        <p id="continuity-review-status" role="status" className="w-full text-xs text-muted-foreground">
+          {busy ? "Reading XRPL. Editing the input clears this review." : review
+            ? review.ledgerIndex === null
+              ? "Validated ledger evidence is unavailable. Retry when the XRPL connection is available."
+              : `XRPL Mainnet · validated ledger ${review.ledgerIndex.toLocaleString()}`
+            : "Paste one intent to review its payment conditions."}
+        </p>
         {error && <p role="alert" className="w-full text-xs text-no-go">{error}</p>}
       </header>
-      <div className="min-h-0 flex-1 overflow-auto" aria-label="Continuity review results">
-        <ContinuityWorkspace preview={preview} settlement={settlement} />
+      <div className="min-h-0 flex-1 overflow-auto" aria-label="Continuity review results" aria-busy={busy}>
+        <ContinuityWorkspace preview={review?.preview} settlement={review?.settlement} />
       </div>
     </div>
   );

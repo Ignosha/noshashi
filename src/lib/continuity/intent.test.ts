@@ -31,4 +31,12 @@ describe("Continuity intent commitment", () => {
     expect(() => validateContinuityIntent({ ...intent, extra: "x" } as never)).toThrow();
     expect(() => validateContinuityIntent({ ...intent, asset: { currency: "USD", issuer: null } })).toThrow();
   });
+  it("rejects malformed imports before any string coercion", () => {
+    expect(() => validateContinuityIntent(null)).toThrow("INVALID_INTENT");
+    expect(() => validateContinuityIntent([intent])).toThrow("INVALID_INTENT");
+    expect(() => validateContinuityIntent({ ...intent, amount: 100 })).toThrow("INVALID_AMOUNT");
+    expect(() => validateContinuityIntent({ ...intent, sourceAccount: [account] })).toThrow("INVALID_ACCOUNT");
+    expect(() => validateContinuityIntent({ ...intent, asset: { currency: ["XRP"], issuer: null } })).toThrow("INVALID_ASSET");
+    expect(() => validateContinuityIntent({ ...intent, signingPayloadSha256: [intent.signingPayloadSha256] })).toThrow("INVALID_SIGNING_PAYLOAD_HASH");
+  });
 });
