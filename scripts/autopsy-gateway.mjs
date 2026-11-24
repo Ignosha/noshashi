@@ -48,7 +48,11 @@ export function parseValidatedTx(raw, expectedHash) {
   if (typeof code !== "string" || !/^(tesSUCCESS|tec[A-Za-z0-9_]+)$/.test(code)) return null;
   const tx = data.tx_json ?? data;
   const paymentDestination = tx.TransactionType === "Payment" && typeof tx.Destination === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(tx.Destination) ? tx.Destination : null;
+  // Delivered asset, not requested Amount/DeliverMax (partial payments can differ).
+  const delivered = data.meta?.delivered_amount;
+  const paymentAsset = paymentDestination && code === "tesSUCCESS" && delivered && typeof delivered === "object" && typeof delivered.issuer === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(delivered.issuer) && typeof delivered.currency === "string" && /^(?:[A-Z0-9]{3}|[A-F0-9]{40})$/i.test(delivered.currency) && delivered.currency.toUpperCase() !== "XRP" ? {issuer:delivered.issuer,currency:delivered.currency} : null;
   return {
+    paymentAsset,
     paymentDestination,
     ledgerIndex: data.ledger_index,
     ledgerHash: data.ledger_hash.toUpperCase(),
@@ -95,7 +99,8 @@ export async function corroborateAutopsy(hash, { servers = UPSTREAMS, fetchFn = 
   if (a.tx.ledgerIndex !== b.tx.ledgerIndex ||
       a.tx.ledgerHash !== b.tx.ledgerHash ||
       a.tx.resultCode !== b.tx.resultCode ||
-      a.tx.paymentDestination !== b.tx.paymentDestination) {
+      a.tx.paymentDestination !== b.tx.paymentDestination ||
+      JSON.stringify(a.tx.paymentAsset) !== JSON.stringify(b.tx.paymentAsset)) {
     return unknownReport(normalized, "UPSTREAM_EVIDENCE_DISAGREEMENT", [a.source, b.source]);
   }
   return {
@@ -104,6 +109,7 @@ export async function corroborateAutopsy(hash, { servers = UPSTREAMS, fetchFn = 
     ledgerIndex: a.tx.ledgerIndex, ledgerHash: a.tx.ledgerHash,
     resultCode: a.tx.resultCode,
     paymentDestination: a.tx.paymentDestination,
+    paymentAsset: a.tx.paymentAsset,
     disposition: a.tx.resultCode === "tesSUCCESS" ? "SUCCESS" : "FAILED",
     reasonCodes: a.tx.resultCode === "tesSUCCESS" ? [] : [a.tx.resultCode],
     evidenceSources: [a.source, b.source],
