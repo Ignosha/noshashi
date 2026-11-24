@@ -3,7 +3,7 @@
  * Fixed upstreams, bounded response, no wallet access, no public endpoint.
  */
 import {UPSTREAMS} from "./autopsy-gateway.mjs";
-import {corroboratePinnedTrustLine,normalizeIssuedCurrency,parsePinnedTrustLine} from "./xrpl-trustline-evidence.mjs";
+import {corroboratePinnedTrustLine,normalizeIssuedCurrency,parsePinnedTrustLine,TRUSTLINE_CORROBORATED_SCHEMA} from "./xrpl-trustline-evidence.mjs";
 const ADDRESS=/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const HEX64=/^[A-F0-9]{64}$/i;
 const MAX_BYTES=1024*1024;
@@ -40,7 +40,7 @@ export async function fetchPinnedTrustLine(server,request,fetchFn=fetch){
  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
 export async function lookupPinnedTrustLine(request,{servers=UPSTREAMS,fetchFn=fetch}={}){
- const base={schema:"noshashi.xrpl.trustline.corroborated.v0",
+ const base={schema:TRUSTLINE_CORROBORATED_SCHEMA,
   status:"UNKNOWN",issuer:request?.issuer??null,holder:request?.holder??null,
   currency:request?.currency??null,
   ledgerHash:typeof request?.ledgerHash==="string"?request.ledgerHash.toUpperCase():null,

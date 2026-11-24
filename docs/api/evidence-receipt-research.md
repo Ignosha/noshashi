@@ -26,3 +26,5 @@ with `INCONSISTENT_CONTROL_EVIDENCE` during signing, and verification returns
 false. This validates internal consistency; provider corroboration and signer
 trust remain separate requirements. Regression coverage exercises missing,
 null, string and opposite values for each of the six summary fields.
+
+Control attestation creation and verification require a current `noshashi.xrpl.trustline.corroborated.v1` observation. The older interpretation could mistake an owner reserve flag for issuer authorization. Legacy control attachments retain only the interpreted flags, so regenerate them from the pinned RippleState evidence before signing. Transaction-only receipts and attestations remain verifiable under their original rules.

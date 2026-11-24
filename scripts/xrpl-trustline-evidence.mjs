@@ -4,8 +4,10 @@
  */
 const HEX64=/^[A-F0-9]{64}$/i;
 const ADDRESS=/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
-const LSF_LOW_AUTH=0x00010000;
-const LSF_HIGH_AUTH=0x00020000;
+export const TRUSTLINE_CORROBORATED_SCHEMA="noshashi.xrpl.trustline.corroborated.v1";
+// RippleState allocates 0x00010000/0x00020000 to owner reserve.
+const LSF_LOW_AUTH=0x00040000;
+const LSF_HIGH_AUTH=0x00080000;
 const LSF_LOW_FREEZE=0x00400000;
 const LSF_HIGH_FREEZE=0x00800000;
 const LSF_LOW_DEEP_FREEZE=0x02000000;
@@ -19,7 +21,7 @@ export function normalizeIssuedCurrency(currency) {
 }
 export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={}){
  const currencyIdentity=normalizeIssuedCurrency(currency);
- const base={schema:"noshashi.xrpl.trustline.observation.v0",status:"UNKNOWN",
+ const base={schema:"noshashi.xrpl.trustline.observation.v1",status:"UNKNOWN",
   issuer:issuer??null,holder:holder??null,currency:currency??null,
   ledgerHash:typeof ledgerHash==="string"?ledgerHash.toUpperCase():null,
   trustLineFrozen:null,trustLineAuthorized:null,
@@ -59,7 +61,7 @@ export function parsePinnedTrustLine(raw,{issuer,holder,currency,ledgerHash}={})
 }
 export function corroboratePinnedTrustLine(a,b,request){
  const left=parsePinnedTrustLine(a,request),right=parsePinnedTrustLine(b,request);
- const base={schema:"noshashi.xrpl.trustline.corroborated.v0",status:"UNKNOWN",
+ const base={schema:TRUSTLINE_CORROBORATED_SCHEMA,status:"UNKNOWN",
    issuer:request?.issuer??null,holder:request?.holder??null,
    currency:request?.currency??null,
    ledgerHash:typeof request?.ledgerHash==="string"?request.ledgerHash.toUpperCase():null,

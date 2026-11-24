@@ -4,6 +4,7 @@
  * authenticate the author or prove the underlying ledger observation.
  */
 import { createHash, createPublicKey, KeyObject, sign, timingSafeEqual, verify } from "node:crypto";
+import { TRUSTLINE_CORROBORATED_SCHEMA } from "./xrpl-trustline-evidence.mjs";
 const HEX64 = /^[0-9A-F]{64}$/;
 const MAX = 16_384;
 function stable(value) {
@@ -117,6 +118,7 @@ function controlEvidenceDigest(receipt, controls) {
       controls.ledgerHash !== tx.ledgerHash || controls.ledgerIndex !== tx.ledgerIndex ||
       tx.disposition !== "SUCCESS" || !tx.paymentDestination || !asset || !pinned ||
       source.destination.account !== tx.paymentDestination || source.issuer.account !== asset.issuer ||
+      source.trustLine.schema !== TRUSTLINE_CORROBORATED_SCHEMA ||
       source.trustLine.holder !== tx.paymentDestination || source.trustLine.issuer !== asset.issuer ||
       source.trustLine.currency !== asset.currency) throw new Error("UNBOUND_CONTROL_EVIDENCE");
   const flagPairs = [

@@ -11,19 +11,35 @@ const observation=(flags,issuerIsLow=true,hash=request.ledgerHash)=>({
  HighLimit:{issuer:issuerIsLow?holder:issuer,currency:"USD",value:"100"},
  }}});
 test("interprets issuer-side freeze and authorization on low side",()=>{
- const r=parsePinnedTrustLine(observation(0x00410000),request);
+ const r=parsePinnedTrustLine(observation(0x00440000),request);
  assert.equal(r.status,"OBSERVED");
  assert.equal(r.trustLineFrozen,true);
  assert.equal(r.trustLineAuthorized,true);
 });
 test("interprets issuer-side flags on high side without mixing holder flags",()=>{
- const r=parsePinnedTrustLine(observation(0x00820000,false),request);
+ const r=parsePinnedTrustLine(observation(0x00880000,false),request);
  assert.equal(r.status,"OBSERVED");
  assert.equal(r.trustLineFrozen,true);
  assert.equal(r.trustLineAuthorized,true);
- const holderOnly=parsePinnedTrustLine(observation(0x00410000,false),request);
+ const holderOnly=parsePinnedTrustLine(observation(0x00440000,false),request);
  assert.equal(holderOnly.trustLineFrozen,false);
  assert.equal(holderOnly.trustLineAuthorized,false);
+});
+test("owner reserve on either side does not authorize a holder",()=>{
+ for(const issuerIsLow of [true,false]){
+  for(const flags of [0x00010000,0x00020000,0x00030000]){
+   const result=parsePinnedTrustLine(observation(flags,issuerIsLow),request);
+   assert.equal(result.status,"OBSERVED");
+   assert.equal(result.trustLineAuthorized,false);
+  }
+ }
+});
+test("authorization disagreement with matching owner reserve fails closed",()=>{
+ const lowReserve=observation(0x00010000);
+ const lowReserveAndAuth=observation(0x00050000);
+ const result=corroboratePinnedTrustLine(lowReserve,lowReserveAndAuth,request);
+ assert.deepEqual(result.reasonCodes,["TRUSTLINE_PROVIDER_DISAGREEMENT"]);
+ assert.equal(result.trustLineAuthorized,null);
 });
 test("invalid ledger, currency or account identity fail closed",()=>{
  assert.equal(parsePinnedTrustLine(observation(0,true,"C".repeat(64)),request).status,"UNKNOWN");

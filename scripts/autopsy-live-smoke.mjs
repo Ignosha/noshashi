@@ -79,7 +79,7 @@ console.log(JSON.stringify({
   ephemeralSignerVerified:true, controlAttestationVerified:true, syntheticApprovalSnapshots:true, reasonCodes:reviewed.reasonCodes,
 }, null, 2));
 
-// Historical public RippleState with issuer-side freeze, deep freeze and authorization.
+// Historical public RippleState with issuer-side freeze, deep freeze, and owner reserve.
 const flagged = await lookupPinnedPaymentControls({
   issuer:"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
   destination:"rnXyVQzgxZe7TR1EPzTkGj2jxH4LMJYh66",
@@ -95,7 +95,7 @@ for (const sourceEvidence of Object.values(flagged.evidence)) {
 assert.equal(flagged.trustLineFrozen, true);
 assert.equal(flagged.issuerDeepFrozen, true);
 assert.equal(flagged.holderDeepFrozen, false);
-assert.equal(flagged.trustLineAuthorized, true);
+assert.equal(flagged.trustLineAuthorized, false);
 assert.equal(flagged.issuerGlobalFreeze, false);
 assert.equal(flagged.issuerRequireAuth, false);
 assert.equal(flagged.authorizationGranted, false);

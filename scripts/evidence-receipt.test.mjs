@@ -1,4 +1,4 @@
-import {createHash, generateKeyPairSync} from "node:crypto";
+import {createHash, generateKeyPairSync, sign} from "node:crypto";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { attestControlEvidence, attestEvidenceReceipt, verifyControlEvidenceAttestation, verifyEvidenceAttestation, createEvidenceReceipt, verifyEvidenceReceipt, canonicalEvidence } from "./evidence-receipt.mjs";
@@ -59,7 +59,7 @@ test("control attestation binds the pinned controls to one transaction receipt a
   trustLineFrozen:true, trustLineAuthorized:false, issuerAuthorizationConditionMet:false, evidence:{
    destination:{...pinned, account:holder, requireDestinationTag:false},
    issuer:{...pinned, account:issuer, globalFreeze:false, requireAuth:true},
-   trustLine:{...pinned, holder, issuer, currency:"USD", trustLineFrozen:true, trustLineAuthorized:false},
+   trustLine:{...pinned, schema:"noshashi.xrpl.trustline.corroborated.v1", holder, issuer, currency:"USD", trustLineFrozen:true, trustLineAuthorized:false},
   },
  };
  const {publicKey, privateKey} = generateKeyPairSync("ed25519");
@@ -73,6 +73,24 @@ test("control attestation binds the pinned controls to one transaction receipt a
  }
 
  assert.equal(verifyControlEvidenceAttestation(receipt, controls, attestation, publicKey), true);
+ const legacyControls = {
+  ...controls,
+  trustLineAuthorized:true,
+  issuerAuthorizationConditionMet:true,
+  evidence:{...controls.evidence,trustLine:{
+   ...controls.evidence.trustLine,schema:"noshashi.xrpl.trustline.corroborated.v0",trustLineAuthorized:true,
+  }},
+ };
+ const legacyDigest = createHash("sha256").update(canonicalEvidence({
+  transactionDigest:receipt.evidenceDigest, controls:legacyControls,
+ })).digest("hex");
+ const legacyPayload = canonicalEvidence({
+  schema:attestation.schema, algorithm:attestation.algorithm, keyId:attestation.keyId, evidenceDigest:legacyDigest,
+ });
+ const legacySignature = sign(null, Buffer.from(legacyPayload), privateKey).toString("base64url");
+ const legacyAttestation = {...attestation, signature:legacySignature};
+ assert.equal(verifyControlEvidenceAttestation(receipt, legacyControls, legacyAttestation, publicKey), false);
+ assert.throws(() => attestControlEvidence(receipt, legacyControls, privateKey), /UNBOUND_CONTROL_EVIDENCE/);
  assert.equal(verifyControlEvidenceAttestation(receipt, {...controls, trustLineFrozen:false}, attestation, publicKey), false);
  assert.equal(verifyControlEvidenceAttestation(createEvidenceReceipt({...transaction, hash:"C".repeat(64)}), controls, attestation, publicKey), false);
  assert.equal(verifyControlEvidenceAttestation(receipt, controls, attestEvidenceReceipt(receipt, privateKey), publicKey), false);

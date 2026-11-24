@@ -27,7 +27,7 @@ function fetchMock(left,right=left){
  };
 }
 test("corroborates pinned issuer-side RippleState flags",async()=>{
- const r=await lookupPinnedTrustLine(request,{fetchFn:fetchMock(reply(0x00410000))});
+ const r=await lookupPinnedTrustLine(request,{fetchFn:fetchMock(reply(0x00440000))});
  assert.equal(r.status,"CORROBORATED");
  assert.equal(r.trustLineFrozen,true);
  assert.equal(r.trustLineAuthorized,true);
