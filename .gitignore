@@ -42,3 +42,6 @@ SETUP.md
 academy/dist/
 academy/src-tauri/target/
 academy/src-tauri/gen/
+/dist-continuity/
+/continuity/src-tauri/target/
+/continuity/src-tauri/gen/

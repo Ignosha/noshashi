@@ -1,41 +1,59 @@
 name: Continuity macOS validation
 
-# Manual, non-distributing native build. Does not sign, notarize, upload
-# releases, modify the production website, or merge code.
+# Compile and inspect unsigned executables on hosted macOS runners.
 on:
+  workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-      - feat/continuity-presign-gate-v1
 
 permissions:
   contents: read
 
 jobs:
-  build-intel-macos:
-    runs-on: macos-15-intel
+  build-native-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: aarch64-apple-darwin
+            architecture: arm64
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+            architecture: x86_64
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.100.0'
+          targets: ${{ matrix.target }}
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: continuity/src-tauri
-      - name: Install JavaScript dependencies
+      - name: Install locked JavaScript dependencies
         run: npm ci --no-audit --no-fund
       - name: Validate Continuity frontend and desktop configuration
         run: |
           npm run continuity:check
           npm run continuity:test
           npm run continuity:desktop:check
-      - name: Compile Intel macOS application without bundling
-        run: npm run continuity:tauri:build -- --no-bundle
-      - name: Report executable presence
+      - name: Compile Continuity without bundling
+        env:
+          TARGET: ${{ matrix.target }}
+        run: npm run continuity:tauri:build -- --no-bundle --target "$TARGET" -- --locked
+      - name: Verify architecture and print deployment target
+        env:
+          TARGET: ${{ matrix.target }}
+          EXPECTED_ARCHITECTURE: ${{ matrix.architecture }}
         run: |
-          test -f continuity/src-tauri/target/release/noshashi-continuity
-          file continuity/src-tauri/target/release/noshashi-continuity
-          echo "Intel macOS native compile completed; installation, signing and notarization remain unverified."
+          binary="continuity/src-tauri/target/$TARGET/release/noshashi-continuity"
+          test -x "$binary"
+          test "$(uname -m)" = "$EXPECTED_ARCHITECTURE"
+          test "$(lipo -archs "$binary")" = "$EXPECTED_ARCHITECTURE"
+          file "$binary"
+          xcrun vtool -show-build "$binary"
