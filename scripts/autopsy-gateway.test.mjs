@@ -86,3 +86,14 @@ test("gateway authenticates, validates inputs and throttles", async () => {
 test("no local gateway can run with a missing/short secret", () => {
   assert.throws(() => createAutopsyGateway({apiKey:"short"}),/32/);
 });
+
+test("payment destination must agree across providers",async()=>{
+ const destination="rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY";
+ const other="r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59";
+ const response=d=>fakeResponse(raw("tesSUCCESS",{tx_json:{TransactionType:"Payment",Destination:d}}));
+ const good=await corroborateAutopsy(HASH,{servers:twoServers,fetchFn:async()=>response(destination)});
+ assert.equal(good.paymentDestination,destination);
+ const bad=await corroborateAutopsy(HASH,{servers:twoServers,fetchFn:async url=>response(url===twoServers[0].url?destination:other)});
+ assert.equal(bad.status,"UNKNOWN");
+ assert.deepEqual(bad.reasonCodes,["UPSTREAM_EVIDENCE_DISAGREEMENT"]);
+});
