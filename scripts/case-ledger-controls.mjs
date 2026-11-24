@@ -56,13 +56,13 @@ export async function reviewCaseWithLedgerControls(input,{
     codes.push("CLAIMED_DESTINATION_TAG_CONFLICT");
   if(claims.issuerGlobalFreeze!==controlEvidence.issuerGlobalFreeze)
     codes.push("CLAIMED_ISSUER_FREEZE_CONFLICT");
+  if(controlEvidence.issuerGlobalFreeze===true)
+    codes.push("ISSUER_GLOBAL_FREEZE_ACTIVE");
   if(controlEvidence.status==="CORROBORATED"){
     if(controlEvidence.issuerAuthorizationConditionMet===false)
       codes.push("ISSUER_TRUST_LINE_AUTHORIZATION_REQUIRED");
     if(controlEvidence.trustLineFrozen===true)
       codes.push("ISSUER_TRUST_LINE_FROZEN");
-    if(controlEvidence.issuerGlobalFreeze===true)
-      codes.push("ISSUER_GLOBAL_FREEZE_ACTIVE");
     if(claims.trustLineFrozen!==controlEvidence.trustLineFrozen)
       codes.push("CLAIMED_TRUST_LINE_FREEZE_CONFLICT");
     if(claims.trustLineAuthorized!==controlEvidence.trustLineAuthorized)
