@@ -14,3 +14,15 @@ For a successful issued-asset payment with corroborated and transaction-bound co
 The attestation covers the transaction report. The separate control attestation binds the observed flags and provider diagnostics to the transaction receipt. Caller-supplied approvals, current policy, case verdict, tenant identity and event time remain outside both statements. The local tests and live smoke use ephemeral keys. A commercial implementation still requires managed key custody, rotation and revocation, actor and tenant binding, replay controls, durable append-only persistence, retention controls and independent review.
 
 No API endpoint, signing key, billing or production storage is enabled by this prototype.
+
+## Control flag consistency
+
+Control attestation creation and verification require explicit boolean summary
+flags that match their attached observations: destination tag requirement,
+issuer global freeze and RequireAuth, and trust-line freeze and authorization.
+The derived authorization condition must equal
+`!issuerRequireAuth || trustLineAuthorized`. Missing or contradictory flags fail
+with `INCONSISTENT_CONTROL_EVIDENCE` during signing, and verification returns
+false. This validates internal consistency; provider corroboration and signer
+trust remain separate requirements. Regression coverage exercises missing,
+null, string and opposite values for each of the six summary fields.

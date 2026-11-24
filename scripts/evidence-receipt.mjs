@@ -119,6 +119,20 @@ function controlEvidenceDigest(receipt, controls) {
       source.destination.account !== tx.paymentDestination || source.issuer.account !== asset.issuer ||
       source.trustLine.holder !== tx.paymentDestination || source.trustLine.issuer !== asset.issuer ||
       source.trustLine.currency !== asset.currency) throw new Error("UNBOUND_CONTROL_EVIDENCE");
+  const flagPairs = [
+    [controls.requireDestinationTag, source.destination.requireDestinationTag],
+    [controls.issuerGlobalFreeze, source.issuer.globalFreeze],
+    [controls.issuerRequireAuth, source.issuer.requireAuth],
+    [controls.trustLineFrozen, source.trustLine.trustLineFrozen],
+    [controls.trustLineAuthorized, source.trustLine.trustLineAuthorized],
+  ];
+  if (flagPairs.some(([summary, observation]) =>
+      typeof summary !== "boolean" || summary !== observation) ||
+      typeof controls.issuerAuthorizationConditionMet !== "boolean" ||
+      controls.issuerAuthorizationConditionMet !==
+        (!controls.issuerRequireAuth || controls.trustLineAuthorized)) {
+    throw new Error("INCONSISTENT_CONTROL_EVIDENCE");
+  }
   return createHash("sha256").update(canonicalEvidence({transactionDigest:receipt.evidenceDigest, controls})).digest("hex");
 }
 

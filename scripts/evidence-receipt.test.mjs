@@ -55,13 +55,23 @@ test("control attestation binds the pinned controls to one transaction receipt a
  const pinned = {status:"CORROBORATED", ledgerHash:report.ledgerHash, ledgerIndex:report.ledgerIndex};
  const controls = {
   ...pinned, schema:"noshashi.xrpl.payment-controls.research.v0", authorizationGranted:false,
-  trustLineFrozen:true, evidence:{
-   destination:{...pinned, account:holder}, issuer:{...pinned, account:issuer},
-   trustLine:{...pinned, holder, issuer, currency:"USD"},
+  requireDestinationTag:false, issuerGlobalFreeze:false, issuerRequireAuth:true,
+  trustLineFrozen:true, trustLineAuthorized:false, issuerAuthorizationConditionMet:false, evidence:{
+   destination:{...pinned, account:holder, requireDestinationTag:false},
+   issuer:{...pinned, account:issuer, globalFreeze:false, requireAuth:true},
+   trustLine:{...pinned, holder, issuer, currency:"USD", trustLineFrozen:true, trustLineAuthorized:false},
   },
  };
  const {publicKey, privateKey} = generateKeyPairSync("ed25519");
  const attestation = attestControlEvidence(receipt, controls, privateKey);
+ for (const field of ["requireDestinationTag", "issuerGlobalFreeze", "issuerRequireAuth", "trustLineFrozen", "trustLineAuthorized", "issuerAuthorizationConditionMet"]) {
+  for (const value of [undefined, null, "false", !controls[field]]) {
+   const altered = {...controls, [field]:value};
+   assert.throws(() => attestControlEvidence(receipt, altered, privateKey), /INCONSISTENT_CONTROL_EVIDENCE/, field);
+   assert.equal(verifyControlEvidenceAttestation(receipt, altered, attestation, publicKey), false);
+  }
+ }
+
  assert.equal(verifyControlEvidenceAttestation(receipt, controls, attestation, publicKey), true);
  assert.equal(verifyControlEvidenceAttestation(receipt, {...controls, trustLineFrozen:false}, attestation, publicKey), false);
  assert.equal(verifyControlEvidenceAttestation(createEvidenceReceipt({...transaction, hash:"C".repeat(64)}), controls, attestation, publicKey), false);
