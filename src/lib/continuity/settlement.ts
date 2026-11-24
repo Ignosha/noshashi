@@ -1,4 +1,5 @@
 import type { ContinuityIntent } from "./intent";
+import { isHolderToHolder, isXrplRlusd, XRPL_RLUSD, type RlusdControls } from "./rlusd";
 
 /** Evidence must be collected from the same validated ledger. */
 export type SettlementEvidence = Readonly<{
@@ -15,6 +16,7 @@ export type SettlementEvidence = Readonly<{
   trustLineAuthorized: boolean | null;
   trustLineFrozen: boolean | null;
   issuerGlobalFreeze: boolean | null;
+  rlusd?: RlusdControls;
 }>;
 export type SettlementResult = Readonly<{
   verdict: "GO" | "HOLD" | "NO-GO";
@@ -32,16 +34,22 @@ function parseDrops(value: string | null): bigint | null {
  */
 export function evaluateSettlement(intent: ContinuityIntent, evidence: SettlementEvidence | null): SettlementResult {
   if (!evidence) return { verdict: "HOLD", reasons: ["SETTLEMENT_EVIDENCE_MISSING"], evidenceComplete: false };
+  const isRlusd = isXrplRlusd(intent);
   const reasons: string[] = [];
   let incomplete = false;
   let blocked = false;
   const missing = (reason: string) => { reasons.push(reason); incomplete = true; };
   const fail = (reason: string) => { reasons.push(reason); blocked = true; };
+  const ledgerBound = evidence.validated && Number.isSafeInteger(evidence.ledgerIndex) && evidence.ledgerIndex > 0 &&
+    evidence.ledgerIndex < intent.lastLedgerSequence;
+  const accountsBound = evidence.sourceAccount === intent.sourceAccount && evidence.destinationAccount === intent.destinationAccount;
   if (intent.transactionType !== "Payment") missing("TRANSACTION_TYPE_UNSUPPORTED");
-  if (!evidence.validated || !Number.isSafeInteger(evidence.ledgerIndex) || evidence.ledgerIndex <= 0 ||
-      evidence.ledgerIndex >= intent.lastLedgerSequence) missing("LEDGER_UNVALIDATED_OR_EXPIRED");
-  if (evidence.sourceAccount !== intent.sourceAccount || evidence.destinationAccount !== intent.destinationAccount)
-    missing("ACCOUNT_EVIDENCE_MISMATCH");
+  if (!ledgerBound) missing("LEDGER_UNVALIDATED_OR_EXPIRED");
+  if (!accountsBound) missing("ACCOUNT_EVIDENCE_MISMATCH");
+  if (incomplete) {
+    // A stale or mismatched snapshot cannot establish an adverse condition either.
+    return { verdict: "HOLD", reasons, evidenceComplete: false };
+  }
   if (evidence.sourceExists === null) missing("SOURCE_ACCOUNT_STATE_UNKNOWN");
   else if (evidence.sourceExists === false) fail("SOURCE_ACCOUNT_NOT_FOUND");
   if (evidence.destinationExists === null) missing("DESTINATION_STATE_UNKNOWN");
@@ -50,7 +58,33 @@ export function evaluateSettlement(intent: ContinuityIntent, evidence: Settlemen
   if (evidence.destinationTagRequired === null) missing("DESTINATION_TAG_RULE_UNKNOWN");
   else if (evidence.destinationTagRequired && intent.destinationTag === null) fail("DESTINATION_TAG_REQUIRED");
   if (intent.asset.currency !== "XRP") {
-    if (evidence.trustLineAuthorized === null || evidence.trustLineFrozen === null || evidence.issuerGlobalFreeze === null)
+    if (isRlusd) {
+      const controls = evidence.rlusd;
+      if (!isHolderToHolder(intent)) {
+        missing("RLUSD_PAYMENT_ROUTE_NOT_EVALUATED");
+      } else if (!controls || !/^[a-f0-9]{64}$/i.test(controls.ledgerHash) ||
+          controls.asset?.network !== intent.network || controls.asset.issuer !== intent.asset.issuer ||
+          controls.asset.currency !== XRPL_RLUSD.currency) {
+        missing("RLUSD_CONTROL_EVIDENCE_UNBOUND");
+      } else {
+        if (controls.issuerGlobalFreeze === null || controls.issuerRequireAuth === null)
+          missing("RLUSD_ISSUER_CONTROL_STATE_UNKNOWN");
+        if (controls.issuerGlobalFreeze === true) fail("RLUSD_ISSUER_GLOBAL_FREEZE");
+        const { sourceLine, destinationLine } = controls;
+        if (!sourceLine) missing("RLUSD_SOURCE_TRUST_LINE_UNKNOWN");
+        if (!destinationLine) missing("RLUSD_DESTINATION_TRUST_LINE_UNKNOWN");
+        if (sourceLine?.issuerFrozen) fail("RLUSD_SOURCE_FROZEN_BY_ISSUER");
+        if (destinationLine?.holderFrozen) fail("RLUSD_DESTINATION_FROZEN_BY_HOLDER");
+        if (sourceLine?.issuerDeepFrozen || sourceLine?.holderDeepFrozen) fail("RLUSD_SOURCE_DEEP_FROZEN");
+        if (destinationLine?.issuerDeepFrozen || destinationLine?.holderDeepFrozen) fail("RLUSD_DESTINATION_DEEP_FROZEN");
+        if (controls.issuerRequireAuth === true) {
+          if (sourceLine?.issuerAuthorized === false) fail("RLUSD_SOURCE_UNAUTHORIZED");
+          if (destinationLine?.issuerAuthorized === false) fail("RLUSD_DESTINATION_UNAUTHORIZED");
+        }
+      }
+    } else if (["RLUSD", XRPL_RLUSD.currency].includes(intent.asset.currency.toUpperCase())) {
+      missing("RLUSD_ASSET_IDENTITY_UNVERIFIED");
+    } else if (evidence.trustLineAuthorized === null || evidence.trustLineFrozen === null || evidence.issuerGlobalFreeze === null)
       missing("ISSUED_ASSET_STATE_UNKNOWN");
     else {
       if (!evidence.trustLineAuthorized) fail("TRUST_LINE_UNAUTHORIZED");

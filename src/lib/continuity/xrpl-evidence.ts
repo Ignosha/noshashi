@@ -1,6 +1,12 @@
 import { rpc } from "../xrpl/client";
 import type { ContinuityIntent } from "./intent";
 import type { SettlementEvidence } from "./settlement";
+import { isHolderToHolder, isXrplRlusd, ledgerFlags, readRlusdLine, XRPL_RLUSD } from "./rlusd";
+
+function matchesPinnedLedger(response: Record<string, unknown>, ledgerIndex: number, ledgerHash: string): boolean {
+  return response.validated === true && response.ledger_index === ledgerIndex &&
+    typeof response.ledger_hash === "string" && response.ledger_hash.toUpperCase() === ledgerHash;
+}
 
 /**
  * Read-only XRPL mainnet evidence adapter.
@@ -11,6 +17,8 @@ import type { SettlementEvidence } from "./settlement";
 export async function collectSettlementEvidence(intent: ContinuityIntent): Promise<SettlementEvidence | null> {
   if (intent.network !== "xrpl-mainnet" || intent.transactionType !== "Payment" ||
       !intent.destinationAccount) return null;
+  const isRlusd = isXrplRlusd(intent);
+  const destinationAccount = intent.destinationAccount;
   try {
     const ledgerResponse = await rpc("ledger", {
       ledger_index: "validated", transactions: false, expand: false,
@@ -18,12 +26,18 @@ export async function collectSettlementEvidence(intent: ContinuityIntent): Promi
     const ledgerIndex = Number(ledgerResponse.ledger?.ledger_index ?? ledgerResponse.ledger_index);
     const validated = ledgerResponse.validated === true;
     if (!validated || !Number.isSafeInteger(ledgerIndex) || ledgerIndex <= 0) return null;
+    const headerHash = ledgerResponse.ledger?.ledger_hash ?? ledgerResponse.ledger_hash;
+    const validatedHash = typeof headerHash === "string" && /^[0-9a-f]{64}$/i.test(headerHash)
+      ? headerHash.toUpperCase() : null;
+    if (isRlusd && validatedHash === null) return null;
     // Name required by the trust-boundary static guard: this index was verified
     // against a validated ledger response immediately above.
     const validatedIndex = ledgerIndex;
     const accountAtLedger = async (account: string) => {
       try {
         const response = await rpc("account_info", { account, ledger_index: validatedIndex });
+        if (isRlusd && (validatedHash === null || !matchesPinnedLedger(response, validatedIndex, validatedHash)))
+          return null;
         // Reject replies that explicitly identify a different ledger or an unvalidated state.
         // Some XRPL servers omit these optional metadata fields for indexed reads.
         const returnedIndex = response.ledger_index;
@@ -33,18 +47,36 @@ export async function collectSettlementEvidence(intent: ContinuityIntent): Promi
         if (!data || typeof data !== "object") return null;
         const accountData = data as Record<string, unknown>;
         // A server reply must never be attributed to a different requested account.
-        if (accountData.Account !== undefined && accountData.Account !== account) return null;
+        if ((isRlusd || accountData.Account !== undefined) && accountData.Account !== account) return null;
+        if (isRlusd && accountData.LedgerEntryType !== "AccountRoot") return null;
         return accountData;
       } catch {
         // Do not guess whether a failed request means unfunded or network failure.
         return null;
       }
     };
-    const [source, destination, feeResponse, serverResponse] = await Promise.all([
+    const readLine = async (holder: string) => {
+      if (validatedHash === null || !isRlusd || !isHolderToHolder(intent)) return null;
+      try {
+        const response = await rpc("ledger_entry", {
+          ripple_state: { accounts: [XRPL_RLUSD.issuer, holder], currency: XRPL_RLUSD.currency },
+          ledger_hash: validatedHash,
+        });
+        if (!matchesPinnedLedger(response, validatedIndex, validatedHash)) return null;
+        return readRlusdLine(response.node, holder);
+      } catch {
+        // A missing entry, unretained ledger, or transport error stays unknown.
+        return null;
+      }
+    };
+    const [source, destination, feeResponse, serverResponse, issuer, sourceLine, destinationLine] = await Promise.all([
       accountAtLedger(intent.sourceAccount),
-      accountAtLedger(intent.destinationAccount),
+      accountAtLedger(destinationAccount),
       rpc("fee").catch(() => null),
       rpc("server_info").catch(() => null),
+      isRlusd ? accountAtLedger(XRPL_RLUSD.issuer) : null,
+      readLine(intent.sourceAccount),
+      readLine(destinationAccount),
     ]);
     const reserveBase = serverResponse?.info?.validated_ledger?.reserve_base_xrp;
     const reserveInc = serverResponse?.info?.validated_ledger?.reserve_inc_xrp;
@@ -69,17 +101,26 @@ export async function collectSettlementEvidence(intent: ContinuityIntent): Promi
     const estimatedFeeDrops = typeof feeDrops === "string" && /^\d+$/.test(feeDrops)
       ? feeDrops : null;
     // Destination tag requirement flag lsfRequireDestTag = 0x00020000.
-    const destinationFlags = Number(destination?.Flags);
-    const destinationTagRequired = destination && Number.isSafeInteger(destinationFlags)
+    const destinationFlags = ledgerFlags(isRlusd ? destination?.Flags : Number(destination?.Flags));
+    const destinationTagRequired = destination && destinationFlags !== null
       ? (destinationFlags & 0x00020000) !== 0 : null;
+    const issuerFlags = ledgerFlags(issuer?.Flags);
     return {
       ledgerIndex, validated, sourceAccount: intent.sourceAccount,
-      destinationAccount: intent.destinationAccount,
+      destinationAccount,
       sourceExists: source ? true : null, destinationExists: destination ? true : null,
       sourceSequence: Number(source?.Sequence ?? 0),
       sourceSpendableDrops: spendable,
       estimatedFeeDrops, destinationTagRequired,
       trustLineAuthorized: null, trustLineFrozen: null, issuerGlobalFreeze: null,
+      ...(isRlusd && validatedHash !== null ? { rlusd: {
+        ledgerHash: validatedHash,
+        asset: XRPL_RLUSD,
+        issuerRequireAuth: issuerFlags === null ? null : (issuerFlags & 0x00040000) !== 0,
+        issuerGlobalFreeze: issuerFlags === null ? null : (issuerFlags & 0x00400000) !== 0,
+        sourceLine,
+        destinationLine,
+      } } : {}),
     };
   } catch {
     return null;
