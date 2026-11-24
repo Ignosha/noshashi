@@ -15,10 +15,37 @@ set -euo pipefail
 
 url="${1:-${DATABASE_URL:-}}"
 [ -n "$url" ] || { echo "usage: $0 <postgres url>" >&2; exit 2; }
-case "$url" in
-  *@localhost[:/]*|*@127.0.0.1[:/]*|*host=/*|postgresql:///*) ;;
-  *) echo "Refusing a non-local database: tests create and drop databases." >&2; exit 2 ;;
-esac
+refuse_target() {
+  echo "Supply a PostgreSQL URL for loopback TCP or a local Unix socket. Tests create and drop a scratch database." >&2
+  exit 2
+}
+
+# Validate the URL authority separately from credentials, paths and options.
+# libpq query options and environment variables can otherwise override it.
+authority_url="${url%%\?*}"
+tcp_url='^postgres(ql)?://([^/@?#[:space:]]+@)?(localhost|127[.]0[.]0[.]1|\[::1\])(:[0-9]+)?/[^/?#[:space:]]+$'
+socket_url='^postgres(ql)?:///[^/?#[:space:]]+$'
+if [[ "$url" =~ [[:space:]#] ]] ||
+   [[ ! "$authority_url" =~ $tcp_url && ! "$authority_url" =~ $socket_url ]]; then
+  refuse_target
+fi
+if [[ "$url" == *\?* ]]; then
+  IFS='&' read -r -a query_options <<< "${url#*\?}"
+  for option in "${query_options[@]}"; do
+    case "$option" in
+      application_name=*|connect_timeout=*|sslmode=*) ;;
+      host=/*)
+        # Keep this a single literal socket path. A comma is a libpq host list.
+        if [[ ! "$authority_url" =~ $socket_url || "${option#host=}" =~ [,%?#[:space:]] ]]; then
+          refuse_target
+        fi ;;
+      *) refuse_target ;;
+    esac
+  done
+fi
+
+# Use an explicit local host from the URL or libpq's default local socket.
+unset PGHOST PGHOSTADDR PGSERVICE PGSERVICEFILE
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 db="noshashi_sqltest_$$"
@@ -39,7 +66,7 @@ for file in "$root"/supabase/migrations/*.sql; do
   [[ "$name" > "20260914" ]] || continue
   if ! run "$file"; then skipped=$((skipped + 1)); failed[$name]=1; fi
 done
-echo "migrations applied; $skipped need Supabase-only extensions and were skipped: ${!failed[*]}"
+echo "Migration check complete. $skipped did not apply fully on local PostgreSQL: ${!failed[*]}"
 
 status=0
 for test in "$root"/tests/sql/*.test.sql; do
