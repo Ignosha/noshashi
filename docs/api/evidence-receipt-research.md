@@ -28,3 +28,15 @@ trust remain separate requirements. Regression coverage exercises missing,
 null, string and opposite values for each of the six summary fields.
 
 Control attestation creation and verification require a current `noshashi.xrpl.trustline.corroborated.v1` observation. The older interpretation could mistake an owner reserve flag for issuer authorization. Legacy control attachments retain only the interpreted flags, so regenerate them from the pinned RippleState evidence before signing. Transaction-only receipts and attestations remain verifiable under their original rules.
+
+## Deep-freeze consistency
+
+The control attestation also requires `issuerDeepFrozen` and `holderDeepFrozen`
+to be explicit booleans matching the attached corroborated trust-line
+observation. Missing, malformed, or contradictory deep-freeze flags prevent
+signing and make verification return false, including when the supplied
+signature is cryptographically valid. Existing receipts without these fields
+must be regenerated from complete corroborated evidence before control
+attestation verification can succeed. All four matching boolean combinations
+remain eligible for an evidence attestation; a signature records evidence and
+does not grant payment permission or clear a freeze.

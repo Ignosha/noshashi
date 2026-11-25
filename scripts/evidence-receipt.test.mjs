@@ -56,15 +56,16 @@ test("control attestation binds the pinned controls to one transaction receipt a
  const controls = {
   ...pinned, schema:"noshashi.xrpl.payment-controls.research.v0", authorizationGranted:false,
   requireDestinationTag:false, issuerGlobalFreeze:false, issuerRequireAuth:true,
+  issuerDeepFrozen:true, holderDeepFrozen:false,
   trustLineFrozen:true, trustLineAuthorized:false, issuerAuthorizationConditionMet:false, evidence:{
    destination:{...pinned, account:holder, requireDestinationTag:false},
    issuer:{...pinned, account:issuer, globalFreeze:false, requireAuth:true},
-   trustLine:{...pinned, schema:"noshashi.xrpl.trustline.corroborated.v1", holder, issuer, currency:"USD", trustLineFrozen:true, trustLineAuthorized:false},
+   trustLine:{...pinned, schema:"noshashi.xrpl.trustline.corroborated.v1", holder, issuer, currency:"USD", trustLineFrozen:true, trustLineAuthorized:false, issuerDeepFrozen:true, holderDeepFrozen:false},
   },
  };
  const {publicKey, privateKey} = generateKeyPairSync("ed25519");
  const attestation = attestControlEvidence(receipt, controls, privateKey);
- for (const field of ["requireDestinationTag", "issuerGlobalFreeze", "issuerRequireAuth", "trustLineFrozen", "trustLineAuthorized", "issuerAuthorizationConditionMet"]) {
+ for (const field of ["requireDestinationTag", "issuerGlobalFreeze", "issuerRequireAuth", "trustLineFrozen", "trustLineAuthorized", "issuerAuthorizationConditionMet", "issuerDeepFrozen", "holderDeepFrozen"]) {
   for (const value of [undefined, null, "false", !controls[field]]) {
    const altered = {...controls, [field]:value};
    assert.throws(() => attestControlEvidence(receipt, altered, privateKey), /INCONSISTENT_CONTROL_EVIDENCE/, field);
@@ -73,6 +74,33 @@ test("control attestation binds the pinned controls to one transaction receipt a
  }
 
  assert.equal(verifyControlEvidenceAttestation(receipt, controls, attestation, publicKey), true);
+ for (const field of ["issuerDeepFrozen", "holderDeepFrozen"]) {
+  for (const value of [undefined, null, "false", !controls[field]]) {
+   const altered = {...controls, evidence:{...controls.evidence,
+    trustLine:{...controls.evidence.trustLine, [field]:value}}};
+   assert.throws(() => attestControlEvidence(receipt, altered, privateKey), /INCONSISTENT_CONTROL_EVIDENCE/);
+  }
+ }
+ for (const issuerDeepFrozen of [true,false]) {
+  for (const holderDeepFrozen of [true,false]) {
+   const bound = {...controls, issuerDeepFrozen, holderDeepFrozen,
+    evidence:{...controls.evidence, trustLine:{...controls.evidence.trustLine,
+     issuerDeepFrozen, holderDeepFrozen}}};
+   const signed = attestControlEvidence(receipt, bound, privateKey);
+   assert.equal(verifyControlEvidenceAttestation(receipt, bound, signed, publicKey), true);
+  }
+ }
+ // Even a mathematically valid signature cannot clear contradictory evidence.
+ const contradictory = {...controls, issuerDeepFrozen:false};
+ const contradictoryDigest = createHash("sha256").update(canonicalEvidence({
+  transactionDigest:receipt.evidenceDigest, controls:contradictory,
+ })).digest("hex");
+ const contradictoryPayload = canonicalEvidence({schema:attestation.schema,
+  algorithm:attestation.algorithm, keyId:attestation.keyId, evidenceDigest:contradictoryDigest});
+ const contradictorySignature = sign(null, Buffer.from(contradictoryPayload), privateKey).toString("base64url");
+ assert.equal(verifyControlEvidenceAttestation(receipt, contradictory,
+  {...attestation, signature:contradictorySignature}, publicKey), false);
+
  const legacyControls = {
   ...controls,
   trustLineAuthorized:true,

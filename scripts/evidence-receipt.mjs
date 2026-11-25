@@ -127,6 +127,8 @@ function controlEvidenceDigest(receipt, controls) {
     [controls.issuerRequireAuth, source.issuer.requireAuth],
     [controls.trustLineFrozen, source.trustLine.trustLineFrozen],
     [controls.trustLineAuthorized, source.trustLine.trustLineAuthorized],
+    [controls.issuerDeepFrozen, source.trustLine.issuerDeepFrozen],
+    [controls.holderDeepFrozen, source.trustLine.holderDeepFrozen],
   ];
   if (flagPairs.some(([summary, observation]) =>
       typeof summary !== "boolean" || summary !== observation) ||
