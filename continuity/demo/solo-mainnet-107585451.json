@@ -1,0 +1,98 @@
+{
+  "records": [
+    {
+      "operator": "InFTF",
+      "tx": {
+        "url": "https://xrplcluster.com/",
+        "capturedAt": "2026-11-24T22:24:38Z",
+        "result": {
+          "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+          "ledger_hash": "879FD94AC6C1944ABE886760B2706E2A5B863A94DDDA62F9FD0D62E66A97F06B",
+          "ledger_index": 107585451,
+          "validated": true,
+          "close_time_iso": "2026-10-11T14:26:32Z",
+          "meta": {
+            "TransactionResult": "tesSUCCESS",
+            "delivered_amount": {
+              "currency": "534F4C4F00000000000000000000000000000000",
+              "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+              "value": "0.067791435856414"
+            }
+          },
+          "tx_json": {
+            "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+            "Destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+            "DeliverMax": {
+              "currency": "534F4C4F00000000000000000000000000000000",
+              "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+              "value": "0.067791435856414"
+            },
+            "Flags": 0,
+            "TransactionType": "Payment"
+          }
+        }
+      },
+      "account_info": {
+        "url": "https://xrplcluster.com/",
+        "capturedAt": "2026-11-24T22:24:38Z",
+        "result": {
+          "ledger_hash": "879FD94AC6C1944ABE886760B2706E2A5B863A94DDDA62F9FD0D62E66A97F06B",
+          "ledger_index": 107585451,
+          "validated": true,
+          "account_data": {
+            "Account": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+            "Flags": 12058624,
+            "LedgerEntryType": "AccountRoot"
+          }
+        }
+      }
+    },
+    {
+      "operator": "Honeycluster",
+      "tx": {
+        "url": "https://honeycluster.io/",
+        "capturedAt": "2026-11-24T22:24:37Z",
+        "result": {
+          "hash": "33C313E12DD8B2CFDB98ABC6298D4EFD0F3BC8EF283C057A026DA6170E7939AD",
+          "ledger_hash": "879FD94AC6C1944ABE886760B2706E2A5B863A94DDDA62F9FD0D62E66A97F06B",
+          "ledger_index": 107585451,
+          "validated": true,
+          "close_time_iso": "2026-10-11T14:26:32Z",
+          "meta": {
+            "TransactionResult": "tesSUCCESS",
+            "delivered_amount": {
+              "currency": "534F4C4F00000000000000000000000000000000",
+              "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+              "value": "0.067791435856414"
+            }
+          },
+          "tx_json": {
+            "Account": "rPBJGLCysYLSrfH6SttjoWkYW3Pvu2qPR",
+            "Destination": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+            "DeliverMax": {
+              "currency": "534F4C4F00000000000000000000000000000000",
+              "issuer": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+              "value": "0.067791435856414"
+            },
+            "Flags": 0,
+            "TransactionType": "Payment"
+          }
+        }
+      },
+      "account_info": {
+        "url": "https://honeycluster.io/",
+        "capturedAt": "2026-11-24T22:24:38Z",
+        "result": {
+          "ledger_hash": "879FD94AC6C1944ABE886760B2706E2A5B863A94DDDA62F9FD0D62E66A97F06B",
+          "ledger_index": 107585451,
+          "validated": true,
+          "account_data": {
+            "Account": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+            "Flags": 12058624,
+            "LedgerEntryType": "AccountRoot"
+          }
+        }
+      }
+    }
+  ]
+}

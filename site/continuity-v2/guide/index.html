@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Continuity Rehearsal Guide | NOSHASHI</title>
+<meta name="description" content="Rehearse the NOSHASHI Continuity payment review, verify the evidence receipt, and run the browser demo offline.">
+<link rel="canonical" href="https://www.noshashi.app/continuity-v2/guide/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/core.css">
+<link rel="stylesheet" href="/assets/continuity-guide.css">
+</head>
+<body class="continuity-guide">
+<a class="guide-skip" href="#guide-content">Skip to guide</a>
+<header>
+  <div class="shell nav">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/favicon.svg" width="24" height="24" alt="">
+      <span>NOSHASHI</span>
+    </a>
+    <nav class="nav-links" aria-label="Site navigation">
+      <a href="/continuity-v2/">Continuity V2</a>
+    </nav>
+  </div>
+</header>
+
+<main class="shell" id="guide-content" tabindex="-1">
+  <div class="page-head guide-hero">
+    <p class="guide-kicker mono">Continuity / Browser rehearsal</p>
+    <h1>Rehearse a payment review</h1>
+    <p>In about six minutes, review an archived XRPL payment, check its evidence, inspect an RLUSD issuer snapshot, and simulate a wallet handoff.</p>
+    <div class="guide-actions">
+      <a class="btn" href="/continuity-rehearsal/continuity/demo/index.html">Open browser rehearsal</a>
+      <a class="btn ghost" href="#offline">Run offline</a>
+    </div>
+  </div>
+
+  <div class="guide-layout">
+    <nav class="guide-toc" aria-label="On this page">
+      <p class="mono">On this page</p>
+      <ul>
+        <li><a href="#walkthrough">Rehearsal walkthrough</a></li>
+        <li><a href="#offline">Offline setup</a></li>
+        <li><a href="#develop">Run from source</a></li>
+        <li><a href="#boundaries">Data and review limits</a></li>
+      </ul>
+    </nav>
+
+    <div class="guide-content">
+      <section id="walkthrough" aria-labelledby="walkthrough-heading">
+        <h2 id="walkthrough-heading">Rehearsal walkthrough</h2>
+        <p>Open the rehearsal in a browser and expand each step below for its click path and evidence.</p>
+        <ol class="guide-steps">
+          <li>
+            <details open>
+              <summary>Review the recorded SOLO payment <span class="guide-label">Historical</span></summary>
+              <p>Open <strong>Recorded payment</strong> and click <strong>Run payment review</strong>. Compare the requested amount with the delivered <strong>0.067791435856414 SOLO</strong>. Check the issuer, destination and tag findings. Open <strong>Capture timestamps</strong> to see the archived observations.</p>
+              <p>The transaction and destination observations bind to validated ledger <strong>107,585,451</strong>. Invoice reconciliation stays on <strong>HOLD</strong> because the archive has no invoice.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Verify and export the receipt <span class="guide-label">Historical</span></summary>
+              <p>Click <strong>Verify receipt digest</strong> and look for <strong>Digest matches</strong>. Click <strong>Export receipt JSON</strong> to save the payload and its SHA-256 digest.</p>
+              <p>Recomputing the digest checks the saved payload against the recorded hash. Provider identity and institutional approvals require separate evidence.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Inspect the RLUSD issuer <span class="guide-label">Historical</span></summary>
+              <p>Open <strong>RLUSD intelligence</strong>. Find the <strong>Issuer account</strong>, <strong>XRPL currency code</strong>, and control flags at validated ledger <strong>107,586,974</strong>.</p>
+              <p>Read the network, issuer and currency code together. The snapshot shows controls at that ledger. Concentration is unknown in this reading. Reserve disclosures are a separate source.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Simulate a wallet handoff <span class="guide-label guide-label-simulated">Simulated</span></summary>
+              <p>Open <strong>Wallet handoff</strong> and click <strong>Assess simulated intent</strong>. Read the <strong>HOLD</strong> assessment. Click <strong>Simulate new tag requirement</strong> and compare the same intent fingerprint with the new <strong>NO-GO</strong> result.</p>
+              <p>The fictional change illustrates how a destination rule can affect a reviewed payment. The Dfns example is hypothetical and uses a mock wallet provider. The wallet provider retains signing and execution in this model.</p>
+            </details>
+          </li>
+        </ol>
+      </section>
+
+      <section id="offline" aria-labelledby="offline-heading">
+        <h2 id="offline-heading">Run the browser rehearsal offline</h2>
+        <p>Save both files to the same folder while you are online. The archive includes the browser build and the rehearsal dataset.</p>
+        <div class="guide-actions">
+          <a class="btn" href="/downloads/noshashi-continuity-browser.zip" download>Download browser archive</a>
+          <a class="btn ghost" href="/downloads/noshashi-continuity-browser.zip.sha256" download>Download SHA-256 checksum</a>
+        </div>
+        <ol class="guide-commands">
+          <li>
+            <h3>Check the archive</h3>
+            <p>From the download folder, check that the file matches the published checksum. On macOS:</p>
+            <pre><code>shasum -a 256 -c noshashi-continuity-browser.zip.sha256</code></pre>
+            <p>On Linux, run <code>sha256sum -c noshashi-continuity-browser.zip.sha256</code>.</p>
+          </li>
+          <li>
+            <h3>Unpack and start a local server</h3>
+            <pre><code>unzip noshashi-continuity-browser.zip
+cd noshashi-continuity-browser
+python3 -m http.server 1430 --bind 127.0.0.1</code></pre>
+            <p>On Windows, use File Explorer to extract the ZIP, then run <code>py -3 -m http.server 1430 --bind 127.0.0.1</code> from the extracted folder.</p>
+          </li>
+          <li>
+            <h3>Open the rehearsal</h3>
+            <p>Keep the terminal running and open <a href="http://127.0.0.1:1430/">http://127.0.0.1:1430/</a>. The archive’s <code>index.html</code> launches the demo. The rehearsal uses the bundled data and needs no account or API keys.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section id="develop" aria-labelledby="develop-heading">
+        <h2 id="develop-heading">Run from source</h2>
+        <p>From the NOSHASHI repository root, install pinned dependencies once while online and start the dedicated Continuity development server.</p>
+        <pre><code>npm ci
+npm run continuity:dev</code></pre>
+        <p>Open <a href="http://localhost:1430/continuity/demo/index.html">http://localhost:1430/continuity/demo/index.html</a> for the rehearsal.</p>
+        <details class="guide-development">
+          <summary>Validate and preview a production build locally</summary>
+          <pre><code>npm run continuity:check
+npm run continuity:test
+npx vitest run tests/continuity-demo.test.js
+npm run continuity:build
+npm exec vite preview -- --config vite.continuity.config.mts --host 127.0.0.1 --port 1430 --strictPort</code></pre>
+          <p>Stop the development server first if it is using port 1430. Then open <a href="http://127.0.0.1:1430/continuity/demo/index.html">http://127.0.0.1:1430/continuity/demo/index.html</a>.</p>
+        </details>
+      </section>
+
+      <section id="boundaries" aria-labelledby="boundaries-heading">
+        <h2 id="boundaries-heading">Data and review limits</h2>
+        <dl class="guide-boundaries">
+          <div>
+            <dt>Historical</dt>
+            <dd>The SOLO payment and RLUSD issuer snapshot come from archived public XRPL observations at the ledgers shown in each view.</dd>
+          </div>
+          <div>
+            <dt>Simulated</dt>
+            <dd>The wallet interaction, proposed payment and changed tag requirement use synthetic fixtures for the hypothetical Dfns workflow.</dd>
+          </div>
+          <div>
+            <dt>Live</dt>
+            <dd>The separate preflight workspace can attempt live, read-only XRPL queries. This rehearsal runs the recorded and simulated workflows.</dd>
+          </div>
+        </dl>
+        <p>Use the browser path for the rehearsal. Native installation and runtime need their own validation. Keep credentials and institution records out of the demo.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="shell foot">
+    <p class="mono">NOSHASHI LABS</p>
+    <div class="foot-links"><a href="/continuity-v2/">Continuity V2 overview</a><a href="#guide-content">Back to guide</a></div>
+  </div>
+</footer>
+</body>
+</html>
