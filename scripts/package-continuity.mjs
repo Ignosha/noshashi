@@ -154,12 +154,12 @@ async function entries() {
 // 2026-01-01 00:00, in MS-DOS date/time form; fixed so the zip is reproducible.
 const DOS_TIME = 0, DOS_DATE = ((2026 - 1980) << 9) | (1 << 5) | 1;
 
-/** A ZIP archive of the given entries, all under DIR, deflated. */
-function zip(files) {
+/** A deterministic ZIP archive of the given entries under a shared folder. */
+export function zip(files, directory = DIR) {
   const locals = [], centrals = [];
   let offset = 0;
   for (const f of files) {
-    const name = Buffer.from(DIR + f.name);
+    const name = Buffer.from(directory + f.name);
     const body = zlib.deflateRawSync(f.data, { level: 9 });
     const crc = zlib.crc32(f.data) >>> 0;
     const local = Buffer.alloc(30);

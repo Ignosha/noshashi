@@ -1896,6 +1896,8 @@ async function buildSitemap(docs = [], tokenPages = [], intelligencePages = []) 
     ...TOKEN_INDEX_PAGES,
     ...PARTNER_PAGES,
     ...PRODUCT_SALES_PAGES,
+    ["/continuity-v2/", "monthly", "0.8"],
+    ["/continuity-v2/guide/", "monthly", "0.7"],
     ...PORTAL_PAGES,
     ...SETTLEMENT_PAGES,
     ...tokenPages,

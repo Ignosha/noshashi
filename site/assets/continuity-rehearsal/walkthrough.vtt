@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.500
+NOSHASHI Continuity
+A read-only institutional payment review, rehearsed offline.
+
+00:00:04.500 --> 00:00:12.300
+Historical XRPL payment
+Two archived sources report the delivered amount. Invoice status stays on HOLD.
+
+00:00:12.300 --> 00:00:20.000
+Evidence receipt
+Recompute the SHA-256 digest and export the recorded evidence as JSON.
+
+00:00:20.000 --> 00:00:27.500
+Historical RLUSD issuer controls
+Inspect network-specific identity, freeze and authorization at the archived ledger.
+
+00:00:27.500 --> 00:00:34.100
+Simulated wallet handoff
+A hypothetical RLUSD payment is on HOLD while trust-line evidence is missing.
+
+00:00:34.100 --> 00:00:41.400
+Simulated condition change
+A newly required destination tag changes the assessment to NO-GO. Signing remains unavailable.

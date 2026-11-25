@@ -1682,6 +1682,9 @@
   .vx-flow span,.vx-c span,.vx-n span{display:block;font:11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
   .vx-flow b,.vx-c b,.vx-n b{display:block;font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;color:var(--ink);margin-bottom:6px}
   .vx-actions{margin:22px 0 0;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+  .continuity-video{margin:20px 0 0;border:1px solid var(--rule);background:var(--ground)}
+  .continuity-video video{display:block;width:100%;aspect-ratio:8/5;object-fit:contain;background:#121211}
+  .continuity-video figcaption{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px 18px;padding:10px 14px;border-top:1px solid var(--rule);color:var(--muted);font-size:13px}
   .vx-cards,.vx-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:18px;border-top:1px solid var(--rule)}
   .vx-c,.vx-n{display:block;padding:18px 20px 20px 0;color:var(--muted);font-size:13.5px;line-height:1.6;text-decoration:none;border-bottom:1px solid var(--rule)}
   .vx-c:hover b,.vx-n:hover b,.vx-c:focus-visible b,.vx-n:focus-visible b{text-decoration:underline;text-underline-offset:4px}
@@ -1714,13 +1717,13 @@
 
     <div class="rh-title lx-hero">
       <div class="rh-title-text">
-        <p class="rh-title-k"><span class="lx-overline-rule" aria-hidden="true"></span>NOSHASHI LABS / CONTINUITY V2 · DESKTOP IN DEVELOPMENT</p>
-        <h1 class="lx-headline rf-headline">Know before.<br>Act with<br><em>evidence.</em></h1>
-        <p class="rh-title-dek">Introducing Continuity V2: an institutional XRP Ledger review workspace for inspecting transaction evidence, surfacing blockers and preparing traceable HOLD or NO-GO decisions before execution. A separate desktop prototype, not a signing or custody service.</p>
-        <p class="rh-title-cta"><a class="rh-btn lg" href="/continuity-v2/">Explore Continuity V2 <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="rh-btn lg ghost" href="/design-partners/#partner-form">Discuss a pilot <span aria-hidden="true">→</span></a></p>
-        <p class="rh-title-fine">Read-only development preview · No signing, custody or transaction submission · Not production-ready</p>
-        <p class="rf-quiet-links"><a href="/console/">API Console</a><a href="/continuity/">Continuity</a><a href="/rippling/">Rippling Exposure API</a><a href="/tutorials/">Video tutorials</a><a href="/developers/">Developers &amp; API</a><a href="/contact/?topic=institutions">Talk to us</a></p>
-        <div class="lx-hero-bottom"><span>01 / Continuity · 02 / Products · 03 / Research · 04 / Evidence</span><a href="#lx-investigate" aria-label="Scroll to the live issuer investigation">Scroll to investigate <span aria-hidden="true">↓</span></a></div>
+        <p class="rh-title-k"><span class="lx-overline-rule" aria-hidden="true"></span>Featured workflow / XRP Ledger payment review</p>
+        <h1 class="lx-headline rf-headline">NOSHASHI:<br><em>Continuity</em></h1>
+        <p class="rh-title-dek">Review a recorded XRP Ledger payment, inspect issuer controls, and see how a changed payment condition affects the review. Export an evidence receipt you can verify.</p>
+        <p class="rh-title-cta"><a class="rh-btn lg" href="/continuity-rehearsal/continuity/demo/index.html">Try the browser demo <svg class="lx-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10"/></svg></a><a class="rh-btn lg ghost" href="/downloads/noshashi-continuity-browser.zip" download>Download demo ZIP</a></p>
+        <p class="rh-title-fine">Free browser demo · No account or wallet required · No signing, custody or transaction submission</p>
+        <p class="rf-quiet-links"><a href="#continuity-walkthrough">Watch the walkthrough</a><a href="/continuity-v2/guide/">Developer &amp; demo guide</a><a href="/continuity-v2/">About Continuity V2</a><a href="/design-partners/#partner-form">Discuss a pilot</a></p>
+        <div class="lx-hero-bottom"><span>01 / Continuity · 02 / Products · 03 / Research · 04 / Evidence</span><a href="#continuity-walkthrough">See the workflow <span aria-hidden="true">↓</span></a></div>
       </div>
       <figure class="rh-emblem ed-seal lx-machine" aria-labelledby="rh-em-c">
         <div class="ed-seal-meta"><span>Fig. 01 / Inside the reading</span><span>Exploratory instrument</span></div>
@@ -1743,7 +1746,23 @@
       </figure>
     </div>
 
-    <nav class="ed-index" aria-label="Explore the ledger desk"><span>Inside the desk</span><a href="#vx-featured">Continuity</a><a href="#vx-products">Products</a><a href="#vx-research">Research</a><a href="#lx-investigate">Investigate</a><a href="#rh-t1">Compare issuers</a><a href="#public">Three workflows</a><a href="#research-case">Sample case file</a><a href="#operational-status">Product status</a><a href="#pilot">Evaluate with us →</a></nav>
+    <nav class="ed-index" aria-label="Explore the ledger desk"><span>Inside the desk</span><a href="#continuity-walkthrough">Continuity</a><a href="#vx-products">Products</a><a href="#vx-research">Research</a><a href="#lx-investigate">Investigate</a><a href="#rh-t1">Compare issuers</a><a href="#public">Three workflows</a><a href="#research-case">Sample case file</a><a href="#operational-status">Product status</a><a href="#pilot">Evaluate with us →</a></nav>
+    <section class="rh-sec" id="continuity-walkthrough" aria-labelledby="continuity-walkthrough-title">
+      <div class="lx-section-heading"><div><p class="ed-kicker">Continuity / Product walkthrough</p><h2 id="continuity-walkthrough-title">A payment.<br><em>Evidence you can keep.</em></h2></div><p>See a historical payment review, a receipt digest check and a simulated destination tag change. Then run the same steps yourself.</p></div>
+      <figure class="continuity-video">
+        <video controls playsinline preload="none" poster="/assets/continuity-rehearsal/poster.webp" aria-label="NOSHASHI Continuity walkthrough">
+          <source src="/assets/continuity-rehearsal/walkthrough.mp4" type="video/mp4">
+          <track kind="captions" src="/assets/continuity-rehearsal/walkthrough.vtt" srclang="en" label="English" default>
+          <a href="/assets/continuity-rehearsal/walkthrough.mp4">Download the walkthrough video</a>
+        </video>
+        <figcaption><span>Recorded browser walkthrough · Historical ledger evidence and simulated handoff</span><a class="lx-inline-link" href="/continuity-v2/guide/">Read the walkthrough →</a></figcaption>
+      </figure>
+      <div class="vx-cards">
+        <a class="vx-c" href="/continuity-rehearsal/continuity/demo/index.html"><b>Review a payment</b>Run the guided historical case and export the evidence receipt.</a>
+        <a class="vx-c" href="#lx-investigate"><b>Inspect issuer controls</b>Read freeze and authorization settings for a public issuer.</a>
+        <a class="vx-c" href="/continuity/"><b>Reconcile a deposit</b>Compare an issued-token payment with the credits posted in your books.</a>
+      </div>
+    </section>
     <!--SLOT:PILLARS-->
 
     <section class="lx-investigation" id="lx-investigate" aria-labelledby="lx-investigate-title">
@@ -1769,7 +1788,7 @@
   </section>
 
   <section class="rh-sec vx-feature" id="vx-featured" aria-labelledby="vx-feature-t">
-    <div class="lx-section-heading"><div><p class="ed-kicker">Featured build / Continuity</p><h2 id="vx-feature-t">Was that deposit<br><em>credited exactly once?</em></h2></div><p>Continuity checks one issued-token deposit against the credits your system posted for it. Two Mainnet servers on one side, your own books on the other, and a plain answer in the middle.</p></div>
+    <div class="lx-section-heading"><div><p class="ed-kicker">Continuity / Deposit reconciliation</p><h2 id="vx-feature-t">Was that deposit<br><em>credited exactly once?</em></h2></div><p>Continuity checks one issued-token deposit against the credits your system posted for it. Two Mainnet servers on one side, your own books on the other, and a plain answer in the middle.</p></div>
     <ol class="vx-flow">
       <li><span>01 / The ledger</span><b>Read the deposit twice</b>Fetched from s1 and s2.ripple.com. The replies must match: validated, successful, the same delivered amount, token and issuer.</li>
       <li><span>02 / Your books</span><b>Read what you credited</b>From your export, or a read-only SQLite view through the open-source adapter on your own machine. Your records never leave it.</li>

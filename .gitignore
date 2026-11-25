@@ -42,3 +42,6 @@ SETUP.md
 academy/dist/
 academy/src-tauri/target/
 academy/src-tauri/gen/
+
+# Generated Continuity browser demo
+/dist-continuity-browser/
