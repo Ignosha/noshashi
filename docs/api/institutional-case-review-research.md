@@ -34,3 +34,16 @@ node --test scripts/autopsy-gateway.test.mjs scripts/approval-drift.test.mjs scr
 - Enterprise security, privacy, tenant isolation, support, and independent audit.
 
 **Product positioning:** A prospective institution should pay only if this complete workflow measurably reduces exception review effort and creates defensible operational evidence. The current prototype is not that completed commercial product.
+
+## Snapshot eligibility and destination binding
+
+The reviewer now stops before receipt creation or signing when approval/current
+snapshots fail the existing drift schema validator. The case reports
+`EVIDENCE_SCHEMA_INVALID`, keeps HOLD and grants no authorization. Existing
+transaction-identity and ledger-conflict error precedence is preserved.
+When the verified transaction includes `paymentDestination`, both snapshots
+must name that destination or the case returns
+`CASE_PAYMENT_DESTINATION_MISMATCH` without a receipt or attestation.
+Reports without an observed destination retain the existing research behavior;
+this check does not authenticate caller snapshots or establish full intent,
+amount, asset, actor or tenant binding.

@@ -100,3 +100,38 @@ test("invalid attestation configuration fails closed without an unsigned fallbac
  assert.equal(result.evidenceAttestation, undefined);
  assert.deepEqual(result.reasonCodes, ["EVIDENCE_ATTESTATION_UNAVAILABLE"]);
 });
+
+
+test("invalid snapshot schemas cannot produce unsigned or signed case receipts", async () => {
+ const {privateKey} = generateKeyPairSync("ed25519");
+ for (const side of ["approved", "current"]) {
+  for (const changes of [{policyVersion:""}, {trustLineAuthorized:"true"}, {unexpected:true}]) {
+   for (const attestationKey of [undefined, privateKey]) {
+    const result = await reviewInstitutionalCase({...input,
+     [side]:{...input[side], ...changes}}, {lookup, attestationKey});
+    assert.deepEqual(result.reasonCodes, ["EVIDENCE_SCHEMA_INVALID"]);
+    assert.equal(result.receipt, null);
+    assert.equal(result.evidenceAttestation, undefined);
+    assert.equal(result.authorizationGranted, false);
+   }
+  }
+ }
+});
+test("observed payment destination binds both snapshots before signing", async () => {
+ const {privateKey, publicKey} = generateKeyPairSync("ed25519");
+ const observed = {...report, paymentDestination:current.destination};
+ const different = "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59";
+ for (const sides of [["approved"], ["current"], ["approved", "current"]]) {
+  const request = {...input};
+  for (const side of sides) request[side] = {...input[side], destination:different};
+  const result = await reviewInstitutionalCase(request,
+   {lookup:async()=>observed, attestationKey:privateKey});
+  assert.deepEqual(result.reasonCodes, ["CASE_PAYMENT_DESTINATION_MISMATCH"]);
+  assert.equal(result.receipt, null);
+  assert.equal(result.evidenceAttestation, undefined);
+ }
+ const matching = await reviewInstitutionalCase(input,
+  {lookup:async()=>observed, attestationKey:privateKey});
+ assert.equal(verifyEvidenceAttestation(matching.receipt, matching.evidenceAttestation, publicKey), true);
+ assert.equal(matching.verdict, "HOLD");
+});

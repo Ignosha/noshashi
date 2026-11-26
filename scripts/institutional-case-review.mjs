@@ -37,6 +37,11 @@ export async function reviewInstitutionalCase(input, { lookup = corroborateAutop
       input.current.transactionHash.toUpperCase() !== transaction.hash) {
     return {...base,transaction,drift,reasonCodes:["CASE_TRANSACTION_IDENTITY_MISMATCH"]};
   }
+  if (typeof transaction.paymentDestination === "string" &&
+      (input.approved.destination !== transaction.paymentDestination ||
+       input.current.destination !== transaction.paymentDestination)) {
+    return {...base,transaction,drift,reasonCodes:["CASE_PAYMENT_DESTINATION_MISMATCH"]};
+  }
   // The current observation must be pinned to the transaction's validated
   // ledger or a later ledger. No externally supplied snapshot is trusted as
   // authenticated by this prototype.
@@ -45,6 +50,9 @@ export async function reviewInstitutionalCase(input, { lookup = corroborateAutop
       (input.current.ledgerIndex === transaction.ledgerIndex &&
        (typeof input.current.ledgerHash !== "string" || input.current.ledgerHash.toUpperCase() !== transaction.ledgerHash))) {
     return {...base,transaction,drift,reasonCodes:["CASE_LEDGER_EVIDENCE_CONFLICT"]};
+  }
+  if (drift.reasonCodes.includes("EVIDENCE_SCHEMA_INVALID")) {
+    return {...base,transaction,drift,reasonCodes:["EVIDENCE_SCHEMA_INVALID"]};
   }
   let receipt;
   try {
