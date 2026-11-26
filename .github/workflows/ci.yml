@@ -259,6 +259,51 @@ jobs:
           test "$(lipo -archs "$binary")" = "$EXPECTED_ARCHITECTURE"
           xcrun vtool -show-build "$binary"
 
+  continuity_macos_research:
+    if: github.ref == 'refs/heads/feat/infrastructure-marketplace-blueprint' || github.head_ref == 'feat/infrastructure-marketplace-blueprint'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: aarch64-apple-darwin
+            architecture: arm64
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+            architecture: x86_64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: continuity/src-tauri
+      - name: Install locked JavaScript dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Compile Continuity without packaging
+        env:
+          TARGET: ${{ matrix.target }}
+        run: npm run continuity:tauri:build -- --no-bundle --target "$TARGET" -- --locked
+      - name: Verify architecture and print deployment target
+        env:
+          TARGET: ${{ matrix.target }}
+          EXPECTED_ARCHITECTURE: ${{ matrix.architecture }}
+        run: |
+          binary="continuity/src-tauri/target/$TARGET/release/noshashi-continuity"
+          test -x "$binary"
+          test "$(uname -m)" = "$EXPECTED_ARCHITECTURE"
+          test "$(lipo -archs "$binary")" = "$EXPECTED_ARCHITECTURE"
+          xcrun vtool -show-build "$binary"
+
   # Native Intel macOS compilation is a separate gate from Linux unit tests.
   # No signing, notarization, bundling, deployment or release upload.
   continuity_macos_intel:
