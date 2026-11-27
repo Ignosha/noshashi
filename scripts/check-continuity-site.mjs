@@ -30,8 +30,12 @@ for (const page of [product, guide]) {
   assert.ok(page.includes(demo));
   assert.ok(page.includes(download));
 }
+assert.match(guide, /<audio controls preload="none" aria-labelledby="guide-narration-title"/);
+assert.match(guide, /<source src="\/assets\/continuity-rehearsal\/guide-narration\.mp3" type="audio\/mpeg">/);
+assert.match(guide, /<details id="guide-narration-transcript">/);
+assert.ok(guide.includes(`href="${demo}" target="_blank" rel="noopener"`));
 assert.ok(statSync("site" + demo).isFile());
-for (const file of ["walkthrough.mp4", "walkthrough.vtt", "poster.webp"]) {
+for (const file of ["walkthrough.mp4", "walkthrough.vtt", "poster.webp", "guide-narration.mp3"]) {
   assert.ok(statSync(`site/assets/continuity-rehearsal/${file}`).size > 0);
 }
 const archive = readFileSync("site" + download);
