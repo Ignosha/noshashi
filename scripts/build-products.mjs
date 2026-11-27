@@ -26,6 +26,7 @@
  * the same table the checkout charges from.
  */
 
+import { buildMarketplace } from "./build-marketplace.mjs";
 import { readFile } from "node:fs/promises";
 import { renderPage, breadcrumb, ORIGIN } from "../api/_lib/shell.js";
 import { EVIDENCE_TIERS } from "../api/_lib/evidence-tiers.js";
@@ -42,6 +43,7 @@ const HISTORY = usd(EVIDENCE_TIERS.history.cents);
 const WATCH = "$19";
 
 export const PRODUCT_SALES_PAGES = [
+  ["/marketplace/", "weekly", "0.9"],
   ["/watch/", "weekly", "0.8"],
   ["/verified/", "weekly", "0.8"],
   ["/listing-review/", "monthly", "0.7"],
@@ -770,7 +772,7 @@ async function buildProductsHub(write) {
       <p>No SOC 2 report yet, no customer logos, no audit opinions. A NOSHASHI record is a reading of ledger facts at a stated
          ledger index, not legal, compliance or investment advice.</p></div>
   </div>
-  <p style="margin-top:20px"><a class="btn" href="/console/">Try every API in the console</a> <a class="btn ghost" href="/contact/?topic=institutions">Talk to us</a> <a class="btn ghost" href="/research/">Read the research</a></p>
+  <p style="margin-top:20px"><a class="btn" href="/marketplace/">Browse the API marketplace</a> <a class="btn ghost" href="/contact/?topic=institutions">Talk to us</a> <a class="btn ghost" href="/research/">Read the research</a></p>
 </section>`;
   const css = `${CSS}<style>
 .vx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
@@ -982,6 +984,7 @@ ${groups}
 export async function buildProducts(write) {
   await buildTutorials(write);
   await buildProductsHub(write);
+  await buildMarketplace(write);
   await buildConsole(write);
   await buildRippling(write);
   await buildPresignGuard(write);

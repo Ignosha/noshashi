@@ -1,0 +1,15 @@
+.mp-section { margin-block: clamp(2.5rem, 7vw, 5rem); scroll-margin-top: 6rem; }
+.mp-section > p { max-width: 72ch; }
+.mp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1rem; margin-block: 1.25rem; }
+.mp-grid > * { min-width: 0; }
+.mp-lab { align-items: start; }
+.mp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.mp-form, .mp-form fieldset { display: grid; gap: .65rem; }
+.mp-form fieldset { min-width: 0; padding: 1rem; border: 1px solid var(--line, currentColor); }
+.mp-section [hidden] { display: none; }
+.mp-form input, .mp-form textarea, .mp-section select { width: 100%; font: inherit; padding: .55rem .65rem; color: inherit; background: transparent; border: 1px solid var(--line, currentColor); border-radius: .25rem; }
+.mp-section option { color: #14181d; background: #fff; }
+.mp-form button { justify-self: start; }
+.mp-section pre { overflow: auto; max-height: 24rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mp-price { font-size: 2rem; line-height: 1.2; }
+.mp-price small { font-size: 1rem; }
