@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
 <title>Continuity Rehearsal Guide | NOSHASHI</title>
-<meta name="description" content="Rehearse the NOSHASHI Continuity payment review, verify the evidence receipt, and run the browser demo offline.">
+<meta name="description" content="Listen to the NOSHASHI Continuity guide, rehearse a payment review, verify an evidence receipt, and run the browser demo offline.">
 <link rel="canonical" href="https://www.noshashi.app/continuity-v2/guide/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/fonts.css">
@@ -32,9 +32,27 @@
     <h1>Rehearse a payment review</h1>
     <p>In about six minutes, review an archived XRPL payment, check its evidence, inspect an RLUSD issuer snapshot, and simulate a wallet handoff.</p>
     <div class="guide-actions">
-      <a class="btn" href="/continuity-rehearsal/continuity/demo/index.html">Open browser rehearsal</a>
+      <a class="btn" href="/continuity-rehearsal/continuity/demo/index.html" target="_blank" rel="noopener" aria-describedby="guide-rehearsal-note">Open browser rehearsal</a>
       <a class="btn ghost" href="#offline">Run offline</a>
     </div>
+    <section class="guide-narration" aria-labelledby="guide-narration-title">
+      <h2 id="guide-narration-title">Listen to the guide</h2>
+      <p id="guide-rehearsal-note">The rehearsal opens in a new tab so you can keep listening.</p>
+      <audio controls preload="none" aria-labelledby="guide-narration-title" aria-describedby="guide-voice-note">
+        <source src="/assets/continuity-rehearsal/guide-narration.mp3" type="audio/mpeg">
+        <a href="/assets/continuity-rehearsal/guide-narration.mp3">Open the narration audio</a>
+      </audio>
+      <span class="guide-voice-note mono" id="guide-voice-note">English · Synthetic voice</span>
+      <details id="guide-narration-transcript">
+        <summary>Read the narration transcript</summary>
+        <p>Welcome to NOSHASHI Continuity. Open the browser rehearsal in another tab. This guide follows a recorded XRP Ledger payment, checks its evidence, and shows what happens when a payment condition changes.</p>
+        <p>Start on Recorded payment and select Run payment review. Compare the requested and delivered amounts for the historical SOLO payment. The ledger recorded a successful transaction. Invoice reconciliation stays on hold because the archive has no invoice. Open Capture timestamps to see when the two public sources were read.</p>
+        <p>Select Verify receipt digest. When you see Digest matches, select Export receipt JSON to keep a copy. Recomputing the digest checks the exported payload against its recorded hash. Provider identity and institutional approvals require separate evidence.</p>
+        <p>Open RLUSD intelligence. Find the network, issuer account, and currency code. The archived reading shows freeze and authorization settings at the ledger displayed on screen. Concentration is unknown in this snapshot.</p>
+        <p>Go to Wallet handoff and select Assess simulated intent. The result is hold while trust-line evidence is missing. Now select Simulate new tag requirement. The same proposed payment moves to no-go because the destination now requires a tag. This handoff is simulated. Continuity reviews payment conditions and keeps evidence.</p>
+        <p>To present offline, download the browser archive and follow the setup steps below. If you're working from the repository, use Run from source to start the demo locally.</p>
+      </details>
+    </section>
   </div>
 
   <div class="guide-layout">

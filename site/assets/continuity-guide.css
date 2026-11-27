@@ -1,5 +1,5 @@
 .continuity-guide{color-scheme:dark}
-.continuity-guide :where(a,summary):focus-visible{outline:2px solid var(--tele);outline-offset:4px}
+.continuity-guide :where(a,summary,audio):focus-visible{outline:2px solid var(--tele);outline-offset:4px}
 .guide-skip{position:absolute;top:8px;left:12px;z-index:25;transform:translateY(-160%);padding:10px 16px;background:var(--ink);color:var(--ground);border-radius:var(--r)}
 .guide-skip:focus{transform:translateY(0)}
 #guide-content{scroll-margin-top:72px}
@@ -9,6 +9,14 @@
 .guide-hero p:not(.guide-kicker){max-width:57ch;font-size:clamp(16px,2vw,19px)}
 .guide-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:19px}
 .guide-actions a{min-height:44px;justify-content:center}
+.guide-narration{margin-top:24px;padding:15px clamp(12px,3vw,24px);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r)}
+.guide-narration h2{color:var(--ink);font-size:20px;line-height:1.25}
+.guide-hero .guide-narration p:not(.guide-kicker){margin:6px 0;color:var(--muted);font-size:14px}
+.guide-narration audio{display:block;width:100%;max-width:420px;margin:12px 0 6px}
+.guide-voice-note{color:var(--muted);font-size:11px}
+.guide-narration details{margin-top:10px;border-top:1px solid var(--rule)}
+.guide-narration summary{display:list-item;width:fit-content;min-height:44px;padding:10px 0;cursor:pointer;color:var(--ink);font-size:14px}
+.guide-narration summary::marker{color:var(--brand)}
 .guide-layout{display:grid;grid-template-columns:minmax(155px,220px) minmax(0,1fr);gap:clamp(30px,6vw,82px)}
 .guide-toc{position:sticky;top:87px;align-self:start;padding-left:15px;border-left:1px solid var(--rule)}
 .guide-toc p{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
