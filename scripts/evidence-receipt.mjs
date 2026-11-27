@@ -13,7 +13,7 @@ function stable(value) {
     if (!Number.isSafeInteger(value)) throw new Error("UNSAFE_NUMBER");
     return JSON.stringify(value);
   }
-  if (Array.isArray(value)) return "["+value.map(stable).join(",")+"]";
+  if (Array.isArray(value)) return "["+Array.from(value, stable).join(",")+"]";
   if (typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype) {
     return "{"+Object.keys(value).sort().map(k => JSON.stringify(k)+":"+stable(value[k])).join(",")+"}";
   }

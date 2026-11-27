@@ -40,3 +40,13 @@ must be regenerated from complete corroborated evidence before control
 attestation verification can succeed. All four matching boolean combinations
 remain eligible for an evidence attestation; a signature records evidence and
 does not grant payment permission or clear a freeze.
+
+## Sparse-array rejection
+
+Canonical evidence rejects JavaScript arrays with missing elements. Previously,
+a one-element sparse array could canonicalize to `[]`, making its digest
+indistinguishable from an empty array. Creation now rejects that input and
+verification returns false for an altered receipt containing missing elements.
+Dense JSON arrays, including explicit `null` elements, retain their existing
+encoding. Regression coverage includes leading holes, multiple holes and
+receipt substitution without changing the digest.

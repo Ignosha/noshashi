@@ -128,3 +128,17 @@ test("control attestation binds the pinned controls to one transaction receipt a
   ...controls, evidence:{...controls.evidence, trustLine:{...controls.evidence.trustLine, currency:"EUR"}},
  }, privateKey), /UNBOUND_CONTROL_EVIDENCE/);
 });
+
+
+test("sparse arrays cannot collapse into different signed evidence", () => {
+ assert.equal(canonicalEvidence([]), "[]");
+ for (const sparse of [Array(1), Array(2), [, "present"]]) {
+  assert.throws(() => canonicalEvidence(sparse), /UNSUPPORTED_EVIDENCE_VALUE/);
+  assert.throws(() => createEvidenceReceipt({...report, diagnostics:sparse}), /UNSUPPORTED_EVIDENCE_VALUE/);
+ }
+ const receipt = createEvidenceReceipt({...report, diagnostics:[]});
+ assert.equal(verifyEvidenceReceipt({...receipt,
+  evidence:{...receipt.evidence, diagnostics:Array(1)}}), false);
+ assert.equal(canonicalEvidence([null]), "[null]");
+ assert.equal(verifyEvidenceReceipt(receipt), true);
+});
