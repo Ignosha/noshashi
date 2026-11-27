@@ -141,3 +141,46 @@ byId("receipt").addEventListener("submit", async (event) => {
 });
 
 updateRequest();
+
+const checkoutButtons = [...document.querySelectorAll("[data-mp-checkout]")];
+const checkoutStatus = byId("checkout-status");
+const checkoutEndpoint = "/api/create-checkout-session";
+
+if (new URLSearchParams(location.search).get("checkout") === "submitted") {
+  byId("checkout-return").hidden = false;
+}
+
+async function loadCheckoutAvailability() {
+  try {
+    const response = await fetch(`${checkoutEndpoint}?product=rippling-api`, { cache: "no-store" });
+    if (!response.ok) return;
+    const { cardCheckout } = await response.json();
+    if (cardCheckout === true) checkoutButtons.forEach((button) => { button.hidden = false; });
+  } catch {
+    // Invoice ordering remains available when checkout status cannot be read.
+  }
+}
+
+for (const button of checkoutButtons) {
+  button.addEventListener("click", async () => {
+    checkoutButtons.forEach((item) => { item.disabled = true; });
+    checkoutStatus.textContent = "Opening Stripe checkout…";
+    try {
+      const response = await fetch(checkoutEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ product: "rippling-api", plan: button.dataset.mpCheckout }),
+      });
+      if (!response.ok) throw new Error("Checkout unavailable");
+      const { url } = await response.json();
+      const checkout = new URL(url);
+      if (checkout.origin !== "https://checkout.stripe.com") throw new Error("Unexpected checkout URL");
+      location.assign(checkout.href);
+    } catch {
+      checkoutStatus.textContent = "Card checkout could not open. Retry or request an invoice below.";
+      checkoutButtons.forEach((item) => { item.disabled = false; });
+    }
+  });
+}
+
+loadCheckoutAvailability();

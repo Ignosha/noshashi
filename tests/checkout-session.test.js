@@ -328,3 +328,49 @@ describe("the Ledger Evidence Report", () => {
     expect(sent).toBeUndefined();
   });
 });
+
+describe("Rippling marketplace checkout", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("keeps checkout closed until explicitly enabled", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "false");
+    const res = mockRes();
+    await handler(post({ product: "rippling-api", plan: "starter" }), res);
+    expect(res.statusCode).toBe(503);
+    expect(res.body.reason).toBe("rippling_invoice_only");
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("uses the published plan price and isolates the purchase from app entitlements", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    const res = mockRes();
+    await handler(post({ product: "rippling-api", plan: "starter", seats: 15, price: 1 }), res);
+    expect(res.statusCode).toBe(200);
+    expect(stripeForm()).toMatchObject({
+      mode: "subscription",
+      "line_items[0][quantity]": "1",
+      "line_items[0][price_data][unit_amount]": "29900",
+      "line_items[0][price_data][recurring][interval]": "month",
+      "metadata[product]": "rippling_api",
+      "subscription_data[metadata][product]": "rippling_api",
+      "subscription_data[metadata][rippling_plan]": "starter",
+    });
+    expect(stripeForm()).not.toHaveProperty("metadata[tier]");
+  });
+
+  it("rejects unknown plans without falling back to Pro", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    const res = mockRes();
+    await handler(post({ product: "rippling-api", plan: "__proto__" }), res);
+    expect(res.statusCode).toBe(400);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("does not advertise test-mode checkout to shoppers", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    const res = mockRes();
+    await handler({ method: "GET", query: { product: "rippling-api" } }, res);
+    expect(res.body).toEqual({ cardCheckout: false });
+    expect(res.headers["cache-control"]).toBe("no-store");
+  });
+});

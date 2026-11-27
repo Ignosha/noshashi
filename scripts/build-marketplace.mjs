@@ -7,14 +7,34 @@ const plans = Object.entries(RIPPLING_PLANS).filter(([id]) => id !== "free");
 export async function buildMarketplace(write) {
   const body = `<div class="page-head">
   <p class="eyebrow">NOSHASHI · XRPL developer marketplace</p>
-  <h1>Bring ledger evidence into your product.</h1>
-  <p>Check what an issuer can do, what a market can fill, or what a payment delivered. Try the public APIs with no account, then add fleet scans or issuer monitoring when you need them.</p>
+  <h1>Scan your XRPL wallet fleet for rippling exposure.</h1>
+  <p>See which wallets hold multiple trust lines open to rippling. Try one public wallet for free, then integrate batch scans into your wallet or treasury workflow.</p>
   <nav class="mp-actions" aria-label="Marketplace sections">
-    <a class="btn" href="#lab">Run a live API call</a>
-    <a class="btn ghost" href="#plans">Compare paid plans</a>
+    <a class="btn" href="#lab">Try a free XRPL check</a>
+    <a class="btn ghost" href="#plans">See plans from $299/month</a>
     <a class="btn ghost" href="/docs/api/">API reference</a>
   </nav>
 </div>
+<section id="plans" class="mp-section" aria-labelledby="plans-title">
+  <h2 id="plans-title">Rippling Exposure API plans</h2>
+  <p>Choose a monthly plan for fleet scans. NOSHASHI contacts you to issue your API key after confirming payment. Ask about annual prepayment by invoice.</p>
+  <p id="mp-checkout-return" role="status" hidden>Checkout was submitted. NOSHASHI will contact your checkout email once Stripe confirms payment.</p>
+  <p id="mp-checkout-status" role="status"></p>
+  <div class="mp-grid mp-plans">${plans.map(([id, plan]) => `
+    <article class="panel">
+      <h3>${plan.label}</h3>
+      <p>${{ starter: "For wallet teams checking a small fleet.", desk: "For larger fleets and token issuer reviews.", institution: "For custody and issuer teams with broader coverage." }[id]}</p>
+      <p class="mp-price">$${plan.monthly_usd.toLocaleString("en-US")} <small>/ month</small></p>
+      <ul>
+        <li>${plan.per_minute} checks per minute</li>
+        <li>${plan.batch} wallets per fleet scan</li>
+        ${plan.issuer_holders ? `<li>Up to ${plan.issuer_holders.toLocaleString("en-US")} holders per issuer</li>` : ""}
+      </ul>
+      <button class="btn" type="button" data-mp-checkout="${id}" hidden>Buy ${plan.label}</button>
+      <a class="btn ghost" href="mailto:institutions@noshashi.app?subject=${encodeURIComponent(`Rippling Exposure API: ${plan.label} plan`)}">Request ${plan.label} invoice</a>
+    </article>`).join("")}</div>
+  <p><a href="/rippling/#plans">See Rippling API requests and plan limits</a></p>
+</section>
 <section id="lab" class="mp-section" aria-labelledby="lab-title">
   <h2 id="lab-title">Live API workbench</h2>
   <p>Start with a public example or use your own public XRPL address. Copy the request into your integration.</p>
@@ -73,22 +93,6 @@ export async function buildMarketplace(write) {
     <article class="panel"><h3>Issuer Watch</h3><p>Subscribe for email alerts when an issuer changes ledger settings such as freeze rights, keys or fees.</p><a class="btn" href="/watch/">Subscribe for $${WATCH_MONTHLY_CENTS / 100}/month</a></article>
     <article class="panel"><h3>Ledger Evidence Report</h3><p>Order a report covering the public issuer or wallet activity you select.</p><a class="btn ghost" href="/evidence-report/">View reports and buy</a></article>
   </div>
-</section>
-<section id="plans" class="mp-section" aria-labelledby="plans-title">
-  <h2 id="plans-title">Rippling Exposure API plans</h2>
-  <p>Order by invoice. NOSHASHI issues your API key after payment. Annual prepayment is 10% less.</p>
-  <div class="mp-grid mp-plans">${plans.map(([, plan]) => `
-    <article class="panel">
-      <h3>${plan.label}</h3>
-      <p class="mp-price">$${plan.monthly_usd.toLocaleString("en-US")} <small>/ month</small></p>
-      <ul>
-        <li>${plan.per_minute} checks per minute</li>
-        <li>${plan.batch} wallets per fleet scan</li>
-        ${plan.issuer_holders ? `<li>Up to ${plan.issuer_holders.toLocaleString("en-US")} holders per issuer</li>` : ""}
-      </ul>
-      <a class="btn ghost" href="mailto:institutions@noshashi.app?subject=${encodeURIComponent(`Rippling Exposure API: ${plan.label} plan`)}">Order ${plan.label}</a>
-    </article>`).join("")}</div>
-  <p><a href="/rippling/#plans">See Rippling API requests and plan limits</a></p>
 </section>
 <section class="mp-section" aria-labelledby="feedback-title">
   <h2 id="feedback-title">Building something on XRPL?</h2>

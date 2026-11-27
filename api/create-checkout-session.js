@@ -46,6 +46,7 @@
  * the key.
  */
 
+import { RIPPLING_PLANS } from "./_lib/rippling-keys.js";
 import { clientKey, take } from "./_lib/rate-limit.js";
 import { EVIDENCE_TIERS, DEFAULT_TIER, tierOf, VERIFIED_MONTHLY_CENTS } from "./_lib/evidence-tiers.js";
 
@@ -288,7 +289,37 @@ export function watchForm(scope, origin) {
   return form;
 }
 
+export function ripplingCheckoutReady(env = process.env) {
+  return env.RIPPLING_CARD_CHECKOUT === "true" && isConfigured(env.STRIPE_SECRET_KEY);
+}
+
+function ripplingForm(planId, origin) {
+  const plan = RIPPLING_PLANS[planId];
+  return new URLSearchParams({
+    mode: "subscription",
+    "payment_method_types[0]": "card",
+    "line_items[0][quantity]": "1",
+    "line_items[0][price_data][currency]": "usd",
+    "line_items[0][price_data][unit_amount]": String(plan.monthly_usd * 100),
+    "line_items[0][price_data][recurring][interval]": "month",
+    "line_items[0][price_data][product_data][name]": `NOSHASHI Rippling Exposure API · ${plan.label}`,
+    "line_items[0][price_data][product_data][description]": `Scan up to ${plan.batch} XRPL wallets per request. API access is provisioned by NOSHASHI after payment confirmation.`,
+    "metadata[product]": "rippling_api",
+    "metadata[rippling_plan]": planId,
+    "subscription_data[metadata][product]": "rippling_api",
+    "subscription_data[metadata][rippling_plan]": planId,
+    "success_url": `${origin}/marketplace/?checkout=submitted#plans`,
+    "cancel_url": `${origin}/marketplace/#plans`,
+    "custom_text[submit][message]": "Billed monthly in USD. NOSHASHI contacts the email you provide to provision your API key after payment confirmation. For billing or cancellation, email institutions@noshashi.app.",
+  });
+}
+
 export default async function handler(req, res) {
+  if (req.method === "GET" && req.query?.product === "rippling-api") {
+    res.setHeader("Cache-Control", "no-store");
+    const mode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "live" : "test";
+    return res.status(200).json({ cardCheckout: ripplingCheckoutReady() && mode === "live" });
+  }
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
@@ -305,7 +336,7 @@ export default async function handler(req, res) {
           `<!doctype html><meta charset="utf-8"><title>Checkout unavailable</title>` +
             `<body style="font:15px/1.6 system-ui;background:#0B0F14;color:#E6E8EB;padding:48px;max-width:46rem;margin:0 auto">` +
             `<h1 style="font-size:20px">Checkout could not start</h1><p>${message}</p>` +
-            `<p><a style="color:#3A82F6" href="/pricing/">Back to pricing</a> · ` +
+            `<p><a style="color:#3A82F6" href="/marketplace/">Back to marketplace</a> · <a style="color:#3A82F6" href="/pricing/">Back to pricing</a> · ` +
             `<a style="color:#3A82F6" href="mailto:support@noshashi.app">support@noshashi.app</a></p></body>`
         );
 
@@ -313,6 +344,12 @@ export default async function handler(req, res) {
   if (!limit.ok) {
     res.setHeader("Retry-After", String(limit.retryAfter));
     return fail(429, "Too many checkout attempts. Try again in a minute.");
+  }
+
+  const body = readBody(req);
+  const isRippling = body?.product === "rippling-api";
+  if (isRippling && req.headers.origin && req.headers.origin !== `https://${req.headers.host}`) {
+    return fail(403, "Open the marketplace to start checkout.");
   }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -324,8 +361,19 @@ export default async function handler(req, res) {
     );
   }
 
-  const body = readBody(req);
-  const origin = process.env.PUBLIC_SITE_URL || `https://${req.headers.host}`;
+  const origin = isRippling && process.env.VERCEL_ENV === "production"
+    ? "https://www.noshashi.app"
+    : process.env.PUBLIC_SITE_URL || `https://${req.headers.host}`;
+
+  if (isRippling) {
+    if (!["starter", "desk", "institution"].includes(body.plan)) {
+      return fail(400, "Select a Rippling Exposure API plan.");
+    }
+    if (!ripplingCheckoutReady()) {
+      return fail(503, "Online checkout is unavailable. Request an invoice from the marketplace.", { reason: "rippling_invoice_only" });
+    }
+    return startCheckout(ripplingForm(body.plan, origin), { product: "rippling-api", plan: body.plan });
+  }
 
   if (String(body.product ?? "") === "evidence-report") {
     const scope = readReportScope(body);
