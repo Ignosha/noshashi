@@ -68,7 +68,7 @@ export const LIMITATIONS = [
 ];
 
 /** Stable JSON: object keys sorted at every depth, so the digest does not depend on key order. */
-export { canonical, receiptFor } from "../../site/assets/asset-risk-receipt.mjs";
+export { canonical, receiptFor } from "./asset-risk-receipt.js";
 
 /**
  * Assemble the report from what was read. Pure: the route does the I/O.

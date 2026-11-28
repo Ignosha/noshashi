@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { renderPage, breadcrumb } from "../api/_lib/shell.js";
 import { RIPPLING_PLANS } from "../api/_lib/rippling-keys.js";
 import { WATCH_MONTHLY_CENTS } from "../api/create-checkout-session.js";
@@ -5,6 +6,8 @@ import { WATCH_MONTHLY_CENTS } from "../api/create-checkout-session.js";
 const plans = Object.entries(RIPPLING_PLANS).filter(([id]) => id !== "free");
 
 export async function buildMarketplace(write) {
+  const receiptModule = await readFile(new URL("../api/_lib/asset-risk-receipt.js", import.meta.url), "utf8");
+  await write("assets/asset-risk-receipt.mjs", receiptModule);
   const body = `<div class="page-head">
   <p class="eyebrow">NOSHASHI · XRPL developer marketplace</p>
   <h1>Scan your XRPL wallet fleet for rippling exposure.</h1>
