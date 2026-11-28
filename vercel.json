@@ -156,6 +156,8 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/v1/destination-preflight", "destination": "/api/tools?tool=v1/destination-preflight" },
+    { "source": "/api/v1/payment-receipt", "destination": "/api/tools?tool=v1/payment-receipt" },
     { "source": "/api/terminal", "destination": "/api/tools?tool=terminal" },
     {
       "source": "/api/badge",

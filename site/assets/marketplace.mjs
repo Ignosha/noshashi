@@ -12,11 +12,24 @@ const receiptStatus = byId("receipt-status");
 const origin = "https://www.noshashi.app";
 let report;
 
+const addressInput = byId("address");
+const hashInput = byId("hash");
+const tagInput = byId("tag");
+const receiptSchemas = new Set(["noshashi.asset-risk.v1", "noshashi.destination-preflight.v1", "noshashi.payment-receipt.v1"]);
+
 function apiPath() {
-  const address = byId("address").value.trim();
-  if (tool.value === "rippling") {
-    return `/api/v1/rippling?${new URLSearchParams({ account: address })}`;
+  const address = addressInput.value.trim();
+  if (tool.value === "payment-receipt") {
+    return `/api/v1/payment-receipt?${new URLSearchParams({ hash: hashInput.value.trim() })}`;
   }
+  if (tool.value === "destination-preflight") {
+    const query = new URLSearchParams({ account: address });
+    if (tagInput.value !== "") query.set("tag", tagInput.value);
+    return `/api/v1/destination-preflight?${query}`;
+  }
+  if (tool.value === "issuer-state") return `/api/issuer-state?${new URLSearchParams({ issuer: address })}`;
+  if (tool.value === "rippling") return `/api/v1/rippling?${new URLSearchParams({ account: address })}`;
+
   const query = new URLSearchParams({ issuer: address, currency: byId("currency").value.trim() });
   const size = byId("size").value;
   if (size) query.set("size", size);
@@ -24,10 +37,15 @@ function apiPath() {
 }
 
 function updateRequest() {
-  const rippling = tool.value === "rippling";
-  asset.hidden = rippling;
-  asset.disabled = rippling;
-  byId("address-label").textContent = rippling ? "Wallet account" : "Issuing account";
+  const assetRisk = tool.value === "asset-risk";
+  const preflight = tool.value === "destination-preflight";
+  const payment = tool.value === "payment-receipt";
+  asset.hidden = asset.disabled = !assetRisk;
+  byId("hash-fields").hidden = hashInput.disabled = !payment;
+  byId("account-fields").hidden = addressInput.disabled = payment;
+  byId("tag-fields").hidden = tagInput.disabled = !preflight;
+  byId("address-label").textContent = preflight ? "Destination account" :
+    tool.value === "rippling" ? "Wallet account" : "Issuing account";
   const url = JSON.stringify(origin + apiPath());
   const snippets = {
     curl: `curl --fail-with-body ${url}`,
@@ -53,7 +71,7 @@ request.addEventListener("submit", async (event) => {
   event.preventDefault();
   const path = apiPath();
   const submit = request.querySelector("button");
-  const controls = [tool, byId("address"), byId("currency"), byId("size"), submit];
+  const controls = [tool, addressInput, hashInput, tagInput, byId("currency"), byId("size"), submit];
   clearReport();
   controls.forEach((control) => { control.disabled = true; });
   status.textContent = "Reading the XRP Ledger…";
@@ -67,7 +85,7 @@ request.addEventListener("submit", async (event) => {
     report = data;
     result.textContent = JSON.stringify(data, null, 2);
     result.hidden = download.hidden = false;
-    verifyResult.hidden = data.schema !== "noshashi.asset-risk.v1" || !data.receipt;
+    verifyResult.hidden = !receiptSchemas.has(data.schema) || !data.receipt;
     status.textContent = `Response received · HTTP ${response.status}`;
   } catch (error) {
     status.textContent = `Check could not complete. ${error.message}`;
@@ -77,12 +95,48 @@ request.addEventListener("submit", async (event) => {
   }
 });
 
+const shelf = byId("shelf");
+const prev = byId("prev");
+const next = byId("next");
+
+function updateShelfControls() {
+  prev.disabled = shelf.scrollLeft < 2;
+  next.disabled = shelf.scrollLeft + shelf.clientWidth >= shelf.scrollWidth - 2;
+}
+
+function stepShelf(direction) {
+  const [first, second] = shelf.children;
+  if (first && second) shelf.scrollBy({ left: (second.offsetLeft - first.offsetLeft) * direction });
+}
+
+prev.parentElement.hidden = false;
+prev.addEventListener("click", () => stepShelf(-1));
+next.addEventListener("click", () => stepShelf(1));
+shelf.addEventListener("scroll", updateShelfControls, { passive: true });
+shelf.addEventListener("keydown", (event) => {
+  if (event.target !== shelf || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+  event.preventDefault();
+  stepShelf(event.key === "ArrowLeft" ? -1 : 1);
+});
+new ResizeObserver(updateShelfControls).observe(shelf);
+updateShelfControls();
+
+shelf.addEventListener("click", (event) => {
+  const selected = event.target.closest("[data-mp-tool]");
+  if (!selected || tool.disabled) return;
+  tool.value = selected.dataset.mpTool;
+  tool.dispatchEvent(new Event("input", { bubbles: true }));
+  tool.focus({ preventScroll: true });
+});
+
 async function copy(value, status, success) {
   try {
     await navigator.clipboard.writeText(value);
     status.textContent = success;
+    return true;
   } catch {
     status.textContent = "Clipboard access was unavailable.";
+    return false;
   }
 }
 
@@ -113,7 +167,7 @@ byId("receipt").addEventListener("submit", async (event) => {
   const json = byId("json").value;
   const savedDigest = byId("digest").value.trim().toUpperCase();
   if (json.length > 1_000_000) {
-    receiptStatus.textContent = "Use an Asset Risk response under one million characters.";
+    receiptStatus.textContent = "Use an API response under one million characters.";
     return;
   }
   const button = event.currentTarget.querySelector("button");
@@ -121,9 +175,9 @@ byId("receipt").addEventListener("submit", async (event) => {
   receiptStatus.textContent = "Calculating digest…";
   try {
     const { receipt, ...body } = JSON.parse(json);
-    if (body.schema !== "noshashi.asset-risk.v1" || receipt?.algorithm !== "SHA-256" ||
+    if (!receiptSchemas.has(body.schema) || receipt?.algorithm !== "SHA-256" ||
         typeof receipt.digest !== "string" || !hashPattern.test(receipt.digest)) {
-      throw new Error("Paste a complete Asset Risk v1 response with a SHA-256 receipt.");
+      throw new Error("Paste a supported NOSHASHI report with a SHA-256 receipt.");
     }
     const digest = await receiptFor(body);
     if (byId("json").value !== json || byId("digest").value.trim().toUpperCase() !== savedDigest) return;
@@ -149,8 +203,20 @@ const checkoutEndpoint = "/api/create-checkout-session";
 const marketplaceQuery = new URLSearchParams(location.search);
 const sandbox = marketplaceQuery.get("sandbox") === "1";
 
-const claimSession = new URLSearchParams(location.hash.slice(1)).get("claim");
-if (marketplaceQuery.get("checkout") === "submitted" && claimSession) {
+const claimStorageKey = "noshashi.rippling.claim";
+let claimSession = new URLSearchParams(location.hash.slice(1)).get("claim");
+try {
+  if (marketplaceQuery.get("checkout") === "submitted" && claimSession) {
+    sessionStorage.setItem(claimStorageKey, claimSession);
+    history.replaceState(null, "", location.pathname + "#plans");
+  } else {
+    claimSession = sessionStorage.getItem(claimStorageKey);
+  }
+} catch {
+  // Without tab storage, leave the original claim fragment available for refresh.
+}
+
+if (claimSession) {
   const keyStatus = byId("key-status");
   const claimButton = byId("key-claim");
   const keyField = byId("issued-key");
@@ -158,7 +224,6 @@ if (marketplaceQuery.get("checkout") === "submitted" && claimSession) {
   byId("checkout-return").hidden = false;
   claimButton.hidden = false;
   keyStatus.textContent = "Claim your key after Stripe confirms payment.";
-  history.replaceState(null, "", location.pathname + "#plans");
   byId("checkout-return").scrollIntoView();
 
   claimButton.addEventListener("click", async () => {
@@ -182,7 +247,15 @@ if (marketplaceQuery.get("checkout") === "submitted" && claimSession) {
     }
   });
 
-  copyButton.addEventListener("click", () => copy(keyField.value, keyStatus, "API key copied. Store it securely."));
+  copyButton.addEventListener("click", async () => {
+    if (!await copy(keyField.value, keyStatus, "API key copied. Store it securely.")) return;
+    try {
+      sessionStorage.removeItem(claimStorageKey);
+      history.replaceState(null, "", location.pathname + "#plans");
+    } catch {
+      // The key was copied even if browser storage was unavailable.
+    }
+  });
 }
 
 async function loadCheckoutAvailability() {

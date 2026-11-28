@@ -36,15 +36,19 @@ import issuerHistory from "./_lib/routes/issuer-history.js";
 import mptAuthority from "./_lib/routes/mpt-authority.js";
 import rippling from "./_lib/routes/rippling.js";
 import { batch as ripplingBatch, issuerScan as ripplingIssuer } from "./_lib/routes/rippling-pro.js";
+import { destinationPreflight, paymentReceipt } from "./_lib/routes/payment-evidence.js";
 import { queryOf } from "./_lib/query.js";
 
-const ROUTES = { terminal, rlusd, "settlement-check": settlementCheck, badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth, "asset-risk": assetRisk, "v1/asset-risk": assetRisk, "stellar-authority": stellarAuthority, "stellar/authority": stellarAuthority, "issuer-history": issuerHistory, "mpt-authority": mptAuthority, rippling, "v1/rippling": rippling, "rippling-batch": ripplingBatch, "v1/rippling/batch": ripplingBatch, "rippling-issuer": ripplingIssuer, "v1/rippling/issuer": ripplingIssuer };
+const ROUTES = { "v1/destination-preflight": destinationPreflight, "v1/payment-receipt": paymentReceipt, terminal, rlusd, "settlement-check": settlementCheck, badge, book, delivered, "issuer-state": issuerState, treasury, "book-health": bookHealth, "asset-risk": assetRisk, "v1/asset-risk": assetRisk, "stellar-authority": stellarAuthority, "stellar/authority": stellarAuthority, "issuer-history": issuerHistory, "mpt-authority": mptAuthority, rippling, "v1/rippling": rippling, "rippling-batch": ripplingBatch, "v1/rippling/batch": ripplingBatch, "rippling-issuer": ripplingIssuer, "v1/rippling/issuer": ripplingIssuer };
 
 export default function handler(req, res) {
   // vercel.json adds ?tool=; the public path (/api/book) names it too, in
   // case the rewritten query is not what reaches the function.
   const q = queryOf(req);
-  const route = ROUTES[String(q.tool ?? "")] ?? ROUTES[String(q.__path ?? "").replace(/^\/api\//, "").replace(/\/$/, "")];
+  const requested = String(q.tool ?? "");
+  const path = String(q.__path ?? "").replace(/^\/api\//, "").replace(/\/$/, "");
+  const name = Object.hasOwn(ROUTES, requested) ? requested : path;
+  const route = Object.hasOwn(ROUTES, name) ? ROUTES[name] : null;
   if (!route) return res.status(404).json({ error: "Not found", routes: Object.keys(ROUTES).filter((r) => r !== "asset-risk" && r !== "stellar-authority").map((r) => `/api/${r}`) });
   return route(req, res);
 }
