@@ -9,7 +9,7 @@ const status = byId("response-status");
 const download = byId("download");
 const verifyResult = byId("verify-result");
 const receiptStatus = byId("receipt-status");
-const origin = "https://www.noshashi.app";
+const origin = location.origin;
 let report;
 
 const addressInput = byId("address");
