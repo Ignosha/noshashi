@@ -46,6 +46,7 @@
  * the key.
  */
 
+import { claimRipplingKey, ripplingBillingMode } from "./_lib/rippling-subscriptions.js";
 import { RIPPLING_PLANS } from "./_lib/rippling-keys.js";
 import { clientKey, take } from "./_lib/rate-limit.js";
 import { EVIDENCE_TIERS, DEFAULT_TIER, tierOf, VERIFIED_MONTHLY_CENTS } from "./_lib/evidence-tiers.js";
@@ -290,10 +291,7 @@ export function watchForm(scope, origin) {
 }
 
 function ripplingCheckoutMode(env = process.env) {
-  const key = env.STRIPE_SECRET_KEY;
-  if (env.RIPPLING_CARD_CHECKOUT !== "true" || !isConfigured(key)) return null;
-  if (env.VERCEL_ENV === "production") return key.startsWith("sk_live_") ? "live" : null;
-  return key.startsWith("sk_test_") ? "test" : null;
+  return env.RIPPLING_CARD_CHECKOUT === "true" ? ripplingBillingMode(env) : null;
 }
 
 function ripplingForm(planId, origin) {
@@ -306,14 +304,14 @@ function ripplingForm(planId, origin) {
     "line_items[0][price_data][unit_amount]": String(plan.monthly_usd * 100),
     "line_items[0][price_data][recurring][interval]": "month",
     "line_items[0][price_data][product_data][name]": `NOSHASHI Rippling Exposure API · ${plan.label}`,
-    "line_items[0][price_data][product_data][description]": `Scan up to ${plan.batch} XRPL wallets per request. API access is provisioned by NOSHASHI after payment confirmation.`,
+    "line_items[0][price_data][product_data][description]": `Scan up to ${plan.batch} XRPL wallets per request. Claim your API key after payment confirmation.`,
     "metadata[product]": "rippling_api",
     "metadata[rippling_plan]": planId,
     "subscription_data[metadata][product]": "rippling_api",
     "subscription_data[metadata][rippling_plan]": planId,
-    "success_url": `${origin}/marketplace/?checkout=submitted#plans`,
+    "success_url": `${origin}/marketplace/?checkout=submitted#claim={CHECKOUT_SESSION_ID}`,
     "cancel_url": `${origin}/marketplace/#plans`,
-    "custom_text[submit][message]": "Billed monthly in USD. NOSHASHI contacts the email you provide to provision your API key after payment confirmation. For billing or cancellation, email institutions@noshashi.app.",
+    "custom_text[submit][message]": "Billed monthly in USD. Return to NOSHASHI after checkout to claim your API key. For billing or cancellation, email institutions@noshashi.app.",
   });
 }
 
@@ -351,8 +349,19 @@ export default async function handler(req, res) {
 
   const body = readBody(req);
   const isRippling = body?.product === "rippling-api";
-  if (isRippling && req.headers.origin && req.headers.origin !== `https://${req.headers.host}`) {
+  const isClaim = body?.product === "rippling-key-claim";
+  if ((isRippling || isClaim) && req.headers.origin && req.headers.origin !== `https://${req.headers.host}`) {
     return fail(403, "Open the marketplace to start checkout.");
+  }
+
+  if (isClaim) {
+    try {
+      const claimed = await claimRipplingKey(body.sessionId);
+      if (!claimed) return fail(403, "A paid, active Rippling subscription could not be confirmed.");
+      return res.status(200).json(claimed);
+    } catch {
+      return fail(503, "Stripe verification is temporarily unavailable. Try again.");
+    }
   }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;

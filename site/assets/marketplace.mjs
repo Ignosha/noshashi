@@ -149,8 +149,40 @@ const checkoutEndpoint = "/api/create-checkout-session";
 const marketplaceQuery = new URLSearchParams(location.search);
 const sandbox = marketplaceQuery.get("sandbox") === "1";
 
-if (marketplaceQuery.get("checkout") === "submitted") {
+const claimSession = new URLSearchParams(location.hash.slice(1)).get("claim");
+if (marketplaceQuery.get("checkout") === "submitted" && claimSession) {
+  const keyStatus = byId("key-status");
+  const claimButton = byId("key-claim");
+  const keyField = byId("issued-key");
+  const copyButton = byId("key-copy");
   byId("checkout-return").hidden = false;
+  claimButton.hidden = false;
+  keyStatus.textContent = "Claim your key after Stripe confirms payment.";
+  history.replaceState(null, "", location.pathname + "#plans");
+  byId("checkout-return").scrollIntoView();
+
+  claimButton.addEventListener("click", async () => {
+    claimButton.disabled = true;
+    keyStatus.textContent = "Verifying payment…";
+    try {
+      const response = await fetch(checkoutEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ product: "rippling-key-claim", sessionId: claimSession }),
+      });
+      const body = await response.json();
+      if (!response.ok || typeof body.key !== "string") throw new Error(body.error || "Could not claim API key.");
+      keyField.value = body.key;
+      keyField.hidden = copyButton.hidden = byId("issued-key-label").hidden = false;
+      claimButton.hidden = true;
+      keyStatus.textContent = "Payment confirmed. Save your key before leaving this page.";
+    } catch (error) {
+      keyStatus.textContent = error.message;
+      claimButton.disabled = false;
+    }
+  });
+
+  copyButton.addEventListener("click", () => copy(keyField.value, keyStatus, "API key copied. Store it securely."));
 }
 
 async function loadCheckoutAvailability() {

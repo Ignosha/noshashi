@@ -330,7 +330,10 @@ describe("the Ledger Evidence Report", () => {
 });
 
 describe("Rippling marketplace checkout", () => {
-  beforeEach(() => vi.stubEnv("VERCEL_ENV", "preview"));
+  beforeEach(() => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("RIPPLING_SUBSCRIPTION_SECRET", "af".repeat(32));
+  });
   afterEach(() => vi.unstubAllEnvs());
 
   it("keeps checkout closed until explicitly enabled", async () => {

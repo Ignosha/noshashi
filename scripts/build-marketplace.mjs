@@ -20,8 +20,15 @@ export async function buildMarketplace(write) {
 </div>
 <section id="plans" class="mp-section" aria-labelledby="plans-title">
   <h2 id="plans-title">Rippling Exposure API plans</h2>
-  <p>Choose a monthly plan for fleet scans. NOSHASHI contacts you to issue your API key after confirming payment. Ask about annual prepayment by invoice.</p>
-  <p id="mp-checkout-return" role="status" hidden>Checkout was submitted. NOSHASHI will contact your checkout email once Stripe confirms payment.</p>
+  <p>Choose a monthly plan for fleet scans. Claim your API key after Stripe confirms card payment, or request an invoice for manual setup.</p>
+  <div id="mp-checkout-return" class="panel mp-form" hidden>
+    <h3>Your Rippling API key</h3>
+    <p id="mp-key-status" role="status"></p>
+    <button type="button" class="btn ghost" id="mp-key-claim" hidden>Claim API key</button>
+    <label for="mp-issued-key" id="mp-issued-key-label" hidden>Copy and save your API key securely</label>
+    <input id="mp-issued-key" type="password" readonly autocomplete="off" spellcheck="false" hidden>
+    <button type="button" class="btn ghost" id="mp-key-copy" hidden>Copy API key</button>
+  </div>
   <p id="mp-checkout-status" role="status"></p>
   <div class="mp-grid mp-plans">${plans.map(([id, plan]) => `
     <article class="panel">
