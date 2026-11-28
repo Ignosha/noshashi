@@ -289,8 +289,11 @@ export function watchForm(scope, origin) {
   return form;
 }
 
-export function ripplingCheckoutReady(env = process.env) {
-  return env.RIPPLING_CARD_CHECKOUT === "true" && isConfigured(env.STRIPE_SECRET_KEY);
+function ripplingCheckoutMode(env = process.env) {
+  const key = env.STRIPE_SECRET_KEY;
+  if (env.RIPPLING_CARD_CHECKOUT !== "true" || !isConfigured(key)) return null;
+  if (env.VERCEL_ENV === "production") return key.startsWith("sk_live_") ? "live" : null;
+  return key.startsWith("sk_test_") ? "test" : null;
 }
 
 function ripplingForm(planId, origin) {
@@ -317,8 +320,8 @@ function ripplingForm(planId, origin) {
 export default async function handler(req, res) {
   if (req.method === "GET" && req.query?.product === "rippling-api") {
     res.setHeader("Cache-Control", "no-store");
-    const mode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "live" : "test";
-    return res.status(200).json({ cardCheckout: ripplingCheckoutReady() && mode === "live" });
+    const mode = ripplingCheckoutMode();
+    return res.status(200).json({ cardCheckout: mode === "live", sandboxCheckout: mode === "test" });
   }
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -369,10 +372,14 @@ export default async function handler(req, res) {
     if (!["starter", "desk", "institution"].includes(body.plan)) {
       return fail(400, "Select a Rippling Exposure API plan.");
     }
-    if (!ripplingCheckoutReady()) {
+    const mode = ripplingCheckoutMode();
+    if (!mode || (mode === "test") !== (body.sandbox === true)) {
       return fail(503, "Online checkout is unavailable. Request an invoice from the marketplace.", { reason: "rippling_invoice_only" });
     }
-    return startCheckout(ripplingForm(body.plan, origin), { product: "rippling-api", plan: body.plan });
+    return startCheckout(
+      ripplingForm(body.plan, mode === "test" ? `https://${req.headers.host}` : origin),
+      { product: "rippling-api", plan: body.plan },
+    );
   }
 
   if (String(body.product ?? "") === "evidence-report") {

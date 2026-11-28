@@ -330,6 +330,7 @@ describe("the Ledger Evidence Report", () => {
 });
 
 describe("Rippling marketplace checkout", () => {
+  beforeEach(() => vi.stubEnv("VERCEL_ENV", "preview"));
   afterEach(() => vi.unstubAllEnvs());
 
   it("keeps checkout closed until explicitly enabled", async () => {
@@ -344,7 +345,7 @@ describe("Rippling marketplace checkout", () => {
   it("uses the published plan price and isolates the purchase from app entitlements", async () => {
     vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
     const res = mockRes();
-    await handler(post({ product: "rippling-api", plan: "starter", seats: 15, price: 1 }), res);
+    await handler(post({ product: "rippling-api", plan: "starter", sandbox: true, seats: 15, price: 1 }), res);
     expect(res.statusCode).toBe(200);
     expect(stripeForm()).toMatchObject({
       mode: "subscription",
@@ -370,7 +371,32 @@ describe("Rippling marketplace checkout", () => {
     vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
     const res = mockRes();
     await handler({ method: "GET", query: { product: "rippling-api" } }, res);
-    expect(res.body).toEqual({ cardCheckout: false });
+    expect(res.body).toEqual({ cardCheckout: false, sandboxCheckout: true });
     expect(res.headers["cache-control"]).toBe("no-store");
+  });
+
+  it("never allows a live Stripe key on a preview checkout", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    vi.stubEnv("STRIPE_SECRET_KEY", FAKE_KEY.replace("_test_", "_live_"));
+    for (const sandbox of [false, true]) {
+      const res = mockRes();
+      await handler(post({ product: "rippling-api", plan: "starter", sandbox }), res);
+      expect(res.statusCode).toBe(503);
+    }
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("requires sandbox requests to opt in and refuses them in production", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    const preview = mockRes();
+    await handler(post({ product: "rippling-api", plan: "starter" }), preview);
+    expect(preview.statusCode).toBe(503);
+
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("STRIPE_SECRET_KEY", FAKE_KEY.replace("_test_", "_live_"));
+    const production = mockRes();
+    await handler(post({ product: "rippling-api", plan: "starter", sandbox: true }), production);
+    expect(production.statusCode).toBe(503);
+    expect(fetch).not.toHaveBeenCalled();
   });
 });

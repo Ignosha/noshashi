@@ -146,7 +146,10 @@ const checkoutButtons = [...document.querySelectorAll("[data-mp-checkout]")];
 const checkoutStatus = byId("checkout-status");
 const checkoutEndpoint = "/api/create-checkout-session";
 
-if (new URLSearchParams(location.search).get("checkout") === "submitted") {
+const marketplaceQuery = new URLSearchParams(location.search);
+const sandbox = marketplaceQuery.get("sandbox") === "1";
+
+if (marketplaceQuery.get("checkout") === "submitted") {
   byId("checkout-return").hidden = false;
 }
 
@@ -154,8 +157,13 @@ async function loadCheckoutAvailability() {
   try {
     const response = await fetch(`${checkoutEndpoint}?product=rippling-api`, { cache: "no-store" });
     if (!response.ok) return;
-    const { cardCheckout } = await response.json();
-    if (cardCheckout === true) checkoutButtons.forEach((button) => { button.hidden = false; });
+    const { cardCheckout, sandboxCheckout } = await response.json();
+    if (sandbox ? sandboxCheckout !== true : cardCheckout !== true) return;
+    for (const button of checkoutButtons) {
+      if (sandbox) button.textContent = button.textContent.replace(/^Buy /, "Test ");
+      button.hidden = false;
+    }
+    if (sandbox) checkoutStatus.textContent = "Stripe sandbox checkout. Use a Stripe test card.";
   } catch {
     // Invoice ordering remains available when checkout status cannot be read.
   }
@@ -169,7 +177,7 @@ for (const button of checkoutButtons) {
       const response = await fetch(checkoutEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ product: "rippling-api", plan: button.dataset.mpCheckout }),
+        body: JSON.stringify({ product: "rippling-api", plan: button.dataset.mpCheckout, sandbox }),
       });
       if (!response.ok) throw new Error("Checkout unavailable");
       const { url } = await response.json();
