@@ -415,6 +415,8 @@ Deno.serve(async (request: Request) => {
         // A Verified Issuer subscription grants nothing in the app either.
         // Its reports come from invoice.paid below, one per month.
         if (session.metadata?.product === "verified_issuer") break;
+        // Rippling API access is issued and reconciled by the operator.
+        if (session.metadata?.product === "rippling_api") break;
         if (session.metadata?.product === "issuer_watch") {
           await recordWatch(session);
           break;
@@ -512,7 +514,7 @@ Deno.serve(async (request: Request) => {
           });
           if(!response.ok)throw new Error('Could not reconcile current subscription.');
           const subscription=await response.json();
-          if (subscription.metadata?.product === "issuer_watch") break;
+          if (["issuer_watch", "rippling_api"].includes(subscription.metadata?.product)) break;
           if (subscription.metadata?.product === "verified_issuer") {
             if (event.type === "invoice.paid") await recordVerifiedInvoice(invoice, subscription);
             break;

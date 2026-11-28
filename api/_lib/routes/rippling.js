@@ -18,7 +18,8 @@ import { isValidClassicAddress } from "../classic-address.js";
 import { clientKey, take } from "../rate-limit.js";
 import { queryOf } from "../query.js";
 import { analyseRippling } from "../rippling.js";
-import { planFor, upgradeOffer, RIPPLING_PLANS } from "../rippling-keys.js";
+import { resolveRipplingPlan } from "../rippling-subscriptions.js";
+import { upgradeOffer, RIPPLING_PLANS } from "../rippling-keys.js";
 
 const PAGE = 400;
 const MAX_PAGES = 5;
@@ -66,7 +67,14 @@ export default async function handler(req, res) {
   if (!isValidClassicAddress(account)) {
     return res.status(400).json({ error: "Pass ?account= a valid XRPL classic address (it begins with r and has a valid checksum)." });
   }
-  const plan = planFor(req);
+  let plan;
+  try {
+    plan = await resolveRipplingPlan(req);
+  } catch {
+    res.setHeader("Cache-Control", "no-store");
+    res.status(503).json({ error: "Could not verify subscription access. Try again shortly." });
+    return;
+  }
   if (plan === null) return res.status(401).json({ error: "That API key is not valid." });
   const limit = take(`rippling:${plan}:${clientKey(req)}`, { limit: RIPPLING_PLANS[plan].per_minute });
   if (!limit.ok) {

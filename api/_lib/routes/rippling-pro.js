@@ -22,7 +22,8 @@ import { clientKey, take } from "../rate-limit.js";
 import { queryOf } from "../query.js";
 import { analyseRippling, fmt } from "../rippling.js";
 import { readLines, LIMITATION } from "./rippling.js";
-import { planFor, upgradeOffer, RIPPLING_PLANS, BUY } from "../rippling-keys.js";
+import { resolveRipplingPlan } from "../rippling-subscriptions.js";
+import { upgradeOffer, RIPPLING_PLANS, BUY } from "../rippling-keys.js";
 
 const BUDGET_MS = 45_000;
 const CONCURRENCY = 6;
@@ -58,8 +59,15 @@ export function ledgerCurrency(code) {
   return null;
 }
 
-function gate(req, res, need) {
-  const plan = planFor(req);
+async function gate(req, res, need) {
+  let plan;
+  try {
+    plan = await resolveRipplingPlan(req);
+  } catch {
+    res.setHeader("Cache-Control", "no-store");
+    res.status(503).json({ error: "Could not verify subscription access. Try again shortly." });
+    return null;
+  }
   if (plan === null) { res.status(401).json({ error: "That API key is not valid." }); return null; }
   const p = RIPPLING_PLANS[plan];
   if (!p[need]) { res.status(402).json({ code: "PAID_PLAN", error: BUY, plan, upgrade: upgradeOffer(plan) }); return null; }
@@ -72,7 +80,7 @@ export async function batch(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
   if (req.method !== "POST") { res.setHeader("Allow", "POST"); return res.status(405).json({ error: "POST required" }); }
-  const g = gate(req, res, "batch");
+  const g = await gate(req, res, "batch");
   if (!g) return;
   let body = req.body;
   try { if (typeof body === "string") body = JSON.parse(body); } catch { body = null; }
@@ -135,7 +143,7 @@ export async function issuerScan(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
   if (req.method !== "GET") { res.setHeader("Allow", "GET"); return res.status(405).json({ error: "GET required" }); }
-  const g = gate(req, res, "issuer_holders");
+  const g = await gate(req, res, "issuer_holders");
   if (!g) return;
   const q = queryOf(req);
   const issuer = String(q.issuer ?? "").trim();

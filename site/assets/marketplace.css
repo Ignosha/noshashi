@@ -1,0 +1,55 @@
+.mp-section { margin-block: clamp(2.5rem, 7vw, 5rem); scroll-margin-top: 6rem; }
+.mp-section > p { max-width: 72ch; }
+.mp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1rem; margin-block: 1.25rem; }
+.mp-grid > * { min-width: 0; }
+.mp-lab { align-items: start; }
+.mp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.mp-form, .mp-form fieldset { display: grid; gap: .65rem; }
+.mp-form fieldset { min-width: 0; padding: 1rem; border: 1px solid var(--line, currentColor); }
+.mp-section [hidden] { display: none; }
+.mp-form input, .mp-form textarea, .mp-section select { width: 100%; font: inherit; padding: .55rem .65rem; color: inherit; background: transparent; border: 1px solid var(--line, currentColor); border-radius: .25rem; }
+.mp-section option { color: #14181d; background: #fff; }
+.mp-form button { justify-self: start; }
+.mp-section pre { overflow: auto; max-height: 24rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mp-price { font-size: 2rem; line-height: 1.2; }
+.mp-price small { font-size: 1rem; }
+
+.mp-shelf-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.mp-shelf-controls { display: flex; gap: .5rem; }
+.mp-shelf-controls[hidden], .mp-fields[hidden] { display: none; }
+.mp-shelf-controls button:disabled { opacity: .48; cursor: default; }
+.mp-shelf {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(16.5rem, 32%, 25rem);
+  gap: .9rem;
+  overflow-x: auto;
+  scroll-snap-type: inline proximity;
+  scroll-behavior: smooth;
+  scrollbar-color: var(--muted) var(--surface);
+  padding: .25rem .1rem 1rem;
+}
+.mp-api-card {
+  display: grid;
+  align-content: start;
+  grid-template-rows: auto auto 1fr auto auto;
+  gap: .8rem;
+  padding: clamp(1.15rem, 2.4vw, 1.7rem);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-top: 2px solid var(--accent, var(--ink));
+  border-radius: var(--r, 3px);
+  scroll-snap-align: start;
+}
+.mp-api-card h3, .mp-api-card p { margin: 0; }
+.mp-api-card h3 { font-size: clamp(1.35rem, 2.4vw, 1.8rem); }
+.mp-api-card .btn { justify-self: start; align-self: end; }
+.mp-api-group, .mp-api-card code { font: .82rem/1.5 "IBM Plex Mono", monospace; color: var(--muted); }
+.mp-api-card code { padding: .6rem 0; border-block: 1px solid var(--rule); overflow-wrap: anywhere; }
+.mp-fields { display: grid; gap: .65rem; }
+@media (max-width: 40rem) {
+  .mp-shelf { grid-auto-columns: min(87%, 23rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mp-shelf { scroll-behavior: auto; }
+}

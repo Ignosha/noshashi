@@ -40,7 +40,8 @@ export { MARK };
 export const NAV = [
   { href: "/products/", label: "Products", key: "products" },
   { href: "/research/", label: "Research", key: "research" },
-  { href: "/console/", label: "Console", key: "console" },
+  { href: "/marketplace/", label: "API Marketplace", key: "marketplace" },
+  { href: "/console/", label: "Console", key: "console", optional: true },
   { href: "/developers/", label: "Developers", key: "developers", optional: true },
   { href: "/#public", label: "Free tools", i18n: "nav.tools", optional: true },
   { href: "/pricing/", label: "Pricing", i18n: "nav.pricing" },
@@ -53,6 +54,7 @@ export const NAV = [
 export const FOOTER_GROUPS = [
   { title: "Products", links: [
     { href: "/products/", label: "All products" },
+    { href: "/marketplace/", label: "API Marketplace" },
     { href: "/console/", label: "API Console" },
     { href: "/tutorials/", label: "Video tutorials" },
     { href: "/continuity/", label: "Continuity · deposit reconciliation" },

@@ -328,3 +328,78 @@ describe("the Ledger Evidence Report", () => {
     expect(sent).toBeUndefined();
   });
 });
+
+describe("Rippling marketplace checkout", () => {
+  beforeEach(() => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("RIPPLING_SUBSCRIPTION_SECRET", "af".repeat(32));
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("keeps checkout closed until explicitly enabled", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "false");
+    const res = mockRes();
+    await handler(post({ product: "rippling-api", plan: "starter" }), res);
+    expect(res.statusCode).toBe(503);
+    expect(res.body.reason).toBe("rippling_invoice_only");
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("uses the published plan price and isolates the purchase from app entitlements", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    const res = mockRes();
+    await handler(post({ product: "rippling-api", plan: "starter", sandbox: true, seats: 15, price: 1 }), res);
+    expect(res.statusCode).toBe(200);
+    expect(stripeForm()).toMatchObject({
+      mode: "subscription",
+      "line_items[0][quantity]": "1",
+      "line_items[0][price_data][unit_amount]": "29900",
+      "line_items[0][price_data][recurring][interval]": "month",
+      "metadata[product]": "rippling_api",
+      "subscription_data[metadata][product]": "rippling_api",
+      "subscription_data[metadata][rippling_plan]": "starter",
+    });
+    expect(stripeForm()).not.toHaveProperty("metadata[tier]");
+  });
+
+  it("rejects unknown plans without falling back to Pro", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    const res = mockRes();
+    await handler(post({ product: "rippling-api", plan: "__proto__" }), res);
+    expect(res.statusCode).toBe(400);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("does not advertise test-mode checkout to shoppers", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    const res = mockRes();
+    await handler({ method: "GET", query: { product: "rippling-api" } }, res);
+    expect(res.body).toEqual({ cardCheckout: false, sandboxCheckout: true });
+    expect(res.headers["cache-control"]).toBe("no-store");
+  });
+
+  it("never allows a live Stripe key on a preview checkout", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    vi.stubEnv("STRIPE_SECRET_KEY", FAKE_KEY.replace("_test_", "_live_"));
+    for (const sandbox of [false, true]) {
+      const res = mockRes();
+      await handler(post({ product: "rippling-api", plan: "starter", sandbox }), res);
+      expect(res.statusCode).toBe(503);
+    }
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("requires sandbox requests to opt in and refuses them in production", async () => {
+    vi.stubEnv("RIPPLING_CARD_CHECKOUT", "true");
+    const preview = mockRes();
+    await handler(post({ product: "rippling-api", plan: "starter" }), preview);
+    expect(preview.statusCode).toBe(503);
+
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("STRIPE_SECRET_KEY", FAKE_KEY.replace("_test_", "_live_"));
+    const production = mockRes();
+    await handler(post({ product: "rippling-api", plan: "starter", sandbox: true }), production);
+    expect(production.statusCode).toBe(503);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+});
